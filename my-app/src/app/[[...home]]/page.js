@@ -9,7 +9,6 @@ const page = () => {
   <Header/>
   <div className="min-h-screen"></div>
   <Footer/>
-
   </>;
 };
 export default page;
