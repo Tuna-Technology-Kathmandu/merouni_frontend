@@ -1,14 +1,18 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { RxCross2 } from "react-icons/rx";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
+import Link from "next/link";
+// import { logout } from "../../action";
 
-const SideBar = ({ onAddPost }) => {
+const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [openOption, setOpenOption] = useState({
     post: false,
   });
+
+  const sidebarRef = useRef(null);
 
   const toggleSection = (section) => {
     setOpenOption((openOption) => ({
@@ -17,15 +21,29 @@ const SideBar = ({ onAddPost }) => {
     }));
   };
 
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
+
   return (
-    <div>
+    <div ref={sidebarRef} className="fixed">
       {/* Sidebar */}
       <div
         // Conditional class based on isOpen
         // state to control width and visibility
         className={`bg-gray-700 text-white 
                    h-screen transition-all 
-                  duration-300  fixed
+                  duration-300  fixed z-10
                   ${isOpen ? "w-64" : "w-0 overflow-hidden"}`}
       >
         {/* Sidebar content */}
@@ -42,7 +60,7 @@ const SideBar = ({ onAddPost }) => {
               onClick={(e) => e.stopPropagation()}
             >
               <summary className="text-base font-medium flex justify-between items-center  cursor-pointer ">
-                Post
+                Settings
                 <span>
                   {openOption.post ? (
                     <button type="button" className="p-2 hover:cursor-pointer">
@@ -58,44 +76,31 @@ const SideBar = ({ onAddPost }) => {
               </summary>
               <ul className="mt-2 space-y-2 pl-4 border-t border-gray-300">
                 <li className="border-b border-gray-300 p-2">
-                  <a href="#" className="hover:underline">
-                    Add Post
-                  </a>
+                  <Link href="/account/post" className="hover:underline">
+                    Change password
+                  </Link>
                 </li>
                 <li className="border-b border-gray-300 p-2">
-                  <a href="/search?sort=newest" className="hover:underline">
-                    Category
-                  </a>
-                </li>
-                <li className="border-b border-gray-300 p-2">
-                  <a
-                    href="/search?sort=top-sellers"
-                    className="hover:underline"
-                  >
-                    Tags
-                  </a>
-                </li>
-                <li className="border-b border-gray-300 p-2">
-                  <a
-                    href="/search?sort=price-high-to-low"
-                    className="hover:underline"
-                  >
-                    Articles
-                  </a>
+                  <Link href="/account/category" className="hover:underline">
+                    Update profile
+                  </Link>
                 </li>
               </ul>
             </details>
           </section>
 
-          <div className="mt-4 hover:bg-gray-200 hover:text-black hover:cursor-pointer ">
+          {/* <div className="mt-4 hover:bg-gray-200 hover:text-black hover:cursor-pointer ">
             <p onClick={onAddPost}>Add Post</p>
-          </div>
+          </div> */}
           <div className="mt-4 hover:bg-gray-200 hover:text-black hover:cursor-pointer ">
-            <p onClick={onAddPost}>Comments</p>
+            <p>Add events</p>
           </div>
 
+          {/* <div className="mt-4 hover:bg-gray-200 hover:text-black hover:cursor-pointer " onClick={logout}> */}
           <div className="mt-4 hover:bg-gray-200 hover:text-black hover:cursor-pointer ">
-            <p onClick={onAddPost}>Logout</p>
+            <Link href="/dashboard/addCollege">
+              <p>Add colleges</p>
+            </Link>
           </div>
 
           {/* Add more sidebar items here */}
@@ -107,40 +112,14 @@ const SideBar = ({ onAddPost }) => {
                       ${isOpen ? "ml-64" : "ml-0"}`}
       >
         {/* Button to toggle sidebar */}
-        <div className="ml-auto">
+        <div className="ml-auto absolute">
           <button
             className="bg-blue-500 hover:bg-blue-700 
-                     text-white font-bold py-2 px-4 rounded"
+                     text-white font-bold py-2 px-4 rounded "
             onClick={() => setIsOpen(!isOpen)}
           >
             {/* Toggle icon based on isOpen state */}
-            {isOpen ? (
-              // <svg
-              //   className="h-6 w-6"
-              //   fill="none"
-              //   viewBox="0 0 24 24"
-              //   stroke="currentColor">
-              //   <path
-              //     strokeLinecap="round"
-              //     strokeLinejoin="round"
-              //     strokeWidth={2}
-              //     d="M6 18L18 6M6 6l12 12" />
-              // </svg>
-              <RxCross2 />
-            ) : (
-              // <svg
-              //   className="h-6 w-6"
-              //   fill="none"
-              //   viewBox="0 0 24 24"
-              //   stroke="currentColor">
-              //   <path
-              //     strokeLinecap="round"
-              //     strokeLinejoin="round"
-              //     strokeWidth={2}
-              //     d="M4 6h16M4 12h16m-7 6h7" />
-              // </svg>
-              <GiHamburgerMenu />
-            )}
+            {isOpen ? <RxCross2 /> : <GiHamburgerMenu />}
           </button>
         </div>
       </div>
