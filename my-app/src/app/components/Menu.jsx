@@ -12,6 +12,8 @@ import { MdOutlineSettings } from "react-icons/md";
 import { AiOutlineLogout } from "react-icons/ai";
 import { IoSchoolSharp } from "react-icons/io5";
 import clsx from "clsx";
+import { HiOutlineUsers } from "react-icons/hi";
+
 
 const menuItems = [
   {
@@ -24,10 +26,16 @@ const menuItems = [
         visible: ["admin", "teacher", "student", "parent"],
       },
       {
+        icon: <HiOutlineUsers />,
+        label: "Users",
+        href: "/dashboard/users",
+        visible: ["admin"],
+      },
+      {
         icon: <IoSchoolSharp />,
         label: "Colleges",
         href: "/dashboard/addCollege",
-        visible: ["admin", "teacher"],
+        visible: ["admin"],
       },
       {
         icon: <GrUserWorker />,
