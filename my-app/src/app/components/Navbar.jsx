@@ -45,7 +45,7 @@ const Navbar = () => {
   // check login status
   useEffect(() => {
     const checkAuth = async () => {
-      const authStatus = await getAuthStatus();
+      // const authStatus = await getAuthStatus();
       setIsLoggenIn(authStatus);
     };
     checkAuth();

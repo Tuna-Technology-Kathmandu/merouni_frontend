@@ -1,5 +1,6 @@
-// import { currentUser } from "@clerk/nextjs/server";
-import Image from "next/image";
+'use client';
+
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { FaHome } from "react-icons/fa";
 import { GrUserWorker } from "react-icons/gr";
@@ -10,52 +11,46 @@ import { FaRegUserCircle } from "react-icons/fa";
 import { MdOutlineSettings } from "react-icons/md";
 import { AiOutlineLogout } from "react-icons/ai";
 import { IoSchoolSharp } from "react-icons/io5";
+import clsx from "clsx";
 
 const menuItems = [
   {
     title: "MENU",
     items: [
       {
-        icon: <FaHome />        ,
+        icon: <FaHome />,
         label: "Home",
-        href: "/",
+        href: "/dashboard",
         visible: ["admin", "teacher", "student", "parent"],
       },
       {
-        icon: <IoSchoolSharp/>,
+        icon: <IoSchoolSharp />,
         label: "Colleges",
-        href: "/colleges",
+        href: "/dashboard/colleges",
         visible: ["admin", "teacher"],
       },
-     
       {
-        icon: <GrUserWorker/>,
+        icon: <GrUserWorker />,
         label: "Agents",
-        href: "/agents",
+        href: "/dashboard/agent",
         visible: ["admin", "teacher"],
       },
-     
-     
-    
-    
       {
-        icon: <HiOutlineDocumentReport/>,
+        icon: <HiOutlineDocumentReport />,
         label: "Results",
-        href: "/results",
+        href: "/dashboard/results",
         visible: ["admin", "teacher", "student", "parent"],
       },
-     
       {
-        icon: <MdEmojiEvents/>,
+        icon: <MdEmojiEvents />,
         label: "Events",
-        href: "/events",
+        href: "/dashboard/events",
         visible: ["admin", "teacher", "student", "parent"],
       },
-      
       {
-        icon: <TfiAnnouncement/>,
+        icon: <TfiAnnouncement />,
         label: "Announcements",
-        href: "/announcements",
+        href: "/dashboard/announcements",
         visible: ["admin", "teacher", "student", "parent"],
       },
     ],
@@ -64,53 +59,57 @@ const menuItems = [
     title: "OTHER",
     items: [
       {
-        icon: <FaRegUserCircle/>,
+        icon: <FaRegUserCircle />,
         label: "Profile",
-        href: "/profile",
+        href: "/dashboard/profile",
         visible: ["admin", "teacher", "student", "parent"],
       },
       {
-        icon: <MdOutlineSettings/>,
+        icon: <MdOutlineSettings />,
         label: "Settings",
-        href: "/settings",
+        href: "/dashboard/settings",
         visible: ["admin", "teacher", "student", "parent"],
       },
       {
-        icon: <AiOutlineLogout/>,
+        icon: <AiOutlineLogout />,
         label: "Logout",
-        href: "/logout",
+        href: "/dashboard/logout",
         visible: ["admin", "teacher", "student", "parent"],
       },
     ],
   },
 ];
 
-const Menu = async () => {
-//   const user = await currentUser();
-//   const role = user?.publicMetadata.role;
-const role="admin"
+const Menu = () => {
+  const pathname = usePathname();
+  const role = "admin"; // Hardcoded for now; replace with dynamic role if needed
 
   return (
     <div className="mt-4 text-sm text-black">
-      {menuItems.map((i) => (
-        <div className="flex flex-col gap-2" key={i.title}>
+      {menuItems.map((menu) => (
+        <div className="flex flex-col gap-2" key={menu.title}>
           <span className="hidden lg:block text-black font-light my-4">
-            {i.title}
+            {menu.title}
           </span>
-          {i.items.map((item) => {
+          {menu.items.map((item) => {
             if (item.visible.includes(role)) {
               return (
                 <Link
                   href={item.href}
                   key={item.label}
-                  className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-lamaSkyLight hover:bg-slate-100"
+                  className={clsx(
+                    "flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-slate-100",
+                    {
+                      "bg-slate-100 text-blue-600": pathname === item.href,
+                    }
+                  )}
                 >
                   {item.icon}
                   <span className="hidden lg:block">{item.label}</span>
                 </Link>
               );
             }
-            return null; // In case role does not match, return null
+            return null;
           })}
         </div>
       ))}
