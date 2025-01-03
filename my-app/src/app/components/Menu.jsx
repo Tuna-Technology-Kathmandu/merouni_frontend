@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -26,7 +26,7 @@ const menuItems = [
       {
         icon: <IoSchoolSharp />,
         label: "Colleges",
-        href: "/dashboard/colleges",
+        href: "/dashboard/addCollege",
         visible: ["admin", "teacher"],
       },
       {
@@ -82,7 +82,7 @@ const menuItems = [
 
 const Menu = () => {
   const pathname = usePathname();
-  const role = "admin"; // Hardcoded for now; replace with dynamic role if needed
+  const role = "admin";
 
   return (
     <div className="mt-4 text-sm text-black">
