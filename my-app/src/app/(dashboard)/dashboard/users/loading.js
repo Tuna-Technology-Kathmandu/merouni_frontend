@@ -5,7 +5,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 const Loading = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-8">
-      {[...Array(10)].map((_, index) => (
+      {[...Array(9)].map((_, index) => (
         <div
           key={index}
           className="bg-white p-4 rounded-lg shadow-lg hover:shadow-2xl transition-all"
