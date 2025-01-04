@@ -4,25 +4,50 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 const Loading = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-8">
-      {[...Array(9)].map((_, index) => (
-        <div
-          key={index}
-          className="bg-white p-4 rounded-lg shadow-lg hover:shadow-2xl transition-all"
-        >
-          <div className="flex justify-between items-center mb-4">
-            <Skeleton width={150} height={24} />
-            <div className="flex space-x-2">
-              <Skeleton width={24} height={24} circle />
-              <Skeleton width={24} height={24} circle />
-            </div>
-          </div>
-          <Skeleton width="100%" height={20} />
-          <Skeleton width="100%" height={20} />
-          <Skeleton width="100%" height={20} />
-          <Skeleton width="100%" height={20} />
-        </div>
-      ))}
+    <div className="m-8">
+      <div className="flex justify-between items-center mb-6">
+        <Skeleton width={200} height={32} />
+        <Skeleton width={120} height={36} />
+      </div>
+
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full">
+          <thead>
+            <tr className="bg-gray-50 border-b">
+              {['Name', 'Email', 'Roles', 'Actions'].map((header, index) => (
+                <th
+                  key={index}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  <Skeleton width={80} height={16} />
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[...Array(5)].map((_, rowIndex) => (
+              <tr key={rowIndex} className="border-b">
+                <td className="px-6 py-4">
+                  <Skeleton width={150} height={20} />
+                </td>
+                <td className="px-6 py-4">
+                  <Skeleton width={200} height={20} />
+                </td>
+                <td className="px-6 py-4">
+                  <Skeleton width={80} height={20} className="mr-2" />
+                  <Skeleton width={80} height={20} />
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex space-x-2">
+                    <Skeleton width={32} height={32} circle />
+                    <Skeleton width={32} height={32} circle />
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

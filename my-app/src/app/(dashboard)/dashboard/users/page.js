@@ -1,55 +1,18 @@
-import { Suspense } from 'react';
-import { AiFillEdit, AiFillDelete } from "react-icons/ai";
-import Pagination from '../../../components/Pagination';
+// app/(dashboard)/dashboard/users/page.js
+import { Suspense } from 'react'
+import { getUsers } from '../../../actions/userActions'
+import { UserTableClient } from '../../../components/UserTableClient'
+import Pagination from '../../../components/Pagination' // Changed to default import
 
-export default async function Page({ searchParams }) {
-  const currentPage = Number(searchParams?.page) || 1;
+export default async function UsersPage({ searchParams }) {
+  const currentPage = Number(searchParams?.page) || 1
   
   try {
-    const data = await fetch(
-      `http://localhost:5000/api/v1/users?limit=9&page=${currentPage}&sort=asc`
-    );
-
-    if (!data.ok) {
-      throw new Error("Failed to fetch data");
-    }
-
-    const users = await data.json();
+    const users = await getUsers(currentPage)
 
     return (
       <div className="m-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {users.items.map((user) => (
-            <div
-              key={user._id}
-              className="bg-white p-4 rounded-lg shadow-lg hover:shadow-2xl transition-all"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold">
-                  {user.firstName} {user.lastName}
-                </h3>
-                <div className="flex space-x-2">
-                  <AiFillEdit
-                    className="text-blue-500 cursor-pointer"
-                    size={20}
-                  />
-                  <AiFillDelete
-                    className="text-red-500 cursor-pointer"
-                    size={20}
-                  />
-                </div>
-              </div>
-              <p className="text-sm text-gray-600">Email: {user.email}</p>
-              <p className="text-sm text-gray-600">Phone: {user.phone_no}</p>
-              <p className="text-sm text-gray-600">
-                Roles: {Object.keys(user.roles).join(", ")}
-              </p>
-              <p className="text-sm text-gray-600">
-                Created At: {new Date(user.createdAt).toLocaleString()}
-              </p>
-            </div>
-          ))}
-        </div>
+        <UserTableClient users={users.items} />
         <Suspense fallback={<div>Loading pagination...</div>}>
           <Pagination
             currentPage={users.pagination.currentPage}
@@ -57,9 +20,13 @@ export default async function Page({ searchParams }) {
           />
         </Suspense>
       </div>
-    );
+    )
   } catch (error) {
-    console.error("Error fetching data:", error);
-    return <div>Failed to load user data</div>;
+    console.error('Error loading users:', error)
+    return (
+      <div className="m-8 text-center">
+        <div className="text-red-500">Error loading users. Please try again later.</div>
+      </div>
+    )
   }
 }

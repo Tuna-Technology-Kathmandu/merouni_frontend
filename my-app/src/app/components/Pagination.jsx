@@ -13,7 +13,8 @@ const Pagination = ({ currentPage, totalPages }) => {
 
   const renderPageButtons = () => {
     const buttons = [];
-    
+    const range = 1; // Number of pages to show on each side of the current page
+
     // Previous button
     buttons.push(
       <button
@@ -26,13 +27,8 @@ const Pagination = ({ currentPage, totalPages }) => {
       </button>
     );
 
-    // Logic for showing page numbers with ellipsis
-    const range = 2; // Number of pages to show on each side of current page
-    let startPage = Math.max(1, currentPage - range);
-    let endPage = Math.min(totalPages, currentPage + range);
-
-    // Always show first page
-    if (startPage > 1) {
+    // Always show the first page
+    if (currentPage > range + 2) {
       buttons.push(
         <button
           key={1}
@@ -42,16 +38,19 @@ const Pagination = ({ currentPage, totalPages }) => {
           1
         </button>
       );
-      if (startPage > 2) {
+      if (currentPage > range + 3) {
         buttons.push(
-          <span key="ellipsis-1" className="px-2">
+          <span key="ellipsis-start" className="px-2">
             ...
           </span>
         );
       }
     }
 
-    // Add middle pages
+    // Pages around the current page
+    const startPage = Math.max(1, currentPage - range);
+    const endPage = Math.min(totalPages, currentPage + range);
+
     for (let i = startPage; i <= endPage; i++) {
       buttons.push(
         <button
@@ -68,11 +67,11 @@ const Pagination = ({ currentPage, totalPages }) => {
       );
     }
 
-    // Always show last page
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) {
+    // Always show the last page
+    if (currentPage < totalPages - range - 1) {
+      if (currentPage < totalPages - range - 2) {
         buttons.push(
-          <span key="ellipsis-2" className="px-2">
+          <span key="ellipsis-end" className="px-2">
             ...
           </span>
         );
