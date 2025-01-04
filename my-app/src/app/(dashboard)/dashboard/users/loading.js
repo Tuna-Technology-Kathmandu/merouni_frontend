@@ -25,7 +25,7 @@ const Loading = () => {
             </tr>
           </thead>
           <tbody>
-            {[...Array(5)].map((_, rowIndex) => (
+            {[...Array(6)].map((_, rowIndex) => (
               <tr key={rowIndex} className="border-b">
                 <td className="px-6 py-4">
                   <Skeleton width={150} height={20} />

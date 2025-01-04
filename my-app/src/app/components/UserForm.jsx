@@ -37,6 +37,7 @@ export function UserForm({ initialData, onComplete }) {
           name="firstName"
           defaultValue={initialData?.firstName}
           required
+          className="border-2"
         />
       </div>
       <div>
@@ -48,6 +49,8 @@ export function UserForm({ initialData, onComplete }) {
           name="lastName"
           defaultValue={initialData?.lastName}
           required
+          className="border-2"
+
         />
       </div>
       <div>
@@ -60,6 +63,8 @@ export function UserForm({ initialData, onComplete }) {
           type="email"
           defaultValue={initialData?.email}
           required
+          className="border-2"
+
         />
       </div>
       <div className="flex justify-end space-x-2">
