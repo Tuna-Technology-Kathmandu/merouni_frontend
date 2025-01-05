@@ -676,6 +676,9 @@ const AuthPage = () => {
   console.log(baseUrl);
   const version = process.env.version;
   console.log(version);
+<<<<<<< HEAD
+>>>>>>> 00d28a3 (otp error)
+=======
 >>>>>>> 00d28a3 (otp error)
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
@@ -688,6 +691,7 @@ const AuthPage = () => {
     password: "",
   });
   const [errors, setErrors] = useState({});
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
   const [loginPassword, setLoginPassword] = useState(false);
@@ -707,6 +711,22 @@ const AuthPage = () => {
       } else if (!/^\d{10}$/.test(formData.phone_no)) {
         newErrors.phone_no = "Phone number must be 10 digits";
 =======
+=======
+  const [loginPassword, setLoginPassword] = useState(false);
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
+  const [showSignupRePassword, setShowSignupRePassword] = useState(false);
+
+  const togglePassword = (passwordType) => {
+    if (passwordType === "loginPassword") {
+      setLoginPassword((prev) => !prev);
+    } else if (passwordType === "signupPassword") {
+      setShowSignupPassword((prev) => !prev);
+    } else if (passwordType === "signupRePassword") {
+      setShowSignupRePassword((prev) => !prev);
+    }
+  };
+
+>>>>>>> 00d28a3 (otp error)
   const handleChange = (e, formType) => {
     const { name, value } = e.target;
 
@@ -1293,7 +1313,11 @@ const AuthPage = () => {
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 export default SignInPage;
+=======
+export default AuthPage;
+>>>>>>> 00d28a3 (otp error)
 =======
 export default AuthPage;
 >>>>>>> 00d28a3 (otp error)
