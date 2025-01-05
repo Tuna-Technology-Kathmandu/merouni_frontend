@@ -9,10 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@tanstack/react-table": "^8.20.6",
+=======
+    "@next/env": "^15.1.3",
+>>>>>>> 00d28a3 (otp error)
     "clsx": "^2.1.1",
     "lucide-react": "^0.469.0",
     "next": "15.1.3",
+    "next-auth": "^4.24.11",
     "react": "^19.0.0",
     "react-calendar": "^5.1.0",
     "react-dom": "^19.0.0",

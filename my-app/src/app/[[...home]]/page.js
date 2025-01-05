@@ -13,6 +13,7 @@ import PU from "../components/Frontpage/PU";
 import Degree from "../components/Frontpage/Degree";
 
 const page = () => {
+<<<<<<< HEAD
   return (
     <>
       <Header />
@@ -32,5 +33,13 @@ const page = () => {
       
     </>
   );
+=======
+  return <>
+  <Header/>
+  <Navbar/>
+  <div className="min-h-screen"></div>
+  <Footer/>
+  </>;
+>>>>>>> 00d28a3 (otp error)
 };
 export default page;
