@@ -7,6 +7,7 @@ import {
   updateFaculty,
   deleteFaculty,
 } from "./action";
+import Loader from "@/app/components/Loading";
 
 export default function FacultyManager() {
   const [faculties, setFaculties] = useState([]);
@@ -67,7 +68,7 @@ export default function FacultyManager() {
     }
   };
 
-  if (loading) return <div className="mx-auto">Loading...</div>;
+  if (loading) return <div className="mx-auto"><Loader/> </div>;
 
   return (
     <div className="p-4 w-1/2 mx-auto">
