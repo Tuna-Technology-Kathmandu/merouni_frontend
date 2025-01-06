@@ -61,6 +61,7 @@ export async function updateCategory(categoryId, data) {
 }
 
 export async function deleteCategory(categoryId) {
+    console.log("before deleteing")
   try {
     const response = await fetch(`http://localhost:5000/api/v1/category?category_id=${categoryId}`, {
       method: 'DELETE',
@@ -69,8 +70,11 @@ export async function deleteCategory(categoryId) {
     if (!response.ok) {
       throw new Error('Failed to delete category');
     }
+    console.log("just before deleteing")
+    const hehe= await response.json();
 
-    return await response.json();
+    console.log(hehe)
+    return hehe
   } catch (error) {
     console.error('Error deleting category:', error);
     throw error;

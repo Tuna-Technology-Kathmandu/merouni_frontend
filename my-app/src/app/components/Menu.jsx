@@ -13,6 +13,10 @@ import { AiOutlineLogout } from "react-icons/ai";
 import { IoSchoolSharp } from "react-icons/io5";
 import clsx from "clsx";
 import { HiOutlineUsers } from "react-icons/hi";
+import { MdCategory } from "react-icons/md";
+import { GrCertificate } from "react-icons/gr";
+
+
 
 
 const menuItems = [
@@ -35,6 +39,18 @@ const menuItems = [
         icon: <IoSchoolSharp />,
         label: "Colleges",
         href: "/dashboard/addCollege",
+        visible: ["admin"],
+      },
+      {
+        icon: <GrCertificate />,
+        label: "Academia",
+        href: "/dashboard/academia",
+        visible: ["admin"],
+      },
+      {
+        icon: <MdCategory />,
+        label: "Category",
+        href: "/dashboard/category",
         visible: ["admin"],
       },
       {

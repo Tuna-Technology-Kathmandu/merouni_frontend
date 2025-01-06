@@ -13,10 +13,11 @@ export default function DashboardLayout({ children }) {
           href="/"
           className="flex items-center justify-center lg:justify-start gap-2"
         >
-          <img
-            src="/images/edusanjal-logo.svg"
+          <Image
+            src="/images/logo.png"
             alt="logo"
             width={100}
+            height={100}
           />
           <span className="hidden lg:block font-bold">My UNI</span>
         </Link>

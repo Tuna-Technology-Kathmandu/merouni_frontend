@@ -54,7 +54,7 @@ const Header = () => {
         {/* Added items-center */}
         <Image
           alt="meroUni logo"
-          src="/images/edusanjal-logo.svg"
+          src="/images/logo.png"
           width={200}
           height={200}
         />
