@@ -1,6 +1,5 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   getAllFaculty,
   createFaculty,
@@ -8,6 +7,8 @@ import {
   deleteFaculty,
 } from "./action";
 import Loader from "@/app/components/Loading";
+import Table from "../../../components/Table"; // Adjust the import path as needed
+import { Edit2, Trash2 } from "lucide-react"; // For action icons
 
 export default function FacultyManager() {
   const [faculties, setFaculties] = useState([]);
@@ -17,6 +18,52 @@ export default function FacultyManager() {
     description: "",
   });
   const [editingId, setEditingId] = useState(null);
+
+  // Define columns with actions
+  const columns = useMemo(
+    () => [
+      {
+        header: "Title",
+        accessorKey: "title",
+      },
+      {
+        header: "Description",
+        accessorKey: "description",
+      },
+      {
+        header: "Author",
+        accessorFn: (row) => `${row.author.firstName} ${row.author.lastName}`,
+      },
+      {
+        header: "Created At",
+        accessorKey: "createdAt",
+        cell: ({ getValue }) => {
+          return new Date(getValue()).toLocaleDateString();
+        },
+      },
+      {
+        header: "Actions",
+        id: "actions",
+        cell: ({ row }) => (
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleEdit(row.original)}
+              className="p-1 text-blue-600 hover:text-blue-800"
+            >
+              <Edit2 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => handleDelete(row.original._id)}
+              className="p-1 text-red-600 hover:text-red-800"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        ),
+      },
+    ],
+    []
+  );
 
   useEffect(() => {
     loadFaculties();
@@ -68,10 +115,10 @@ export default function FacultyManager() {
     }
   };
 
-  if (loading) return <div className="mx-auto"><Loader/> </div>;
+  if (loading) return <div className="mx-auto"><Loader /></div>;
 
   return (
-    <div className="p-4 w-1/2 mx-auto">
+    <div className="p-4 w-4/5 mx-auto">
       <h1 className="text-2xl font-bold mb-4">Faculty Management</h1>
 
       {/* Form */}
@@ -106,29 +153,8 @@ export default function FacultyManager() {
         </button>
       </form>
 
-      {/* List */}
-      <div className="grid gap-4">
-        {faculties.map((faculty) => (
-          <div key={faculty._id} className="border p-4 rounded">
-            <h3 className="font-bold">{faculty.title}</h3>
-            <p className="text-gray-600">{faculty.description}</p>
-            <div className="mt-2">
-              <button
-                onClick={() => handleEdit(faculty)}
-                className="mr-2 text-blue-500 hover:text-blue-700"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDelete(faculty._id)}
-                className="text-red-500 hover:text-red-700"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Table */}
+      <Table data={faculties} columns={columns} />
     </div>
   );
 }
