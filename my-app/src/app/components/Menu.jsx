@@ -17,6 +17,7 @@ import { MdCategory } from "react-icons/md";
 import { GrCertificate } from "react-icons/gr";
 
 
+import { FaWpforms } from "react-icons/fa";
 
 
 const menuItems = [
@@ -75,6 +76,12 @@ const menuItems = [
         icon: <TfiAnnouncement />,
         label: "Announcements",
         href: "/dashboard/announcements",
+        visible: ["admin", "teacher", "student", "parent"],
+      },
+      {
+        icon: <FaWpforms />,
+        label: "Apply for agent",
+        href: "/dashboard/ApplyAgent",
         visible: ["admin", "teacher", "student", "parent"],
       },
     ],

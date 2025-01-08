@@ -19,7 +19,7 @@ export default function DashboardLayout({ children }) {
             width={100}
             height={100}
           />
-          <span className="hidden lg:block font-bold">My UNI</span>
+          <span className="hidden lg:block font-bold">Mero UNI</span>
         </Link>
         <Menu />
       </div>
