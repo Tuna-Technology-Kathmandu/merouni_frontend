@@ -9,8 +9,11 @@ import {
 import Loading from "../../../components/Loading";
 import Table from "../../../components/Table";
 import { Edit2, Trash2 } from "lucide-react";
+import { FaRegSquarePlus } from "react-icons/fa6";
+import { FaRegMinusSquare } from "react-icons/fa";
 
 export default function ScholarshipManager() {
+  const [visibility, setVisibility] = useState(false);
   const [scholarships, setScholarships] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -165,108 +168,139 @@ export default function ScholarshipManager() {
     return new Date(dateString).toISOString().split("T")[0];
   };
 
-  if (loading) return <div className="mx-auto"><Loading /></div>;
+  if (loading)
+    return (
+      <div className="mx-auto">
+        <Loading />
+      </div>
+    );
 
   return (
     <div className="p-4 w-4/5 mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Scholarship Management</h1>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="mb-8 space-y-4">
-        <div>
-          <input
-            type="text"
-            placeholder="Scholarship Name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <textarea
-            placeholder="Description"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="w-full p-2 border rounded"
-          />
-        </div>
-
-        <div>
-          <input
-            type="text"
-            placeholder="Eligibility Criteria"
-            value={formData.eligibilityCriteria}
-            onChange={(e) =>
-              setFormData({ ...formData, eligibilityCriteria: e.target.value })
-            }
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <input
-            type="number"
-            placeholder="Amount"
-            value={formData.amount}
-            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <input
-            type="date"
-            value={formData.applicationDeadline}
-            onChange={(e) =>
-              setFormData({ ...formData, applicationDeadline: e.target.value })
-            }
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <input
-            type="text"
-            placeholder="Renewal Criteria"
-            value={formData.renewalCriteria}
-            onChange={(e) =>
-              setFormData({ ...formData, renewalCriteria: e.target.value })
-            }
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <div>
-          <input
-            type="text"
-            placeholder="Contact Information"
-            value={formData.contactInfo}
-            onChange={(e) =>
-              setFormData({ ...formData, contactInfo: e.target.value })
-            }
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        {error && <div className="text-red-500">{error}</div>}
-
+      <div className="flex justify-between items-center ">
+        <h1 className="text-2xl font-bold mb-4">Scholarship Management</h1>
         <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          type="button"
+          className=" items-center justify-center"
+          onClick={() => setVisibility(!visibility)}
         >
-          {editingId ? "Update Scholarship" : "Add Scholarship"}
+          {visibility ? (
+            <FaRegMinusSquare size={25} />
+          ) : (
+            <FaRegSquarePlus size={25} />
+          )}
+          {/* Add Scholarship */}
         </button>
-      </form>
+      </div>
 
-      {/* Table */}
-      <Table data={scholarships} columns={columns} />
+      {visibility ? (
+        <form onSubmit={handleSubmit} className="mb-8 space-y-4">
+          <div>
+            <input
+              type="text"
+              placeholder="Scholarship Name"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              className="w-full p-2 border rounded"
+              required
+            />
+          </div>
+
+          <div>
+            <textarea
+              placeholder="Description"
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              className="w-full p-2 border rounded"
+            />
+          </div>
+
+          <div>
+            <input
+              type="text"
+              placeholder="Eligibility Criteria"
+              value={formData.eligibilityCriteria}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  eligibilityCriteria: e.target.value,
+                })
+              }
+              className="w-full p-2 border rounded"
+              required
+            />
+          </div>
+
+          <div>
+            <input
+              type="number"
+              placeholder="Amount"
+              value={formData.amount}
+              onChange={(e) =>
+                setFormData({ ...formData, amount: e.target.value })
+              }
+              className="w-full p-2 border rounded"
+              required
+            />
+          </div>
+
+          <div>
+            <input
+              type="date"
+              value={formData.applicationDeadline}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  applicationDeadline: e.target.value,
+                })
+              }
+              className="w-full p-2 border rounded"
+              required
+            />
+          </div>
+
+          <div>
+            <input
+              type="text"
+              placeholder="Renewal Criteria"
+              value={formData.renewalCriteria}
+              onChange={(e) =>
+                setFormData({ ...formData, renewalCriteria: e.target.value })
+              }
+              className="w-full p-2 border rounded"
+              required
+            />
+          </div>
+
+          <div>
+            <input
+              type="text"
+              placeholder="Contact Information"
+              value={formData.contactInfo}
+              onChange={(e) =>
+                setFormData({ ...formData, contactInfo: e.target.value })
+              }
+              className="w-full p-2 border rounded"
+              required
+            />
+          </div>
+
+          {error && <div className="text-red-500">{error}</div>}
+
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            {editingId ? "Update Scholarship" : "Add Scholarship"}
+          </button>
+        </form>
+      ) : (
+        <Table data={scholarships} columns={columns} />
+      )}
     </div>
   );
 }

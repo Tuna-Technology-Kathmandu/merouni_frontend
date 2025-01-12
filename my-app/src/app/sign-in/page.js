@@ -5,10 +5,13 @@ import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa6";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const AuthPage = () => {
-    const router = useRouter()
+  const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
+  const baseUrl = process.env.baseUrl;
+  const version = process.env.version;
   // const [formData, setFormData] = useState({});
 
   const [loginForm, setLoginForm] = useState({
@@ -20,14 +23,15 @@ const AuthPage = () => {
     firstName: "",
     lastName: "",
     email: "",
+    phone_no: "",
     password: "",
     confirmPassword: "",
   });
 
   const [errors, setErrors] = useState({});
-  const [loginPassword, setLoginPassword] = useState(false)
+  const [loginPassword, setLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
-  const [showSignupRePassword, setShowSignupRePassword] = useState(false)
+  const [showSignupRePassword, setShowSignupRePassword] = useState(false);
 
   const togglePassword = (passwordType) => {
     if (passwordType === "loginPassword") {
@@ -38,8 +42,6 @@ const AuthPage = () => {
       setShowSignupRePassword((prev) => !prev);
     }
   };
-
-  
 
   const handleChange = (e, formType) => {
     const { name, value } = e.target;
@@ -83,6 +85,14 @@ const AuthPage = () => {
         errors.email = "Email is invalid";
       }
 
+      if (!signupForm.phone_no.trim()) {
+        errors.phone_no = "Phone number is required";
+      } else if (!/^\d+$/.test(signupForm.phone_no)) {
+        errors.phone_no = "Phone number must contain only numbers";
+      } else if (signupForm.phone_no.length < 10) {
+        errors.phone_no = "Phone number must be at least 10 characters long";
+      }
+
       if (!signupForm.password) {
         errors.password = "Password is required";
       } else if (signupForm.password.length < 8) {
@@ -110,34 +120,40 @@ const AuthPage = () => {
             password: loginForm.password,
           });
 
-          const response = await fetch(
-            "http://localhost:9999/api/v1/auth/login",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              credentials: "include",
-              body: JSON.stringify({
-                email: loginForm.email,
-                password: loginForm.password,
-              }),
-            }
-          );
+          const response = await fetch(`${baseUrl}${version}/auth/login`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              email: loginForm.email,
+              password: loginForm.password,
+            }),
+          });
 
           console.log("Raw Response:", response);
 
           const data = await response.json();
           // console.log("Response Data:", data);
 
+          // if (response.ok) {
+          //   console.log("Login successful:", data);
+          //   alert(data.message || "Logged In successfully!");
+          //   // create(data.token);
+          //   router.push("/");
+          // } else {
+          //   console.error("Login failed:", data);
+          //   alert(data.message || "Login Failed");
+          // }
+
           if (response.ok) {
             console.log("Login successful:", data);
-            alert(data.message || "Logged In successfully!");
-            // create(data.token);
-            router.push('/')
+            toast.success(data.message || "Logged In successfully!");
+            router.push("/");
           } else {
             console.error("Login failed:", data);
-            alert(data.message || "Login Failed");
+            toast.error(data.message || "Login Failed");
           }
         } catch (error) {
           console.error("Detailed Network Error:", {
@@ -153,43 +169,58 @@ const AuthPage = () => {
             firstName: signupForm.firstName,
             lastName: signupForm.lastName,
             email: signupForm.email,
+            phone_no: signupForm.phone_no,
             password: signupForm.password,
           });
 
-          const response = await fetch(
-            "http://localhost:9999/api/v1/auth/register",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                firstName: signupForm.firstName,
-                lastName: signupForm.lastName,
-                email: signupForm.email,
-                password: signupForm.password,
-              }),
-            }
-          );
+          const response = await fetch(`${baseUrl}${version}/auth/register`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              firstName: signupForm.firstName,
+              lastName: signupForm.lastName,
+              email: signupForm.email,
+              phone_no: signupForm.phone_no,
+              password: signupForm.password,
+            }),
+          });
 
           console.log("Raw Response:", response);
 
           const data = await response.json();
           console.log("Response Data:", data);
 
+          // if (response.ok) {
+          //   setSignupForm({
+          //     firstName: "",
+          //     lastName: "",
+          //     email: "",
+          //     phone_no: "",
+          //     password: "",
+          //     confirmPassword: "",
+          //   });
+          //   console.log("Signup successful:", data);
+          //   alert(data.message || "Registration successful!");
+          // } else {
+          //   console.error("Signup failed:", data);
+          //   alert(data.message || "Registration failed");
+          // }
           if (response.ok) {
             setSignupForm({
-                firstName:"",
-                lastName: "",
-                email: "",
-                password: "",
-                confirmPassword: ""
-            })
+              firstName: "",
+              lastName: "",
+              email: "",
+              phone_no: "",
+              password: "",
+              confirmPassword: "",
+            });
             console.log("Signup successful:", data);
-            alert(data.message || "Registration successful!");
+            toast.success(data.message || "Registration successful!");
           } else {
             console.error("Signup failed:", data);
-            alert(data.message || "Registration failed");
+            toast.error(data.message || "Registration failed");
           }
         } catch (error) {
           console.error("Detailed Network Error:", {
@@ -197,7 +228,10 @@ const AuthPage = () => {
             message: error.message,
             stack: error.stack,
           });
-          alert("Unable to connect to server. Please check your connection.");
+          // alert("Unable to connect to server. Please check your connection.");
+          toast.error(
+            "Unable to connect to server. Please check your connection."
+          );
         }
       }
     } else {
@@ -210,8 +244,6 @@ const AuthPage = () => {
   return (
     <div className=" flex m-10 items-center justify-center bg-grey-1000 h-[100vh] my-auto">
       <div className="max-w-5xl w-full bg-white rounded-lg shadow-xl p-10 flex items-center justify-center">
-       
-
         {/* Right Side Form (Login / SignUp) */}
         <div className="w-full md:w-1/2 p-4">
           <h2 className="text-3xl font-semibold text-center text-[#0450A4]">
@@ -251,25 +283,23 @@ const AuthPage = () => {
                 Password
               </label>
 
-             
-
               <div className="relative flex items-center">
-
-              <input
-                type={loginPassword ? "text" : "password"}
-                name="password"
-                placeholder="Enter your password"
-                className="w-full mt-2 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0450A4]"
-                value={loginForm.password}
-                onChange={(e) => handleChange(e, "login")}
-              />
-               <button type="button" 
-                onClick={()=> togglePassword("loginPassword")}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                <input
+                  type={loginPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Enter your password"
+                  className="w-full mt-2 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0450A4]"
+                  value={loginForm.password}
+                  onChange={(e) => handleChange(e, "login")}
+                />
+                <button
+                  type="button"
+                  onClick={() => togglePassword("loginPassword")}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
                 >
-                {loginPassword ? (<FaEyeSlash />) : (<FaEye />)}
-               </button>
-                </div>
+                  {loginPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
               {errors.password && (
                 <span className="text-red-700 text-xs">{errors.password}</span>
               )}
@@ -344,6 +374,26 @@ const AuthPage = () => {
                 <span className="text-red-700 text-xs">{errors.email}</span>
               )}
 
+              <label
+                htmlFor="phone_no"
+                className="block text-sm mt-2 font-medium text-gray-700"
+              >
+                Phone Number
+              </label>
+
+              <input
+                type="text"
+                name="phone_no"
+                placeholder="Enter your phone number "
+                className="w-full mt-2 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0450A4]"
+                value={signupForm.phone_no}
+                onChange={(e) => handleChange(e, "signup")}
+                maxLength={10}
+              />
+              {errors.phone_no && (
+                <span className="text-red-700 text-xs">{errors.phone_no}</span>
+              )}
+
               {/* Password */}
               <label
                 htmlFor="password"
@@ -360,12 +410,13 @@ const AuthPage = () => {
                   value={signupForm.password}
                   onChange={(e) => handleChange(e, "signup")}
                 />
-               <button type="button" 
-                onClick={()=>togglePassword("signupPassword")}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                <button
+                  type="button"
+                  onClick={() => togglePassword("signupPassword")}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
                 >
-                {showSignupPassword ? (<FaEyeSlash />) : (<FaEye />)}
-               </button>
+                  {showSignupPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
               </div>
               {errors.password && (
                 <span className="text-red-700 text-xs">{errors.password}</span>
@@ -380,27 +431,27 @@ const AuthPage = () => {
               </label>
 
               <div className="relative flex items-center">
-              <input
-                type={showSignupRePassword ? "text" : "password"}
-                name="confirmPassword"
-                placeholder="Re-type your password"
-                className="w-full mt-2 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0450A4]"
-                value={signupForm.confirmPassword}
-                onChange={(e) => handleChange(e, "signup")}
+                <input
+                  type={showSignupRePassword ? "text" : "password"}
+                  name="confirmPassword"
+                  placeholder="Re-type your password"
+                  className="w-full mt-2 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0450A4]"
+                  value={signupForm.confirmPassword}
+                  onChange={(e) => handleChange(e, "signup")}
                 />
-                <button type="button"
-                 onClick={()=>togglePassword("signupRePassword")} 
-                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                <button
+                  type="button"
+                  onClick={() => togglePassword("signupRePassword")}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
                 >
-                  {showSignupRePassword ? <FaEyeSlash/> : <FaEye/>}
+                  {showSignupRePassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
-                </div>
+              </div>
               {errors.confirmPassword && (
                 <span className="text-red-700 text-xs">
                   {errors.confirmPassword}
                 </span>
               )}
-
 
               <button
                 type="submit"
@@ -422,7 +473,7 @@ const AuthPage = () => {
               </button>
             </p>
 
-            <div className="mt-4 flex justify-center space-x-4">
+            {/* <div className="mt-4 flex justify-center space-x-4">
               <button className="px-6 py-2 bg-gray-100 rounded-md hover:bg-gray-200 flex items-center space-x-2">
                 <FcGoogle />
                 <span className="text-sm text-black">Login with Google</span>
@@ -431,7 +482,7 @@ const AuthPage = () => {
                 <FaApple />
                 <span className="text-sm">Login with Apple</span>
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

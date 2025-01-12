@@ -5,8 +5,8 @@ import Footer from "../components/Footer";
 
 const page = () => {
   return <>
-  <Navbar/>
   <Header/>
+  <Navbar/>
   <div className="min-h-screen"></div>
   <Footer/>
   </>;
