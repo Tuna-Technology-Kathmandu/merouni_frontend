@@ -168,6 +168,8 @@ import { fetchCategories, createCategory, updateCategory, deleteCategory } from 
 import Loader from "@/app/components/Loading";
 import Table from "../../../components/Table";
 import { Edit2, Trash2 } from "lucide-react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function CategoryManager() {
   const [categories, setCategories] = useState([]);
@@ -177,9 +179,7 @@ export default function CategoryManager() {
     description: "",
   });
   const [editingId, setEditingId] = useState(null);
-  const [error, setError] = useState(null);
 
-  // Define columns with actions
   const columns = useMemo(
     () => [
       {
@@ -230,7 +230,7 @@ export default function CategoryManager() {
       const response = await fetchCategories();
       setCategories(response.items);
     } catch (err) {
-      setError("Failed to load categories");
+      toast.error("Failed to load categories");
       console.error("Error loading categories:", err);
     } finally {
       setLoading(false);
@@ -242,15 +242,17 @@ export default function CategoryManager() {
     try {
       if (editingId) {
         await updateCategory(editingId, formData);
+        toast.success("Category updated successfully");
       } else {
         await createCategory(formData);
+        toast.success("Category created successfully");
       }
       setFormData({ title: "", description: "" });
       setEditingId(null);
-      setError(null);
       loadCategories();
     } catch (err) {
-      setError(`Failed to ${editingId ? "update" : "create"} category`);
+      const errorMsg = err.response?.data?.message || "Network error occurred";
+      toast.error(`Failed to ${editingId ? "update" : "create"} category: ${errorMsg}`);
       console.error("Error saving category:", err);
     }
   };
@@ -261,17 +263,17 @@ export default function CategoryManager() {
       description: category.description || "",
     });
     setEditingId(category._id);
-    setError(null);
   };
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this category?")) {
       try {
         await deleteCategory(id);
+        toast.success("Category deleted successfully");
         loadCategories();
-        setError(null);
       } catch (err) {
-        setError("Failed to delete category");
+        const errorMsg = err.response?.data?.message || "Network error occurred";
+        toast.error(`Failed to delete category: ${errorMsg}`);
         console.error("Error deleting category:", err);
       }
     }
@@ -281,6 +283,7 @@ export default function CategoryManager() {
 
   return (
     <div className="p-4 w-4/5 mx-auto">
+      <ToastContainer />
       <h1 className="text-2xl font-bold mb-4">Category Management</h1>
 
       {/* Form */}
@@ -307,9 +310,6 @@ export default function CategoryManager() {
             className="w-full p-2 border rounded"
           />
         </div>
-        {error && (
-          <div className="text-red-500 mb-4">{error}</div>
-        )}
         <button
           type="submit"
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
