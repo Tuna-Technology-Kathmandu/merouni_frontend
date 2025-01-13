@@ -5,6 +5,8 @@ import Footer from "../components/Footer";
 import Hero from "../components/Frontpage/Hero";
 import Ranking from "../components/Frontpage/Ranking";
 import Program from "../components/Frontpage/Program";
+import Sponsore from "../components/Frontpage/Sponsore";
+import Colleges from "../components/Frontpage/Colleges";
 
 const page = () => {
   return (
@@ -14,6 +16,9 @@ const page = () => {
       <Hero />
       <Ranking />
       <Program />
+      <Sponsore />
+      <Colleges/>
+     
     </>
   );
 };
