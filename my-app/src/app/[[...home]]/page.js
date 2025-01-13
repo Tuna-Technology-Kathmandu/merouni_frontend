@@ -4,14 +4,16 @@ import Header from "../components/Frontpage/Header";
 import Footer from "../components/Footer";
 import Hero from "../components/Frontpage/Hero";
 import Ranking from "../components/Frontpage/Ranking";
+import Program from "../components/Frontpage/Program";
 
 const page = () => {
   return (
     <>
       <Header />
       <Navbar />
-      <Hero/>
-      <Ranking/>
+      <Hero />
+      <Ranking />
+      <Program />
     </>
   );
 };
