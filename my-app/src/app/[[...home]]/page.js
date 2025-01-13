@@ -7,6 +7,10 @@ import Ranking from "../components/Frontpage/Ranking";
 import Program from "../components/Frontpage/Program";
 import Sponsore from "../components/Frontpage/Sponsore";
 import Colleges from "../components/Frontpage/Colleges";
+import TU from "../components/Frontpage/TU";
+import KU from "../components/Frontpage/KU";
+import PU from "../components/Frontpage/PU";
+import Degree from "../components/Frontpage/Degree";
 
 const page = () => {
   return (
@@ -17,8 +21,15 @@ const page = () => {
       <Ranking />
       <Program />
       <Sponsore />
-      <Colleges/>
-     
+      <Colleges />
+      <TU/>
+      {/* <div className="h-[300vh] overflow-y-scroll parent-div">
+      <TU />
+      <KU />
+      <PU />
+      </div> */}
+      <Degree/>
+      
     </>
   );
 };
