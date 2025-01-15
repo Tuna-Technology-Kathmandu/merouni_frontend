@@ -1,6 +1,7 @@
 "use client";
 import React, { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { FaArrowCircleRight } from "react-icons/fa";
 
 const DegreeScroller = () => {
   const scrollerRef = useRef(null);
@@ -26,51 +27,96 @@ const DegreeScroller = () => {
   };
 
   return (
-    <div className="relative max-w-6xl mx-auto px-4 h-screen bg-white text-black mt-36">
-      <h2 className="text-xl font-bold mb-6">Explore Degrees</h2>
+    <div className="h-screen">
+      <div className="relative max-w-6xl mx-auto px-4  bg-white text-black mt-36">
+        <h2 className="text-xl font-bold mb-6">
+          Find the Right Degree For You
+        </h2>
 
-      <div className="relative">
-        {/* Scroller Container */}
-        <div
-          ref={scrollerRef}
-          className="flex gap-4 overflow-x-auto scroll-smooth scrollbar-thin scrollbar-track-gray-100 h-64  scrollbar-thumb-black"
-          style={{
-            scrollbarWidth: "thin",
-            msOverflowStyle: "none",
-          }}
-          onWheel={(e) => {
-            e.preventDefault();
-            scrollerRef.current.scrollLeft += e.deltaY;
-          }}
-        >
-          {degrees.map((degree) => (
-            <div
-              key={degree.id}
-              className="flex-shrink-0 w-64 bg-gray-100 rounded-lg p-12"
-            >
-              <div className="space-y-4">
-                <h3 className="font-semibold">{degree.name}</h3>
-                <p className="text-sm text-gray-600">Duration: {degree.duration}</p>
-                <p className="font-bold">Fees: ${degree.fees.toFixed(2)}</p>
+        <div className="relative">
+          {/* Scroller Container */}
+          <div
+            ref={scrollerRef}
+            className="flex gap-4 overflow-x-auto scroll-smooth scrollbar-thin scrollbar-track-gray-100 h-64  scrollbar-thumb-black"
+            style={{
+              scrollbarWidth: "thin",
+              msOverflowStyle: "none",
+            }}
+            onWheel={(e) => {
+              e.preventDefault();
+              scrollerRef.current.scrollLeft += e.deltaY;
+            }}
+          >
+            {degrees.map((degree) => (
+              <div
+                key={degree.id}
+                className="flex-shrink-0 w-64 bg-gray-100 rounded-lg p-12"
+              >
+                <div className="space-y-4">
+                  <h3 className="font-semibold">{degree.name}</h3>
+                  <p className="text-sm text-gray-600">
+                    Duration: {degree.duration}
+                  </p>
+                  <p className="font-bold">Fees: ${degree.fees.toFixed(2)}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Left and Right Navigation Buttons */}
+          <button
+            onClick={() => scrollBy(-300)}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white rounded-full p-2 shadow-lg"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+
+          <button
+            onClick={() => scrollBy(300)}
+            className="absolute right-0 top-1/2 translate-x-4 -translate-y-1/2 bg-white rounded-full p-2 shadow-lg"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
         </div>
-
-        {/* Left and Right Navigation Buttons */}
-        <button
-          onClick={() => scrollBy(-300)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white rounded-full p-2 shadow-lg"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </button>
-
-        <button
-          onClick={() => scrollBy(300)}
-          className="absolute right-0 top-1/2 translate-x-4 -translate-y-1/2 bg-white rounded-full p-2 shadow-lg"
-        >
-          <ChevronRight className="w-6 h-6" />
-        </button>
+      </div>
+      <div className="bg-[#f4fbf9] max-w-[2000px] flex">
+        <div className="flex flex-col justify-between">
+          <div>Selective Fields to Study</div>
+          <div>
+            Explore diverse fields of study to find the best fit for your
+            academic and career goals
+          </div>
+          <button className="w-[130px] text-center border border-black rounded-xl  flex items-center justify-center p-2 font-bold">
+            View all
+            <div className="w-6 h-6 rounded-full bg-black text-white mx-2">
+              &gt;
+            </div>
+          </button>
+        </div>
+        <div className="bg-[#e1f3ef] h-[250px] flex flex-col items-start justify-center gap-4">
+          <div className="font-black  text-4xl">1</div>
+          <div className="font-bold text-xl">Engineering</div>
+          <div>120 colleges</div>
+          <div className="self-end"><FaArrowCircleRight/></div>
+        </div>
+        <div className="bg-[#e1f3ef]">
+          <div>1</div>
+          <div>Engineering</div>
+          <div>120 colleges</div>
+          <div><FaArrowCircleRight/></div>
+        </div>
+        <div className="bg-[#e1f3ef]">
+          <div>1</div>
+          <div>Engineering</div>
+          <div>120 colleges</div>
+          <div><FaArrowCircleRight/></div>
+        </div>
+        <div className="bg-[#e1f3ef]">
+          <div>1</div>
+          <div>Engineering</div>
+          <div>120 colleges</div>
+          <div><FaArrowCircleRight/></div>
+        </div>
       </div>
     </div>
   );
