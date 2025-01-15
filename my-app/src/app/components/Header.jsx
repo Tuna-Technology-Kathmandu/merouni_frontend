@@ -5,32 +5,6 @@ import { HiQuestionMarkCircle } from "react-icons/hi";
 
 const Header = () => {
   return (
-<<<<<<< HEAD
-    <div className="max-w-[1400px] justify-center p-3 mx-auto m-3 flex flex-row">
-      <div className="flex flex-row items-center space-x-8">
-        {" "}
-        {/* Added items-center */}
-        <Image
-          alt="meroUni logo"
-          src="/images/logo.png"
-          width={200}
-          height={200}
-        />
-        <div className="flex border-blue-500 bg-blue-500 p-1 rounded-lg">
-          <input
-            type="search"
-            name="search"
-            placeholder="   Search colleges, courses, schools .."
-            className="border-gray-200 border-2 rounded-l-2xl w-full h-10"
-            size={50}
-          />
-          <button
-            type="submit"
-            className="flex items-center justify-center p-2"
-          >
-            <IoSearch className="" />
-          </button>
-=======
     <div className="w-full border-b">
       <div className="max-w-[1400px] mx-auto py-3 px-4">
         <div className="flex items-center justify-between gap-4">
@@ -88,7 +62,6 @@ const Header = () => {
               Sign Up
             </button>
           </div>
->>>>>>> db06809 (Header)
         </div>
       </div>
     </div>
