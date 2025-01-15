@@ -40,3 +40,14 @@ body {
   background-color: #c3ebfa !important;
   color: black !important;
 }
+
+/* Hide scrollbar */
+.parent-div {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.parent-div::-webkit-scrollbar {
+  width: 0; /* Webkit browsers */
+  height: 0; /* For horizontal scrollbar */
+}
