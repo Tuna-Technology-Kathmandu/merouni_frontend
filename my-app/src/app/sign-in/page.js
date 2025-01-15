@@ -7,7 +7,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
 const AuthPage = () => {
-    const router = useRouter()
+  const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
   // const [formData, setFormData] = useState({});
 
@@ -25,9 +25,9 @@ const AuthPage = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [loginPassword, setLoginPassword] = useState(false)
+  const [loginPassword, setLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
-  const [showSignupRePassword, setShowSignupRePassword] = useState(false)
+  const [showSignupRePassword, setShowSignupRePassword] = useState(false);
 
   const togglePassword = (passwordType) => {
     if (passwordType === "loginPassword") {
@@ -38,8 +38,6 @@ const AuthPage = () => {
       setShowSignupRePassword((prev) => !prev);
     }
   };
-
-  
 
   const handleChange = (e, formType) => {
     const { name, value } = e.target;
@@ -134,7 +132,7 @@ const AuthPage = () => {
             console.log("Login successful:", data);
             alert(data.message || "Logged In successfully!");
             // create(data.token);
-            router.push('/')
+            router.push("/");
           } else {
             console.error("Login failed:", data);
             alert(data.message || "Login Failed");
@@ -179,12 +177,12 @@ const AuthPage = () => {
 
           if (response.ok) {
             setSignupForm({
-                firstName:"",
-                lastName: "",
-                email: "",
-                password: "",
-                confirmPassword: ""
-            })
+              firstName: "",
+              lastName: "",
+              email: "",
+              password: "",
+              confirmPassword: "",
+            });
             console.log("Signup successful:", data);
             alert(data.message || "Registration successful!");
           } else {
@@ -210,8 +208,6 @@ const AuthPage = () => {
   return (
     <div className=" flex m-10 items-center justify-center bg-grey-1000 h-[100vh] my-auto">
       <div className="max-w-5xl w-full bg-white rounded-lg shadow-xl p-10 flex items-center justify-center">
-       
-
         {/* Right Side Form (Login / SignUp) */}
         <div className="w-full md:w-1/2 p-4">
           <h2 className="text-3xl font-semibold text-center text-[#0450A4]">
@@ -251,25 +247,23 @@ const AuthPage = () => {
                 Password
               </label>
 
-             
-
               <div className="relative flex items-center">
-
-              <input
-                type={loginPassword ? "text" : "password"}
-                name="password"
-                placeholder="Enter your password"
-                className="w-full mt-2 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0450A4]"
-                value={loginForm.password}
-                onChange={(e) => handleChange(e, "login")}
-              />
-               <button type="button" 
-                onClick={()=> togglePassword("loginPassword")}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                <input
+                  type={loginPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Enter your password"
+                  className="w-full mt-2 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0450A4]"
+                  value={loginForm.password}
+                  onChange={(e) => handleChange(e, "login")}
+                />
+                <button
+                  type="button"
+                  onClick={() => togglePassword("loginPassword")}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
                 >
-                {loginPassword ? (<FaEyeSlash />) : (<FaEye />)}
-               </button>
-                </div>
+                  {loginPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
               {errors.password && (
                 <span className="text-red-700 text-xs">{errors.password}</span>
               )}
@@ -360,12 +354,13 @@ const AuthPage = () => {
                   value={signupForm.password}
                   onChange={(e) => handleChange(e, "signup")}
                 />
-               <button type="button" 
-                onClick={()=>togglePassword("signupPassword")}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                <button
+                  type="button"
+                  onClick={() => togglePassword("signupPassword")}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
                 >
-                {showSignupPassword ? (<FaEyeSlash />) : (<FaEye />)}
-               </button>
+                  {showSignupPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
               </div>
               {errors.password && (
                 <span className="text-red-700 text-xs">{errors.password}</span>
@@ -380,27 +375,27 @@ const AuthPage = () => {
               </label>
 
               <div className="relative flex items-center">
-              <input
-                type={showSignupRePassword ? "text" : "password"}
-                name="confirmPassword"
-                placeholder="Re-type your password"
-                className="w-full mt-2 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0450A4]"
-                value={signupForm.confirmPassword}
-                onChange={(e) => handleChange(e, "signup")}
+                <input
+                  type={showSignupRePassword ? "text" : "password"}
+                  name="confirmPassword"
+                  placeholder="Re-type your password"
+                  className="w-full mt-2 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0450A4]"
+                  value={signupForm.confirmPassword}
+                  onChange={(e) => handleChange(e, "signup")}
                 />
-                <button type="button"
-                 onClick={()=>togglePassword("signupRePassword")} 
-                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                <button
+                  type="button"
+                  onClick={() => togglePassword("signupRePassword")}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
                 >
-                  {showSignupRePassword ? <FaEyeSlash/> : <FaEye/>}
+                  {showSignupRePassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
-                </div>
+              </div>
               {errors.confirmPassword && (
                 <span className="text-red-700 text-xs">
                   {errors.confirmPassword}
                 </span>
               )}
-
 
               <button
                 type="submit"
@@ -421,7 +416,7 @@ const AuthPage = () => {
                 {isLogin ? "Sign up" : "Login"}
               </button>
             </p>
-
+            {/*  
             <div className="mt-4 flex justify-center space-x-4">
               <button className="px-6 py-2 bg-gray-100 rounded-md hover:bg-gray-200 flex items-center space-x-2">
                 <FcGoogle />
@@ -432,6 +427,7 @@ const AuthPage = () => {
                 <span className="text-sm">Login with Apple</span>
               </button>
             </div>
+            */}
           </div>
         </div>
       </div>
