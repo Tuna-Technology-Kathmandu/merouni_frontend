@@ -28,7 +28,7 @@ const DegreeScroller = () => {
 
   return (
     <div className="h-screen">
-      <div className="relative max-w-6xl mx-auto px-4  bg-white text-black mt-36">
+      <div className="relative max-w-[2000px] mx-auto px-4  bg-white text-black mt-36">
         <h2 className="text-xl font-bold mb-6">
           Find the Right Degree For You
         </h2>
@@ -79,10 +79,12 @@ const DegreeScroller = () => {
           </button>
         </div>
       </div>
-      <div className="bg-[#f4fbf9] max-w-[2000px] flex">
-        <div className="flex flex-col justify-between">
-          <div>Selective Fields to Study</div>
-          <div>
+      <div className="bg-[#f4fbf9]  max-w-[2000px] flex flex-row mt-44 p-12  mx-auto overflow-x-scroll justify-between gap-24 parent-div px-8">
+        <div className="flex flex-col my-auto gap-4 ">
+          <div className="font-extrabold text-7xl w-[600px]">
+            Selective Fields to Study
+          </div>
+          <div className="font-bold">
             Explore diverse fields of study to find the best fit for your
             academic and career goals
           </div>
@@ -93,29 +95,77 @@ const DegreeScroller = () => {
             </div>
           </button>
         </div>
-        <div className="bg-[#e1f3ef] h-[250px] flex flex-col items-start justify-center gap-4">
-          <div className="font-black  text-4xl">1</div>
-          <div className="font-bold text-xl">Engineering</div>
-          <div>120 colleges</div>
-          <div className="self-end"><FaArrowCircleRight/></div>
-        </div>
-        <div className="bg-[#e1f3ef]">
-          <div>1</div>
-          <div>Engineering</div>
-          <div>120 colleges</div>
-          <div><FaArrowCircleRight/></div>
-        </div>
-        <div className="bg-[#e1f3ef]">
-          <div>1</div>
-          <div>Engineering</div>
-          <div>120 colleges</div>
-          <div><FaArrowCircleRight/></div>
-        </div>
-        <div className="bg-[#e1f3ef]">
-          <div>1</div>
-          <div>Engineering</div>
-          <div>120 colleges</div>
-          <div><FaArrowCircleRight/></div>
+        <div className="flex  gap-4 ">
+          <div className="bg-[#e1f3ef] h-[250px] w-[250px] p-4 rounded-2xl flex flex-col items-start justify-center gap-4 ">
+            <div className="font-black  text-4xl">1</div>
+            <div className="font-bold text-xl">Engineering</div>
+            <div>120 colleges</div>
+            <div className="self-end ">
+              <FaArrowCircleRight
+                style={{ width: "40px", height: "40px", color: "#9ad7c8" }}
+              />
+            </div>
+          </div>
+          <div className="bg-[#e1f3ef] h-[250px] w-[250px]  p-4 rounded-2xl flex flex-col items-start justify-center gap-4">
+            <div className="font-black  text-4xl">2</div>
+            <div className="font-bold text-xl">Medical</div>
+            <div>120 colleges</div>
+            <div className="self-end">
+              <FaArrowCircleRight
+                style={{ width: "40px", height: "40px", color: "#9ad7c8" }}
+              />{" "}
+            </div>
+          </div>
+          <div className="bg-[#e1f3ef] h-[250px] w-[250px]  p-4 rounded-2xl flex flex-col items-start justify-center gap-4">
+            <div className="font-black  text-4xl">3</div>
+            <div className="font-bold text-xl">Humanities</div>
+            <div>120 colleges</div>
+            <div className="self-end">
+              <FaArrowCircleRight
+                style={{ width: "40px", height: "40px", color: "#9ad7c8" }}
+              />{" "}
+            </div>
+          </div>
+          <div className="bg-[#e1f3ef] h-[250px] w-[250px]  p-4 rounded-2xl flex flex-col items-start justify-center gap-4">
+            <div className="font-black  text-4xl">4</div>
+            <div className="font-bold text-xl">Law</div>
+            <div>120 colleges</div>
+            <div className="self-end">
+              <FaArrowCircleRight
+                style={{ width: "40px", height: "40px", color: "#9ad7c8" }}
+              />{" "}
+            </div>
+          </div>
+          <div className="bg-[#e1f3ef] h-[250px] w-[250px]  p-4 rounded-2xl flex flex-col items-start justify-center gap-4">
+            <div className="font-black  text-4xl">4</div>
+            <div className="font-bold text-xl">Law</div>
+            <div>120 colleges</div>
+            <div className="self-end">
+              <FaArrowCircleRight
+                style={{ width: "40px", height: "40px", color: "#9ad7c8" }}
+              />{" "}
+            </div>
+          </div>
+          <div className="bg-[#e1f3ef] h-[250px] w-[250px]  p-4 rounded-2xl flex flex-col items-start justify-center gap-4">
+            <div className="font-black  text-4xl">4</div>
+            <div className="font-bold text-xl">Law</div>
+            <div>120 colleges</div>
+            <div className="self-end">
+              <FaArrowCircleRight
+                style={{ width: "40px", height: "40px", color: "#9ad7c8" }}
+              />{" "}
+            </div>
+          </div>
+          <div className="bg-[#e1f3ef] h-[250px] w-[250px]  p-4 rounded-2xl flex flex-col items-start justify-center gap-4">
+            <div className="font-black  text-4xl">4</div>
+            <div className="font-bold text-xl">Law</div>
+            <div>120 colleges</div>
+            <div className="self-end">
+              <FaArrowCircleRight
+                style={{ width: "40px", height: "40px", color: "#9ad7c8" }}
+              />{" "}
+            </div>
+          </div>
         </div>
       </div>
     </div>

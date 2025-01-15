@@ -8,10 +8,10 @@ import Program from "../components/Frontpage/Program";
 import Sponsore from "../components/Frontpage/Sponsore";
 import Colleges from "../components/Frontpage/Colleges";
 import TU from "../components/Frontpage/TU";
-import KU from "../components/Frontpage/KU";
-import PU from "../components/Frontpage/PU";
 import Degree from "../components/Frontpage/Degree";
 import Footer from "../components/Frontpage/Footer";
+import Event from "../components/Frontpage/Event";
+import Blogs from "../components/Frontpage/Blogs";
 
 const page = () => {
   return (
@@ -23,17 +23,12 @@ const page = () => {
       <Program />
       <Sponsore />
       <Colleges />
-      <TU/>
-      {/* <div className="h-[300vh] overflow-y-scroll parent-div">
       <TU />
-      <KU />
-      <PU />
-      </div> */}
-      <Degree/>
-      <Footer/>
-      
+      <Degree />
+      <Event />
+      <Blogs />
+      <Footer />
     </>
   );
 };
 export default page;
-
