@@ -6,6 +6,9 @@ const page = () => {
     <div className="m-2 flex flex-wrap gap-4 mx-auto">
       <AcademiaCard title="Faculty" img="/images/logo.png" link="/dashboard/faculty" />
       <AcademiaCard title="Scholarship" img="/images/logo.png" link="/dashboard/scholarship" />
+      <AcademiaCard title="University" img="/images/logo.png" link="/dashboard/university" />
+      <AcademiaCard title="Program" img="/images/logo.png" link="/dashboard/program" />
+
     </div>
   );
 };
