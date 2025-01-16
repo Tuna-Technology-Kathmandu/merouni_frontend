@@ -12,6 +12,7 @@ import Degree from "../components/Frontpage/Degree";
 import Footer from "../components/Frontpage/Footer";
 import Event from "../components/Frontpage/Event";
 import Blogs from "../components/Frontpage/Blogs";
+import Newsletter from "../components/Frontpage/NewsLetter";
 
 const page = () => {
   return (
@@ -27,6 +28,7 @@ const page = () => {
       <Degree />
       <Event />
       <Blogs />
+      <Newsletter/>
       <Footer />
     </>
   );
