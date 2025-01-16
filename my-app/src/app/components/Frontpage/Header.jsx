@@ -12,16 +12,30 @@ const Header = () => {
           width={200}
           height={200}
           alt="Mero UNI logo"
+          className="hidden md:block"
         />
-        <div className="flex items-center bg-[#e4e4e4] p-2 rounded-lg">
+        <div className="block md:hidden">☰</div>
+        <div className="bg-[#e4e4e4] p-2 rounded-lg hidden md:block">
+          <div className="flex items-center">
+            <IoSearchOutline />
+            <div className="mx-2">Search</div>
+            <input
+              type="text"
+              name=""
+              id=""
+              className="p-[2px] bg-inherit focus:outline-none"
+            />
+          </div>
+        </div>
+        <Image
+          src={"/images/logo.png"}
+          width={200}
+          height={200}
+          alt="Mero UNI logo"
+          className="block md:hidden"
+        />
+        <div className="block md:hidden">
           <IoSearchOutline />
-          <div className="mx-2">Search</div>
-          <input
-            type="text"
-            name=""
-            id=""
-            className="p-[2px] bg-inherit focus:outline-none"
-          />
         </div>
         <div>
           <FaUserCircle
