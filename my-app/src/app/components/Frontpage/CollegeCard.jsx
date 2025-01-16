@@ -1,6 +1,6 @@
 const CollegeCard = ({ logo, name, address, gradient }) => {
   return (
-    <div className="h-[600px] text-center min-w-[500px] mx-4 rounded-2xl flex flex-col items-center  justify-evenly"
+    <div className="h-[600px] text-center min-w-[300px] md:min-w-[500px]  mx-4 rounded-2xl flex flex-col items-center  justify-evenly"
       style={{
         background: gradient,
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",

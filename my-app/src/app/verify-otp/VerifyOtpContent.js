@@ -9,13 +9,14 @@ const VerifyOtpContent = () => {
   const email = searchParams.get("email");
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const inputRefs = useRef([...Array(6)].map(() => useRef()));
-
-  // Your existing component logic here...
+  
+  // Fix: Create refs array properly
+  const inputRefs = useRef([]);
+  inputRefs.current = Array(6).fill(null).map((_, i) => inputRefs.current[i] ?? useRef(null));
 
   useEffect(() => {
     // Focus first input on mount
-    inputRefs.current[0].current?.focus();
+    inputRefs.current[0]?.current?.focus();
   }, []);
 
   const handleChange = (index, value) => {
@@ -28,7 +29,7 @@ const VerifyOtpContent = () => {
 
     // Auto-focus next input
     if (value && index < 5) {
-      inputRefs.current[index + 1].current?.focus();
+      inputRefs.current[index + 1]?.current?.focus();
     }
   };
 
@@ -39,7 +40,7 @@ const VerifyOtpContent = () => {
         const newOtp = [...otp];
         newOtp[index - 1] = "";
         setOtp(newOtp);
-        inputRefs.current[index - 1].current?.focus();
+        inputRefs.current[index - 1]?.current?.focus();
       }
     }
   };
@@ -58,7 +59,7 @@ const VerifyOtpContent = () => {
     // Focus last filled input or first empty input
     const lastFilledIndex = newOtp.findLastIndex((val) => val !== "");
     const focusIndex = lastFilledIndex < 5 ? lastFilledIndex + 1 : 5;
-    inputRefs.current[focusIndex].current?.focus();
+    inputRefs.current[focusIndex]?.current?.focus();
   };
 
   const handleResendOtp = async () => {
@@ -135,14 +136,12 @@ const VerifyOtpContent = () => {
         </p>
       </div>
 
-      {/* Rest of your existing JSX... */}
-
       <form onSubmit={handleSubmit} className="mt-8 space-y-6">
         <div className="flex gap-4 justify-center">
           {otp.map((digit, index) => (
             <input
               key={index}
-              ref={inputRefs.current[index]}
+              ref={el => inputRefs.current[index] = { current: el }}
               type="text"
               maxLength={1}
               value={digit}

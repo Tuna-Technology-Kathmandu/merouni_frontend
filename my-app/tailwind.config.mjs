@@ -11,6 +11,10 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      screens: {
+        lp: "1325px", // Custom screen size
+        tb:"915px"
+      },
     },
   },
   plugins: [],
