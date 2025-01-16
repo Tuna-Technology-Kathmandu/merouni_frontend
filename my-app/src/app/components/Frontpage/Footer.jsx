@@ -126,8 +126,8 @@ const Footer = () => {
         </div>
       </header>
 
-      <footer class=" bg-black text-white py-10">
-        <div class="container mx-auto px-4">
+      <footer className=" bg-black text-white py-10">
+        <div className="container mx-auto px-4">
           {/* <!-- Footer Content Section --> */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
             {/* <!-- Top Exams --> */}
@@ -189,9 +189,9 @@ const Footer = () => {
                   width={250}
                   height={250}
                   alt="Mero UNI logo"
-                  className="ml-10"
+                  className="ml-6"
                 />
-                <div className="flex space-x-8">
+                <div className="flex space-x-2 md:space-x-8">
                   <Link
                     className="hover:text-[#30ad8f] transition-colors"
                     href={"/"}
@@ -286,7 +286,7 @@ const Footer = () => {
                   </Link>
                 </div>
 
-                <div className="flex items-center space-x-24 mt-16 mb-8">
+                <div className="flex items-center justify-between gap-4  mt-16 mb-8">
                 <a href="#">
                   <FaFacebook size={28} />
                 </a>
