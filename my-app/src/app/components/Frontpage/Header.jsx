@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import React, { useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
@@ -24,7 +23,6 @@ const Header = () => {
           onClick={() => setShowSearch(false)}
         />
       )}
-
       <div className="flex justify-between max-w-[1600px] mx-auto px-8  items-center">
         <Image
           src={"/images/logo.png"}
@@ -43,6 +41,7 @@ const Header = () => {
               name=""
               id=""
               className="p-[2px] bg-inherit focus:outline-none"
+              onClick={() => setShowSearch(true)}
             />
           </div>
         </div>
@@ -54,16 +53,7 @@ const Header = () => {
           className="block md:hidden"
         />
         <div className="block md:hidden">
-          <IoSearchOutline />
-          <div className="mx-2">Search</div>
-          <input
-            type="text"
-            name=""
-            id=""
-            className="p-[2px] bg-inherit focus:outline-none"
-            onClick={() => setShowSearch(true)}
-          />
-
+          <IoSearchOutline onClick={() => setShowSearch(true)} />
         </div>
         <div>
           <FaUserCircle
@@ -71,8 +61,6 @@ const Header = () => {
           />
         </div>
       </div>
-
-      {/* {showSearch && <SearchBox onClose={() => setShowSearch(false)}/>} */}
     </>
   );
 };
