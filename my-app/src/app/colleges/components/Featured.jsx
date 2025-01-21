@@ -51,10 +51,12 @@
 // };
 
 // export default Featured;
-"use client"
+"use client";
 
 import React, { useRef } from "react";
 import Fcollege from "./Fcollege";
+import { GoArrowLeft } from "react-icons/go";
+import { GoArrowRight } from "react-icons/go";
 
 const collegesData = [
   {
@@ -140,7 +142,7 @@ const collegesData = [
     description:
       "One of the leading institutions with a focus on holistic education and interdisciplinary learning.",
     image: "/images/eventcard.png",
-  }
+  },
 
   // Add more colleges as needed
 ];
@@ -163,8 +165,8 @@ const Featured = () => {
   };
 
   return (
-    <div className="flex flex-col p-4">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">
+    <div className="flex flex-col p-4  py-20">
+      <h2 className="text-2xl font-bold text-gray-800 mb-8">
         Featured Colleges
       </h2>
       <div className="relative">
@@ -173,13 +175,13 @@ const Featured = () => {
           onClick={scrollLeft}
           className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-200 hover:bg-gray-300 p-2 rounded-full shadow-md z-10"
         >
-          &lt;
+          <GoArrowLeft />
         </button>
 
         {/* Scrollable Container */}
         <div
           ref={scrollRef}
-          className="flex gap-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 p-2"
+          className="flex gap-10 overflow-x-auto scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 p-2  "
         >
           {collegesData.map((college, index) => (
             <Fcollege
@@ -194,9 +196,9 @@ const Featured = () => {
         {/* Right Scroll Button */}
         <button
           onClick={scrollRight}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-200 hover:bg-gray-300 p-2 rounded-full shadow-md z-10"
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-200 hover:bg-gray-300 p-2 rounded-full shadow-md z-10 "
         >
-          &gt;
+          <GoArrowRight />
         </button>
       </div>
     </div>
