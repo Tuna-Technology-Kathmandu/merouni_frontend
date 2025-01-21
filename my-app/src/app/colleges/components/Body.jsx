@@ -6,58 +6,58 @@ import DegreeSection from "./DegreeSection";
 import AffiliationSection from "./AffiliationSection";
 import CourseFeeSection from "./CourseFeeSection";
 import UniversityCard from "./UniversityCard";
-import { useState } from "react";
-
-// const CourseFeeSection = () => {
-//   return (
-//     <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-lg">
-//       <div className="flex justify-between items-center mb-3">
-//         <h3 className="text-gray-800 font-medium">Course Fees</h3>
-//         <svg
-//           className="w-4 h-4"
-//           viewBox="0 0 24 24"
-//           fill="none"
-//           stroke="currentColor"
-//           strokeWidth="2"
-//         >
-//           <path d="M19 9l-7 7-7-7" />
-//         </svg>
-//       </div>
-//       <div className="space-y-4">
-//         <div className="relative pt-1">
-//           <div className="flex items-center justify-between">
-//             <span className="text-xs text-green-500">NPR 1,30,000</span>
-//             <span className="text-xs text-green-500">NPR 25,00,000</span>
-//           </div>
-//           <div className="h-2 bg-gray-200 rounded-full mt-2">
-//             <div className="h-2 bg-green-500 rounded-full w-full relative">
-//               <div className="absolute -left-2 -top-1.5 w-5 h-5 bg-white border-2 border-green-500 rounded-full"></div>
-//               <div className="absolute -right-2 -top-1.5 w-5 h-5 bg-white border-2 border-green-500 rounded-full"></div>
-//             </div>
-//           </div>
-//         </div>
-//         <div className="flex gap-4">
-//           <input
-//             type="text"
-//             value="1,30,000"
-//             className="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none"
-//           />
-//           <input
-//             type="text"
-//             value="25,00,000"
-//             className="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none"
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+import { useState, useEffect, useCallback } from "react";
+import { getColleges, searchColleges } from "../actions";
+import { debounce } from "lodash";
 
 const CollegeFinder = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [universities, setUniversities] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    totalPages: 1,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  useEffect(() => {
+    if (!searchQuery) {
+      fetchColleges(currentPage);
+    }
+  }, [currentPage, searchQuery]);
+  const debouncedSearch = useCallback(
+    debounce(async (query) => {
+      if (query) {
+        setIsSearching(true);
+        const results = await searchColleges(query);
+        setUniversities(results.colleges);
+        setPagination(results.pagination);
+        setIsSearching(false);
+      }
+    }, 1000), // 1000ms delay
+    []
+  );
 
-  // State for filters (you'll need to pass these to your filter components)
- 
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    debouncedSearch(query);
+  };
+
+  const fetchColleges = async (page) => {
+    setIsLoading(true);
+    try {
+      const data = await getColleges(page);
+      setUniversities(data.colleges);
+      setPagination(data.pagination);
+    } catch (error) {
+      console.error("Error fetching colleges:", error);
+    }
+    setIsLoading(false);
+  };
+
   const filters = [
     {
       title: "Discipline (32)",
@@ -133,157 +133,8 @@ const CollegeFinder = () => {
         { name: "Kaski", count: 8 },
       ],
     },
-  ]
-
-  const universities = [
-    {
-      name: "Texas College of Management and IT",
-      location: "Sifal, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "The British College - Trade Tower",
-      location: "Thapathali, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "St. Xavier's College",
-      location: "Maitighar, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "Texas College of Management and IT",
-      location: "Sifal, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "The British College - Trade Tower",
-      location: "Thapathali, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "St. Xavier's College",
-      location: "Maitighar, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "Texas College of Management and IT",
-      location: "Sifal, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "The British College - Trade Tower",
-      location: "Thapathali, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "St. Xavier's College",
-      location: "Maitighar, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "Texas College of Management and IT",
-      location: "Sifal, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "The British College - Trade Tower",
-      location: "Thapathali, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "St. Xavier's College",
-      location: "Maitighar, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "Texas College of Management and IT",
-      location: "Sifal, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "The British College - Trade Tower",
-      location: "Thapathali, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "St. Xavier's College",
-      location: "Maitighar, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "Texas College of Management and IT",
-      location: "Sifal, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "The British College - Trade Tower",
-      location: "Thapathali, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "St. Xavier's College",
-      location: "Maitighar, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "Texas College of Management and IT",
-      location: "Sifal, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "The British College - Trade Tower",
-      location: "Thapathali, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
-    {
-      name: "St. Xavier's College",
-      location: "Maitighar, Kathmandu",
-      description:
-        "Established in 2009 under the Texas International Education Network, Texas College of Management & IT in Kathmandu offers robust academic programs in Management and Information Technology.",
-      logo: "/images/pu.png",
-    },
   ];
+
   const FilterModal = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
       <div className="bg-white rounded-xl p-6 w-[80%] h-[80%] overflow-y-auto">
@@ -330,6 +181,44 @@ const CollegeFinder = () => {
     </div>
   );
 
+  const PaginationControls = () => (
+    <div className="flex justify-center items-center gap-4 mt-8">
+      <button
+        onClick={() => setCurrentPage((prev) => prev - 1)}
+        disabled={!pagination.hasPreviousPage}
+        className={`px-4 py-2 rounded-lg ${
+          pagination.hasPreviousPage
+            ? "bg-blue-500 text-white hover:bg-blue-600"
+            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+        }`}
+      >
+        Previous
+      </button>
+      <span className="text-gray-600">
+        Page {currentPage} of {pagination.totalPages}
+      </span>
+      <button
+        onClick={() => setCurrentPage((prev) => prev + 1)}
+        disabled={!pagination.hasNextPage}
+        className={`px-4 py-2 rounded-lg ${
+          pagination.hasNextPage
+            ? "bg-blue-500 text-white hover:bg-blue-600"
+            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+        }`}
+      >
+        Next
+      </button>
+    </div>
+  );
+  const NoResultsFound = () => (
+    <div className="flex flex-col items-center justify-center h-64">
+      <Search className="w-16 h-16 text-gray-300 mb-4" />
+      <h3 className="text-xl font-semibold text-gray-600">No Results Found</h3>
+      <p className="text-gray-500 mt-2">
+        Try adjusting your search criteria or browse all colleges
+      </p>
+    </div>
+  );
   return (
     <div className="max-w-[1600px] mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
@@ -345,22 +234,36 @@ const CollegeFinder = () => {
                 <FaExpandAlt />
               </div>
             </button>
-            <button className="text-gray-600 text-sm">Clear All</button>
+            <button
+              className="text-gray-600 text-sm"
+              onClick={() => setSearchQuery("")}
+            >
+              Clear All
+            </button>
           </div>
         </div>
         <div className="flex  items-center gap-4">
           <div className="flex gap-4">
             <h2 className="text-xl font-semibold">Universities</h2>
-            <span className="text-gray-500">(1000+ Colleges)</span>
+            <span className="text-gray-500">
+              ({pagination.totalRecords || "0"} Colleges)
+            </span>
           </div>
         </div>
         <div className="flex bg-gray-100 items-center rounded-xl ">
           <Search className=" left-3 top-2.5 w-5 h-5 text-gray-400 mx-2" />
           <input
             type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
             placeholder="Search by colleges"
-            className="w-full  pr-4 py-2.5 bg-gray-100 rounded-xl text-sm focus:outline-none"
+            className="w-full pr-4 py-2.5 bg-gray-100 rounded-xl text-sm focus:outline-none"
           />
+          {isSearching && (
+            <div className="absolute right-3 top-2.5">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-500"></div>
+            </div>
+          )}
         </div>
       </div>
       <div className="flex gap-8">
@@ -374,11 +277,65 @@ const CollegeFinder = () => {
         </div>
 
         <div className="w-3/4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {universities.map((university, index) => (
               <UniversityCard key={index} {...university} />
             ))}
-          </div>
+          </div> */}
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            </div>
+          ) : (
+            // <>
+            //   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            //     {universities.map((university, index) => (
+            //       <UniversityCard key={index} {...university} />
+            //     ))}
+            //   </div>
+            //   <PaginationControls />
+            // </>
+            <>
+              {universities.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {universities.map((university, index) => (
+                    <UniversityCard key={index} {...university} />
+                  ))}
+                </div>
+              ) : (
+                <NoResultsFound />
+              )}
+              {!searchQuery && universities.length > 0 && (
+                <div className="flex justify-center items-center gap-4 mt-8">
+                  <button
+                    onClick={() => setCurrentPage((prev) => prev - 1)}
+                    disabled={!pagination.hasPreviousPage}
+                    className={`px-4 py-2 rounded-lg ${
+                      pagination.hasPreviousPage
+                        ? "bg-blue-500 text-white hover:bg-blue-600"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
+                  >
+                    Previous
+                  </button>
+                  <span className="text-gray-600">
+                    Page {currentPage} of {pagination.totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage((prev) => prev + 1)}
+                    disabled={!pagination.hasNextPage}
+                    className={`px-4 py-2 rounded-lg ${
+                      pagination.hasNextPage
+                        ? "bg-blue-500 text-white hover:bg-blue-600"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
       {isModalOpen && <FilterModal />}
