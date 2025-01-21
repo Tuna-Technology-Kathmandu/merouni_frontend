@@ -9,8 +9,8 @@ const Newsletter = () => {
         <div className="mb-6 md:mb-0 text-center md:text-left">
           <h2 className="text-3xl font-bold text-gray-800 mb-4 md:mb-2">News Letter</h2>
           <p className="text-gray-600 font-semibold mt-2">
-            Get the latest exam updates, study resources, and expert tips
-            delivered straight to your inbox
+            Get the latest exam updates, study resources, and <br/>
+            expert tips delivered straight to your inbox
           </p>
         </div>
 
