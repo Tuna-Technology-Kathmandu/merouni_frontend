@@ -87,3 +87,9 @@ export async function updateFaculty(id, data) {
 export async function deleteFaculty(id) {
   return services.faculty.delete(id);
 }
+
+
+// Events actions
+export async function getEvents(queryParams){
+  return services.event.getAll(queryParams)
+}
