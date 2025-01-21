@@ -4,13 +4,13 @@ import { FaGreaterThan } from "react-icons/fa";
 
 const Ranking = () => {
   return (
-    <div className="h-screen bg-gradient-to-r flex items-center text-black ">
-      <div className="flex items-center max-w-[1600px] mx-auto gap-64">
-        <div className="flex flex-col">
-          <div className="font-poppins text-2xl md:text-7xl font-extrabold leading-3 md:leading-[80px] text-left text-inherit w-[400px] mb-4">
+    <div className=" bg-gradient-to-r flex items-center text-black my-24 ">
+      <div className="flex items-center max-w-[1600px] mx-auto gap-16  2xl:gap-40 flex-col 2xl:flex-row">
+        <div className="flex flex-col items-left sm:items-center md:items-start ">
+          <div className="font-poppins text-xl md:text-5xl 2xl:text-7xl font-bold md:font-extrabold leading-9 md:leading-[80px] text-left text-inherit w-[300px] md:w-[400px] mb-4">
             Find The Perfect College For You
           </div>
-          <div className="w-[600px] text-black text-2xl font-bold mb-4">
+          <div className="w-[300px] md:w-[600px] text-black text-md md:text-2xl font-bold mb-4">
             Select colleges based on your goals, interests and future
             aspirations
           </div>
@@ -26,7 +26,7 @@ const Ranking = () => {
           style={{
             background:
               "linear-gradient(133.94deg, #FFFFFF 0.51%, #E9E9E9 99.49%)",
-              boxShadow: "8px 10px 4px rgba(0, 0, 0, 0.1)",
+            boxShadow: "8px 10px 4px rgba(0, 0, 0, 0.1)",
           }}
         >
           <div className="flex items-center">
@@ -38,12 +38,12 @@ const Ranking = () => {
             />
             <div className="font-extrabold text-2xl">Rankings</div>
           </div>
-          <p className="font-semibold w-[600px] mx-2">
+          <p className="font-semibold w-[300px] md:w-[600px] mx-2">
             1500+ colleges ranked with trusted, student-focused data approved by
             Nepal’s Education Authorities
           </p>
-          <div className="flex flex-col gap-12 my-8 font-semibold">
-            <div className="flex justify-evenly">
+          <div className="flex flex-col gap-4 mx-auto my-8 font-semibold">
+            <div className="flex flex-col gap-4 md:flex-row justify-evenly">
               <div className="border border-black rounded-lg text-center p-2 w-[275px] ">
                 Top IT COllege in Nepal
               </div>
@@ -51,7 +51,7 @@ const Ranking = () => {
                 Top Universities in Nepal
               </div>
             </div>
-            <div className="flex justify-evenly">
+            <div className="flex flex-col md:flex-row  gap-4 justify-evenly">
               <div className="border border-black rounded-lg text-center p-2 w-[275px] ">
                 Top Engineering COlleges in Nepal
               </div>
@@ -59,7 +59,7 @@ const Ranking = () => {
                 Top MBA colleges in Nepal
               </div>
             </div>
-            <div className="flex justify-evenly">
+            <div className="flex  flex-col md:flex-row gap-4 justify-evenly">
               <div className="border border-black rounded-lg text-center p-2 w-[275px] ">
                 Top Medical COlleges in Nepal
               </div>
