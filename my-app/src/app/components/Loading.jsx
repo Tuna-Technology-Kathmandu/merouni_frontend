@@ -2,7 +2,10 @@ import React from 'react';
 
 const Loader = () => {
   return (
-    <div className="w-12 h-12 border-4 border-black border-t-white rounded-full animate-spin"></div>
+    <div className=' flex items-center mx-auto w-max mt-6'>
+
+    <div className="w-12 h-12 border-4 border-black border-t-white rounded-full animate-spin "></div>
+    </div>
   );
 };
 
