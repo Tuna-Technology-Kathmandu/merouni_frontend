@@ -14,6 +14,7 @@ export default {
       screens: {
         lp: "1325px", // Custom screen size
         tb: "915px",
+        
       },
     },
   },

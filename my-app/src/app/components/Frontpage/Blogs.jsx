@@ -3,7 +3,7 @@ import React from "react";
 
 const Blogs = () => {
   return (
-    <div className="max-w-[1700px] mx-auto">
+    <div className="max-w-[1700px] mx-auto my-36">
       <div className="font-extrabold text-xl md:text-4xl px-2 md:px-32 my-8 whitespace-nowrap ">
         Featured Blogs and Articles
       </div>
