@@ -164,6 +164,8 @@ const Featured = () => {
     });
   };
 
+  
+
   return (
     <div className="flex flex-col p-4  py-20">
       <h2 className="text-2xl font-bold text-gray-800 mb-8">
