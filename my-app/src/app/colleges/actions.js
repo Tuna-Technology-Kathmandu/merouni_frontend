@@ -3,7 +3,7 @@
 export async function getColleges(page = 1, sort = "ASC") {
   try {
     const response = await fetch(
-      `http://localhost:8000/api/v1/college?page=${page}&sort=${sort}`,
+      `${process.env.baseUrl}${process.env.version}/college?page=${page}&sort=${sort}`,
       {
         cache: "no-store",
       }
