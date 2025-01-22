@@ -3,12 +3,12 @@ import { FaLocationArrow } from "react-icons/fa6";
 
 const Newsletter = () => {
   return (
-    <div className=" bg-gradient-to-b from-[#E0E0E0] to-[#FFFFFF] py-20">
-      <div className="container mx-auto px-4 flex flex-col md:flex-row items-center md:justify-between">
+    <div className=" bg-gradient-to-b from-[#E0E0E0] to-[#FFFFFF] py-20 h-[70vh] flex items-center">
+      <div className="container mx-auto px-4 flex flex-col md:flex-row items-center md:justify-center gap-8 md:gap-48 flex-wrap">
         {/* Left Section */}
         <div className="mb-6 md:mb-0 text-center md:text-left">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4 md:mb-2">News Letter</h2>
-          <p className="text-gray-600 font-semibold mt-2">
+          <h2 className="text-2xl font-bold md:text-5xl md:font-extrabold text-black mb-4 md:mb-2">News Letter</h2>
+          <p className="text-black font-semibold mt-2">
             Get the latest exam updates, study resources, and <br/>
             expert tips delivered straight to your inbox
           </p>

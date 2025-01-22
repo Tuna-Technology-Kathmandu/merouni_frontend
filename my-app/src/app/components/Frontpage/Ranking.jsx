@@ -5,7 +5,7 @@ import { FaGreaterThan } from "react-icons/fa";
 const Ranking = () => {
   return (
     <div className=" bg-gradient-to-r flex items-center text-black my-24 ">
-      <div className="flex items-center max-w-[1600px] mx-auto gap-16  2xl:gap-40 flex-col 2xl:flex-row">
+      <div className="flex items-center max-w-[1600px] mx-auto gap-16  2xl:gap-40 flex-col lp:flex-row">
         <div className="flex flex-col items-left sm:items-center md:items-start ">
           <div className="font-poppins text-xl md:text-5xl 2xl:text-7xl font-bold md:font-extrabold leading-9 md:leading-[80px] text-left text-inherit w-[300px] md:w-[400px] mb-4">
             Find The Perfect College For You
