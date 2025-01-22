@@ -233,7 +233,7 @@ const DegreeScroller = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className=" my-12">
       {/* First Section - Degree Programs */}
       <div className="relative max-w-[2000px] mx-auto px-4 bg-white text-black mt-12 md:mt-36">
         <h2 className="text-xl font-bold mb-6">
@@ -243,7 +243,7 @@ const DegreeScroller = () => {
         <div className="relative">
           <div
             ref={scrollerRef}
-            className="flex gap-4 overflow-x-auto scroll-smooth scrollbar-thin scrollbar-track-gray-100 h-auto md:h-64 scrollbar-thumb-black pb-4"
+            className="flex gap-4 overflow-x-auto scroll-smooth scrollbar-thin scrollbar-track-gray-100 h-72 md:h-96 scrollbar-thumb-black pb-4"
             style={{
               scrollbarWidth: "thin",
               msOverflowStyle: "none",
@@ -256,15 +256,9 @@ const DegreeScroller = () => {
             {degrees.map((degree) => (
               <div
                 key={degree.id}
-                className="flex-shrink-0 w-[280px] md:w-64 bg-gray-100 rounded-lg p-8 md:p-12"
+                className="flex-shrink-0 w-[280px] md:w-64 bg-[#dedede] rounded-lg p-8 md:p-12 flex items-center justify-center "
               >
-                <div className="space-y-4">
-                  <h3 className="font-semibold">{degree.name}</h3>
-                  <p className="text-sm text-gray-600">
-                    Duration: {degree.duration}
-                  </p>
-                  <p className="font-bold">Fees: ${degree.fees.toFixed(2)}</p>
-                </div>
+                <h3 className="font-bold text-black my-auto  whitespace-nowrap ">{degree.name}</h3>
               </div>
             ))}
           </div>
@@ -320,20 +314,22 @@ const DegreeScroller = () => {
               { number: "4", title: "Law" },
               { number: "4", title: "Law" },
               { number: "4", title: "Law" },
-              { number: "4", title: "Law" }
+              { number: "4", title: "Law" },
               // ... add more fields as needed
             ].map((field, index) => (
               <div
                 key={index}
                 className="flex-shrink-0 bg-[#e1f3ef] h-[200px] md:h-[250px] w-[200px] md:w-[250px] p-4 rounded-2xl flex flex-col items-start justify-center gap-4"
               >
-                <div className="font-black text-3xl md:text-4xl">{field.number}</div>
-                <div className="font-bold text-lg md:text-xl">{field.title}</div>
+                <div className="font-black text-3xl md:text-4xl">
+                  {field.number}
+                </div>
+                <div className="font-bold text-lg md:text-xl">
+                  {field.title}
+                </div>
                 <div className="text-sm md:text-base">120 colleges</div>
                 <div className="self-end">
-                  <FaArrowCircleRight
-                    className="w-8 h-8 md:w-10 md:h-10 text-[#9ad7c8]"
-                  />
+                  <FaArrowCircleRight className="w-8 h-8 md:w-10 md:h-10 text-[#9ad7c8]" />
                 </div>
               </div>
             ))}
