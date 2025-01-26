@@ -22,20 +22,19 @@ const Header = () => {
   return (
     <>
       {/* Search Box Overlay */}
-      <div
-        className={`fixed top-0 left-0 w-full transform transition-transform duration-200 ease-in-out ${
-          showSearch ? "translate-y-0" : "-translate-y-full"
-        }`}
-      >
-        <SearchBox onClose={() => setShowSearch(false)} />
-      </div>
-
-      {/* Search Backdrop */}
       {showSearch && (
-        <div
-          className="fixed inset-0 z-10"
-          onClick={() => setShowSearch(false)}
-        />
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={() => setShowSearch(false)}
+          />
+
+          {/* SearchBox */}
+          <div className="fixed top-0 left-0 w-full z-50">
+            <SearchBox onClose={() => setShowSearch(false)} />
+          </div>
+        </>
       )}
 
       {/* Sidebar */}
@@ -92,16 +91,12 @@ const Header = () => {
 
         {/* Search Box for desktop */}
         <div
-          className="bg-[#e4e4e4] p-2 rounded-lg hidden md:block flex-1 max-w-[300px] mx-auto"
+          className="bg-[#e4e4e4] p-2 rounded-lg hidden md:block flex-1 max-w-[300px] mx-auto cursor-pointer"
           onClick={() => setShowSearch(true)}
         >
           <div className="flex items-center">
             <IoSearchOutline />
             <div className="mx-2">Search</div>
-            <input
-              type="text"
-              className="p-[2px] bg-inherit focus:outline-none w-1/2"
-            />
           </div>
         </div>
 

@@ -83,12 +83,14 @@ export default function UsersManager() {
 
   useEffect(() => {
     loadUsers();
+    
   }, []);
 
   const loadUsers = async () => {
     try {
       setLoading(true);
       const response = await getUsers();
+      console.log("Response:",response.headers)
       setUsers(response.items);
       setError(null);
     } catch (err) {
