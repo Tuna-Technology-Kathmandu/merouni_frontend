@@ -102,3 +102,5 @@ export async function getBlogs(queryParams){
   const q = `page=${queryParams}`
   return services.news.getAll(q)
 }
+
+

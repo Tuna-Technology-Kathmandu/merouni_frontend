@@ -1,11 +1,23 @@
 // export default SimpleSignup;
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { v4 as uuidv4 } from "uuid";
 
 const SignInPage = () => {
   const router = useRouter();
+
+  const getDeviceId = () => {
+    let deviceId = localStorage.getItem("deviceId");
+    if (!deviceId) {
+      deviceId = uuidv4();
+      localStorage.setItem("deviceId", deviceId);
+    }
+    return deviceId;
+  };
+
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -17,12 +29,20 @@ const SignInPage = () => {
   });
   const [errors, setErrors] = useState({});
 
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
     if (!isLogin) {
-      if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
-      if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+      if (!formData.firstName.trim())
+        newErrors.firstName = "First name is required";
+      if (!formData.lastName.trim())
+        newErrors.lastName = "Last name is required";
       if (!formData.phone_no.trim()) {
         newErrors.phone_no = "Phone number is required";
       } else if (!/^\d{10}$/.test(formData.phone_no)) {
@@ -63,21 +83,36 @@ const SignInPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const deviceId = getDeviceId();
     if (!validateForm()) return;
 
     setLoading(true);
     try {
       const endpoint = isLogin ? "/api/v1/auth/login" : "/api/v1/auth/register";
 
-      const response = await fetch(`http://localhost:5000${endpoint}`, {
+      const filteredData = isLogin
+        ? {
+            email: formData.email,
+            password: formData.password,
+            deviceName: navigator.userAgent,
+          }
+        : {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phone_no: formData.phone_no,
+            password: formData.password,
+          };
+      const response = await fetch(`${process.env.baseUrl}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(isLogin && { "device-id": getDeviceId() }),
         },
         credentials: "include",
-        body: JSON.stringify(formData),
+        body: JSON.stringify(filteredData),
       });
-
+      console.log("Response:", response);
       const data = await response.json();
 
       if (response.ok) {
@@ -85,8 +120,16 @@ const SignInPage = () => {
           toast.success("Login successful!");
           router.push("/dashboard");
         } else {
+          setFormData({
+            firstName: "",
+            email: "",
+            lastName: "",
+            password: "",
+            phone_no: "",
+          });
           toast.success("Account created! Please verify your email.");
-          router.push(`/verify-otp?email=${formData.email}`);
+
+          // router.push(`/verify-otp?email=${formData.email}`);
         }
       } else {
         // Show server-provided error message
@@ -131,7 +174,9 @@ const SignInPage = () => {
                   } focus:outline-none focus:ring-blue-500`}
                 />
                 {errors.firstName && (
-                  <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.firstName}
+                  </p>
                 )}
               </div>
               <div>
@@ -162,7 +207,9 @@ const SignInPage = () => {
                 errors.email ? "border-red-500" : "border-gray-300"
               } focus:outline-none focus:ring-blue-500`}
             />
-            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+            )}
           </div>
           {!isLogin && (
             <div>
@@ -183,20 +230,33 @@ const SignInPage = () => {
             </div>
           )}
           <div>
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              className={`appearance-none rounded-lg w-full px-3 py-2 border ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              } focus:outline-none focus:ring-blue-500`}
-            />
+           
+
+            <div className="relative flex flex-row">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                className={`appearance-none rounded-lg w-full px-3 py-2 border ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                } focus:outline-none focus:ring-blue-500`}
+              />
+              <button
+                type="button"
+                onClick={togglePassword}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">{errors.password}</p>
             )}
           </div>
+
           <div>
             <button
               type="submit"
