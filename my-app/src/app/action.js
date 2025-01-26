@@ -1,6 +1,10 @@
 "use server";
 
 import services from './apiService';
+import { cookies } from 'next/headers';
+
+
+// const cookieStore = await 
 
 // University actions
 export async function getUniversities(queryParams) {
@@ -104,3 +108,8 @@ export async function getBlogs(queryParams){
 }
 
 
+export async function getToken(){
+  const cookieStore = await cookies()
+  const token = cookieStore.get("token")
+  return token
+}
