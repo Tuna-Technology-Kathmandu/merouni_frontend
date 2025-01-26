@@ -7,6 +7,7 @@ class ApiService {
   async getAll(queryParams = "") {
     try {
       const url = queryParams ? `${this.baseUrl}?${queryParams}` : this.baseUrl;
+      console.log("Final URL:", url); // Debug log
       const response = await fetch(url, {
         cache: "no-store",
       });
@@ -86,6 +87,7 @@ const services = {
   course: new ApiService("course"),
   faculty: new ApiService("faculty"),
   event: new ApiService("events"),
+  news: new ApiService("news"),
 };
 
 export default services;

@@ -1,1 +1,1 @@
-# merouni_frontend
+# Merouni Frontend Application

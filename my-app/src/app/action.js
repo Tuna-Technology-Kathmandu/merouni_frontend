@@ -93,3 +93,14 @@ export async function deleteFaculty(id) {
 export async function getEvents(queryParams){
   return services.event.getAll(queryParams)
 }
+
+
+
+
+//Blogs actions
+export async function getBlogs(queryParams){
+  const q = `page=${queryParams}`
+  return services.news.getAll(q)
+}
+
+

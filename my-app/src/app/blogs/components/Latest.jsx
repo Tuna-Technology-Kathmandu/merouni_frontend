@@ -1,9 +1,11 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 import LatestBlogs from "./LatestBlogs";
 import { GoArrowLeft } from "react-icons/go";
 import { GoArrowRight } from "react-icons/go";
+import { getBlogs } from "@/app/action";
+import Loading from "../../components/Loading";
 
 const collegesData = [
   {
@@ -83,6 +85,40 @@ const Latest = () => {
     });
   };
 
+  const [blogs, setBlogs] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadBlogs();
+  }, []);
+
+  const loadBlogs = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await getBlogs(1);
+      setBlogs(response.items);
+    } catch (error) {
+      setError("Failed to load latest Blogs");
+      console.error("Error fetching latest blogs:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const truncateString = (str, maxLength) => {
+    if (str.length > maxLength) {
+      return str.slice(0, maxLength) + "...";
+    }
+    return str;
+  };
+
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   return (
     <>
       {/*Top Section*/}
@@ -93,39 +129,50 @@ const Latest = () => {
             <span className="text-[#0A70A7] text-2xl font-bold">Blogs</span>
           </div>
 
-          <div className="relative mb-10">
-            {/* Left Scroll Button */}
-            <button
-              onClick={scrollLeft}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-200 hover:bg-gray-300 p-2 rounded-full shadow-md z-10"
-            >
-              <GoArrowLeft />
-            </button>
+          {loading ? (
+            <Loading />
+          ) : (
+            <div className="relative mb-10">
+              {/* Left Scroll Button */}
+              <button
+                onClick={scrollLeft}
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-200 hover:bg-gray-300 p-2 rounded-full shadow-md z-10"
+              >
+                <GoArrowLeft />
+              </button>
 
-            {/* Scrollable Container */}
-            <div
-              ref={scrollRef}
-              className="flex  overflow-x-auto scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 p-2  "
-            >
-              {collegesData.map((college, index) => (
-                <LatestBlogs
-                  key={index}
-                  title={college.title}
-                  description={college.description}
-                  image={college.image}
-                  date={college.date}
-                />
-              ))}
+              <div
+                ref={scrollRef}
+                className="flex  overflow-x-auto scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 p-2"
+              >
+                {blogs.length > 0 ? (
+                  blogs.map((blog, index) => (
+                    <LatestBlogs
+                      key={index}
+                      title={truncateString(blog.title, 30)}
+                      description={truncateString(blog.description, 100)}
+                      image={collegesData[1]["image"]}
+                      date={formatDate(blog.createdAt)}
+                    />
+                  ))
+                ) : loading ? (
+                  <p>Loading....</p>
+                ) : error ? (
+                  <p>{error}</p>
+                ) : (
+                  <p>No blogs found within the 4 days</p>
+                )}
+              </div>
+
+              {/* Right Scroll Button */}
+              <button
+                onClick={scrollRight}
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-200 hover:bg-gray-300 p-2 rounded-full shadow-md z-10 "
+              >
+                <GoArrowRight />
+              </button>
             </div>
-
-            {/* Right Scroll Button */}
-            <button
-              onClick={scrollRight}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-200 hover:bg-gray-300 p-2 rounded-full shadow-md z-10 "
-            >
-              <GoArrowRight />
-            </button>
-          </div>
+          )}
         </div>
       </div>
     </>
