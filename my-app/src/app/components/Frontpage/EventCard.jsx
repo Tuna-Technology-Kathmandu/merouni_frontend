@@ -9,7 +9,7 @@ const EventCard = ({ photo, month, day, title, description }) => {
       <div className="h-[300px]">
 
         <img
-          src={photo}
+          src="/images/upcoming.png"
           alt={`${title} logo`}
           className="w-full  object-cover "
           />
