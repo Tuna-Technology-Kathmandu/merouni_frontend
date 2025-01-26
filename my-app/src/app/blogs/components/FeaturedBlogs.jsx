@@ -149,13 +149,6 @@ const FeaturedBlogs = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  if (loading)
-    return (
-      <div className="mx-auto">
-        <Loading />
-      </div>
-    );
-
   return (
     <>
       <div className="flex flex-col max-w-[1600px] mx-auto px-8 mt-10">
@@ -165,19 +158,23 @@ const FeaturedBlogs = () => {
           <span className="text-[#0A70A7] text-2xl font-bold">Blogs</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
-          {Blogs.map((blog, index) => (
-            <div key={index}>
-              <BlogCard
-                date={formatDate(blog.createdAt)}
-                description={truncateString(blog.description, 100)}
-                image={blogs[0]["image"]}
-                title={truncateString(blog.title, 20)}
-                views={blogs[0]["views"]}
-              />
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <Loading />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
+            {Blogs.map((blog, index) => (
+              <div key={index}>
+                <BlogCard
+                  date={formatDate(blog.createdAt)}
+                  description={truncateString(blog.description, 100)}
+                  image={blogs[0]["image"]}
+                  title={truncateString(blog.title, 20)}
+                  views={blogs[0]["views"]}
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       <Pagination pagination={pagination} onPageChange={handlePageChange} />
     </>
