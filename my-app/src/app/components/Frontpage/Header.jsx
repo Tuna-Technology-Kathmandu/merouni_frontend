@@ -7,7 +7,7 @@ import SearchBox from "./SearchBox";
 import Link from "next/link";
 import { IoMenu } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
-
+import Usericon from "./Usericon";
 const Header = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
@@ -80,7 +80,7 @@ const Header = () => {
       {/* Main Header */}
       <div className="flex justify-between items-center max-w-[1600px] mx-auto">
         {/* Left Logo */}
-        <Link href="/" className="flex-shrink-0">
+        {/* <Link href="/" className="flex-shrink-0">
           <Image
             src={"/images/logo.png"}
             width={200}
@@ -88,6 +88,16 @@ const Header = () => {
             alt="Mero UNI logo"
             className="hidden md:block"
           />
+        </Link> */}
+        <Link href="/" className="flex-shrink-0">
+          <div className="hidden md:block w-[180px] h-[80px] relative">
+            <Image
+              src={"/images/logo.png"}
+              alt="Mero UNI logo"
+              fill
+              className="object-contain"
+            />
+          </div>
         </Link>
 
         {/* Search Box for desktop */}
@@ -105,26 +115,27 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Mobile Logo */}
         <Link href="/" className="block md:hidden">
-          <Image
-            src={"/images/logo.png"}
-            width={200}
-            height={200}
-            alt="Mero UNI logo"
-          />
+          <div className=" w-[180px] h-[80px] relative">
+            <Image
+              src={"/images/logo.png"}
+              alt="Mero UNI logo"
+              fill
+              className="object-contain"
+            />
+          </div>
         </Link>
-
         {/* Search Icon for mobile */}
         <div className="block md:hidden" onClick={() => setShowSearch(true)}>
           <IoSearchOutline />
         </div>
 
         {/* User Icon */}
-        <div className="mx-2">
-          <FaUserCircle
+        <div className="">
+        <Usericon/>
+          {/* <FaUserCircle
             style={{ width: "40px", height: "40px", color: "#0a6fa7" }}
-          />
+          /> */}
         </div>
 
         {/* Mobile Menu Icon (☰) */}
