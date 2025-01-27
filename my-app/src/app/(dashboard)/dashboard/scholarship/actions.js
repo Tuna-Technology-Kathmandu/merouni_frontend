@@ -1,9 +1,11 @@
 // app/actions/scholarship.js
 'use server'
 
+let url = `${process.env.baseUrl}${process.env.version}/scholarship`;
+
 export async function getAllScholarships() {
   try {
-    const response = await fetch('http://localhost:5000/api/v1/scholarship', {
+    const response = await fetch(`${url}`, {
       cache: 'no-store'
     });
     const data = await response.json();
@@ -15,7 +17,9 @@ export async function getAllScholarships() {
 
 export async function createScholarship(data) {
   try {
-    const response = await fetch('http://localhost:5000/api/v1/scholarship', {
+    console.log(`Scholarship Data : ${data}`);
+
+    const response = await fetch(`${url}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -30,7 +34,7 @@ export async function createScholarship(data) {
 
 export async function updateScholarship(id, data) {
   try {
-    const response = await fetch(`http://localhost:5000/api/v1/scholarship?scholarship_id=${id}`, {
+    const response = await fetch(`${url}?scholarship_id=${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -45,7 +49,7 @@ export async function updateScholarship(id, data) {
 
 export async function deleteScholarship(id) {
   try {
-    const response = await fetch(`http://localhost:5000/api/v1/scholarship?scholarship_id=${id}`, {
+    const response = await fetch(`${url}?scholarship_id=${id}`, {
       method: 'DELETE',
     });
     return await response.json();
