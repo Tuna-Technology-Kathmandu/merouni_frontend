@@ -1,26 +1,26 @@
 "use server";
 
-let url = `${process.env.baseUrl}${process.env.version}/category`;
+let url = `${process.env.baseUrl}${process.env.version}/events`;
 
-export async function fetchCategories(page = 1, limit = 10) {
+export async function fetchEvents(page = 1, limit = 10) {
   try {
     const response = await fetch(
-      `${url}?limit=${limit}&page=${page}&sort=desc`,
+      `${url}?limit=${limit}&page=${page}`,
       { cache: "no-store" }
     );
-
+    console.log(`Response: ${response}`);
     if (!response.ok) {
-      throw new Error("Failed to fetch categories");
+      throw new Error("Failed to fetch events");
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error fetching categories:", error);
+    console.error("Error fetching events:", error);
     throw error;
   }
 }
 
-export async function createCategory(data) {
+export async function createEvent(data) {
   try {
     const response = await fetch(`${url}`, {
       method: "POST",
@@ -41,9 +41,9 @@ export async function createCategory(data) {
   }
 }
 
-export async function updateCategory(categoryId, data) {
+export async function updateEvent(eventId, data) {
   try {
-    const response = await fetch(`${url}?category_id=${categoryId}`, {
+    const response = await fetch(`${url}?event_id=${eventId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -62,10 +62,10 @@ export async function updateCategory(categoryId, data) {
   }
 }
 
-export async function deleteCategory(categoryId) {
+export async function deleteEvent(eventId) {
   console.log("before deleteing");
   try {
-    const response = await fetch(`${url}?category_id=${categoryId}`, {
+    const response = await fetch(`${url}?event_id=${eventId}`, {
       method: "DELETE",
     });
 

@@ -40,9 +40,9 @@ export default function ScholarshipManager() {
         accessorKey: "eligibilityCriteria",
       },
       {
-        header: "Amount",
+        header: "Amount (Rs.)",
         accessorKey: "amount",
-        cell: ({ getValue }) => `$${getValue().toLocaleString()}`,
+        cell: ({ getValue }) => `${getValue().toLocaleString()}`,
       },
       {
         header: "Deadline",
@@ -105,7 +105,6 @@ export default function ScholarshipManager() {
         amount: Number(formData.amount),
         applicationDeadline: formatDate(formData.applicationDeadline),
       };
-
       if (editingId) {
         await updateScholarship(editingId, formattedData);
       } else {
