@@ -9,10 +9,14 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 export default function EventManager() {
 =======
 export default function CategoryManager() {
 >>>>>>> 4732788 (Refactor scholarship and category actions to use environment variables for API URLs; update scholarship manager to display amount in Rs.)
+=======
+export default function EventManager() {
+>>>>>>> ce9df3d (Add News Management feature with CRUD operations and update Menu)
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
