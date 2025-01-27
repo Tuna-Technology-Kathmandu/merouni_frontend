@@ -8,7 +8,11 @@ import { Edit2, Trash2 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+<<<<<<< HEAD
 export default function EventManager() {
+=======
+export default function CategoryManager() {
+>>>>>>> 4732788 (Refactor scholarship and category actions to use environment variables for API URLs; update scholarship manager to display amount in Rs.)
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
