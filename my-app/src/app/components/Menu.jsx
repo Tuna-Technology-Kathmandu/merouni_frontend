@@ -68,6 +68,12 @@ const menuItems = [
       },
       {
         icon: <MdEmojiEvents />,
+        label: "News",
+        href: "/dashboard/news",
+        visible: ["admin", "teacher", "student", "parent"],
+      },
+      {
+        icon: <MdEmojiEvents />,
         label: "Events",
         href: "/dashboard/events",
         visible: ["admin", "teacher", "student", "parent"],
