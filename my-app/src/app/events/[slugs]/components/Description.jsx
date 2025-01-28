@@ -94,7 +94,7 @@ const Description = ({ event }) => {
           <div className="mt-2 rounded-md" 
                dangerouslySetInnerHTML={{ __html: event?.eventMeta?.mapIframe }} 
           />
-          <div className="text-4xl font-extrabold mt-4">{event?.title}</div>
+          <div className="text-4xl font-extrabold mt-4">{event?.title || ""}</div>
           <div className="text-xl font-sm mt-4">{event?.host}</div>
         </div>
       </div>
