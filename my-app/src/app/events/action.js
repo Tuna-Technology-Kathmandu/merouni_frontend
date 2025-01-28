@@ -3,7 +3,7 @@
 export async function getEvents() {
   try {
     const response = await fetch(
-      "http://localhost:8000/api/v1/events?random=true",
+      `${process.env.baseUrl}${process.env.version}/events?random=true`,
       {
         method: "GET",
         headers: {
@@ -26,7 +26,7 @@ export async function getEvents() {
 export async function getThisWeekEvents() {
   try {
     const response = await fetch(
-      "http://localhost:8000/api/v1/events/this-week",
+      `${process.env.baseUrl}${process.env.version}/events/this-week`,
       {
         method: "GET",
         headers: {
@@ -49,7 +49,7 @@ export async function getThisWeekEvents() {
 export async function getNextWeekEvents() {
   try {
     const response = await fetch(
-      "http://localhost:8000/api/v1/events/next-month",
+      `${process.env.baseUrl}${process.env.version}/events/next-month`,
       {
         method: "GET",
         headers: {
@@ -72,7 +72,7 @@ export async function getNextWeekEvents() {
 export async function getEventBySlug(slug) {
   try {
     const response = await fetch(
-      `http://localhost:8000/api/v1/events/${slug}`,
+      `${process.env.baseUrl}${process.env.version}/events/${slug}`,
       {
         method: "GET",
         headers: {
@@ -96,13 +96,16 @@ export async function getEventBySlug(slug) {
 
 export async function getRelatedEvents() {
   try {
-    const response = await fetch("http://localhost:8000/api/v1/events", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    });
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/events`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to fetch related events");
