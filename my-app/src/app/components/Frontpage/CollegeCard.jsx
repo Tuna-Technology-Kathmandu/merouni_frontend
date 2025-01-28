@@ -1,7 +1,9 @@
 const CollegeCard = ({ logo, name, address, gradient }) => {
   return (
-    <div className="h-[600px] text-center min-w-[500px] mx-4 rounded-2xl flex flex-col items-center  justify-evenly"
+    <div
+      className="text-center min-w-[300px] md:min-w-[400px] mx-4 rounded-2xl flex flex-col items-center justify-evenly"
       style={{
+        height: "70vh",  // Adjusted height to 70% of viewport height
         background: gradient,
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
       }}
@@ -18,4 +20,4 @@ const CollegeCard = ({ logo, name, address, gradient }) => {
   );
 };
 
-export default CollegeCard;
+export default CollegeCard

@@ -1,6 +1,10 @@
 "use server";
 
 import services from './apiService';
+import { cookies } from 'next/headers';
+
+
+// const cookieStore = await 
 
 // University actions
 export async function getUniversities(queryParams) {
@@ -86,4 +90,26 @@ export async function updateFaculty(id, data) {
 
 export async function deleteFaculty(id) {
   return services.faculty.delete(id);
+}
+
+
+// Events actions
+export async function getEvents(queryParams){
+  return services.event.getAll(queryParams)
+}
+
+
+
+
+//Blogs actions
+export async function getBlogs(queryParams){
+  const q = `page=${queryParams}`
+  return services.news.getAll(q)
+}
+
+
+export async function getToken(){
+  const cookieStore = await cookies()
+  const token = cookieStore.get("token")
+  return token
 }
