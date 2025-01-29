@@ -6,6 +6,7 @@ import { GoArrowLeft } from "react-icons/go";
 import { GoArrowRight } from "react-icons/go";
 import { getBlogs } from "@/app/action";
 import Loading from "../../components/Loading";
+import Link from "next/link";
 
 const collegesData = [
   {
@@ -141,19 +142,24 @@ const Latest = () => {
                 <GoArrowLeft />
               </button>
 
+              {/* <Link href={`/events/${event.slugs}`} key={index}> */}
+
+
               <div
                 ref={scrollRef}
                 className="flex  overflow-x-auto scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 p-2"
               >
                 {blogs.length > 0 ? (
                   blogs.map((blog, index) => (
+                    <Link href={`/blogs/${blog.slugs}`} key={index}>
                     <LatestBlogs
                       key={index}
                       title={truncateString(blog.title, 30)}
                       description={truncateString(blog.description, 100)}
                       image={collegesData[1]["image"]}
                       date={formatDate(blog.createdAt)}
-                    />
+                      />
+                      </Link>
                   ))
                 ) : loading ? (
                   <p>Loading....</p>

@@ -1,9 +1,16 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
-import { getUsers, createUser, updateUser, deleteUser } from "../../../actions/userActions";
+import {
+  getUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+} from "../../../actions/userActions";
 import Loading from "@/app/components/Loading";
 import Table from "../../../components/Table";
 import { Edit2, Trash2 } from "lucide-react";
+import { getToken } from "@/app/action";
+import { jwtDecode } from "jwt-decode";
 
 export default function UsersManager() {
   const [users, setUsers] = useState([]);
@@ -16,11 +23,28 @@ export default function UsersManager() {
     roles: {
       student: false,
       teacher: false,
-      admin: false
-    }
+      admin: false,
+    },
   });
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+
+  // useEffect(() => {
+  //   const checkToken = async () => {
+  //     const token = await getToken();
+  //     console.log("Token:", token.value);
+  //     if (token?.value) {
+  //       const decoded = jwtDecode(token.value);
+  //       console.log("Decoded token:", decoded);
+  //       setUserId(decoded.data.id);
+  //       setUserRole(decoded.data.role);
+  //       console.log("User ROle:", decoded.data.role.key);
+  //     }
+  //   };
+  //   checkToken();
+  // }, []);
 
   const columns = useMemo(
     () => [
@@ -83,14 +107,22 @@ export default function UsersManager() {
 
   useEffect(() => {
     loadUsers();
-    
   }, []);
 
   const loadUsers = async () => {
     try {
+      const tokenObj = await getToken();
+      const token = tokenObj.value;
+      const decodedToken = jwtDecode(tokenObj.value)
+      const roleObject = decodedToken.data.role
+      const roleName = Object.keys(roleObject).filter(key => roleObject[key] === 'true')
+      console.log("ROLE NAME:",roleName)
+      if (!token) {
+        throw new Error("Token not found");
+      }
       setLoading(true);
-      const response = await getUsers();
-      console.log("Response:",response.headers)
+      const response = await getUsers(1, token,roleName);
+      console.log("Response:", response.headers);
       setUsers(response.items);
       setError(null);
     } catch (err) {
@@ -117,8 +149,8 @@ export default function UsersManager() {
         roles: {
           student: false,
           teacher: false,
-          admin: false
-        }
+          admin: false,
+        },
       });
       setEditingId(null);
       setError(null);
@@ -134,7 +166,7 @@ export default function UsersManager() {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      roles: { ...user.roles }
+      roles: { ...user.roles },
     });
     setEditingId(user._id);
     setError(null);
@@ -158,12 +190,17 @@ export default function UsersManager() {
       ...formData,
       roles: {
         ...formData.roles,
-        [role]: !formData.roles[role]
-      }
+        [role]: !formData.roles[role],
+      },
     });
   };
 
-  if (loading) return <div className="mx-auto"><Loading /></div>;
+  if (loading)
+    return (
+      <div className="mx-auto">
+        <Loading />
+      </div>
+    );
 
   return (
     <div className="p-4 w-4/5 mx-auto">
@@ -202,7 +239,9 @@ export default function UsersManager() {
             type="email"
             placeholder="Email"
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             className="w-full p-2 border rounded"
             required
           />
@@ -259,8 +298,8 @@ export default function UsersManager() {
                 roles: {
                   student: false,
                   teacher: false,
-                  admin: false
-                }
+                  admin: false,
+                },
               });
             }}
             className="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"

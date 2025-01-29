@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { IoIosSearch } from "react-icons/io";
 import { RxCross2 } from "react-icons/rx";
+import Link from "next/link";
+
 
 const SearchBox = ({ onClose }) => {
   const popularSearches = [
@@ -17,8 +19,13 @@ const SearchBox = ({ onClose }) => {
   ];
 
   const [searchTag, setSearchTag] = useState("");
-  const [searchResults, setSearchResults] = useState({ news: [], events: [] });
-  const [isLoading, setIsLoading] = useState(false); // For loading indication
+  const [searchResults, setSearchResults] = useState({
+    // colleges: [],
+    // universities: [],
+    events: [],
+    blogs: [],
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch search results based on input
   const fetchSearchResults = async (query) => {
@@ -30,11 +37,11 @@ const SearchBox = ({ onClose }) => {
         setSearchResults(data);
       } else {
         console.error("Error fetching results:", response.statusText);
-        setSearchResults({ news: [], events: [] });
+        setSearchResults({ blogs: [], events: [] });
       }
     } catch (error) {
       console.error("Error fetching search results:", error.message);
-      setSearchResults({ news: [], events: [] });
+      setSearchResults({ blogs: [], events: [] });
     } finally {
       setIsLoading(false);
     }
@@ -42,10 +49,9 @@ const SearchBox = ({ onClose }) => {
 
   useEffect(() => {
     if (searchTag.trim() !== "") {
-      // Only fetch results for non-empty queries
       fetchSearchResults(searchTag);
     } else {
-      setSearchResults({ news: [], events: [] });
+      setSearchResults({ blogs: [], events: [] });
     }
   }, [searchTag]);
 
@@ -57,91 +63,139 @@ const SearchBox = ({ onClose }) => {
     setSearchTag(value);
   };
 
+
+
+  const handleViewAll = () => {
+    onClose()
+
+  }
+
+  const ResultSection = ({ title, items }) =>{
+
+    const categoryPath = title.toLowerCase();
+
+
+    
+    return items.length > 0 && (
+      <div className="mb-8 px-10">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">{title}</h2>
+          {items.length > 3 && (
+            <Link href={`/${categoryPath}`} className="text-sm text-[#30AD8F] border-b border-[#30AD8F] " onClick={onClose}>
+            View All</Link>
+          )}
+          {/* <button className="text-sm text-[#30AD8F]" >View All</button> */}
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {items.slice(0, 3).map((item, index) => (
+            <>
+            <Link href={`/${categoryPath}/${item.slugs}`} key={index}>
+
+            <div
+              key={index}
+              className="cursor-pointer   p-4 max-w-sm "
+            >
+              <div className="flex justify-center border-2 rounded-3xl items-center  overflow-hidden mb-2 p-4">
+                <img
+                  src="/images/hult_prize.png"
+                  alt={item.title}
+                  className="w-48 h-48 object-contain"
+                />
+              </div>
+              <div className="px-4 pb-4 flex flex-col ">
+                <h3 className="text-lg   font-bold text-center">{item.title}</h3>
+                <p className="text-xs text-gray-700 text-center">{item.location}</p>
+              </div>
+            </div>
+            </Link>
+            </>
+          ))}
+        </div>
+      </div>
+    ) };
+
   return (
     <div
-      className="flex flex-col bg-white shadow-md w-full h-[450px] z-50 items-center justify-center"
+      className={`fixed flex flex-col top-0 left-0 w-full transition-all duration-300 z-50 ${
+        searchTag.trim()
+          ? "h-screen bg-white overflow-auto"
+          : "h-[450px] bg-white shadow-md"
+      }`}
       onClick={(e) => e.stopPropagation()} // Prevents clicks from propagating
     >
-      {/* Search Input */}
-      <div className="relative">
-        <input
-          type="text"
-          placeholder="Search Universities, Colleges, Events & more..."
-          name="searchTag"
-          value={searchTag}
-          className="py-2 border-b-2 border-black focus:outline-none w-[550px] placeholder-gray-500"
-          onChange={handleInputChange}
-          autoFocus
-        />
-        <span className="absolute top-1/2 right-20 transform -translate-y-1/2 text-gray-400">
-          <IoIosSearch size={25} style={{ color: "black" }} />
-        </span>
-        <button
-          onClick={onClose}
-          className="absolute top-1/2 right-4 transform -translate-y-1/2"
-        >
-          <RxCross2 size={20} />
-        </button>
+      {/* Search Input Container */}
+      <div className="relative flex justify-center mt-6">
+        <div className="relative w-[600px]">
+          <input
+            type="text"
+            placeholder="Search Universities, Colleges, Events & more..."
+            value={searchTag}
+            className="w-full py-2 border-b-2 border-black focus:outline-none placeholder-gray-500 pr-16"
+            onChange={handleInputChange}
+            autoFocus
+          />
+          {/* Icons Container */}
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-4 pr-2">
+            {searchTag.trim() && (
+              <button
+                onClick={() => {
+                  setSearchTag("");
+                  setSearchResults({ news: [], events: [] });
+                }}
+                className="hover:bg-[#30AD8F] hover:rounded-lg  "
+              >
+                <RxCross2
+                  size={20}
+                  className="text-gray-600 hover:text-white "
+                />
+              </button>
+            )}
+            <IoIosSearch size={20} className="text-black" />
+          </div>
+        </div>
       </div>
 
-      {/* Search Results or Popular Searches */}
-      <div className="w-[550px] mt-4 h-[350px] overflow-y-auto">
-        {searchTag.trim() ? (
-          isLoading ? (
-            <div className="text-gray-500 text-center">Loading...</div>
-          ) : (
-            <>
-              <ul>
-                {searchResults.news.length > 0 && (
-                  <>
-                    <li className="text-gray-500 mt-2 font-semibold">News</li>
-                    {searchResults.news.map((news, index) => (
-                      <li
-                        key={`news-${index}`}
-                        className="mt-2 font-medium cursor-pointer hover:text-[#30AD8F]"
-                        onClick={() => handleItemClick(news.title)}
-                      >
-                        {news.title}
-                      </li>
-                    ))}
-                  </>
-                )}
-                {searchResults.events.length > 0 && (
-                  <>
-                    <li className="text-gray-500 mt-2 font-semibold">Events</li>
-                    {searchResults.events.map((event, index) => (
-                      <li
-                        key={`event-${index}`}
-                        className="mt-2 font-medium cursor-pointer hover:text-[#30AD8F]"
-                        onClick={() => handleItemClick(event.title)}
-                      >
-                        {event.title}
-                      </li>
-                    ))}
-                  </>
-                )}
-              </ul>
-              {searchResults.news.length === 0 &&
-                searchResults.events.length === 0 && (
-                  <div className="text-gray-500 text-center">
-                    No results found for "{searchTag}"
-                  </div>
-                )}
-            </>
-          )
-        ) : (
-          <ul className="mt-2">
-            <li className="text-gray-500 mt-2 font-semibold">
-              Popular Searches
-            </li>
+      {/* 🔹 Popular Searches (Now Centered Below Search Field) */}
+      {!searchTag.trim() && (
+        <div className="absolute left-1/2 transform -translate-x-1/2 mt-20 w-[600px] h-[400px] overflow-y-auto">
+          <h3 className="text-gray-500 font-semibold">Popular Searches</h3>
+          <ul className="mt-2  ">
             {popularSearches.map((search, index) => (
-              <li key={index} className="mt-2 font-medium cursor-pointer hover:text-[#30AD8F]" onClick={() => handleItemClick(search)}>
+              <li
+                key={index}
+                className="py-2  font-medium cursor-pointer hover:bg-gray-100 hover:text-[#30AD8F] rounded-md"
+                onClick={() => handleItemClick(search)}
+              >
                 {search}
               </li>
             ))}
           </ul>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* 🔹 Search Results */}
+      {searchTag.trim() && (
+        <div className="w-full mt-6 px-10">
+          {isLoading ? (
+            <div className="text-gray-500 text-center mt-10">Loading...</div>
+          ) : (
+            <>
+              {Object.values(searchResults).every((arr) => arr.length === 0) ? (
+                <div className="text-gray-500 text-center mt-10">
+                  No results found for "{searchTag}"
+                </div>
+              ) : (
+                <>
+                  {/* <ResultSection title="Colleges" items={searchResults.colleges} />
+                  <ResultSection title="Universities" items={searchResults.universities} /> */}
+                  <ResultSection title="Events" items={searchResults.events} />
+                  <ResultSection title="Blogs" items={searchResults.news} />
+                </>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };

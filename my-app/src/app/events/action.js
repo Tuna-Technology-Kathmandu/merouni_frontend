@@ -81,6 +81,7 @@ export async function getEventBySlug(slug) {
         cache: "no-store",
       }
     );
+    console.log("RESPONSE:",response)
 
     if (!response.ok) {
       throw new Error("Failed to fetch event details");
