@@ -1,14 +1,16 @@
-// export default SimpleSignup;
 "use client";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
-
+import { getToken } from "../action";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
+import { jwtDecode } from "jwt-decode";
 const SignInPage = () => {
+  const dispatch = useDispatch();
   const router = useRouter();
-
   const getDeviceId = () => {
     let deviceId = localStorage.getItem("deviceId");
     if (!deviceId) {
@@ -49,7 +51,6 @@ const SignInPage = () => {
         newErrors.phone_no = "Phone number must be 10 digits";
       }
     }
-
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -114,6 +115,10 @@ const SignInPage = () => {
       });
       console.log("Response:", response);
       const data = await response.json();
+      console.log(`Data:`, data);
+      const tokenObj = await getToken();
+      const decodedToken = jwtDecode(tokenObj.value)
+      dispatch(addUser(decodedToken));
 
       if (response.ok) {
         if (isLogin) {
@@ -136,7 +141,7 @@ const SignInPage = () => {
         toast.error(data.message || "Something went wrong. Please try again.");
       }
     } catch (err) {
-      toast.error("Connection error. Please check your network.");
+      toast.error("Connection error. Please check your network." + err);
     } finally {
       setLoading(false);
     }
@@ -230,8 +235,6 @@ const SignInPage = () => {
             </div>
           )}
           <div>
-           
-
             <div className="relative flex flex-row">
               <input
                 type={showPassword ? "text" : "password"}
