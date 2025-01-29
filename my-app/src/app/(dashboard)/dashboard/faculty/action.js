@@ -4,6 +4,7 @@ let url = `${process.env.baseUrl}${process.env.version}/faculty`;
 
 export async function getAllFaculty() {
   try {
+
     const response = await fetch(`${url}`, {
       cache: "no-store",
     });
@@ -16,6 +17,7 @@ export async function getAllFaculty() {
 
 export async function createFaculty(data) {
   try {
+
     const response = await fetch(`${url}`, {
       method: "POST",
       headers: {
@@ -31,6 +33,7 @@ export async function createFaculty(data) {
 
 export async function updateFaculty(id, data) {
   try {
+
     const response = await fetch(
       `${url}?id=${id}`,
       {
@@ -41,6 +44,7 @@ export async function updateFaculty(id, data) {
         body: JSON.stringify(data),
       }
     );
+
     return await response.json();
   } catch (error) {
     throw new Error("Failed to update faculty");
@@ -49,6 +53,7 @@ export async function updateFaculty(id, data) {
 
 export async function deleteFaculty(id) {
   try {
+
     const response = await fetch(
       `${url}?id=${id}`,
       {

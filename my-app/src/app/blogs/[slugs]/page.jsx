@@ -19,9 +19,12 @@
 // };
 
 // export default page;
+
 "use client";
 import React, { useState, useEffect } from "react";
-import { getEventBySlug, getRelatedEvents } from "../../events/action";
+// import { getEventBySlug, getRelatedEvents } from "../../events/action";
+import { getNewsBySlug, getRelatedNews } from "../action";
+import { use } from "react";
 import Navbar from "../../components/Frontpage/Navbar";
 import Footer from "../../components/Frontpage/Footer";
 import Header from "../../components/Frontpage/Header";
@@ -31,22 +34,24 @@ import Cardlist from "./components/Cardlist";
 import Loading from "../../components/Loading";
 
 const EventDetailsPage = ({ params }) => {
-  const [event, setEvent] = useState(null);
-  const [relatedEvents, setRelatedEvents] = useState([]);
+  const resolvedParams = use(params);
+  const [news, setNews] = useState(null);
+  const [relatedNews, setRelatedNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchEventDetails = async () => {
+    const fetchNewsDetails = async () => {
       try {
-        const slugs = params.slugs; // No need to await params.slugs
+        const slugs = resolvedParams.slugs; // No need to await params.slugs
 
-        const [eventData, allEvents] = await Promise.all([
-          getEventBySlug(slugs),
-          getRelatedEvents(),
+        const [newsData, allNews] = await Promise.all([
+          getNewsBySlug(slugs),
+          getRelatedNews(),
         ]);
-        setEvent(eventData || null); // Set eventData directly
-        setRelatedEvents(allEvents);
+        setNews(newsData || null); // Set eventData directly
+        setRelatedNews(allNews);
+        // console.log("News Description:",news)
       } catch (err) {
         setError(err.message);
       } finally {
@@ -54,14 +59,13 @@ const EventDetailsPage = ({ params }) => {
       }
     };
 
-    fetchEventDetails();
-  }, [params.slugs]); // Add params.slugs to dependency array
-
+    fetchNewsDetails();
+  }, [resolvedParams.slugs]); // Add params.slugs to dependency array
 
   useEffect(() => {
-   console.log("Events:",event)
-  }, [event])
-  
+    console.log("News:", news);
+  }, [news]);
+
   // if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   // if (!event) return <div>No event found</div>;
@@ -74,9 +78,9 @@ const EventDetailsPage = ({ params }) => {
         <Loading />
       ) : (
         <>
-          <Hero event={event} />
-          <Description event={event} />
-          <Cardlist events={relatedEvents} />
+          <Hero news={news} />
+          <Description news={news} />
+          <Cardlist news={relatedNews} />
         </>
       )}
 

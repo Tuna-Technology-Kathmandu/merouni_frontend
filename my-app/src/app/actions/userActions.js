@@ -1,11 +1,18 @@
 // app/actions/userActions.js
 "use server";
 
-export async function getUsers(page = 1) {
+export async function getUsers(page = 1, token, role) {
   try {
     const response = await fetch(
       `${process.env.baseUrl}${process.env.version}/users?limit=9&page=${page}&sort=asc`,
-      { cache: "no-store" } // Ensure fresh data on each request
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Role: role.join(","),
+        },
+        cache: "no-store",
+      }
+
     );
 
     if (!response.ok) {
@@ -33,6 +40,7 @@ export async function createUser(formData) {
   "use server";
   try {
     const userData = Object.fromEntries(formData);
+
     const response = await fetch(
       `${process.env.baseUrl}${process.env.version}/users`,
       {

@@ -22,13 +22,13 @@ const AdminNavbar = () => {
   useEffect(() => {
     const checkToken = async () => {
       const token = await getToken();
-      console.log("Token:", token.value);
+      // console.log("Token:", token.value);
       if (token?.value) {
         const decoded = jwtDecode(token.value);
         console.log("Decoded token:", decoded);
         setUserId(decoded.data.id);
         setUserRole(decoded.data.role);
-        console.log("User ROle:",decoded.data.role)
+        // console.log("User ROle:",decoded.data.role)
       }
     };
     checkToken();
