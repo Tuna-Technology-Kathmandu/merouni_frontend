@@ -8,6 +8,7 @@ import { Edit2, Trash2 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+
 export default function EventManager() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);

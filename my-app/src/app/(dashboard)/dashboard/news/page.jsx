@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { fetchEvents, createEvent, updateEvent, deleteEvent } from "./action";
+import { fetchNews, createNews, updateNews, deleteNews } from "./action";
 import Loader from "@/app/components/Loading";
 import Table from "../../../components/Table";
 import { Edit2, Trash2 } from "lucide-react";
@@ -90,10 +90,10 @@ export default function NewsManager() {
     e.preventDefault();
     try {
       if (editingId) {
-        await updateEvent(editingId, formData);
+        await updateNews(editingId, formData);
         toast.success("News updated successfully");
       } else {
-        await createEvent(formData);
+        await createNews(formData);
         toast.success("News created successfully");
       }
       resetForm();
@@ -125,7 +125,7 @@ export default function NewsManager() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this news?")) {
       try {
-        await deleteEvent(id);
+        await deleteNews(id);
         toast.success("News deleted successfully");
         loadData();
       } catch (err) {
