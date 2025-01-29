@@ -1,5 +1,5 @@
 "use client";
-import {  useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -39,7 +39,6 @@ const SignInPage = () => {
 
   const validateForm = () => {
     const newErrors = {};
-
     if (!isLogin) {
       if (!formData.firstName.trim())
         newErrors.firstName = "First name is required";
@@ -104,6 +103,7 @@ const SignInPage = () => {
             phone_no: formData.phone_no,
             password: formData.password,
           };
+
       const response = await fetch(`${process.env.baseUrl}${endpoint}`, {
         method: "POST",
         headers: {
@@ -113,12 +113,15 @@ const SignInPage = () => {
         credentials: "include",
         body: JSON.stringify(filteredData),
       });
+
       console.log("Response:", response);
       const data = await response.json();
       console.log(`Data:`, data);
+
       const tokenObj = await getToken();
-      const decodedToken = jwtDecode(tokenObj.value)
-      dispatch(addUser(decodedToken));
+      const decodedToken = jwtDecode(tokenObj.value);
+
+      dispatch(addUser({ ...decodedToken, token: tokenObj.value })); // Store both decoded token and raw token
 
       if (response.ok) {
         if (isLogin) {
@@ -137,11 +140,10 @@ const SignInPage = () => {
           // router.push(`/verify-otp?email=${formData.email}`);
         }
       } else {
-        // Show server-provided error message
         toast.error(data.message || "Something went wrong. Please try again.");
       }
     } catch (err) {
-      toast.error("Connection error. Please check your network." + err);
+      toast.error("Connection error. Please check your network. " + err);
     } finally {
       setLoading(false);
     }
