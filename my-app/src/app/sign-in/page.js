@@ -25,9 +25,9 @@ const SignInPage = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    email: "",
+    email: "asuyog043@gmail.com",
     phone_no: "",
-    password: "",
+    password: "Admin@12345",
   });
   const [errors, setErrors] = useState({});
 

@@ -13,38 +13,6 @@ const WishlistPage = () => {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   if (!userData?.id || !userData?.token) {
-  //     console.log("User not logged in or token missing.");
-  //     setLoading(false);
-  //     return;
-  //   }
-
-  //   console.log("Fetching wishlist...");
-  //   fetch("http://localhost:8000/api/v1/wishlist", {
-  //     method: "GET",
-  //     headers: {
-  //       Authorization: `Bearer ${userData.token}`,
-  //       "Content-Type": "application/json",
-  //     },
-  //   })
-  //     .then((res) => {
-  //       console.log("Response Status:", res.status);
-  //       if (!res.ok) {
-  //         throw new Error(`HTTP Error! Status: ${res.status}`);
-  //       }
-  //       return res.json();
-  //     })
-  //     .then((data) => {
-  //       console.log("Wishlist Data:", data);
-  //       setWishlist(data.items || []);
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error fetching wishlist:", err);
-  //     })
-  //     .finally(() => setLoading(false));
-  // }, [userData]);
-
   useEffect(() => {
     console.log("Redux State:", userData);
 
@@ -71,7 +39,7 @@ const WishlistPage = () => {
       })
       .then((data) => {
         console.log("Wishlist Data:", data);
-        setWishlist(data.items || []);
+        setWishlist(data.items[0].colleges || []);
       })
       .catch((err) => {
         console.error("Error fetching wishlist:", err);
@@ -103,12 +71,12 @@ const WishlistPage = () => {
               wishlist.map((item) => (
                 <UniversityCard
                   key={item._id}
-                  name={item.colleges?.[0]?.fullname || "Unknown College"}
+                  name={item?.fullname || "Unknown College"}
                   description={
-                    item.colleges?.[0]?.description ||
+                    item?.description ||
                     "No description available"
                   }
-                  logo={item.colleges?.[0]?.assets?.featuredImage || ""}
+                  logo={item?.assets?.featuredImage || ""}
                 />
               ))
             ) : (
