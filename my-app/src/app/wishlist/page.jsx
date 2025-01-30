@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Frontpage/Navbar";
 import Header from "../components/Frontpage/Header";
 import Footer from "../components/Frontpage/Footer";
-import UniversityCard from "../colleges/components/UniversityCard";
+import UniversityCard from "./Card";
 
 const WishlistPage = () => {
   const userData = useSelector((store) => store.user);
@@ -66,23 +66,25 @@ const WishlistPage = () => {
           </span>
         </div>
         <div className="border border-black rounded-xl p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {wishlist.length > 0 ? (
-              wishlist.map((item) => (
+          {!userId || !token ? (
+            <p className="text-gray-600">
+              Please login to add to your wishlist.
+            </p>
+          ) : wishlist.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {wishlist.map((item) => (
                 <UniversityCard
                   key={item._id}
+                  collegeId={item._id}
                   name={item?.fullname || "Unknown College"}
-                  description={
-                    item?.description ||
-                    "No description available"
-                  }
+                  description={item?.description || "No description available"}
                   logo={item?.assets?.featuredImage || ""}
                 />
-              ))
-            ) : (
-              <p className="text-gray-600">Your wishlist is empty.</p>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-600">Your wishlist is empty.</p>
+          )}
         </div>
       </div>
       <Footer />
