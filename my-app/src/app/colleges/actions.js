@@ -23,6 +23,7 @@ export async function getColleges(page = 1, sort = "ASC") {
         facilities: college.facilities,
         instituteType: college.instituteType,
         programmes: college.programmes,
+        collegeId: college._id,
       })),
       pagination: data.pagination,
     };
