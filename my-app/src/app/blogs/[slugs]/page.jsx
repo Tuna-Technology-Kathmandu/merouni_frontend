@@ -33,8 +33,9 @@ import Description from "./components/Description";
 import Cardlist from "./components/Cardlist";
 import Loading from "../../components/Loading";
 
-const EventDetailsPage = ({ params }) => {
+const NewsDetailsPage = ({ params }) => {
   const resolvedParams = use(params);
+  console.log("REsolvedParams:",resolvedParams)
   const [news, setNews] = useState(null);
   const [relatedNews, setRelatedNews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -89,4 +90,4 @@ const EventDetailsPage = ({ params }) => {
   );
 };
 
-export default EventDetailsPage;
+export default NewsDetailsPage;

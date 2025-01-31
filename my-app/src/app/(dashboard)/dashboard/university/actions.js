@@ -2,10 +2,10 @@
 
 import { University } from "lucide-react";
 
-export async function getUniversities() {
+export async function getUniversities(page=1) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/university`,
+      `${process.env.baseUrl}${process.env.version}/university?limit=9&page=${page}&sort=asc`,
       {
         cache: "no-store",
       }

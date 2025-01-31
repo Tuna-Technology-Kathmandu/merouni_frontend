@@ -1,10 +1,9 @@
 "use server";
 
-import services from './apiService';
-import { cookies } from 'next/headers';
+import services from "./apiService";
+import { cookies } from "next/headers";
 
-
-// const cookieStore = await 
+// const cookieStore = await
 
 // University actions
 export async function getUniversities(queryParams) {
@@ -41,8 +40,14 @@ export async function deleteScholarship(id) {
 }
 
 // Program actions
-export async function getPrograms(queryParams) {
-  return services.program.getAll(queryParams);
+export async function getPrograms(page, limit = 9, sort = "asc") {
+  // const q = `page=${queryParams}`
+  const params = {
+    page,
+    limit,
+    sort,
+  };
+  return services.program.getAll(params);
 }
 
 export async function createProgram(data) {
@@ -74,7 +79,6 @@ export async function deleteCourse(id) {
   return services.course.delete(id);
 }
 
-
 // Faculty actions
 export async function getFaculties(queryParams) {
   return services.faculty.getAll(queryParams);
@@ -92,24 +96,22 @@ export async function deleteFaculty(id) {
   return services.faculty.delete(id);
 }
 
-
 // Events actions
-export async function getEvents(queryParams){
-  return services.event.getAll(queryParams)
+export async function getEvents(queryParams) {
+  return services.event.getAll(queryParams);
 }
-
-
-
 
 //Blogs actions
-export async function getBlogs(queryParams){
-  const q = `page=${queryParams}`
-  return services.news.getAll(q)
+export async function getBlogs(page) {
+  // const q = `page=${queryParams}`;
+  const params = {
+    page,
+  };
+  return services.news.getAll(page);
 }
 
-
-export async function getToken(){
-  const cookieStore = await cookies()
-  const token = cookieStore.get("token")
-  return token
+export async function getToken() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token");
+  return token;
 }
