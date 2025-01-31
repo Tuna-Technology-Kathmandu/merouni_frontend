@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Share, Heart } from "lucide-react";
-import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { getToken } from "../../action"; // Assuming getToken is correctly imported
 
 const UniversityCard = ({
   name,
@@ -11,22 +11,31 @@ const UniversityCard = ({
   collegeId,
   isWishlistPage = false,
 }) => {
-  const userData = useSelector((store) => store.user);
   const [isInWishlist, setIsInWishlist] = useState(isWishlistPage);
   const [isLoading, setIsLoading] = useState(false);
+  const [token, setToken] = useState(null);
 
   useEffect(() => {
-    if (userData?.token && !isWishlistPage) {
+    const fetchToken = async () => {
+      const tokenObj = await getToken();
+      setToken(tokenObj?.value || null);
+      console.log("Token:", token);
+    };
+    fetchToken();
+  }, []);
+
+  useEffect(() => {
+    if (token && !isWishlistPage) {
       checkWishlistStatus();
     }
-  }, [userData?.token, collegeId]);
+  }, [token, collegeId]);
 
   const checkWishlistStatus = async () => {
     try {
       const response = await fetch("http://localhost:8000/api/v1/wishlist", {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${userData?.token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
@@ -36,8 +45,6 @@ const UniversityCard = ({
       }
 
       const data = await response.json();
-
-      // Check if the college exists in any of the wishlist items
       const isInList = data.items.some((item) =>
         item.colleges?.some((college) => college._id === collegeId)
       );
@@ -45,15 +52,11 @@ const UniversityCard = ({
       setIsInWishlist(isInList);
     } catch (error) {
       console.error("Error checking wishlist status:", error);
-      toast.error("Failed to fetch wishlist status", {
-        position: "top-right",
-        autoClose: 3000,
-      });
     }
   };
 
   const handleWishlistToggle = async () => {
-    if (!userData?.token) {
+    if (!token) {
       toast.warning("Please sign in to manage your wishlist", {
         position: "top-right",
         autoClose: 3000,
@@ -67,7 +70,7 @@ const UniversityCard = ({
       const response = await fetch("http://localhost:8000/api/v1/wishlist", {
         method,
         headers: {
-          Authorization: `Bearer ${userData.token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ college_id: collegeId }),
@@ -86,10 +89,6 @@ const UniversityCard = ({
         {
           position: "top-right",
           autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
         }
       );
     } catch (error) {
@@ -115,7 +114,7 @@ const UniversityCard = ({
           <button className="p-2 hover:bg-gray-100 rounded-full">
             <Share className="w-5 h-5 text-gray-600" />
           </button>
-          {userData?.token && (
+          {token && (
             <button
               className="p-2 hover:bg-gray-100 rounded-full"
               onClick={handleWishlistToggle}
