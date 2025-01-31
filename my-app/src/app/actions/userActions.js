@@ -12,6 +12,7 @@ export async function getUsers(page = 1, token, role) {
         },
         cache: "no-store",
       }
+
     );
 
     if (!response.ok) {
@@ -40,13 +41,17 @@ export async function createUser(formData) {
   "use server";
   try {
     const userData = Object.fromEntries(formData);
-    const response = await fetch("http://localhost:8000/api/v1/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
+
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/users`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to create user");

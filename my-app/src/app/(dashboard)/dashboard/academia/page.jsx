@@ -8,6 +8,8 @@ const page = () => {
       <AcademiaCard title="Scholarship" img="/images/logo.png" link="/dashboard/scholarship" />
       <AcademiaCard title="University" img="/images/logo.png" link="/dashboard/university" />
       <AcademiaCard title="Program" img="/images/logo.png" link="/dashboard/program" />
+      <AcademiaCard title="College" img="/images/logo.png" link="/dashboard/addCollege" />
+
 
     </div>
   );

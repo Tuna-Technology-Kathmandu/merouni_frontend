@@ -9,10 +9,12 @@ const VerifyOtpContent = () => {
   const email = searchParams.get("email");
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  
+
   // Fix: Create refs array properly
   const inputRefs = useRef([]);
-  inputRefs.current = Array(6).fill(null).map((_, i) => inputRefs.current[i] ?? useRef(null));
+  inputRefs.current = Array(6)
+    .fill(null)
+    .map((_, i) => inputRefs.current[i] ?? useRef(null));
 
   useEffect(() => {
     // Focus first input on mount
@@ -65,7 +67,7 @@ const VerifyOtpContent = () => {
   const handleResendOtp = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/v1/auth/resend-otp",
+        `${process.env.baseUrl}${process.env.version}/auth/resend-otp`,
         {
           method: "POST",
           headers: {
@@ -99,7 +101,7 @@ const VerifyOtpContent = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:5000/api/v1/auth/verify-email",
+        `${process.env.baseUrl}${process.env.version}/auth/verify-email`,
         {
           method: "PUT",
           headers: {
@@ -141,7 +143,7 @@ const VerifyOtpContent = () => {
           {otp.map((digit, index) => (
             <input
               key={index}
-              ref={el => inputRefs.current[index] = { current: el }}
+              ref={(el) => (inputRefs.current[index] = { current: el })}
               type="text"
               maxLength={1}
               value={digit}

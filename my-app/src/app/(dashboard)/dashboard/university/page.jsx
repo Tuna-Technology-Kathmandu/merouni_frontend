@@ -700,6 +700,7 @@ const UniversityManager = () => {
         pagination={pagination}
         onPageChange={(newPage) => loadUniversities(newPage)}
       />
+
     </div>
   );
 };
