@@ -235,28 +235,64 @@ import {
   flexRender,
   getPaginationRowModel,
   getSortedRowModel,
-  getFilteredRowModel
+  getFilteredRowModel,
 } from "@tanstack/react-table";
 import { Search, ChevronUp, ChevronDown } from "lucide-react";
 
-const Table = ({ data, columns }) => {
+const Table = ({ data, columns, pagination, onPageChange }) => {
   const [sorting, setSorting] = useState([]);
   const [filtering, setFiltering] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  // const [searchResults, setSearchResults] = useState([]);
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    manualPagination: true,
+    pageCount: pagination.totalPages,
     state: {
       sorting: sorting,
-      globalFilter: filtering
+      globalFilter: filtering,
+      pagination: {
+        pageIndex: pagination.currentPage - 1,
+        pageSize: 9,
+      },
     },
     onSortingChange: setSorting,
-    onGlobalFilterChange: setFiltering
+    onGlobalFilterChange: setFiltering,
+    onPaginationChange: (updater) => {
+      if (typeof updater === "function") {
+        const newPageIndex = updater(table.getState().pagination).pageIndex;
+        onPageChange(newPageIndex + 1);
+      }
+    },
   });
+
+  // const fetchSearchUsers = async (query) => {
+  //   setIsLoading(true);
+  //   try {
+  //     const response = await fetch(
+  //       `${process.env.baseUrl}${process.env.version}/users/search?q=${query}`
+  //     );
+
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       setSearchResults(data);
+  //     } else {
+  //       console.error("Error fetching results:", response.statusText);
+  //       setSearchResults([]);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching users results:", error.message);
+  //     setSearchResults([]);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
     <div className="w-full p-4 space-y-4">
@@ -310,7 +346,10 @@ const Table = ({ data, columns }) => {
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id} className="hover:bg-gray-50">
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td
+                    key={cell.id}
+                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -323,34 +362,42 @@ const Table = ({ data, columns }) => {
       {/* Pagination Controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-sm text-gray-700">
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
+          Page {pagination.currentPage} of {pagination.totalPages}
+          (Showing{" "}
+          {Math.min(
+            (pagination.currentPage - 1) * 9 + 1,
+            pagination.total
+          )} - {Math.min(pagination.currentPage * 9, pagination.total)} of{" "}
+          {pagination.total} items)
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => onPageChange(1)}
+            disabled={pagination.currentPage === 1}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             First
           </button>
+
           <button
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => onPageChange(pagination.currentPage - 1)}
+            disabled={pagination.currentPage === 1}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
+
           <button
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => onPageChange(pagination.currentPage + 1)}
+            disabled={pagination.currentPage === pagination.totalPages}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>
+
           <button
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
+            onClick={() => onPageChange(pagination.totalPages)}
+            disabled={pagination.currentPage === pagination.totalPages}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Last

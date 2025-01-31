@@ -45,6 +45,13 @@ const UniversityManager = () => {
       featuredImage: "",
     },
   });
+
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
+
   const [loading, setLoading] = useState(true);
   const [visibility, setVisibility] = useState(false);
   const [universities, setUniversities] = useState([]);
@@ -148,10 +155,15 @@ const UniversityManager = () => {
     loadUniversities();
   }, []);
 
-  const loadUniversities = async () => {
+  const loadUniversities = async (page = 1) => {
     try {
-      const response = await getUniversities();
+      const response = await getUniversities(page);
       setUniversities(response.items);
+      setPagination({
+        currentPage: response.pagination.currentPage,
+        totalPages: response.pagination.totalPages,
+        total: response.pagination.totalRecords,
+      });
     } catch (error) {
       setError("Failed to load universities");
       console.error("Error loading universities:", error);
@@ -682,7 +694,13 @@ const UniversityManager = () => {
         </button>
       </form>
 
-      <Table data={universities} columns={columns} />
+      <Table
+        data={universities}
+        columns={columns}
+        pagination={pagination}
+        onPageChange={(newPage) => loadUniversities(newPage)}
+      />
+
     </div>
   );
 };

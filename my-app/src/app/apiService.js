@@ -4,9 +4,30 @@ class ApiService {
     this.baseUrl = `${process.env.baseUrl}${process.env.version}/${endpoint}`;
   }
 
-  async getAll(queryParams = "") {
+  buildUrl(baseUrl,params){
+    if (!params) return baseUrl;
+
+    if (typeof params === 'string'){
+      return `${baseUrl}?${params}`
+    }
+
+    const searchParams = new URLSearchParams()
+    Object.entries(params).forEach(([key,value]) => {
+      if (value !== undefined && value !== null){
+        searchParams.append(key,value)
+      }
+    })
+
+    const queryString = searchParams.toString()
+    return queryString ? `${baseUrl}?${queryString}`: baseUrl
+  }
+
+  
+
+  async getAll(params = {}) {
     try {
-      const url = queryParams ? `${this.baseUrl}?${queryParams}` : this.baseUrl;
+      // const url = queryParams ? `${this.baseUrl}?${queryParams}` : this.baseUrl;
+      const url = this.buildUrl(this.baseUrl,params)
       console.log("Final URL:", url); // Debug log
       const response = await fetch(url, {
         cache: "no-store",
@@ -23,11 +44,12 @@ class ApiService {
     }
   }
 
-  async getById(id, queryParams = "") {
+  async getById(id, params = {}) {
     try {
-      const url = `${this.baseUrl}/${id}${
-        queryParams ? `?${queryParams}` : ""
-      }`;
+      // const url = `${this.baseUrl}/${id}${
+      //   queryParams ? `?${queryParams}` : ""
+      // }`;
+      const url = this.buildUrl(`${this.baseUrl}/${id}`,params)
       const response = await fetch(url, {
         cache: "no-store",
       });

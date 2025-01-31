@@ -26,25 +26,16 @@ export default function UsersManager() {
       admin: false,
     },
   });
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
+ 
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(null);
   const [userRole, setUserRole] = useState(null);
-
-  // useEffect(() => {
-  //   const checkToken = async () => {
-  //     const token = await getToken();
-  //     console.log("Token:", token.value);
-  //     if (token?.value) {
-  //       const decoded = jwtDecode(token.value);
-  //       console.log("Decoded token:", decoded);
-  //       setUserId(decoded.data.id);
-  //       setUserRole(decoded.data.role);
-  //       console.log("User ROle:", decoded.data.role.key);
-  //     }
-  //   };
-  //   checkToken();
-  // }, []);
 
   const columns = useMemo(
     () => [
@@ -109,21 +100,28 @@ export default function UsersManager() {
     loadUsers();
   }, []);
 
-  const loadUsers = async () => {
+  const loadUsers = async (page = 1) => {
     try {
       const tokenObj = await getToken();
       const token = tokenObj.value;
-      const decodedToken = jwtDecode(tokenObj.value)
-      const roleObject = decodedToken.data.role
-      const roleName = Object.keys(roleObject).filter(key => roleObject[key] === 'true')
-      console.log("ROLE NAME:",roleName)
+      const decodedToken = jwtDecode(tokenObj.value);
+      const roleObject = decodedToken.data.role;
+      const roleName = Object.keys(roleObject).filter(
+        (key) => roleObject[key] === "true"
+      );
+      console.log("ROLE NAME:", roleName);
       if (!token) {
         throw new Error("Token not found");
       }
       setLoading(true);
-      const response = await getUsers(1, token,roleName);
+      const response = await getUsers(page, token, roleName);
       console.log("Response:", response.headers);
       setUsers(response.items);
+      setPagination({
+        currentPage: response.pagination.currentPage,
+        totalPages: response.pagination.totalPages,
+        total: response.pagination.totalRecords,
+      });
       setError(null);
     } catch (err) {
       setError("Failed to load users");
@@ -132,6 +130,11 @@ export default function UsersManager() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    console.log("USERS:", users);
+    console.log("PAGINATION:", pagination);
+  }, [users, pagination]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -310,7 +313,12 @@ export default function UsersManager() {
       </form>
 
       {/* Table */}
-      <Table data={users} columns={columns} />
+      <Table
+        data={users}
+        columns={columns}
+        pagination={pagination}
+        onPageChange={(newPage) => loadUsers(newPage)}
+      />
     </div>
   );
 }
