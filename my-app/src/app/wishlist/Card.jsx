@@ -1,7 +1,8 @@
+"use client";
 import React, { useState } from "react";
 import { Share, Heart } from "lucide-react";
-import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { getToken } from "../action";
 
 const WishlistCollegeCard = ({
   name,
@@ -11,15 +12,17 @@ const WishlistCollegeCard = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRemoved, setIsRemoved] = useState(false);
-  const userData = useSelector((store) => store.user);
 
   const handleWishlistRemove = async () => {
     setIsLoading(true);
+    const tokenObj = await getToken();
+    const token = tokenObj.value;
+
     try {
       const response = await fetch("http://localhost:8000/api/v1/wishlist", {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${userData.token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ college_id: collegeId }),

@@ -81,6 +81,73 @@ const SignInPage = () => {
     }
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   const deviceId = getDeviceId();
+  //   if (!validateForm()) return;
+
+  //   setLoading(true);
+  //   try {
+  //     const endpoint = isLogin ? "/api/v1/auth/login" : "/api/v1/auth/register";
+
+  //     const filteredData = isLogin
+  //       ? {
+  //           email: formData.email,
+  //           password: formData.password,
+  //           deviceName: navigator.userAgent,
+  //         }
+  //       : {
+  //           firstName: formData.firstName,
+  //           lastName: formData.lastName,
+  //           email: formData.email,
+  //           phone_no: formData.phone_no,
+  //           password: formData.password,
+  //         };
+
+  //     const response = await fetch(`${process.env.baseUrl}${endpoint}`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         ...(isLogin && { "device-id": getDeviceId() }),
+
+  //       },
+  //       credentials: "include",
+  //       body: JSON.stringify(filteredData),
+  //     });
+
+  //     console.log("Response:", response);
+  //     const data = await response.json();
+  //     console.log(`Data:`, data);
+
+  //     const tokenObj = await getToken();
+  //     const decodedToken = jwtDecode(tokenObj.value);
+  //     dispatch(addUser({ ...decodedToken })); // Store both decoded token and raw token
+  //     if (response.ok) {
+  //       if (isLogin) {
+  //         toast.success("Login successful!");
+  //         router.push("/dashboard");
+  //       } else {
+  //         setFormData({
+  //           firstName: "",
+  //           email: "",
+  //           lastName: "",
+  //           password: "",
+  //           phone_no: "",
+  //         });
+  //         toast.success("Account created! Please verify your email.");
+
+  //         // router.push(`/verify-otp?email=${formData.email}`);
+  //       }
+  //     } else {
+  //       toast.error(data.message || "Something went wrong. Please try again.");
+  //     }
+  //   } catch (err) {
+  //     toast.error("Connection error. Please check your network. " + err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const deviceId = getDeviceId();
@@ -90,6 +157,7 @@ const SignInPage = () => {
     try {
       const endpoint = isLogin ? "/api/v1/auth/login" : "/api/v1/auth/register";
 
+      // Define filteredData here, based on isLogin
       const filteredData = isLogin
         ? {
             email: formData.email,
@@ -104,26 +172,32 @@ const SignInPage = () => {
             password: formData.password,
           };
 
+    
       const response = await fetch(`${process.env.baseUrl}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(isLogin && { "device-id": getDeviceId() }),
+          "device-id": deviceId,
         },
         credentials: "include",
         body: JSON.stringify(filteredData),
       });
 
-      console.log("Response:", response);
+      // Get all response headers
+      const refreshToken = response.headers.get("x-refresh-token");
+      console.log("All headers:", [...response.headers.entries()]);
+      console.log("Refresh token:", refreshToken);
+
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken);
+      }
       const data = await response.json();
-      console.log(`Data:`, data);
-
-      const tokenObj = await getToken();
-      const decodedToken = jwtDecode(tokenObj.value);
-
-      dispatch(addUser({ ...decodedToken, token: tokenObj.value })); // Store both decoded token and raw token
 
       if (response.ok) {
+        console.log("am i here")
+        const tokenObj = await getToken();
+        const decodedToken = jwtDecode(tokenObj.value);
+        dispatch(addUser({ ...decodedToken }));
         if (isLogin) {
           toast.success("Login successful!");
           router.push("/dashboard");
@@ -136,14 +210,12 @@ const SignInPage = () => {
             phone_no: "",
           });
           toast.success("Account created! Please verify your email.");
-
-          // router.push(`/verify-otp?email=${formData.email}`);
         }
       } else {
-        toast.error(data.message || "Something went wrong. Please try again.");
+        toast.error(data.message || "Something went wrong");
       }
     } catch (err) {
-      toast.error("Connection error. Please check your network. " + err);
+      toast.error("Connection error: " + err);
     } finally {
       setLoading(false);
     }

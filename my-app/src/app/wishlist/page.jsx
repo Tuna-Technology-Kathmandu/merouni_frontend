@@ -1,59 +1,63 @@
+
 "use client";
-import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Frontpage/Navbar";
 import Header from "../components/Frontpage/Header";
 import Footer from "../components/Frontpage/Footer";
 import UniversityCard from "./Card";
+import { authFetch } from "./authFetch";
+import { getToken } from "../action"; // Import the function to get the token
 
 const WishlistPage = () => {
-  const userData = useSelector((store) => store.user);
-  const userId = userData?.data?.id;
-  const token = userData?.token;
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [token, setToken] = useState(null);
 
   useEffect(() => {
-    console.log("Redux State:", userData);
-
-    if (!userId || !token) {
-      console.log("User not logged in or token missing.");
-      setLoading(false);
-      return;
-    }
-
-    console.log("Fetching wishlist...");
-    fetch("http://localhost:8000/api/v1/wishlist", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => {
-        console.log("Response Status:", res.status);
-        if (!res.ok) {
-          throw new Error(`HTTP Error! Status: ${res.status}`);
+    const fetchWishlist = async () => {
+      try {
+        const tokenObj = await getToken();
+        if (!tokenObj?.value) {
+          setError("Please login to see your wishlist.");
+          setLoading(false);
+          return;
         }
-        return res.json();
-      })
-      .then((data) => {
-        console.log("Wishlist Data:", data);
-        setWishlist(data.items[0].colleges || []);
-      })
-      .catch((err) => {
-        console.error("Error fetching wishlist:", err);
-      })
-      .finally(() => setLoading(false));
-  }, [userId, token]);
 
-  if (!userData) {
-    return <div>Please sign in to view your wishlist</div>;
-  }
+        setToken(tokenObj.value);
+        const response = await authFetch(
+          "http://localhost:8000/api/v1/wishlist",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${tokenObj.value}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setWishlist(data.items[0].colleges || []);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching wishlist:", err);
+        setError("Failed to load wishlist.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWishlist();
+  }, []);
 
   if (loading) {
     return <div>Loading wishlist...</div>;
   }
+
   return (
     <div>
       <Header />
@@ -66,10 +70,8 @@ const WishlistPage = () => {
           </span>
         </div>
         <div className="border border-black rounded-xl p-6">
-          {!userId || !token ? (
-            <p className="text-gray-600">
-              Please login to add to your wishlist.
-            </p>
+          {!token ? (
+            <p className="text-gray-600">Please login to see your wishlist.</p>
           ) : wishlist.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {wishlist.map((item) => (
