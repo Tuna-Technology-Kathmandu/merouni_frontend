@@ -67,10 +67,11 @@ const Navbar = () => {
           <Link href="/blogs">
             <div className="hover:text-gray-200 cursor-pointer">Blogs</div>
           </Link>
-          <Link href="/wishlist">
-            <div className="hover:text-gray-200 cursor-pointer">Wishlist</div>
+
+          <Link href="/materials">
+            <div className="hover:text-gray-200 cursor-pointer">Materials</div>
           </Link>
-          <div className="hover:text-gray-200 cursor-pointer">Materials</div>
+
         </div>
       </div>
       <div className="block md:hidden bg-[#30ad8f] h-28 pt-[10px]">

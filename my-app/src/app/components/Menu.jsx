@@ -8,7 +8,7 @@ import { HiOutlineDocumentReport } from "react-icons/hi";
 import { MdEmojiEvents } from "react-icons/md";
 import { TfiAnnouncement } from "react-icons/tfi";
 import { FaRegUserCircle } from "react-icons/fa";
-import { MdOutlineSettings } from "react-icons/md";
+import { MdOutlineSettings, MdOutlinePermMedia } from "react-icons/md";
 import { AiOutlineLogout } from "react-icons/ai";
 import { IoSchoolSharp } from "react-icons/io5";
 import clsx from "clsx";
@@ -40,6 +40,12 @@ const menuItems = [
         icon: <IoSchoolSharp />,
         label: "Colleges",
         href: "/dashboard/addCollege",
+        visible: ["admin"],
+      },
+      {
+        icon: <MdOutlinePermMedia />,
+        label: "Media",
+        href: "/dashboard/media",
         visible: ["admin"],
       },
       {

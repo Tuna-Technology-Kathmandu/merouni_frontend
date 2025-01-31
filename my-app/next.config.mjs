@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: {
-    // baseUrl: "https://backend.merouni.com",
-    baseUrl: "http://localhost:8000",
+    localUrl: "http://localhost:8000",
+    mediaUrl: "https://uploads.merouni.com",
+    baseUrl: "https://backend.merouni.com",
+
 
     version: "/api/v1",
   },
