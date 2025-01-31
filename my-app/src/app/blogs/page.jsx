@@ -145,7 +145,7 @@ const Blogs = () => {
         ) : ( */}
           <>
             <Latest />
-            <FeaturedBlogs />
+            <FeaturedBlogs title="Featured" subTitle="Blogs"/>
             {/* <Pagination pagination={pagination} onPageChange={handlePageChange} /> */}
           </>
         

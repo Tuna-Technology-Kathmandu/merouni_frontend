@@ -1,7 +1,31 @@
+"use client";
+
 import Image from "next/image";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { getItems } from "../../[[...home]]/action";
 
 const Program = () => {
+  const [items, setItems] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadItems();
+  }, []);
+
+  const loadItems = async () => {
+    try {
+      const response = await getItems("Exams");
+      const data = response.items || [];
+      setItems(data);
+    } catch (err) {
+      setError("Failed to load exams.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <>
       <div className=" bg-[#E3E3E3] text-black  border-black flex items-center  flex-col lp:flex-row">
@@ -37,18 +61,22 @@ const Program = () => {
                 more...
               </div>
               <div className="flex flex-wrap gap-4  m-4 py-6 font-bold">
-                <div className="border border-black rounded-lg text-center p-4 w-[250px] ">
-                  CMAT
-                </div>
-                <div className="border border-black rounded-lg text-center p-4 w-[250px] ">
-                  BIT-TU Entrance Exam
-                </div>
-                <div className="border border-black rounded-lg text-center p-4 w-[250px] ">
-                  KUUMAT
-                </div>
-                <div className="border border-black rounded-lg text-center p-4 w-[250px] ">
-                  BSc CSIT Entrance Exam
-                </div>
+                {items.length > 0 ? (
+                  items.map((item, index) => (
+                    <Link href={`/blogs/${item.slugs}`}>
+                      <div
+                        key={index}
+                        className="border border-black rounded-lg text-center p-4 w-[250px] "
+                      >
+                        {item.title}
+                      </div>
+                    </Link>
+                  ))
+                ) : loading ? (
+                  <p>Loading...</p>
+                ) : (
+                  <p>{error}</p>
+                )}
               </div>
             </div>
             <div className="font-extrabold text-6xl w-[400px] ml-auto hidden lp:block">

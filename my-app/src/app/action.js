@@ -99,8 +99,6 @@ export async function getEvents(queryParams){
 }
 
 
-
-
 //Blogs actions
 export async function getBlogs(queryParams){
   const q = `page=${queryParams}`
