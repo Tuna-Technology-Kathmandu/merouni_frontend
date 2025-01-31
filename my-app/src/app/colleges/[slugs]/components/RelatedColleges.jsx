@@ -19,7 +19,7 @@ const RelatedColleges = ({ college }) => {
       console.log("RElated clz", data);
 
       const filteredColleges = data.colleges.filter(
-        (c) => c.id !== college._id
+        (c) => c.collegeId !== college._id
       );
       console.log("Filtered Colleges:", filteredColleges);
       // setColleges(data.colleges);
