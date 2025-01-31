@@ -9,6 +9,7 @@ import UniversityCard from "./UniversityCard";
 import { useState, useEffect, useCallback } from "react";
 import { getColleges, searchColleges } from "../actions";
 import { debounce } from "lodash";
+import Link from "next/link";
 
 const CollegeFinder = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -57,6 +58,11 @@ const CollegeFinder = () => {
     }
     setIsLoading(false);
   };
+
+  useEffect(() => {
+    console.log("UNiversity fetch:",universities[8])
+  }, [universities])
+  
 
   const filters = [
     {
@@ -299,7 +305,9 @@ const CollegeFinder = () => {
               {universities.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {universities.map((university, index) => (
-                    <UniversityCard key={index} {...university} />
+                    <Link href={`/colleges/${university.slug}`} key={index}>
+                      <UniversityCard key={index} {...university} />
+                     </Link>
                   ))}
                 </div>
               ) : (

@@ -45,6 +45,11 @@ const ProgramManager = () => {
     startDate: "",
     endDate: "",
   });
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
   const [scholarships, setScholarships] = useState([]);
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState([]);
@@ -173,10 +178,16 @@ const ProgramManager = () => {
     loadAllPrograms();
   }, []);
 
-  const loadAllPrograms = async () => {
+  const loadAllPrograms = async (page = 1) => {
     try {
-      const response = await getPrograms();
+      const response = await getPrograms(page, 9, "asc");
+      console.log("ALL RESPONSE UNIVERSITY:", response);
       setPrograms(response.items);
+      setPagination({
+        currentPage: response.pagination.currentPage,
+        totalPages: response.pagination.totalPages,
+        total: response.pagination.totalRecords,
+      });
     } catch (error) {
       setError("Failed to load programs");
     } finally {
@@ -1097,7 +1108,12 @@ const ProgramManager = () => {
           {editingId ? "Update Program" : "Add Program"}
         </button>
       </form>
-      <Table data={programs} columns={columns} />
+      <Table
+        data={programs}
+        columns={columns}
+        pagination={pagination}
+        onPageChange={(newPage) => loadAllPrograms(newPage)}
+      />
     </div>
   );
 };

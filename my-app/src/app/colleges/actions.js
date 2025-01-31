@@ -3,7 +3,7 @@
 export async function getColleges(page = 1, sort = "ASC") {
   try {
     const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/college?page=${page}`,
+      `${process.env.baseUrl}${process.env.version}/college?page=${page}`,
       {
         cache: "no-store",
       }
@@ -23,6 +23,7 @@ export async function getColleges(page = 1, sort = "ASC") {
         facilities: college.facilities,
         instituteType: college.instituteType,
         programmes: college.programmes,
+        slug: college.slug,
         collegeId: college._id,
       })),
       pagination: data.pagination,
@@ -45,9 +46,9 @@ export async function getColleges(page = 1, sort = "ASC") {
 export async function searchColleges(query) {
   try {
     const response = await fetch(
-     `${process.env.baseUrl}${process.env.version}/college/search?q=${encodeURIComponent(
-        query
-      )}`,
+      `${process.env.baseUrl}${
+        process.env.version
+      }/college/search?q=${encodeURIComponent(query)}`,
       {
         cache: "no-store",
       }
@@ -99,5 +100,36 @@ export async function searchColleges(query) {
         hasPreviousPage: false,
       },
     };
+  }
+}
+
+export async function getCollegeBySlug(slug) {
+  try {
+    // console.log("Fetching college details for slug:", slug);
+    console.log(`${process.env.baseUrl}${process.env.version}/college/${slug}`);
+
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/college/${slug}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      }
+    );
+
+    console.log("RESPOnse:", response);
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch College Details");
+    }
+
+    const data = await response.json();
+    console.log("Data:", data);
+    return data.item;
+  } catch (error) {
+    console.error("Error fetching college details:", error);
+    throw error;
   }
 }

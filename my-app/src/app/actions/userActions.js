@@ -24,11 +24,12 @@ export async function getUsers(page = 1, token, role) {
     // Ensure the response has the expected structure
     return {
       items: data.items || [],
-      pagination: {
-        currentPage: page,
-        totalPages: Math.ceil((data.total || 0) / 9), // Assuming 9 items per page
-        total: data.total || 0,
-      },
+      // pagination: {
+      //   currentPage: page,
+      //   totalPages: Math.ceil((data.total || 0) / 9), // Assuming 9 items per page
+      //   total: data.total || 0,
+      // },
+      pagination: data.pagination,
     };
   } catch (error) {
     console.error("Error fetching users:", error);
