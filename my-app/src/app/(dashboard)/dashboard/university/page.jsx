@@ -11,7 +11,6 @@ import Loading from "../../../components/Loading";
 import Table from "@/app/components/Table";
 import { Edit2, Trash2 } from "lucide-react";
 
-
 const UniversityManager = () => {
   const [formData, setFormData] = useState({
     fullname: "",
@@ -210,7 +209,6 @@ const UniversityManager = () => {
     }
   };
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission behavior
 
@@ -295,7 +293,6 @@ const UniversityManager = () => {
       );
     }
   };
-
 
   if (loading)
     return (
@@ -411,13 +408,13 @@ const UniversityManager = () => {
             Levels
           </label>
           <select
-            value="" 
+            value=""
             onChange={(e) => {
               const selectedOptions = Array.from(
                 e.target.selectedOptions,
                 (option) => option.value
               );
-              handleLevel(selectedOptions); 
+              handleLevel(selectedOptions);
             }}
             className="border border-gray-400 p-2 w-full rounded focus:outline-none focus:ring-2 focus:ring-gray-400 hover:border-gray-500"
           >
@@ -681,12 +678,11 @@ const UniversityManager = () => {
           type="submit"
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
-                      {editingId ? "Update University" : "Add University"}
-
+          {editingId ? "Update University" : "Add University"}
         </button>
       </form>
 
-      <Table data={universities} columns={columns}/>
+      <Table data={universities} columns={columns} />
     </div>
   );
 };
