@@ -77,7 +77,7 @@ const Header = () => {
       )}
 
       {/* Main Header */}
-      <div className="flex justify-between items-center max-w-[1600px] mx-auto">
+      <div className="flex justify-between items-center w-[85%] max-w-[1600px] mx-auto">
         {/* Left Logo */}
         {/* <Link href="/" className="flex-shrink-0">
           <Image
@@ -127,7 +127,7 @@ const Header = () => {
 
         {/* User Icon */}
         <div className="">
-        <Usericon/>
+          <Usericon />
           {/* <FaUserCircle
             style={{ width: "40px", height: "40px", color: "#0a6fa7" }}
           /> */}

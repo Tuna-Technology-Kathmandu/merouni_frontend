@@ -16,14 +16,20 @@ import { HiOutlineUsers } from "react-icons/hi";
 import { MdCategory } from "react-icons/md";
 import { GrCertificate } from "react-icons/gr";
 
-
 import { FaWpforms } from "react-icons/fa";
 
+import { useSelector } from "react-redux";
 
 const menuItems = [
   {
     title: "MENU",
     items: [
+      {
+        icon: <FaHome />,
+        label: "Home",
+        href: "/insights",
+        visible: ["admin", "super-admin"],
+      },
       {
         icon: <FaHome />,
         label: "Home",
@@ -34,7 +40,7 @@ const menuItems = [
         icon: <HiOutlineUsers />,
         label: "Users",
         href: "/dashboard/users",
-        visible: ["admin"],
+        visible: ["admin", "super-admin", "editor"],
       },
       {
         icon: <IoSchoolSharp />,
@@ -105,19 +111,19 @@ const menuItems = [
         icon: <FaRegUserCircle />,
         label: "Profile",
         href: "/dashboard/profile",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["admin", "teacher", "student", "parent", "subscriber"],
       },
       {
         icon: <MdOutlineSettings />,
         label: "Settings",
         href: "/dashboard/settings",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["admin", "teacher", "student", "parent", "subscriber"],
       },
       {
         icon: <AiOutlineLogout />,
         label: "Logout",
         href: "/dashboard/logout",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["admin", "teacher", "student", "parent", "subscriber"],
       },
     ],
   },
@@ -125,7 +131,9 @@ const menuItems = [
 
 const Menu = () => {
   const pathname = usePathname();
-  const role = "admin";
+
+  // Get the user role dynamically from Redux
+  const role = useSelector((state) => state.user?.data?.role || {});
 
   return (
     <div className="mt-4 text-sm text-black">
@@ -135,7 +143,10 @@ const Menu = () => {
             {menu.title}
           </span>
           {menu.items.map((item) => {
-            if (item.visible.includes(role)) {
+            // Check if the user has at least one true role that matches item.visible
+            const hasAccess = item.visible.some((r) => role[r] === true);
+
+            if (hasAccess) {
               return (
                 <Link
                   href={item.href}
@@ -159,5 +170,4 @@ const Menu = () => {
     </div>
   );
 };
-
 export default Menu;

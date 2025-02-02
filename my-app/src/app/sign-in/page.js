@@ -172,7 +172,6 @@ const SignInPage = () => {
             password: formData.password,
           };
 
-    
       const response = await fetch(`${process.env.baseUrl}${endpoint}`, {
         method: "POST",
         headers: {
@@ -194,13 +193,28 @@ const SignInPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log("am i here")
-        const tokenObj = await getToken();
-        const decodedToken = jwtDecode(tokenObj.value);
-        dispatch(addUser({ ...decodedToken }));
-        if (isLogin) {
-          toast.success("Login successful!");
-          router.push("/dashboard");
+        console.log("am i here");
+
+        if (response.ok) {
+          console.log("am i here");
+
+          if (isLogin) {
+            const tokenObj = await getToken();
+            const decodedToken = jwtDecode(tokenObj.value);
+            dispatch(addUser({ ...decodedToken }));
+            toast.success("Login successful!");
+            router.push("/dashboard");
+          } else {
+            setFormData({
+              firstName: "",
+              email: "",
+              lastName: "",
+              password: "",
+              phone_no: "",
+            });
+            toast.success("Account created! Please verify your email.");
+            router.push("/verifyemail"); // Redirect to verify email page
+          }
         } else {
           setFormData({
             firstName: "",

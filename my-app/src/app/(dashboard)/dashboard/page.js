@@ -1,9 +1,11 @@
+"use client"
 import StudentEnrollmentGrowthChart from "@/app/components/EnrollmentChart";
 import Announcements from "../../components/Announcements";
 import Calendar from "../../components/Calendar";
 import UserCard from "../../components/UserCard";
 import Piechart from "../../components/Piechart";
 import Barchart from "../../components/Barchart";
+import withAuth from "@/app/components/withAuth";
 
 const AdminPage = () => {
   return (
@@ -40,4 +42,4 @@ const AdminPage = () => {
   );
 };
 
-export default AdminPage;
+export default withAuth(AdminPage);
