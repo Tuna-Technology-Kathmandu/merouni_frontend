@@ -25,9 +25,9 @@ const SignInPage = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    email: "asuyog043@gmail.com",
+    email: "admintuna@gmail.com",
     phone_no: "",
-    password: "Admin@12345",
+    password: "admintuna@12345",
   });
   const [errors, setErrors] = useState({});
 
@@ -171,16 +171,17 @@ const SignInPage = () => {
             phone_no: formData.phone_no,
             password: formData.password,
           };
-
-      const response = await fetch(`${process.env.baseUrl}${endpoint}`, {
+      const response = await fetch(`${process.env.baseUrl}${process.env.version}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "device-id": deviceId,
+          // "device-id": deviceId,
         },
         credentials: "include",
         body: JSON.stringify(filteredData),
       });
+
+      console.log(response);
 
       // Get all response headers
       const refreshToken = response.headers.get("x-refresh-token");
@@ -226,9 +227,11 @@ const SignInPage = () => {
           toast.success("Account created! Please verify your email.");
         }
       } else {
+        console.log(data.message);
         toast.error(data.message || "Something went wrong");
       }
     } catch (err) {
+      console.log(err);
       toast.error("Connection error: " + err);
     } finally {
       setLoading(false);

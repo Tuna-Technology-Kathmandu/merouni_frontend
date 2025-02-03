@@ -26,6 +26,7 @@ export async function middleware(request) {
   console.log("Middleware running for:", request.nextUrl.pathname);
 
   const token = request.cookies.get("token")?.value;
+  console.log("Token from cookies:", token);
 
   if (!token) {
     console.log("No token found. Redirecting to /sign-in");
@@ -33,13 +34,14 @@ export async function middleware(request) {
   }
 
   try {
-    const secret = new TextEncoder().encode(`${process.env.jwtsecret}`);
-
+    const secret = new TextEncoder().encode(process.env.jwtsecret || "stayinpeace");
     const { payload: user } = await jwtVerify(token, secret);
 
     console.log("Decoded user:", user);
 
-    const role = user?.data?.role || {};
+    // Parse role if it's stored as a JSON string
+    const role = user?.data?.role ? JSON.parse(user.data.role) : {};
+
     const pathname = request.nextUrl.pathname;
 
     // Define access control
@@ -80,3 +82,4 @@ export async function middleware(request) {
 export const config = {
   matcher: ["/dashboard/:path*"],
 };
+

@@ -133,8 +133,12 @@ const Menu = () => {
   const pathname = usePathname();
 
   // Get the user role dynamically from Redux
-  const role = useSelector((state) => state.user?.data?.role || {});
 
+  const role = useSelector((state) => {
+    const roleData = state.user?.data?.role;
+    return roleData ? JSON.parse(roleData) : {}; // Parse role if it's a string
+  });
+  
   return (
     <div className="mt-4 text-sm text-black">
       {menuItems.map((menu) => (
