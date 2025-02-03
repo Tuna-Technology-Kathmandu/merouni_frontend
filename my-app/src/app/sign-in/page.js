@@ -23,11 +23,11 @@ const SignInPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "admintuna@gmail.com",
-    phone_no: "",
-    password: "admintuna@12345",
+    firstName: "tuna",
+    lastName: "dai",
+    email: "asuyog042@gmail.com",
+    phoneNo: "1212121212",
+    password: "Admin@12345",
   });
   const [errors, setErrors] = useState({});
 
@@ -44,10 +44,10 @@ const SignInPage = () => {
         newErrors.firstName = "First name is required";
       if (!formData.lastName.trim())
         newErrors.lastName = "Last name is required";
-      if (!formData.phone_no.trim()) {
-        newErrors.phone_no = "Phone number is required";
-      } else if (!/^\d{10}$/.test(formData.phone_no)) {
-        newErrors.phone_no = "Phone number must be 10 digits";
+      if (!formData.phoneNo.trim()) {
+        newErrors.phoneNo = "Phone number is required";
+      } else if (!/^\d{10}$/.test(formData.phoneNo)) {
+        newErrors.phoneNo = "Phone number must be 10 digits";
       }
     }
     if (!formData.email.trim()) {
@@ -100,7 +100,7 @@ const SignInPage = () => {
   //           firstName: formData.firstName,
   //           lastName: formData.lastName,
   //           email: formData.email,
-  //           phone_no: formData.phone_no,
+  //           phoneNo: formData.phoneNo,
   //           password: formData.password,
   //         };
 
@@ -132,7 +132,7 @@ const SignInPage = () => {
   //           email: "",
   //           lastName: "",
   //           password: "",
-  //           phone_no: "",
+  //           phoneNo: "",
   //         });
   //         toast.success("Account created! Please verify your email.");
 
@@ -148,16 +148,17 @@ const SignInPage = () => {
   //   }
   // };
 
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     const deviceId = getDeviceId();
     if (!validateForm()) return;
-
+  
     setLoading(true);
     try {
       const endpoint = isLogin ? "/api/v1/auth/login" : "/api/v1/auth/register";
-
-      // Define filteredData here, based on isLogin
+  
+      // Define filteredData based on isLogin
       const filteredData = isLogin
         ? {
             email: formData.email,
@@ -168,10 +169,11 @@ const SignInPage = () => {
             firstName: formData.firstName,
             lastName: formData.lastName,
             email: formData.email,
-            phone_no: formData.phone_no,
+            phoneNo: formData.phoneNo,
             password: formData.password,
           };
-      const response = await fetch(`${process.env.baseUrl}${process.env.version}/auth/login`, {
+  
+      const response = await fetch(`${process.env.baseUrl}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -180,63 +182,52 @@ const SignInPage = () => {
         credentials: "include",
         body: JSON.stringify(filteredData),
       });
-
+  
       console.log(response);
-
+  
       // Get all response headers
       const refreshToken = response.headers.get("x-refresh-token");
       console.log("All headers:", [...response.headers.entries()]);
       console.log("Refresh token:", refreshToken);
-
+  
       if (refreshToken) {
         localStorage.setItem("refreshToken", refreshToken);
       }
+  
       const data = await response.json();
-
+  
       if (response.ok) {
         console.log("am i here");
-
-        if (response.ok) {
-          console.log("am i here");
-
-          if (isLogin) {
-            const tokenObj = await getToken();
-            const decodedToken = jwtDecode(tokenObj.value);
-            dispatch(addUser({ ...decodedToken }));
-            toast.success("Login successful!");
-            router.push("/dashboard");
-          } else {
-            setFormData({
-              firstName: "",
-              email: "",
-              lastName: "",
-              password: "",
-              phone_no: "",
-            });
-            toast.success("Account created! Please verify your email.");
-            router.push("/verifyemail"); // Redirect to verify email page
-          }
+  
+        if (isLogin) {
+          const tokenObj = await getToken();
+          const decodedToken = jwtDecode(tokenObj.value);
+          dispatch(addUser({ ...decodedToken }));
+          toast.success("Login successful!");
+          router.push("/dashboard");
         } else {
           setFormData({
             firstName: "",
             email: "",
             lastName: "",
             password: "",
-            phone_no: "",
+            phoneNo: "",
           });
           toast.success("Account created! Please verify your email.");
+          router.push(`/verify-otp?email=${formData.email}`); // Use formData.email correctly
         }
       } else {
-        console.log(data.message);
-        toast.error(data.message || "Something went wrong");
+        // Handle unsuccessful responses
+        toast.error(data?.message || "Something went wrong. Please try again.");
       }
     } catch (err) {
       console.log(err);
-      toast.error("Connection error: " + err);
+      toast.error("Connection error: " + err.message);
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -311,17 +302,17 @@ const SignInPage = () => {
             <div>
               <input
                 type="tel"
-                name="phone_no"
+                name="phoneNo"
                 placeholder="Phone Number"
-                value={formData.phone_no}
+                value={formData.phoneNo}
                 onChange={handleChange}
                 className={`appearance-none rounded-lg w-full px-3 py-2 border ${
-                  errors.phone_no ? "border-red-500" : "border-gray-300"
+                  errors.phoneNo ? "border-red-500" : "border-gray-300"
                 } focus:outline-none focus:ring-blue-500`}
                 maxLength={10}
               />
-              {errors.phone_no && (
-                <p className="text-red-500 text-xs mt-1">{errors.phone_no}</p>
+              {errors.phoneNo && (
+                <p className="text-red-500 text-xs mt-1">{errors.phoneNo}</p>
               )}
             </div>
           )}
