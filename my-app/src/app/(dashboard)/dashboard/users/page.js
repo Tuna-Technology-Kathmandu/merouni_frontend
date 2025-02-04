@@ -31,7 +31,7 @@ export default function UsersManager() {
     totalPages: 1,
     total: 0,
   });
- 
+
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(null);
@@ -135,6 +135,65 @@ export default function UsersManager() {
     console.log("USERS:", users);
     console.log("PAGINATION:", pagination);
   }, [users, pagination]);
+
+  const handleSearch = async (query) => {
+    if (!query) {
+      loadUsers();
+      return;
+    }
+    try {
+      const tokenObj = await getToken();
+      const token = tokenObj.value;
+      const decodedToken = jwtDecode(tokenObj.value);
+      const roleObject = decodedToken.data.role;
+      const roleName = Object.keys(roleObject).filter(
+        (key) => roleObject[key] === "true"
+      );
+      const response = await fetch(
+        `${process.env.baseUrl}${process.env.version}/users/search?q=${query}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+
+            Role: roleName.join(","),
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+
+        const userArray = Object.keys(data)
+          .filter((key) => !isNaN(key))
+          .map((key) => data[key]);
+        // setUsers(data.items || data);
+        console.log("User Array:", userArray);
+
+        if (userArray.length === 0) {
+          console.log("NO users found in search results");
+        }
+        setUsers(userArray);
+
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalRecords,
+          });
+        }
+      } else {
+        console.error("Error fetching results:", response.statusText);
+        setUsers([]);
+      }
+    } catch (error) {
+      console.error("Error fetching user search results:", error.message);
+      setUsers([]);
+    }
+  };
+
+  useEffect(() => {
+    console.log("USErs searching:", users);
+  }, [users]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -318,6 +377,7 @@ export default function UsersManager() {
         columns={columns}
         pagination={pagination}
         onPageChange={(newPage) => loadUsers(newPage)}
+        onSearch={handleSearch}
       />
     </div>
   );

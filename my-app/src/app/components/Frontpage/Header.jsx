@@ -8,15 +8,21 @@ import Link from "next/link";
 import { IoMenu } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import Usericon from "./Usericon";
+import { FiChevronRight } from "react-icons/fi";
+import { GoArrowUpRight } from "react-icons/go";
+
 const Header = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
 
   const menuItems = [
-    { title: "Home", href: "/" },
-    { title: "About", href: "/about" },
-    { title: "Services", href: "/services" },
-    { title: "Contact", href: "/contact" },
+    { title: "College", href: "/college" },
+    { title: "Course", href: "/course" },
+    { title: "Degree", href: "/degree" },
+    { title: "Admission", href: "/admission" },
+    { title: "Scholarship", href: "/scholarship" },
+    { title: "Events", href: "/events" },
+    { title: "Blogs", href: "/blogs" },
   ];
 
   return (
@@ -39,19 +45,19 @@ const Header = () => {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50 ${
+        className={`fixed top-[80px] right-0 h-[550px] w-full bg-white shadow-lg border-t-2 transform transition-transform duration-300 ease-in-out z-50 ${
           showSidebar ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Close Button */}
-        <div className="flex justify-end p-4">
+        {/* <div className="flex justify-end p-4">
           <button
             onClick={() => setShowSidebar(false)}
             className="text-gray-600 hover:text-gray-800"
           >
             <IoClose size={24} />
           </button>
-        </div>
+        </div> */}
 
         {/* Menu Items */}
         <nav className="px-4">
@@ -59,25 +65,42 @@ const Header = () => {
             <Link
               key={index}
               href={item.href}
-              className="block py-3 text-gray-700 hover:text-blue-600 border-b border-gray-200"
+              className=" py-4  text-gray-700 hover:text-blue-600 border-b border-gray-200 flex flex-row justify-between"
               onClick={() => setShowSidebar(false)}
             >
-              {item.title}
+              <span className="text-lg font-bold">{item.title}</span>
+              <FiChevronRight style={{ color: "black" }} size={25} />
             </Link>
           ))}
         </nav>
+
+        <div className="flex flex-row justify-between m-4">
+          <button type="button" className=" bg-[#0A6FA7] w-[150px] p-2">
+            <span className="text-white font-bold text-lg">Login</span>
+          </button>
+
+          <div className="border-2  border-solid border-[#0A6FA7] ">
+            <button
+              type="button"
+              className="  w-[150px] p-2 flex flex-row justify-center items-center"
+            >
+              <span className=" font-bold text-lg">Join Us</span>
+              <GoArrowUpRight size={25} />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Sidebar Backdrop */}
       {showSidebar && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="fixed inset-0  z-40"
           onClick={() => setShowSidebar(false)}
         />
       )}
 
       {/* Main Header */}
-      <div className="flex justify-between items-center max-w-[1600px] mx-auto">
+      <div className="flex justify-between items-center max-w-[1600px] mx-auto ">
         {/* Left Logo */}
         {/* <Link href="/" className="flex-shrink-0">
           <Image
@@ -127,14 +150,14 @@ const Header = () => {
 
         {/* User Icon */}
         <div className="">
-        <Usericon/>
+          <Usericon />
           {/* <FaUserCircle
             style={{ width: "40px", height: "40px", color: "#0a6fa7" }}
           /> */}
         </div>
 
         {/* Mobile Menu Icon (☰) */}
-        <div className="block md:hidden px-2 cursor-pointer">
+        <div className="block md:hidden px-2 cursor-pointer ">
           <IoMenu onClick={() => setShowSidebar(true)} size={24} />
         </div>
       </div>

@@ -24,7 +24,7 @@ export async function getColleges(page = 1, sort = "ASC") {
         instituteType: college.instituteType,
         programmes: college.programmes,
         slug: college.slug,
-        id: college._id,
+        collegeId: college._id,
       })),
       pagination: data.pagination,
     };

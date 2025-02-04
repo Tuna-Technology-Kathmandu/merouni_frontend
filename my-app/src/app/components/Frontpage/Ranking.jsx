@@ -1,8 +1,35 @@
+"use client";
+
 import Image from "next/image";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FaGreaterThan } from "react-icons/fa";
+import { getRankings } from "@/app/action";
 
 const Ranking = () => {
+  const [ranking, setRanking] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchRanking();
+  }, []);
+
+  const fetchRanking = async () => {
+    try {
+      const response = await getRankings(4, 1, "Ranking");
+      setRanking(response.items);
+    } catch (error) {
+      setError(error || "Error fetching the rankings ");
+      console.error("Error fetching the rankings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Ranking from the news:", ranking);
+  }, [ranking]);
+
   return (
     <div className=" bg-gradient-to-r flex items-center text-black my-24 ">
       <div className="flex items-center max-w-[1600px] mx-auto gap-16  2xl:gap-40 flex-col lp:flex-row">
@@ -22,12 +49,14 @@ const Ranking = () => {
           </button>
         </div>
         <div
-          className="flex flex-col justify-center rounded-lg "
-          style={{
-            background:
-              "linear-gradient(133.94deg, #FFFFFF 0.51%, #E9E9E9 99.49%)",
-            boxShadow: "8px 10px 4px rgba(0, 0, 0, 0.1)",
-          }}
+          className="flex flex-col justify-center rounded-lg border-2 shadow-md"
+          style={
+            {
+              // background:
+              //   "linear-gradient(133.94deg, #FFFFFF 0.51%, #E9E9E9 99.49%)",
+              // boxShadow: "8px 10px 4px rgba(0, 0, 0, 0.1)",
+            }
+          }
         >
           <div className="flex items-center">
             <Image
@@ -43,29 +72,15 @@ const Ranking = () => {
             Nepal’s Education Authorities
           </p>
           <div className="flex flex-col gap-4 mx-auto my-8 font-semibold">
-            <div className="flex flex-col gap-4 md:flex-row justify-evenly">
-              <div className="border border-black rounded-lg text-center p-2 w-[275px] ">
-                Top IT COllege in Nepal
-              </div>
-              <div className="border border-black rounded-lg text-center p-2 w-[275px] ">
-                Top Universities in Nepal
-              </div>
-            </div>
-            <div className="flex flex-col md:flex-row  gap-4 justify-evenly">
-              <div className="border border-black rounded-lg text-center p-2 w-[275px] ">
-                Top Engineering COlleges in Nepal
-              </div>
-              <div className="border border-black rounded-lg text-center p-2 w-[275px] ">
-                Top MBA colleges in Nepal
-              </div>
-            </div>
-            <div className="flex  flex-col md:flex-row gap-4 justify-evenly">
-              <div className="border border-black rounded-lg text-center p-2 w-[275px] ">
-                Top Medical COlleges in Nepal
-              </div>
-              <div className="border border-black rounded-lg text-center p-2 w-[275px] ">
-                Top Law COlleges in Nepal
-              </div>
+            <div className="grid grid-cols-1  md:grid-cols-2 gap-4 ">
+              {ranking.map((rank, index) => (
+                <div
+                  className="border border-black rounded-lg text-center p-2 w-[275px] flex justify-center items-center"
+                  key={index}
+                >
+                  {rank.title}
+                </div>
+              ))}
             </div>
           </div>
         </div>

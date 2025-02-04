@@ -109,7 +109,10 @@ const services = {
   course: new ApiService("course"),
   faculty: new ApiService("faculty"),
   event: new ApiService("events"),
-  news: new ApiService("news"),
+  news: new ApiService("blogs"),
+  banner: new ApiService("banner"),
+  exam: new ApiService("exam"),
+  college: new ApiService("college")
 };
 
 export default services;

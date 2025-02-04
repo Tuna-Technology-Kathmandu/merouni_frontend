@@ -110,8 +110,68 @@ export async function getBlogs(page) {
   return services.news.getAll(page);
 }
 
+// get ranking
+export async function getRankings(limit, page, category_title) {
+  const params = {
+    limit,
+    page,
+    category_title,
+  };
+  return services.news.getAll(params);
+}
+
 export async function getToken() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
   return token;
+}
+
+// Banner Actions
+
+export async function getBanners() {
+  return services.banner.getAll();
+}
+
+export async function getColleges(is_featured, pinned, limit, page) {
+  const params = {
+    limit,
+    page,
+    is_featured,
+    pinned,
+  };
+
+  return services.college.getAll(params);
+}
+
+export async function getFeaturedColleges() {
+  console.log("HEllo");
+  try {
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/college/featured-college`,
+      {
+        cache: "no-store",
+      }
+    );
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching featured colleges:", error);
+    throw error;
+  }
+}
+
+// exams section
+
+export async function getExams(limit, page) {
+  const params = {
+    limit,
+    page,
+  };
+  return services.exam.getAll(params);
 }

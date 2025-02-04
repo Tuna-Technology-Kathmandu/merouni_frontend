@@ -1,7 +1,56 @@
+"use client";
+
 import Image from "next/image";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { getCourses, getExams } from "@/app/action";
 
 const Program = () => {
+  const [courses, setCourses] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [exams, setExams] = useState([]);
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  const fetchCourses = async () => {
+    try {
+      const response = await getCourses();
+      setCourses(response.items);
+    } catch (error) {
+      setError("Failed to load courses");
+      console.error("Error loading courses:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Courses:", courses);
+  }, [courses]);
+
+  useEffect(() => {
+    fetchExams();
+  }, []);
+
+  const fetchExams = async () => {
+    setLoading(true);
+    try {
+      const response = await getExams(4, 1);
+      setExams(response.items);
+    } catch (error) {
+      setError("Failed to load exams");
+      console.error("Error loading exams:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Exams:", exams);
+  }, [exams]);
+
   return (
     <>
       <div className=" bg-[#E3E3E3] text-black  border-black flex items-center  flex-col lp:flex-row">
@@ -36,19 +85,21 @@ const Program = () => {
                 Simple access to information on preparation, dates, syllabus and
                 more...
               </div>
+              {loading && (
+                <div className="flex justify-center items-center h-64">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                </div>
+              )}
+
               <div className="flex flex-wrap gap-4  m-4 py-6 font-bold">
-                <div className="border border-black rounded-lg text-center p-4 w-[250px] ">
-                  CMAT
-                </div>
-                <div className="border border-black rounded-lg text-center p-4 w-[250px] ">
-                  BIT-TU Entrance Exam
-                </div>
-                <div className="border border-black rounded-lg text-center p-4 w-[250px] ">
-                  KUUMAT
-                </div>
-                <div className="border border-black rounded-lg text-center p-4 w-[250px] ">
-                  BSc CSIT Entrance Exam
-                </div>
+                {exams.map((exam, index) => (
+                  <div
+                    className="border border-black rounded-lg text-center p-4 w-[250px] "
+                    key={index}
+                  >
+                    {exam.title}
+                  </div>
+                ))}
               </div>
             </div>
             <div className="font-extrabold text-6xl w-[400px] ml-auto hidden lp:block">
@@ -85,7 +136,15 @@ const Program = () => {
                 more...
               </div>
               <div className="flex flex-wrap gap-4  m-4 py-6 font-bold ">
-                <div className="border border-black rounded-lg text-center p-4 w-[150px] ">
+                {courses.map((course, index) => (
+                  <div
+                    className="border border-black rounded-lg text-center p-4 w-[150px] "
+                    key={index}
+                  >
+                    {course.title}
+                  </div>
+                ))}
+                {/* <div className="border border-black rounded-lg text-center p-4 w-[150px] ">
                   MBBS
                 </div>
                 <div className="border border-black rounded-lg text-center p-4 w-[150px] ">
@@ -102,7 +161,7 @@ const Program = () => {
                 </div>
                 <div className="border border-black rounded-lg text-center p-4 w-[150px] ">
                   IT
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

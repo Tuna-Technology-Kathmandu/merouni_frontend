@@ -120,7 +120,7 @@ const UniversitySection = ({ name, colleges, logo, zIndex, index }) => {
 
   return (
     <div
-      className="h-screen w-full flex items-start bg-black text-white sticky border-t-[1px] border-gray-100 pt-8"
+      className="h-screen w-full flex items-start bg-[#EEEEEE] text-black sticky border-t-[1px] border-black pt-8"
       style={{
         zIndex,
         top: `${index * 200}px`,
@@ -138,11 +138,11 @@ const UniversitySection = ({ name, colleges, logo, zIndex, index }) => {
           {allUniversities.map((uni, idx) => (
             <div
               key={idx}
-              className="flex text-white gap-2 items-center"
+              className="flex text-black gap-2 items-center"
               style={{ opacity: uni === name ? 1 : 0.5 }}
             >
               {uni === name && (
-                <div className="h-3 w-3 rounded-full bg-white" />
+                <div className="h-3 w-3 rounded-full bg-black" />
               )}
               <p className="font-bold text-lg">{uni}</p>
             </div>
@@ -164,7 +164,7 @@ const UniversitySection = ({ name, colleges, logo, zIndex, index }) => {
           </div>
 
           {/* View all button */}
-          <button className="w-[130px] text-center border border-white rounded-xl flex items-center justify-center p-2 font-bold">
+          <button className="w-[130px] text-center border border-black rounded-xl flex items-center justify-center p-2 font-bold hover:bg-[]">
             View all
             <div className="w-6 h-6 rounded-full bg-white text-black mx-2">
               &gt;

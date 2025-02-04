@@ -58,125 +58,124 @@ const Footer = () => {
 
   return (
     <>
-    <div className="hidden md:block">
+      <div className="hidden md:block">
+        <header className="  bg-[#011E3F] bg-opacity-80 text-white">
+          <div className="container mx-auto px-4">
+            <div>
+              <nav className="flex justify-between items-center py-4">
+                <div className="flex items-center">
+                  <Image
+                    src={"/images/logo.png"}
+                    width={256}
+                    height={86}
+                    alt="Mero UNI logo"
+                  />
+                </div>
 
-      <header className=" bg-black text-white">
-        <div className="container mx-auto px-4">
-          <div>
-            <nav className="flex justify-between items-center py-4">
-              <div className="flex items-center">
-                <Image
-                  src={"/images/logo.png"}
-                  width={256}
-                  height={86}
-                  alt="Mero UNI logo"
-                />
-              </div>
+                <div className="hidden md:flex items-center space-x-8">
+                  <Link
+                    className="hover:text-[#30ad8f] transition-colors"
+                    href={"/"}
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    className="hover:text-[#30ad8f] transition-colors"
+                    href={"/events"}
+                  >
+                    Events
+                  </Link>
+                  <Link
+                    className="hover:text-[#30ad8f] transition-colors"
+                    href={"/blogs"}
+                  >
+                    Blogs
+                  </Link>
+                  <Link
+                    className="hover:text-[#30ad8f] transition-colors"
+                    href={"/contact"}
+                  >
+                    Contact
+                  </Link>
+                  <Link
+                    className="hover:text-[#30ad8f] transition-colors"
+                    href={"/about"}
+                  >
+                    About Us
+                  </Link>
+                </div>
 
-              <div className="hidden md:flex items-center space-x-8">
-                <Link
-                  className="hover:text-[#30ad8f] transition-colors"
-                  href={"/"}
-                >
-                  Home
-                </Link>
-                <Link
-                  className="hover:text-[#30ad8f] transition-colors"
-                  href={"/events"}
-                >
-                  Events
-                </Link>
-                <Link
-                  className="hover:text-[#30ad8f] transition-colors"
-                  href={"/blogs"}
-                >
-                  Blogs
-                </Link>
-                <Link
-                  className="hover:text-[#30ad8f] transition-colors"
-                  href={"/contact"}
-                >
-                  Contact
-                </Link>
-                <Link
-                  className="hover:text-[#30ad8f] transition-colors"
-                  href={"/about"}
-                >
-                  About Us
-                </Link>
-              </div>
-
-              <div className="hidden md:flex items-center space-x-4">
-                <a href="#">
-                  <FaFacebook size={28} />
-                </a>
-                <a href="#">
-                  <FaInstagram size={28} />
-                </a>
-                <a href="#">
-                  <TiSocialLinkedinCircular size={30} />
-                </a>
-                <a href="#">
-                  <PiXLogoLight size={28} />
-                </a>
-              </div>
-            </nav>
-            <div className=" h-[1px] bg-white"></div>
-          </div>
-        </div>
-      </header>
-
-      <footer className=" bg-black text-white py-10">
-        <div className="container mx-auto px-4">
-          {/* <!-- Footer Content Section --> */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-            {/* <!-- Top Exams --> */}
-
-            {Object.entries(Sections).map(([key, section], index) => (
-              <div key={index}>
-                <h3 className="text-xl font-semibold mb-10">
-                  {section.header}
-                </h3>
-                <ul className="space-y-3">
-                  {section.list.map((item, itemIndex) => (
-                    <li key={itemIndex}>
-                      <Link
-                        href={"#"}
-                        className="hover:text-[#30ad8f] transition-colors"
-                      >
-                        {item}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-
-          <div className="pt-8 border-t border-white flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 mb-10">
-            <div className="space-x-8">
-              <Link
-                href={"#"}
-                className="hover:text-[#30ad8f] transition-colors font-semibold"
-              >
-                Disclaimer
-              </Link>
-              <Link
-                href={"#"}
-                className="hover:text-[#30ad8f] transition-colors font-semibold"
-              >
-                Privacy Policy
-              </Link>
-            </div>
-            <div className="flex flex-row items-center justify-center">
-              <span className="font-semibold">
-                {" "}
-                &copy; All rights reserved 2025
-              </span>
+                <div className="hidden md:flex items-center space-x-4">
+                  <a href="#">
+                    <FaFacebook size={28} />
+                  </a>
+                  <a href="#">
+                    <FaInstagram size={28} />
+                  </a>
+                  <a href="#">
+                    <TiSocialLinkedinCircular size={30} />
+                  </a>
+                  <a href="#">
+                    <PiXLogoLight size={28} />
+                  </a>
+                </div>
+              </nav>
+              <div className=" h-[1px] bg-white"></div>
             </div>
           </div>
-        </div>
-      </footer>
+        </header>
+
+        <footer className=" bg-[#011E3F] bg-opacity-80 text-white py-10">
+          <div className="container mx-auto px-4">
+            {/* <!-- Footer Content Section --> */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+              {/* <!-- Top Exams --> */}
+
+              {Object.entries(Sections).map(([key, section], index) => (
+                <div key={index}>
+                  <h3 className="text-xl font-semibold mb-10">
+                    {section.header}
+                  </h3>
+                  <ul className="space-y-3">
+                    {section.list.map((item, itemIndex) => (
+                      <li key={itemIndex}>
+                        <Link
+                          href={"#"}
+                          className="hover:text-[#30ad8f] transition-colors"
+                        >
+                          {item}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-8 border-t border-white flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 mb-10">
+              <div className="space-x-8">
+                <Link
+                  href={"#"}
+                  className="hover:text-[#30ad8f] transition-colors font-semibold"
+                >
+                  Disclaimer
+                </Link>
+                <Link
+                  href={"#"}
+                  className="hover:text-[#30ad8f] transition-colors font-semibold"
+                >
+                  Privacy Policy
+                </Link>
+              </div>
+              <div className="flex flex-row items-center justify-center">
+                <span className="font-semibold">
+                  {" "}
+                  &copy; All rights reserved 2025
+                </span>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
 
       <>
@@ -287,20 +286,19 @@ const Footer = () => {
                 </div>
 
                 <div className="flex items-center justify-between gap-4  mt-16 mb-8">
-                <a href="#">
-                  <FaFacebook size={28} />
-                </a>
-                <a href="#">
-                  <FaInstagram size={28} />
-                </a>
-                <a href="#">
-                  <TiSocialLinkedinCircular size={30} />
-                </a>
-                <a href="#">
-                  <PiXLogoLight size={28} />
-                </a>
-              </div>
-
+                  <a href="#">
+                    <FaFacebook size={28} />
+                  </a>
+                  <a href="#">
+                    <FaInstagram size={28} />
+                  </a>
+                  <a href="#">
+                    <TiSocialLinkedinCircular size={30} />
+                  </a>
+                  <a href="#">
+                    <PiXLogoLight size={28} />
+                  </a>
+                </div>
               </div>
             </div>
           </footer>
