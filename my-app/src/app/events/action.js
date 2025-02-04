@@ -3,7 +3,7 @@
 export async function getEvents() {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/events?random=true`,
+      `${process.env.baseUrl}${process.env.version}/event`,
       {
         method: "GET",
         headers: {

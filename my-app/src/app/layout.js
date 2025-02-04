@@ -18,6 +18,8 @@ export const metadata = {
   title: "Mero UNI ",
   description:
     "Mero Uni is a platform where you can find your dream education.",
+  description:
+    "Mero Uni is a platform where you can find your dream education.",
 };
 
 export default function RootLayout({ children }) {
