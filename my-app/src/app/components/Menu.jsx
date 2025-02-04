@@ -15,10 +15,12 @@ import clsx from "clsx";
 import { HiOutlineUsers } from "react-icons/hi";
 import { MdCategory } from "react-icons/md";
 import { GrCertificate } from "react-icons/gr";
+import { useRouter } from "next/navigation";
 
 import { FaWpforms } from "react-icons/fa";
 
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { removeUser } from "@/app/utils/userSlice";
 
 const menuItems = [
   {
@@ -109,7 +111,7 @@ const menuItems = [
     items: [
       {
         icon: <FaRegUserCircle />,
-        label: "Profile",
+        label: "Update Profile",
         href: "/dashboard/profile",
         visible: ["admin", "teacher", "student", "parent", "subscriber"],
       },
@@ -131,6 +133,8 @@ const menuItems = [
 
 const Menu = () => {
   const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useDispatch();
 
   // Get the user role dynamically from Redux
 
@@ -138,7 +142,39 @@ const Menu = () => {
     const roleData = state.user?.data?.role;
     return roleData ? JSON.parse(roleData) : {}; // Parse role if it's a string
   });
-  
+
+  const handleLogout = async (e) => {
+    e.preventDefault();
+
+    try {
+      // 1. Call logout API
+      const response = await fetch("http://localhost:8000/api/v1/auth/logout", {
+        method: "POST",
+        credentials: "include", // Important for cookies
+      });
+
+      if (!response.ok) {
+        throw new Error("Logout failed");
+      }
+
+      // 2. Clear cookie named "token"
+      document.cookie =
+        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+      // 3. Clear Redux store
+      dispatch(removeUser());
+
+      // 4. Clear localStorage
+      localStorage.removeItem("refreshToken");
+
+      // 5. Redirect to login page or home
+      router.push("/sign-in"); // Adjust the path as needed
+    } catch (error) {
+      toast.error("Logout error:", error);
+      // Handle error appropriately - maybe show a notification to user
+    }
+  };
+
   return (
     <div className="mt-4 text-sm text-black">
       {menuItems.map((menu) => (
@@ -147,10 +183,29 @@ const Menu = () => {
             {menu.title}
           </span>
           {menu.items.map((item) => {
-            // Check if the user has at least one true role that matches item.visible
             const hasAccess = item.visible.some((r) => role[r] === true);
 
             if (hasAccess) {
+              // Special handling for logout
+              if (item.href === "/dashboard/logout") {
+                return (
+                  <a
+                    href="#"
+                    key={item.label}
+                    onClick={handleLogout}
+                    className={clsx(
+                      "flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-slate-100",
+                      {
+                        "bg-slate-100 text-blue-600": pathname === item.href,
+                      }
+                    )}
+                  >
+                    {item.icon}
+                    <span className="hidden lg:block">{item.label}</span>
+                  </a>
+                );
+              }
+
               return (
                 <Link
                   href={item.href}
@@ -173,5 +228,42 @@ const Menu = () => {
       ))}
     </div>
   );
+
+  // return (
+  //   <div className="mt-4 text-sm text-black">
+  //     {menuItems.map((menu) => (
+  //       <div className="flex flex-col gap-2" key={menu.title}>
+  //         <span className="hidden lg:block text-black font-light my-4">
+  //           {menu.title}
+  //         </span>
+  //         {menu.items.map((item) => {
+  //           // Check if the user has at least one true role that matches item.visible
+  //           const hasAccess = item.visible.some((r) => role[r] === true);
+
+  //           if (hasAccess) {
+
+  //             return (
+  //               <Link
+  //                 href={item.href}
+  //                 key={item.label}
+  //                 className={clsx(
+  //                   "flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-slate-100",
+  //                   {
+  //                     "bg-slate-100 text-blue-600": pathname === item.href,
+  //                   }
+  //                 )}
+  //               >
+  //                 {item.icon}
+  //                 <span className="hidden lg:block">{item.label}</span>
+  //               </Link>
+  //             );
+  //           }
+  //           return null;
+  //         })}
+  //       </div>
+  //     ))}
+  //   </div>
+
+  // );
 };
 export default Menu;

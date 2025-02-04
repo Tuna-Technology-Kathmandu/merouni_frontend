@@ -1,16 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import { getToken } from "../action";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { jwtDecode } from "jwt-decode";
 const SignInPage = () => {
   const dispatch = useDispatch();
   const router = useRouter();
+  // const user = useSelector((state) => state.user?.data);
+  // useEffect(() => {
+  //   if (user) {
+  //     router.replace("/dashboard"); 
+  //   }
+  // }, [user, router]);
+
   const getDeviceId = () => {
     let deviceId = localStorage.getItem("deviceId");
     if (!deviceId) {
@@ -148,16 +155,15 @@ const SignInPage = () => {
   //   }
   // };
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     const deviceId = getDeviceId();
     if (!validateForm()) return;
-  
+
     setLoading(true);
     try {
       const endpoint = isLogin ? "/api/v1/auth/login" : "/api/v1/auth/register";
-  
+
       // Define filteredData based on isLogin
       const filteredData = isLogin
         ? {
@@ -172,7 +178,7 @@ const SignInPage = () => {
             phoneNo: formData.phoneNo,
             password: formData.password,
           };
-  
+
       const response = await fetch(`${process.env.baseUrl}${endpoint}`, {
         method: "POST",
         headers: {
@@ -182,23 +188,23 @@ const SignInPage = () => {
         credentials: "include",
         body: JSON.stringify(filteredData),
       });
-  
+
       console.log(response);
-  
+
       // Get all response headers
       const refreshToken = response.headers.get("x-refresh-token");
       console.log("All headers:", [...response.headers.entries()]);
       console.log("Refresh token:", refreshToken);
-  
+
       if (refreshToken) {
         localStorage.setItem("refreshToken", refreshToken);
       }
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         console.log("am i here");
-  
+
         if (isLogin) {
           const tokenObj = await getToken();
           const decodedToken = jwtDecode(tokenObj.value);
@@ -227,7 +233,6 @@ const SignInPage = () => {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
