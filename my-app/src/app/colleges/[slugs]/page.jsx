@@ -81,6 +81,7 @@ import { getCollegeBySlug } from "../actions";
 import Gallery from "./components/gallery";
 import ApplyNow from "./components/applyNow";
 import RelatedColleges from "./components/RelatedColleges";
+import Loading from "../../components/Loading";
 
 const CollegeDetailPage = ({ params }) => {
   // const { slugs } = params; // Use `slugs` directly from `params`
@@ -127,7 +128,7 @@ const CollegeDetailPage = ({ params }) => {
   }, [college]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (error) {

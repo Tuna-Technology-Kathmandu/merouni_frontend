@@ -7,9 +7,11 @@ import AffiliationSection from "./AffiliationSection";
 import CourseFeeSection from "./CourseFeeSection";
 import UniversityCard from "./UniversityCard";
 import { useState, useEffect, useCallback } from "react";
-import { getColleges, searchColleges } from "../actions";
+// import { getColleges, searchColleges } from "../actions";
+import { searchColleges } from "../actions";
 import { debounce } from "lodash";
 import Link from "next/link";
+import { getColleges } from "@/app/action";
 
 const CollegeFinder = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,8 +52,9 @@ const CollegeFinder = () => {
   const fetchColleges = async (page) => {
     setIsLoading(true);
     try {
-      const data = await getColleges(page);
-      setUniversities(data.colleges);
+      const data = await getColleges(undefined, undefined, 10, page);
+      console.log("Getting data in college page:", data);
+      setUniversities(data.items);
       setPagination(data.pagination);
     } catch (error) {
       console.error("Error fetching colleges:", error);
@@ -60,9 +63,8 @@ const CollegeFinder = () => {
   };
 
   useEffect(() => {
-    console.log("UNiversity fetch:",universities[8])
-  }, [universities])
-  
+    console.log("UNiversity fetch:", universities[8]);
+  }, [universities]);
 
   const filters = [
     {
@@ -307,7 +309,7 @@ const CollegeFinder = () => {
                   {universities.map((university, index) => (
                     <Link href={`/colleges/${university.slug}`} key={index}>
                       <UniversityCard key={index} {...university} />
-                     </Link>
+                    </Link>
                   ))}
                 </div>
               ) : (

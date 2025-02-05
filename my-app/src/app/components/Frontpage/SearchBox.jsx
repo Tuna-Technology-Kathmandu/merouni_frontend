@@ -5,7 +5,6 @@ import { IoIosSearch } from "react-icons/io";
 import { RxCross2 } from "react-icons/rx";
 import Link from "next/link";
 
-
 const SearchBox = ({ onClose }) => {
   const popularSearches = [
     "KUUMAT",
@@ -24,6 +23,7 @@ const SearchBox = ({ onClose }) => {
     // universities: [],
     events: [],
     blogs: [],
+    colleges: [],
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,10 +31,18 @@ const SearchBox = ({ onClose }) => {
   const fetchSearchResults = async (query) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${process.env.baseUrl}/search?q=${query}`);
+      console.log("INside searching box component");
+      const response = await fetch(
+        `${process.env.baseUrl}${process.env.version}/search?q=${query}`
+      );
       if (response.ok) {
         const data = await response.json();
-        setSearchResults(data);
+        console.log("Data of search:", data);
+        setSearchResults({
+          blogs: Array.isArray(data.blogs) ? data.blogs : [],
+          events: Array.isArray(data.events) ? data.events : [],
+          colleges: Array.isArray(data.colleges) ? data.colleges : [],
+        });
       } else {
         console.error("Error fetching results:", response.statusText);
         setSearchResults({ blogs: [], events: [] });
@@ -46,6 +54,9 @@ const SearchBox = ({ onClose }) => {
       setIsLoading(false);
     }
   };
+  useEffect(() => {
+    console.log("Search result data:", searchResults);
+  }, [searchResults]);
 
   useEffect(() => {
     if (searchTag.trim() !== "") {
@@ -63,56 +74,59 @@ const SearchBox = ({ onClose }) => {
     setSearchTag(value);
   };
 
-
-
   const handleViewAll = () => {
-    onClose()
+    onClose();
+  };
 
-  }
-
-  const ResultSection = ({ title, items }) =>{
-
+  const ResultSection = ({ title, items }) => {
+    if (!Array.isArray(items) || items.length === 0) return null;
     const categoryPath = title.toLowerCase();
 
-
-    
-    return items.length > 0 && (
-      <div className="mb-8 px-10">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">{title}</h2>
-          {items.length > 3 && (
-            <Link href={`/${categoryPath}`} className="text-sm text-[#30AD8F] border-b border-[#30AD8F] " onClick={onClose}>
-            View All</Link>
-          )}
-          {/* <button className="text-sm text-[#30AD8F]" >View All</button> */}
+    return (
+      items.length > 0 && (
+        <div className="mb-8 px-10">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">{title}</h2>
+            {items.length > 3 && (
+              <Link
+                href={`/${categoryPath}`}
+                className="text-sm text-[#30AD8F] border-b border-[#30AD8F] "
+                onClick={onClose}
+              >
+                View All
+              </Link>
+            )}
+            {/* <button className="text-sm text-[#30AD8F]" >View All</button> */}
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {items.slice(0, 3).map((item, index) => (
+              <>
+                <Link href={`/${categoryPath}/${item.slugs}`} key={index}>
+                  <div key={index} className="cursor-pointer   p-4 max-w-sm ">
+                    <div className="flex justify-center border-2 rounded-3xl items-center  overflow-hidden mb-2 p-4">
+                      <img
+                        src="/images/hult_prize.png"
+                        alt={item.name}
+                        className="w-48 h-48 object-contain"
+                      />
+                    </div>
+                    <div className="px-4 pb-4 flex flex-col ">
+                      <h3 className="text-lg   font-bold text-center">
+                        {item.name}
+                      </h3>
+                      {/* <p className="text-xs text-gray-700 text-center">
+                        {item.location}
+                      </p> */}
+                    </div>
+                  </div>
+                </Link>
+              </>
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-3 gap-2">
-          {items.slice(0, 3).map((item, index) => (
-            <>
-            <Link href={`/${categoryPath}/${item.slugs}`} key={index}>
-
-            <div
-              key={index}
-              className="cursor-pointer   p-4 max-w-sm "
-            >
-              <div className="flex justify-center border-2 rounded-3xl items-center  overflow-hidden mb-2 p-4">
-                <img
-                  src="/images/hult_prize.png"
-                  alt={item.title}
-                  className="w-48 h-48 object-contain"
-                />
-              </div>
-              <div className="px-4 pb-4 flex flex-col ">
-                <h3 className="text-lg   font-bold text-center">{item.title}</h3>
-                <p className="text-xs text-gray-700 text-center">{item.location}</p>
-              </div>
-            </div>
-            </Link>
-            </>
-          ))}
-        </div>
-      </div>
-    ) };
+      )
+    );
+  };
 
   return (
     <div
@@ -189,7 +203,11 @@ const SearchBox = ({ onClose }) => {
                   {/* <ResultSection title="Colleges" items={searchResults.colleges} />
                   <ResultSection title="Universities" items={searchResults.universities} /> */}
                   <ResultSection title="Events" items={searchResults.events} />
-                  <ResultSection title="Blogs" items={searchResults.news} />
+                  <ResultSection title="Blogs" items={searchResults.blogs} />
+                  <ResultSection
+                    title="Colleges"
+                    items={searchResults.colleges}
+                  />
                 </>
               )}
             </>
