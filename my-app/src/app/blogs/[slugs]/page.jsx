@@ -34,8 +34,8 @@ import Cardlist from "./components/Cardlist";
 import Loading from "../../components/Loading";
 
 const NewsDetailsPage = ({ params }) => {
-  const resolvedParams = use(params);
-  console.log("REsolvedParams:",resolvedParams)
+  // const resolvedParams = use(params);
+  // console.log("REsolvedParams:",resolvedParams)
   const [news, setNews] = useState(null);
   const [relatedNews, setRelatedNews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,8 +44,9 @@ const NewsDetailsPage = ({ params }) => {
   useEffect(() => {
     const fetchNewsDetails = async () => {
       try {
+        const resolvedParams = await params;
         const slugs = resolvedParams.slugs; // No need to await params.slugs
-
+        console.log("NEws slug:", slugs);
         const [newsData, allNews] = await Promise.all([
           getNewsBySlug(slugs),
           getRelatedNews(),
@@ -61,7 +62,7 @@ const NewsDetailsPage = ({ params }) => {
     };
 
     fetchNewsDetails();
-  }, [resolvedParams.slugs]); // Add params.slugs to dependency array
+  }, []); // Add params.slugs to dependency array
 
   useEffect(() => {
     console.log("News:", news);
