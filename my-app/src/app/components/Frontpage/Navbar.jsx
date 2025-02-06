@@ -80,7 +80,9 @@ More: News, Exam, School, Videos, University, Career, */}
               Consultancy
             </div>
           </Link>
-          <div className="hover:text-gray-200 cursor-pointer">Materials</div>
+          <Link href="/materials">
+            <div className="hover:text-gray-200 cursor-pointer">Materials</div>
+          </Link>
           <Link href="/events">
             <div className="hover:text-gray-200 cursor-pointer">Events</div>
           </Link>

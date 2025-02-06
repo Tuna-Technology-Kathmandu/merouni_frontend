@@ -21,7 +21,7 @@ const ApplyNow = ({ college }) => {
         <FaArrowRight className="ml-2"/>
       </div> */}
       <div className="flex flex-row items-center bg-[#0A6FA7] text-white rounded-lg p-2 cursor-pointer">
-        <a href={college.contactInfo.websiteUrl} target="_blank">
+        <a href={college.website_url} target="_blank">
           Apply Now
         </a>
         <FaArrowRight className="ml-2" />

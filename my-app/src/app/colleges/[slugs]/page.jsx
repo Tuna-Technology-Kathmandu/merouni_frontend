@@ -100,7 +100,6 @@ const CollegeDetailPage = ({ params }) => {
         console.error("Error resolving params:", error);
       }
     };
-
     fetchSlugAndCollegeDetails();
   }, []);
 

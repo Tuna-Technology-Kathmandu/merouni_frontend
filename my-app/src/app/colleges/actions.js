@@ -13,20 +13,24 @@ export async function getColleges(page = 1, sort = "ASC") {
     }
 
     const data = await response.json();
+    
     return {
       colleges: data.items.map((college) => ({
-        name: college.fullname,
+        name: college.name,
         location: `${college.address.city}, ${college.address.state}`,
         description: college.description,
-        logo: college.assets.featuredImage,
-        contactInfo: college.contactInfo,
-        facilities: college.facilities,
-        instituteType: college.instituteType,
-        programmes: college.programmes,
-        slug: college.slug,
-        collegeId: college._id,
+        googleMapUrl: college.google_map_url,
+        instituteType: college.institute_type,
+        slug: college.slugs,
+        collegeId: college.id,
       })),
-      pagination: data.pagination,
+      pagination: data.pagination || {
+        currentPage: 1,
+        totalPages: 1,
+        totalRecords: data.items.length,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      },
     };
   } catch (error) {
     console.error("Failed to fetch colleges:", error);
@@ -42,6 +46,7 @@ export async function getColleges(page = 1, sort = "ASC") {
     };
   }
 }
+
 
 export async function searchColleges(query) {
   try {

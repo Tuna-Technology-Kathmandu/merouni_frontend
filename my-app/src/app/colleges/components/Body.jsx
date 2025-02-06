@@ -307,7 +307,7 @@ const CollegeFinder = () => {
               {universities.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {universities.map((university, index) => (
-                    <Link href={`/colleges/${university.slug}`} key={index}>
+                    <Link href={`/colleges/${university.slugs}`} key={index}>
                       <UniversityCard key={index} {...university} />
                     </Link>
                   ))}
