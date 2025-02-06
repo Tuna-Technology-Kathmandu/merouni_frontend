@@ -4,7 +4,7 @@
 export async function getUsers(page = 1, token, role) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/users?limit=9&page=${page}&sort=asc`,
+      `${process.env.baseUrl}${process.env.version}/users?limit=10`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -12,7 +12,6 @@ export async function getUsers(page = 1, token, role) {
         },
         cache: "no-store",
       }
-
     );
 
     if (!response.ok) {
