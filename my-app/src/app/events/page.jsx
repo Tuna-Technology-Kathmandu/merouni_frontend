@@ -37,7 +37,7 @@ const Events = () => {
       const featured = thisWeek.events[0]; // First event as featured
 
       // Parse the event_host data for the featured event
-      const eventHost = featured.event_host
+      const eventHost = featured?.event_host
         ? JSON.parse(featured.event_host)
         : null;
       featured.eventHost = eventHost; // Attach the parsed eventHost to the featuredEvent

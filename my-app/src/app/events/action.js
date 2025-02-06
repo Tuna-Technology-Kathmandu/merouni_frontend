@@ -88,7 +88,7 @@ export async function getEventBySlug(slug) {
     }
 
     const data = await response.json();
-    return data.event; // Note the change from 'item' to 'event'
+    return data.item; // Note the change from 'item' to 'event'
   } catch (error) {
     console.error("Error fetching event details:", error);
     throw error;
