@@ -13,7 +13,8 @@ const Event = () => {
   const fetchEvents = async () => {
     setLoading(true);
     try {
-      const response = await getEvents();
+      const response = await getEvents(1);
+      console.log("", response);
       setEvents(response.items.slice(0, 3));
     } catch (error) {
       setError("Failed to fetch events");
@@ -96,24 +97,24 @@ const Event = () => {
       <div className="hidden tb:block">
         <div className="flex flex-col gap-8 my-4 ">
           {events.slice(1).map((event, index) => (
-                        <Link href={`/events/${event.slugs}`} key={index}>
-
-            <div className="flex gap-4 items-center" key={index}>
-              <Image
-                src={"/images/upcoming.png" || event.images}
-                width={200}
-                height={200}
-                alt={event.title || "Event logo"}
-                className="object-contain"
-              />
-              <div>
-                <div className="font-bold text-2xl">{event.title}</div>
-                <div className="w-[250px] text-left">{event.description}</div>
-                <div className="mt-1 font-semibold">
-                  {formatDate(event.eventMeta?.startDate) || "No date provided"}
+            <Link href={`/events/${event.slugs}`} key={index}>
+              <div className="flex gap-4 items-center" key={index}>
+                <Image
+                  src={"/images/upcoming.png" || event.images}
+                  width={200}
+                  height={200}
+                  alt={event.title || "Event logo"}
+                  className="object-contain"
+                />
+                <div>
+                  <div className="font-bold text-2xl">{event.title}</div>
+                  <div className="w-[250px] text-left">{event.description}</div>
+                  <div className="mt-1 font-semibold">
+                    {formatDate(event.eventMeta?.startDate) ||
+                      "No date provided"}
+                  </div>
                 </div>
               </div>
-            </div>
             </Link>
           ))}
         </div>

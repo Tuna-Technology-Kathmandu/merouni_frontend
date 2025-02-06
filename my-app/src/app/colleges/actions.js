@@ -13,18 +13,19 @@ export async function getColleges(page = 1, sort = "ASC") {
     }
 
     const data = await response.json();
+    console.log("Data fo college:", data);
     return {
       colleges: data.items.map((college) => ({
-        name: college.fullname,
+        name: college.name,
         location: `${college.address.city}, ${college.address.state}`,
         description: college.description,
         logo: college.assets.featuredImage,
         contactInfo: college.contactInfo,
         facilities: college.facilities,
-        instituteType: college.instituteType,
-        programmes: college.programmes,
-        slug: college.slug,
-        collegeId: college._id,
+        instituteType: college.institute_type,
+        // programmes: college.programmes,
+        slug: college.slugs,
+        collegeId: college.id,
       })),
       pagination: data.pagination,
     };
