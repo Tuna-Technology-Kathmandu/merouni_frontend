@@ -57,7 +57,7 @@ const Navbar = () => {
 More: News, Exam, School, Videos, University, Career, */}
 
       <div className="bg-[#30ad8f] w-full h-12 pt-[10px] hidden md:block">
-        <div className="flex items-center mx-auto justify-center gap-8 md:gap-16 text-white">
+        <div className="flex items-center mx-auto justify-center gap-8 md:gap-8 text-white">
           <Link href="/colleges">
             <div className="hover:text-gray-200 cursor-pointer">Colleges</div>
           </Link>
