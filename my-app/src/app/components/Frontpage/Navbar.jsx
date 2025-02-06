@@ -135,6 +135,12 @@ More: News, Exam, School, Videos, University, Career, */}
               >
                 Vacancy
               </Link>
+              <Link
+                href="/wishlist"
+                className="block p-2 hover:text-gray-200 hover:bg-[#30ad8f] hover:bg-opacity-15 cursor-pointer"
+              >
+                Wishlist
+              </Link>
             </div>
           </div>
         </div>

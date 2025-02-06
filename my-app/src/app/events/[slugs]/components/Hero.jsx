@@ -8,7 +8,7 @@ const Hero = ({ event }) => {
     <div className="relative">
       <img
         src={"/images/eventsdesc.png"}
-        alt={event.title}
+        alt={event?.title|| "Event"}
         layout="fill"
         objectFit="cover"
         className="w-full h-[70vh]"
