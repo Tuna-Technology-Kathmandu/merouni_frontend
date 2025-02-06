@@ -34,10 +34,17 @@ const Events = () => {
       // Filter events for different sections
       const thisWeek = await getThisWeekEvents();
       const nextWeek = await getNextWeekEvents();
-      setFeaturedEvent(thisWeek.items[0]); // First event as featured
+      const featured = thisWeek.events[0]; // First event as featured
 
-      setThisWeekEvents(thisWeek.items.slice(1));
-      setNextWeekEvents(nextWeek.items);
+      // Parse the event_host data for the featured event
+      const eventHost = featured.event_host
+        ? JSON.parse(featured.event_host)
+        : null;
+      featured.eventHost = eventHost; // Attach the parsed eventHost to the featuredEvent
+
+      setFeaturedEvent(featured);
+      setThisWeekEvents(thisWeek.events.slice(1));
+      setNextWeekEvents(nextWeek.events);
     } catch (error) {
       setError("Failed to load Events");
       console.error(error);
@@ -47,7 +54,6 @@ const Events = () => {
   };
 
   if (error) return <div>Error: {error}</div>;
-  // if (!featuredEvent) return null;
 
   return (
     <>
@@ -58,7 +64,7 @@ const Events = () => {
         <Loading />
       ) : (
         <div className="mx-auto">
-          {featuredEvent && (
+          {featuredEvent && featuredEvent.event_host && (
             <div className="flex flex-col md:flex-row items-center justify-between p-6 md:p-10 max-w-[1600px] mx-auto mb-10">
               {/* Left Column - Featured Event */}
               <div className="md:w-1/2">
@@ -73,7 +79,7 @@ const Events = () => {
                     <p className="text-sm font-bold">Starts</p>
                     <p className="whitespace-nowrap">
                       {new Date(
-                        featuredEvent.eventMeta.startDate
+                        JSON.parse(featuredEvent.event_host).start_date
                       ).toLocaleDateString()}
                     </p>
                   </div>
@@ -84,7 +90,7 @@ const Events = () => {
                     <p className="text-sm font-bold">Ends</p>
                     <p className="whitespace-nowrap">
                       {new Date(
-                        featuredEvent.eventMeta.endDate
+                        JSON.parse(featuredEvent.event_host).end_date
                       ).toLocaleDateString()}
                     </p>
                   </div>
@@ -94,7 +100,7 @@ const Events = () => {
                   <div className="flex flex-col items-center">
                     <p className="text-sm font-bold whitespace-nowrap">Time</p>
                     <p className="whitespace-nowrap">
-                      {featuredEvent.eventMeta.time}
+                      {JSON.parse(featuredEvent.event_host).time}
                     </p>
                   </div>
                 </div>

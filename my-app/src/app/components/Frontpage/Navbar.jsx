@@ -80,7 +80,9 @@ More: News, Exam, School, Videos, University, Career, */}
               Consultancy
             </div>
           </Link>
-          <div className="hover:text-gray-200 cursor-pointer">Materials</div>
+          <Link href="/materials">
+            <div className="hover:text-gray-200 cursor-pointer">Materials</div>
+          </Link>
           <Link href="/events">
             <div className="hover:text-gray-200 cursor-pointer">Events</div>
           </Link>
@@ -120,6 +122,18 @@ More: News, Exam, School, Videos, University, Career, */}
                 className="block p-2 hover:text-gray-200 hover:bg-[#30ad8f] hover:bg-opacity-15 cursor-pointer"
               >
                 Universities
+              </Link>
+              <Link
+                href="/career"
+                className="block p-2 hover:text-gray-200 hover:bg-[#30ad8f] hover:bg-opacity-15 cursor-pointer"
+              >
+                Career
+              </Link>
+              <Link
+                href="/vacancy"
+                className="block p-2 hover:text-gray-200 hover:bg-[#30ad8f] hover:bg-opacity-15 cursor-pointer"
+              >
+                Vacancy
               </Link>
             </div>
           </div>

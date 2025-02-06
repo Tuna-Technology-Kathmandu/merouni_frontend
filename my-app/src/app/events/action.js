@@ -26,7 +26,7 @@ export async function getEvents() {
 export async function getThisWeekEvents() {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/events/this-week`,
+      `${process.env.baseUrl}${process.env.version}/event/this-week`,
       {
         method: "GET",
         headers: {
@@ -49,7 +49,7 @@ export async function getThisWeekEvents() {
 export async function getNextWeekEvents() {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/events/next-month`,
+      `${process.env.baseUrl}${process.env.version}/event/next-month`,
       {
         method: "GET",
         headers: {
@@ -72,7 +72,7 @@ export async function getNextWeekEvents() {
 export async function getEventBySlug(slug) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/events/${slug}`,
+      `${process.env.baseUrl}${process.env.version}/event/${slug}`,
       {
         method: "GET",
         headers: {
@@ -98,7 +98,7 @@ export async function getEventBySlug(slug) {
 export async function getRelatedEvents() {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/events`,
+      `${process.env.baseUrl}${process.env.version}/event`,
       {
         method: "GET",
         headers: {

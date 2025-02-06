@@ -3,7 +3,7 @@
 export async function getMaterials() {
   try {
     const response = await fetch(
-      `${process.env.localUrl}${process.env.version}/material`,
+      `${process.env.baseUrl}${process.env.version}/material`,
       {
         method: "GET",
         headers: {
