@@ -27,8 +27,8 @@ const MaterialCard = () => {
       const response = await getMaterials(page);
 
       if (response && response.pagination) {
-        setBlogs(response.items);
-        console.log("look", response.pagination);
+        setBlogs(response.materials);
+
         setPagination((prev) => ({
           ...prev,
           ...response.pagination, // Update the pagination state with the new data
