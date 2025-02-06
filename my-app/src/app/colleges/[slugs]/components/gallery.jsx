@@ -27,6 +27,7 @@ const Gallery = ({ college }) => {
             key={index}
             width={250}
             height={100}
+            
           />
         ))}
       </div>
