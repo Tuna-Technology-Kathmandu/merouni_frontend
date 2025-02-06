@@ -123,6 +123,18 @@ More: News, Exam, School, Videos, University, Career, */}
               >
                 Universities
               </Link>
+              <Link
+                href="/career"
+                className="block p-2 hover:text-gray-200 hover:bg-[#30ad8f] hover:bg-opacity-15 cursor-pointer"
+              >
+                Career
+              </Link>
+              <Link
+                href="/vacancy"
+                className="block p-2 hover:text-gray-200 hover:bg-[#30ad8f] hover:bg-opacity-15 cursor-pointer"
+              >
+                Vacancy
+              </Link>
             </div>
           </div>
         </div>

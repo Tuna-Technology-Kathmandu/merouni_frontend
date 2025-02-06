@@ -52,17 +52,7 @@ export default async function VacanciesPage({ searchParams }) {
                 <div className="p-6">
                   {/* Status Badge */}
                   <div className="mb-4">
-                    <span
-                      className={`inline-block px-3 py-1 rounded-full text-sm font-medium
-                    ${
-                      vacancy.status === "published"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                    >
-                      {vacancy.status.charAt(0).toUpperCase() +
-                        vacancy.status.slice(1)}
-                    </span>
+                
                   </div>
 
                   {/* Title */}
