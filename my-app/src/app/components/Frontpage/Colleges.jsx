@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import CollegeCard from "./CollegeCard";
 import { useRef } from "react";
-import { getFeaturedColleges,getColleges } from "@/app/action";
+import { getFeaturedColleges, getColleges } from "@/app/action";
 import Loading from "../../components/Loading";
 import Link from "next/link";
 
@@ -138,7 +138,7 @@ const Colleges = () => {
     try {
       console.log("Hlo zero");
       // const response = await getFeaturedColleges();
-      const response = await getColleges(true,false)
+      const response = await getColleges(true, false);
       console.log("RESOPHOSG:", response);
       setFeaturedColleges(response.items);
     } catch (error) {

@@ -13,7 +13,7 @@ export async function getColleges(page = 1, sort = "ASC") {
     }
 
     const data = await response.json();
-    
+
     return {
       colleges: data.items.map((college) => ({
         name: college.name,
@@ -21,6 +21,8 @@ export async function getColleges(page = 1, sort = "ASC") {
         description: college.description,
         googleMapUrl: college.google_map_url,
         instituteType: college.institute_type,
+        logo: college.assets.featured_img,
+        // programmes: college.programmes,
         slug: college.slugs,
         collegeId: college.id,
       })),

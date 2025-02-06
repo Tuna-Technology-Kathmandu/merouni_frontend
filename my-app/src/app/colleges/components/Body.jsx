@@ -7,11 +7,11 @@ import AffiliationSection from "./AffiliationSection";
 import CourseFeeSection from "./CourseFeeSection";
 import UniversityCard from "./UniversityCard";
 import { useState, useEffect, useCallback } from "react";
-// import { getColleges, searchColleges } from "../actions";
-import { searchColleges } from "../actions";
+import { getColleges, searchColleges } from "../actions";
+// import { searchColleges } from "../actions";
 import { debounce } from "lodash";
 import Link from "next/link";
-import { getColleges } from "@/app/action";
+// import { getColleges } from "@/app/action";
 
 const CollegeFinder = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -52,9 +52,10 @@ const CollegeFinder = () => {
   const fetchColleges = async (page) => {
     setIsLoading(true);
     try {
-      const data = await getColleges(undefined, undefined, 10, page);
+      console.log("INside fetch college");
+      const data = await getColleges(page);
       console.log("Getting data in college page:", data);
-      setUniversities(data.items);
+      setUniversities(data.colleges);
       setPagination(data.pagination);
     } catch (error) {
       console.error("Error fetching colleges:", error);

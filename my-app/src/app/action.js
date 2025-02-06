@@ -97,8 +97,11 @@ export async function deleteFaculty(id) {
 }
 
 // Events actions
-export async function getEvents(queryParams) {
-  return services.event.getAll(queryParams);
+export async function getEvents(page) {
+  const params = {
+    page,
+  };
+  return services.event.getAll(params);
 }
 
 //Blogs actions

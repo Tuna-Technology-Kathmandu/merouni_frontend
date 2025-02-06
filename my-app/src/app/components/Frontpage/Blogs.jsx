@@ -15,6 +15,7 @@ const Blogs = () => {
     setLoading(true);
     try {
       const response = await getBlogs(1);
+      console.log("Response of blogs:", response);
       setBlogs(response.items.slice(0, 4));
     } catch (error) {
       setError("Failed to fetch Blogs");
@@ -70,7 +71,7 @@ const Blogs = () => {
         <div className="flex flex-wrap gap-y-16 px-12 ">
           {blogs.slice(0, 2).map((blog, index) => (
             <Link
-              href={`/blogs/${blog.slugs}`}
+              href={`/blogs/${blog.slug}`}
               key={index}
               className="w-1/2 flex items-start justify-center"
             >
