@@ -21,7 +21,7 @@ export async function getColleges(page = 1, sort = "ASC") {
         description: college.description,
         googleMapUrl: college.google_map_url,
         instituteType: college.institute_type,
-        logo: college.assets.featured_img,
+        // logo: college.assets.featured_img,
         // programmes: college.programmes,
         slug: college.slugs,
         collegeId: college.id,
