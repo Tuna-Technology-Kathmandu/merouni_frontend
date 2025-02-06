@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import Navbar from "../components/Frontpage/Navbar";
 import Footer from "../components/Frontpage/Footer";
 import Header from "../components/Frontpage/Header";
+import Link from "next/link";
 
 const CoursePage = () => {
   const [courses, setCourses] = useState([]);
@@ -16,6 +17,7 @@ const CoursePage = () => {
       setLoading(true);
       try {
         const response = await fetchDegrees();
+        console.log("RESPONS Degree:", response);
         setCourses(response.items);
       } catch (error) {
         console.error("Error:", error);
@@ -26,11 +28,16 @@ const CoursePage = () => {
 
     getCourses();
   }, []);
+  useEffect(() => {
+    console.log("Courses:", courses);
+  }, [courses]);
 
   if (loading) {
-    return <div className="flex justify-center items-center h-64">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-  </div>
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   return (
@@ -53,44 +60,51 @@ const CoursePage = () => {
           </div>
         </div>
 
+        {/* <Link href={`/colleges/${university.slug}`} key={index}>
+                      <UniversityCard key={index} {...university} />
+                    </Link> */}
+
         {/* Degrees Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((degree) => (
-            <div
-              key={degree.id}
-              className="border rounded-lg p-6 hover:shadow-lg transition-shadow bg-white"
-            >
-              <div className="mb-4">
-                <h2 className="text-xl font-semibold mb-4">{degree.title}</h2>
+          {courses.map((degree, index) => (
+            <Link href={`/degree/${degree.slugs}`} key={index}>
+              <div
+                key={degree.id}
+                className="border rounded-lg p-6 hover:shadow-lg transition-shadow bg-white"
+              >
+                <div className="mb-4">
+                  <h2 className="text-xl font-semibold mb-4">{degree.title}</h2>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Duration:</span>
+                    <span>{degree.duration}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Credits:</span>
+                    <span>{degree.credits}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Language:</span>
+                    <span>{degree.language}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Fee:</span>
+                    <span>{degree.fee}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Delivery:</span>
+                    <span>{degree.delivery_mode}</span>
+                  </div>
+                  <div className="mt-4 pt-4 border-t">
+                    <p className="text-sm text-gray-600">
+                      <strong>Eligibility:</strong>{" "}
+                      {degree.eligibility_criteria}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Duration:</span>
-                  <span>{degree.duration}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Credits:</span>
-                  <span>{degree.credits}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Language:</span>
-                  <span>{degree.language}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Fee:</span>
-                  <span>{degree.fee}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Delivery:</span>
-                  <span>{degree.delivery_mode}</span>
-                </div>
-                <div className="mt-4 pt-4 border-t">
-                  <p className="text-sm text-gray-600">
-                    <strong>Eligibility:</strong> {degree.eligibility_criteria}
-                  </p>
-                </div>
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
 
