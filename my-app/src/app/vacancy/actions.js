@@ -1,7 +1,7 @@
 export async function getCareers(page = 1) {
   try {
     const response = await fetch(
-      `http://localhost:8000/api/v1/blogs/?category_title=Vacancy`,
+      `${process.env.baseUrl}${process.env.version}/blogs/?category_title=Vacancy`,
       {
         method: "GET",
         headers: {

@@ -19,7 +19,7 @@ const WishlistCollegeCard = ({
     const token = tokenObj.value;
 
     try {
-      const response = await fetch("http://localhost:8000/api/v1/wishlist", {
+      const response = await fetch(`${process.env.baseUrl}${process.env.version}/wishlist`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

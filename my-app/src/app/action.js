@@ -135,6 +135,13 @@ export async function getBanners() {
   return services.banner.getAll();
 }
 
+export async function getBannersById(id) {
+  const params = {
+    id,
+  };
+  return services.banner.getById(params);
+}
+
 export async function getColleges(is_featured, pinned, limit, page) {
   const params = {
     limit,
@@ -142,7 +149,7 @@ export async function getColleges(is_featured, pinned, limit, page) {
     is_featured,
     pinned,
   };
-
+  console.log("Value of is_f and pine:", is_featured, pinned);
   return services.college.getAll(params);
 }
 
@@ -177,4 +184,37 @@ export async function getExams(limit, page) {
     page,
   };
   return services.exam.getAll(params);
+}
+
+export async function getBannerById(id) {
+  try {
+    // console.log("Fetching college details for slug:", slug);
+    console.log("Banner detail fetching");
+    console.log(
+      "FULL URL:",
+      `${process.env.baseUrl}${process.env.version}/banner/${id}`
+    );
+
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/banner/${id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch Banner Details");
+    }
+
+    const data = await response.json();
+    console.log("Raw api  banner response:", data);
+    return data?.items || data;
+  } catch (error) {
+    console.error("Error fetching banner details:", error);
+    throw error;
+  }
 }

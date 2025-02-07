@@ -1,4 +1,3 @@
-
 "use client";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Frontpage/Navbar";
@@ -26,7 +25,7 @@ const WishlistPage = () => {
 
         setToken(tokenObj.value);
         const response = await authFetch(
-          "http://localhost:8000/api/v1/wishlist",
+          `${process.env.baseUrl}${process.env.version}/wishlist`,
           {
             method: "GET",
             headers: {

@@ -1,7 +1,7 @@
 "use server";
 
 export async function createCollege(data) {
-  const response = await fetch("http://localhost:8000/api/v1/college", {
+  const response = await fetch(`${process.env.baseUrl}${process.env.version}/college`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -19,7 +19,7 @@ export async function createCollege(data) {
 
 export const fetchUniversities = async () => {
   try {
-    const response = await fetch("http://localhost:8000/api/v1/university");
+    const response = await fetch(`${process.env.baseUrl}${process.env.version}/university`);
     if (!response.ok) {
       throw new Error("Failed to fetch universities");
     }

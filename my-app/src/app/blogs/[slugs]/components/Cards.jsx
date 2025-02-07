@@ -28,13 +28,18 @@
 
 // export default EventCard;
 
-
-
-
 import React from "react";
 import { FaEye, FaRegHeart } from "react-icons/fa";
+import { Share } from "lucide-react";
+import { toast } from "react-toastify";
 
-const BlogCard = ({ image, date, views, title, description }) => {
+const BlogCard = ({ image, date, title, description, slug }) => {
+  const handleShareClick = () => {
+    const blogUrl = `${window.location.origin}/blogs/${slug}`;
+    navigator.clipboard.writeText(blogUrl).then(() => {
+      toast.success("Blog URL copied to clipboard!");
+    });
+  };
   return (
     <div className="min-w-[350px] max-w-[350px] my-2 bg-white rounded-2xl shadow-md border border-gray-300 mb-10">
       <div className="h-[200px] relative">
@@ -65,10 +70,9 @@ const BlogCard = ({ image, date, views, title, description }) => {
 
         {/* Views Counter */}
         <div className="flex items-center text-gray-500 justify-between">
-          <div className="flex flex-row gap-1">
-            <FaEye size={20} />
-            <span>{views} views</span>
-          </div>
+          <button onClick={handleShareClick} className="flex flex-row gap-1">
+            <Share size={20} />
+          </button>
           <div>
             <FaRegHeart size={20} />
           </div>

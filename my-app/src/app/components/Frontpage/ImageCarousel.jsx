@@ -14,19 +14,7 @@ const ImageCarousel = () => {
     fetchFeaturedColleges();
   }, []);
 
-  // const fetchFeaturedColleges = async () => {
-  //   try {
-  //     console.log("Hlo zero");
-  //     const response = await getFeaturedColleges();
-  //     console.log("RESOPHOSG:", response);
-  //     setFeaturedColleges(response.items);
-  //   } catch (error) {
-  //     console.error("Error fetching the colleges data:", error);
-  //     setError("Failed to load featured Colleges");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+ 
 
   const fetchFeaturedColleges = async () => {
     try {

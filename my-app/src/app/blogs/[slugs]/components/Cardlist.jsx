@@ -36,6 +36,7 @@ import React from "react";
 import BlogCard from "./Cards"; // Import the EventCard component
 
 const Cardlist = ({ news }) => {
+  console.log("Blogs obtained after passing :", news);
   const truncateString = (str, maxLength) => {
     if (str.length > maxLength) {
       return str.slice(0, maxLength) + "...";
@@ -57,12 +58,12 @@ const Cardlist = ({ news }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {news.map((blog) => (
             <BlogCard
-              image={"/images/eventsdesc.png"}
+              image={"/images/eventsdesc.png" || blog.featuredImage}
               date={formatDate(blog.createdAt)}
               description={truncateString(blog.description, 100)}
               title={truncateString(blog.title, 20)}
-              views={100}
-              key={blog._id}
+              key={blog.id}
+              slug={blog.slug}
             />
 
             //   <BlogCard

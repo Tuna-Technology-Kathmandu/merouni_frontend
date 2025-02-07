@@ -4,30 +4,28 @@ class ApiService {
     this.baseUrl = `${process.env.baseUrl}${process.env.version}/${endpoint}`;
   }
 
-  buildUrl(baseUrl,params){
+  buildUrl(baseUrl, params) {
     if (!params) return baseUrl;
 
-    if (typeof params === 'string'){
-      return `${baseUrl}?${params}`
+    if (typeof params === "string") {
+      return `${baseUrl}?${params}`;
     }
 
-    const searchParams = new URLSearchParams()
-    Object.entries(params).forEach(([key,value]) => {
-      if (value !== undefined && value !== null){
-        searchParams.append(key,value)
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        searchParams.append(key, value);
       }
-    })
+    });
 
-    const queryString = searchParams.toString()
-    return queryString ? `${baseUrl}?${queryString}`: baseUrl
+    const queryString = searchParams.toString();
+    return queryString ? `${baseUrl}?${queryString}` : baseUrl;
   }
-
-  
 
   async getAll(params = {}) {
     try {
       // const url = queryParams ? `${this.baseUrl}?${queryParams}` : this.baseUrl;
-      const url = this.buildUrl(this.baseUrl,params)
+      const url = this.buildUrl(this.baseUrl, params);
       console.log("Final URL:", url); // Debug log
       const response = await fetch(url, {
         cache: "no-store",
@@ -49,7 +47,7 @@ class ApiService {
       // const url = `${this.baseUrl}/${id}${
       //   queryParams ? `?${queryParams}` : ""
       // }`;
-      const url = this.buildUrl(`${this.baseUrl}/${id}`,params)
+      const url = this.buildUrl(`${this.baseUrl}/${id}`, params);
       const response = await fetch(url, {
         cache: "no-store",
       });
@@ -112,7 +110,7 @@ const services = {
   news: new ApiService("blogs"),
   banner: new ApiService("banner"),
   exam: new ApiService("exam"),
-  college: new ApiService("college")
+  college: new ApiService("college"),
 };
 
 export default services;

@@ -47,12 +47,15 @@ const NewsDetailsPage = ({ params }) => {
         const resolvedParams = await params;
         const slugs = resolvedParams.slugs; // No need to await params.slugs
         console.log("NEws slug:", slugs);
-        const [newsData, allNews] = await Promise.all([
-          getNewsBySlug(slugs),
-          getRelatedNews(),
-        ]);
-        setNews(newsData || null); // Set eventData directly
-        setRelatedNews(allNews);
+        // const [newsData, allNews] = await Promise.all([
+        //   getNewsBySlug(slugs),
+        //   getRelatedNews(),
+        // ]);
+        const newsData = await getNewsBySlug(slugs);
+
+        setNews(newsData.blog || null); // Set eventData directly
+        // setRelatedNews(allNews);
+        setRelatedNews(newsData.similarBlogs || []);
         // console.log("News Description:",news)
       } catch (err) {
         setError(err.message);
@@ -62,7 +65,7 @@ const NewsDetailsPage = ({ params }) => {
     };
 
     fetchNewsDetails();
-  }, []); // Add params.slugs to dependency array
+  }, [params]); // Add params.slugs to dependency array
 
   useEffect(() => {
     console.log("News:", news);

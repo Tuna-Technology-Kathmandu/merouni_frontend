@@ -26,11 +26,12 @@
 // export default Fcollege;
 
 import React from "react";
+import Link from "next/link";
 
-const Fcollege = ({ name, description, image }) => {
+const Fcollege = ({ name, description, image, slug }) => {
   return (
     <div className="flex flex-col bg-[#e2ece9] border border-gray-300 rounded-lg shadow-md w-64 min-w-[20rem] ml-10 p-4  hover:shadow-lg transition-shadow duration-300 mb-8">
-      <div className="flex items-center mb-3">
+      <div className="flex items-center mb-3 justify-between">
         <div className="font-semibold text-lg text-gray-800 truncate">
           {name}
         </div>
@@ -43,9 +44,11 @@ const Fcollege = ({ name, description, image }) => {
       <div className="text-black text-sm mb-4 line-clamp-3 w-3/4">
         {description}
       </div>
-      <button className="mt-auto px-4 py-2 bg-[#387CAE] text-white rounded-lg  transition duration-200 w-1/2">
-        Apply
-      </button>
+      <Link href={`/colleges/${slug}`}>
+        <button className="mt-auto px-4 py-2 bg-[#387CAE] text-white rounded-lg  transition duration-200 w-1/2">
+          Apply
+        </button>
+      </Link>
     </div>
   );
 };

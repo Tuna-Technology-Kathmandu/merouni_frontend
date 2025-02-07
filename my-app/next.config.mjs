@@ -2,8 +2,9 @@
 const nextConfig = {
   env: {
     baseUrl: "http://localhost:8000",
+    // baseUrl: "https://backend.merouni.com",
     version: "/api/v1",
-    jwtsecret: "somethingisdown"
+    jwtsecret: "somethingisdown",
   },
   eslint: {
     ignoreDuringBuilds: true,
