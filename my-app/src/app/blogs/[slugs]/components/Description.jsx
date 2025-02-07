@@ -88,15 +88,7 @@ const Description = ({ news }) => {
           {/* <div className="text-base mt-2 leading-10">
             {news?.description}
           </div> */}
-          <div className="text-base mt-4 leading-10">
-            {news?.content} Lorem ipsum dolor sit amet consectetur adipisicing
-            elit. Libero nisi minus iste iure sunt perferendis facilis obcaecati
-            quam, nesciunt mollitia eius provident. Enim unde illo suscipit
-            error neque. Rerum porro autem iure perferendis dolorem! Aut itaque
-            consequatur illo minus facere. Aperiam quasi numquam corporis
-            impedit molestiae odio, voluptate aspernatur eveniet eligendi ex
-            fugit, dolorum pariatur asperiores. Earum repellat similique et?
-          </div>
+          <div className="text-base mt-4 leading-10">{news?.content}</div>
         </div>
       </div>
 

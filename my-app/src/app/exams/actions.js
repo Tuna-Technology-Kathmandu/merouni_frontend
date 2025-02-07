@@ -3,7 +3,7 @@
 
   export async function getExams() {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/exam/', {
+      const response = await fetch(`${process.env.baseUrl}${process.env.version}/exam/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

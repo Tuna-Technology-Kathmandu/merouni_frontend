@@ -148,10 +148,13 @@ const Menu = () => {
 
     try {
       // 1. Call logout API
-      const response = await fetch("http://localhost:8000/api/v1/auth/logout", {
-        method: "POST",
-        credentials: "include", // Important for cookies
-      });
+      const response = await fetch(
+        `${process.env.baseUrl}${process.env.version}/auth/logout`,
+        {
+          method: "POST",
+          credentials: "include", // Important for cookies
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Logout failed");

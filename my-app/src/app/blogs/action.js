@@ -3,7 +3,7 @@
 export async function getNews() {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/news?random=true`,
+      `${process.env.baseUrl}${process.env.version}/blogs?random=true`,
       {
         method: "GET",
         headers: {
@@ -14,20 +14,20 @@ export async function getNews() {
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch news");
+      throw new Error("Failed to fetch blogs");
     }
     return await response.json();
   } catch (error) {
-    console.error("Error fetching news:", error);
+    console.error("Error fetching blogs:", error);
     throw error;
   }
 }
 
 export async function getNewsBySlug(slug) {
   try {
-    console.log(`${process.env.baseUrl}${process.env.version}/news/${slug}`);
+    console.log(`${process.env.baseUrl}${process.env.version}/blogs/${slug}`);
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/news/${slug}`,
+      `${process.env.baseUrl}${process.env.version}/blogs/${slug}`,
       {
         method: "GET",
         headers: {
@@ -39,14 +39,14 @@ export async function getNewsBySlug(slug) {
     // console.log("response-------------------:", response.title);
 
     if (!response.ok) {
-      throw new Error("Failed to fetch news details");
+      throw new Error("Failed to fetch blogs details");
     }
 
     const data = await response.json();
-    console.log("Data:", data.post);
-    return data.post; // Note the change from 'item' to 'event'
+    console.log("Data:", data.blog);
+    return data; // Note the change from 'item' to 'event'
   } catch (error) {
-    console.error("Error fetching news details:", error);
+    console.error("Error fetching blogs details:", error);
     throw error;
   }
 }
@@ -54,7 +54,7 @@ export async function getNewsBySlug(slug) {
 export async function getRelatedNews() {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/news`,
+      `${process.env.baseUrl}${process.env.version}/blogs`,
       {
         method: "GET",
         headers: {
@@ -65,13 +65,13 @@ export async function getRelatedNews() {
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch related events");
+      throw new Error("Failed to fetch related blogs");
     }
 
     const data = await response.json();
     return data.items; // Fetch all events to use as related events
   } catch (error) {
-    console.error("Error fetching related events:", error);
+    console.error("Error fetching related blogs:", error);
     throw error;
   }
 }

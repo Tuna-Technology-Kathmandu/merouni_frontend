@@ -47,7 +47,7 @@ const ProfileUpdate = () => {
     setIsLoading(true);
     try {
       await axios.post(
-        `http://localhost:8000/api/v1/users/edit-profile`,
+        `${process.env.baseUrl}${process.env.version}/users/edit-profile`,
         {
           firstName: nameForm.firstName,
           middleName: nameForm.middleName,
@@ -77,7 +77,7 @@ const ProfileUpdate = () => {
     setIsLoading(true);
     try {
       await axios.post(
-        `http://localhost:8000/api/v1/users/edit-profile?user_id=${userData.id}`,
+        `${process.env.baseUrl}${process.env.version}/users/edit-profile?user_id=${userData.id}`,
         {
           password: passwordForm.newPassword,
         }

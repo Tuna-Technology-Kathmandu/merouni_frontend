@@ -120,19 +120,39 @@
 // // };
 
 // // export default Sponsore;
+"use client";
 
 import Image from "next/image";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { getBanners } from "@/app/action";
+import AdLayout from "./AdLayout";
 
 const Sponsore = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null); // State for error handling
+  const [banner, setBanner] = useState([]);
+
+  useEffect(() => {
+    fetchBanner();
+  }, []);
+
+  const fetchBanner = async () => {
+    try {
+      setLoading(true);
+      const response = await getBanners();
+      console.log("Banner data in Sponsors:", response);
+      setBanner(response.items);
+    } catch (error) {
+      console.error("Error fetching banner content:", error);
+      setError("Failed to load banners");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="max-w-[800px] mx-auto my-12">
-      <Image
-        src={"/images/ad.png"}
-        width={800}
-        height={500}
-        alt="Mero UNI logo"
-      />
+    <div className=" w-full h-auto mr-10 ml-auto my-12">
+      <AdLayout banners={banner} size="large" number={2} />
     </div>
   );
 };

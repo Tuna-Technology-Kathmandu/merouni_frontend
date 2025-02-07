@@ -1,10 +1,10 @@
-
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Fcollege from "./Fcollege";
 import { GoArrowLeft } from "react-icons/go";
 import { GoArrowRight } from "react-icons/go";
+import { getColleges } from "@/app/action";
 
 const collegesData = [
   {
@@ -112,7 +112,30 @@ const Featured = () => {
     });
   };
 
-  
+  const [featuredColleges, setFeaturedColleges] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchFeaturedColleges();
+  }, []);
+
+  const fetchFeaturedColleges = async () => {
+    try {
+      const response = await getColleges(true, undefined);
+      console.log("RESOPHOSG:", response);
+      setFeaturedColleges(response.items);
+    } catch (error) {
+      console.error("Error fetching the colleges data:", error);
+      setError("Failed to load featured Colleges");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    console.log("FEatured College Data in college page:", featuredColleges);
+  }, [featuredColleges]);
 
   return (
     <div className="flex flex-col p-4  py-20">
@@ -133,14 +156,24 @@ const Featured = () => {
           ref={scrollRef}
           className="flex gap-10 overflow-x-auto scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 p-2  "
         >
-          {collegesData.map((college, index) => (
+          {featuredColleges.map((college, index) => (
+            <Fcollege
+              description={college.description}
+              name={college.name}
+              image={collegesData[0].image || college.featured_img}
+              key={index}
+              slug = {college.slugs}
+            />
+          ))}
+
+          {/* {collegesData.map((college, index) => (
             <Fcollege
               key={index}
               name={college.name}
               description={college.description}
               image={college.image}
             />
-          ))}
+          ))} */}
         </div>
 
         {/* Right Scroll Button */}

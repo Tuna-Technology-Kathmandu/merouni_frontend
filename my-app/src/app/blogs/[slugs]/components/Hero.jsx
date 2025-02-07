@@ -41,7 +41,6 @@
 
 // export default Hero;
 
-
 import React from "react";
 import { FiMapPin } from "react-icons/fi";
 import Image from "next/image";
@@ -56,21 +55,17 @@ const Hero = ({ news }) => {
         objectFit="cover"
         className="w-full h-[70vh]"
       />
-      <div className="left-36 absolute top-1/2 transform -translate-y-1/2 text-white text-4xl font-extrabold w-[800px]">
-        <div className="text-5xl">{news.title.split(':')[0]}</div>
-        <div className="text-6xl my-2">{news.title.split(':')[1] || ''}</div>
+      <div className="left-36 absolute top-1/2 translate-y-12 transform text-white text-4xl font-extrabold w-[800px]">
+        <div className="text-5xl">{news.title.split(":")[0]}</div>
+        {/* <div className="text-6xl my-2">{news.title.split(":")[1] || ""}</div> */}
         <div className="font-medium text-sm my-6">
-          By - {news.author.firstName} {news.author.lastName}
+          By - {news.newsAuthor.firstName} {news.newsAuthor.middleName || ""}{" "}
+          {news.newsAuthor.lastName}
         </div>
-        <div className="">
-          <div className="font-medium text-sm my-6">
-            {news.host}
-          </div>
-          {/* <div className="flex gap-2 font-medium text-sm my-6">
-            <FiMapPin />
-            <div>Map</div>
-          </div> */}
-        </div>
+        {/* <div className="">
+          <div className="font-medium text-sm my-6">{news.host}</div>
+          
+        </div> */}
       </div>
       {/* Social share icons remain the same */}
       <div className="space-y-4 text-[#b0b2c3] fixed left-8 top-[30%] md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col">

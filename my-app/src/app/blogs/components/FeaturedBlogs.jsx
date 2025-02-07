@@ -164,14 +164,14 @@ const FeaturedBlogs = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
             {Blogs.map((blog, index) => (
-              <Link href={`/blogs/${blog.slugs}`} key={index}>
+              <Link href={`/blogs/${blog.slug}`} key={index}>
                 <div key={index}>
                   <BlogCard
                     date={formatDate(blog.createdAt)}
                     description={truncateString(blog.description, 100)}
                     image={blogs[0]["image"]}
                     title={truncateString(blog.title, 20)}
-                    views={blogs[0]["views"]}
+                    slug={blog.slug}
                   />
                 </div>
               </Link>

@@ -1,7 +1,7 @@
 export async function getConsultancies(page = 1) {
   try {
     const response = await fetch(
-      `http://localhost:8000/api/v1/consultancy?sort=desc`,
+      `${process.env.baseUrl}${process.env.version}/consultancy?sort=desc`,
       {
         method: "GET",
         headers: {

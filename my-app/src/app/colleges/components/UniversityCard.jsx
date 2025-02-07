@@ -32,13 +32,16 @@ const UniversityCard = ({
 
   const checkWishlistStatus = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/wishlist", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${process.env.baseUrl}${process.env.version}/wishlist`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP Error! Status: ${response.status}`);
@@ -67,14 +70,17 @@ const UniversityCard = ({
     setIsLoading(true);
     try {
       const method = isWishlistPage || isInWishlist ? "DELETE" : "POST";
-      const response = await fetch("http://localhost:8000/api/v1/wishlist", {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ college_id: collegeId }),
-      });
+      const response = await fetch(
+        `${process.env.baseUrl}${process.env.version}/wishlist`,
+        {
+          method,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ college_id: collegeId }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP Error! Status: ${response.status}`);
