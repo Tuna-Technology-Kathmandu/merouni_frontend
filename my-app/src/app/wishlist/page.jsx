@@ -1,4 +1,3 @@
-
 "use client";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Frontpage/Navbar";
@@ -7,6 +6,7 @@ import Footer from "../components/Frontpage/Footer";
 import UniversityCard from "./Card";
 import { authFetch } from "./authFetch";
 import { getToken } from "../action"; // Import the function to get the token
+import { useSelector } from "react-redux";
 
 const WishlistPage = () => {
   const [wishlist, setWishlist] = useState([]);
@@ -14,19 +14,24 @@ const WishlistPage = () => {
   const [error, setError] = useState(null);
   const [token, setToken] = useState(null);
 
+  const user = useSelector((state) => state.user.data);
+
   useEffect(() => {
     const fetchWishlist = async () => {
       try {
         const tokenObj = await getToken();
-        if (!tokenObj?.value) {
+        console.log("what is token obj", tokenObj);
+        if (!tokenObj.value) {
           setError("Please login to see your wishlist.");
           setLoading(false);
           return;
         }
+        console.log("inside fetchwishlist");
 
-        setToken(tokenObj.value);
+        setToken(tokenObj);
+        console.log("what is token oobj value", tokenObj.value);
         const response = await authFetch(
-          "http://localhost:8000/api/v1/wishlist",
+          `http://localhost:8000/api/v1/wishlist?user_id=${user.id}`,
           {
             method: "GET",
             headers: {
@@ -41,7 +46,8 @@ const WishlistPage = () => {
         }
 
         const data = await response.json();
-        setWishlist(data.items[0].colleges || []);
+        console.log("API Response wishlist:", data);
+        setWishlist(data.items || []);
         setError(null);
       } catch (err) {
         console.error("Error fetching wishlist:", err);
@@ -76,11 +82,11 @@ const WishlistPage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {wishlist.map((item) => (
                 <UniversityCard
-                  key={item._id}
-                  collegeId={item._id}
-                  name={item?.fullname || "Unknown College"}
-                  description={item?.description || "No description available"}
-                  logo={item?.assets?.featuredImage || ""}
+                  key={item.id}
+                  collegeId={item.college_id}
+                  name={item?.college?.name || "Unknown College"}
+                  description={item?.college?.description || "No description available"}
+                  logo={item?.college?.featuredImage || ""}
                 />
               ))}
             </div>

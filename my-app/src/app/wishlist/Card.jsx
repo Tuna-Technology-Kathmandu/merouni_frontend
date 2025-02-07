@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Share, Heart } from "lucide-react";
 import { toast } from "react-toastify";
 import { getToken } from "../action";
+import { useSelector } from "react-redux";
 
 const WishlistCollegeCard = ({
   name,
@@ -12,6 +13,7 @@ const WishlistCollegeCard = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRemoved, setIsRemoved] = useState(false);
+  const user = useSelector((state) => state.user.data);
 
   const handleWishlistRemove = async () => {
     setIsLoading(true);
@@ -25,7 +27,7 @@ const WishlistCollegeCard = ({
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ college_id: collegeId }),
+        body: JSON.stringify({ college_id: collegeId , user_id:user.id}),
       });
 
       if (!response.ok) {
