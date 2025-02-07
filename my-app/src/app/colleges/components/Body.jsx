@@ -253,9 +253,9 @@ const CollegeFinder = () => {
         </div>
         <div className="flex  items-center gap-4">
           <div className="flex gap-4">
-            <h2 className="text-xl font-semibold">Universities</h2>
+            <h2 className="text-xl font-semibold">Colleges</h2>
             <span className="text-gray-500">
-              ({pagination.totalRecords || "0"} Colleges)
+              ({pagination.totalCount || "0"} Colleges)
             </span>
           </div>
         </div>
@@ -308,9 +308,7 @@ const CollegeFinder = () => {
               {universities.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {universities.map((university, index) => (
-                    <Link href={`/colleges/${university.slug}`} key={index}>
-                      <UniversityCard key={index} {...university} />
-                    </Link>
+                    <UniversityCard key={index} {...university} />
                   ))}
                 </div>
               ) : (

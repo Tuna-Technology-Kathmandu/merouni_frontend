@@ -32,7 +32,7 @@ const UniversityCard = ({
 
   const checkWishlistStatus = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/wishlist", {
+      const response = await fetch(`${process.env.baseUrl}${process.env.version}/wishlist`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +67,7 @@ const UniversityCard = ({
     setIsLoading(true);
     try {
       const method = isWishlistPage || isInWishlist ? "DELETE" : "POST";
-      const response = await fetch("http://localhost:8000/api/v1/wishlist", {
+      const response = await fetch(`${process.env.baseUrl}${process.env.version}/wishlist`, {
         method,
         headers: {
           Authorization: `Bearer ${token}`,

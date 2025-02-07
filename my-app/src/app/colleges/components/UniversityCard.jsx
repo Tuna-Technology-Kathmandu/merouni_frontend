@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Share, Heart } from "lucide-react";
 import { toast } from "react-toastify";
 import { getToken } from "../../action"; // Assuming getToken is correctly imported
-
+import { useSelector } from "react-redux";
+import Link from "next/link";
 const UniversityCard = ({
   name,
   location,
@@ -10,10 +11,12 @@ const UniversityCard = ({
   logo,
   collegeId,
   isWishlistPage = false,
+  slug,
 }) => {
   const [isInWishlist, setIsInWishlist] = useState(isWishlistPage);
   const [isLoading, setIsLoading] = useState(false);
   const [token, setToken] = useState(null);
+  const user = useSelector((state) => state.user.data);
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -33,7 +36,7 @@ const UniversityCard = ({
   const checkWishlistStatus = async () => {
     try {
       const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/wishlist`,
+        `${process.env.baseUrl}${process.env.version}/wishlist?user_id=${user.id}`,
         {
           method: "GET",
           headers: {
@@ -48,9 +51,8 @@ const UniversityCard = ({
       }
 
       const data = await response.json();
-      const isInList = data.items.some((item) =>
-        item.colleges?.some((college) => college._id === collegeId)
-      );
+      console.log("Wishlist data vitra:", data);
+      const isInList = data.items.some((item) => item.college.id === collegeId);
 
       setIsInWishlist(isInList);
     } catch (error) {
@@ -70,22 +72,18 @@ const UniversityCard = ({
     setIsLoading(true);
     try {
       const method = isWishlistPage || isInWishlist ? "DELETE" : "POST";
-      const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/wishlist`,
-        {
-          method,
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ college_id: collegeId }),
-        }
-      );
+      const response = await fetch(`${process.env.baseUrl}${process.env.version}/wishlist`, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ college_id: collegeId, user_id: user.id }),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP Error! Status: ${response.status}`);
       }
-
       setIsInWishlist(!isInWishlist);
 
       toast.success(
@@ -139,9 +137,11 @@ const UniversityCard = ({
       <h3 className="font-semibold text-lg mb-1">{name}</h3>
       <p className="text-black text-sm my-4">{description}</p>
       <div className="flex gap-3">
-        <button className="flex-1 py-2 px-4 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-50 text-sm font-medium">
-          Details
-        </button>
+        <Link href={`/colleges/${slug}`} key={collegeId}>
+          <button className="flex-1 py-2 px-4 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-50 text-sm font-medium">
+            Details
+          </button>
+        </Link>
         <button className="flex-1 py-2 px-4 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 text-sm font-medium">
           Apply Now
         </button>

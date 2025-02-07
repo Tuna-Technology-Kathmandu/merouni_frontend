@@ -75,9 +75,11 @@ const Header = () => {
         </nav>
 
         <div className="flex flex-row justify-between m-4">
+          <Link href="/sign-in">
           <button type="button" className=" bg-[#0A6FA7] w-[150px] p-2">
             <span className="text-white font-bold text-lg">Login</span>
           </button>
+          </Link>
 
           <div className="border-2  border-solid border-[#0A6FA7] ">
             <button
