@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
 
@@ -35,18 +36,22 @@ export default function UserDropdown() {
             {/* Optional icon inside dropdown */}
           </div>
           <ul className="p-4 text-gray-700">
+            <Link href="/dashboard">
             <li className="py-2 border-b cursor-pointer hover:text-blue-600">
               My Account
             </li>
+            </Link>
             <li className="py-2 border-b cursor-pointer hover:text-blue-600">
               Contact Us
             </li>
             <li className="py-2 border-b cursor-pointer hover:text-blue-600">
               My Watchlist
             </li>
+            <Link href="/sign-in">
             <button className="w-full py-2 mt-2 bg-blue-600 text-white rounded-lg font-bold">
               Login
             </button>
+            </Link>
             <button className="w-full py-2 mt-2 border border-blue-600 text-blue-600 rounded-lg font-bold">
               Join Us →
             </button>

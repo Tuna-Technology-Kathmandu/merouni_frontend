@@ -106,7 +106,7 @@ More: News, Exam, School, Videos, University, Career, */}
                 Exams
               </Link>
               <Link
-                href="/school"
+                href="/schools"
                 className="block p-2 hover:text-gray-200 hover:bg-[#30ad8f] hover:bg-opacity-15 cursor-pointer"
               >
                 School

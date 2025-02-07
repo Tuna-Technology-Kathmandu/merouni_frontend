@@ -18,6 +18,7 @@ import { GrCertificate } from "react-icons/gr";
 import { useRouter } from "next/navigation";
 
 import { FaWpforms } from "react-icons/fa";
+import { MdInsights } from "react-icons/md";
 
 import { useSelector, useDispatch } from "react-redux";
 import { removeUser } from "@/app/utils/userSlice";
@@ -29,81 +30,66 @@ const menuItems = [
       {
         icon: <FaHome />,
         label: "Home",
-        href: "/insights",
-        visible: ["admin", "super-admin"],
+        href: "/dashboard",
+        visible: ["admin", "superadmin", "editor","teacher", "student"],
       },
       {
-        icon: <FaHome />,
-        label: "Home",
-        href: "/dashboard",
-        visible: ["admin", "teacher", "student", "parent"],
+        icon: <MdInsights />,
+        label: "Insights",
+        href: "/dashboard/insights",
+        visible: ["admin", "superadmin"],
       },
       {
         icon: <HiOutlineUsers />,
         label: "Users",
         href: "/dashboard/users",
-        visible: ["admin", "super-admin", "editor"],
+        visible: ["admin", "superadmin", "editor"],
       },
       {
         icon: <IoSchoolSharp />,
         label: "Colleges",
         href: "/dashboard/addCollege",
-        visible: ["admin"],
+        visible: ["admin","editor", "superadmin"],
       },
       {
         icon: <MdOutlinePermMedia />,
         label: "Media",
         href: "/dashboard/media",
-        visible: ["admin"],
+        visible: ["admin","editor", "superadmin"],
       },
       {
         icon: <GrCertificate />,
         label: "Academia",
         href: "/dashboard/academia",
-        visible: ["admin"],
+        visible: ["admin","editor", "superadmin"],
       },
       {
         icon: <MdCategory />,
         label: "Category",
         href: "/dashboard/category",
-        visible: ["admin"],
+        visible: ["admin","editor", "superadmin"],
       },
       {
         icon: <GrUserWorker />,
         label: "Agents",
         href: "/dashboard/agent",
-        visible: ["admin", "teacher"],
+        visible: ["admin", "superadmin"],
       },
-      {
-        icon: <HiOutlineDocumentReport />,
-        label: "Results",
-        href: "/dashboard/results",
-        visible: ["admin", "teacher", "student", "parent"],
-      },
+   
       {
         icon: <MdEmojiEvents />,
         label: "News",
         href: "/dashboard/news",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["admin","editor", "superadmin"],
       },
       {
         icon: <MdEmojiEvents />,
         label: "Events",
         href: "/dashboard/events",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["admin","editor", "superadmin"],
       },
-      {
-        icon: <TfiAnnouncement />,
-        label: "Announcements",
-        href: "/dashboard/announcements",
-        visible: ["admin", "teacher", "student", "parent"],
-      },
-      {
-        icon: <FaWpforms />,
-        label: "Apply for agent",
-        href: "/dashboard/ApplyAgent",
-        visible: ["admin", "teacher", "student", "parent"],
-      },
+   
+      
     ],
   },
   {
@@ -113,19 +99,14 @@ const menuItems = [
         icon: <FaRegUserCircle />,
         label: "Update Profile",
         href: "/dashboard/profile",
-        visible: ["admin", "teacher", "student", "parent", "subscriber"],
+        visible: ["admin","editor", "superadmin", "teacher", "student"],
       },
-      {
-        icon: <MdOutlineSettings />,
-        label: "Settings",
-        href: "/dashboard/settings",
-        visible: ["admin", "teacher", "student", "parent", "subscriber"],
-      },
+  
       {
         icon: <AiOutlineLogout />,
         label: "Logout",
         href: "/dashboard/logout",
-        visible: ["admin", "teacher", "student", "parent", "subscriber"],
+        visible: ["admin","editor", "superadmin", "teacher", "student"],
       },
     ],
   },
