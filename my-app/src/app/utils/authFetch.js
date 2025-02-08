@@ -1,12 +1,14 @@
-export const authFetch = async (url) => {
+export const authFetch = async (url, options = {}) => {
   try {
     // Get the stored refresh token
     const refreshToken = localStorage.getItem("refreshToken");
 
     // First attempt with current token
     let response = await fetch(url, {
+      ...options,
       credentials: "include", // Important for cookies
       headers: {
+        ...options.headers,
         "x-refresh-token": refreshToken,
       },
     });
@@ -16,17 +18,13 @@ export const authFetch = async (url) => {
       console.log("Token expired, attempting refresh...");
 
       const newResponse = await fetch(url, {
+        ...options,
         credentials: "include",
         headers: {
+          ...options.headers,
           "x-refresh-token": refreshToken,
         },
       });
-
-      // Check for new access token in Authorization header
-      const newAccessToken = newResponse.headers.get("Authorization");
-      if (newAccessToken) {
-        console.log("Received new access token");
-      }
 
       if (!newResponse.ok) {
         if (newResponse.status === 401) {
