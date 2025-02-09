@@ -21,12 +21,11 @@
 // };
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
-
+import { decodeJwt } from "jose";
 export async function middleware(request) {
   console.log("Middleware running for:", request.nextUrl.pathname);
 
   const token = request.cookies.get("token")?.value;
-  console.log("Token from cookies:", token);
 
   const pathname = request.nextUrl.pathname;
 
@@ -36,8 +35,7 @@ export async function middleware(request) {
       const secret = new TextEncoder().encode(
         process.env.jwtsecret || "stayinpeace"
       );
-      await jwtVerify(token, secret);
-      console.log("User is logged in. Redirecting to /dashboard");
+      // await jwtVerify(token, secret);
       return NextResponse.redirect(new URL("/dashboard", request.url));
     } catch (error) {
       console.error("Invalid token:", error);
@@ -58,9 +56,8 @@ export async function middleware(request) {
       const secret = new TextEncoder().encode(
         process.env.jwtsecret || "stayinpeace"
       );
-      const { payload: user } = await jwtVerify(token, secret);
-
-      console.log("Decoded user:", user);
+      // const { payload: user } = await jwtVerify(token, secret);
+      const user = decodeJwt(token);
 
       // Parse role if it's stored as a JSON string
       const role = user?.data?.role ? JSON.parse(user.data.role) : {};

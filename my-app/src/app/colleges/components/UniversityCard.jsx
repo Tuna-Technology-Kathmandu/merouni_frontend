@@ -20,7 +20,7 @@ const UniversityCard = ({
  
 
   useEffect(() => {
-    if (user.id) {
+    if (user?.id) {
       checkWishlistStatus();
     }
   }, [user]);
