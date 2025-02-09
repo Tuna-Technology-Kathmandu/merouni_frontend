@@ -25,12 +25,12 @@ const Table = ({ data, columns, pagination, onPageChange, onSearch }) => {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     manualPagination: true,
-    pageCount: pagination.totalPages,
+    pageCount: pagination?.totalPages,
     state: {
       sorting: sorting,
       // globalFilter: filtering,
       pagination: {
-        pageIndex: pagination.currentPage - 1,
+        pageIndex: pagination?.currentPage - 1,
         pageSize: 9,
       },
     },
@@ -154,42 +154,42 @@ const Table = ({ data, columns, pagination, onPageChange, onSearch }) => {
       {/* Pagination Controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-sm text-gray-700">
-          Page {pagination.currentPage} of {pagination.totalPages}
+          Page {pagination?.currentPage} of {pagination?.totalPages}
           (Showing{" "}
           {Math.min(
-            (pagination.currentPage - 1) * 9 + 1,
-            pagination.total
-          )} - {Math.min(pagination.currentPage * 9, pagination.total)} of{" "}
-          {pagination.total} items)
+            (pagination?.currentPage - 1) * 9 + 1,
+            pagination?.total
+          )} - {Math.min(pagination?.currentPage * 9, pagination?.total)} of{" "}
+          {pagination?.total} items)
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => onPageChange(1)}
-            disabled={pagination.currentPage === 1}
+            disabled={pagination?.currentPage === 1}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             First
           </button>
 
           <button
-            onClick={() => onPageChange(pagination.currentPage - 1)}
-            disabled={pagination.currentPage === 1}
+            onClick={() => onPageChange(pagination?.currentPage - 1)}
+            disabled={pagination?.currentPage === 1}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
 
           <button
-            onClick={() => onPageChange(pagination.currentPage + 1)}
-            disabled={pagination.currentPage === pagination.totalPages}
+            onClick={() => onPageChange(pagination?.currentPage + 1)}
+            disabled={pagination?.currentPage === pagination?.totalPages}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>
 
           <button
-            onClick={() => onPageChange(pagination.totalPages)}
-            disabled={pagination.currentPage === pagination.totalPages}
+            onClick={() => onPageChange(pagination?.totalPages)}
+            disabled={pagination?.currentPage === pagination?.totalPages}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Last

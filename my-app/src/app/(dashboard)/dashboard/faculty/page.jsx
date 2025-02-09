@@ -19,7 +19,7 @@ export default function FacultyManager() {
   });
   const [editingId, setEditingId] = useState(null);
 
-  // Define columns with actions
+  // Define columns with actionsSchool",
   const columns = useMemo(
     () => [
       {
@@ -32,7 +32,7 @@ export default function FacultyManager() {
       },
       {
         header: "Author",
-        accessorFn: (row) => `${row.author.firstName} ${row.author.lastName}`,
+        accessorFn: (row) => `${row.authorDetails.firstName} ${row.authorDetails.lastName}`,
       },
       {
         header: "Created At",
@@ -73,6 +73,7 @@ export default function FacultyManager() {
     try {
       const response = await getAllFaculty();
       setFaculties(response.items);
+      console.log(" resss",response.items);
     } catch (error) {
       console.error("Error loading faculties:", error);
     } finally {

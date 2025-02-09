@@ -88,7 +88,8 @@ export default function ScholarshipManager() {
   const loadScholarships = async () => {
     try {
       const response = await getAllScholarships();
-      setScholarships(response.items);
+      setScholarships(response);
+      console.log(" rest", response);
     } catch (error) {
       setError("Failed to load scholarships");
       console.error("Error loading scholarships:", error);
@@ -164,7 +165,12 @@ export default function ScholarshipManager() {
     return new Date(dateString).toISOString().split("T")[0];
   };
 
-  if (loading) return <div className="mx-auto"><Loading /></div>;
+  if (loading)
+    return (
+      <div className="mx-auto">
+        <Loading />
+      </div>
+    );
 
   return (
     <div className="p-4 w-4/5 mx-auto">
@@ -187,7 +193,9 @@ export default function ScholarshipManager() {
           <textarea
             placeholder="Description"
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
             className="w-full p-2 border rounded"
           />
         </div>
@@ -210,7 +218,9 @@ export default function ScholarshipManager() {
             type="number"
             placeholder="Amount"
             value={formData.amount}
-            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, amount: e.target.value })
+            }
             className="w-full p-2 border rounded"
             required
           />

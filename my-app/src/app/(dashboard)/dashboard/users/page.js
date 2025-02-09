@@ -51,21 +51,25 @@ export default function UsersManager() {
         header: "Email",
         accessorKey: "email",
       },
+
       {
         header: "Roles",
         accessorKey: "roles",
-        cell: ({ row }) => (
-          <div className="flex gap-1">
-            {Object.keys(row.original.roles).map((role) => (
-              <span
-                key={role}
-                className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800"
-              >
-                {role}
-              </span>
-            ))}
-          </div>
-        ),
+        cell: ({ row }) => {
+          const roles = JSON.parse(row.original.roles || "{}"); // Parse the string to an object
+          return (
+            <div className="flex gap-1">
+              {Object.keys(roles).map((role) => (
+                <span
+                  key={role}
+                  className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800"
+                >
+                  {role}
+                </span>
+              ))}
+            </div>
+          );
+        },
       },
       {
         header: "Created At",
@@ -103,11 +107,17 @@ export default function UsersManager() {
   const loadUsers = async (page = 1) => {
     try {
       const tokenObj = await getToken();
+      console.log("TOKEN OBJ:", tokenObj);
       const token = tokenObj.value;
+      console.log("TOKEN:", token);
       const decodedToken = jwtDecode(tokenObj.value);
-      const roleObject = decodedToken.data.role;
+      console.log("DECODED TOKEN:", decodedToken);
+      const roleObject = JSON.parse(decodedToken.data.role);
+      console.log("ROLE OBJECT:", roleObject);
+
+      // Extract the role name based on the condition
       const roleName = Object.keys(roleObject).filter(
-        (key) => roleObject[key] === "true"
+        (key) => roleObject[key] === true
       );
       console.log("ROLE NAME:", roleName);
       if (!token) {
@@ -115,7 +125,7 @@ export default function UsersManager() {
       }
       setLoading(true);
       const response = await getUsers(page, token, roleName);
-      console.log("Response:", response.headers);
+      console.log("Response:", response);
       setUsers(response.items);
       setPagination({
         currentPage: response.pagination.currentPage,
