@@ -15,8 +15,6 @@ export default function withAuth(Component) {
       }
     }, [user])
 
-    // Don't render component if no user
-    if (!user) return null
 
     return <Component {...props} />
   }

@@ -4,6 +4,7 @@ import { Share, Heart } from "lucide-react";
 import { toast } from "react-toastify";
 import { getToken } from "../action";
 import { useSelector } from "react-redux";
+import { authFetch } from "../utils/authFetch";
 
 const WishlistCollegeCard = ({
   name,
@@ -17,21 +18,26 @@ const WishlistCollegeCard = ({
 
   const handleWishlistRemove = async () => {
     setIsLoading(true);
-    const tokenObj = await getToken();
-    const token = tokenObj.value;
+
 
     try {
-      const response = await fetch(`${process.env.baseUrl}${process.env.version}/wishlist`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ college_id: collegeId , user_id:user.id}),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP Error! Status: ${response.status}`);
+      const res = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/wishlist`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json", // Make sure the Content-Type is set to JSON
+          },
+          body: JSON.stringify({
+            college_id: collegeId,
+            user_id: user.id,
+          }),
+        }
+      );
+      // console.log("res is" + res);
+      // const response = await res.json();
+      if (!res.ok) {
+        throw new Error(`HTTP Error! Status: ${res.status}`);
       }
 
       setIsRemoved(true);

@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 
 const WishlistPage = () => {
   const [wishlist, setWishlist] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [token, setToken] = useState(null);
 
@@ -18,48 +18,29 @@ const WishlistPage = () => {
 
   useEffect(() => {
     const fetchWishlist = async () => {
+      setLoading(true);
       try {
-        const tokenObj = await getToken();
-        console.log("what is token obj", tokenObj);
-        if (!tokenObj.value) {
-          setError("Please login to see your wishlist.");
-          setLoading(false);
-          return;
-        }
-        console.log("inside fetchwishlist");
-
-        setToken(tokenObj);
-        console.log("what is token oobj value", tokenObj.value);
         const response = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/wishlist?user_id=${user.id}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${tokenObj.value}`,
-            },
-          }
+          `${process.env.baseUrl}${process.env.version}/wishlist?user_id=${user.id}`
         );
-
-        if (!response.ok) {
-          throw new Error(`HTTP Error! Status: ${response.status}`);
-        }
-
         const data = await response.json();
-        console.log("API Response wishlist:", data);
         setWishlist(data.items || []);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching wishlist:", err);
-        setError("Failed to load wishlist.");
+      } catch (error) {
+        if (error.message.includes("login again")) {
+          // Redirect to login page or show login modal
+          setError("Session expired. Please login again.");
+        } else {
+          setError("Failed to load wishlist. Please try again.");
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchWishlist();
-  }, []);
-
+    if (user?.id) {
+      fetchWishlist();
+    }
+  }, [user]);
   if (loading) {
     return <div>Loading wishlist...</div>;
   }
@@ -76,7 +57,7 @@ const WishlistPage = () => {
           </span>
         </div>
         <div className="border border-black rounded-xl p-6">
-          {!token ? (
+          {!user ? (
             <p className="text-gray-600">Please login to see your wishlist.</p>
           ) : wishlist.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -85,7 +66,9 @@ const WishlistPage = () => {
                   key={item.id}
                   collegeId={item.college_id}
                   name={item?.college?.name || "Unknown College"}
-                  description={item?.college?.description || "No description available"}
+                  description={
+                    item?.college?.description || "No description available"
+                  }
                   logo={item?.college?.featuredImage || ""}
                 />
               ))}

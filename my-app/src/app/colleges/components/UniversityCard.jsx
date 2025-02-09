@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Share, Heart } from "lucide-react";
 import { toast } from "react-toastify";
-import { getToken } from "../../action"; // Assuming getToken is correctly imported
 import { useSelector } from "react-redux";
 import Link from "next/link";
+import { authFetch } from "@/app/utils/authFetch";
 const UniversityCard = ({
   name,
   location,
@@ -15,32 +15,23 @@ const UniversityCard = ({
 }) => {
   const [isInWishlist, setIsInWishlist] = useState(isWishlistPage);
   const [isLoading, setIsLoading] = useState(false);
-  const [token, setToken] = useState(null);
   const user = useSelector((state) => state.user.data);
 
-  useEffect(() => {
-    const fetchToken = async () => {
-      const tokenObj = await getToken();
-      setToken(tokenObj?.value || null);
-      console.log("Token:", token);
-    };
-    fetchToken();
-  }, []);
+ 
 
   useEffect(() => {
-    if (token && !isWishlistPage) {
+    if (user?.id) {
       checkWishlistStatus();
     }
-  }, [token, collegeId]);
+  }, [user]);
 
   const checkWishlistStatus = async () => {
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/wishlist?user_id=${user.id}`,
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -61,7 +52,7 @@ const UniversityCard = ({
   };
 
   const handleWishlistToggle = async () => {
-    if (!token) {
+    if (!user) {
       toast.warning("Please sign in to manage your wishlist", {
         position: "top-right",
         autoClose: 3000,
@@ -72,14 +63,16 @@ const UniversityCard = ({
     setIsLoading(true);
     try {
       const method = isWishlistPage || isInWishlist ? "DELETE" : "POST";
-      const response = await fetch(`${process.env.baseUrl}${process.env.version}/wishlist`, {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ college_id: collegeId, user_id: user.id }),
-      });
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/wishlist`,
+        {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ college_id: collegeId, user_id: user.id }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP Error! Status: ${response.status}`);
@@ -118,7 +111,7 @@ const UniversityCard = ({
           <button className="p-2 hover:bg-gray-100 rounded-full">
             <Share className="w-5 h-5 text-gray-600" />
           </button>
-          {token && (
+          {user && (
             <button
               className="p-2 hover:bg-gray-100 rounded-full"
               onClick={handleWishlistToggle}
