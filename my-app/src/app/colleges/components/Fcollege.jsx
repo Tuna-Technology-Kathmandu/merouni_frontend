@@ -30,6 +30,7 @@ import Link from "next/link";
 
 const Fcollege = ({ name, description, image, slug }) => {
   return (
+    <Link href={`/colleges/${slug}`}>
     <div className="flex flex-col bg-[#e2ece9] border border-gray-300 rounded-lg shadow-md w-64 min-w-[20rem] ml-10 p-4  hover:shadow-lg transition-shadow duration-300 mb-8">
       <div className="flex items-center mb-3 justify-between">
         <div className="font-semibold text-lg text-gray-800 truncate">
@@ -44,12 +45,19 @@ const Fcollege = ({ name, description, image, slug }) => {
       <div className="text-black text-sm mb-4 line-clamp-3 w-3/4">
         {description}
       </div>
-      <Link href={`/colleges/${slug}`}>
+      <Link href={`/colleges/apply/${slug}`}>
         <button className="mt-auto px-4 py-2 bg-[#387CAE] text-white rounded-lg  transition duration-200 w-1/2">
           Apply
         </button>
       </Link>
+      {/* <Link href={`/colleges/apply/${slug}`}>
+        <button className="mt-auto px-4 py-2 bg-[#387CAE] text-white rounded-lg  transition duration-200 w-1/2">
+          Apply Applicaton
+        </button>
+      </Link> */}
     </div>
+    </Link>
+
   );
 };
 

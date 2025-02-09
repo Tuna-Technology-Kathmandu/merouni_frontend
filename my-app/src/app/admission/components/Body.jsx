@@ -102,7 +102,7 @@ const Body = () => {
 
             <p className="text-gray-700 mb-2">
               <Link
-                href={`/college/${admis?.collegeAdmissionCollege?.slugs}`}
+                href={`/colleges/${admis?.collegeAdmissionCollege?.slugs}`}
                 className="hover:underline hover:decoration-[#30AD8F]"
               >
                 {/* <h2 className="text-xl font-semibold mb-2">{admis.program.title}</h2> */}
