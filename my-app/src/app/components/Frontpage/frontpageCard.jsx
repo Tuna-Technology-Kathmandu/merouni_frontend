@@ -19,21 +19,24 @@ export default function FrontPageCard({ colleges }) {
                 className="h-24 w-full object-cover"
               />
             </Link>
-            <Link href={college.website_url || "www.example.com"}>
+            <a
+              href={college.website_url || "https://www.example.com/"}
+              target="_blank"
+            >
               <button className="btn primary absolute bottom-2 right-2 rounded-full border border-gray-100 bg-blue-500 px-3 py-1 text-xs text-white shadow-md hover:bg-blue-600">
                 Apply
               </button>
-            </Link>
+            </a>
           </div>
           <div className="px-4 py-2">
             <Link
-              href={`/college/${college.slugs}`}
+              href={`/colleges/${college.slugs}`}
               className="text-lg font-semibold"
             >
               {college.name}
             </Link>
             <div className="text-xs text-gray-600 mt-1">
-              <Link href={`/college/${college.slugs}`}>
+              <Link href={`/colleges/${college.slugs}`}>
                 {college.address.city}, {college.address.state},{" "}
                 {college.address.country}
               </Link>

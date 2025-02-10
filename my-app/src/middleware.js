@@ -79,7 +79,8 @@ export async function middleware(request) {
           "/dashboard/shcolarship",
           "/dashboard/university",
           "/dashboard/users",
-          "dashboard/agent",
+          "/dashboard/agent",
+          "/dashboard/agentApprove",
         ],
         editor: [
           "/dashboard",
@@ -96,8 +97,9 @@ export async function middleware(request) {
           "/dashboard/shcolarship",
           "/dashboard/university",
           "/dashboard/users",
-          "dashboard/agent",
+          "/dashboard/agent",
         ],
+        agent: ["/dashboard/referStudent"],
         teacher: ["/dashboard", "/dashboard/material", "/dashboard/profile"],
         student: ["/dashboard", "/dashboard/profile"],
         superadmin: ["*"], // Full access

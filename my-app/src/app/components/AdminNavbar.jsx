@@ -4,23 +4,24 @@ import { React, useState } from "react";
 import Image from "next/image";
 import { CiPower } from "react-icons/ci";
 import { toast } from "react-toastify";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 import { TfiAnnouncement } from "react-icons/tfi";
-import { apiAuth } from  "../utils/agentverify";
+import { apiAuth } from "../utils/agentverify";
 
 const AdminNavbar = () => {
   const [loading, setLoading] = useState(false);
-  
+
   // Get user data from Redux store
   const userData = useSelector((state) => state.user.data);
-  
+
   // Parse the role JSON string if it exists, otherwise default to an empty object
   let userRoles = {};
   if (userData?.role) {
     try {
+      console.log("User Data id:", userData.id);
       userRoles = JSON.parse(userData.role);
     } catch (error) {
-      console.error('Error parsing user role:', error);
+      console.error("Error parsing user role:", error);
       userRoles = {};
     }
   }
@@ -33,24 +34,35 @@ const AdminNavbar = () => {
 
     setLoading(true);
     try {
-      const response = await apiAuth(`${process.env.baseUrl}${process.env.version}/users/apply-agent`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await apiAuth(
+        `${process.env.baseUrl}${process.env.version}/users/apply-agent`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ user_id: userData.id }),
         }
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to send verification request');
+        throw new Error(
+          errorData.message || "Failed to send verification request"
+        );
       }
 
       const data = await response.json();
-      toast.success(data.message || "Agent verification request sent successfully!");
+      toast.success(
+        data.message || "Agent verification request sent successfully!"
+      );
       console.log("Verification request sent");
     } catch (error) {
-      console.error('Error during agent verification:', error);
-      toast.error(error.message || "Failed to send verification request. Please try again.");
+      console.error("Error during agent verification:", error);
+      toast.error(
+        error.message ||
+          "Failed to send verification request. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -90,10 +102,10 @@ const AdminNavbar = () => {
         )}
         <div className="flex flex-col">
           <span className="text-xs leading-3 font-medium">
-            {userData ? `${userData.firstName} ${userData.lastName}` : ''}
+            {userData ? `${userData.firstName} ${userData.lastName}` : ""}
           </span>
           <span className="text-[10px] text-gray-500 text-right">
-            {Object.keys(userRoles).join(', ')}
+            {Object.keys(userRoles).join(", ")}
           </span>
         </div>
         <CiPower />

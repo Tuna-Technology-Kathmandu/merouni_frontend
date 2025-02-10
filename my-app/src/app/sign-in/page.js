@@ -14,7 +14,7 @@ const SignInPage = () => {
   // const user = useSelector((state) => state.user?.data);
   // useEffect(() => {
   //   if (user) {
-  //     router.replace("/dashboard"); 
+  //     router.replace("/dashboard");
   //   }
   // }, [user, router]);
 
@@ -32,9 +32,9 @@ const SignInPage = () => {
   const [formData, setFormData] = useState({
     firstName: "tuna",
     lastName: "dai",
-    email: "asuyog042@gmail.com",
+    email: "admintuna@gmail.com",
     phoneNo: "1212121212",
-    password: "Admin@12345",
+    password: "admintuna@12345",
   });
   const [errors, setErrors] = useState({});
 

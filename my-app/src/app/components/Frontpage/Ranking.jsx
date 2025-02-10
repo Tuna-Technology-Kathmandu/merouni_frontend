@@ -3,6 +3,7 @@ import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { FaGreaterThan } from "react-icons/fa";
 import { getRankings } from "@/app/action";
+import Link from "next/link";
 
 // import Image from "next/image";
 // import React, { useState, useEffect } from "react";
@@ -162,12 +163,14 @@ const Ranking = () => {
           <div className="flex flex-col gap-4 mx-auto my-8 font-semibold">
             <div className="grid grid-cols-1  md:grid-cols-2 gap-4 ">
               {ranking.map((rank, index) => (
-                <div
-                  className="border border-black rounded-lg text-center p-2 w-[275px] flex justify-center items-center"
-                  key={index}
-                >
-                  {rank.title}
-                </div>
+                <Link href={`/blogs/${rank.slug}`}>
+                  <div
+                    className="border border-black rounded-lg text-center p-2 w-[275px] flex justify-center items-center"
+                    key={index}
+                  >
+                    {rank.title}
+                  </div>
+                </Link>
               ))}
             </div>
           </div>

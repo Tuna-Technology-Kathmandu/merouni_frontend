@@ -135,9 +135,11 @@ const UniversityCard = ({
             Details
           </button>
         </Link>
+        <Link href={`/colleges/apply/${slug}`}>
         <button className="flex-1 py-2 px-4 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 text-sm font-medium">
           Apply Now
         </button>
+        </Link>
       </div>
     </div>
   );
