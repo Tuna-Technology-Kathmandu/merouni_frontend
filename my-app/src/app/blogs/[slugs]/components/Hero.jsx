@@ -68,7 +68,7 @@ const Hero = ({ news }) => {
         </div> */}
       </div>
       {/* Social share icons remain the same */}
-      <div className="space-y-4 text-[#b0b2c3] fixed left-8 top-[30%] md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col">
+      <div className="space-y-4 text-[#b0b2c3] z-40 fixed left-8 top-[30%] md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col">
         {/* Social share icons */}
         <div className="text-black font-bold text-sm">Share</div>
         <img src="/images/fb.png" alt="Facebook" className="w-6" />

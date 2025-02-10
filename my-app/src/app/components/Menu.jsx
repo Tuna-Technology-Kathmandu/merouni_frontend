@@ -16,6 +16,7 @@ import { HiOutlineUsers } from "react-icons/hi";
 import { MdCategory } from "react-icons/md";
 import { GrCertificate } from "react-icons/gr";
 import { useRouter } from "next/navigation";
+import { MdBackHand } from "react-icons/md";
 
 import { FaWpforms } from "react-icons/fa";
 import { MdInsights } from "react-icons/md";
@@ -31,7 +32,7 @@ const menuItems = [
         icon: <FaHome />,
         label: "Home",
         href: "/dashboard",
-        visible: ["admin", "superadmin", "editor","teacher", "student"],
+        visible: ["admin", "superadmin", "editor", "teacher", "student"],
       },
       {
         icon: <MdInsights />,
@@ -49,25 +50,25 @@ const menuItems = [
         icon: <IoSchoolSharp />,
         label: "Colleges",
         href: "/dashboard/addCollege",
-        visible: ["admin","editor", "superadmin"],
+        visible: ["admin", "editor", "superadmin"],
       },
       {
         icon: <MdOutlinePermMedia />,
         label: "Media",
         href: "/dashboard/media",
-        visible: ["admin","editor", "superadmin"],
+        visible: ["admin", "editor", "superadmin"],
       },
       {
         icon: <GrCertificate />,
         label: "Academia",
         href: "/dashboard/academia",
-        visible: ["admin","editor", "superadmin"],
+        visible: ["admin", "editor", "superadmin"],
       },
       {
         icon: <MdCategory />,
         label: "Category",
         href: "/dashboard/category",
-        visible: ["admin","editor", "superadmin"],
+        visible: ["admin", "editor", "superadmin"],
       },
       {
         icon: <GrUserWorker />,
@@ -75,21 +76,31 @@ const menuItems = [
         href: "/dashboard/agent",
         visible: ["admin", "superadmin"],
       },
-   
+
       {
         icon: <MdEmojiEvents />,
         label: "News",
         href: "/dashboard/news",
-        visible: ["admin","editor", "superadmin"],
+        visible: ["admin", "editor", "superadmin"],
       },
       {
         icon: <MdEmojiEvents />,
         label: "Events",
         href: "/dashboard/events",
-        visible: ["admin","editor", "superadmin"],
+        visible: ["admin", "editor", "superadmin"],
       },
-   
-      
+      {
+        icon: <GrUserWorker />,
+        label: "Agent Approve",
+        href: "/dashboard/agentApprove",
+        visible: ["admin", "superadmin"],
+      },
+      {
+        icon: <MdBackHand />,
+        label: "Refer Student",
+        href: "/dashboard/referStudent",
+        visible: ["agent"],
+      },
     ],
   },
   {
@@ -99,14 +110,14 @@ const menuItems = [
         icon: <FaRegUserCircle />,
         label: "Update Profile",
         href: "/dashboard/profile",
-        visible: ["admin","editor", "superadmin", "teacher", "student"],
+        visible: ["admin", "editor", "superadmin", "teacher", "student"],
       },
-  
+
       {
         icon: <AiOutlineLogout />,
         label: "Logout",
         href: "/dashboard/logout",
-        visible: ["admin","editor", "superadmin", "teacher", "student"],
+        visible: ["admin", "editor", "superadmin", "teacher", "student"],
       },
     ],
   },
@@ -123,6 +134,12 @@ const Menu = () => {
     const roleData = state.user?.data?.role;
     return roleData ? JSON.parse(roleData) : {}; // Parse role if it's a string
   });
+
+  console.log("User role after login:", role);
+  console.log(
+    "Redux state after login:",
+    useSelector((state) => state.user)
+  );
 
   const handleLogout = async (e) => {
     e.preventDefault();
