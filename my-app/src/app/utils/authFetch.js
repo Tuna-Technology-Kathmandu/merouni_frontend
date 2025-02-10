@@ -34,10 +34,8 @@ export const authFetch = async (url, options = {}) => {
         }
         throw new Error(`Request failed with status ${newResponse.status}`);
       }
-
       return newResponse;
     }
-
     if (!response.ok) {
       throw new Error(`Request failed with status ${response.status}`);
     }

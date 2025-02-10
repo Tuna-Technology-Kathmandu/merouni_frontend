@@ -1,10 +1,11 @@
-"use server";
+
+import { authFetch } from "@/app/utils/authFetch";
 
 let url = `${process.env.mediaUrl}${process.env.version}/media`;
 
 export async function fetchMedia(page = 1, limit = 10) {
   try {
-    const response = await fetch(
+    const response = await authFetch(
       `${url}?limit=${limit}&page=${page}`,
       { cache: "no-store" }
     );
@@ -22,7 +23,7 @@ export async function fetchMedia(page = 1, limit = 10) {
 
 export async function uploadMedia(data) {
   try {
-    const response = await fetch(`${url}`, {
+    const response = await authFetch(`${url}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -44,7 +45,7 @@ export async function uploadMedia(data) {
 export async function deleteMedia(eventId) {
   console.log("before deleteing");
   try {
-    const response = await fetch(`${url}?event_id=${eventId}`, {
+    const response = await authFetch(`${url}?event_id=${eventId}`, {
       method: "DELETE",
     });
 

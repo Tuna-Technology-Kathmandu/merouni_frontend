@@ -3,6 +3,7 @@ const nextConfig = {
   env: {
     baseUrl: "http://localhost:8000",
     // baseUrl: "https://backend.merouni.com",
+    mediaUrl: "https://uploads.merouni.com",
     version: "/api/v1",
     jwtsecret: "somethingisdown",
   },
