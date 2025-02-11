@@ -1,7 +1,7 @@
-export async function getConsultancies(page = 1) {
+export async function getConsultancies(page = 1, searchQuery="") {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/consultancy?sort=desc`,
+      `${process.env.baseUrl}${process.env.version}/consultancy?page=${page}&sort=desc&q=${searchQuery}`,
       {
         method: "GET",
         headers: {

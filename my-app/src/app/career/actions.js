@@ -1,7 +1,7 @@
-export async function getCareers(page = 1) {
+export async function getCareers(page = 1, searchQuery="") {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/career?page=${page}`,
+      `${process.env.baseUrl}${process.env.version}/career?page=${page}&q=${searchQuery}`,
       {
         method: "GET",
         headers: {
