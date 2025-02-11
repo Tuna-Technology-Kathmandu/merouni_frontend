@@ -64,7 +64,6 @@ const CollegeFinder = () => {
   };
 
   useEffect(() => {
-    console.log("UNiversity fetch:", universities[8]);
   }, [universities]);
 
   const filters = [

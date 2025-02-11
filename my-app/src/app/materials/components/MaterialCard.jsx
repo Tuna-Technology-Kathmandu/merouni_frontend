@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { Search } from "lucide-react";
 import { getMaterials } from "../action";
 import Pagination from "../../blogs/components/Pagination";
 import Loading from "../../components/Loading";
@@ -73,10 +74,23 @@ const MaterialCard = () => {
           <span className="text-[#0A70A7] text-2xl font-bold">Materials</span>
         </div>
 
+        {/* Search Bar */}
+        <div className="flex justify-end w-full">
+          <div className="relative w-full max-w-md mb-6">
+            <input
+              type="text"
+              placeholder="Search material..."
+              className="w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+             // onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+          </div>
+        </div>
+
         {loading ? (
           <Loading />
         ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
             {blogs.map((blog, index) => (
               <div
                 key={index}
@@ -99,7 +113,6 @@ const MaterialCard = () => {
               </div>
             ))}
           </div>
-          
         )}
       </div>
       <Pagination pagination={pagination} onPageChange={handlePageChange} />

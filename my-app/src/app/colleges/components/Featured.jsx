@@ -133,15 +133,14 @@ const Featured = () => {
     }
   };
 
-  useEffect(() => {
-    console.log("FEatured College Data in college page:", featuredColleges);
-  }, [featuredColleges]);
+  useEffect(() => {}, [featuredColleges]);
 
   return (
-    <div className="flex flex-col p-4  py-20">
-      <h2 className="text-2xl font-bold text-gray-800 mb-8">
-        Featured Colleges
-      </h2>
+    <div className="flex flex-col p-4">
+      <div className="border-b-2 border-[#0A70A7] w-[45px] mt-8 mb-4 pl-2">
+        <span className="text-2xl font-bold mr-2">Featured</span>
+        <span className="text-[#0A70A7] text-2xl font-bold">Colleges</span>
+      </div>
       <div className="relative">
         {/* Left Scroll Button */}
         <button
@@ -162,7 +161,7 @@ const Featured = () => {
               name={college.name}
               image={collegesData[0].image || college.featured_img}
               key={index}
-              slug = {college.slugs}
+              slug={college.slugs}
             />
           ))}
 

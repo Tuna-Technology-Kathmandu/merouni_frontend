@@ -1,10 +1,12 @@
 // page.jsx
 import Image from "next/image";
 import Link from "next/link";
+import { Search } from "lucide-react";
 import { getConsultancies } from "./actions";
 import Header from "../components/Frontpage/Header";
 import Navbar from "../components/Frontpage/Navbar";
 import Footer from "../components/Frontpage/Footer";
+import Shimmer from "../components/Shimmer";
 export default async function ConsultanciesPage({ searchParams }) {
   const currentPage = Number(searchParams?.page) || 1;
   const { items, pagination } = await getConsultancies(currentPage);
@@ -14,9 +16,23 @@ export default async function ConsultanciesPage({ searchParams }) {
       <Header />
       <Navbar />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Education Consultancies
-        </h1>
+        <div className="border-b-2 border-[#0A70A7] w-[45px] mt-8 mb-4 pl-2">
+          <span className="text-2xl font-bold mr-2">Explore</span>
+          <span className="text-[#0A70A7] text-2xl font-bold">Consultancies</span>
+        </div>
+        {/* Search Bar */}
+        <div className="flex justify-end w-full">
+          <div className="relative w-full max-w-md mb-6">
+            <input
+              type="text"
+              placeholder="Search scholarship..."
+              className="w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              // onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+          </div>
+        </div>
+        
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((consultancy) => {
