@@ -1,6 +1,8 @@
 import { getCareers } from "./actions";
 import Image from "next/image";
 import Link from "next/link";
+
+import { Search } from "lucide-react";
 import Footer from "../components/Frontpage/Footer";
 import Header from "../components/Frontpage/Header";
 import Navbar from "../components/Frontpage/Navbar";
@@ -18,9 +20,30 @@ export default async function CareersPage({ searchParams }) {
 
   return (
     <>
-        <Header />
-        <Navbar />
+      <Header />
+      <Navbar />
       <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <div className="border-b-2 border-[#0A70A7] w-[45px] mt-8 mb-4 pl-2">
+            <span className="text-2xl font-bold mr-2">Career</span>
+            <span className="text-[#0A70A7] text-2xl font-bold">
+              
+            </span>
+          </div>
+
+          {/* Search Bar */}
+          <div className="flex justify-end w-full mb-6">
+            <div className="relative w-full max-w-md">
+              <input
+                type="text"
+                placeholder="Search career..."
+                className="w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                //onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+            </div>
+          </div>
+        </div>
         {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((career) => (
@@ -85,7 +108,7 @@ export default async function CareersPage({ searchParams }) {
           entries: {pagination.totalCount}
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 }
