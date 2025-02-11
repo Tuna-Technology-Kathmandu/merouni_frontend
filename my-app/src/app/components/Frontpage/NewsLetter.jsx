@@ -7,10 +7,10 @@ const Newsletter = () => {
       <div className="container mx-auto px-4 flex flex-col md:flex-row items-center md:justify-center gap-8 md:gap-48 flex-wrap">
         {/* Left Section */}
         <div className="mb-6 md:mb-0 text-center md:text-left">
-          <h2 className="text-2xl font-bold md:text-5xl md:font-extrabold text-black mb-4 md:mb-2">
+          <h2 className="text-3xl font-bold md:text-5xl md:font-extrabold text-black mb-4 md:mb-2">
             News Letter
           </h2>
-          <p className="text-black font-semibold mt-2">
+          <p className="text-black font-medium mt-2">
             Get the latest exam updates, study resources, and <br />
             expert tips delivered straight to your inbox
           </p>

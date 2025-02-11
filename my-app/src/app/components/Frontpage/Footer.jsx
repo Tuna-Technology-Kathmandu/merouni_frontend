@@ -72,33 +72,33 @@ const Footer = () => {
                   />
                 </div>
 
-                <div className="hidden md:flex items-center space-x-8">
+                <div className="hidden md:flex items-center space-x-8 ">
                   <Link
-                    className="hover:text-[#30ad8f] transition-colors"
+                    className="hover:text-[#30ad8f] transition-colors font-bold"
                     href={"/"}
                   >
                     Home
                   </Link>
                   <Link
-                    className="hover:text-[#30ad8f] transition-colors"
+                    className="hover:text-[#30ad8f] transition-colors font-bold"
                     href={"/events"}
                   >
                     Events
                   </Link>
                   <Link
-                    className="hover:text-[#30ad8f] transition-colors"
+                    className="hover:text-[#30ad8f] transition-colors font-bold"
                     href={"/blogs"}
                   >
                     Blogs
                   </Link>
                   <Link
-                    className="hover:text-[#30ad8f] transition-colors"
+                    className="hover:text-[#30ad8f] transition-colors font-bold"
                     href={"/contact"}
                   >
                     Contact
                   </Link>
                   <Link
-                    className="hover:text-[#30ad8f] transition-colors"
+                    className="hover:text-[#30ad8f] transition-colors font-bold"
                     href={"/about"}
                   >
                     About Us
@@ -179,44 +179,45 @@ const Footer = () => {
       </div>
 
       <>
-        <div className="md:hidden flex flex-col justify-center items-center bg-black">
+        <div className="md:hidden flex flex-col justify-center items-center bg-[#011E3F] bg-opacity-95">
           <header className=" text-white">
             <div className="mx-auto px-4">
               <nav className="py-4">
-                <Image
-                  src={"/images/logo.png"}
-                  width={250}
-                  height={250}
-                  alt="Mero UNI logo"
-                  className="ml-6"
-                />
-                <div className="flex space-x-2 md:space-x-8">
+                <div className="items-center flex justify-center">
+                  <Image
+                    src={"/images/logo.png"}
+                    width={250}
+                    height={250}
+                    alt="Mero UNI logo"
+                  />
+                </div>
+                <div className="flex space-x-4 md:space-x-8">
                   <Link
-                    className="hover:text-[#30ad8f] transition-colors"
+                    className="hover:text-[#30ad8f] transition-colors font-semibold"
                     href={"/"}
                   >
                     Home
                   </Link>
                   <Link
-                    className="hover:text-[#30ad8f] transition-colors"
+                    className="hover:text-[#30ad8f] transition-colors font-semibold"
                     href={"/events"}
                   >
                     Events
                   </Link>
                   <Link
-                    className="hover:text-[#30ad8f] transition-colors"
+                    className="hover:text-[#30ad8f] transition-colors font-semibold"
                     href={"/blogs"}
                   >
                     Blogs
                   </Link>
                   <Link
-                    className="hover:text-[#30ad8f] transition-colors"
+                    className="hover:text-[#30ad8f] transition-colors font-semibold"
                     href={"/contact"}
                   >
                     Contact
                   </Link>
                   <Link
-                    className="hover:text-[#30ad8f] transition-colors"
+                    className="hover:text-[#30ad8f] transition-colors font-semibold"
                     href={"/about"}
                   >
                     About Us
@@ -229,13 +230,13 @@ const Footer = () => {
           <footer className="text-white w-full">
             <div className="md:hidden space-y-4 w-full px-4">
               {Object.entries(Sections).map(([key, section], index) => (
-                <div className="border-b border-white w-full" key={index}>
+                <div className="border-b border-white w-full mt-10" key={index}>
                   <details
                     className="pb-4 w-full"
                     open={openSections[index]}
                     onToggle={() => toggleSection(index)}
                   >
-                    <summary className="w-full list-none flex justify-between items-center hover:cursor-pointer font-semibold">
+                    <summary className="w-full list-none flex justify-between items-center hover:cursor-pointer font-bold text-lg">
                       {section.header}
                       <span>
                         <button type="button" className="p-2">
@@ -265,7 +266,7 @@ const Footer = () => {
               ))}
 
               <div className="flex flex-col items-center">
-                <span className="font-semibold mt-24">
+                <span className="font-semibold mt-20">
                   {" "}
                   &copy; Merouni All rights reserved 2025
                 </span>
@@ -285,7 +286,7 @@ const Footer = () => {
                   </Link>
                 </div>
 
-                <div className="flex items-center justify-between gap-4  mt-16 mb-8">
+                <div className="flex items-center justify-between gap-4 space-x-12 mt-16 mb-8">
                   <a href="#">
                     <FaFacebook size={28} />
                   </a>
