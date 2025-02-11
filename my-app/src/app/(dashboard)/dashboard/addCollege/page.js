@@ -89,6 +89,7 @@ export default function CollegeForm() {
   });
   const [isOpen, setIsOpen] = useState(false);
   const [colleges, setColleges] = useState([]);
+  const [tableloading, setTableLoading] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
@@ -144,6 +145,7 @@ export default function CollegeForm() {
   useEffect(() => {
     const loadColleges = async () => {
       setLoading(true);
+      setTableLoading(true);
       try {
         const response = await getColleges();
         setColleges(response.items);
@@ -151,6 +153,7 @@ export default function CollegeForm() {
         console.log(err);
       } finally {
         setLoading(false);
+        setTableLoading(false);
       }
     };
     loadColleges();
@@ -222,10 +225,17 @@ export default function CollegeForm() {
         cell: ({ getValue }) => {
           const url = getValue();
           return url ? (
-            <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
               <Globe className="inline w-4 h-4" /> Visit
             </a>
-          ) : "N/A";
+          ) : (
+            "N/A"
+          );
         },
       },
       {
@@ -234,10 +244,17 @@ export default function CollegeForm() {
         cell: ({ getValue }) => {
           const url = getValue();
           return url ? (
-            <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
               <MapPin className="inline w-4 h-4" /> View Map
             </a>
-          ) : "N/A";
+          ) : (
+            "N/A"
+          );
         },
       },
       {
@@ -245,7 +262,9 @@ export default function CollegeForm() {
         accessorKey: "description",
         cell: ({ getValue }) => {
           const text = getValue();
-          return text?.length > 50 ? text.substring(0, 50) + "..." : text || "N/A";
+          return text?.length > 50
+            ? text.substring(0, 50) + "..."
+            : text || "N/A";
         },
       },
       {
@@ -277,16 +296,82 @@ export default function CollegeForm() {
     []
   );
 
-    const handleSearch = async (query) => {
-      if (!query) {
-        getColleges();
-        return;
-      }
-    };
+  const handleSearch = async (query) => {
+    if (!query) {
+      getColleges();
+      return;
+    }
+  };
+
+  const handleEdit = (college) => {
+    // Reset form with college data
+    setValue("name", college.name);
+    setValue("institute_type", college.institute_type);
+    setValue("website_url", college.website_url);
+    setValue("google_map_url", college.google_map_url);
+    setValue("description", college.description);
+    setValue("content", college.content);
+    setValue("featured_img", college.featured_img);
+    setValue("college_logo", college.college_logo);
+    setValue("is_featured", Boolean(college.isFeatured));
+    setValue("pinned", Boolean(college.pinned));
+
+    // Handle institute_level (convert string array to actual array if needed)
+    let instituteLevels = [];
+    try {
+      instituteLevels = JSON.parse(college.institute_level);
+    } catch (e) {
+      // Handle case where institute_level might already be an array
+      instituteLevels = college.institute_level || [];
+    }
+    setValue("institute_level", instituteLevels);
+
+    // Handle address
+    if (college.address) {
+      setValue("address.country", college.address.country);
+      setValue("address.state", college.address.state);
+      setValue("address.city", college.address.city);
+      setValue("address.street", college.address?.street || "");
+      setValue("address.postal_code", college.address?.postal_code || "");
+    }
+
+    // Handle courses
+    if (college.collegeCourses) {
+      const courses = college.collegeCourses.map((course) => ({
+        id: course.id,
+        title: course.program.title,
+      }));
+      setValue("courses", courses);
+    }
+
+    // Initialize empty arrays for fields that don't have data yet
+    if (!college.contacts) setValue("contacts", [""]);
+    if (!college.members)
+      setValue("members", [
+        {
+          name: "",
+          contact_number: "",
+          role: "",
+          description: "",
+        },
+      ]);
+    if (!college.admissions)
+      setValue("admissions", [
+        {
+          course_id: "",
+          eligibility_criteria: "",
+          admission_process: "",
+          fee_details: "",
+          description: "",
+        },
+      ]);
+
+    // You might want to open a modal or navigate to edit form here
+  };
 
   return (
     <>
-      <div className="text-2xl mr-auto p-4 font-bold">
+      <div className="text-2xl mr-auto p-4 ml-14 font-bold">
         <div className="text-center">College Management</div>
         <div className="flex justify-left mt-2">
           <button
@@ -585,10 +670,17 @@ export default function CollegeForm() {
                   </div>
                   <div>
                     <label className="block mb-2">Role</label>
-                    <input
+                    <select
                       {...register(`members.${index}.role`)}
                       className="w-full p-2 border rounded"
-                    />
+                    >
+                      <option value="">Select Roles</option>
+                      <option value="Principal">Principal</option>
+                      <option value="Professor">Professor</option>
+                      <option value="Lecturer">Lecturer</option>
+                      <option value="Admin">Admin</option>
+                      <option value="Staff">Staff</option>
+                    </select>
                   </div>
                   <div>
                     <label className="block mb-2">Contact Number</label>
@@ -793,6 +885,7 @@ export default function CollegeForm() {
 
       {/*table*/}
       <Table
+        loading={tableloading}
         data={colleges}
         columns={columns}
         pagination={pagination}

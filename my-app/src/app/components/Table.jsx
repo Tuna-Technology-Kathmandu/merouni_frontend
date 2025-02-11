@@ -9,8 +9,9 @@ import {
   getFilteredRowModel,
 } from "@tanstack/react-table";
 import { Search, ChevronUp, ChevronDown } from "lucide-react";
+import ShimmerEffect from "./ShimmerEffect";
 
-const Table = ({ data, columns, pagination, onPageChange, onSearch }) => {
+const Table = ({ data, columns, pagination, onPageChange, onSearch, loading=false }) => {
   const [sorting, setSorting] = useState([]);
   const [filtering, setFiltering] = useState("");
   // const [isLoading, setIsLoading] = useState(false);
@@ -86,6 +87,7 @@ const Table = ({ data, columns, pagination, onPageChange, onSearch }) => {
   // };
 
   return (
+    
     <div className="w-full p-4 space-y-4">
       {/* Search Input */}
       <div className="relative w-full max-w-md">
@@ -103,7 +105,7 @@ const Table = ({ data, columns, pagination, onPageChange, onSearch }) => {
       </div>
 
       {/* Table Container */}
-      <div className="overflow-x-auto rounded-lg border shadow">
+      {loading? <ShimmerEffect/>:  <div className="overflow-x-auto rounded-lg border shadow">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -149,7 +151,8 @@ const Table = ({ data, columns, pagination, onPageChange, onSearch }) => {
             ))}
           </tbody>
         </table>
-      </div>
+      </div>}
+     
 
       {/* Pagination Controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
