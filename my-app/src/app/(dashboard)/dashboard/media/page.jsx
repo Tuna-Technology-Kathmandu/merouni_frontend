@@ -5,6 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchMedia } from "./action";
 import MediaCard from "./components/MediaCard";
+import { authFetch } from "@/app/utils/authFetch";
 
 function Modal({ isOpen, onClose, onSave, isUploading }) {
   const [title, setTitle] = useState("");
@@ -115,6 +116,7 @@ export default function MediaPage() {
     try {
       setLoading(true);
       const response = await fetchMedia();
+      console.log("Response:", response);
       setNews(response.items);
       toast.success("Images Loaded");
     } catch (err) {
@@ -142,10 +144,10 @@ export default function MediaPage() {
     formData.append("altText", altText);
     formData.append("description", description);
     formData.append("file", file);
-    formData.append("author", "677a47175eb6da928c70e1c3"); // Set the author
+    formData.append("authorId", "1"); // Set the author
 
     try {
-      const response = await fetch(
+      const response = await authFetch(
         "https://uploads.merouni.com/api/v1/media/upload",
         {
           method: "POST",
@@ -171,8 +173,8 @@ export default function MediaPage() {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(
-        `https://uploads.merouni.com/api/v1/media/?media_id=${id}`,
+      const response = await authFetch(
+        `https://uploads.merouni.com/api/v1/media/${id}`,
         {
           method: "DELETE",
         }
@@ -211,7 +213,7 @@ export default function MediaPage() {
             photo={item.url}
             title={item.title}
             key={index}
-            onDelete={() =>handleDelete(item._id)}
+            onDelete={() =>handleDelete(item.id)}
           />
         ))}
       </div>

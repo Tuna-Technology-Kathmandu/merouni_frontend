@@ -76,7 +76,7 @@ export async function middleware(request) {
           "/dashboard/news",
           "/dashboard/profile",
           "/dashboard/program",
-          "/dashboard/shcolarship",
+          "/dashboard/scholarship",
           "/dashboard/university",
           "/dashboard/users",
           "/dashboard/agent",

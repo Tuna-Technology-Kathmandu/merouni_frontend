@@ -1,11 +1,11 @@
-"use server";
+import { authFetch } from "@/app/utils/authFetch";
 
 let url = `${process.env.baseUrl}${process.env.version}/faculty`;
 
 export async function getAllFaculty() {
   try {
 
-    const response = await fetch(`${url}`, {
+    const response = await authFetch(`${url}`, {
       cache: "no-store",
     });
     const data = await response.json();

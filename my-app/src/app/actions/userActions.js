@@ -1,13 +1,14 @@
 // app/actions/userActions.js
-"use server";
+
+import { authFetch } from "../utils/authFetch";
 
 export async function getUsers(page = 1, token, role) {
   try {
-    const response = await fetch(
+    const response = await authFetch(
       `${process.env.baseUrl}${process.env.version}/users?limit=10`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          // Authorization: `Bearer ${token}`,
           Role: role.join(","),
         },
         cache: "no-store",
@@ -37,7 +38,6 @@ export async function getUsers(page = 1, token, role) {
 }
 
 export async function createUser(formData) {
-  "use server";
   try {
     const userData = Object.fromEntries(formData);
 
@@ -64,7 +64,6 @@ export async function createUser(formData) {
 }
 
 export async function updateUser(userId, formData) {
-  "use server";
   try {
     const userData = Object.fromEntries(formData);
     const response = await fetch(
@@ -90,7 +89,6 @@ export async function updateUser(userId, formData) {
 }
 
 export async function deleteUser(userId) {
-  "use server";
   try {
     const response = await fetch(
       `${process.env.baseUrl}${process.env.version}/users/${userId}`,

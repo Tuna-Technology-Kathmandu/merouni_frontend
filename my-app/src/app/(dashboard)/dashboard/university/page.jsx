@@ -71,14 +71,14 @@ const UniversityManager = () => {
         accessorKey: "address",
         cell: ({ getValue }) => {
           const address = getValue();
-          return `${address.street},${address.city},${address.state},${address.country} - ${address.postalCode}`;
+          return `${address?.street},${address?.city},${address?.state},${address?.country} - ${address?.postalCode}`;
         },
       },
-      {
-        header: "Level",
-        accessorKey: "level",
-        cell: ({ getValue }) => getValue().join(", "),
-      },
+      // {
+      //   header: "Level",
+      //   accessorKey: "level",
+      //   cell: ({ getValue }) => getValue().join(", "),
+      // },
 
       {
         header: "Contact Info",
@@ -87,10 +87,10 @@ const UniversityManager = () => {
           const contact = getValue();
           return (
             <>
-              <p>Email: {contact.email}</p>
-              <p>Phone: {contact.phoneNumber}</p>
-              <p>Faxes: {contact.faxes}</p>
-              <p>PO Boxes: {contact.poboxes}</p>
+              <p>Email: {contact?.email}</p>
+              <p>Phone: {contact?.phoneNumber}</p>
+              <p>Faxes: {contact?.faxes}</p>
+              <p>PO Boxes: {contact?.poboxes}</p>
             </>
           );
         },
@@ -160,9 +160,9 @@ const UniversityManager = () => {
       const response = await getUniversities(page);
       setUniversities(response.items);
       setPagination({
-        currentPage: response.pagination.currentPage,
-        totalPages: response.pagination.totalPages,
-        total: response.pagination.totalRecords,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        total: response.totalRecords,
       });
     } catch (error) {
       setError("Failed to load universities");

@@ -1,16 +1,17 @@
-"use server";
 
+import { authFetch } from "@/app/utils/authFetch";
 import { University } from "lucide-react";
 
 export async function getUniversities(page=1) {
   try {
-    const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/university?limit=9&page=${page}&sort=asc`,
+    const response = await authFetch(
+      `${process.env.baseUrl}${process.env.version}/university`,
       {
         cache: "no-store",
       }
     );
     const data = await response.json();
+    console.log("data", data);
     return data;
   } catch (error) {
     throw new Error("Failed to fetch Universities");

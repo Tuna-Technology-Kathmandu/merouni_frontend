@@ -1,9 +1,14 @@
 "use client";
 import withAuth from "@/app/components/withAuth";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import { FaUniversity, FaBookOpen, FaCalendarAlt } from "react-icons/fa";
 
+
 const AdminPage = () => {
+  useEffect (() => {
+    document.title = "MeroUni Admin Dashboard";
+  }, []);
   return (
     <div className="container mx-auto p-8">
       {/* Hero Section */}

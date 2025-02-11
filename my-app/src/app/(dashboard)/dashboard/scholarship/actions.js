@@ -1,17 +1,19 @@
 // app/actions/scholarship.js
-'use server'
+
+import { authFetch } from "@/app/utils/authFetch";
 
 let url = `${process.env.baseUrl}${process.env.version}/scholarship`;
 
 export async function getAllScholarships() {
   try {
-    const response = await fetch(`${url}`, {
-      cache: 'no-store'
+    const response = await authFetch(`${url}`, {
+      cache: "no-store",
     });
     const data = await response.json();
-    return data;
+    console.log("data", data);
+    return data.scholarships;
   } catch (error) {
-    throw new Error('Failed to fetch scholarships');
+    throw new Error("Failed to fetch scholarships");
   }
 }
 
@@ -20,40 +22,40 @@ export async function createScholarship(data) {
     console.log(`Scholarship Data : ${data}`);
 
     const response = await fetch(`${url}`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
     return await response.json();
   } catch (error) {
-    throw new Error('Failed to create scholarship');
+    throw new Error("Failed to create scholarship");
   }
 }
 
 export async function updateScholarship(id, data) {
   try {
     const response = await fetch(`${url}?scholarship_id=${id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
     return await response.json();
   } catch (error) {
-    throw new Error('Failed to update scholarship');
+    throw new Error("Failed to update scholarship");
   }
 }
 
 export async function deleteScholarship(id) {
   try {
     const response = await fetch(`${url}?scholarship_id=${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
     return await response.json();
   } catch (error) {
-    throw new Error('Failed to delete scholarship');
+    throw new Error("Failed to delete scholarship");
   }
 }
