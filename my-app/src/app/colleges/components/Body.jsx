@@ -8,10 +8,9 @@ import CourseFeeSection from "./CourseFeeSection";
 import UniversityCard from "./UniversityCard";
 import { useState, useEffect, useCallback } from "react";
 import { getColleges, searchColleges } from "../actions";
-// import { searchColleges } from "../actions";
 import { debounce } from "lodash";
 import Link from "next/link";
-// import { getColleges } from "@/app/action";
+import UniversityCardShimmer from "./UniversityShimmerCard";
 
 const CollegeFinder = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,8 +62,7 @@ const CollegeFinder = () => {
     setIsLoading(false);
   };
 
-  useEffect(() => {
-  }, [universities]);
+  useEffect(() => {}, [universities]);
 
   const filters = [
     {
@@ -285,24 +283,13 @@ const CollegeFinder = () => {
         </div>
 
         <div className="w-3/4">
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {universities.map((university, index) => (
-              <UniversityCard key={index} {...university} />
-            ))}
-          </div> */}
           {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <UniversityCardShimmer key={index} />
+              ))}
             </div>
           ) : (
-            // <>
-            //   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            //     {universities.map((university, index) => (
-            //       <UniversityCard key={index} {...university} />
-            //     ))}
-            //   </div>
-            //   <PaginationControls />
-            // </>
             <>
               {universities.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
