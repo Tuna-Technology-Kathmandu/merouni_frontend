@@ -9,14 +9,32 @@ import Table from "@/app/components/Table";
 import { getColleges } from "@/app/action";
 import { Edit2, Trash2 } from "lucide-react";
 import { Globe, MapPin } from "lucide-react";
+import { authFetch } from "@/app/utils/authFetch";
 
 export default function CollegeForm() {
+  const [universities, setUniversities] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState({
+    logo: "",
+    featured: "",
+    additional: [],
+  });
+  const [isOpen, setIsOpen] = useState(false);
+  const [colleges, setColleges] = useState([]);
+  const [tableloading, setTableLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
   const author_id = useSelector((state) => state.user.data.id);
   const {
     register,
     control,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -80,23 +98,6 @@ export default function CollegeForm() {
     remove: removeImage,
   } = useFieldArray({ control, name: "images" });
 
-  const [universities, setUniversities] = useState([]);
-  const [courses, setCourses] = useState([]);
-  const [uploadedFiles, setUploadedFiles] = useState({
-    logo: "",
-    featured: "",
-    additional: [],
-  });
-  const [isOpen, setIsOpen] = useState(false);
-  const [colleges, setColleges] = useState([]);
-  const [tableloading, setTableLoading] = useState(false);
-
-  const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    total: 0,
-  });
   const onSubmit = async (data) => {
     try {
       data.is_featured = +data.is_featured;
@@ -110,7 +111,7 @@ export default function CollegeForm() {
       data.images = uploadedFiles.additional.filter((url) => url);
 
       console.log("final data is", data);
-      await createCollege(data);
+      // await createCollege(data);
       alert("College created successfully!");
     } catch (error) {
       alert(error.message || "Failed to create college");
@@ -133,7 +134,9 @@ export default function CollegeForm() {
     const getCourses = async () => {
       try {
         const courseList = await fetchCourse();
+        console.log("courseList", courseList);
         setCourses(courseList);
+        console.log(courses);
       } catch (error) {
         console.error("Error fetching courses:", error);
       }
@@ -160,141 +163,138 @@ export default function CollegeForm() {
   }, []);
 
   //columnes
-  const columns = useMemo(
-    () => [
-      {
-        header: "ID",
-        accessorKey: "id",
-      },
-      {
-        header: "College Name",
-        accessorKey: "name",
-      },
-      {
-        header: "Type",
-        accessorKey: "institute_type",
-      },
-      {
-        header: "Country",
-        accessorKey: "address.country",
-      },
-      {
-        header: "State",
-        accessorKey: "address.state",
-      },
-      {
-        header: "City",
-        accessorKey: "address.city",
-      },
-      {
-        header: "University ID",
-        accessorKey: "university_id",
-      },
-      {
-        header: "Featured",
-        accessorKey: "isFeatured",
-        cell: ({ getValue }) => (getValue() ? "Yes" : "No"),
-      },
-      {
-        header: "Pinned",
-        accessorKey: "pinned",
-        cell: ({ getValue }) => (getValue() ? "Yes" : "No"),
-      },
-      {
-        header: "Courses",
-        accessorKey: "collegeCourses",
-        cell: ({ row }) => {
-          const courses = row.original.collegeCourses || [];
-          return (
-            <div className="flex flex-wrap gap-1">
-              {courses.map((course) => (
-                <span
-                  key={course.id}
-                  className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800"
-                >
-                  {course.program.title}
-                </span>
-              ))}
-            </div>
-          );
-        },
-      },
-      {
-        header: "Website",
-        accessorKey: "website_url",
-        cell: ({ getValue }) => {
-          const url = getValue();
-          return url ? (
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
-            >
-              <Globe className="inline w-4 h-4" /> Visit
-            </a>
-          ) : (
-            "N/A"
-          );
-        },
-      },
-      {
-        header: "Google Maps",
-        accessorKey: "google_map_url",
-        cell: ({ getValue }) => {
-          const url = getValue();
-          return url ? (
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
-            >
-              <MapPin className="inline w-4 h-4" /> View Map
-            </a>
-          ) : (
-            "N/A"
-          );
-        },
-      },
-      {
-        header: "Description",
-        accessorKey: "description",
-        cell: ({ getValue }) => {
-          const text = getValue();
-          return text?.length > 50
-            ? text.substring(0, 50) + "..."
-            : text || "N/A";
-        },
-      },
-      {
-        header: "Created At",
-        accessorKey: "createdAt",
-        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
-      },
-      {
-        header: "Actions",
-        id: "actions",
-        cell: ({ row }) => (
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleEdit(row.original)}
-              className="p-1 text-blue-600 hover:text-blue-800"
-            >
-              <Edit2 className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => handleDelete(row.original.id)}
-              className="p-1 text-red-600 hover:text-red-800"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+  const columns = [
+    {
+      header: "ID",
+      accessorKey: "id",
+    },
+    {
+      header: "College Name",
+      accessorKey: "name",
+    },
+    {
+      header: "Type",
+      accessorKey: "institute_type",
+    },
+    {
+      header: "Country",
+      accessorKey: "address.country",
+    },
+    {
+      header: "State",
+      accessorKey: "address.state",
+    },
+    {
+      header: "City",
+      accessorKey: "address.city",
+    },
+    {
+      header: "University ID",
+      accessorKey: "university_id",
+    },
+    {
+      header: "Featured",
+      accessorKey: "isFeatured",
+      cell: ({ getValue }) => (getValue() ? "Yes" : "No"),
+    },
+    {
+      header: "Pinned",
+      accessorKey: "pinned",
+      cell: ({ getValue }) => (getValue() ? "Yes" : "No"),
+    },
+    {
+      header: "Courses",
+      accessorKey: "collegeCourses",
+      cell: ({ row }) => {
+        const courses = row.original.collegeCourses || [];
+        return (
+          <div className="flex flex-wrap gap-1">
+            {courses.map((course) => (
+              <span
+                key={course.id}
+                className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800"
+              >
+                {course.program.title}
+              </span>
+            ))}
           </div>
-        ),
+        );
       },
-    ],
-    []
-  );
+    },
+    {
+      header: "Website",
+      accessorKey: "website_url",
+      cell: ({ getValue }) => {
+        const url = getValue();
+        return url ? (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            <Globe className="inline w-4 h-4" /> Visit
+          </a>
+        ) : (
+          "N/A"
+        );
+      },
+    },
+    {
+      header: "Google Maps",
+      accessorKey: "google_map_url",
+      cell: ({ getValue }) => {
+        const url = getValue();
+        return url ? (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            <MapPin className="inline w-4 h-4" /> View Map
+          </a>
+        ) : (
+          "N/A"
+        );
+      },
+    },
+    {
+      header: "Description",
+      accessorKey: "description",
+      cell: ({ getValue }) => {
+        const text = getValue();
+        return text?.length > 50
+          ? text.substring(0, 50) + "..."
+          : text || "N/A";
+      },
+    },
+    {
+      header: "Created At",
+      accessorKey: "createdAt",
+      cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+    },
+    {
+      header: "Actions",
+      id: "actions",
+      cell: ({ row }) => (
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleEdit(row.original.slugs)}
+            className="p-1 text-blue-600 hover:text-blue-800"
+          >
+            <Edit2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => handleDelete(row.original.id)}
+            className="p-1 text-red-600 hover:text-red-800"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      ),
+    },
+  ];
 
   const handleSearch = async (query) => {
     if (!query) {
@@ -303,72 +303,153 @@ export default function CollegeForm() {
     }
   };
 
-  const handleEdit = (college) => {
-    // Reset form with college data
-    setValue("name", college.name);
-    setValue("institute_type", college.institute_type);
-    setValue("website_url", college.website_url);
-    setValue("google_map_url", college.google_map_url);
-    setValue("description", college.description);
-    setValue("content", college.content);
-    setValue("featured_img", college.featured_img);
-    setValue("college_logo", college.college_logo);
-    setValue("is_featured", Boolean(college.isFeatured));
-    setValue("pinned", Boolean(college.pinned));
-
-    // Handle institute_level (convert string array to actual array if needed)
-    let instituteLevels = [];
+  const handleEdit = async (slug) => {
     try {
-      instituteLevels = JSON.parse(college.institute_level);
-    } catch (e) {
-      // Handle case where institute_level might already be an array
-      instituteLevels = college.institute_level || [];
-    }
-    setValue("institute_level", instituteLevels);
-
-    // Handle address
-    if (college.address) {
-      setValue("address.country", college.address.country);
-      setValue("address.state", college.address.state);
-      setValue("address.city", college.address.city);
-      setValue("address.street", college.address?.street || "");
-      setValue("address.postal_code", college.address?.postal_code || "");
-    }
-
-    // Handle courses
-    if (college.collegeCourses) {
-      const courses = college.collegeCourses.map((course) => ({
-        id: course.id,
-        title: course.program.title,
-      }));
-      setValue("courses", courses);
-    }
-
-    // Initialize empty arrays for fields that don't have data yet
-    if (!college.contacts) setValue("contacts", [""]);
-    if (!college.members)
-      setValue("members", [
+      setLoading(true);
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/college/${slug}`,
         {
-          name: "",
-          contact_number: "",
-          role: "",
-          description: "",
-        },
-      ]);
-    if (!college.admissions)
-      setValue("admissions", [
-        {
-          course_id: "",
-          eligibility_criteria: "",
-          admission_process: "",
-          fee_details: "",
-          description: "",
-        },
-      ]);
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    // You might want to open a modal or navigate to edit form here
+      let collegeData = await response.json();
+      collegeData = collegeData.item;
+      console.log(collegeData);
+      // Basic Information
+      setValue("name", collegeData.name);
+      setValue("institute_type", collegeData.institute_type);
+      setValue(
+        "institute_level",
+        JSON.parse(collegeData.institute_level || "[]")
+      );
+      setValue("description", collegeData.description);
+      setValue("content", collegeData.content);
+      setValue("website_url", collegeData.website_url);
+      setValue("google_map_url", collegeData.google_map_url);
+      setValue("is_featured", collegeData.isFeatured === 1);
+setValue("pinned", collegeData.pinned === 1);
+      // Set university_id from university data
+      if (collegeData.university) {
+        const universityId = universities.find(
+          (u) => u.fullname === collegeData.university.fullname
+        )?.id;
+        if (universityId) {
+          setValue("university_id", universityId);
+        }
+      }
+
+      // Set courses from collegeCourses
+      //here course means programs
+      console.log("collegeData", collegeData);
+      console.log("courses", courses);
+      const courseIds = collegeData.collegeCourses?.map(
+        (course) => courses.find((c) => c.title === course.program.title)?.id
+      );
+
+      console.log(courseIds);
+      setValue("courses", courseIds || []);
+      courseIds?.forEach((id) => {
+        const checkbox = document.querySelector(
+          `input[type="checkbox"][value="${id}"]`
+        );
+        if (checkbox) {
+          checkbox.checked = true; // Set checkbox as checked
+        }
+      });
+      // Address
+      console.log("address");
+      if (collegeData.collegeAddress) {
+        setValue("address.country", collegeData.collegeAddress.country);
+        setValue("address.state", collegeData.collegeAddress.state);
+        setValue("address.city", collegeData.collegeAddress.city);
+        setValue("address.street", collegeData.collegeAddress.street);
+        setValue("address.postal_code", collegeData.collegeAddress.postal_code);
+      }
+
+      // Contacts
+      console.log("contact");
+      const contacts = collegeData.collegeContacts?.map(
+        (contact) => contact.contact_number
+      ) || ["", ""];
+      setValue("contacts", contacts);
+
+      // Images
+      console.log("files");
+      setUploadedFiles({
+        logo: collegeData.college_logo || "",
+        featured: collegeData.featured_img || "",
+        additional: collegeData.collegeGallery?.map((img) => img.img_url) || [
+          "",
+        ],
+      });
+
+      const memberData = collegeData.collegeMembers?.length
+        ? collegeData.collegeMembers
+        : [
+            {
+              name: "",
+              contact_number: "",
+              role: "",
+              description: "",
+            },
+          ];
+
+      setValue("members", memberData);
+
+      // if (collegeData.collegeMembers && collegeData.collegeMembers.length > 0) {
+      //   // Remove default member field
+      //   // while (memberFields.length > 0) {
+      //   //   removeMember(0);
+      //   // }
+
+      //   // Add each member from the data
+      //   collegeData.collegeMembers.forEach((member) => {
+      //     appendMember({
+      //       name: member.name,
+      //       contact_number: member.contact_number,
+      //       role: member.role,
+      //       description: member.description
+      //     });
+      //   });
+      // }
+
+      const admissionData = collegeData.collegeAdmissions?.length
+        ? collegeData.collegeAdmissions.map((admission) => {
+            const courseId = courses.find(
+              (c) => c.title === admission.program.title
+            )?.id;
+            return {
+              course_id: courseId || "",
+              eligibility_criteria: admission.eligibility_criteria || "",
+              admission_process: admission.admission_process || "",
+              fee_details: admission.fee_details || "",
+              description: admission.description || "",
+            };
+          })
+        : [
+            {
+              course_id: "",
+              eligibility_criteria: "",
+              admission_process: "",
+              fee_details: "",
+              description: "",
+            },
+          ];
+
+      setValue("admissions", admissionData);
+
+      // Open the form
+      setIsOpen(true);
+    } catch (error) {
+      console.error("Error fetching college data:", error);
+      alert("Failed to fetch college data");
+    } finally {
+      setLoading(false);
+    }
   };
-
   return (
     <>
       <div className="text-2xl mr-auto p-4 ml-14 font-bold">
@@ -384,7 +465,7 @@ export default function CollegeForm() {
           </button>
         </div>
       </div>
-
+      -
       {isOpen && (
         <div className="container mx-auto p-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -417,7 +498,7 @@ export default function CollegeForm() {
                 <div>
                   <label className="block mb-2">Institute Level</label>
                   <div className="space-y-2">
-                    {["School", "College"].map((level) => (
+                    {["School", "College", "Masters"].map((level) => (
                       <label key={level} className="flex items-center">
                         <input
                           type="checkbox"
@@ -443,6 +524,7 @@ export default function CollegeForm() {
                     }
                   >
                     <option value="">Select University</option>
+
                     {universities.map((university) => (
                       <option key={university.id} value={university.id}>
                         {university.fullname}
@@ -470,6 +552,7 @@ export default function CollegeForm() {
             </div>
 
             {/* Courses Section */}
+
             <div className="bg-white p-6 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold mb-4">Courses</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -504,58 +587,6 @@ export default function CollegeForm() {
                 </div>
               </div>
             </div>
-
-            {/* Media Section */}
-            {/* <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Media</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block mb-2">College Logo URL</label>
-              <input
-                {...register("college_logo")}
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            <div>
-              <label className="block mb-2">Featured Image URL</label>
-              <input
-                {...register("featured_img")}
-                className="w-full p-2 border rounded"
-              />
-            </div>
-          </div>
-
-          <div className="mt-4">
-            <div className="flex justify-between items-center mb-4">
-              <label className="block">Additional Images</label>
-              <button
-                type="button"
-                onClick={() => appendImage("")}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-              >
-                Add Image URL
-              </button>
-            </div>
-            {imageFields.map((field, index) => (
-              <div key={field.id} className="flex gap-2 mb-2">
-                <input
-                  {...register(`images.${index}`)}
-                  className="flex-1 p-2 border rounded"
-                  placeholder="Image URL"
-                />
-                {index > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => removeImage(index)}
-                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div> */}
 
             <div className="bg-white p-6 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold mb-4">Media</h2>
@@ -882,7 +913,6 @@ export default function CollegeForm() {
           </form>
         </div>
       )}
-
       {/*table*/}
       <Table
         loading={tableloading}

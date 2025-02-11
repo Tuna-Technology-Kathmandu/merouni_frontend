@@ -5,10 +5,10 @@ import { getConsultancies } from "./actions";
 import Header from "../components/Frontpage/Header";
 import Navbar from "../components/Frontpage/Navbar";
 import Footer from "../components/Frontpage/Footer";
+
 export default async function ConsultanciesPage({ searchParams }) {
   const currentPage = Number(searchParams?.page) || 1;
   const { items, pagination } = await getConsultancies(currentPage);
-
   return (
     <>
       <Header />
