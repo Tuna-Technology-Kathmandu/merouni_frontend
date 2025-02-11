@@ -6,16 +6,24 @@ import Link from "next/link";
 
 // Define a simple Shimmer component for loading state
 const Shimmer = ({ width, height }) => (
-  <div
-    className="shimmer bg-gray-200 rounded"
-    style={{ width, height }}
-  ></div>
+  <div className="shimmer bg-gray-200 rounded" style={{ width, height }}></div>
 );
 
 const Body = () => {
   const [admission, setAdmission] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
 
   useEffect(() => {
     fetchAdmission();
@@ -36,7 +44,7 @@ const Body = () => {
 
   // Filter admissions based on search term
   const filteredAdmissions = admission.filter((admis) =>
-    admis.program.title.toLowerCase().includes(searchTerm.toLowerCase())
+    admis.program.title.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
   return (
@@ -53,6 +61,7 @@ const Body = () => {
             placeholder="Search admissions..."
             className="w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchTerm}
           />
           <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
         </div>

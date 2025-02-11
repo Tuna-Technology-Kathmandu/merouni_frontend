@@ -11,6 +11,18 @@ import Header from "../components/Frontpage/Header";
 const ScholarshipPage = () => {
   const [scholarships, setScholarships] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
 
   useEffect(() => {
     const getScholarships = async () => {
@@ -27,6 +39,10 @@ const ScholarshipPage = () => {
 
     getScholarships();
   }, []);
+
+  const filteredScholarships = scholarships.filter((scholarship) =>
+    scholarship.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+  );
 
   return (
     <>
@@ -46,6 +62,7 @@ const ScholarshipPage = () => {
               placeholder="Search scholarship..."
               className="w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchTerm}
             />
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
@@ -79,7 +96,7 @@ const ScholarshipPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {scholarships.map((scholarship) => (
+            {filteredScholarships.map((scholarship) => (
               <div
                 key={scholarship.id}
                 className="bg-white rounded-xl p-6 border border-gray-200 shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300"

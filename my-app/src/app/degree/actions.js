@@ -1,8 +1,8 @@
 // services.js
-export const fetchDegrees = async () => {
+export const fetchDegrees = async (search="") => {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/program`
+      `${process.env.baseUrl}${process.env.version}/program?q=${search}`
     );
     const data = await response.json();
     return data;

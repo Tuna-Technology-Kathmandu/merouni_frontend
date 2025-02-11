@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Share, Heart } from "lucide-react";
 import { fetchDegrees } from "./actions";
 import { Search } from "lucide-react";
 import Navbar from "../components/Frontpage/Navbar";
@@ -9,25 +8,37 @@ import Header from "../components/Frontpage/Header";
 import Shimmer from "../components/Shimmer";
 import Link from "next/link";
 
-const CoursePage = () => {
+const DegreePage = () => {
   const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true); // Start with loading set to true
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
 
   useEffect(() => {
     const getCourses = async () => {
+      setLoading(true);
       try {
-        const response = await fetchDegrees();
-        console.log("RESPONS Degree:", response);
+        const response = await fetchDegrees(debouncedSearch);
         setCourses(response.items);
       } catch (error) {
         console.error("Error:", error);
       } finally {
-        setLoading(false); // After the API call, set loading to false
+        setLoading(false);
       }
     };
 
     getCourses();
-  }, []);
+  }, [debouncedSearch]);
 
   return (
     <>
@@ -46,6 +57,8 @@ const CoursePage = () => {
               <input
                 type="text"
                 placeholder="Search degrees..."
+                onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchTerm}
                 className="w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
@@ -90,7 +103,9 @@ const CoursePage = () => {
                 <Link href={`/degree/${degree.slugs}`} key={index}>
                   <div className="border rounded-lg p-6 hover:shadow-lg transition-shadow bg-white">
                     <div className="mb-4">
-                      <h2 className="text-xl font-semibold mb-4">{degree.title}</h2>
+                      <h2 className="text-xl font-semibold mb-4">
+                        {degree.title}
+                      </h2>
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between">
@@ -132,4 +147,4 @@ const CoursePage = () => {
   );
 };
 
-export default CoursePage;
+export default DegreePage;
