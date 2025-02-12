@@ -142,11 +142,6 @@
 
 // export default Program;
 
-
-
-
-
-
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { getCourses, getExams } from "@/app/action";
@@ -207,7 +202,6 @@ const Program = () => {
           </div>
           <div className="font-medium text-md md:text-lg text-center  md:w-[400px] m-2">
             Browse through programs based on your interests and career goals.
-
           </div>
           <button className="w-[130px] text-center border border-black rounded-xl  flex items-center justify-center p-2 font-bold mt-2">
             View all
@@ -268,7 +262,7 @@ const Program = () => {
               </button>
             </div>
 
-            <div className="flex flex-col items-center md:items-start bg-white rounded-lg shadow-[8px_10px_4px_rgba(0,0,0,0.1)] max-w-[600px] w-full p-8 ml-auto mb-4">
+            <div className="flex flex-col items-start md:items-start bg-white rounded-lg shadow-[8px_10px_4px_rgba(0,0,0,0.1)] max-w-[600px] w-full p-8 ml-auto mb-4">
               <div className="flex items-center">
                 <Image
                   src={"/images/courses.png"}
@@ -278,12 +272,12 @@ const Program = () => {
                 />
                 <div className="font-extrabold text-2xl px-2">Courses</div>
               </div>
-              <div className="font-semibold mt-4 text-center md:text-start">
+              <div className="font-semibold mt-4  md:text-start">
                 Simple access to information on preparation, dates, syllabus and
                 more...
               </div>
               <div className="flex flex-wrap  gap-4 items-center justify-center  m-4 py-6 font-bold ">
-              {/* <div className="grid md:grid-cols-2 grid-cols-2 gap-4 mt-4"> */}
+                {/* <div className="grid md:grid-cols-2 grid-cols-2 gap-4 mt-4"> */}
 
                 {courses.map((course, index) => (
                   <div
