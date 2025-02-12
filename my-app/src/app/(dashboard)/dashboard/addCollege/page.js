@@ -11,6 +11,7 @@ import { Edit2, Trash2 } from "lucide-react";
 import { Globe, MapPin } from "lucide-react";
 import { authFetch } from "@/app/utils/authFetch";
 import { toast } from "react-toastify";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 export default function CollegeForm() {
   const [universities, setUniversities] = useState([]);
@@ -29,6 +30,7 @@ export default function CollegeForm() {
     totalPages: 1,
     total: 0,
   });
+  const [editing, setEditing] = useState(false);
 
   const author_id = useSelector((state) => state.user.data.id);
   const {
@@ -36,7 +38,9 @@ export default function CollegeForm() {
     control,
     handleSubmit,
     setValue,
+    reset,
     watch,
+    getValues,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -113,8 +117,18 @@ export default function CollegeForm() {
       data.images = uploadedFiles.additional.filter((url) => url);
 
       console.log("final data is", data);
-      // await createCollege(data);
-      toast.success("College created successfully!");
+      await createCollege(data);
+
+      editing
+        ? toast.success("College updated successfully!")
+        : toast.success("College created successfully!");
+      setEditing(false);
+      reset();
+      setUploadedFiles({
+        logo: "",
+        featured: "",
+        additional: [],
+      });
     } catch (error) {
       alert(error.message || "Failed to create college");
     }
@@ -288,7 +302,7 @@ export default function CollegeForm() {
             <Edit2 className="w-4 h-4" />
           </button>
           <button
-            onClick={() => handleDelete(row.original.id)}
+            onClick={() => handleDeleteClick(row.original.id)}
             className="p-1 text-red-600 hover:text-red-800"
           >
             <Trash2 className="w-4 h-4" />
@@ -304,11 +318,68 @@ export default function CollegeForm() {
       return;
     }
   };
+  const [deleteId, setDeleteId] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const handleDeleteClick = (id) => {
+    setDeleteId(id); // Store the ID of the item to delete
+    setIsDialogOpen(true); // Open the confirmation dialog
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteId) return;
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/college/${deleteId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const res = await response.json();
+      toast.success(res.message);
+      const updatedColleges = await getColleges();
+      setColleges(updatedColleges.items);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsDialogOpen(false); // Close the dialog
+      setDeleteId(null); // Reset the delete ID
+    }
+  };
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false); // Close the dialog without deleting
+    setDeleteId(null); // Reset the delete ID
+  };
+
+  // const handleDelete = async (id) => {
+
+  //   console.log("id isss", id);
+  //   try {
+  //     const response = await authFetch(
+  //       `${process.env.baseUrl}${process.env.version}/college/${id}`,
+  //       {
+  //         method: "DELETE",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+  //     const res = await response.json();
+  //     toast.success(res.message);
+  //   } catch (err) {
+  //     toast.error(err.message);
+  //   }
+  // };
   const handleEdit = async (slug) => {
     try {
+      setEditing(true);
       setLoading(true);
-      setIsOpen(true)
+      setIsOpen(true);
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/college/${slug}`,
         {
@@ -320,9 +391,12 @@ export default function CollegeForm() {
 
       let collegeData = await response.json();
       collegeData = collegeData.item;
-      console.log(collegeData);
+      console.log("detail", collegeData);
       // Basic Information
+      console.log("id is", collegeData.id);
+      setValue("id", collegeData.id);
       setValue("name", collegeData.name);
+
       setValue("institute_type", collegeData.institute_type);
       setValue(
         "institute_level",
@@ -447,7 +521,6 @@ export default function CollegeForm() {
 
       // Open the form
       setIsOpen(true);
-    
     } catch (error) {
       console.error("Error fetching college data:", error);
       alert("Failed to fetch college data");
@@ -455,6 +528,7 @@ export default function CollegeForm() {
       setLoading(false);
     }
   };
+
   return (
     <>
       <div className="text-2xl mr-auto p-4 ml-14 font-bold">
@@ -555,7 +629,7 @@ export default function CollegeForm() {
                 </div>
               </div>
             </div>
-
+            {editing ? <input type="hidden" {...register("id")} /> : <></>}
             {/* Courses Section */}
 
             <div className="bg-white p-6 rounded-lg shadow-md">
@@ -913,11 +987,18 @@ export default function CollegeForm() {
               type="submit"
               className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors"
             >
-              Create College
+              {editing ? "Update College" : "Create College"}
             </button>
           </form>
         </div>
       )}
+      <ConfirmationDialog
+        open={isDialogOpen}
+        onClose={handleDialogClose}
+        onConfirm={handleDeleteConfirm}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this item? This action cannot be undone."
+      />
       {/*table*/}
       <Table
         loading={tableloading}
