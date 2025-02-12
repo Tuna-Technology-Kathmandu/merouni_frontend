@@ -1,8 +1,8 @@
 // actions.js
-export const fetchScholarships = async () => {
+export const fetchScholarships = async (search = "") => {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/scholarship`
+      `${process.env.baseUrl}${process.env.version}/scholarship?q=${search}`
     );
     const data = await response.json();
     return data;

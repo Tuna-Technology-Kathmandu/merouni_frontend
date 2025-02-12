@@ -1,12 +1,7 @@
-export async function getAdmission() {
+export async function getAdmission(search = "") {
   try {
-    // console.log("Fetching college details for slug:", slug);
-    console.log(
-      `${process.env.baseUrl}${process.env.version}/college/admission`
-    );
-
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/college/admission`,
+      `${process.env.baseUrl}${process.env.version}/college/admission?q=${search}`,
       {
         method: "GET",
         headers: {

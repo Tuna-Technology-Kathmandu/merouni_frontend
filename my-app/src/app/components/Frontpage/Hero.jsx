@@ -8,6 +8,7 @@ import AdLayout from "./AdLayout";
 const Hero = () => {
   const [featuredColleges, setFeaturedColleges] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isCollegeLoading, setIsCollegeLoading] = useState(true);
   const [error, setError] = useState(null); // State for error handling
   const [banner, setBanner] = useState([]);
 
@@ -17,14 +18,13 @@ const Hero = () => {
 
   const fetchFeaturedColleges = async () => {
     try {
-      console.log("Hlo hero");
-      // const response = await getFeaturedColleges();
       const response = await getColleges(undefined, true);
-      console.log("RESOPHOSG hero page of front:", response);
       setFeaturedColleges(response.items);
+      setIsCollegeLoading(false);
     } catch (error) {
       console.error("Error fetching the colleges data:", error);
       setError("Failed to load featured Colleges");
+      setIsCollegeLoading(false);
     } finally {
       setLoading(false);
     }
@@ -50,16 +50,14 @@ const Hero = () => {
 
   return (
     <div className="w-full ">
-      {loading && (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-        </div>
-      )}
       {/* The carousel takes the full height of the Hero section */}
       <div className="container mx-auto px-4">
         <AdLayout banners={banner} size="medium" number={3} />
         {/* <ImageCarousel />  */}
-        <FrontPageCard colleges={featuredColleges} />
+        <FrontPageCard
+          colleges={featuredColleges}
+          isLoading={isCollegeLoading}
+        />
       </div>
     </div>
   );

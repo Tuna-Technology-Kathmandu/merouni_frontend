@@ -16,13 +16,19 @@ const Header = () => {
   const [showSidebar, setShowSidebar] = useState(false);
 
   const menuItems = [
-    { title: "College", href: "/college" },
+    { title: "College", href: "/colleges" },
     { title: "Course", href: "/course" },
     { title: "Degree", href: "/degree" },
     { title: "Admission", href: "/admission" },
     { title: "Scholarship", href: "/scholarship" },
     { title: "Events", href: "/events" },
     { title: "Blogs", href: "/blogs" },
+    { title: "Exams", href: "/exams" },
+    // {title: " Consultancy,Materials,Events,School,Videos,Universities,Career,Vacancy,Wishlist"}
+    { title: "Consultancy", href: "/events" },
+    { title: "School", href: "/schools" },
+    { title: "Universites", href: "/universities" },
+    { title: "Career", href: "/career" },
   ];
 
   return (
@@ -45,10 +51,12 @@ const Header = () => {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-[80px] right-0 h-[550px] w-full bg-white shadow-lg border-t-2 transform transition-transform duration-300 ease-in-out z-50 ${
-          showSidebar ? "translate-x-0" : "translate-x-full"
+        className={`absolute top-[80px] left-0 h-screen  w-full bg-white shadow-lg border-t-2 transform transition-transform duration-300 ease-in-out z-50 ${
+          showSidebar ? "translate-x-0" : "-translate-x-full"
         }`}
       >
+        {/* className={`absolute top-[80px] left-0 h-[550px]  w-full bg-white shadow-lg border-t-2 transform transition-transform duration-300 ease-in-out z-50 ${ */}
+
         {/* Close Button */}
         {/* <div className="flex justify-end p-4">
           <button
@@ -60,7 +68,7 @@ const Header = () => {
         </div> */}
 
         {/* Menu Items */}
-        <nav className="px-4">
+        <nav className="px-4 h-[80%] overflow-auto">
           {menuItems.map((item, index) => (
             <Link
               key={index}
@@ -76,12 +84,12 @@ const Header = () => {
 
         <div className="flex flex-row justify-between m-4">
           <Link href="/sign-in">
-          <button type="button" className=" bg-[#0A6FA7] w-[150px] p-2">
-            <span className="text-white font-bold text-lg">Login</span>
-          </button>
+            <button type="button" className=" bg-[#0A6FA7] w-[150px] p-2 rounded-lg">
+              <span className="text-white font-bold text-lg">Login</span>
+            </button>
           </Link>
 
-          <div className="border-2  border-solid border-[#0A6FA7] ">
+          <div className="border-2  border-solid border-[#0A6FA7] rounded-lg">
             <button
               type="button"
               className="  w-[150px] p-2 flex flex-row justify-center items-center"
@@ -102,7 +110,7 @@ const Header = () => {
       )}
 
       {/* Main Header */}
-      <div className="flex justify-between items-center w-[85%] max-w-[1600px] mx-auto">
+      <div className="flex justify-between items-center  md:w-[85%] max-w-[1600px] md:mx-auto">
         {/* Left Logo */}
         {/* <Link href="/" className="flex-shrink-0">
           <Image
@@ -135,6 +143,11 @@ const Header = () => {
           </div>
         </div>
 
+        {/*Menu Bar Mobile Show */}
+        <div className="block md:hidden px-2 cursor-pointer ">
+          <IoMenu onClick={() => setShowSidebar(true)} size={24} />
+        </div>
+
         <Link href="/" className="block md:hidden">
           <div className=" w-[180px] h-[80px] relative">
             <Image
@@ -159,9 +172,9 @@ const Header = () => {
         </div>
 
         {/* Mobile Menu Icon (☰) */}
-        <div className="block md:hidden px-2 cursor-pointer ">
+        {/* <div className="block md:hidden px-2 cursor-pointer ">
           <IoMenu onClick={() => setShowSidebar(true)} size={24} />
-        </div>
+        </div> */}
       </div>
     </>
   );

@@ -3,93 +3,10 @@ import React, { useState, useEffect } from "react";
 import BlogCard from "./BlogCard";
 import { getBlogs } from "@/app/action";
 import Pagination from "./Pagination";
-import Loading from "../../components/Loading";
+import FeaturedBlogsShimmer from "./FeaturedBlogShimmer";
 import Link from "next/link";
 
 const FeaturedBlogs = () => {
-  const blogs = [
-    {
-      title: "Engineering Education in Nepal",
-      date: "June 20, 2024",
-      description:
-        "Engineering has long been regarded as one of Nepal's most prestigious and so...",
-      image: "/images/blogs_image1.png",
-      views: 100,
-    },
-    {
-      title: "Engineering Education in Nepal",
-      date: "June 20, 2024",
-      description:
-        "Engineering has long been regarded as one of Nepal's most prestigious and so...",
-      image: "/images/blogs_image2.png",
-      views: 100,
-    },
-    {
-      title: "Engineering Education in Nepal",
-      date: "June 20, 2024",
-      description:
-        "Engineering has long been regarded as one of Nepal's most prestigious and so...",
-      image: "/images/blogs_image1.png",
-      views: 100,
-    },
-    {
-      title: "Engineering Education in Nepal",
-      date: "June 20, 2024",
-      description:
-        "Engineering has long been regarded as one of Nepal's most prestigious and so...",
-      image: "/images/blogs_image2.png",
-      views: 100,
-    },
-    {
-      title: "Engineering Education in Nepal",
-      date: "June 20, 2024",
-      description:
-        "Engineering has long been regarded as one of Nepal's most prestigious and so...",
-      image: "/images/blogs_image1.png",
-      views: 100,
-    },
-    {
-      title: "Engineering Education in Nepal",
-      date: "June 20, 2024",
-      description:
-        "Engineering has long been regarded as one of Nepal's most prestigious and so...",
-      image: "/images/blogs_image2.png",
-      views: 100,
-    },
-    {
-      title: "Engineering Education in Nepal",
-      date: "June 20, 2024",
-      description:
-        "Engineering has long been regarded as one of Nepal's most prestigious and so...",
-      image: "/images/blogs_image1.png",
-      views: 100,
-    },
-    {
-      title: "Engineering Education in Nepal",
-      date: "June 20, 2024",
-      description:
-        "Engineering has long been regarded as one of Nepal's most prestigious and so...",
-      image: "/images/blogs_image2.png",
-      views: 100,
-    },
-    {
-      title: "Engineering Education in Nepal",
-      date: "June 20, 2024",
-      description:
-        "Engineering has long been regarded as one of Nepal's most prestigious and so...",
-      image: "/images/blogs_image1.png",
-      views: 100,
-    },
-    {
-      title: "Engineering Education in Nepal",
-      date: "June 20, 2024",
-      description:
-        "Engineering has long been regarded as one of Nepal's most prestigious and so...",
-      image: "/images/blogs_image2.png",
-      views: 100,
-    },
-  ];
-
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -101,23 +18,21 @@ const FeaturedBlogs = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    loadPageNumber(pagination.currentPage); // Pass the current page directly here
+    loadPageNumber(pagination.currentPage); 
   }, [pagination.currentPage]);
 
   const loadPageNumber = async (page) => {
     setLoading(true);
     setError(null);
     try {
-      console.log(`Fetching blogs for page: ${page}`); // Debugging
-      const response = await getBlogs(page); // Use the updated page directly
-      console.log("Response from getBlogs:", response);
+      const response = await getBlogs(page); 
 
       if (response && response.pagination) {
         setBlogs(response.items);
         console.log("look", response.pagination);
         setPagination((prev) => ({
           ...prev,
-          ...response.pagination, // Update the pagination state with the new data
+          ...response.pagination,
         }));
       } else {
         console.error("Pagination data not found in response:", response);
@@ -133,7 +48,7 @@ const FeaturedBlogs = () => {
     if (page > 0 && page <= pagination.totalPages) {
       setPagination((prev) => ({
         ...prev,
-        currentPage: page, // Update current page
+        currentPage: page, 
       }));
     }
   };
@@ -152,7 +67,7 @@ const FeaturedBlogs = () => {
 
   return (
     <>
-      <div className="flex flex-col max-w-[1600px] mx-auto px-8 mt-10">
+      <div className="flex flex-col max-w-[1600px] mx-auto px-4 sm:px-8 mt-10">
         {/* top section  */}
         <div className="flex flex-row border-b-2 border-[#0A70A7] w-[45px] mb-10">
           <span className="text-2xl font-bold mr-2">Featured</span>
@@ -160,16 +75,16 @@ const FeaturedBlogs = () => {
         </div>
 
         {loading ? (
-          <Loading />
+          <FeaturedBlogsShimmer />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {Blogs.map((blog, index) => (
               <Link href={`/blogs/${blog.slug}`} key={index}>
                 <div key={index}>
                   <BlogCard
                     date={formatDate(blog.createdAt)}
                     description={truncateString(blog.description, 100)}
-                    image={blogs[0]["image"]}
+                    image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ718nztPNJfCbDJjZG8fOkejBnBAeQw5eAUA&s"
                     title={truncateString(blog.title, 20)}
                     slug={blog.slug}
                   />

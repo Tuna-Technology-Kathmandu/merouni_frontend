@@ -14,7 +14,19 @@ export default {
       screens: {
         lp: "1325px", // Custom screen size
         tb: "915px",
-        
+      },
+      animation: {
+        "featured-shimmer": "featured-shimmer 1.5s infinite ease-in-out",
+      },
+      keyframes: {
+        "featured-shimmer": {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+      },
+      backgroundImage: {
+        "featured-shimmer":
+          "linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)",
       },
     },
   },
