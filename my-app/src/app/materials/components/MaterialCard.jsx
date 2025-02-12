@@ -16,29 +16,41 @@ const MaterialCard = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    loadPageNumber(pagination.currentPage); // Pass the current page directly here
-  }, [pagination.currentPage]);
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    loadPageNumber(pagination.currentPage);
+  }, [pagination.currentPage, debouncedSearch]);
 
   const loadPageNumber = async (page) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getMaterials(page);
-
+      const response = await getMaterials(page, debouncedSearch); // Pass search term to API
+  
       if (response && response.pagination) {
         setBlogs(response.materials);
-
+  
         setPagination((prev) => ({
           ...prev,
-          ...response.pagination, // Update the pagination state with the new data
+          ...response.pagination,
         }));
       } else {
         console.error("Pagination data not found in response:", response);
       }
     } catch (error) {
-      setError("Failed to load blogs");
+      setError("Failed to load materials");
     } finally {
       setLoading(false);
     }
@@ -81,7 +93,8 @@ const MaterialCard = () => {
               type="text"
               placeholder="Search material..."
               className="w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              // onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchTerm}
             />
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>

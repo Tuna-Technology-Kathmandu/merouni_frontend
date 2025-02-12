@@ -1,9 +1,9 @@
 "use server";
 
-export async function getMaterials() {
+export async function getMaterials(search = "") {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/material`,
+      `${process.env.baseUrl}${process.env.version}/material?search=${search}`,
       {
         method: "GET",
         headers: {
