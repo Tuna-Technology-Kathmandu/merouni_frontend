@@ -34,6 +34,7 @@ const CollegeFinder = () => {
       if (query) {
         setIsSearching(true);
         const results = await searchColleges(query);
+        console.log("Search Results in college:", results);
         setUniversities(results.colleges);
         setPagination(results.pagination);
         setIsSearching(false);

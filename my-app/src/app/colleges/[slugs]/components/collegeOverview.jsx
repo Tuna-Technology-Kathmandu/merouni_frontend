@@ -368,16 +368,16 @@ import { IoMdMail } from "react-icons/io";
 import { PiLineVerticalThin } from "react-icons/pi";
 
 const CollegeOverview = ({ college }) => {
+  console.log("Clz:", college);
   const [activeTab, setActiveTab] = useState("Overview");
 
   return (
     <div className="w-full max-w-[1150px] mx-auto bg-white border-2 shadow-md rounded-2xl mb-10 pb-5">
-      <div className="grid grid-cols-6 rounded-t-2xl bg-[#D9D9D9]">
+      <div className="grid grid-cols-5 rounded-t-2xl bg-[#D9D9D9]">
         {[
           "Overview",
           "Programs",
           "Members",
-          "Facilities",
           "Contact",
           "Address",
         ].map((tab) => (
@@ -399,6 +399,8 @@ const CollegeOverview = ({ college }) => {
         <div className="mt-6 ml-4">
           <h2 className="text-2xl font-bold">About</h2>
           <p className="text-gray-700 mt-4 leading-7">{college.description}</p>
+          <p className="text-gray-700 mt-4 leading-7">{college.content}</p>
+
           <h2 className="text-2xl font-bold mt-6">Institution Type</h2>
           <p className="text-gray-700 mt-4">{college.institute_type}</p>
         </div>
@@ -560,14 +562,10 @@ const CollegeOverview = ({ college }) => {
 
           <div className="mt-10 flex flex-col">
             <h2 className="text-2xl font-bold mb-5">Get Direction</h2>
-            <div className="mt-2 rounded-md">
-              <iframe
-                src={college.google_map_url}
-                style={{ border: "0", borderRadius: "8px" }}
-                className="w-[1050px] h-[300px] border-0 rounded-md"
-                allowFullScreen
-                loading="lazy"
-              ></iframe>
+            <div className="mt-2 rounded-md flex items-center justify-center mx-auto">
+              <div
+                dangerouslySetInnerHTML={{ __html: college.google_map_url }}
+              className="w-full"></div>
             </div>
           </div>
         </div>

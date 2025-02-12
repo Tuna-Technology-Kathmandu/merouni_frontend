@@ -7,6 +7,7 @@ import { IoMdMail } from "react-icons/io";
 import { LiaUniversitySolid } from "react-icons/lia";
 
 const ImageSection = ({ college }) => {
+  console.log("COllege slug:",college)
   return (
     <>
       <div className="flex flex-col items-center">
@@ -20,7 +21,7 @@ const ImageSection = ({ college }) => {
           <div className="flex flex-row bg-[#30AD8F] bg-opacity-5 h-[110px] mb-20 items-center p-0 md:pl-32">
             <div>
               <Image
-                src={"/images/texas_logo.png"}
+                src={college.college_logo || "/images/texas_logo.png"}
                 width={150}
                 height={150}
                 alt="College Logo"

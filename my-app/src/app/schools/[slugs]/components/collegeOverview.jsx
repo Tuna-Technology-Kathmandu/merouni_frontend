@@ -563,13 +563,13 @@ const CollegeOverview = ({ college }) => {
           <div className="mt-10 flex flex-col">
             <h2 className="text-2xl font-bold mb-5">Get Direction</h2>
             <div className="mt-2 rounded-md">
-              <iframe
+              {/* <iframe
                 src={college.google_map_url}
                 style={{ border: "0", borderRadius: "8px" }}
                 className="w-[1050px] h-[300px] border-0 rounded-md"
                 allowFullScreen
                 loading="lazy"
-              ></iframe>
+              ></iframe> */}
             </div>
           </div>
         </div>

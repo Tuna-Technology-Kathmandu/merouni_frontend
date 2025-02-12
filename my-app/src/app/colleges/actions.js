@@ -49,13 +49,12 @@ export async function getColleges(page = 1, sort = "ASC") {
   }
 }
 
-
 export async function searchColleges(query) {
   try {
     const response = await fetch(
       `${process.env.baseUrl}${
         process.env.version
-      }/college/search?q=${encodeURIComponent(query)}`,
+      }/college?q=${encodeURIComponent(query)}`,
       {
         cache: "no-store",
       }

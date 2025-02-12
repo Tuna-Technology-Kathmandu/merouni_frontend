@@ -5,6 +5,7 @@ import { PiLineVerticalThin } from "react-icons/pi";
 import { FaUniversity, FaPhoneAlt } from "react-icons/fa";
 import { IoMdMail } from "react-icons/io";
 import { LiaUniversitySolid } from "react-icons/lia";
+import { BsGlobe2 } from "react-icons/bs";
 
 const ImageSection = ({ college }) => {
   return (
@@ -12,25 +13,24 @@ const ImageSection = ({ college }) => {
       <div className="flex flex-col items-center">
         <div>
           <Image
-            src={"/images/collegePhoto.png"}
+            src={college.featured_img || "/images/collegePhoto.png"}
             width={2400}
             height={600}
             alt="College Photo"
+            className="h-[50vh] object-fill"
           />
           <div className="flex flex-row bg-[#30AD8F] bg-opacity-5 h-[110px] mb-20 items-center p-0 md:pl-32">
-            <div>
+            <div className="flex items-center justify-center w-[150px] h-[150px] rounded-full bg-white -translate-y-8">
               <Image
-                src={"/images/texas_logo.png"}
-                width={150}
-                height={150}
+                src={college.college_logo || "/images/texas_logo.png"}
+                width={120}
+                height={120}
                 alt="College Logo"
-                className="-translate-y-8"
+                className=""
               />
             </div>
             <div className="ml-8">
-              <h2 className="font-bold text-3xl leading-10">
-                {college?.name}
-              </h2>
+              <h2 className="font-bold text-3xl leading-10">{college?.name}</h2>
               <div className="flex flex-row">
                 <p className="font-semibold text-lg ">
                   {college?.collegeAddress?.street},{" "}
@@ -82,8 +82,13 @@ const ImageSection = ({ college }) => {
             <PiLineVerticalThin size={60} />
           </div>
           <div className="flex flex-col items-center">
-            <IoMdMail size={25} />
-            <p className="whitespace-nowrap ">N/A</p>
+            {/* <IoMdMail size={25} /> */}
+            <BsGlobe2 size={25} />
+            <a href={college.website_url} target="_blank">
+            <p className="whitespace-nowrap hover:underline hover:text-blue-500 hover:cursor-pointer">
+              {college.website_url || N / A}
+            </p>
+            </a>
           </div>
         </div>
 

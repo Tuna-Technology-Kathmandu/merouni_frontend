@@ -2,32 +2,21 @@ import React from "react";
 import Image from "next/image";
 
 const Gallery = ({ college }) => {
-  const images = [
-    "/images/events_photo.png",
-    "/images/events_photo.png",
-    "/images/events_photo.png",
-    "/images/events_photo.png",
-    "/images/events_photo.png",
-    "/images/events_photo.png",
-    "/images/events_photo.png",
-    "/images/events_photo.png",
-    "/images/events_photo.png",
-    "/images/events_photo.png",
-    "/images/events_photo.png",
-    "/images/events_photo.png",
-  ];
+  console.log("Galle:", college);
   return (
     <div className="flex flex-col  max-w-[1600px]  mx-auto mb-20">
       <h2 className="font-bold text-3xl leading-10 mb-4">Gallery</h2>
       <div className="grid grid-cols-4 gap-1">
-        {college.collegeGallery.map((photo, index) => (
+        {college?.collegeGallery.map((photo, index) => (
           <Image
             alt="college photo"
-            src={photo}
+            src={
+              photo.img_url ||
+              "https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996"
+            }
             key={index}
             width={250}
             height={100}
-            
           />
         ))}
       </div>
