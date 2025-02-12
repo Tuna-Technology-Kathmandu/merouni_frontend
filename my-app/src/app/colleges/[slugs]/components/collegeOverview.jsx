@@ -362,13 +362,6 @@
 
 // export default CollegeOverview;
 
-
-
-
-
-
-
-
 import React, { useState } from "react";
 import { FaUser } from "react-icons/fa";
 import { IoMdMail } from "react-icons/io";
@@ -475,7 +468,10 @@ const CollegeOverview = ({ college }) => {
               />
               <h2 className="text-2xl font-bold mt-2">Contact Info</h2>
               {college.collegeContacts.map((contact, index) => (
-                <p key={index} className="flex flex-col items-center justify-center">
+                <p
+                  key={index}
+                  className="flex flex-col items-center justify-center"
+                >
                   {contact.contact_number}
                 </p>
               ))}
@@ -488,11 +484,13 @@ const CollegeOverview = ({ college }) => {
                 className="w-10 -translate-y-5"
               />
               <h2 className="text-2xl font-bold mt-6">Website</h2>
+              {/* console.log("Website url:") */}
               <a
-                href={college.website_url}
+                href="https://www.merouni.com"
                 className="underline text-blue-600"
+                target="_blank"
               >
-                {college.website_url || "Not Available"}
+                {college.website_url || "N/A"}
               </a>
             </div>
           </div>
@@ -508,7 +506,9 @@ const CollegeOverview = ({ college }) => {
                 alt="level"
                 className="w-8"
               />
-              <p className="whitespace-nowrap">{college.collegeAddress.country}</p>
+              <p className="whitespace-nowrap">
+                {college.collegeAddress.country}
+              </p>
             </div>
             <div className="flex items-center">
               <PiLineVerticalThin size={60} />
@@ -527,11 +527,7 @@ const CollegeOverview = ({ college }) => {
               <PiLineVerticalThin size={60} />
             </div>
             <div className="flex flex-col items-center">
-              <img
-                src="/images/city_college.png"
-                alt="level"
-                className="w-8"
-              />
+              <img src="/images/city_college.png" alt="level" className="w-8" />
               <p className="whitespace-nowrap">{college.collegeAddress.city}</p>
             </div>
             <div className="flex items-center">
@@ -543,7 +539,9 @@ const CollegeOverview = ({ college }) => {
                 alt="level"
                 className="w-6"
               />
-              <p className="whitespace-nowrap">{college.collegeAddress.street}</p>
+              <p className="whitespace-nowrap">
+                {college.collegeAddress.street}
+              </p>
             </div>
             <div className="flex items-center">
               <PiLineVerticalThin size={60} />

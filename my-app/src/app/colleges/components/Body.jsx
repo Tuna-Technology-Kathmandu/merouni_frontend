@@ -227,7 +227,7 @@ const CollegeFinder = () => {
   );
   return (
     <div className="max-w-[1600px] mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 md:gap-0">
         <div className="flex items-center gap-4">
           <h2 className="text-xl font-semibold">Filters</h2>
           <div className="flex gap-3">
@@ -282,7 +282,7 @@ const CollegeFinder = () => {
           <CourseFeeSection />
         </div>
 
-        <div className="w-3/4">
+        <div className=" md:w-3/4">
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, index) => (
