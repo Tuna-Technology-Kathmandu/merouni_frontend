@@ -10,6 +10,7 @@ import { getColleges } from "@/app/action";
 import { Edit2, Trash2 } from "lucide-react";
 import { Globe, MapPin } from "lucide-react";
 import { authFetch } from "@/app/utils/authFetch";
+import { toast } from "react-toastify";
 
 export default function CollegeForm() {
   const [universities, setUniversities] = useState([]);
@@ -28,6 +29,7 @@ export default function CollegeForm() {
     totalPages: 1,
     total: 0,
   });
+
   const author_id = useSelector((state) => state.user.data.id);
   const {
     register,
@@ -112,7 +114,7 @@ export default function CollegeForm() {
 
       console.log("final data is", data);
       // await createCollege(data);
-      alert("College created successfully!");
+      toast.success("College created successfully!");
     } catch (error) {
       alert(error.message || "Failed to create college");
     }
@@ -306,6 +308,7 @@ export default function CollegeForm() {
   const handleEdit = async (slug) => {
     try {
       setLoading(true);
+      setIsOpen(true)
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/college/${slug}`,
         {
@@ -330,7 +333,7 @@ export default function CollegeForm() {
       setValue("website_url", collegeData.website_url);
       setValue("google_map_url", collegeData.google_map_url);
       setValue("is_featured", collegeData.isFeatured === 1);
-setValue("pinned", collegeData.pinned === 1);
+      setValue("pinned", collegeData.pinned === 1);
       // Set university_id from university data
       if (collegeData.university) {
         const universityId = universities.find(
@@ -355,10 +358,11 @@ setValue("pinned", collegeData.pinned === 1);
         const checkbox = document.querySelector(
           `input[type="checkbox"][value="${id}"]`
         );
-        if (checkbox) {
-          checkbox.checked = true; // Set checkbox as checked
+        if (checkbox && !checkbox.checked) {
+          checkbox.click(); // Trigger click event on the checkbox
         }
       });
+
       // Address
       console.log("address");
       if (collegeData.collegeAddress) {
@@ -443,6 +447,7 @@ setValue("pinned", collegeData.pinned === 1);
 
       // Open the form
       setIsOpen(true);
+    
     } catch (error) {
       console.error("Error fetching college data:", error);
       alert("Failed to fetch college data");
@@ -465,7 +470,7 @@ setValue("pinned", collegeData.pinned === 1);
           </button>
         </div>
       </div>
-      -
+
       {isOpen && (
         <div className="container mx-auto p-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -498,7 +503,7 @@ setValue("pinned", collegeData.pinned === 1);
                 <div>
                   <label className="block mb-2">Institute Level</label>
                   <div className="space-y-2">
-                    {["School", "College", "Masters"].map((level) => (
+                    {["School", "College"].map((level) => (
                       <label key={level} className="flex items-center">
                         <input
                           type="checkbox"

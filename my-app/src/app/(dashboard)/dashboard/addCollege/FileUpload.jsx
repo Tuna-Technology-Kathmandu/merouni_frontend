@@ -1,8 +1,14 @@
 import { Upload } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
 const FileUpload = ({ onUploadComplete, label, defaultPreview = null }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState(defaultPreview);
+
+  // Add useEffect to update preview when defaultPreview changes
+  useEffect(() => {
+    setPreview(defaultPreview);
+  }, [defaultPreview]);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
