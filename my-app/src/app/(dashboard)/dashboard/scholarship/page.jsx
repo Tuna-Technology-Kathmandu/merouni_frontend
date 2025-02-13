@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
+import { useSelector } from "react-redux";
 import {
   getAllScholarships,
   createScholarship,
@@ -11,6 +12,7 @@ import Table from "../../../components/Table";
 import { Edit2, Trash2 } from "lucide-react";
 
 export default function ScholarshipManager() {
+  const author_id = useSelector((state) => state.user.data.id);
   const [scholarships, setScholarships] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -69,7 +71,7 @@ export default function ScholarshipManager() {
               <Edit2 className="w-4 h-4" />
             </button>
             <button
-              onClick={() => handleDelete(row.original._id)}
+              onClick={() => handleDelete(row.original.id)}
               className="p-1 text-red-600 hover:text-red-800"
             >
               <Trash2 className="w-4 h-4" />
@@ -88,8 +90,23 @@ export default function ScholarshipManager() {
   const loadScholarships = async () => {
     try {
       const response = await getAllScholarships();
-      setScholarships(response);
-      console.log(" rest", response);
+
+      const updatedScholarships = response.map((scholarship) => ({
+        ...scholarship,
+        eligibilityCriteria: JSON.parse(
+          scholarship.eligibilityCriteria || '""'
+        ),
+        renewalCriteria: JSON.parse(scholarship.renewalCriteria || '""'),
+
+        applicationDeadline: new Date(scholarship.applicationDeadline),
+
+        formattedDeadline: new Date(
+          scholarship.applicationDeadline
+        ).toLocaleDateString(),
+      }));
+
+      setScholarships(updatedScholarships);
+      console.log("Updated scholarships:", updatedScholarships);
     } catch (error) {
       setError("Failed to load scholarships");
       console.error("Error loading scholarships:", error);
@@ -105,7 +122,9 @@ export default function ScholarshipManager() {
         ...formData,
         amount: Number(formData.amount),
         applicationDeadline: formatDate(formData.applicationDeadline),
+        author: author_id,
       };
+      console.log("formatted data", formattedData);
       if (editingId) {
         await updateScholarship(editingId, formattedData);
       } else {
@@ -131,20 +150,22 @@ export default function ScholarshipManager() {
   };
 
   const handleEdit = (scholarship) => {
+    console.log(scholarship);
     setFormData({
       name: scholarship.name,
       description: scholarship.description,
       eligibilityCriteria: scholarship.eligibilityCriteria,
-      amount: scholarship.amount.toString(),
+      amount: scholarship.amount,
       applicationDeadline: formatDateForInput(scholarship.applicationDeadline),
       renewalCriteria: scholarship.renewalCriteria,
       contactInfo: scholarship.contactInfo,
     });
-    setEditingId(scholarship._id);
+    setEditingId(scholarship.id);
     setError(null);
   };
 
   const handleDelete = async (id) => {
+    console.log("ids0", id);
     if (window.confirm("Are you sure you want to delete this scholarship?")) {
       try {
         await deleteScholarship(id);
