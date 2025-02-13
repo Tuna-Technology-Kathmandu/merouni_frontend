@@ -477,23 +477,6 @@ export default function CollegeForm() {
 
       setValue("members", memberData);
 
-      // if (collegeData.collegeMembers && collegeData.collegeMembers.length > 0) {
-      //   // Remove default member field
-      //   // while (memberFields.length > 0) {
-      //   //   removeMember(0);
-      //   // }
-
-      //   // Add each member from the data
-      //   collegeData.collegeMembers.forEach((member) => {
-      //     appendMember({
-      //       name: member.name,
-      //       contact_number: member.contact_number,
-      //       role: member.role,
-      //       description: member.description
-      //     });
-      //   });
-      // }
-
       const admissionData = collegeData.collegeAdmissions?.length
         ? collegeData.collegeAdmissions.map((admission) => {
             const courseId = courses.find(
@@ -997,7 +980,7 @@ export default function CollegeForm() {
         onClose={handleDialogClose}
         onConfirm={handleDeleteConfirm}
         title="Confirm Deletion"
-        message="Are you sure you want to delete this item? This action cannot be undone."
+        message="Are you sure you want to delete this College? This action cannot be undone."
       />
       {/*table*/}
       <Table
