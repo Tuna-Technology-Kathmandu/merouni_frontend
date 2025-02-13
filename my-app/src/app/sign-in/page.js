@@ -181,15 +181,13 @@ const SignInPage = () => {
 
       const response = await fetch(`${process.env.baseUrl}${endpoint}`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           // "device-id": deviceId,
         },
-        credentials: "include",
         body: JSON.stringify(filteredData),
       });
-
-      console.log(response);
 
       // Get all response headers
       const refreshToken = response.headers.get("x-refresh-token");
@@ -200,14 +198,19 @@ const SignInPage = () => {
         localStorage.setItem("refreshToken", refreshToken);
       }
 
-      const data = await response.json();
+      let tokenObj = await response.json();
+      console.log("token Response:", tokenObj.accessToken);
+
+      tokenObj = tokenObj.accessToken;
+      console.log("Obt:", tokenObj);
 
       if (response.ok) {
         console.log("am i here");
 
         if (isLogin) {
-          const tokenObj = await getToken();
-          const decodedToken = jwtDecode(tokenObj.value);
+          // const tokenObj = await getToken();
+          console.log("token obj isss", tokenObj);
+          const decodedToken = jwtDecode(tokenObj);
           dispatch(addUser({ ...decodedToken }));
           toast.success("Login successful!");
           router.push("/dashboard");

@@ -39,16 +39,17 @@ export async function getUsers(page = 1, token, role) {
 
 export async function createUser(formData) {
   try {
-    const userData = Object.fromEntries(formData);
+    // const userData = Object.fromEntries(formData);
+    console.log("FORM Data:", formData);
 
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/users`,
+      `${process.env.baseUrl}${process.env.version}/auth/register`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify(formData),
       }
     );
 

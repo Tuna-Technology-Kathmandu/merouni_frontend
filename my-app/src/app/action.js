@@ -110,7 +110,7 @@ export async function getBlogs(page) {
   const params = {
     page,
   };
-  return services.news.getAll(page);
+  return services.news.getAll(params);
 }
 
 // get ranking
@@ -126,6 +126,10 @@ export async function getRankings(limit, page, category_title) {
 export async function getToken() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
+  if (!token) {
+    console.log("No token found in cookies");
+    return null;
+  }
   return token;
 }
 
@@ -142,14 +146,14 @@ export async function getBannersById(id) {
   return services.banner.getById(params);
 }
 
-export async function getColleges(is_featured, pinned, limit, page) {
+export async function getColleges(isFeatured, pinned, limit, page) {
   const params = {
     limit,
     page,
-    is_featured,
+    isFeatured,
     pinned,
   };
-  console.log("Value of is_f and pine:", is_featured, pinned);
+  console.log("Value of is_f and pine:", isFeatured, pinned);
   return services.college.getAll(params);
 }
 

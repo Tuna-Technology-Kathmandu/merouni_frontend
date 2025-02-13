@@ -113,6 +113,7 @@
 // export default page;
 
 "use client";
+import { authFetch } from "@/app/utils/authFetch";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
@@ -150,7 +151,7 @@ const Page = () => {
     try {
       console.log("Sending request with:", { user_id, action }); // Debug log
 
-      const response = await fetch(
+      const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/users/review-agent`,
         {
           method: "PUT",

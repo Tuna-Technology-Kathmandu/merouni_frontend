@@ -11,6 +11,7 @@ import Table from "../../../components/Table";
 import { Edit2, Trash2 } from "lucide-react";
 import { getToken } from "@/app/action";
 import { jwtDecode } from "jwt-decode";
+import { authFetch } from "@/app/utils/authFetch";
 
 export default function UsersManager() {
   const [users, setUsers] = useState([]);
@@ -20,11 +21,12 @@ export default function UsersManager() {
     lastName: "",
     email: "",
     password: "",
-    roles: {
-      student: false,
-      teacher: false,
-      admin: false,
-    },
+    phoneNo: "",
+    // roles: {
+    //   student: false,
+    //   teacher: false,
+    //   admin: false,
+    // },
   });
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -114,7 +116,8 @@ export default function UsersManager() {
       console.log("DECODED TOKEN:", decodedToken);
       const roleObject = JSON.parse(decodedToken.data.role);
       console.log("ROLE OBJECT:", roleObject);
-
+      const refreshToken = localStorage.getItem("refreshToken");
+      console.log("refresh TOKEN:", refreshToken);
       // Extract the role name based on the condition
       const roleName = Object.keys(roleObject).filter(
         (key) => roleObject[key] === true
@@ -125,12 +128,12 @@ export default function UsersManager() {
       }
       setLoading(true);
       const response = await getUsers(page, token, roleName);
-      console.log("Response:", response);
+      console.log("Response of users:", response);
       setUsers(response.items);
       setPagination({
         currentPage: response.pagination.currentPage,
         totalPages: response.pagination.totalPages,
-        total: response.pagination.totalRecords,
+        total: response.pagination.totalCount,
       });
       setError(null);
     } catch (err) {
@@ -152,6 +155,7 @@ export default function UsersManager() {
       return;
     }
     try {
+      console.log("Query:", query);
       const tokenObj = await getToken();
       const token = tokenObj.value;
       const decodedToken = jwtDecode(tokenObj.value);
@@ -159,12 +163,11 @@ export default function UsersManager() {
       const roleName = Object.keys(roleObject).filter(
         (key) => roleObject[key] === "true"
       );
-      const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/users/search?q=${query}`,
+
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/users?q=${query}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
-
             Role: roleName.join(","),
           },
         }
@@ -172,23 +175,15 @@ export default function UsersManager() {
 
       if (response.ok) {
         const data = await response.json();
+        console.log("REsponse of serach:", data);
 
-        const userArray = Object.keys(data)
-          .filter((key) => !isNaN(key))
-          .map((key) => data[key]);
-        // setUsers(data.items || data);
-        console.log("User Array:", userArray);
-
-        if (userArray.length === 0) {
-          console.log("NO users found in search results");
-        }
-        setUsers(userArray);
+        setUsers(data.items);
 
         if (data.pagination) {
           setPagination({
             currentPage: data.pagination.currentPage,
             totalPages: data.pagination.totalPages,
-            total: data.pagination.totalRecords,
+            total: data.pagination.totalCount,
           });
         }
       } else {
@@ -211,6 +206,7 @@ export default function UsersManager() {
       if (editingId) {
         await updateUser(editingId, formData);
       } else {
+        console.log("Form Data:", formData);
         await createUser(formData);
       }
       setFormData({
@@ -218,11 +214,12 @@ export default function UsersManager() {
         lastName: "",
         email: "",
         password: "",
-        roles: {
-          student: false,
-          teacher: false,
-          admin: false,
-        },
+        phoneNo: "",
+        // roles: {
+        //   student: false,
+        //   teacher: false,
+        //   admin: false,
+        // },
       });
       setEditingId(null);
       setError(null);
@@ -238,7 +235,8 @@ export default function UsersManager() {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      roles: { ...user.roles },
+      phoneNo: user.phoneNo,
+      // roles: { ...user.roles },
     });
     setEditingId(user._id);
     setError(null);
@@ -257,15 +255,15 @@ export default function UsersManager() {
     }
   };
 
-  const handleRoleToggle = (role) => {
-    setFormData({
-      ...formData,
-      roles: {
-        ...formData.roles,
-        [role]: !formData.roles[role],
-      },
-    });
-  };
+  // const handleRoleToggle = (role) => {
+  //   setFormData({
+  //     ...formData,
+  //     roles: {
+  //       ...formData.roles,
+  //       [role]: !formData.roles[role],
+  //     },
+  //   });
+  // };
 
   if (loading)
     return (
@@ -319,6 +317,21 @@ export default function UsersManager() {
           />
         </div>
 
+        <div>
+          <input
+            type="tel"
+            name="phoneNo"
+            placeholder="Phone Number"
+            value={formData.phoneNo}
+            onChange={(e) =>
+              setFormData({ ...formData, phoneNo: e.target.value })
+            }
+            className="w-full p-2 border rounded"
+            required
+            maxLength={10}
+          />
+        </div>
+
         {!editingId && (
           <div>
             <input
@@ -334,7 +347,7 @@ export default function UsersManager() {
           </div>
         )}
 
-        <div className="flex gap-4">
+        {/* <div className="flex gap-4">
           {["student", "teacher", "admin"].map((role) => (
             <label key={role} className="flex items-center space-x-2">
               <input
@@ -346,7 +359,7 @@ export default function UsersManager() {
               <span className="capitalize">{role}</span>
             </label>
           ))}
-        </div>
+        </div> */}
 
         {error && <div className="text-red-500">{error}</div>}
 

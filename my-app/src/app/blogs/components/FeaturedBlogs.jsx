@@ -10,30 +10,36 @@ const FeaturedBlogs = () => {
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
-    hasNextPage: false,
-    hasPreviousPage: false,
+    totalCount: 1,
   });
+
   const [Blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    loadPageNumber(pagination.currentPage); 
+    loadPageNumber(pagination.currentPage);
   }, [pagination.currentPage]);
 
   const loadPageNumber = async (page) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getBlogs(page); 
+      const response = await getBlogs(page);
+      console.log("Response of blogs:", response);
 
       if (response && response.pagination) {
         setBlogs(response.items);
         console.log("look", response.pagination);
-        setPagination((prev) => ({
-          ...prev,
-          ...response.pagination,
-        }));
+        // setPagination((prev) => ({
+        //   ...prev,
+        //   ...response.pagination,
+        // }));
+        setPagination({
+          currentPage: response.pagination.currentPage,
+          totalPages: response.pagination.totalPages,
+          totalCount: response.pagination.totalCount,
+        });
       } else {
         console.error("Pagination data not found in response:", response);
       }
@@ -45,13 +51,24 @@ const FeaturedBlogs = () => {
   };
 
   const handlePageChange = (page) => {
+    console.log("Pages response from pagination controle:", page);
     if (page > 0 && page <= pagination.totalPages) {
       setPagination((prev) => ({
         ...prev,
-        currentPage: page, 
+        currentPage: page,
       }));
     }
   };
+
+  useEffect(() => {
+    console.log("Updated Current Page:", pagination.currentPage);
+  }, [pagination.currentPage]);
+
+  // const handlePageChange = (newPage) => {
+  //   if (newPage >= 1 && newPage <= pagination.totalPages) {
+  //     setCurrentPage(newPage);
+  //   }
+  // };
 
   const truncateString = (str, maxLength) => {
     if (str.length > maxLength) {

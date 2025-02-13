@@ -68,7 +68,7 @@ const Header = () => {
         </div> */}
 
         {/* Menu Items */}
-        <nav className="px-4 h-[80%] overflow-auto">
+        <nav className="px-4 h-[70%] overflow-auto">
           {menuItems.map((item, index) => (
             <Link
               key={index}
@@ -82,9 +82,12 @@ const Header = () => {
           ))}
         </nav>
 
-        <div className="flex flex-row justify-between m-4">
+        <div className="flex flex-row justify-between mt-12 ml-4 mr-4">
           <Link href="/sign-in">
-            <button type="button" className=" bg-[#0A6FA7] w-[150px] p-2 rounded-lg">
+            <button
+              type="button"
+              className=" bg-[#0A6FA7] w-[150px] p-2 rounded-lg"
+            >
               <span className="text-white font-bold text-lg">Login</span>
             </button>
           </Link>

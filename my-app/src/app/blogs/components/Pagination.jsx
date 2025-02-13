@@ -3,7 +3,7 @@
 
 // const Pagination = ({ pagination,onPageChange }) => {
 //   const {currentPage,totalPages,hasNextPage,hasPreviousPage} = pagination;
-  
+
 //   // const [currentPage, setCurrentPage] = useState(1);
 //   // const [pagination, setPagination] = useState({
 //   //   currentPage: 1,
@@ -23,7 +23,7 @@
 //       onPageChange(currentPage -1)
 //     }
 //   }
-  
+
 //   // const [loading, setLoading] = useState(false);
 //   // const [error, setError] = useState(null);
 
@@ -40,8 +40,6 @@
 //   //     setLoading(false);
 //   //   }
 //   // };
-
-   
 
 //   // const handlePageChange = (page) => {
 //   //   if (page > 0 && page <= totalPages) {
@@ -114,26 +112,49 @@
 
 // export default Pagination;
 
-
-
 "use client";
 import React from "react";
 
-const Pagination = ({ pagination, onPageChange }) => {
-  const { currentPage, totalPages, hasNextPage, hasPreviousPage } = pagination;
-// console.log(onPageChange)
+// const PaginationControls = () => (
+//   <div className="flex justify-center items-center gap-4 mt-8">
+//     <button
+//       onClick={() => handlePageChange(currentPage - 1)}
+//       disabled={currentPage === 1}
+//       className="px-4 py-2 bg-gray-300 rounded-md mx-2 disabled:opacity-50"
+//     >
+//       Previous
+//     </button>
+//     <span className="text-gray-600">
+//       Page {currentPage} of {pagination.totalPages}
+//     </span>
+//     <button
+//       onClick={() => handlePageChange(currentPage + 1)}
+//       disabled={currentPage === pagination.totalPages}
+//       className="px-4 py-2 bg-gray-300 rounded-md mx-2 disabled:opacity-50"
+//     >
+//       Next
+//     </button>
+//   </div>
+// );
 
+const Pagination = ({ pagination, onPageChange }) => {
+  const { currentPage, totalPages, totalCount } = pagination;
+  // console.log(onPageChange)
+  // const [pagination, setPagination] = useState({
+  //     currentPage: 1,
+  //     totalPages: 1,
+  //     totalCount: 1,
+  //   });
   const handleNext = () => {
     // console.log("inside handlenext")
-    if (hasNextPage) {
+    if (currentPage < totalPages) {
       // console.log("inside handle next currentpage", currentPage)
       onPageChange(currentPage + 1);
-      console.log("page:",currentPage)
     }
   };
 
   const handlePrevious = () => {
-    if (hasPreviousPage) {
+    if (currentPage > 1) {
       onPageChange(currentPage - 1);
     }
   };
@@ -141,28 +162,24 @@ const Pagination = ({ pagination, onPageChange }) => {
   return (
     <div className="flex items-center justify-center mt-5 mb-10">
       <button
-        className={`px-3 py-1 mx-1 rounded-full border ${
-          !hasPreviousPage
-            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-            : "hover:bg-gray-200 text-gray-600"
-        }`}
+        // className={`px-3 py-1 mx-1 rounded-full border ${
+        //   !hasPreviousPage
+        //     ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+        //     : "hover:bg-gray-200 text-gray-600"
+        // }`}
+        className="px-4 py-2 bg-gray-300 rounded-full mx-2 disabled:opacity-50"
         onClick={handlePrevious}
-        disabled={!hasPreviousPage}
+        disabled={currentPage === 1}
       >
         &lt;
       </button>
       <span>
         Page {currentPage} of {totalPages}
       </span>
-      {console.log("hasnextpage", hasNextPage)}
       <button
-        className={`px-3 py-1 mx-1 rounded-full border ${
-          !hasNextPage
-            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-            : "hover:bg-gray-200 text-gray-600"
-        }`}
+        className="px-4 py-2 bg-gray-300 rounded-full mx-2 disabled:opacity-50"
         onClick={handleNext}
-        disabled={!hasNextPage}
+        disabled={currentPage === totalPages}
       >
         &gt;
       </button>
@@ -171,3 +188,4 @@ const Pagination = ({ pagination, onPageChange }) => {
 };
 
 export default Pagination;
+

@@ -1,12 +1,27 @@
 import { Search } from "lucide-react";
+import { useState } from "react";
 
 const FilterSection = ({
   title,
   options,
   placeholder,
-  selectedItems,
-  onSelectionChange,
+  selectedItems = [],
+  onSelectionChange = () => {},
 }) => {
+  const [searchText, setSearchText] = useState("");
+
+  const filteredOptions = options.filter((option) =>
+    option.name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  const handleCheckBoxChange = (option) => {
+    if (selectedItems.includes(option.name)) {
+      onSelectionChange(selectedItems.filter((item) => item !== option.name));
+    } else {
+      onSelectionChange([...selectedItems, option.name]);
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-lg">
       <div className="flex justify-between items-center mb-3">
@@ -26,17 +41,23 @@ const FilterSection = ({
         <input
           type="text"
           placeholder={placeholder}
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
           className="w-full pl-9 pr-3 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none"
         />
       </div>
+     
+
       <div className="mt-3 space-y-2 overflow-y-auto h-24 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-100">
-        {options.map((option, index) => (
+        {filteredOptions.map((option, index) => (
           <label key={index} className="flex items-center gap-2">
-            <input type="checkbox" className="rounded-full border-gray-300" />
+            <input
+              type="checkbox"
+              className="rounded-full border-gray-300"
+              checked={selectedItems?.includes(option.name) }
+              onChange={() => handleCheckBoxChange(option)}
+            />
             <span className="text-gray-700 text-sm">{option.name}</span>
-            <span className="text-gray-500 text-sm ml-auto mr-2">
-              ({option.count})
-            </span>
           </label>
         ))}
       </div>

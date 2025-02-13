@@ -11,24 +11,35 @@ import { getColleges, searchColleges } from "../actions";
 import { debounce } from "lodash";
 import Link from "next/link";
 import UniversityCardShimmer from "./UniversityShimmerCard";
+import Pagination from "@/app/blogs/components/Pagination";
 
 const CollegeFinder = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [universities, setUniversities] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
     totalPages: 1,
-    hasNextPage: false,
-    hasPreviousPage: false,
+    currentPage: 1,
+    totalCount: 1,
+   
   });
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+
+  const [selectedFilters, setSelectedFilters] = useState({
+    disciplines: [],
+    state: [],
+    degrees: [],
+    affiliations: [],
+    courseFees: { min: 0, max: 1000000 },
+  });
+
   useEffect(() => {
     if (!searchQuery) {
-      fetchColleges(currentPage);
+      fetchColleges(pagination.currentPage,selectedFilters);
     }
-  }, [currentPage, searchQuery]);
+  }, [pagination.currentPage, searchQuery,selectedFilters]);
+
   const debouncedSearch = useCallback(
     debounce(async (query) => {
       if (query) {
@@ -45,6 +56,7 @@ const CollegeFinder = () => {
 
   const handleSearchChange = (e) => {
     const query = e.target.value;
+    console.log("querY:", query);
     setSearchQuery(query);
     debouncedSearch(query);
   };
@@ -53,7 +65,7 @@ const CollegeFinder = () => {
     setIsLoading(true);
     try {
       console.log("INside fetch college");
-      const data = await getColleges(page);
+      const data = await getColleges(page, selectedFilters);
       console.log("Getting data in college page:", data);
       setUniversities(data.colleges);
       setPagination(data.pagination);
@@ -67,78 +79,91 @@ const CollegeFinder = () => {
 
   const filters = [
     {
-      title: "Discipline (32)",
+      title: "Discipline ",
       placeholder: "Search by discipline",
       options: [
-        { name: "Agriculture", count: 12 },
-        { name: "Animal Sciences", count: 18 },
-        { name: "Architecture", count: 22 },
-        { name: "Pokhara", count: 18 },
-        { name: "Lalitpur", count: 22 },
-        { name: "Kaski", count: 8 },
-        { name: "Pokhara", count: 18 },
-        { name: "Lalitpur", count: 22 },
-        { name: "Kaski", count: 8 },
-        { name: "Pokhara", count: 18 },
-        { name: "Lalitpur", count: 22 },
-        { name: "Kaski", count: 8 },
+        { name: "Agriculture" },
+        { name: "Agriculture, Forestry, and Animal Sciences" },
+        { name: "Allied Health Sciences" },
+        { name: "Animal Sciences" },
+        { name: "Architecture" },
+        { name: "Ayurveda" },
+        { name: "Biotechnology" },
+        { name: "Chemical Engineering" },
+        { name: "Civil Engineering" },
+        { name: "Computer Engineering" },
+        { name: "Computer and Information Technology" },
+        { name: "Dentistry and Oral Health" },
+        { name: "Development Studies" },
+        { name: "Education" },
+        { name: "Electrical Engineering" },
+        { name: "Electronics Engineering" },
+        { name: "Energy and Power Engineering" },
+        { name: "Engineering" },
+        { name: "Environmental Sciences" },
+        { name: "Fashion Technology" },
+        { name: "Finance and Accounting" },
+        { name: "Fine Arts and Performing Arts" },
+        { name: "Fisheries" },
+        { name: "Forestry" },
+        { name: "Geology" },
+        { name: "Health Sciences" },
+        { name: "Hospitality and Tourism" },
+        { name: "Humanities" },
+        { name: "Journalism and Mass Communication" },
+        { name: "Law" },
+        { name: "Library and Information Sciences" },
+        { name: "Linguistics and Languages" },
+        { name: "Management" },
+        { name: "Mathematics and Statistics" },
+        { name: "Mechanical Engineering" },
+        { name: "Medical Sciences" },
+        { name: "Medicine" },
+        { name: "Microbiology" },
+        { name: "Military Sciences" },
+        { name: "Music" },
+        { name: "Nanotechnology" },
+        { name: "Nursing" },
+        { name: "Optometry" },
+        { name: "Paramedical Sciences" },
+        { name: "Pharmaceutical Sciences" },
+        { name: "Philosophy" },
+        { name: "Physical Education and Sports" },
+        { name: "Physics" },
+        { name: "Physiotherapy" },
+        { name: "Political Science and International Relations" },
+        { name: "Psychology" },
+        { name: "Public Administration" },
+        { name: "Public Health" },
+        { name: "Rural Development" },
+        { name: "Science and Technology" },
+        { name: "Social Sciences" },
+        { name: "Sociology" },
+        { name: "Space Science" },
+        { name: "Veterinary Sciences" },
+        { name: "Yoga" },
       ],
+      selectedItems: selectedFilters.disciplines,
+      onSelectionChange: (items) => {
+        setSelectedFilters((prev) => ({ ...prev, disciplines: items }));
+      },
     },
     {
-      title: "State (132)",
+      title: "State ",
       placeholder: "Search by state",
       options: [
-        { name: "Kathmandu", count: 12 },
-        { name: "Pokhara", count: 18 },
-        { name: "Lalitpur", count: 22 },
-        { name: "Kaski", count: 8 },
-        { name: "Pokhara", count: 18 },
-        { name: "Lalitpur", count: 22 },
-        { name: "Kaski", count: 8 },
-        { name: "Pokhara", count: 18 },
-        { name: "Lalitpur", count: 22 },
-        { name: "Kaski", count: 8 },
+        { name: "Bagmati" },
+        { name: "Gandaki" },
+        { name: "Karnali" },
+        { name: "Koshi" },
+        { name: "Lumbini" },
+        { name: "Madhesh" },
+        { name: "Sudurpashchim" },
       ],
-    },
-    {
-      title: "State (132)",
-      placeholder: "Search by state",
-      options: [
-        { name: "Kathmandu", count: 12 },
-        { name: "Pokhara", count: 18 },
-        { name: "Lalitpur", count: 22 },
-        { name: "Kaski", count: 8 },
-      ],
-    },
-    {
-      title: "State (132)",
-      placeholder: "Search by state",
-      options: [
-        { name: "Kathmandu", count: 12 },
-        { name: "Pokhara", count: 18 },
-        { name: "Lalitpur", count: 22 },
-        { name: "Kaski", count: 8 },
-      ],
-    },
-    {
-      title: "State (132)",
-      placeholder: "Search by state",
-      options: [
-        { name: "Kathmandu", count: 12 },
-        { name: "Pokhara", count: 18 },
-        { name: "Lalitpur", count: 22 },
-        { name: "Kaski", count: 8 },
-      ],
-    },
-    {
-      title: "State (132)",
-      placeholder: "Search by state",
-      options: [
-        { name: "Kathmandu", count: 12 },
-        { name: "Pokhara", count: 18 },
-        { name: "Lalitpur", count: 22 },
-        { name: "Kaski", count: 8 },
-      ],
+      selectedItems: selectedFilters.states,
+      onSelectionChange: (items) => {
+        setSelectedFilters((prev) => ({ ...prev, states: items }));
+      },
     },
   ];
 
@@ -188,35 +213,38 @@ const CollegeFinder = () => {
     </div>
   );
 
+  const handlePageChange = (page) => {
+    console.log("Pages response from pagination controle:", page);
+    if (page > 0 && page <= pagination.totalPages) {
+      setPagination((prev) => ({
+        ...prev,
+        currentPage: page,
+      }));
+    }
+  };
+
   const PaginationControls = () => (
     <div className="flex justify-center items-center gap-4 mt-8">
       <button
-        onClick={() => setCurrentPage((prev) => prev - 1)}
-        disabled={!pagination.hasPreviousPage}
-        className={`px-4 py-2 rounded-lg ${
-          pagination.hasPreviousPage
-            ? "bg-blue-500 text-white hover:bg-blue-600"
-            : "bg-gray-300 text-gray-500 cursor-not-allowed"
-        }`}
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="px-4 py-2 bg-gray-300 rounded-full mx-2 disabled:opacity-50"
       >
-        Previous
+        &lt;
       </button>
       <span className="text-gray-600">
         Page {currentPage} of {pagination.totalPages}
       </span>
       <button
-        onClick={() => setCurrentPage((prev) => prev + 1)}
-        disabled={!pagination.hasNextPage}
-        className={`px-4 py-2 rounded-lg ${
-          pagination.hasNextPage
-            ? "bg-blue-500 text-white hover:bg-blue-600"
-            : "bg-gray-300 text-gray-500 cursor-not-allowed"
-        }`}
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === pagination.totalPages}
+        className="px-4 py-2 bg-gray-300 rounded-full mx-2 disabled:opacity-50"
       >
-        Next
+        &gt;
       </button>
     </div>
   );
+
   const NoResultsFound = () => (
     <div className="flex flex-col items-center justify-center h-64">
       <Search className="w-16 h-16 text-gray-300 mb-4" />
@@ -302,33 +330,38 @@ const CollegeFinder = () => {
                 <NoResultsFound />
               )}
               {!searchQuery && universities.length > 0 && (
-                <div className="flex justify-center items-center gap-4 mt-8">
-                  <button
-                    onClick={() => setCurrentPage((prev) => prev - 1)}
-                    disabled={!pagination.hasPreviousPage}
-                    className={`px-4 py-2 rounded-lg ${
-                      pagination.hasPreviousPage
-                        ? "bg-blue-500 text-white hover:bg-blue-600"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                  >
-                    Previous
-                  </button>
-                  <span className="text-gray-600">
-                    Page {currentPage} of {pagination.totalPages}
-                  </span>
-                  <button
-                    onClick={() => setCurrentPage((prev) => prev + 1)}
-                    disabled={!pagination.hasNextPage}
-                    className={`px-4 py-2 rounded-lg ${
-                      pagination.hasNextPage
-                        ? "bg-blue-500 text-white hover:bg-blue-600"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                  >
-                    Next
-                  </button>
-                </div>
+                // <div className="flex justify-center items-center gap-4 mt-8">
+                //   <button
+                //     onClick={() => setCurrentPage((prev) => prev - 1)}
+                //     disabled={!pagination.hasPreviousPage}
+                //     className={`px-4 py-2 rounded-lg ${
+                //       pagination.hasPreviousPage
+                //         ? "bg-blue-500 text-white hover:bg-blue-600"
+                //         : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                //     }`}
+                //   >
+                //     Previous
+                //   </button>
+                //   <span className="text-gray-600">
+                //     Page {currentPage} of {pagination.totalPages}
+                //   </span>
+                //   <button
+                //     onClick={() => setCurrentPage((prev) => prev + 1)}
+                //     disabled={!pagination.hasNextPage}
+                //     className={`px-4 py-2 rounded-lg ${
+                //       pagination.hasNextPage
+                //         ? "bg-blue-500 text-white hover:bg-blue-600"
+                //         : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                //     }`}
+                //   >
+                //     Next
+                //   </button>
+                // </div>
+                // <PaginationControls />
+                <Pagination
+                  onPageChange={handlePageChange}
+                  pagination={pagination}
+                />
               )}
             </>
           )}
