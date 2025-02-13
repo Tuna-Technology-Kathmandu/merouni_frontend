@@ -6,6 +6,7 @@ import {
   updateFaculty,
   deleteFaculty,
 } from "./action";
+import { useSelector } from "react-redux";
 import Loader from "@/app/components/Loading";
 import Table from "../../../components/Table"; // Adjust the import path as needed
 import { Edit2, Trash2 } from "lucide-react"; // For action icons
@@ -18,6 +19,7 @@ export default function FacultyManager() {
     description: "",
   });
   const [editingId, setEditingId] = useState(null);
+  const author_id = useSelector((state) => state.user.data.id);
 
   // Define columns with actionsSchool",
   const columns = useMemo(
@@ -32,7 +34,8 @@ export default function FacultyManager() {
       },
       {
         header: "Author",
-        accessorFn: (row) => `${row.authorDetails.firstName} ${row.authorDetails.lastName}`,
+        accessorFn: (row) =>
+          `${row.authorDetails.firstName} ${row.authorDetails.lastName}`,
       },
       {
         header: "Created At",
@@ -53,7 +56,7 @@ export default function FacultyManager() {
               <Edit2 className="w-4 h-4" />
             </button>
             <button
-              onClick={() => handleDelete(row.original._id)}
+              onClick={() => handleDelete(row.original.id)}
               className="p-1 text-red-600 hover:text-red-800"
             >
               <Trash2 className="w-4 h-4" />
@@ -73,7 +76,7 @@ export default function FacultyManager() {
     try {
       const response = await getAllFaculty();
       setFaculties(response.items);
-      console.log(" resss",response.items);
+      console.log(" resss", response.items);
     } catch (error) {
       console.error("Error loading faculties:", error);
     } finally {
@@ -84,11 +87,14 @@ export default function FacultyManager() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const requestData = { ...formData, author:author_id };
+
       if (editingId) {
-        await updateFaculty(editingId, formData);
+        await updateFaculty(editingId, requestData);
       } else {
-        await createFaculty(formData);
+        await createFaculty(requestData);
       }
+
       setFormData({ title: "", description: "" });
       setEditingId(null);
       loadFaculties();
@@ -102,7 +108,7 @@ export default function FacultyManager() {
       title: faculty.title,
       description: faculty.description,
     });
-    setEditingId(faculty._id);
+    setEditingId(faculty.id);
   };
 
   const handleDelete = async (id) => {
@@ -116,7 +122,12 @@ export default function FacultyManager() {
     }
   };
 
-  if (loading) return <div className="mx-auto"><Loader /></div>;
+  if (loading)
+    return (
+      <div className="mx-auto">
+        <Loader />
+      </div>
+    );
 
   return (
     <div className="p-4 w-4/5 mx-auto">
