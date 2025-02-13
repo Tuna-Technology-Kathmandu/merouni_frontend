@@ -36,7 +36,7 @@ export async function createScholarship(data) {
 
 export async function updateScholarship(id, data) {
   try {
-    const response = await fetch(`${url}?scholarship_id=${id}`, {
+    const response = await authFetch(`${url}?scholarship_id=${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -51,11 +51,12 @@ export async function updateScholarship(id, data) {
 
 export async function deleteScholarship(id) {
   try {
-    const response = await fetch(`${url}?scholarship_id=${id}`, {
+    const response = await authFetch(`${url}?scholarship_id=${id}`, {
       method: "DELETE",
     });
-    return await response.json();
+    const res = await response.json();
+    return res;
   } catch (error) {
-    throw new Error("Failed to delete scholarship");
+    throw new Error(error);
   }
 }
