@@ -164,7 +164,7 @@ const ProgramManager = () => {
     try {
       const response = await getAllScholarships();
       console.log(response);
-      setScholarships(response.items);
+      setScholarships(response);
       // console.log(scholarships);
     } catch (error) {
       setError("Failed to load scholarships");
