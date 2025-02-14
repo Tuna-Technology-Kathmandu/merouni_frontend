@@ -34,24 +34,9 @@ export async function createExam(data) {
   }
 }
 
-export async function updateExam(id, data) {
-  try {
-    const response = await authFetch(`${url}?scholarship_id=${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    return await response.json();
-  } catch (error) {
-    throw new Error("Failed to update scholarship");
-  }
-}
-
 export async function deleteExam(id) {
   try {
-    const response = await authFetch(`${url}?scholarship_id=${id}`, {
+    const response = await authFetch(`${url}/${id}`, {
       method: "DELETE",
     });
     const res = await response.json();

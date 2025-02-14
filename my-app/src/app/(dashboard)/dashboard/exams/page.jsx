@@ -175,14 +175,9 @@ export default function ExamManager() {
           normal_fee: Number(formData.applicationDetails.normal_fee),
           late_fee: Number(formData.applicationDetails.late_fee),
         },
+        id: editingId,
       };
-
-      if (editingId) {
-        await updateExam(editingId, formattedData);
-      } else {
-        await createExam(formattedData);
-      }
-
+      await createExam(formattedData);
       // Reset form...
       setFormData({
         title: "",
@@ -219,6 +214,7 @@ export default function ExamManager() {
   };
 
   const handleEdit = (exam) => {
+    console.log("while editing", exam)
     setFormData({
       title: exam.title,
       description: exam.description,
@@ -226,7 +222,7 @@ export default function ExamManager() {
       affiliation: exam.affiliation,
       syllabus: exam.syllabus,
       pastQuestion: exam.pastQuestion,
-      examDetails: exam.examDetails || [
+      examDetails: exam.exam_details || [
         {
           exam_type: "Written",
           full_marks: "",
@@ -236,7 +232,7 @@ export default function ExamManager() {
           duration: "",
         },
       ],
-      applicationDetails: exam.applicationDetails || {
+      applicationDetails: exam.application_details[0] || {
         normal_fee: "",
         late_fee: "",
         exam_date: "",
@@ -467,6 +463,40 @@ export default function ExamManager() {
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Application Details</h2>
           {/* Normal fee and Late fee inputs remain the same */}
+
+          <input
+            type="text"
+            placeholder="Normal fee (e.g., 2000)"
+            value={formData.applicationDetails.normal_fee}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                applicationDetails: {
+                  ...formData.applicationDetails,
+                  normal_fee: e.target.value,
+                },
+              })
+            }
+            className="w-full p-2 border rounded"
+            required
+          />
+
+          <input
+            type="text"
+            placeholder="Late fee (e.g., 2000)"
+            value={formData.applicationDetails.late_fee}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                applicationDetails: {
+                  ...formData.applicationDetails,
+                  late_fee: e.target.value,
+                },
+              })
+            }
+            className="w-full p-2 border rounded"
+            required
+          />
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Exam Date

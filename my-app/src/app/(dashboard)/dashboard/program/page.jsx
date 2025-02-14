@@ -1373,15 +1373,19 @@ export default function ProgramForm() {
     },
     {
       header: "Faculty",
-      accessorKey: "faculty_title",
+      accessorKey: "faculty_id",
     },
     {
       header: "Duration",
       accessorKey: "duration",
     },
     {
+      header: "Fee",
+      accessorKey: "fee",
+    },
+    {
       header: "Level",
-      accessorKey: "level_title",
+      accessorKey: "level_id",
     },
     {
       header: "Actions",
