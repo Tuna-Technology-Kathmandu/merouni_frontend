@@ -7,8 +7,10 @@ import { Edit2, Trash2 } from "lucide-react";
 import { authFetch } from "@/app/utils/authFetch";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../addCollege/ConfirmationDialog";
+import { X } from "lucide-react";
 
 export default function ProgramForm() {
+
   const author_id = useSelector((state) => state.user.data.id);
   const [isOpen, setIsOpen] = useState(false);
   const [programs, setPrograms] = useState([]);
@@ -25,6 +27,49 @@ export default function ProgramForm() {
   const [exams, setExams] = useState([]);
   const [courses, setCourses] = useState([]);
   const [colleges, setColleges] = useState([]);
+  const [collegeSearch, setCollegeSearch] = useState("");
+  const [selectedColleges, setSelectedColleges] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+
+  const searchCollege = async (e) => {
+    const query = e.target.value;
+    setCollegeSearch(query);
+    if (query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/college?q=${query}`
+      );
+      const data = await response.json();
+      setSearchResults(data.items || []);
+    } catch (error) {
+      console.error("College Search Error:", error);
+      toast.error("Failed to search colleges");
+    }
+  };
+  const addCollege = (college) => {
+    if (!selectedColleges.some((c) => c.id === college.id)) {
+      setSelectedColleges((prev) => [...prev, college]);
+      // Update form value
+      const collegeIds = [...selectedColleges, college].map((c) => c.id);
+      setValue("colleges", collegeIds);
+    }
+    setCollegeSearch("");
+    setSearchResults([]);
+  };
+
+  // Add function to remove college
+  const removeCollege = (collegeId) => {
+    setSelectedColleges((prev) => prev.filter((c) => c.id !== collegeId));
+    // Update form value
+    const updatedCollegeIds = selectedColleges
+      .filter((c) => c.id !== collegeId)
+      .map((c) => c.id);
+    setValue("colleges", updatedCollegeIds);
+  };
 
   const {
     register,
@@ -169,7 +214,7 @@ export default function ProgramForm() {
   const onSubmit = async (data) => {
     try {
       const url = `${process.env.baseUrl}${process.env.version}/program`;
-      const method = editing ? "PUT" : "POST";
+      const method =  "POST";
       console.log("while submiting data is", data);
 
       const response = await authFetch(url, {
@@ -266,6 +311,19 @@ export default function ProgramForm() {
           (college) => college.program_college.college_id
         );
         setValue("colleges", collegeIds);
+      }
+
+      if (program.colleges) {
+        const collegeData = program.colleges.map((college) => ({
+          id: college.program_college.college_id,
+          name: college.name,
+          slugs: college.slugs,
+        }));
+        setSelectedColleges(collegeData);
+        setValue(
+          "colleges",
+          collegeData.map((c) => c.id)
+        );
       }
 
       // Set syllabus
@@ -642,7 +700,7 @@ export default function ProgramForm() {
                   />
                 </div>
 
-                <div>
+                {/* <div>
                   <label className="block mb-2">Associated Colleges</label>
                   <select
                     multiple
@@ -659,6 +717,51 @@ export default function ProgramForm() {
                   <p className="text-sm text-gray-500 mt-1">
                     Hold Ctrl/Cmd to select multiple colleges
                   </p>
+                </div> */}
+
+                <div className="mb-4">
+                  <label className="block mb-2">Colleges</label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {selectedColleges.map((college) => (
+                      <div
+                        key={college.id}
+                        className="flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full"
+                      >
+                        <span>{college.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeCollege(college.id)}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={collegeSearch}
+                      onChange={searchCollege}
+                      className="w-full p-2 border rounded"
+                      placeholder="Search colleges..."
+                    />
+
+                    {searchResults.length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                        {searchResults.map((college) => (
+                          <div
+                            key={college.id}
+                            onClick={() => addCollege(college)}
+                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                          >
+                            {college.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
