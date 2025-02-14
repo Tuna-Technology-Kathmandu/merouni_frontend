@@ -14,7 +14,6 @@ const page = () => {
   const user = useSelector((state) => state.user.data);
 
   const teacherId = user.id;
-  // search college api call
   const searchCollege = async (e) => {
     const query = e.target.value;
     setCollegeSearch(query);

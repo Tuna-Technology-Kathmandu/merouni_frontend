@@ -127,7 +127,7 @@ const Page = () => {
 
   const fetchPendingRoles = async () => {
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/users/pending-role?role=agent`,
         {
           cache: "no-store",
