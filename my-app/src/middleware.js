@@ -81,7 +81,9 @@ export async function middleware(request) {
           "/dashboard/users",
           "/dashboard/agent",
           "/dashboard/agentApprove",
-          "/dashboard/exams"
+          "/dashboard/exams",
+          "/dashboard/courses"
+
         ],
         editor: [
           "/dashboard",
