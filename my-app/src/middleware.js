@@ -102,6 +102,8 @@ export async function middleware(request) {
           "/dashboard/users",
           "/dashboard/agent",
           "/dashboard/career",
+          "/dashboard/consultancy",
+
 
         ],
         agent: ["/dashboard/referStudent"],

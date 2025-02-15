@@ -30,6 +30,7 @@ export default function ProgramForm() {
   const [collegeSearch, setCollegeSearch] = useState("");
   const [selectedColleges, setSelectedColleges] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
+  
 
   const searchCollege = async (e) => {
     const query = e.target.value;
