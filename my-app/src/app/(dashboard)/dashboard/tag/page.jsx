@@ -139,7 +139,7 @@ export default function TagForm() {
       header: "Title",
       accessorKey: "title",
     },
-   
+
     {
       header: "Created At",
       accessorKey: "createdAt",
@@ -213,7 +213,11 @@ export default function TagForm() {
                 disabled={loading}
                 className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300"
               >
-                {loading ? "Processing..." : editing ? "Update Tag" : "Create Tag"}
+                {loading
+                  ? "Processing..."
+                  : editing
+                  ? "Update Tag"
+                  : "Create Tag"}
               </button>
             </div>
           </form>
