@@ -81,6 +81,9 @@ export async function middleware(request) {
           "/dashboard/users",
           "/dashboard/agent",
           "/dashboard/agentApprove",
+          "/dashboard/exams",
+          "/dashboard/courses"
+
         ],
         editor: [
           "/dashboard",
@@ -98,6 +101,13 @@ export async function middleware(request) {
           "/dashboard/university",
           "/dashboard/users",
           "/dashboard/agent",
+          "/dashboard/career",
+          "/dashboard/consultancy",
+          "/dashboard/level",
+          "/dashboard/tag",
+          "/dashboard/material"
+
+
         ],
         agent: ["/dashboard/referStudent"],
         teacher: ["/dashboard", "/dashboard/material", "/dashboard/profile"],
