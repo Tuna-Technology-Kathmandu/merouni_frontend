@@ -66,6 +66,7 @@ class ApiService {
         },
         body: JSON.stringify(data),
       });
+      console.log("Response of create:", response.json());
       return await response.json();
     } catch (error) {
       throw new Error(`Failed to create item`);
@@ -111,6 +112,7 @@ const services = {
   banner: new ApiService("banner"),
   exam: new ApiService("exam"),
   college: new ApiService("college"),
+  category: new ApiService("category"),
 };
 
 export default services;

@@ -1,11 +1,13 @@
 "use server";
 
+import { authFetch } from "@/app/utils/authFetch";
+
 let url = `${process.env.baseUrl}${process.env.version}/category`;
 
-export async function fetchCategories(page = 1, limit = 10) {
+export async function fetchCategories(page = 1) {
   try {
     const response = await fetch(
-      `${url}?limit=${limit}&page=${page}&sort=desc`,
+      `${url}?page=${page}`,
       { cache: "no-store" }
     );
 
@@ -22,6 +24,7 @@ export async function fetchCategories(page = 1, limit = 10) {
 
 export async function createCategory(data) {
   try {
+    console.log("Data of category:", data);
     const response = await fetch(`${url}`, {
       method: "POST",
       headers: {
@@ -29,6 +32,7 @@ export async function createCategory(data) {
       },
       body: JSON.stringify(data),
     });
+    console.log("Response of create category:", response);
 
     if (!response.ok) {
       throw new Error("Failed to create category");

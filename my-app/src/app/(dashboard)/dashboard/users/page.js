@@ -15,7 +15,7 @@ import { authFetch } from "@/app/utils/authFetch";
 
 export default function UsersManager() {
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",

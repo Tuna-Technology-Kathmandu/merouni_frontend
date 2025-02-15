@@ -1,32 +1,351 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { fetchEvents, createEvent, updateEvent, deleteEvent } from "./action";
-import Loader from "@/app/components/Loading";
 import Table from "../../../components/Table";
 import { Edit2, Trash2 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { getEvents, getCategories } from "@/app/action";
+import { useForm } from "react-hook-form";
+import FileUpload from "../addCollege/FileUpload";
+import { MapPin } from "lucide-react";
+import { useSelector } from "react-redux";
+import { authFetch } from "@/app/utils/authFetch";
+import ConfirmationDialog from "../addCollege/ConfirmationDialog";
+import debounce from "lodash/debounce";
 
 export default function EventManager() {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({
-    title: "",
-    host: "",
-    description: "",
-    content: "",
-    status: "",
-    visibility: "",
-    eventMeta: {
-      startDate: "",
-      endDate: "",
-      time: "",
-      mapIframe: "",
+  const author_id = useSelector((state) => state.user.data.id);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      title: "",
+      category_id: "",
+      college_id: "",
+      author_id: author_id,
+      description: "",
+      content: "",
+      image: "",
+      event_host: {
+        start_date: "",
+        end_date: "",
+        time: "",
+        host: "",
+        map_url: "",
+      },
+      is_featured: false,
     },
   });
-  const [editingId, setEditingId] = useState(null);
+
+  const [events, setEvents] = useState([]);
+  const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState({
+    image: "",
+  });
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
+  const [categories, setCategories] = useState([]);
+  const [collegeSearch, setCollegeSearch] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedCollege, setSelectedCollege] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingEventId, setEditingEventId] = useState(null);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categoriesList = await getCategories();
+        setCategories(categoriesList.items);
+      } catch (error) {
+        console.error("Failed to fetch categories");
+      }
+    };
+    loadCategories();
+  }, []);
+
+  useEffect(() => {
+    loadEvents();
+  }, []);
+
+  // const searchCollege = async (e) => {
+  //   const query = e.target.value;
+  //   setCollegeSearch(query);
+  //   if (query.length < 2) return;
+
+  //   try {
+  //     const response = await fetch(
+  //       `${process.env.baseUrl}${process.env.version}/college?q=${query}`
+  //     );
+  //     const data = await response.json();
+  //     setSearchResults(data.items || []);
+  //   } catch (error) {
+  //     console.error("College Search Error:", error);
+  //   }
+  // };
+
+  // Create a debounced version of your API call
+  const debouncedSearch = useMemo(
+    () =>
+      debounce(async (query) => {
+        try {
+          const response = await fetch(
+            `${process.env.baseUrl}${process.env.version}/college?q=${query}`
+          );
+          const data = await response.json();
+          setSearchResults(data.items || []);
+        } catch (error) {
+          console.error("College Search Error:", error);
+        }
+      }, 300),
+    []
+  );
+
+  const searchCollege = (e) => {
+    const query = e.target.value;
+    setCollegeSearch(query);
+
+    if (selectedCollege && query === selectedCollege.name) {
+      setSearchResults([]);
+      return;
+    }
+    if (query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    debouncedSearch(query);
+  };
+
+  const handleCollegeSelect = (college) => {
+    setValue("college_id", college.id);
+    setSelectedCollege(college);
+    setCollegeSearch(college.name);
+    setSearchResults([]);
+  };
+
+  const handleCancel = () => {
+    reset();
+    setEditing(false);
+    setEditingEventId(null);
+    setUploadedFiles({ image: "" });
+    setCollegeSearch("");
+    setSelectedCollege(null);
+  };
+
+  const handleSearch = async (query) => {
+    if (!query) {
+      loadEvents();
+      return;
+    }
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/event?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setEvents(data.items);
+
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount,
+          });
+        }
+      } else {
+        console.error("Error fetching results:", response.statusText);
+        setEvents([]);
+      }
+    } catch (error) {
+      console.error("Error fetching event search results:", error.message);
+      setEvents([]);
+    }
+  };
+
+  const loadEvents = async (page = 1) => {
+    try {
+      const response = await getEvents(page);
+      setEvents(response.items);
+      setPagination({
+        currentPage: response.pagination.currentPage,
+        totalPages: response.pagination.totalPages,
+        total: response.pagination.totalCount,
+      });
+    } catch (err) {
+      toast.error("Failed to load events");
+      console.error("Error loading events:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onSubmit = async (data) => {
+    try {
+      const formData = {
+        ...data,
+        image: uploadedFiles.image,
+      };
+
+      // Include event ID for update operation
+      if (editing) {
+        formData.id = editingEventId; // Add the event ID to the formData
+      }
+
+      console.log("Form Data:", formData);
+
+      // Use the same endpoint for both create and update
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/event`,
+        {
+          method: "POST", // Always use POST
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      const responseData = await response.json();
+      console.log("REsponse data:", responseData);
+
+      if (!response.ok) {
+        throw new Error(responseData.message || "Failed to process event");
+      }
+
+      toast.success(
+        editing ? "Event updated successfully" : "Event created successfully"
+      );
+
+      // Reset form and state
+      reset();
+      setEditing(false);
+      setUploadedFiles({ image: "" });
+      setCollegeSearch("");
+      setSelectedCollege(null);
+      loadEvents(); // Refresh the event list
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || "Network error occurred";
+      toast.error(
+        `Failed to ${editing ? "update" : "create"} event: ${errorMsg}`
+      );
+    }
+  };
+
+  const handleEdit = async (slug) => {
+    try {
+      setEditing(true);
+      setLoading(true);
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/event/${slug}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      let eventData = await response.json();
+      eventData = eventData.item; // Assuming the event data is nested under `item`
+      console.log("Event data:", eventData);
+      console.log("Cate:", categories);
+      setEditingEventId(eventData.id);
+
+      // Populate form fields with event data
+      setValue("title", eventData.title);
+
+      // if (eventData.category?.id) {
+      //   setValue("category_id", eventData.category.id);
+      // }
+      if (eventData.category) {
+        const categoryID = categories.find(
+          (c) => c.title === eventData.category.title
+        )?.id;
+        if (categoryID) {
+          console.log("Cat id:", categoryID);
+          setValue("category_id", categoryID);
+        }
+      }
+
+      setValue("college_id", eventData.college.id); // Assuming college has an `id`
+      setCollegeSearch(eventData.college.name);
+      setSelectedCollege(eventData.college);
+
+      setValue("author_id", eventData.author.id); // Assuming author has an `id`
+      setValue("description", eventData.description);
+      setValue("content", eventData.content);
+      setValue("image", eventData.image);
+      setUploadedFiles((prev) => ({ ...prev, image: eventData.image })); // Set uploaded image URL
+
+      const eventHost = eventData.event_host;
+
+      // Populate event_host fields
+      setValue("event_host.start_date", eventHost.start_date);
+      setValue("event_host.end_date", eventHost.end_date);
+      setValue("event_host.time", eventHost.time);
+      setValue("event_host.host", eventHost.host);
+      setValue("event_host.map_url", eventHost.map_url);
+
+      // Set is_featured checkbox
+      setValue("is_featured", eventData.is_featured === 1);
+
+      // Set college search input (if applicable)
+      // setCollegeSearch(eventData.college.name);
+      // setSelectedCollege(eventData.college);
+
+      console.log("Form populated with event data:", getValues());
+    } catch (error) {
+      console.error("Error fetching event data:", error);
+      toast.error("Failed to fetch event data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (id) => {
+    setDeleteId(id);
+    setIsDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteId) return;
+    try {
+      console.log("Deleting id is :", deleteId);
+
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/event?event_id=${deleteId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const res = await response.json();
+      toast.success(res.message);
+      loadEvents();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsDialogOpen(false);
+      setDeleteId(null);
+    }
+  };
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+    setDeleteId(null);
+  };
 
   const columns = useMemo(
     () => [
@@ -36,32 +355,108 @@ export default function EventManager() {
       },
       {
         header: "Host",
-        accessorKey: "host",
-      },
-      {
-        header: "Author",
-        accessorKey: "author.firstName",
-      },
-      {
-        header: "Created At",
-        accessorKey: "createdAt",
-        cell: ({ getValue }) => {
-          return new Date(getValue()).toLocaleDateString();
+        id: "host", // provide a unique id instead of a nested accessorKey
+        cell: ({ row }) => {
+          const rawValue = row.original.event_host;
+          if (!rawValue) return "";
+          try {
+            const eventHost = JSON.parse(rawValue);
+            return eventHost.host || "";
+          } catch (error) {
+            console.error("JSON parsing error for host:", error);
+            return "";
+          }
         },
+      },
+      {
+        header: "Start Date",
+        id: "start_date",
+        cell: ({ row }) => {
+          const rawValue = row.original.event_host;
+          if (!rawValue) return "";
+          try {
+            const eventHost = JSON.parse(rawValue);
+            return eventHost.start_date || "";
+          } catch (error) {
+            console.error("JSON parsing error for start_date:", error);
+            return "";
+          }
+        },
+      },
+      {
+        header: "End Date",
+        id: "end_date",
+        cell: ({ row }) => {
+          const rawValue = row.original.event_host;
+          if (!rawValue) return "";
+          try {
+            const eventHost = JSON.parse(rawValue);
+            return eventHost.end_date || "";
+          } catch (error) {
+            console.error("JSON parsing error for end_date:", error);
+            return "";
+          }
+        },
+      },
+      {
+        header: "Time",
+        id: "time",
+        cell: ({ row }) => {
+          const rawValue = row.original.event_host;
+          if (!rawValue) return "";
+          try {
+            const eventHost = JSON.parse(rawValue);
+            return eventHost.time || "";
+          } catch (error) {
+            console.error("JSON parsing error for time:", error);
+            return "";
+          }
+        },
+      },
+      {
+        header: "Location",
+        id: "location",
+        cell: ({ row }) => {
+          const rawValue = row.original.event_host;
+          if (!rawValue) return "N/A";
+          try {
+            const eventHost = JSON.parse(rawValue);
+            return eventHost.map_url ? (
+              <a
+                href={eventHost.map_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                <MapPin className="inline w-4 h-4" /> View Map
+              </a>
+            ) : (
+              "N/A"
+            );
+          } catch (error) {
+            console.error("JSON parsing error for map_url:", error);
+            return "N/A";
+          }
+        },
+      },
+      {
+        header: "Featured",
+        accessorKey: "is_featured",
+        cell: ({ getValue }) => (getValue() ? "Yes" : "No"),
       },
       {
         header: "Actions",
         id: "actions",
         cell: ({ row }) => (
-          <div className="flex gap-2">
+          <div className="flex gap-2" key={row.original.id}>
             <button
-              onClick={() => handleEdit(row.original)}
+              onClick={() => handleEdit(row.original.slugs)}
               className="p-1 text-blue-600 hover:text-blue-800"
             >
               <Edit2 className="w-4 h-4" />
             </button>
             <button
-              onClick={() => handleDelete(row.original._id)}
+              onClick={() => handleDeleteClick(row.original.id)}
               className="p-1 text-red-600 hover:text-red-800"
             >
               <Trash2 className="w-4 h-4" />
@@ -73,255 +468,222 @@ export default function EventManager() {
     []
   );
 
-  useEffect(() => {
-    loadEvents();
-  }, []);
-
-  const loadEvents = async () => {
-    try {
-      const response = await fetchEvents();
-      setCategories(response.items);
-    } catch (err) {
-      toast.error("Failed to load events");
-      console.error("Error loading events:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (editingId) {
-        await updateEvent(editingId, formData);
-        toast.success("Events updated successfully");
-      } else {
-        await createEvent(formData);
-        toast.success("Events created successfully");
-      }
-      setFormData({
-        title: "",
-        host: "",
-        description: "",
-        content: "",
-        status: "",
-        visibility: "",
-        eventMeta: {
-          startDate: "",
-          endDate: "",
-          time: "",
-          mapIframe: "",
-        },
-      });
-      setEditingId(null);
-      loadEvents();
-    } catch (err) {
-      const errorMsg = err.response?.data?.message || "Network error occurred";
-      toast.error(
-        `Failed to ${editingId ? "update" : "create"} category: ${errorMsg}`
-      );
-      console.error("Error saving category:", err);
-    }
-  };
-
-  const handleEdit = (event) => {
-    setFormData({
-      title: event.title,
-      host: event.host,
-      description: event.description || "",
-      content: event.content || "",
-      status: event.status || "draft",
-      visibility: event.visibility || "public",
-      eventMeta: {
-        startDate: event.eventMeta?.startDate || "2025",
-        endDate: event.eventMeta?.endDate || "",
-        time: event.eventMeta?.time || "",
-        mapIframe: event.eventMeta?.mapIframe || "",
-      },
-    });
-    setEditingId(event._id);
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this event?")) {
-      try {
-        await deleteEvent(id);
-        toast.success("Event deleted successfully");
-        loadEvents();
-      } catch (err) {
-        const errorMsg =
-          err.response?.data?.message || "Network error occurred";
-        toast.error(`Failed to delete event: ${errorMsg}`);
-        console.error("Error deleting event:", err);
-      }
-    }
-  };
-
-  if (loading)
-    return (
-      <div className="mx-auto">
-        <Loader />
-      </div>
-    );
-
   return (
     <div className="p-4 w-4/5 mx-auto">
       <ToastContainer />
       <h1 className="text-2xl font-bold mb-4">Event Management</h1>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="mb-8">
+      <form onSubmit={handleSubmit(onSubmit)} className="mb-8">
         <div className="mb-4">
+          <label htmlFor="title">Event Title </label>
+
           <input
-            type="text"
+            {...register("title", { required: "Title is required" })}
             placeholder="Event Title"
-            value={formData.title}
-            onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
-            }
             className="w-full p-2 border rounded"
-            required
           />
+          {errors.title && (
+            <span className="text-red-500">{errors.title.message}</span>
+          )}
         </div>
+
         <div className="mb-4">
+          <label htmlFor="category_id">Categories *</label>
+          <select
+            {...register("category_id", { required: true })}
+            className="w-full p-2 border rounded"
+            onChange={(e) => setValue("category_id", Number(e.target.value))}
+          >
+            <option value="">Select Category</option>
+            {categories.map((category) => (
+              <option value={category.id} key={category.id}>
+                {category.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="colleges">Colleges *</label>
+          <input
+            {...register("college_id", { required: true })}
+            type="hidden"
+          />
           <input
             type="text"
+            value={collegeSearch}
+            onChange={searchCollege}
+            className="border rounded w-full p-2"
+            placeholder="Type college name..."
+          />
+          {errors.college_id && (
+            <span className="text-red-500">College is required</span>
+          )}
+          {searchResults.length > 0 && (
+            <ul className="border rounded mt-2">
+              {searchResults.map((college) => (
+                <li
+                  key={college.id}
+                  className="cursor-pointer p-2 hover:bg-gray-200"
+                  onClick={() => handleCollegeSelect(college)}
+                >
+                  {college.name}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="host">Host</label>
+
+          <input
+            {...register("event_host.host", { required: "Host is required" })}
             placeholder="Event Host"
-            value={formData.host}
-            onChange={(e) => setFormData({ ...formData, host: e.target.value })}
             className="w-full p-2 border rounded"
-            required
           />
+          {errors.event_host?.host && (
+            <span className="text-red-500">
+              {errors.event_host.host.message}
+            </span>
+          )}
         </div>
+
         <div className="mb-4">
+          <label htmlFor="description">Description </label>
+
           <textarea
+            {...register("description")}
             placeholder="Description"
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
             className="w-full p-2 border rounded"
           />
         </div>
+
         <div className="mb-4">
+          <label htmlFor="content">Content </label>
+
           <textarea
+            {...register("content")}
             placeholder="Content"
-            value={formData.content}
-            onChange={(e) =>
-              setFormData({ ...formData, content: e.target.value })
-            }
             className="w-full p-2 border rounded"
           />
         </div>
+
         <div className="flex mb-4">
           <div className="w-1/2 mr-4">
-            <select
+            <label htmlFor="start_date">Start Date </label>
+
+            <input
+              type="date"
+              {...register("event_host.start_date", {
+                required: "Start date is required",
+              })}
               className="w-full p-2 border rounded"
-              value={formData.visibility}
-              onChange={(e) =>
-                setFormData({ ...formData, visibility: e.target.value })
-              }
-            >
-              <option value="private">Private</option>
-              <option value="public">Public</option>
-            </select>
+            />
+            {errors.event_host?.start_date && (
+              <span className="text-red-500">
+                {errors.event_host.start_date.message}
+              </span>
+            )}
           </div>
           <div className="w-1/2">
-            <select
-              value={formData.status}
+            <label htmlFor="end_date">End Date </label>
+
+            <input
+              type="date"
+              {...register("event_host.end_date", {
+                required: "End date is required",
+              })}
               className="w-full p-2 border rounded"
-              onChange={(e) =>
-                setFormData({ ...formData, status: e.target.value })
-              }
-            >
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-            </select>
+            />
+            {errors.event_host?.end_date && (
+              <span className="text-red-500">
+                {errors.event_host.end_date.message}
+              </span>
+            )}
           </div>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+          <FileUpload
+            label={"Event Image"}
+            onUploadComplete={(url) => {
+              setUploadedFiles((prev) => ({ ...prev, image: url }));
+            }}
+            defaultPreview={uploadedFiles.image}
+          />
         </div>
 
         <div className="flex mb-4">
           <div className="w-1/2 mr-4">
-            <input
-              type="date"
-              placeholder=""
-              value={formData.startDate}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  eventMeta: {
-                    ...formData.eventMeta,
-                    startDate: e.target.value,
-                  },
-                })
-              }
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-          <div className="w-1/2">
-            <input
-              type="date"
-              placeholder=""
-              value={formData.endDate}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  eventMeta: { ...formData.eventMeta, endDate: e.target.value },
-                })
-              }
-              className="w-full p-2 border rounded"
-              required
-            />
-          </div>
-        </div>
+            <label htmlFor="time">Time</label>
 
-        <div className="flex mb-4">
-          <div className="w-1/2 mr-4">
             <input
               type="time"
-              placeholder=""
-              value={formData.time}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  eventMeta: { ...formData.eventMeta, time: e.target.value },
-                })
-              }
+              {...register("event_host.time", { required: "Time is required" })}
               className="w-full p-2 border rounded"
-              required
+              placeholder="Time"
             />
+            {errors.event_host?.time && (
+              <span className="text-red-500">
+                {errors.event_host.time.message}
+              </span>
+            )}
           </div>
           <div className="w-1/2">
+            <label htmlFor="end_date">Map Location </label>
+
             <input
               type="text"
-              placeholder="iFrame URL"
-              value={formData.mapIframe}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  eventMeta: {
-                    ...formData.eventMeta,
-                    mapIframe: e.target.value,
-                  },
-                })
-              }
+              {...register("event_host.map_url")}
+              placeholder="Map URL"
               className="w-full p-2 border rounded"
-              required
             />
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          {editingId ? "Update Event" : "Add Event"}
-        </button>
+        <div className="flex mb-4">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              {...register("is_featured")}
+              className="mr-2"
+            />
+            Feature Event
+          </label>
+        </div>
+        <div className="flex gap-4">
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            {editing ? "Update Event" : "Add Event"}
+          </button>
+          {editing && (
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
 
-      {/* Table */}
-      <Table data={categories} columns={columns} />
+      <Table
+        data={events}
+        columns={columns}
+        pagination={pagination}
+        onPageChange={(newPage) => loadEvents(newPage)}
+        onSearch={handleSearch}
+      />
+      <ConfirmationDialog
+        open={isDialogOpen}
+        onClose={handleDialogClose}
+        onConfirm={handleDeleteConfirm}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this event? This action cannot be undone."
+      />
     </div>
   );
 }

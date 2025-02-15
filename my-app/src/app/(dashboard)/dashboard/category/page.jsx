@@ -1,184 +1,45 @@
-// 'use client'
-
-// import { useState, useEffect } from 'react';
-// import { fetchCategories, createCategory, updateCategory, deleteCategory } from './action';
-
-// const Page = () => {
-//   const [categories, setCategories] = useState([]);
-//   const [title, setTitle] = useState('');
-//   const [description, setDescription] = useState('');
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-//   const [editingCategory, setEditingCategory] = useState(null);
-
-//   useEffect(() => {
-//     loadCategories();
-//   }, []);
-
-//   const loadCategories = async () => {
-//     try {
-//       const response = await fetchCategories();
-//       setCategories(response.items);
-//     } catch (err) {
-//       setError('Failed to load categories');
-//     }
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setLoading(true);
-//     setError(null);
-
-//     try {
-//       if (editingCategory) {
-//         await updateCategory(editingCategory._id, { title, description });
-//       } else {
-//         await createCategory({ title, description });
-//       }
-//       setTitle('');
-//       setDescription('');
-//       setEditingCategory(null);
-//       await loadCategories();
-//     } catch (err) {
-//       setError(`Failed to ${editingCategory ? 'update' : 'create'} category`);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const handleEdit = (category) => {
-//     setEditingCategory(category);
-//     setTitle(category.title);
-//     setDescription(category.description || '');
-//   };
-
-//   const handleDelete = async (categoryId) => {
-//     if (!window.confirm('Are you sure you want to delete this category?')) {
-//       return;
-//     }
-
-//     setLoading(true);
-//     try {
-//       await deleteCategory(categoryId);
-//       await loadCategories();
-//     } catch (err) {
-//       setError('Failed to delete category');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const handleCancel = () => {
-//     setEditingCategory(null);
-//     setTitle('');
-//     setDescription('');
-//   };
-
-//   return (
-//     <div className="w-1/2 mx-auto p-4">
-//       <form onSubmit={handleSubmit} className="space-y-4 mb-8">
-//         <div>
-//           <label htmlFor="title" className="block mb-2">
-//             Category Title
-//           </label>
-//           <input
-//             type="text"
-//             id="title"
-//             value={title}
-//             onChange={(e) => setTitle(e.target.value)}
-//             className="w-full border p-2 rounded"
-//             required
-//           />
-//         </div>
-        
-//         <div>
-//           <label htmlFor="description" className="block mb-2">
-//             Description
-//           </label>
-//           <textarea
-//             id="description"
-//             value={description}
-//             onChange={(e) => setDescription(e.target.value)}
-//             className="w-full border p-2 rounded"
-//             rows={3}
-//           />
-//         </div>
-
-//         {error && (
-//           <div className="text-red-500">{error}</div>
-//         )}
-
-//         <div className="flex gap-2">
-//           <button
-//             type="submit"
-//             disabled={loading}
-//             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
-//           >
-//             {loading ? 'Saving...' : editingCategory ? 'Update Category' : 'Create Category'}
-//           </button>
-
-//           {editingCategory && (
-//             <button
-//               type="button"
-//               onClick={handleCancel}
-//               className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-//             >
-//               Cancel
-//             </button>
-//           )}
-//         </div>
-//       </form>
-
-//       <div className="space-y-4">
-//         <h2 className="text-xl font-bold">Categories</h2>
-//         {categories.map((category) => (
-//           <div key={category._id} className="border p-4 rounded flex justify-between items-start">
-//             <div>
-//               <h3 className="font-semibold">{category.title}</h3>
-//               <p className="text-gray-600">{category.description}</p>
-//               <p className="text-sm text-gray-500">
-//                 Created: {new Date(category.createdAt).toLocaleDateString()}
-//               </p>
-//             </div>
-//             <div className="flex gap-2">
-//               <button
-//                 onClick={() => handleEdit(category)}
-//                 className="text-blue-500 hover:text-blue-700"
-//               >
-//                 Edit
-//               </button>
-//               <button
-//                 onClick={() => handleDelete(category._id)}
-//                 className="text-red-500 hover:text-red-700"
-//               >
-//                 Delete
-//               </button>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Page;
 "use client";
+
 import { useState, useEffect, useMemo } from "react";
-import { fetchCategories, createCategory, updateCategory, deleteCategory } from "./action";
+import { useForm } from "react-hook-form";
+import { fetchCategories, deleteCategory } from "./action";
 import Loader from "@/app/components/Loading";
 import Table from "../../../components/Table";
 import { Edit2, Trash2 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from "react-redux";
+import { authFetch } from "@/app/utils/authFetch";
+import ConfirmationDialog from "../addCollege/ConfirmationDialog";
 
 export default function CategoryManager() {
+  const author_id = useSelector((state) => state.user.data.id);
+
+  // Initialize react-hook-form
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      title: "",
+      description: "",
+      author: author_id,
+    },
+  });
+
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-  });
   const [editingId, setEditingId] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
 
   const columns = useMemo(
     () => [
@@ -193,9 +54,7 @@ export default function CategoryManager() {
       {
         header: "Created At",
         accessorKey: "createdAt",
-        cell: ({ getValue }) => {
-          return new Date(getValue()).toLocaleDateString();
-        },
+        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
       },
       {
         header: "Actions",
@@ -209,7 +68,7 @@ export default function CategoryManager() {
               <Edit2 className="w-4 h-4" />
             </button>
             <button
-              onClick={() => handleDelete(row.original._id)}
+              onClick={() => handleDeleteClick(row.original.id)}
               className="p-1 text-red-600 hover:text-red-800"
             >
               <Trash2 className="w-4 h-4" />
@@ -223,12 +82,18 @@ export default function CategoryManager() {
 
   useEffect(() => {
     loadCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const loadCategories = async () => {
+  const loadCategories = async (page = 1) => {
     try {
-      const response = await fetchCategories();
+      const response = await fetchCategories(page);
       setCategories(response.items);
+      setPagination({
+        currentPage: response.pagination.currentPage,
+        totalPages: response.pagination.totalPages,
+        total: response.pagination.totalCount,
+      });
     } catch (err) {
       toast.error("Failed to load categories");
       console.error("Error loading categories:", err);
@@ -237,49 +102,158 @@ export default function CategoryManager() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const createCategory = async (data) => {
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/category`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to create category");
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error creating category:", error);
+      throw error;
+    }
+  };
+
+  const updateCategory = async (data, id) => {
+    try {
+      console.log("Updating category with data:", data, "and id:", id);
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/category?category_id=${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update category");
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error updating category:", error);
+      throw error;
+    }
+  };
+
+  // Use react-hook-form's handleSubmit to process the form data.
+  const onSubmit = async (data) => {
     try {
       if (editingId) {
-        await updateCategory(editingId, formData);
+        // Update category if in edit mode
+        await updateCategory(data, editingId);
         toast.success("Category updated successfully");
       } else {
-        await createCategory(formData);
+        // Otherwise, create a new category
+        await createCategory(data);
         toast.success("Category created successfully");
       }
-      setFormData({ title: "", description: "" });
+      reset(); // Clear form
       setEditingId(null);
-      loadCategories();
+      loadCategories(); 
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Network error occurred";
-      toast.error(`Failed to ${editingId ? "update" : "create"} category: ${errorMsg}`);
+      toast.error(
+        `Failed to ${editingId ? "update" : "create"} category: ${errorMsg}`
+      );
       console.error("Error saving category:", err);
     }
   };
 
   const handleEdit = (category) => {
-    setFormData({
-      title: category.title,
-      description: category.description || "",
-    });
-    setEditingId(category._id);
+    setEditingId(category.id);
+    setValue("title", category.title);
+    setValue("description", category.description || "");
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this category?")) {
-      try {
-        await deleteCategory(id);
-        toast.success("Category deleted successfully");
-        loadCategories();
-      } catch (err) {
-        const errorMsg = err.response?.data?.message || "Network error occurred";
-        toast.error(`Failed to delete category: ${errorMsg}`);
-        console.error("Error deleting category:", err);
-      }
+  const handleCancel = () => {
+    reset();
+    setEditingId(null);
+  };
+
+  const handleDeleteClick = (id) => {
+    setDeleteId(id);
+    setIsDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteId) return;
+    try {
+      console.log("Deleting id is :", deleteId);
+
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/category?category_id=${deleteId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const res = await response.json();
+      toast.success(res.message);
+      loadCategories();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsDialogOpen(false);
+      setDeleteId(null);
     }
   };
 
-  if (loading) return <div className="mx-auto"><Loader /></div>;
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+    setDeleteId(null);
+  };
+
+  const handleSearch = async (query) => {
+    if (!query) {
+      loadEvents();
+      return;
+    }
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/category?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setCategories(data.items);
+
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount,
+          });
+        }
+      } else {
+        console.error("Error fetching results:", response.statusText);
+        setCategories([]);
+      }
+    } catch (error) {
+      console.error("Error fetching category search results:", error.message);
+      setCategories([]);
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="mx-auto">
+        <Loader />
+      </div>
+    );
 
   return (
     <div className="p-4 w-4/5 mx-auto">
@@ -287,39 +261,59 @@ export default function CategoryManager() {
       <h1 className="text-2xl font-bold mb-4">Category Management</h1>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="mb-8">
+      <form onSubmit={handleSubmit(onSubmit)} className="mb-8">
         <div className="mb-4">
           <input
             type="text"
             placeholder="Category Title"
-            value={formData.title}
-            onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
-            }
+            {...register("title", { required: "Title is required" })}
             className="w-full p-2 border rounded"
-            required
           />
+          {errors.title && (
+            <span className="text-red-500">{errors.title.message}</span>
+          )}
         </div>
         <div className="mb-4">
           <textarea
             placeholder="Description"
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
+            {...register("description")}
             className="w-full p-2 border rounded"
           />
         </div>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          {editingId ? "Update Category" : "Add Category"}
-        </button>
+        <div className="flex gap-4">
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            {editingId ? "Update Category" : "Add Category"}
+          </button>
+          {editingId && (
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
 
       {/* Table */}
-      <Table data={categories} columns={columns} />
+      <Table
+        data={categories}
+        columns={columns}
+        pagination={pagination}
+        onPageChange={(newPage) => loadCategories(newPage)}
+        onSearch={handleSearch}
+      />
+      <ConfirmationDialog
+        open={isDialogOpen}
+        onClose={handleDialogClose}
+        onConfirm={handleDeleteConfirm}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this category? This action cannot be undone."
+      />
     </div>
   );
 }

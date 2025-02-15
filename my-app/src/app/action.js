@@ -222,3 +222,30 @@ export async function getBannerById(id) {
     throw error;
   }
 }
+
+
+
+// category section 
+
+export async function getCategories(queryParams) {
+  return services.category.getAll(queryParams);
+}
+
+export async function createCategory(data) {
+  return services.category.create(data);
+}
+
+export async function updateCategory(id, data) {
+  return services.category.update(id, data);
+}
+
+export async function deleteCategory(id) {
+  return services.category.delete(id);
+}
+
+
+
+// events create
+export async function createEvent(data) {
+  return services.event.create(data);
+}

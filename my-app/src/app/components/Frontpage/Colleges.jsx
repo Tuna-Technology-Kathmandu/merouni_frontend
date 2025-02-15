@@ -119,7 +119,6 @@ import Link from "next/link";
 
 // export default Colleges;
 
-
 const Colleges = () => {
   const [featuredColleges, setFeaturedColleges] = useState([]);
   const [error, setError] = useState(null);
@@ -138,8 +137,8 @@ const Colleges = () => {
     try {
       console.log("Hlo zero");
       // const response = await getFeaturedColleges();
-      const response = await getColleges(true, false);
-      console.log("RESOPHOSG:", response);
+      const response = await getColleges(true, undefined);
+      console.log("RESOPHOSG:", response.items);
       setFeaturedColleges(response.items);
     } catch (error) {
       console.error("Error fetching the colleges data:", error);

@@ -11,7 +11,14 @@ import {
 import { Search, ChevronUp, ChevronDown } from "lucide-react";
 import ShimmerEffect from "./ShimmerEffect";
 
-const Table = ({ data, columns, pagination, onPageChange, onSearch, loading=false }) => {
+const Table = ({
+  data,
+  columns,
+  pagination,
+  onPageChange,
+  onSearch,
+  loading = false,
+}) => {
   const [sorting, setSorting] = useState([]);
   const [filtering, setFiltering] = useState("");
   // const [isLoading, setIsLoading] = useState(false);
@@ -87,7 +94,6 @@ const Table = ({ data, columns, pagination, onPageChange, onSearch, loading=fals
   // };
 
   return (
-    
     <div className="w-full p-4 space-y-4">
       {/* Search Input */}
       <div className="relative w-full max-w-md">
@@ -105,54 +111,60 @@ const Table = ({ data, columns, pagination, onPageChange, onSearch, loading=fals
       </div>
 
       {/* Table Container */}
-      {loading? <ShimmerEffect/>:  <div className="overflow-x-auto rounded-lg border shadow">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    key={header.id}
-                    onClick={header.column.getToggleSortingHandler()}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span>
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                      </span>
-                      <span className="inline-block w-4">
-                        {header.column.getIsSorted() === "asc" ? (
-                          <ChevronUp className="w-4 h-4" />
-                        ) : header.column.getIsSorted() === "desc" ? (
-                          <ChevronDown className="w-4 h-4" />
-                        ) : null}
-                      </span>
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50">
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>}
-     
+      {loading ? (
+        <ShimmerEffect />
+      ) : (
+        <div className="overflow-x-auto rounded-lg border shadow">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th
+                      key={header.id}
+                      onClick={header.column.getToggleSortingHandler()}
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    >
+                      <div className="flex items-center space-x-1">
+                        <span>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                        </span>
+                        <span className="inline-block w-4">
+                          {header.column.getIsSorted() === "asc" ? (
+                            <ChevronUp className="w-4 h-4" />
+                          ) : header.column.getIsSorted() === "desc" ? (
+                            <ChevronDown className="w-4 h-4" />
+                          ) : null}
+                        </span>
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {table.getRowModel().rows.map((row) => (
+                <tr key={row.id} className="hover:bg-gray-50">
+                  {row.getVisibleCells().map((cell) => (
+                    <td
+                      key={cell.id}
+                      className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Pagination Controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -160,9 +172,10 @@ const Table = ({ data, columns, pagination, onPageChange, onSearch, loading=fals
           Page {pagination?.currentPage} of {pagination?.totalPages}
           (Showing{" "}
           {Math.min(
-            (pagination?.currentPage - 1) * 9 + 1,
+            (pagination?.currentPage - 1) * 10 + 1,
             pagination?.total
-          )} - {Math.min(pagination?.currentPage * 9, pagination?.total)} of{" "}
+          )}{" "}
+          - {Math.min(pagination?.currentPage * 10, pagination?.total)} of{" "}
           {pagination?.total} items)
         </div>
         <div className="flex gap-2">

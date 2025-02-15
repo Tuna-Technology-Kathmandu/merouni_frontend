@@ -145,6 +145,7 @@ export default function CollegeForm() {
     };
     getUniversities();
   }, []);
+  
 
   useEffect(() => {
     const getCourses = async () => {

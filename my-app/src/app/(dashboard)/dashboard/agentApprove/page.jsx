@@ -127,7 +127,7 @@ const Page = () => {
 
   const fetchPendingRoles = async () => {
     try {
-      const response = await fetch(
+      const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/users/pending-role?role=agent`,
         {
           cache: "no-store",
@@ -135,6 +135,7 @@ const Page = () => {
         }
       );
       const data = await response.json();
+      console.log("Pen:",data)
       setPendingUsers(data.items);
     } catch (error) {
       console.error("Error fetching the pending roles:", error);
@@ -214,7 +215,7 @@ const Page = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {pendingUsers.map((user) => (
+            {pendingUsers?.map((user) => (
               <tr key={user.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 text-sm">
                   {`${user.firstName} ${user.middleName || ""} ${
@@ -249,7 +250,7 @@ const Page = () => {
           </tbody>
         </table>
 
-        {pendingUsers.length === 0 && (
+        { pendingUsers && pendingUsers.length === 0 && (
           <div className="text-center py-4 text-gray-500">
             No pending requests found
           </div>
