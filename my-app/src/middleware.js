@@ -103,6 +103,7 @@ export async function middleware(request) {
           "/dashboard/agent",
           "/dashboard/career",
           "/dashboard/consultancy",
+          "/dashboard/level"
 
 
         ],
