@@ -13,9 +13,12 @@ import { useSelector } from "react-redux";
 import { authFetch } from "@/app/utils/authFetch";
 import ConfirmationDialog from "../addCollege/ConfirmationDialog";
 import debounce from "lodash/debounce";
+import { fetchCategories } from "../category/action";
+import { X } from "lucide-react";
 
 export default function EventManager() {
   const author_id = useSelector((state) => state.user.data.id);
+  console.log("author", author_id);
 
   const {
     register,
@@ -56,18 +59,24 @@ export default function EventManager() {
     total: 0,
   });
   const [categories, setCategories] = useState([]);
-  const [collegeSearch, setCollegeSearch] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [selectedCollege, setSelectedCollege] = useState(null);
+  // const [collegeSearch, setCollegeSearch] = useState("");
+  // const [searchResults, setSearchResults] = useState([]);
+  // const [selectedCollege, setSelectedCollege] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState(null);
+  const [selectedColleges, setSelectedColleges] = useState([]);
+  const [collegeSearch, setCollegeSearch] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     const loadCategories = async () => {
+      console.log("fetching category");
       try {
-        const categoriesList = await getCategories();
+        const categoriesList = await fetchCategories();
+        console.log("middle", categoriesList);
         setCategories(categoriesList.items);
+        console.log("cate1", categories);
       } catch (error) {
         console.error("Failed to fetch categories");
       }
@@ -96,42 +105,84 @@ export default function EventManager() {
   // };
 
   // Create a debounced version of your API call
-  const debouncedSearch = useMemo(
-    () =>
-      debounce(async (query) => {
-        try {
-          const response = await fetch(
-            `${process.env.baseUrl}${process.env.version}/college?q=${query}`
-          );
-          const data = await response.json();
-          setSearchResults(data.items || []);
-        } catch (error) {
-          console.error("College Search Error:", error);
-        }
-      }, 300),
-    []
-  );
+  // const debouncedSearch = useMemo(
+  //   () =>
+  //     debounce(async (query) => {
+  //       try {
+  //         const response = await fetch(
+  //           `${process.env.baseUrl}${process.env.version}/college?q=${query}`
+  //         );
+  //         const data = await response.json();
+  //         setSearchResults(data.items || []);
+  //       } catch (error) {
+  //         console.error("College Search Error:", error);
+  //       }
+  //     }, 300),
+  //   []
+  // );
 
-  const searchCollege = (e) => {
+  // const searchCollege = (e) => {
+  //   const query = e.target.value;
+  //   setCollegeSearch(query);
+
+  //   if (selectedCollege && query === selectedCollege.name) {
+  //     setSearchResults([]);
+  //     return;
+  //   }
+  //   if (query.length < 2) {
+  //     setSearchResults([]);
+  //     return;
+  //   }
+  //   debouncedSearch(query);
+  // };
+
+  // const handleCollegeSelect = (college) => {
+  //   setValue("college_id", college.id);
+  //   setSelectedCollege(college);
+  //   setCollegeSearch(college.name);
+  //   setSearchResults([]);
+  // };
+
+  const searchCollege = async (e) => {
     const query = e.target.value;
     setCollegeSearch(query);
-
-    if (selectedCollege && query === selectedCollege.name) {
-      setSearchResults([]);
-      return;
-    }
     if (query.length < 2) {
       setSearchResults([]);
       return;
     }
-    debouncedSearch(query);
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/college?q=${query}`
+      );
+      const data = await response.json();
+      setSearchResults(data.items || []);
+    } catch (error) {
+      console.error("College Search Error:", error);
+      toast.error("Failed to search colleges");
+    }
   };
 
-  const handleCollegeSelect = (college) => {
-    setValue("college_id", college.id);
-    setSelectedCollege(college);
-    setCollegeSearch(college.name);
+  // Add function to handle college selection
+  const addCollege = (college) => {
+    if (!selectedColleges.some((c) => c.id === college.id)) {
+      setSelectedColleges((prev) => [...prev, college]);
+      // Update form value
+      const collegeIds = [...selectedColleges, college].map((c) => c.id);
+      setValue("college_id", collegeIds[0]);
+    }
+    setCollegeSearch("");
     setSearchResults([]);
+  };
+
+  // Add function to remove college
+  const removeCollege = (collegeId) => {
+    setSelectedColleges((prev) => prev.filter((c) => c.id !== collegeId));
+    // Update form value
+    const updatedCollegeIds = selectedColleges
+      .filter((c) => c.id !== collegeId)
+      .map((c) => c.id);
+    setValue("college_id", updatedCollegeIds[0]);
   };
 
   const handleCancel = () => {
@@ -140,7 +191,8 @@ export default function EventManager() {
     setEditingEventId(null);
     setUploadedFiles({ image: "" });
     setCollegeSearch("");
-    setSelectedCollege(null);
+    // setSelectedCollege(null);
+    setSelectedColleges(null);
   };
 
   const handleSearch = async (query) => {
@@ -192,9 +244,12 @@ export default function EventManager() {
   };
 
   const onSubmit = async (data) => {
+    console.log("Cate2:", categories);
+
     try {
       const formData = {
         ...data,
+        is_featured: Number(data.is_featured),
         image: uploadedFiles.image,
       };
 
@@ -209,7 +264,7 @@ export default function EventManager() {
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/event`,
         {
-          method: "POST", // Always use POST
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
@@ -233,7 +288,7 @@ export default function EventManager() {
       setEditing(false);
       setUploadedFiles({ image: "" });
       setCollegeSearch("");
-      setSelectedCollege(null);
+      setSelectedColleges([]);
       loadEvents(); // Refresh the event list
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Network error occurred";
@@ -243,12 +298,16 @@ export default function EventManager() {
     }
   };
 
-  const handleEdit = async (slug) => {
+  const handleEdit = async (data) => {
+    console.log("Cate3:", categories);
+
     try {
       setEditing(true);
       setLoading(true);
+      console.log("Cate1:", categories);
+
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/event/${slug}`,
+        `${process.env.baseUrl}${process.env.version}/event/${data.slugs}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -257,6 +316,7 @@ export default function EventManager() {
       );
       let eventData = await response.json();
       eventData = eventData.item; // Assuming the event data is nested under `item`
+      // let eventData=slug
       console.log("Event data:", eventData);
       console.log("Cate:", categories);
       setEditingEventId(eventData.id);
@@ -277,11 +337,14 @@ export default function EventManager() {
         }
       }
 
-      setValue("college_id", eventData.college.id); // Assuming college has an `id`
-      setCollegeSearch(eventData.college.name);
-      setSelectedCollege(eventData.college);
-
-      setValue("author_id", eventData.author.id); // Assuming author has an `id`
+      setValue("college_id", data.id); // Assuming college has an `id`
+      const colgData = [
+        {
+          id: data.id,
+          name: eventData.college.name,
+        },
+      ];
+      setSelectedColleges(colgData);
       setValue("description", eventData.description);
       setValue("content", eventData.content);
       setValue("image", eventData.image);
@@ -450,7 +513,7 @@ export default function EventManager() {
         cell: ({ row }) => (
           <div className="flex gap-2" key={row.original.id}>
             <button
-              onClick={() => handleEdit(row.original.slugs)}
+              onClick={() => handleEdit(row.original)}
               className="p-1 text-blue-600 hover:text-blue-800"
             >
               <Edit2 className="w-4 h-4" />
@@ -465,13 +528,14 @@ export default function EventManager() {
         ),
       },
     ],
-    []
+    [categories]
   );
 
   return (
     <div className="p-4 w-4/5 mx-auto">
       <ToastContainer />
       <h1 className="text-2xl font-bold mb-4">Event Management</h1>
+      {console.log("Cate4:", categories)}
 
       <form onSubmit={handleSubmit(onSubmit)} className="mb-8">
         <div className="mb-4">
@@ -492,7 +556,6 @@ export default function EventManager() {
           <select
             {...register("category_id", { required: true })}
             className="w-full p-2 border rounded"
-            onChange={(e) => setValue("category_id", Number(e.target.value))}
           >
             <option value="">Select Category</option>
             {categories.map((category) => (
@@ -503,7 +566,7 @@ export default function EventManager() {
           </select>
         </div>
 
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label htmlFor="colleges">Colleges *</label>
           <input
             {...register("college_id", { required: true })}
@@ -532,6 +595,52 @@ export default function EventManager() {
               ))}
             </ul>
           )}
+        </div> */}
+
+        <div className="mb-4">
+          <label className="block mb-2">College</label>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {selectedColleges.map((college) => (
+              <div
+                key={college.id}
+                className="flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full"
+              >
+                <span>{college.name}</span>
+                <button
+                  type="button"
+                  onClick={() => removeCollege(college.id)}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="relative">
+            <input
+              type="text"
+              disabled={selectedColleges.length > 0}
+              value={collegeSearch}
+              onChange={searchCollege}
+              className="w-full p-2 border rounded"
+              placeholder="Search college..."
+            />
+
+            {searchResults.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                {searchResults.map((college) => (
+                  <div
+                    key={college.id}
+                    onClick={() => addCollege(college)}
+                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                  >
+                    {college.name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="mb-4">
@@ -551,7 +660,6 @@ export default function EventManager() {
 
         <div className="mb-4">
           <label htmlFor="description">Description </label>
-
           <textarea
             {...register("description")}
             placeholder="Description"
