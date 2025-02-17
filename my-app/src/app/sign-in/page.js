@@ -8,6 +8,8 @@ import { getToken } from "../action";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { jwtDecode } from "jwt-decode";
+import Link from "next/link";
+
 const SignInPage = () => {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -39,6 +41,7 @@ const SignInPage = () => {
   const [errors, setErrors] = useState({});
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const togglePassword = () => {
     setShowPassword((prev) => !prev);
@@ -347,6 +350,13 @@ const SignInPage = () => {
 
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+            )}
+            {isLogin && (
+              <Link href={`/forgot-password`} className="hover:cursor-pointer ">
+                <button className="text-blue-600 hover:underline">
+                  Forgot Password?
+                </button>
+              </Link>
             )}
           </div>
 
