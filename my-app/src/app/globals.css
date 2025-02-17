@@ -65,3 +65,23 @@ body {
   animation: shimmer 1.5s infinite linear;
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
 }
+
+
+/* Add this to your global CSS file or within a <style> tag */
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px; /* Adjust the width as needed */
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Track color */
+  border-radius: 3px; /* Rounded corners */
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: #888; /* Thumb color */
+  border-radius: 3px; /* Rounded corners */
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Thumb color on hover */
+}

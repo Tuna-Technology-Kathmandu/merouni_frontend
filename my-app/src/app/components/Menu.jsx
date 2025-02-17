@@ -1,101 +1,114 @@
 "use client";
 
+import React from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { FaHome } from "react-icons/fa";
-import { GrUserWorker } from "react-icons/gr";
-import { HiOutlineDocumentReport } from "react-icons/hi";
-import { MdEmojiEvents } from "react-icons/md";
-import { TfiAnnouncement } from "react-icons/tfi";
-import { FaRegUserCircle } from "react-icons/fa";
-import { MdOutlineSettings, MdOutlinePermMedia } from "react-icons/md";
-import { AiOutlineLogout } from "react-icons/ai";
-import { IoSchoolSharp } from "react-icons/io5";
-import clsx from "clsx";
-import { HiOutlineUsers } from "react-icons/hi";
-import { MdCategory } from "react-icons/md";
-import { GrCertificate } from "react-icons/gr";
 import { useRouter } from "next/navigation";
-import { MdBackHand } from "react-icons/md";
-import { VscReferences } from "react-icons/vsc";
-import { TiNews } from "react-icons/ti";
-
-import { FaWpforms } from "react-icons/fa";
-import { MdInsights } from "react-icons/md";
-
 import { useSelector, useDispatch } from "react-redux";
 import { removeUser } from "@/app/utils/userSlice";
+
+// Icons
+import {
+  FaHome,
+  FaRegUserCircle,
+  FaWpforms,
+  FaBuilding,
+  FaBriefcase,
+} from "react-icons/fa";
+import { BsNewspaper, BsCalendarEvent } from "react-icons/bs";
+import { HiOutlineUsers, HiOutlineAcademicCap } from "react-icons/hi";
+import { MdInsights, MdCategory, MdOutlinePermMedia } from "react-icons/md";
+import { IoSchoolSharp } from "react-icons/io5";
+import { RiUserSettingsLine } from "react-icons/ri";
+import { BiLogOut } from "react-icons/bi";
+import { TbBrandGoogleAnalytics } from "react-icons/tb";
+// import { GiHandshake } from "react-icons/gi";
+import { FaHandshake } from "react-icons/fa";
+import { MdBackHand } from "react-icons/md";
+import { VscReferences } from "react-icons/vsc";
 
 const menuItems = [
   {
     title: "MENU",
     items: [
       {
-        icon: <FaHome />,
+        icon: <FaHome className="text-xl" />,
         label: "Home",
         href: "/dashboard",
         visible: ["admin", "superadmin", "editor", "teacher", "student"],
       },
       {
-        icon: <MdInsights />,
+        icon: <TbBrandGoogleAnalytics className="text-xl" />,
         label: "Insights",
         href: "/dashboard/insights",
         visible: ["admin", "superadmin"],
       },
       {
-        icon: <HiOutlineUsers />,
+        icon: <HiOutlineUsers className="text-xl" />,
         label: "Users",
         href: "/dashboard/users",
         visible: ["admin", "superadmin", "editor"],
       },
       {
-        icon: <IoSchoolSharp />,
-        label: "Colleges",
-        href: "/dashboard/addCollege",
-        visible: ["admin", "editor", "superadmin"],
-      },
-      {
-        icon: <MdOutlinePermMedia />,
-        label: "Media",
-        href: "/dashboard/media",
-        visible: ["admin", "editor", "superadmin"],
-      },
-      {
-        icon: <GrCertificate />,
+        icon: <HiOutlineAcademicCap className="text-xl" />,
         label: "Academia",
         href: "/dashboard/academia",
         visible: ["admin", "editor", "superadmin"],
       },
       {
-        icon: <MdCategory />,
+        icon: <RiUserSettingsLine className="text-xl" />,
+        label: "Agent Approve",
+        href: "/dashboard/agentApprove",
+        visible: ["admin", "superadmin"],
+      },
+      {
+        icon: <FaBuilding className="text-xl" />,
+        label: "Banner",
+        href: "/dashboard/banner",
+        visible: ["admin", "superadmin", "editor"],
+      },
+      {
+        icon: <FaBriefcase className="text-xl" />,
+        label: "Career",
+        href: "/dashboard/career",
+        visible: ["admin", "superadmin", "editor"],
+      },
+      {
+        icon: <MdCategory className="text-xl" />,
         label: "Category",
         href: "/dashboard/category",
         visible: ["admin", "editor", "superadmin"],
       },
       {
-        icon: <GrUserWorker />,
-        label: "Agents",
-        href: "/dashboard/agent",
-        visible: ["admin", "superadmin"],
-      },
-
-      {
-        icon: <TiNews />,
-        label: "News",
-        href: "/dashboard/news",
+        icon: <IoSchoolSharp className="text-xl" />,
+        label: "Colleges",
+        href: "/dashboard/addCollege",
         visible: ["admin", "editor", "superadmin"],
       },
       {
-        icon: <MdEmojiEvents />,
+        icon: <FaHandshake className="text-xl" />,
+        label: "Consultancy",
+        href: "/dashboard/consultancy",
+        visible: ["admin", "superadmin", "editor"],
+      },
+      {
+        icon: <BsCalendarEvent className="text-xl" />,
         label: "Events",
         href: "/dashboard/events",
         visible: ["admin", "editor", "superadmin"],
       },
+
       {
-        icon: <GrUserWorker />,
-        label: "Agent Approve",
-        href: "/dashboard/agentApprove",
-        visible: ["admin", "superadmin"],
+        icon: <MdOutlinePermMedia className="text-xl" />,
+        label: "Media",
+        href: "/dashboard/media",
+        visible: ["admin", "editor", "superadmin"],
+      },
+      {
+        icon: <BsNewspaper className="text-xl" />,
+        label: "News",
+        href: "/dashboard/news",
+        visible: ["admin", "editor", "superadmin"],
       },
       {
         icon: <MdBackHand />,
@@ -115,17 +128,16 @@ const menuItems = [
     title: "OTHER",
     items: [
       {
-        icon: <FaRegUserCircle />,
+        icon: <FaRegUserCircle className="text-xl" />,
         label: "Update Profile",
         href: "/dashboard/profile",
-        visible: ["admin", "editor", "superadmin", "teacher", "student"],
+        visible: ["admin", "editor", "superadmin", "agent", "student"],
       },
-
       {
-        icon: <AiOutlineLogout />,
+        icon: <BiLogOut className="text-xl" />,
         label: "Logout",
         href: "/dashboard/logout",
-        visible: ["admin", "editor", "superadmin", "teacher", "student"],
+        visible: ["admin", "editor", "superadmin", "agent", "student"],
       },
     ],
   },
@@ -136,143 +148,94 @@ const Menu = () => {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  // Get the user role dynamically from Redux
-
   const role = useSelector((state) => {
     const roleData = state.user?.data?.role;
-    return roleData ? JSON.parse(roleData) : {}; // Parse role if it's a string
+    return roleData ? JSON.parse(roleData) : {};
   });
-
-  console.log("User role after login:", role);
-  console.log(
-    "Redux state after login:",
-    useSelector((state) => state.user)
-  );
 
   const handleLogout = async (e) => {
     e.preventDefault();
-
     try {
-      // 1. Call logout API
       const response = await fetch(
         `${process.env.baseUrl}${process.env.version}/auth/logout`,
         {
           method: "POST",
-          credentials: "include", // Important for cookies
+          credentials: "include",
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Logout failed");
-      }
+      if (!response.ok) throw new Error("Logout failed");
 
-      // 2. Clear cookie named "token"
       document.cookie =
         "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
-      // 3. Clear Redux store
       dispatch(removeUser());
-
-      // 4. Clear localStorage
       localStorage.removeItem("refreshToken");
-
-      // 5. Redirect to login page or home
-      router.push("/sign-in"); // Adjust the path as needed
+      router.push("/sign-in");
     } catch (error) {
-      toast.error("Logout error:", error);
-      // Handle error appropriately - maybe show a notification to user
+      console.error("Logout error:", error);
     }
   };
 
   return (
-    <div className="mt-4 text-sm text-black">
-      {menuItems.map((menu) => (
-        <div className="flex flex-col gap-2" key={menu.title}>
-          <span className="hidden lg:block text-black font-light my-4">
-            {menu.title}
-          </span>
-          {menu.items.map((item) => {
-            const hasAccess = item.visible.some((r) => role[r] === true);
+    <nav className="w-full h-full px-2 py-4 bg-white">
+      <div className="flex flex-col h-full space-y-6">
+        {menuItems.map((menu) => (
+          <div key={menu.title} className="flex flex-col space-y-2">
+            <h2 className="hidden lg:block text-xs font-semibold text-gray-400 px-4">
+              {menu.title}
+            </h2>
+            <div className="flex flex-col space-y-1">
+              {menu.items.map((item) => {
+                const hasAccess = item.visible.some((r) => role[r] === true);
 
-            if (hasAccess) {
-              // Special handling for logout
-              if (item.href === "/dashboard/logout") {
+                if (!hasAccess) return null;
+
+                const isActive = pathname === item.href;
+                const itemClasses = `
+                  flex items-center w-full p-2 text-gray-600 transition-colors rounded-lg
+                  hover:bg-gray-100 hover:text-blue-600
+                  ${isActive ? "bg-blue-50 text-blue-600" : ""}
+                  group
+                `;
+
+                if (item.href === "/dashboard/logout") {
+                  return (
+                    <button
+                      key={item.label}
+                      onClick={handleLogout}
+                      className={itemClasses}
+                    >
+                      <span className="flex items-center justify-center w-8 h-8 text-gray-500 group-hover:text-blue-600">
+                        {item.icon}
+                      </span>
+                      <span className="hidden lg:block ml-3 text-sm font-medium">
+                        {item.label}
+                      </span>
+                    </button>
+                  );
+                }
+
                 return (
-                  <a
-                    href="#"
+                  <Link
                     key={item.label}
-                    onClick={handleLogout}
-                    className={clsx(
-                      "flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-slate-100",
-                      {
-                        "bg-slate-100 text-blue-600": pathname === item.href,
-                      }
-                    )}
+                    href={item.href}
+                    className={itemClasses}
                   >
-                    {item.icon}
-                    <span className="hidden lg:block">{item.label}</span>
-                  </a>
+                    <span className="flex items-center justify-center w-8 h-8 text-gray-500 group-hover:text-blue-600">
+                      {item.icon}
+                    </span>
+                    <span className="hidden lg:block ml-3 text-sm font-medium">
+                      {item.label}
+                    </span>
+                  </Link>
                 );
-              }
-
-              return (
-                <Link
-                  href={item.href}
-                  key={item.label}
-                  className={clsx(
-                    "flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-slate-100",
-                    {
-                      "bg-slate-100 text-blue-600": pathname === item.href,
-                    }
-                  )}
-                >
-                  {item.icon}
-                  <span className="hidden lg:block">{item.label}</span>
-                </Link>
-              );
-            }
-            return null;
-          })}
-        </div>
-      ))}
-    </div>
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </nav>
   );
-
-  // return (
-  //   <div className="mt-4 text-sm text-black">
-  //     {menuItems.map((menu) => (
-  //       <div className="flex flex-col gap-2" key={menu.title}>
-  //         <span className="hidden lg:block text-black font-light my-4">
-  //           {menu.title}
-  //         </span>
-  //         {menu.items.map((item) => {
-  //           // Check if the user has at least one true role that matches item.visible
-  //           const hasAccess = item.visible.some((r) => role[r] === true);
-
-  //           if (hasAccess) {
-
-  //             return (
-  //               <Link
-  //                 href={item.href}
-  //                 key={item.label}
-  //                 className={clsx(
-  //                   "flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-slate-100",
-  //                   {
-  //                     "bg-slate-100 text-blue-600": pathname === item.href,
-  //                   }
-  //                 )}
-  //               >
-  //                 {item.icon}
-  //                 <span className="hidden lg:block">{item.label}</span>
-  //               </Link>
-  //             );
-  //           }
-  //           return null;
-  //         })}
-  //       </div>
-  //     ))}
-  //   </div>
-
-  // );
 };
+
 export default Menu;

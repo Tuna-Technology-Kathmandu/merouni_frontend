@@ -18,7 +18,7 @@ const AdminPage = () => {
         className="text-center mb-12"
       >
         <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Welcome to MeroUni Admin Dashboard
+          Welcome to MeroUni Dashboard
         </h1>
         <p className="text-lg text-gray-600 mb-6">
           Empowering students with the tools and resources to unlock their
