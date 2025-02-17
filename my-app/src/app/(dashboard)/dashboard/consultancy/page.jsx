@@ -100,7 +100,7 @@ export default function ConsultancyForm() {
       setSelectedColleges((prev) => [...prev, college]);
       // Update form value
       const collegeIds = [...selectedColleges, college].map((c) => c.id);
-      setValue("courses", collegeIds[0]);
+      setValue("courses", collegeIds);
     }
     setCollegeSearch("");
     setSearchResults([]);
@@ -113,7 +113,7 @@ export default function ConsultancyForm() {
     const updatedCollegeIds = selectedColleges
       .filter((c) => c.id !== collegeId)
       .map((c) => c.id);
-    setValue("colleges", updatedCollegeIds);
+    setValue("courses", updatedCollegeIds);
   };
 
   const onSubmit = async (data) => {
@@ -122,6 +122,9 @@ export default function ConsultancyForm() {
       data.destination = data.destination;
       data.address = data.address;
       data.pinned = Number(data.pinned);
+      if (editId) {
+        data.id = editId;
+      }
 
       const url = `${process.env.baseUrl}${process.env.version}/consultancy`;
       const method = "POST";
@@ -152,16 +155,17 @@ export default function ConsultancyForm() {
     }
   };
 
-  const handleEdit = async (slug) => {
+  const handleEdit = async (consultancy) => {
     try {
       setEditing(true);
       setLoading(true);
       setIsOpen(true);
-      const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/consultancy/${slug}`
-      );
-      const data = await response.json();
-      const consultancy = data.category;
+      // const response = await authFetch(
+      //   `${process.env.baseUrl}${process.env.version}/consultancy/${slug}`
+      // );
+      // const data = await response.json();
+      // console.log("editdata", editdata);
+      // const consultancy = editdata;
       console.log("while edititnc consul", consultancy);
       setEditingId(consultancy.id);
       setValue("title", consultancy.title);
@@ -169,16 +173,18 @@ export default function ConsultancyForm() {
       setValue("destination", parsedDestination);
       setValue("address", JSON.parse(consultancy.address));
       setValue("pinned", consultancy.pinned);
-      setValue("courses", consultancy.courses);
-      //   if (program.colleges) {
-      //     const collegeData = program.colleges.map(college => ({
-      //       id: college.program_college.college_id,
-      //       name: college.name,
-      //       slugs: college.slugs
-      //     }));
-      //     setSelectedColleges(collegeData);
-      //     setValue('colleges', collegeData.map(c => c.id));
-      //   }
+      // setValue("courses", consultancy.courses);
+      let consultId = consultancy.consultancyCourses.map((c) => c.id);
+      setValue("courses", consultId);
+      const consultData = consultancy.consultancyCourses.map((c) => ({
+        id: c.id,
+        title: c.title,
+      }));
+      setSelectedColleges(consultData);
+      setValue(
+        "courses",
+        consultData.map((c) => c.id)
+      );
 
       setUploadedFiles({
         featured: consultancy.featured_image || "",
@@ -239,17 +245,25 @@ export default function ConsultancyForm() {
         return destinations.map((d) => `${d.city}, ${d.country}`).join("; ");
       },
     },
+
     {
       header: "Courses",
-      accessorKey: "courses",
+      accessorKey: "consultancyCourses",
+      cell: ({ row }) => {
+        const consultancyCourses = row.original.consultancyCourses;
+        console.log("Consultancy Courses", consultancyCourses);
+        // Return the titles of the consultancy courses, joined by a comma
+        return consultancyCourses.map((course) => course.title).join(", ");
+      },
     },
+
     {
       header: "Actions",
       id: "actions",
       cell: ({ row }) => (
         <div className="flex gap-2">
           <button
-            onClick={() => handleEdit(row.original.slugs)}
+            onClick={() => handleEdit(row.original)}
             className="p-1 text-blue-600 hover:text-blue-800"
           >
             <Edit2 className="w-4 h-4" />
@@ -430,7 +444,6 @@ export default function ConsultancyForm() {
                   <div className="relative">
                     <input
                       type="text"
-                      disabled={selectedColleges.length > 0}
                       value={collegeSearch}
                       onChange={searchCollege}
                       className="w-full p-2 border rounded"
