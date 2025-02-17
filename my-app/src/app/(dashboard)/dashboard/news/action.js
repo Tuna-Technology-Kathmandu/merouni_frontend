@@ -1,6 +1,5 @@
-"use server";
-
-let url = `${process.env.baseUrl}${process.env.version}/news`;
+import { authFetch } from "@/app/utils/authFetch";
+let url = `${process.env.baseUrl}${process.env.version}/blogs`;
 
 export async function fetchNews(page = 1, limit = 10) {
   try {
@@ -19,6 +18,32 @@ export async function fetchNews(page = 1, limit = 10) {
     throw error;
   }
 }
+
+
+// action.js
+export const fetchTags = async () => {
+  try {
+    // Log the full URL being called
+    const url = `${process.env.baseUrl}${process.env.version}/tag`;
+    console.log("Fetching tags from URL:", url);
+
+    const response = await authFetch(url);
+    
+    // Add better error handling
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log("Tags data received:", data);
+    return data;
+  } catch (error) {
+    console.error("Error in fetchTags:", error);
+    throw error;
+  }
+};
+
+
 
 export async function createNews(data) {
   try {

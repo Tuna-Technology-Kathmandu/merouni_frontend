@@ -432,7 +432,7 @@ const AdLayout = ({ banners = [], size = "", number = 1 }) => {
           <div key={`${banner.id}-${index}`} className="w-full ml-4 mr-2">
             <img
               src={
-                "https://media.edusanjal.com/bfs/Techspire_College_Edusanjal_2.jpg" ||
+                "/images/Large-Banner.jpg" ||
                 banner.imageUrl
               }
               alt={`Banner ${banner.title}`}

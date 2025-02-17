@@ -1,17 +1,24 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { PiLineVerticalThin } from "react-icons/pi";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import { IoArrowUp } from "react-icons/io5";
 import Image from "next/image";
 import EventCard from "../components/Frontpage/EventCard";
 import { IoIosSearch } from "react-icons/io";
-import { getEvents, getThisWeekEvents, getNextWeekEvents } from "./action";
+import {
+  getEvents,
+  getThisWeekEvents,
+  getNextWeekEvents,
+  searchEvent,
+} from "./action";
 import Navbar from "../components/Frontpage/Navbar";
 import Footer from "../components/Frontpage/Footer";
 import Header from "../components/Frontpage/Header";
 import Link from "next/link";
 import Loading from "../components/Loading";
+import Pagination from "../blogs/components/Pagination";
+import { debounce } from "lodash";
 
 const Events = () => {
   const [allEvents, setAllEvents] = useState([]);
@@ -20,16 +27,30 @@ const Events = () => {
   const [featuredEvent, setFeaturedEvent] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 1,
+  });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
-    loadEvents();
-  }, []);
+    if (!searchQuery) {
+      loadEvents(pagination.currentPage);
+    }
+  }, [pagination.currentPage, searchQuery]);
 
-  const loadEvents = async () => {
+  const loadEvents = async (page = 1) => {
     try {
-      const response = await getEvents();
+      const response = await getEvents(page);
       const events = response.items;
       setAllEvents(events);
+      setPagination({
+        currentPage: response.pagination.currentPage,
+        totalPages: response.pagination.totalPages,
+        totalCount: response.pagination.totalCount,
+      });
 
       // Filter events for different sections
       const thisWeek = await getThisWeekEvents();
@@ -43,7 +64,7 @@ const Events = () => {
       featured.eventHost = eventHost; // Attach the parsed eventHost to the featuredEvent
 
       setFeaturedEvent(featured);
-      setThisWeekEvents(thisWeek.events.slice(1));
+      setThisWeekEvents(thisWeek.events);
       setNextWeekEvents(nextWeek.events);
     } catch (error) {
       setError("Failed to load Events");
@@ -51,6 +72,36 @@ const Events = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePageChange = (page) => {
+    console.log("Pages response from pagination controle:", page);
+    if (page > 0 && page <= pagination.totalPages) {
+      setPagination((prev) => ({
+        ...prev,
+        currentPage: page,
+      }));
+    }
+  };
+
+  const debouncedSearch = useCallback(
+    debounce(async (query) => {
+      if (query) {
+        setIsSearching(true);
+        const results = await searchEvent(query);
+        console.log("Search Results in event:", results);
+        setAllEvents(results.items);
+        setPagination(results.pagination);
+        setIsSearching(false);
+      }
+    }, 1000), // 1000ms delay
+    []
+  );
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    debouncedSearch(query);
   };
 
   if (error) return <div>Error: {error}</div>;
@@ -107,7 +158,7 @@ const Events = () => {
 
                 {/* Buttons */}
                 <div className="flex gap-4">
-                  <button className="border-2 border-black text-black px-6 py-2 rounded-lg hover:bg-gray-800 flex flex-row items-center justify-between mt-5">
+                  <button className="border-2 border-black text-black px-6 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition-all flex flex-row items-center justify-between mt-5">
                     <span className="pr-4 font-semibold">View More</span>
                     <IoIosArrowDroprightCircle size={25} />
                   </button>
@@ -212,7 +263,14 @@ const Events = () => {
                   type="text"
                   placeholder="Search Events..."
                   className="px-4 py-2 border-b border-black focus:outline-none"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
                 />
+                {isSearching && (
+                  <div className="absolute right-3 top-2.5">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-500"></div>
+                  </div>
+                )}
                 <span className="absolute right-3 top-1/2 transform -translate-y-1/2 -translate-x-28 text-gray-400">
                   <IoIosSearch />
                 </span>
@@ -239,7 +297,7 @@ const Events = () => {
             </div>
 
             {/* Right Section - All Events Grid */}
-            <div className="w-3/4">
+            <div className="flex flex-col w-3/4 items-center justify-center">
               <div className="grid grid-cols-3 gap-3">
                 {allEvents.map((event, index) => (
                   <Link href={`/events/${event.slugs}`} key={index}>
@@ -252,6 +310,12 @@ const Events = () => {
                     </div>
                   </Link>
                 ))}
+              </div>
+              <div className="mt-10">
+                <Pagination
+                  pagination={pagination}
+                  onPageChange={handlePageChange}
+                />
               </div>
             </div>
           </div>

@@ -1,9 +1,9 @@
 "use server";
 
-export async function getEvents() {
+export async function getEvents(page = 1) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/event`,
+      `${process.env.baseUrl}${process.env.version}/event?page=${page}`,
       {
         method: "GET",
         headers: {
@@ -19,6 +19,26 @@ export async function getEvents() {
     return await response.json();
   } catch (error) {
     console.error("Error fetching events:", error);
+    throw error;
+  }
+}
+
+export async function searchEvent(query) {
+  try {
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/event?q=${query}`,
+      {
+        cache: "no-store",
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to search events");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error searching events:", error);
     throw error;
   }
 }
@@ -81,7 +101,7 @@ export async function getEventBySlug(slug) {
         cache: "no-store",
       }
     );
-    console.log("RESPONSE:",response)
+    console.log("RESPONSE:", response);
 
     if (!response.ok) {
       throw new Error("Failed to fetch event details");

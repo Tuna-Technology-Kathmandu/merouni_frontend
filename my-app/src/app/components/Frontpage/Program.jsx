@@ -211,7 +211,8 @@ const Program = () => {
           </button>
         </div>
         <div className="max-w-[1600px] mx-auto">
-          <div className="flex justify-around flex-wrap gap-64 mt-20 lp:mt-40">
+          <div className="flex justify-around  gap-64 mt-20 lp:mt-40">
+            
             <div className="flex flex-col  bg-white rounded-lg shadow-[8px_10px_4px_rgba(0,0,0,0.1)] max-w-[650px] w-full p-8">
               <div className="flex items-center">
                 <Image

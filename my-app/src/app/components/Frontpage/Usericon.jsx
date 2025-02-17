@@ -37,25 +37,27 @@ export default function UserDropdown() {
           </div>
           <ul className="p-4 text-gray-700">
             <Link href="/dashboard">
-            <li className="py-2 border-b cursor-pointer hover:text-blue-600">
-              My Account
-            </li>
+              <li className="py-2 border-b cursor-pointer hover:text-blue-600">
+                My Account
+              </li>
             </Link>
-            <li className="py-2 border-b cursor-pointer hover:text-blue-600">
-              Contact Us
-            </li>
+            <Link href="/contact">
+              <li className="py-2 border-b cursor-pointer hover:text-blue-600">
+                Contact Us
+              </li>
+            </Link>
             <li className="py-2 border-b cursor-pointer hover:text-blue-600">
               My Watchlist
             </li>
             <Link href="/sign-in">
-            <button className="w-full py-2 mt-2 bg-blue-600 text-white rounded-lg font-bold">
-              Login
-            </button>
+              <button className="w-full py-2 mt-2 bg-blue-600 text-white rounded-lg font-bold">
+                Login
+              </button>
             </Link>
             <Link href="/contact">
-            <button className="w-full py-2 mt-2 border border-blue-600 text-blue-600 rounded-lg font-bold">
-            Join Us →
-            </button>
+              <button className="w-full py-2 mt-2 border border-blue-600 text-blue-600 rounded-lg font-bold">
+                Join Us →
+              </button>
             </Link>
           </ul>
         </div>

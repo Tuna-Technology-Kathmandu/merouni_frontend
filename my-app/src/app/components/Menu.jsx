@@ -17,6 +17,8 @@ import { MdCategory } from "react-icons/md";
 import { GrCertificate } from "react-icons/gr";
 import { useRouter } from "next/navigation";
 import { MdBackHand } from "react-icons/md";
+import { VscReferences } from "react-icons/vsc";
+import { TiNews } from "react-icons/ti";
 
 import { FaWpforms } from "react-icons/fa";
 import { MdInsights } from "react-icons/md";
@@ -78,7 +80,7 @@ const menuItems = [
       },
 
       {
-        icon: <MdEmojiEvents />,
+        icon: <TiNews />,
         label: "News",
         href: "/dashboard/news",
         visible: ["admin", "editor", "superadmin"],
@@ -100,6 +102,12 @@ const menuItems = [
         label: "Refer Student",
         href: "/dashboard/referStudent",
         visible: ["agent"],
+      },
+      {
+        icon: <VscReferences />,
+        label: "Referrals",
+        href: "/dashboard/referrals",
+        visible: ["admin", "superadmin"],
       },
     ],
   },

@@ -145,7 +145,6 @@ export default function CollegeForm() {
     };
     getUniversities();
   }, []);
-  
 
   useEffect(() => {
     const getCourses = async () => {
@@ -410,6 +409,7 @@ export default function CollegeForm() {
       setValue("is_featured", collegeData.isFeatured === 1);
       setValue("pinned", collegeData.pinned === 1);
       // Set university_id from university data
+      console.log("Univerisites data of clz add", universities);
       if (collegeData.university) {
         const universityId = universities.find(
           (u) => u.fullname === collegeData.university.fullname
