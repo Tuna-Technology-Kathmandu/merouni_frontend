@@ -130,28 +130,28 @@ export default function MaterialForm() {
       const url = `${process.env.baseUrl}${process.env.version}/material`;
       const method = editing ? "PUT" : "POST";
       console.log("before submit", data);
-      // if (editing) {
-      //   const response = await authFetch(
-      //     `${process.env.baseUrl}${process.env.version}/material?id=${editId}`,
-      //     {
-      //       method,
-      //       headers: {
-      //         "Content-Type": "application/json",
-      //       },
-      //       body: JSON.stringify(data),
-      //     }
-      //   );
-      //   await response.json();
-      // } else {
-      //   const response = await authFetch(url, {
-      //     method,
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify(data),
-      //   });
-      //   await response.json();
-      // }
+      if (editing) {
+        const response = await authFetch(
+          `${process.env.baseUrl}${process.env.version}/material?id=${editId}`,
+          {
+            method,
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          }
+        );
+        await response.json();
+      } else {
+        const response = await authFetch(url, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+        await response.json();
+      }
 
       toast.success(
         editing
@@ -162,6 +162,7 @@ export default function MaterialForm() {
       reset();
       setUploadedFiles({ image: "", file: "" });
       setSelectedColleges([]);
+      setSearchResults([])
       fetchMaterials();
       setIsOpen(false);
     } catch (error) {
@@ -175,6 +176,7 @@ export default function MaterialForm() {
       setEditing(true);
       setLoading(true);
       setIsOpen(true);
+      console.log("editdata",editdata)
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/material/${editdata.id}`
       );
@@ -184,13 +186,13 @@ export default function MaterialForm() {
       setEditingId(material.id);
 
       setValue("title", material.title);
-      let tagg = JSON.parse(material.tags);
+      let tagg = JSON.parse(editdata.tags);
       if (material.tags) setValue("tags", tagg);
 
       if (material.tags) {
-        const tagData = tagg.map((tag) => ({
+        const tagData = tagg.map((tag,index) => ({
           id: tag,
-          title: editdata.title,
+          title: material.tags[index].title,
         }));
         setSelectedColleges(tagData);
         setValue(
