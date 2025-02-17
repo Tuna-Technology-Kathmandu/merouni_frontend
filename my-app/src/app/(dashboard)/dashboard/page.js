@@ -4,9 +4,8 @@ import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { FaUniversity, FaBookOpen, FaCalendarAlt } from "react-icons/fa";
 
-
 const AdminPage = () => {
-  useEffect (() => {
+  useEffect(() => {
     document.title = "MeroUni Admin Dashboard";
   }, []);
   return (
@@ -22,7 +21,8 @@ const AdminPage = () => {
           Welcome to MeroUni Admin Dashboard
         </h1>
         <p className="text-lg text-gray-600 mb-6">
-          Empowering students with the tools and resources to unlock their educational potential in Nepal.
+          Empowering students with the tools and resources to unlock their
+          educational potential in Nepal.
         </p>
       </motion.div>
 
@@ -33,9 +33,15 @@ const AdminPage = () => {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg shadow-lg p-8 mb-8"
       >
-        <h2 className="text-2xl font-semibold mb-6 text-gray-800">About MeroUni</h2>
+        <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+          About MeroUni
+        </h2>
         <p className="text-gray-700 leading-relaxed">
-          MeroUni is Nepal&apos;s premier educational platform, dedicated to bridging the gap between students and their dream institutions. We offer a comprehensive database of colleges, universities, degree programs, and entrance exam details, ensuring students have all the information they need to make informed decisions about their future.
+          MeroUni is Nepal&apos;s premier educational platform, dedicated to
+          bridging the gap between students and their dream institutions. We
+          offer a comprehensive database of colleges, universities, degree
+          programs, and entrance exam details, ensuring students have all the
+          information they need to make informed decisions about their future.
         </p>
       </motion.div>
 
@@ -51,9 +57,12 @@ const AdminPage = () => {
           <div className="flex justify-center mb-4">
             <FaUniversity className="text-4xl text-blue-600" />
           </div>
-          <h3 className="font-semibold mb-4 text-xl text-blue-600">Discover Institutions</h3>
+          <h3 className="font-semibold mb-4 text-xl text-blue-600">
+            Discover Institutions
+          </h3>
           <p className="text-gray-600">
-            Explore the best colleges and universities in Nepal, tailored to your academic goals.
+            Explore the best colleges and universities in Nepal, tailored to
+            your academic goals.
           </p>
         </div>
 
@@ -62,9 +71,12 @@ const AdminPage = () => {
           <div className="flex justify-center mb-4">
             <FaCalendarAlt className="text-4xl text-purple-600" />
           </div>
-          <h3 className="font-semibold mb-4 text-xl text-purple-600">Entrance Exam Updates</h3>
+          <h3 className="font-semibold mb-4 text-xl text-purple-600">
+            Entrance Exam Updates
+          </h3>
           <p className="text-gray-600">
-            Stay ahead with the latest information on upcoming entrance exams and deadlines.
+            Stay ahead with the latest information on upcoming entrance exams
+            and deadlines.
           </p>
         </div>
 
@@ -73,9 +85,12 @@ const AdminPage = () => {
           <div className="flex justify-center mb-4">
             <FaBookOpen className="text-4xl text-blue-600" />
           </div>
-          <h3 className="font-semibold mb-4 text-xl text-blue-600">Explore Programs</h3>
+          <h3 className="font-semibold mb-4 text-xl text-blue-600">
+            Explore Programs
+          </h3>
           <p className="text-gray-600">
-            Find the perfect degree program to match your interests and career aspirations.
+            Find the perfect degree program to match your interests and career
+            aspirations.
           </p>
         </div>
       </motion.div>
@@ -87,9 +102,12 @@ const AdminPage = () => {
         transition={{ duration: 0.5, delay: 0.6 }}
         className="mt-12 text-center"
       >
-        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Ready to Take the Next Step?</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+          Ready to Take the Next Step?
+        </h2>
         <p className="text-gray-600 mb-6">
-          Join thousands of students who have found their path with MeroUni. Start your journey today!
+          Join thousands of students who have found their path with MeroUni.
+          Start your journey today!
         </p>
         <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300">
           Get Started

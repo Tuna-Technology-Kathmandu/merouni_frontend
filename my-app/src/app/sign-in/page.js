@@ -30,11 +30,11 @@ const SignInPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: "tuna",
-    lastName: "dai",
-    email: "admintuna@gmail.com",
-    phoneNo: "1212121212",
-    password: "admintuna@12345",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNo: "",
+    password: "",
   });
   const [errors, setErrors] = useState({});
 
