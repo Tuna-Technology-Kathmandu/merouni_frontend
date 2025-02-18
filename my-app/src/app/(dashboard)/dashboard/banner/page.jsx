@@ -23,7 +23,11 @@ export default function BannerForm() {
   const [showDropdown, setShowDropdown] = useState(false);
   const searchTimeoutRef = useRef(null);
   const dropdownRef = useRef(null);
-
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
   const {
     register,
     control,
@@ -63,14 +67,19 @@ export default function BannerForm() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const fetchBanners = async () => {
+  const fetchBanners = async (page = 1) => {
     setTableLoading(true);
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/banner`
+        `${process.env.baseUrl}${process.env.version}/banner?page=${page}`
       );
       const data = await response.json();
       setBanners(data.items);
+      setPagination({
+        currentPage: data.pagination.currentPage,
+        totalPages: data.pagination.totalPages,
+        total: data.pagination.totalCount,
+      });
     } catch (error) {
       toast.error("Failed to fetch banners");
     } finally {
@@ -257,6 +266,36 @@ export default function BannerForm() {
     },
   ];
 
+  const handleSearch = async (query) => {
+    if (!query) {
+      fetchBanners();
+      return;
+    }
+
+    // try {
+    //   const response = await authFetch(
+    //     `${process.env.baseUrl}${process.env.version}/level?q=${query}`
+    //   );
+    //   if (response.ok) {
+    //     const data = await response.json();
+    //     setLevels(data.items);
+
+    //     if (data.pagination) {
+    //       setPagination({
+    //         currentPage: data.pagination.currentPage,
+    //         totalPages: data.pagination.totalPages,
+    //         total: data.pagination.totalCount,
+    //       });
+    //     }
+    //   } else {
+    //     console.error("Error fetching levels:", response.statusText);
+    //     setLevels([]);
+    //   }
+    // } catch (error) {
+    //   console.error("Error fetching levels search results:", error.message);
+    //   setLevels([]);
+    // }
+  };
   return (
     <>
       <div className="text-2xl mr-auto p-4 ml-14 font-bold">
@@ -437,7 +476,14 @@ export default function BannerForm() {
       )}
 
       <div className="mt-8">
-        <Table loading={tableLoading} data={banners} columns={columns} />
+        <Table
+          loading={tableLoading}
+          data={banners}
+          columns={columns}
+          pagination={pagination}
+          onPageChange={(newPage) => fetchBanners(newPage)}
+          onSearch={handleSearch}
+        />
       </div>
 
       <ConfirmationDialog

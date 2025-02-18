@@ -23,7 +23,11 @@ export default function CareerForm() {
   const [editId, setEditingId] = useState(null);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
   const {
     register,
     handleSubmit,
@@ -44,21 +48,55 @@ export default function CareerForm() {
     fetchCareers();
   }, []);
 
-  const fetchCareers = async () => {
+  const fetchCareers = async (page = 1) => {
     setTableLoading(true);
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/career`
+        `${process.env.baseUrl}${process.env.version}/career?page=${page}`
       );
       const data = await response.json();
       setCareers(data.items);
+      setPagination({
+        currentPage: data.pagination.currentPage,
+        totalPages: data.pagination.totalPages,
+        total: data.pagination.totalCount,
+      });
     } catch (error) {
       toast.error("Failed to fetch careers");
     } finally {
       setTableLoading(false);
     }
   };
+  const handleSearch = async (query) => {
+    if (!query) {
+      fetchCareers();
+      return;
+    }
 
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/career?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setCareers(data.items);
+
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount,
+          });
+        }
+      } else {
+        console.error("Error fetching careers:", response.statusText);
+        setCareers([]);
+      }
+    } catch (error) {
+      console.error("Error fetching careers search results:", error.message);
+      setCareers([]);
+    }
+  };
   const onSubmit = async (data) => {
     try {
       data.featuredImage = uploadedFiles.featured;
@@ -292,10 +330,9 @@ export default function CareerForm() {
           loading={tableLoading}
           data={careers}
           columns={columns}
-          onSearch={(query) => {
-            // Implement search functionality here
-            console.log("Searching for:", query);
-          }}
+          pagination={pagination}
+          onPageChange={(newPage) => fetchCareers(newPage)}
+          onSearch={handleSearch}
         />
       </div>
 

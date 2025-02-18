@@ -26,7 +26,11 @@ export default function ConsultancyForm() {
   const [selectedColleges, setSelectedColleges] = useState([]);
   const [collegeSearch, setCollegeSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
   const {
     register,
     handleSubmit,
@@ -59,14 +63,19 @@ export default function ConsultancyForm() {
     fetchConsultancies();
   }, []);
 
-  const fetchConsultancies = async () => {
+  const fetchConsultancies = async (page = 1) => {
     setTableLoading(true);
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/consultancy`
+        `${process.env.baseUrl}${process.env.version}/consultancy?page=${page}`
       );
       const data = await response.json();
       setConsultancies(data.items);
+      setPagination({
+        currentPage: data.pagination.currentPage,
+        totalPages: data.pagination.totalPages,
+        total: data.pagination.totalCount,
+      });
     } catch (error) {
       toast.error("Failed to fetch consultancies");
     } finally {
@@ -279,6 +288,36 @@ export default function ConsultancyForm() {
     },
   ];
 
+  const handleSearch = async (query) => {
+    if (!query) {
+      fetchConsultancies();
+      return;
+    }
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/consultancy?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setConsultancies(data.items);
+
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount,
+          });
+        }
+      } else {
+        console.error("Error fetching consultancy:", response.statusText);
+        setConsultancies([]);
+      }
+    } catch (error) {
+      console.error("Error fetching consutancy search results:", error.message);
+      setConsultancies([]);
+    }
+  };
   return (
     <>
       <div className="text-2xl mr-auto p-4 ml-14 font-bold">
@@ -510,9 +549,9 @@ export default function ConsultancyForm() {
           loading={tableLoading}
           data={consultancies}
           columns={columns}
-          onSearch={(query) => {
-            console.log("Searching for:", query);
-          }}
+          pagination={pagination}
+          onPageChange={(newPage) => fetchConsultancies(newPage)}
+          onSearch={handleSearch}
         />
       </div>
 

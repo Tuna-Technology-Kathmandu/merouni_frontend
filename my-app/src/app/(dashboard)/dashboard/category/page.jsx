@@ -219,7 +219,7 @@ export default function CategoryManager() {
 
   const handleSearch = async (query) => {
     if (!query) {
-      loadEvents();
+      loadCategories();
       return;
     }
 

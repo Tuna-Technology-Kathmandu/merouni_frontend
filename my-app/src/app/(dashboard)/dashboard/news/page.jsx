@@ -394,7 +394,7 @@ export default function NewsManager() {
 
   const handleSearch = async (query) => {
     if (!query) {
-      loadEvents();
+      loadData();
       return;
     }
 
