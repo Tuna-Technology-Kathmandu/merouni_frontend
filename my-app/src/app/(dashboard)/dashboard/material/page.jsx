@@ -28,7 +28,11 @@ export default function MaterialForm() {
   const [collegeSearch, setCollegeSearch] = useState("");
   const [selectedColleges, setSelectedColleges] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
-
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
   const statusOptions = ["draft", "published", "archived"];
   const visibilityOptions = ["public", "private"];
 
@@ -107,13 +111,18 @@ export default function MaterialForm() {
     }
   };
 
-  const fetchMaterials = async () => {
+  const fetchMaterials = async (page = 1) => {
     setTableLoading(true);
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/material`
+        `${process.env.baseUrl}${process.env.version}/material?page=${page}`
       );
       const data = await response.json();
+      setPagination({
+        currentPage: data.pagination.currentPage,
+        totalPages: data.pagination.totalPages,
+        total: data.pagination.totalCount,
+      });
       setMaterials(data.materials);
     } catch (error) {
       toast.error("Failed to fetch materials");
@@ -162,7 +171,7 @@ export default function MaterialForm() {
       reset();
       setUploadedFiles({ image: "", file: "" });
       setSelectedColleges([]);
-      setSearchResults([])
+      setSearchResults([]);
       fetchMaterials();
       setIsOpen(false);
     } catch (error) {
@@ -176,7 +185,7 @@ export default function MaterialForm() {
       setEditing(true);
       setLoading(true);
       setIsOpen(true);
-      console.log("editdata",editdata)
+      console.log("editdata", editdata);
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/material/${editdata.id}`
       );
@@ -190,7 +199,7 @@ export default function MaterialForm() {
       if (material.tags) setValue("tags", tagg);
 
       if (material.tags) {
-        const tagData = tagg.map((tag,index) => ({
+        const tagData = tagg.map((tag, index) => ({
           id: tag,
           title: material.tags[index].title,
         }));
@@ -290,6 +299,37 @@ export default function MaterialForm() {
       ),
     },
   ];
+
+  const handleSearch = async (query) => {
+    if (!query) {
+      fetchMaterials();
+      return;
+    }
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/material?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setMaterials(data.materials);
+
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount,
+          });
+        }
+      } else {
+        console.error("Error fetching materials:", response.statusText);
+        setMaterials([]);
+      }
+    } catch (error) {
+      console.error("Error fetching materials search results:", error.message);
+      setMaterials([]);
+    }
+  };
 
   return (
     <>
@@ -464,9 +504,9 @@ export default function MaterialForm() {
           loading={tableLoading}
           data={materials}
           columns={columns}
-          onSearch={(query) => {
-            console.log("Searching for:", query);
-          }}
+          pagination={pagination}
+          onPageChange={(newPage) => fetchMaterials(newPage)}
+          onSearch={handleSearch}
         />
       </div>
 

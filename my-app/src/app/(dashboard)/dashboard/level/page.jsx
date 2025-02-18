@@ -40,7 +40,7 @@ export default function LevelForm() {
     fetchLevels();
   }, []);
 
-  const fetchLevels = async (page=1) => {
+  const fetchLevels = async (page = 1) => {
     setTableLoading(true);
     try {
       const response = await authFetch(
@@ -262,7 +262,7 @@ export default function LevelForm() {
           data={levels}
           columns={columns}
           pagination={pagination}
-          onPageChange={(newPage) => fetchCourses(newPage)}
+          onPageChange={(newPage) => fetchLevels(newPage)}
           onSearch={handleSearch}
         />
       </div>
