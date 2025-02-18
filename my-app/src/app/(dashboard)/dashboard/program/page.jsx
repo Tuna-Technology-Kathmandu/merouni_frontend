@@ -10,7 +10,6 @@ import ConfirmationDialog from "../addCollege/ConfirmationDialog";
 import { X } from "lucide-react";
 
 export default function ProgramForm() {
-
   const author_id = useSelector((state) => state.user.data.id);
   const [isOpen, setIsOpen] = useState(false);
   const [programs, setPrograms] = useState([]);
@@ -30,8 +29,12 @@ export default function ProgramForm() {
   const [collegeSearch, setCollegeSearch] = useState("");
   const [selectedColleges, setSelectedColleges] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
-  
 
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
   const searchCollege = async (e) => {
     const query = e.target.value;
     setCollegeSearch(query);
@@ -126,14 +129,19 @@ export default function ProgramForm() {
   }, []);
 
   // Fetch functions for all dropdown data
-  const fetchPrograms = async () => {
+  const fetchPrograms = async (page = 1) => {
     setTableLoading(true);
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/program`
+        `${process.env.baseUrl}${process.env.version}/program?page=${page}`
       );
       const data = await response.json();
       setPrograms(data.items);
+      setPagination({
+        currentPage: data.pagination.currentPage,
+        totalPages: data.pagination.totalPages,
+        total: data.pagination.totalCount,
+      });
     } catch (error) {
       toast.error("Failed to fetch programs");
     } finally {
@@ -215,7 +223,7 @@ export default function ProgramForm() {
   const onSubmit = async (data) => {
     try {
       const url = `${process.env.baseUrl}${process.env.version}/program`;
-      const method =  "POST";
+      const method = "POST";
       console.log("while submiting data is", data);
 
       const response = await authFetch(url, {
@@ -416,6 +424,37 @@ export default function ProgramForm() {
       ),
     },
   ];
+
+  const handleSearch = async (query) => {
+    if (!query) {
+      fetchPrograms();
+      return;
+    }
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/program?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setPrograms(data.items);
+
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount,
+          });
+        }
+      } else {
+        console.error("Error fetching levels:", response.statusText);
+        setPrograms([]);
+      }
+    } catch (error) {
+      console.error("Error fetching levels search results:", error.message);
+      setPrograms([]);
+    }
+  };
 
   return (
     <>
@@ -791,10 +830,9 @@ export default function ProgramForm() {
           loading={tableLoading}
           data={programs}
           columns={columns}
-          onSearch={(query) => {
-            // Implement search functionality here
-            console.log("Searching for:", query);
-          }}
+          pagination={pagination}
+          onPageChange={(newPage) => fetchPrograms(newPage)}
+          onSearch={handleSearch}
         />
       </div>
 
