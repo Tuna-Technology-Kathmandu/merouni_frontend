@@ -10,6 +10,7 @@ import {
 import Loading from "../../../components/Loading";
 import Table from "../../../components/Table";
 import { Edit2, Trash2 } from "lucide-react";
+import { authFetch } from "@/app/utils/authFetch";
 
 export default function ScholarshipManager() {
   const author_id = useSelector((state) => state.user.data.id);
@@ -26,7 +27,11 @@ export default function ScholarshipManager() {
   });
   const [editingId, setEditingId] = useState(null);
   const [error, setError] = useState(null);
-
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
   const columns = useMemo(
     () => [
       {
@@ -87,9 +92,10 @@ export default function ScholarshipManager() {
     loadScholarships();
   }, []);
 
-  const loadScholarships = async () => {
+  const loadScholarships = async (page = 1) => {
     try {
-      const response = await getAllScholarships();
+      const res = await getAllScholarships((page = 1));
+      const response = res.scholarships;
 
       const updatedScholarships = response.map((scholarship) => ({
         ...scholarship,
@@ -106,7 +112,13 @@ export default function ScholarshipManager() {
       }));
 
       setScholarships(updatedScholarships);
+
       console.log("Updated scholarships:", updatedScholarships);
+      setPagination({
+        currentPage: res.pagination.currentPage,
+        totalPages: res.pagination.totalPages,
+        total: res.pagination.totalCount,
+      });
     } catch (error) {
       setError("Failed to load scholarships");
       console.error("Error loading scholarships:", error);
@@ -184,6 +196,38 @@ export default function ScholarshipManager() {
 
   const formatDateForInput = (dateString) => {
     return new Date(dateString).toISOString().split("T")[0];
+  };
+
+  const handleSearch = async (query) => {
+    if (!query) {
+      loadScholarships();
+      return;
+    }
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/scholarship?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setScholarships(data.scholarships);
+        
+
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount,
+          });
+        }
+      } else {
+        console.error("Error scholarship levels:", response.statusText);
+        setScholarships([]);
+      }
+    } catch (error) {
+      console.error("Error fetching scholarhsip search results:", error.message);
+      setScholarships([]);
+    }
   };
 
   if (loading)
@@ -296,7 +340,13 @@ export default function ScholarshipManager() {
       </form>
 
       {/* Table */}
-      <Table data={scholarships} columns={columns} />
+      <Table
+        data={scholarships}
+        columns={columns}
+        pagination={pagination}
+        onPageChange={(newPage) => loadScholarships(newPage)}
+        onSearch={handleSearch}
+      />
     </div>
   );
 }
