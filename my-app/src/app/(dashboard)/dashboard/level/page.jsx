@@ -18,7 +18,11 @@ export default function LevelForm() {
   const [editId, setEditingId] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
   const {
     register,
     handleSubmit,
@@ -36,14 +40,19 @@ export default function LevelForm() {
     fetchLevels();
   }, []);
 
-  const fetchLevels = async () => {
+  const fetchLevels = async (page=1) => {
     setTableLoading(true);
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/level`
+        `${process.env.baseUrl}${process.env.version}/level?page=${page}`
       );
       const data = await response.json();
       setLevels(data.items);
+      setPagination({
+        currentPage: data.pagination.currentPage,
+        totalPages: data.pagination.totalPages,
+        total: data.pagination.totalCount,
+      });
     } catch (error) {
       toast.error("Failed to fetch levels");
     } finally {
@@ -161,6 +170,36 @@ export default function LevelForm() {
     },
   ];
 
+  const handleSearch = async (query) => {
+    if (!query) {
+      fetchLevels();
+      return;
+    }
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/level?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setLevels(data.items);
+
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount,
+          });
+        }
+      } else {
+        console.error("Error fetching levels:", response.statusText);
+        setLevels([]);
+      }
+    } catch (error) {
+      console.error("Error fetching levels search results:", error.message);
+      setLevels([]);
+    }
+  };
   return (
     <>
       <div className="text-2xl mr-auto p-4 ml-14 font-bold">
@@ -206,7 +245,11 @@ export default function LevelForm() {
                 disabled={loading}
                 className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300"
               >
-                {loading ? "Processing..." : editing ? "Update Level" : "Create Level"}
+                {loading
+                  ? "Processing..."
+                  : editing
+                  ? "Update Level"
+                  : "Create Level"}
               </button>
             </div>
           </form>
@@ -218,9 +261,9 @@ export default function LevelForm() {
           loading={tableLoading}
           data={levels}
           columns={columns}
-          onSearch={(query) => {
-            console.log("Searching for:", query);
-          }}
+          pagination={pagination}
+          onPageChange={(newPage) => fetchCourses(newPage)}
+          onSearch={handleSearch}
         />
       </div>
 

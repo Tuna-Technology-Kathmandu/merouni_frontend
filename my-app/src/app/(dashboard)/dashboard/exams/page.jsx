@@ -14,6 +14,11 @@ export default function ExamManager() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
 
   const [formData, setFormData] = useState({
     title: "",
@@ -140,16 +145,52 @@ export default function ExamManager() {
     loadExams();
   }, []);
 
-  const loadExams = async () => {
+  const loadExams = async (page = 1) => {
     try {
-      const response = await getAllExams();
-      setExams(response);
+      const response = await getAllExams(page);
+      console.log("edam",response)
+      setExams(response.items);
+      setPagination({
+        currentPage: response.pagination.currentPage,
+        totalPages: response.pagination.totalPages,
+        total: response.pagination.totalCount,
+      });
     } catch (error) {
       setError("Failed to load exams");
       console.error("Error loading exams:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = async (query) => {
+    if (!query) {
+      loadExams();
+      return;
+    }
+    // try {
+    //   const response = await authFetch(
+    //     `${process.env.baseUrl}${process.env.version}/exam?q=${query}`
+    //   );
+    //   if (response.ok) {
+    //     const data = await response.json();
+    //     setCourses(data.items);
+
+    //     if (data.pagination) {
+    //       setPagination({
+    //         currentPage: data.pagination.currentPage,
+    //         totalPages: data.pagination.totalPages,
+    //         total: data.pagination.totalCount,
+    //       });
+    //     }
+    //   } else {
+    //     console.error("Error fetching results:", response.statusText);
+    //     setCourses([]);
+    //   }
+    // } catch (error) {
+    //   console.error("Error fetching event search results:", error.message);
+    //   setCourses([]);
+    // }
   };
 
   const handleSubmit = async (e) => {
@@ -214,7 +255,7 @@ export default function ExamManager() {
   };
 
   const handleEdit = (exam) => {
-    console.log("while editing", exam)
+    console.log("while editing", exam);
     setFormData({
       title: exam.title,
       description: exam.description,
@@ -573,7 +614,13 @@ export default function ExamManager() {
         </button>
       </form>
 
-      <Table data={exams} columns={columns} />
+      <Table
+        data={exams}
+        columns={columns}
+        pagination={pagination}
+        onPageChange={(newPage) => loadExams(newPage)}
+        onSearch={handleSearch}
+      />
     </div>
   );
 }

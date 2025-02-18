@@ -4,14 +4,14 @@ import { authFetch } from "@/app/utils/authFetch";
 
 let url = `${process.env.baseUrl}${process.env.version}/exam`;
 
-export async function getAllExams() {
+export async function getAllExams(page) {
   try {
-    const response = await authFetch(`${url}`, {
+    const response = await authFetch(`${url}?page=${page}`, {
       cache: "no-store",
     });
     const data = await response.json();
     console.log("data", data);
-    return data.items;
+    return data;
   } catch (error) {
     throw new Error("Failed to fetch scholarships");
   }

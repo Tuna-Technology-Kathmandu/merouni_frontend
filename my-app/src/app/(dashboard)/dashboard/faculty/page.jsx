@@ -20,7 +20,11 @@ export default function FacultyManager() {
   });
   const [editingId, setEditingId] = useState(null);
   const author_id = useSelector((state) => state.user.data.id);
-
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
   // Define columns with actionsSchool",
   const columns = useMemo(
     () => [
@@ -72,10 +76,15 @@ export default function FacultyManager() {
     loadFaculties();
   }, []);
 
-  const loadFaculties = async () => {
+  const loadFaculties = async (page = 1) => {
     try {
-      const response = await getAllFaculty();
+      const response = await getAllFaculty(page);
       setFaculties(response.items);
+      setPagination({
+        currentPage: response.pagination.currentPage,
+        totalPages: response.pagination.totalPages,
+        total: response.pagination.totalCount,
+      });
       console.log(" resss", response.items);
     } catch (error) {
       console.error("Error loading faculties:", error);
@@ -87,7 +96,7 @@ export default function FacultyManager() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const requestData = { ...formData, author:author_id };
+      const requestData = { ...formData, author: author_id };
 
       if (editingId) {
         await updateFaculty(editingId, requestData);
@@ -121,7 +130,35 @@ export default function FacultyManager() {
       }
     }
   };
+  const handleSearch = async (query) => {
+    if (!query) {
+      loadFaculties();
+      return;
+    }
+    // try {
+    //   const response = await authFetch(
+    //     `${process.env.baseUrl}${process.env.version}/course?q=${query}`
+    //   );
+    //   if (response.ok) {
+    //     const data = await response.json();
+    //     setCourses(data.items);
 
+    //     if (data.pagination) {
+    //       setPagination({
+    //         currentPage: data.pagination.currentPage,
+    //         totalPages: data.pagination.totalPages,
+    //         total: data.pagination.totalCount,
+    //       });
+    //     }
+    //   } else {
+    //     console.error("Error fetching results:", response.statusText);
+    //     setCourses([]);
+    //   }
+    // } catch (error) {
+    //   console.error("Error fetching event search results:", error.message);
+    //   setCourses([]);
+    // }
+  };
   if (loading)
     return (
       <div className="mx-auto">
@@ -166,7 +203,13 @@ export default function FacultyManager() {
       </form>
 
       {/* Table */}
-      <Table data={faculties} columns={columns} />
+      <Table
+        data={faculties}
+        columns={columns}
+        pagination={pagination}
+        onPageChange={(newPage) => loadFaculties(newPage)}
+        onSearch={handleSearch}
+      />
     </div>
   );
 }
