@@ -18,7 +18,11 @@ export default function TagForm() {
   const [editId, setEditingId] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
   const {
     register,
     handleSubmit,
@@ -36,14 +40,19 @@ export default function TagForm() {
     fetchTags();
   }, []);
 
-  const fetchTags = async () => {
+  const fetchTags = async (page = 1) => {
     setTableLoading(true);
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/tag`
+        `${process.env.baseUrl}${process.env.version}/tag?page=${page}`
       );
       const data = await response.json();
       setTags(data.items);
+      setPagination({
+        currentPage: data.pagination.currentPage,
+        totalPages: data.pagination.totalPages,
+        total: data.pagination.totalCount,
+      });
     } catch (error) {
       toast.error("Failed to fetch tags");
     } finally {
@@ -167,6 +176,36 @@ export default function TagForm() {
     },
   ];
 
+  const handleSearch = async (query) => {
+    if (!query) {
+      fetchTags();
+      return;
+    }
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/tag?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setTags(data.items);
+
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount,
+          });
+        }
+      } else {
+        console.error("Error fetching levels:", response.statusText);
+        setTags([]);
+      }
+    } catch (error) {
+      console.error("Error fetching levels search results:", error.message);
+      setTags([]);
+    }
+  };
   return (
     <>
       <div className="text-2xl mr-auto p-4 ml-14 font-bold">
@@ -229,9 +268,9 @@ export default function TagForm() {
           loading={tableLoading}
           data={tags}
           columns={columns}
-          onSearch={(query) => {
-            console.log("Searching for:", query);
-          }}
+          pagination={pagination}
+          onPageChange={(newPage) => fetchTags(newPage)}
+          onSearch={handleSearch}
         />
       </div>
 

@@ -21,6 +21,11 @@ export default function UniversityForm() {
     featured: "",
     gallery: [],
   });
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
   const [deleteId, setDeleteId] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -84,14 +89,19 @@ export default function UniversityForm() {
     fetchUniversities();
   }, []);
 
-  const fetchUniversities = async () => {
+  const fetchUniversities = async (page = 1) => {
     setTableLoading(true);
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/university`
+        `${process.env.baseUrl}${process.env.version}/university?page=${page}`
       );
       const data = await response.json();
       setUniversities(data.items);
+      setPagination({
+        currentPage: data.currentPage,
+        totalPages: data.totalPages,
+        total: data.totalItems,
+      });
     } catch (error) {
       toast.error("Failed to fetch universities");
     } finally {
@@ -277,6 +287,36 @@ export default function UniversityForm() {
     },
   ];
 
+  const handleSearch = async (query) => {
+    if (!query) {
+      fetchUniversities();
+      return;
+    }
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/university?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setUniversities(data.items);
+
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.currentPage,
+            totalPages: data.totalPages,
+            total: data.totalItems,
+          });
+        }
+      } else {
+        console.error("Error fetching university:", response.statusText);
+        setUniversities([]);
+      }
+    } catch (error) {
+      console.error("Error fetching university search results:", error.message);
+      setUniversities([]);
+    }
+  };
   return (
     <>
       <div className="text-2xl mr-auto p-4 ml-14 font-bold">
@@ -598,10 +638,9 @@ export default function UniversityForm() {
           loading={tableLoading}
           data={universities}
           columns={columns}
-          onSearch={(query) => {
-            // Implement search functionality here
-            console.log("Searching for:", query);
-          }}
+          pagination={pagination}
+          onPageChange={(newPage) => fetchUniversities(newPage)}
+          onSearch={handleSearch}
         />
       </div>
 
