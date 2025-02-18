@@ -7,6 +7,7 @@ import { Edit2, Trash2 } from "lucide-react";
 import { authFetch } from "@/app/utils/authFetch";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../addCollege/ConfirmationDialog";
+import { getCourses } from "@/app/action";
 
 export default function CourseForm() {
   const author_id = useSelector((state) => state.user.data.id);
@@ -18,7 +19,11 @@ export default function CourseForm() {
   const [deleteId, setDeleteId] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [faculties, setFaculties] = useState([]);
-
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0,
+  });
   const {
     register,
     handleSubmit,
@@ -44,16 +49,21 @@ export default function CourseForm() {
     fetchFaculties();
   }, []);
 
-  const fetchCourses = async () => {
+  const fetchCourses = async (page=1) => {
     setTableLoading(true);
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/course`
+        `${process.env.baseUrl}${process.env.version}/course?page=${page}`
       );
       const data = await response.json();
       setCourses(data.items);
+      setPagination({
+        currentPage: data.pagination.currentPage,
+        totalPages: data.pagination.totalPages,
+        total: data.pagination.totalCount,
+      });
     } catch (error) {
-      toast.error("Failed to fetch courses");
+      toast.error("Failed to fetch courses",error);
     } finally {
       setTableLoading(false);
     }
@@ -206,6 +216,55 @@ export default function CourseForm() {
     },
   ];
 
+  const handleSearch = async (query) => {
+    if (!query) {
+      fetchCourses();
+      return;
+    }
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/course?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setCourses(data.items);
+
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount,
+          });
+        }
+      } else {
+        console.error("Error fetching results:", response.statusText);
+        setCourses([]);
+      }
+    } catch (error) {
+      console.error("Error fetching event search results:", error.message);
+      setCourses([]);
+    }
+  };
+
+  // const loadCourses = async (page = 1) => {
+  //   try {
+  //     const response = await fetchCourses(page);
+
+  //     setCourses(response.items);
+  //     setPagination({
+  //       currentPage: response.pagination.currentPage,
+  //       totalPages: response.pagination.totalPages,
+  //       total: response.pagination.totalCount,
+  //     });
+  //   } catch (err) {
+  //     toast.error("Failed to load courses");
+  //     console.error("Error loading courses:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   return (
     <>
       <div className="text-2xl mr-auto p-4 ml-14 font-bold">
@@ -329,9 +388,9 @@ export default function CourseForm() {
           loading={tableLoading}
           data={courses}
           columns={columns}
-          onSearch={(query) => {
-            console.log("Searching for:", query);
-          }}
+          pagination={pagination}
+          onPageChange={(newPage) => fetchCourses(newPage)}
+          onSearch={handleSearch}
         />
       </div>
 
