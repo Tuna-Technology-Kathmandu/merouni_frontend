@@ -168,6 +168,11 @@ export default function CollegeForm() {
       try {
         const response = await getColleges();
         setColleges(response.items);
+        setPagination({
+          currentPage: response.pagination.currentPage,
+          totalPages: response.pagination.totalPages,
+          total: response.pagination.totalCount,
+        });
       } catch (err) {
         console.log(err);
       } finally {
@@ -312,12 +317,6 @@ export default function CollegeForm() {
     },
   ];
 
-  const handleSearch = async (query) => {
-    if (!query) {
-      getColleges();
-      return;
-    }
-  };
   const [deleteId, setDeleteId] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -510,6 +509,57 @@ export default function CollegeForm() {
       alert("Failed to fetch college data");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadColleges = async (page = 1) => {
+    try {
+      const response = await getColleges(null, null, 10, page);
+
+      setColleges(response.items);
+      setPagination({
+        currentPage: response.pagination.currentPage,
+        totalPages: response.pagination.totalPages,
+        total: response.pagination.totalCount,
+      });
+    } catch (err) {
+      toast.error("Failed to load colleges");
+      console.error("Error loading colleges:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = async (query) => {
+    console.log("q",query)
+    if (!query) {
+      // getColleges();
+      loadColleges()
+      return;
+    }
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/college?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setColleges(data.items);
+
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount,
+          });
+        }
+      } else {
+        console.error("Error fetching results:", response.statusText);
+        setColleges([]);
+      }
+    } catch (error) {
+      console.error("Error fetching college search results:", error.message);
+      setColleges([]);
     }
   };
 
@@ -989,7 +1039,7 @@ export default function CollegeForm() {
         data={colleges}
         columns={columns}
         pagination={pagination}
-        onPageChange={(newPage) => getColleges(newPage)}
+        onPageChange={(newPage) => loadColleges(newPage)}
         onSearch={handleSearch}
       />
     </>

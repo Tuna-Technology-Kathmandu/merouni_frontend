@@ -146,14 +146,13 @@ export async function getBannersById(id) {
   return services.banner.getById(params);
 }
 
-export async function getColleges(isFeatured, pinned, limit, page) {
+export async function getColleges(isFeatured=null, pinned=null, limit=10, page=1) {
   const params = {
     limit,
     page,
     isFeatured,
     pinned,
   };
-  console.log("Value of is_f and pine:", isFeatured, pinned);
   return services.college.getAll(params);
 }
 
