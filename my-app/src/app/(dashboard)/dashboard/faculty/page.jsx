@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import Loader from "@/app/components/Loading";
 import Table from "../../../components/Table"; // Adjust the import path as needed
 import { Edit2, Trash2 } from "lucide-react"; // For action icons
+import { authFetch } from "@/app/utils/authFetch";
 
 export default function FacultyManager() {
   const [faculties, setFaculties] = useState([]);
@@ -135,29 +136,29 @@ export default function FacultyManager() {
       loadFaculties();
       return;
     }
-    // try {
-    //   const response = await authFetch(
-    //     `${process.env.baseUrl}${process.env.version}/course?q=${query}`
-    //   );
-    //   if (response.ok) {
-    //     const data = await response.json();
-    //     setCourses(data.items);
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/faculty?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setFaculties(data.items);
 
-    //     if (data.pagination) {
-    //       setPagination({
-    //         currentPage: data.pagination.currentPage,
-    //         totalPages: data.pagination.totalPages,
-    //         total: data.pagination.totalCount,
-    //       });
-    //     }
-    //   } else {
-    //     console.error("Error fetching results:", response.statusText);
-    //     setCourses([]);
-    //   }
-    // } catch (error) {
-    //   console.error("Error fetching event search results:", error.message);
-    //   setCourses([]);
-    // }
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount,
+          });
+        }
+      } else {
+        console.error("Error fetching results:", response.statusText);
+        setFaculties([]);
+      }
+    } catch (error) {
+      console.error("Error fetching faculty search results:", error.message);
+      setFaculties([]);
+    }
   };
   if (loading)
     return (

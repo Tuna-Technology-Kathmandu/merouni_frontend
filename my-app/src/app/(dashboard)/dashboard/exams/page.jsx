@@ -5,6 +5,7 @@ import { getAllExams, createExam, updateExam, deleteExam } from "./actions";
 import Loading from "../../../components/Loading";
 import Table from "../../../components/Table";
 import { Edit2, Trash2 } from "lucide-react";
+import { authFetch } from "@/app/utils/authFetch";
 
 export default function ExamManager() {
   const author_id = useSelector((state) => state.user.data.id);
@@ -148,7 +149,7 @@ export default function ExamManager() {
   const loadExams = async (page = 1) => {
     try {
       const response = await getAllExams(page);
-      console.log("edam",response)
+      console.log("edam", response);
       setExams(response.items);
       setPagination({
         currentPage: response.pagination.currentPage,
@@ -168,29 +169,29 @@ export default function ExamManager() {
       loadExams();
       return;
     }
-    // try {
-    //   const response = await authFetch(
-    //     `${process.env.baseUrl}${process.env.version}/exam?q=${query}`
-    //   );
-    //   if (response.ok) {
-    //     const data = await response.json();
-    //     setCourses(data.items);
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/exam?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setExams(data.items);
 
-    //     if (data.pagination) {
-    //       setPagination({
-    //         currentPage: data.pagination.currentPage,
-    //         totalPages: data.pagination.totalPages,
-    //         total: data.pagination.totalCount,
-    //       });
-    //     }
-    //   } else {
-    //     console.error("Error fetching results:", response.statusText);
-    //     setCourses([]);
-    //   }
-    // } catch (error) {
-    //   console.error("Error fetching event search results:", error.message);
-    //   setCourses([]);
-    // }
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount,
+          });
+        }
+      } else {
+        console.error("Error fetching exams:", response.statusText);
+        setExams([]);
+      }
+    } catch (error) {
+      console.error("Error fetching exams search results:", error.message);
+      setExams([]);
+    }
   };
 
   const handleSubmit = async (e) => {

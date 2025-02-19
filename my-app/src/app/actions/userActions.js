@@ -5,7 +5,7 @@ import { authFetch } from "../utils/authFetch";
 export async function getUsers(page = 1, token, role) {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/users?limit=10`,
+      `${process.env.baseUrl}${process.env.version}/users?page=${page}`,
       {
         headers: {
           // Authorization: `Bearer ${token}`,

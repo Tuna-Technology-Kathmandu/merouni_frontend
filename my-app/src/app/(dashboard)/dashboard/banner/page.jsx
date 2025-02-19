@@ -272,29 +272,29 @@ export default function BannerForm() {
       return;
     }
 
-    // try {
-    //   const response = await authFetch(
-    //     `${process.env.baseUrl}${process.env.version}/level?q=${query}`
-    //   );
-    //   if (response.ok) {
-    //     const data = await response.json();
-    //     setLevels(data.items);
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/banner?q=${query}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setBanners(data.items);
 
-    //     if (data.pagination) {
-    //       setPagination({
-    //         currentPage: data.pagination.currentPage,
-    //         totalPages: data.pagination.totalPages,
-    //         total: data.pagination.totalCount,
-    //       });
-    //     }
-    //   } else {
-    //     console.error("Error fetching levels:", response.statusText);
-    //     setLevels([]);
-    //   }
-    // } catch (error) {
-    //   console.error("Error fetching levels search results:", error.message);
-    //   setLevels([]);
-    // }
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount,
+          });
+        }
+      } else {
+        console.error("Error fetching banner:", response.statusText);
+        setBanners([]);
+      }
+    } catch (error) {
+      console.error("Error fetching banner search results:", error.message);
+      setBanners([]);
+    }
   };
   return (
     <>
