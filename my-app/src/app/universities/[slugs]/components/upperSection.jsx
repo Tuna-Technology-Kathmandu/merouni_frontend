@@ -28,20 +28,12 @@ const ImageSection = ({ university }) => {
               className=" w-32 h-32"
             />
           </div>
-          <div className="ml-8">
-            <h2 className="font-bold text-3xl leading-10">
+          <div className="ml-8 my-4">
+            <h2 className="font-bold text-sm md:text-3xl leading-10">
               {university?.fullname || "Bachelor of Computer Application"}
             </h2>
-            {/* 
-            <div className="flex flex-row items-center ">
-              <p className="font-semibold text-lg ">BCA</p>
-              <span>
-                <MdOutlineArrowRight size={25} />
-              </span>
-              <p className="font-semibold text-lg ">Tribhuvan University</p>
-            </div> */}
             <div className="flex flex-row">
-              <p className="font-semibold text-lg ">
+              <p className="font-semibold text-sm md:text-lg ">
                 {university.street},{university.city},{university.country}
               </p>
               <span>
@@ -52,8 +44,8 @@ const ImageSection = ({ university }) => {
         </div>
       </div>
 
-      <div className="  bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex flex-row  mb-8  items-center justify-center w-[1150px] h-[150px] p-8">
-        <div className=" flex flex-col items-center pr-14">
+      <div className="  bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex flex-col lp:flex-row  mb-8  items-left justify-between w-full lp:w-[80%] gap-4   p-8">
+        <div className=" flex flex-row lp:flex-col items-center gap-2 ">
           {/* <p className="text-sm font-bold">Starts</p> */}
           {/* <img src="/images/course_year.png" alt="year" className="w-8" /> */}
           <MdDateRange size={30} />
@@ -61,10 +53,10 @@ const ImageSection = ({ university }) => {
             {university?.date_of_establish || "2009-12-10"}
           </p>
         </div>
-        <div className="flex items-center pr-5">
+        <div className="items-center hidden lp:block">
           <PiLineVerticalThin size={60} />
         </div>
-        <div className=" flex flex-col items-center pl-14 pr-14">
+        <div className=" flex flex-row lp:flex-col items-center gap-2 ">
           {/* <p className="text-sm font-bold">Starts</p> */}
           {/* <img
             src="/images/course_faculty.png"
@@ -77,20 +69,20 @@ const ImageSection = ({ university }) => {
             {university?.type_of_institute || "Private"}
           </p>
         </div>
-        <div className="flex items-center pr-5">
+        <div className="items-center hidden lp:block">
           <PiLineVerticalThin size={60} />
         </div>
-        <div className=" flex flex-col items-center pl-14 pr-14">
+        <div className=" flex flex-row lp:flex-col items-center gap-2 ">
           <FaPhoneAlt size={20} />
 
           <div className="flex flex-row">
             <p>{university?.contact?.phone_number || "N/A"}</p>
           </div>
         </div>
-        <div className="flex items-center ">
+        <div className="items-center hidden lp:block">
           <PiLineVerticalThin size={60} />
         </div>
-        <div className=" flex flex-col items-center pl-14">
+        <div className=" flex flex-row lp:flex-col items-center gap-2 ">
           {/* <p className="text-sm font-bold">Ends</p> */}
           {/* <img src="/images/course_hour.png" alt="level" className="w-10" />
 
@@ -104,11 +96,11 @@ const ImageSection = ({ university }) => {
         </div>
       </div>
 
-      <div className="   bg-opacity-10 text-black rounded-md flex flex-col  mb-8    w-[1150px]  pt-10">
-        <h2 className="font-bold text-3xl leading-10">
+      <div className="   bg-opacity-10 text-black rounded-md flex flex-col  mb-8      pt-10">
+        <h2 className="font-bold text-xl md:text-3xl leading-10 m-4">
           Why Study in {university.fullname}?
         </h2>
-        <p className="pt-6 leading-7 ">
+        <p className="pt-6 leading-7">
           {university?.description ||
             " This university has good environment for excelling"}
         </p>

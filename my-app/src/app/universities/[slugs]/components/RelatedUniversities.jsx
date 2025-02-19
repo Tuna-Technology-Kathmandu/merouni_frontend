@@ -46,29 +46,28 @@ const RelatedUniversities = ({ university }) => {
   }
 
   return (
-    <div className="flex flex-col  w-[1150px]  mx-auto mb-20">
+    <div className="flex flex-col w-full max-w-[1150px] mx-auto mb-20 px-4">
       <h2 className="font-bold text-3xl leading-10 mb-4">
         Other Universities you might like
       </h2>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {universities.map((university, index) => (
           <Link href={`/universites/${university.slugs}`} key={index}>
-            <div key={index} className="cursor-pointer  p-4 max-w-sm ">
-              <div className="flex justify-center border-2 rounded-3xl items-center  overflow-hidden mb-2 p-4 ">
+            <div className="cursor-pointer p-4 w-full">
+              <div className="flex justify-center border-2 rounded-3xl items-center overflow-hidden mb-2 p-4">
                 <img
-                  src={"/images/islington.png" }
-                  //  src={college.logo}
+                  src={"/images/islington.png"}
                   alt={university.fullname}
                   className="w-48 h-48 object-cover"
                 />
               </div>
-              <div className="px-4 pb-4 flex flex-col ">
-                <h3 className="text-lg   font-bold text-center">
+              <div className="px-4 pb-4 flex flex-col">
+                <h3 className="text-lg font-bold text-center">
                   {university.fullname}
                 </h3>
                 <p className="text-xs text-gray-700 text-center">
-                  {university.city},{university.state},{university.country}
+                  {university.city}, {university.state}, {university.country}
                 </p>
               </div>
             </div>

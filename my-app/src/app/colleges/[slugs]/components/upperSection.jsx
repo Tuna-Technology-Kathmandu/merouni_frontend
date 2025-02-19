@@ -11,41 +11,41 @@ const ImageSection = ({ college }) => {
   return (
     <>
       <div className="flex flex-col items-center relative ">
-      <div>
-  <Image
-    src={college.featured_img || "/images/collegePhoto.png"}
-    width={2400}
-    height={600}
-    alt="College Photo"
-    className="h-[25vh] md:h-[50vh] object-fill"
-  />
-  <div className="flex flex-row bg-[#30AD8F] bg-opacity-5 mb-20 items-center p-0 md:pl-32">
-    {/* Logo Container */}
-    <div className="flex items-center justify-center rounded-full bg-white -translate-y-8 overflow-hidden w-24 h-24 md:w-32 md:h-32">
-      <Image
-        src={college.college_logo || "/images/texas_logo.png"}
-        width={120}
-        height={120}
-        alt="College Logo"
-        className="object-cover w-full h-full rounded-full aspect-square" // Ensures the image is circular
-      />
-    </div>
-    <div className="ml-8">
-      <h2 className="font-bold text-lg lp:text-3xl leading-10">
-        {college?.name}
-      </h2>
-      <div className="flex flex-row">
-        <p className="font-semibold text-lg ">
-          {college?.collegeAddress?.street},{" "}
-          {college?.collegeAddress?.city}
-        </p>
-        <span>
-          <IoIosGlobe size={25} />
-        </span>
-      </div>
-    </div>
-  </div>
-</div>
+        <div>
+          <Image
+            src={college.featured_img || "/images/collegePhoto.png"}
+            width={2400}
+            height={600}
+            alt="College Photo"
+            // className="h-[25vh] md:h-[50vh] object-fill"
+          />
+          <div className="flex flex-row bg-[#30AD8F] bg-opacity-5 mb-20 items-center p-0 md:pl-32">
+            {/* Logo Container */}
+            <div className="flex items-center justify-center rounded-full bg-white -translate-y-8 overflow-hidden w-24 h-24 md:w-32 md:h-32">
+              <Image
+                src={college.college_logo || "/images/texas_logo.png"}
+                width={120}
+                height={120}
+                alt="College Logo"
+                className="object-cover w-full h-full rounded-full aspect-square" // Ensures the image is circular
+              />
+            </div>
+            <div className="ml-8">
+              <h2 className="font-bold text-lg lp:text-3xl leading-10">
+                {college?.name}
+              </h2>
+              <div className="flex flex-row">
+                <p className="font-semibold text-lg ">
+                  {college?.collegeAddress?.street},{" "}
+                  {college?.collegeAddress?.city}
+                </p>
+                <span>
+                  <IoIosGlobe size={25} />
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div className="bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex  flex-col lp:flex-row mb-8  items-left w-full lp:w-[80%] justify-between gap-4 lp:gap-12  p-8 ">
           <div className="flex flex-row lp:flex-col items-center gap-2 ">

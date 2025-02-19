@@ -1,6 +1,7 @@
 import React from "react";
 import { FaArrowRight } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { LogsIcon } from "lucide-react";
 
 const ApplyNow = ({ college }) => {
   const router = useRouter();
@@ -31,3 +32,5 @@ const ApplyNow = ({ college }) => {
 };
 
 export default ApplyNow;
+
+
