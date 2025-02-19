@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const EventCard = ({ photo, month, day, title, description }) => {
   return (
-    <div className="min-w-[350px] max-w-[350px] mx-2 my-2 bg-white rounded-2xl  shadow-md border border-gray-300 ">
+    <div className="md:min-w-[350px] md:max-w-[350px] mx-2 my-2 bg-white rounded-2xl  shadow-md border border-gray-300 ">
       {/* <!-- Top Section: Image --> */}
       {/* <div className="flex justify-center mb-4"> */}
       <img src={photo} alt={`${title} logo`} className="w-full object-cover" />

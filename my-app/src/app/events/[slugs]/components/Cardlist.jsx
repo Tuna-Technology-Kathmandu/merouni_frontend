@@ -3,8 +3,8 @@ import EventCard from "./Cards"; // Import the EventCard component
 
 const Cardlist = ({ events }) => {
   return (
-    <div className="px-4 py-8 bg-[#E7E7E7] p-8 mt-20 rounded-md">
-      <div className="max-w-[1600px] mx-auto">
+    <div className="px-4 py-8 bg-[#E7E7E7] p-8 mt-20 rounded-md ">
+      <div className="max-w-full md:max-w-[1600px] md:mx-auto">
         <div className="text-2xl font-semibold mb-6">
           Other events you may like
         </div>
@@ -17,7 +17,7 @@ const Cardlist = ({ events }) => {
               <EventCard
                 key={event.id}
                 photo={"/images/eventsdesc.png"} // Use the event image or fallback
-                month={startDate.toLocaleString('default', { month: 'long' })} // Get the month in text
+                month={startDate.toLocaleString("default", { month: "long" })} // Get the month in text
                 day={startDate.getDate()} // Get the day of the month
                 title={event.title}
                 description={event.description}

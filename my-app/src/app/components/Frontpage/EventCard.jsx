@@ -1,19 +1,29 @@
 import React from "react";
 import Image from "next/image";
 
-const EventCard = ({ photo, month, day, title, description }) => {
+const EventCard = ({ event }) => {
+  // console.log("Month and day in event card:", event_host.start_date, day);
+  let month = "";
+  let day = "";
+  try {
+    const { start_date } = JSON.parse(event.event_host);
+    const dateObj = new Date(start_date);
+    month = dateObj.toLocaleString("en-US", { month: "short" }); // e.g., "Feb"
+    day = dateObj.getDate(); // e.g., 15
+  } catch (error) {
+    console.error("Error parsing event_host:", error);
+  }
   return (
-    <div className="min-w-[350px] max-w-[350px] mx-2 my-2 bg-white rounded-2xl  shadow-md border border-gray-300  ">
+    <div className="min-w-[300px] max-w-[350px] mx-2 my-2 bg-white rounded-2xl  shadow-md border border-gray-300  ">
       {/* <!-- Top Section: Image --> */}
       {/* <div className="flex justify-center mb-4"> */}
-      <div className="h-[300px]">
-
+      <div className="md:h-[300px]">
         <img
           src="/images/upcoming.png"
-          alt={`${title} logo`}
-          className="w-full  object-cover "
-          />
-          </div>
+          alt={`${event.title} logo`}
+          className="w-full  object-cover rounded-t-2xl"
+        />
+      </div>
       {/* </div> */}
 
       <div className="flex items-start space-x-4 mb-4">
@@ -25,8 +35,8 @@ const EventCard = ({ photo, month, day, title, description }) => {
 
         {/* Title and Description */}
         <div className="flex-1">
-          <h3 className="text-lg font-bold text-gray-900 p-2">{title}</h3>
-          <p className="text-gray-700 text-sm p-2">{description}</p>
+          <h3 className="text-lg font-bold text-gray-900 p-2">{event.title}</h3>
+          <p className="text-gray-700 text-sm p-2">{event.description}</p>
         </div>
       </div>
     </div>

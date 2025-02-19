@@ -19,6 +19,7 @@ import Link from "next/link";
 import Loading from "../components/Loading";
 import Pagination from "../blogs/components/Pagination";
 import { debounce } from "lodash";
+import useMediaQuery from "./MediaQuery";
 
 const Events = () => {
   const [allEvents, setAllEvents] = useState([]);
@@ -34,6 +35,7 @@ const Events = () => {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   useEffect(() => {
     if (!searchQuery) {
@@ -45,6 +47,7 @@ const Events = () => {
     try {
       const response = await getEvents(page);
       const events = response.items;
+      console.log("Events:", events);
       setAllEvents(events);
       setPagination({
         currentPage: response.pagination.currentPage,
@@ -116,16 +119,42 @@ const Events = () => {
       ) : (
         <div className="mx-auto">
           {featuredEvent && featuredEvent.event_host && (
-            <div className="flex flex-col md:flex-row items-center justify-between p-6 md:p-10 max-w-[1600px] mx-auto mb-10">
-              {/* Left Column - Featured Event */}
-              <div className="md:w-1/2">
-                <h2 className="text-2xl md:text-3xl font-bold mb-4">
+            <div className="flex flex-col md:flex-row items-center justify-between p-0 md:p-10 max-w-[1600px] mx-auto mb-10 ">
+              <div className="order-1 md:order-2 w-full md:w-1/2 flex justify-center mt-0 mb-2 md:mb-0 md:mt-0">
+                {isMobile ? (
+                  // For mobile: use layout="responsive" so the image fills the container width
+                  <Image
+                    src="/images/events.png"
+                    alt={featuredEvent.title}
+                    className="md:rounded-lg rounded-none shadow-md"
+                    width={400}
+                    height={450}
+                    layout="responsive"
+                  />
+                ) : (
+                  // For larger screens: use layout="intrinsic" to respect the intrinsic dimensions
+                  <Image
+                    src="/images/events.png"
+                    alt={featuredEvent.title}
+                    className="md:rounded-lg rounded-none shadow-md"
+                    width={400}
+                    height={450}
+                    layout="intrinsic"
+                  />
+                )}
+              </div>
+
+              {/* Featured Event Content */}
+              <div className="order-2 md:order-1 md:w-1/2 flex flex-col">
+                <h2 className="text-2xl md:text-3xl font-bold mb-4 mt-4 md:mt-0 text-center md:text-start">
                   {featuredEvent.title}
                 </h2>
-                <p className="mb-6">{featuredEvent.description}</p>
+                <p className="md:mb-6 text-center md:text-start">
+                  {featuredEvent.description}
+                </p>
 
                 {/* Event Details */}
-                <div className="bg-gradient-to-l from-[#30AD8F] to-[#0A6FA7] text-white rounded-lg flex flex-row mb-8 items-center justify-between w-[600px] h-[120px] p-8">
+                <div className="order-2 md:order-1 bg-gradient-to-l from-[#30AD8F] to-[#0A6FA7] text-white rounded-lg flex flex-row mb-8 items-center justify-between w-full md:w-[600px] md:h-[120px] p-6 md:p-8">
                   <div className="flex flex-col items-center">
                     <p className="text-sm font-bold">Starts</p>
                     <p className="whitespace-nowrap">
@@ -157,51 +186,45 @@ const Events = () => {
                 </div>
 
                 {/* Buttons */}
-                <div className="flex gap-4">
-                  <button className="border-2 border-black text-black px-6 py-2 rounded-lg hover:bg-gray-800 hover:text-white transition-all flex flex-row items-center justify-between mt-5">
-                    <span className="pr-4 font-semibold">View More</span>
+                <div className="order-1 md:order-2  flex flex-row mb-6 md:mb-0 items-center justify-center md:items-center md:justify-start md:flex-row gap-4">
+                  <button className="border-2 border-black text-black px-2 py-1 md:px-6 md:py-2 rounded-full md:rounded-lg hover:bg-gray-800 hover:text-white transition-all flex flex-row items-center justify-between mt-5">
+                    <span className="pr-2 md:pr-4 font-semibold text-sm md:text-base">
+                      View More
+                    </span>
                     <IoIosArrowDroprightCircle size={25} />
                   </button>
                   <a
                     href="#"
                     className="text-[#3D3D3D] hover:text-blue-700 underline flex items-center mt-5"
                   >
-                    <span>Apply Here</span>
+                    <span className="text-sm md:text-base">Apply Here</span>
                     <IoArrowUp className="rotate-45" />
                   </a>
                 </div>
               </div>
-
-              {/* Right Column (Image) */}
-              <div className="md:w-1/2 flex justify-center mt-6 md:mt-0">
-                <Image
-                  src="/images/events.png"
-                  alt={featuredEvent.title}
-                  className="rounded-lg shadow-md"
-                  width={400}
-                  height={450}
-                />
-              </div>
             </div>
           )}
+
           {/* Sponsors Section */}
           <div className="bg-[#E8E8E8] py-20 flex flex-row items-center justify-center w-full">
             <h2 className="text-3xl font-bold">*Sponsors* (Sliding) </h2>
           </div>
 
           {/* This Week's Events */}
-          <div className="flex max-w-[2000px] mx-auto items-center justify-center py-20">
-            <div className="flex justify-center items-center space-y-2 w-1/2 ml-28">
+          {/* <div className="flex flex-col md:flex-row items-center justify-between p-0 md:p-10 max-w-[1600px] mx-auto mb-10"> */}
+
+          <div className="flex flex-col md:flex-row max-w-[2000px] mx-auto items-center justify-center py-20 ">
+            <div className="flex justify-center items-center space-y-2 w-full md:w-1/2 ml-0 mb-4 md:mb-0 md:ml-28">
               <div className="min-w-[200px] flex flex-col pr-8">
-                <span className="text-3xl font-bold text-[#0A6FA7] block">
+                <span className="text-2xl md:text-3xl font-bold text-[#0A6FA7] block md:text-start text-center">
                   Events this Week
                 </span>
               </div>
             </div>
 
-            <div className="md:w-3/4">
-              <div className="overflow-x-auto no-scrollbar">
-                <div className="flex gap-6 pb-4 ml-20">
+            <div className="w-full md:w-3/4">
+              <div className="overflow-x-auto md:no-scrollbar">
+                <div className="flex md:gap-6 pb-4  md:ml-20">
                   {thisWeekEvents.map((event, index) => (
                     <Link href={`/events/${event.slugs}`} key={index}>
                       <div
@@ -209,7 +232,7 @@ const Events = () => {
                         className="transition-all duration-300 ease-in-out"
                         style={{ minWidth: "max-content" }}
                       >
-                        <EventCard {...event} />
+                        <EventCard event={event} />
                       </div>
                     </Link>
                   ))}
@@ -218,18 +241,17 @@ const Events = () => {
             </div>
           </div>
 
-          {/* Next Week's Events */}
-          <div className="flex max-w-[2000px] bg-[#30AD8F] bg-opacity-5 mx-auto items-center justify-center py-20">
-            <div className="flex justify-center items-center space-y-2 w-1/2 ml-28">
+          <div className="flex flex-col md:flex-row md:max-w-[2000px] bg-[#F1F1F1] md:bg-[#30AD8F] md:bg-opacity-5 md:mx-auto items-center justify-center py-20">
+            <div className="flex justify-center items-center space-y-2 w-full md:w-1/2 md:ml-28 ml-0 mb-4 md:mb-0">
               <div className="min-w-[200px] flex flex-col pr-8">
-                <span className="text-3xl font-bold text-[#0A6FA7] block">
+                <span className="text-2xl md:text-3xl font-bold text-[#0A6FA7] block">
                   Upcoming Events
                 </span>
               </div>
             </div>
 
-            <div className="md:w-3/4">
-              <div className="overflow-x-auto no-scrollbar">
+            <div className="w-full md:w-3/4">
+              <div className="overflow-x-auto md:no-scrollbar">
                 <div className="flex gap-6 pb-4 ml-20">
                   {nextWeekEvents.map((event, index) => (
                     <Link href={`/events/${event.slugs}`} key={index}>
@@ -238,7 +260,7 @@ const Events = () => {
                         className="transition-all duration-300 ease-in-out"
                         style={{ minWidth: "max-content" }}
                       >
-                        <EventCard {...event} />
+                        <EventCard event={event} />
                       </div>
                     </Link>
                   ))}
@@ -248,11 +270,12 @@ const Events = () => {
           </div>
 
           {/* All Events Section */}
-          <div className="flex flex-row container mx-auto py-20 mb-20">
+          <div className="container mx-auto flex flex-col md:flex-row px-4 py-20 mb-20 gap-8 ">
             {/* Left Section */}
-            <div className="flex flex-col w-1/4 space-y-8 pr-8">
+            <div className="w-full md:w-1/4 flex flex-col space-y-8">
+              {/* Heading */}
               <div>
-                <span className="text-3xl font-bold text-[#0A6FA7] block">
+                <span className="text-2xl md:text-3xl font-bold text-[#0A6FA7] block mb-4 md:text-start text-center">
                   All Events
                 </span>
               </div>
@@ -262,7 +285,7 @@ const Events = () => {
                 <input
                   type="text"
                   placeholder="Search Events..."
-                  className="px-4 py-2 border-b border-black focus:outline-none"
+                  className="px-4 py-2 border md:border-0 rounded-md md:rounded-none bg-[#F1F1F1] md:bg-transparent md:border-b md:border-black w-full focus:outline-none"
                   value={searchQuery}
                   onChange={handleSearchChange}
                 />
@@ -271,16 +294,15 @@ const Events = () => {
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-500"></div>
                   </div>
                 )}
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 -translate-x-28 text-gray-400">
+                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 -translate-x-7 text-gray-400">
                   <IoIosSearch />
                 </span>
               </div>
 
               {/* Archive Section */}
-              <div>
-                <h2 className="text-xl font-bold mb-2 mt-8">Archive</h2>
-                <div className="w-60 border-b border-black"></div>
-
+              <div className="md:block hidden">
+                <h2 className="text-xl font-bold mb-2">Archive</h2>
+                <div className="border-b border-black w-full mb-4"></div>
                 <ul className="list-disc space-y-4 ml-4 mt-2">
                   {[
                     "January 2025",
@@ -297,8 +319,9 @@ const Events = () => {
             </div>
 
             {/* Right Section - All Events Grid */}
-            <div className="flex flex-col w-3/4 items-center justify-center">
-              <div className="grid grid-cols-3 gap-3">
+            <div className="w-full md:w-3/4 flex flex-col items-center justify-center">
+              {/* Responsive Grid: 1 col on mobile, 2 cols on small screens, 3 cols on md+ */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 md:gap-6 justify-items-center">
                 {allEvents.map((event, index) => (
                   <Link href={`/events/${event.slugs}`} key={index}>
                     <div
@@ -306,11 +329,14 @@ const Events = () => {
                       className="transition-all duration-300 ease-in-out"
                       style={{ minWidth: "max-content" }}
                     >
-                      <EventCard {...event} />
+                      {/* <EventCard {...event} /> */}
+                      <EventCard event={event} />
                     </div>
                   </Link>
                 ))}
               </div>
+
+              {/* Pagination */}
               <div className="mt-10">
                 <Pagination
                   pagination={pagination}
