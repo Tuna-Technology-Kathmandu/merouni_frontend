@@ -38,26 +38,24 @@ const RelatedColleges = ({ college }) => {
   
 
   return (
-    <div className="flex flex-col  max-w-[1600px]  mx-auto mb-20">
-      <h2 className="font-bold text-3xl leading-10 mb-4">
-         Colleges you may like
+    <div className="flex flex-col max-w-[1600px] mx-auto mb-20">
+      <h2 className="font-bold text-xl md:text-3xl leading-10 m-4">
+        Colleges you may like
       </h2>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {colleges.map((college, index) => (
           <Link href={`/colleges/${college.slug}`} key={index}>
-            <div key={index} className="cursor-pointer  p-4 max-w-sm ">
-              <div className="flex justify-center border-2 rounded-3xl items-center  overflow-hidden mb-2 p-4 ">
+            <div className="cursor-pointer p-4 max-w-sm mx-auto sm:mx-0">
+              <div className="flex justify-center border-2 rounded-3xl items-center overflow-hidden mb-2 p-4">
                 <img
                   src="/images/islington.png"
-                  //  src={college.logo}
+                  // src={college.logo}
                   alt={college.name}
                   className="w-48 h-48 object-cover"
                 />
               </div>
-              <div className="px-4 pb-4 flex flex-col ">
-                <h3 className="text-lg   font-bold text-center">
-                  {college.name}
-                </h3>
+              <div className="px-4 pb-4 flex flex-col">
+                <h3 className="text-lg font-bold text-center">{college.name}</h3>
                 <p className="text-xs text-gray-700 text-center">
                   {college.location}
                 </p>
