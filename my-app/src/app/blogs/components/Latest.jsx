@@ -60,7 +60,7 @@ const Latest = () => {
 
   return (
     <div className="bg-[#F1F1F1]">
-      <div className="flex flex-col max-w-[1600px] mx-auto px-8">
+      <div className="flex flex-col max-w-[1600px] mx-auto px-4 sm:px-8">
         <div className="border-b-2 border-[#0A70A7] w-[45px] mt-10">
           <span className="text-2xl font-bold mr-2">Latest</span>
           <span className="text-[#0A70A7] text-2xl font-bold">Blogs</span>
