@@ -1,84 +1,107 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import { FaLocationArrow } from "react-icons/fa6";
+import { authFetch } from "@/app/utils/authFetch";
 
 const Newsletter = () => {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage(""); // Clear previous messages
+
+    if (!email) {
+      setMessage("Please enter a valid email.");
+      return;
+    }
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/newsletter`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessage("Subscribed successfully!");
+        setEmail(""); // Clear input field
+      } else {
+        setMessage(data.message || "Something went wrong.");
+      }
+    } catch (error) {
+      setMessage("Failed to subscribe. Please try again later.");
+    }
+  };
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage("");
+      }, 3000); // 3000ms = 3 seconds
+
+      // Cleanup timer on component unmount or if message changes
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   return (
-    <div className=" bg-gradient-to-b from-[#E0E0E0] to-[#FFFFFF] py-20 h-[40vh] flex items-center">
-      <div className="container mx-auto px-4 flex flex-col md:flex-row items-center md:justify-center gap-8 md:gap-48 flex-wrap">
+    <div className="relative bg-cover bg-center py-20 h-auto flex items-center px-4">
+      {/* Overlay for better readability */}
+      <div className="absolute inset-0 bg-[#E0E0E0] bg-opacity-50"></div>
+
+      <div className="relative container mx-auto flex flex-col md:flex-row items-center md:justify-between gap-4 md:gap-48 text-center md:text-left">
         {/* Left Section */}
-        <div className="mb-6 md:mb-0 text-center md:text-left">
-          <h2 className="text-3xl font-bold md:text-5xl md:font-extrabold text-black mb-4 md:mb-2">
+        <div>
+          <h2 className="text-2xl font-bold md:text-5xl md:font-extrabold mb-2">
             News Letter
           </h2>
-          <p className="text-black font-medium mt-2">
-            Get the latest exam updates, study resources, and <br />
-            expert tips delivered straight to your inbox
+          <p className="font-medium  mt-2">
+            Get the latest exam updates, study resources, and{" "}
+            <br className="hidden md:block" />
+            expert tips delivered straight to your inbox.
           </p>
         </div>
 
-        {/* Right Section */}
-        <div className="mt-2 flex flex-row  md:flex-row items-center bg-[#eaf4f3]  rounded-xl shadow-md w-full md:w-auto">
+        {/* Right Section - Input and Button */}
+        <form
+          onSubmit={handleSubmit}
+          className="mt-2 flex flex-row items-center bg-[#eaf4f3] rounded-xl shadow-md w-full md:w-1/2"
+        >
           <input
             type="email"
             placeholder="Your Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="flex-grow w-full px-4 py-4 bg-transparent text-gray-700 placeholder-gray-500 focus:outline-none rounded-t-xl md:rounded-t-none md:rounded-l-xl"
           />
-          <button className="bg-[#30AD8F] bg-opacity-20  py-6 px-6 rounded-r-xl flex items-center justify-center hover:bg-[#288c74] transition-colors">
+          <button
+            type="submit"
+            className="bg-[#30AD8F] bg-opacity-20 py-6 px-6 rounded-r-xl flex items-center justify-center hover:bg-[#288c74] transition-colors"
+          >
             Send
             <span className="ml-2">
               <FaLocationArrow className="rotate-45 " />
             </span>
           </button>
-        </div>
+        </form>
+
+        {/* Message Feedback */}
+        {message && (
+          <p className="text-center md:text-left mt-2 text-gray-700">
+            {message}
+          </p>
+        )}
       </div>
     </div>
   );
 };
 
 export default Newsletter;
-
-// import React from "react";
-// import { FaLocationArrow } from "react-icons/fa6";
-
-// const Newsletter = () => {
-//   return (
-//     <div
-//       className="relative bg-cover bg-center py-20 h-auto flex items-center px-4"
-//       style={{ backgroundImage: "url('/images/news_letter.png')" }} // Update with your image path
-//     >
-//       {/* Overlay for better readability */}
-//       <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-
-//       <div className="relative container mx-auto flex flex-col md:flex-row items-center md:justify-between gap-4 md:gap-48 text-center md:text-left">
-//         {/* Left Section */}
-//         <div className="">
-//           <h2 className="text-2xl font-bold md:text-5xl md:font-extrabold mb-2">
-//             News Letter
-//           </h2>
-//           <p className="font-semibold mt-2">
-//             Get the latest exam updates, study resources, and{" "}
-//             <br className="hidden md:block" />
-//             expert tips delivered straight to your inbox.
-//           </p>
-//         </div>
-
-//         {/* Right Section - Input and Button */}
-//         <div className="w-full md:w-auto flex flex-col md:flex-row items-center bg-[#30AD8F] rounded-xl shadow-md overflow-hidden">
-//           <input
-//             type="email"
-//             placeholder="Your Email Address"
-//             className="flex-grow w-full px-6 py-4 bg-white text-gray-700 placeholder-gray-500 focus:outline-none rounded-t-xl md:rounded-t-none md:rounded-l-xl"
-//           />
-//           <button className="bg-[#30AD8F] py-4 px-6 text-white flex items-center justify-center hover:bg-[#288c74] transition-colors w-full md:w-auto rounded-b-xl md:rounded-b-none md:rounded-r-xl">
-//             Send
-//             <span className="ml-2">
-//               <FaLocationArrow className="rotate-45" />
-//             </span>
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Newsletter;

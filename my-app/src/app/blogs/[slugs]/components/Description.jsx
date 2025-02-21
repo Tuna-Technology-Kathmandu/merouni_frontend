@@ -82,25 +82,21 @@ import { AiOutlineLike } from "react-icons/ai";
 const Description = ({ news }) => {
   return (
     <>
-      <div className="p-4 flex max-w-[1200px] mx-auto h-[40vh] items-center leading-[200px]">
+      <div className="p-4 flex md:max-w-[1600px] md:mx-auto  items-center md:leading-[200px]">
         <div className="mb-6">
           <div className="text-xl font-bold">Content</div>
           {/* <div className="text-base mt-2 leading-10">
             {news?.description}
           </div> */}
-          <div className="text-base mt-4 leading-10">{news?.content}</div>
+          <div className="text-base mt-4 leading-8">{news?.content}</div>
         </div>
       </div>
 
       {/* Rest of the component remains the same */}
-      {/* <div className="max-w-[1200px] mx-auto leading-[40px] flex justify-start items-center"> */}
-      <div className="max-w-[1200px] mx-auto flex justify-start items-center mt-4">
-        {/* <div className="w-1/2">
-          <div className="font-bold text-2xl">Events highlights</div>
-          <div>{news?.content}</div>
-        </div> */}
+      <div className="md:max-w-[1600px] md:mx-auto flex md:justify-start items-center justify-center mt-4">
+        
 
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-row gap-4 md:items-start ">
           <button type="button" className="p-2  rounded hover:bg-blue-600">
             <FaRegFaceLaugh size={25} />
           </button>

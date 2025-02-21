@@ -304,7 +304,7 @@ export default function EventManager() {
     try {
       setEditing(true);
       setLoading(true);
-      console.log("Cate1:", categories);
+      // console.log("Cate1:", categories);
 
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/event/${data.slugs}`,
@@ -316,9 +316,10 @@ export default function EventManager() {
       );
       let eventData = await response.json();
       eventData = eventData.item; // Assuming the event data is nested under `item`
+
       // let eventData=slug
       console.log("Event data:", eventData);
-      console.log("Cate:", categories);
+      // console.log("Cate:", categories);
       setEditingEventId(eventData.id);
 
       // Populate form fields with event data
@@ -337,14 +338,27 @@ export default function EventManager() {
         }
       }
 
-      setValue("college_id", data.id); // Assuming college has an `id`
-      const colgData = [
-        {
-          id: data.id,
-          name: eventData.college.name,
-        },
-      ];
-      setSelectedColleges(colgData);
+      if (eventData?.college) {
+        const response = await authFetch(
+          `${process.env.baseUrl}${process.env.version}/college?q=${eventData.college.slugs}`
+        );
+        const collegeData = await response.json();
+        const collegeId = collegeData.items[0]?.id;
+
+        if (collegeId) {
+          setValue("college_id", collegeId); 
+
+          const colgData = [
+            {
+              id: collegeId,
+              name: eventData.college.name,
+            },
+          ];
+          setSelectedColleges(colgData);
+        }
+      }
+
+
       setValue("description", eventData.description);
       setValue("content", eventData.content);
       setValue("image", eventData.image);
@@ -375,6 +389,7 @@ export default function EventManager() {
     }
   };
 
+ 
   const handleDeleteClick = (id) => {
     setDeleteId(id);
     setIsDialogOpen(true);

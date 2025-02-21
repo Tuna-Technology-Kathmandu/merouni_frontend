@@ -14,7 +14,7 @@ const Hero = ({ event }) => {
         objectFit="cover"
         className="w-full h-[50vh] md:h-[70vh]"
       />
-      <div className="absolute top-1/2 left-4 md:left-36 transform -translate-y-1/2 text-white text-3xl md:text-4xl font-extrabold max-w-full px-4">
+      <div className="absolute top-3/4 left-4 md:left-36 transform -translate-y-1/2 text-white text-3xl md:text-4xl font-extrabold max-w-full px-4">
         <div className="text-4xl md:text-5xl">{event.title.split(":")[0]}</div>
         <div className="text-5xl md:text-6xl my-2">
           {event.title.split(":")[1] || ""}

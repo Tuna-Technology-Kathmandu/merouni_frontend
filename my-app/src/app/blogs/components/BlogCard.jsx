@@ -57,7 +57,7 @@ const BlogCard = ({ image, date, title, description, slug }) => {
     });
   };
   return (
-    <div className="min-w-[350px] max-w-[350px] my-2 bg-white rounded-2xl shadow-md border border-gray-300 mb-10">
+    <div className="md:min-w-[350px] md:max-w-[350px] my-2 bg-white rounded-2xl shadow-md border border-gray-300 mb-10">
       <div className="h-[200px] relative">
         <img
           src={image}
