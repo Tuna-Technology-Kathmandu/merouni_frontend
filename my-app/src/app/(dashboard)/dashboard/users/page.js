@@ -12,10 +12,11 @@ import { Edit2, Trash2 } from "lucide-react";
 import { getToken } from "@/app/action";
 import { jwtDecode } from "jwt-decode";
 import { authFetch } from "@/app/utils/authFetch";
-
+import ExportModal from "./ExportModal";
 export default function UsersManager() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -393,6 +394,19 @@ export default function UsersManager() {
           </button>
         )}
       </form>
+
+      {/* Button to open modal */}
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-4"
+      >
+        Export User
+      </button>
+
+      <ExportModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <h2 className="text-xl font-bold mb-4">Export Users</h2>
+        <p>This is the modal content. You can add any form or content here.</p>
+      </ExportModal>
 
       {/* Table */}
       <Table
