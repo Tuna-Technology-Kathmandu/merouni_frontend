@@ -169,50 +169,37 @@ const CollegeFinder = () => {
 
   const FilterModal = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-      <div className="bg-white rounded-xl p-6 w-[80%] h-[80%] overflow-y-auto">
+      <div className="bg-white rounded-xl p-6 w-full max-w-[90%] md:max-w-[80%] lg:max-w-[60%] h-full max-h-[90%] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">All Filters</h2>
           <button
             onClick={() => setIsModalOpen(false)}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700 text-xl"
           >
             ✕
           </button>
         </div>
-        <div className="grid grid-cols-3 gap-6">
+        {/* Responsive Filter Layout */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filters.map((filter, index) => (
-            <FilterSection
-              key={index}
-              {...filter}
-              selectedItems={selectedFilters.disciplines}
-              onSelectionChange={(items) => {
-                setSelectedFilters((prev) => ({ ...prev, disciplines: items }));
-              }}
-            />
+            <FilterSection key={index} {...filter} />
           ))}
-          <DegreeSection
-            selectedDegrees={selectedFilters.degrees}
-            onSelectionChange={(degrees) => {
-              setSelectedFilters((prev) => ({ ...prev, degrees }));
-            }}
-          />
-          <AffiliationSection
-            selectedAffiliations={selectedFilters.affiliations}
-            onSelectionChange={(affiliations) => {
-              setSelectedFilters((prev) => ({ ...prev, affiliations }));
-            }}
-          />
-          <CourseFeeSection
-            range={selectedFilters.courseFees}
-            onRangeChange={(range) => {
-              setSelectedFilters((prev) => ({ ...prev, courseFees: range }));
-            }}
-          />
+          <DegreeSection />
+          <AffiliationSection />
+          <CourseFeeSection />
+        </div>
+        <div className="flex justify-end mt-4">
+          <button
+            onClick={() => setIsModalOpen(false)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+          >
+            Apply Filters
+          </button>
         </div>
       </div>
     </div>
   );
-
+  
   const handlePageChange = (page) => {
     console.log("Pages response from pagination controle:", page);
     if (page > 0 && page <= pagination.totalPages) {
@@ -330,34 +317,6 @@ const CollegeFinder = () => {
                 <NoResultsFound />
               )}
               {!searchQuery && universities.length > 0 && (
-                // <div className="flex justify-center items-center gap-4 mt-8">
-                //   <button
-                //     onClick={() => setCurrentPage((prev) => prev - 1)}
-                //     disabled={!pagination.hasPreviousPage}
-                //     className={`px-4 py-2 rounded-lg ${
-                //       pagination.hasPreviousPage
-                //         ? "bg-blue-500 text-white hover:bg-blue-600"
-                //         : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                //     }`}
-                //   >
-                //     Previous
-                //   </button>
-                //   <span className="text-gray-600">
-                //     Page {currentPage} of {pagination.totalPages}
-                //   </span>
-                //   <button
-                //     onClick={() => setCurrentPage((prev) => prev + 1)}
-                //     disabled={!pagination.hasNextPage}
-                //     className={`px-4 py-2 rounded-lg ${
-                //       pagination.hasNextPage
-                //         ? "bg-blue-500 text-white hover:bg-blue-600"
-                //         : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                //     }`}
-                //   >
-                //     Next
-                //   </button>
-                // </div>
-                // <PaginationControls />
                 <Pagination
                   onPageChange={handlePageChange}
                   pagination={pagination}
