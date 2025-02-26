@@ -40,10 +40,12 @@ export default function BannerForm() {
     defaultValues: {
       collegeSearch: "",
       collegeId: "",
+      website_url: "",
       bannerImages: [
         {
           title: "",
           gallery: { small: "", medium: "", large: "" },
+          is_featured: 0,
         },
       ],
     },
@@ -134,9 +136,11 @@ export default function BannerForm() {
     try {
       const bannerData = {
         collegeId: selectedCollege.id,
+        website_url: data.website_url,
         bannerImage: data.bannerImages.map((image) => ({
           title: image.title,
           gallery: image.gallery,
+          is_featured: image.is_featured,
         })),
       };
 
@@ -190,6 +194,7 @@ export default function BannerForm() {
       if (banner.Banners && banner.Banners.length > 0) {
         const bannerImages = banner.Banners.map((b) => ({
           title: b.title,
+          website_url: b.website_url,
           gallery: {
             small:
               b.banner_galleries.find((g) => g.size === "small")?.url || "",
@@ -198,11 +203,13 @@ export default function BannerForm() {
             large:
               b.banner_galleries.find((g) => g.size === "large")?.url || "",
           },
+          is_featured: b.is_featured,
         }));
 
         reset({
           collegeSearch: banner.name,
           collegeId: banner.id,
+          website_url: banner.website_url,
           bannerImages,
         });
 
@@ -365,6 +372,28 @@ export default function BannerForm() {
                 </div>
               )}
 
+              <div className="mb-4">
+                <label className="block mb-2">Website URL</label>
+                <input
+                  type="text"
+                  {...register("website_url", {
+                    required: "Website URL is required",
+                    pattern: {
+                      value:
+                        /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6}\.?)(\/[\w.-]*)*\/?$/,
+                      message: "Enter a valid URL",
+                    },
+                  })}
+                  className="w-full p-2 border rounded"
+                  placeholder="Enter website URL"
+                />
+                {errors.website_url && (
+                  <span className="text-red-500">
+                    {errors.website_url.message}
+                  </span>
+                )}
+              </div>
+
               {/* Banner Images Array */}
               <div className="space-y-6">
                 {fields.map((field, index) => (
@@ -394,6 +423,24 @@ export default function BannerForm() {
                           {errors.bannerImages[index].title.message}
                         </span>
                       )}
+                    </div>
+
+                    <div className="mb-4 flex items-center">
+                      <input
+                        type="checkbox"
+                        {...register(`bannerImages.${index}.is_featured`)}
+                        onChange={(e) =>
+                          setValue(
+                            `bannerImages.${index}.is_featured`,
+                            e.target.checked ? 1 : 0
+                          )
+                        }
+                        checked={
+                          watch(`bannerImages.${index}.is_featured`) == 1
+                        }
+                      />
+
+                      <label>Is Featured?</label>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
