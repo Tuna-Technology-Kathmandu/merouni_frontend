@@ -100,7 +100,7 @@ const Latest = () => {
                       title={truncateString(blog.title, 30)}
                       description={truncateString(blog.description, 100)}
                       image={
-                        blog?.featured_image ||
+                        blog?.featuredImage ||
                         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ718nztPNJfCbDJjZG8fOkejBnBAeQw5eAUA&s"
                       } // Use blog.image if available
                       date={formatDate(blog.createdAt)}

@@ -13,6 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import FileUpload from "../addCollege/FileUpload";
 import ConfirmationDialog from "../addCollege/ConfirmationDialog";
+import RichTextEditor from "@/app/components/RichTextEditor";
 
 export default function NewsManager() {
   const author_id = useSelector((state) => state.user.data.id);
@@ -59,6 +60,8 @@ export default function NewsManager() {
       visibility: "private",
     },
   });
+
+  const content = watch("content");
 
   const columns = useMemo(
     () => [
@@ -592,10 +595,12 @@ export default function NewsManager() {
         </div>
 
         <div className="mb-4">
-          <textarea
-            placeholder="Content"
-            {...register("content", { required: "Content is required" })}
-            className="w-full p-2 border rounded"
+          <label htmlFor="content">Content</label>
+          <RichTextEditor
+            onEditorChange={(content) => {
+              setValue("content", content);
+            }}
+            initialContent={content}
           />
           {errors.content && (
             <span className="text-red-500 text-sm">

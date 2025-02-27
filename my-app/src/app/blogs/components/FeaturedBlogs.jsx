@@ -64,11 +64,6 @@ const FeaturedBlogs = () => {
     console.log("Updated Current Page:", pagination.currentPage);
   }, [pagination.currentPage]);
 
-  // const handlePageChange = (newPage) => {
-  //   if (newPage >= 1 && newPage <= pagination.totalPages) {
-  //     setCurrentPage(newPage);
-  //   }
-  // };
 
   const truncateString = (str, maxLength) => {
     if (str.length > maxLength) {

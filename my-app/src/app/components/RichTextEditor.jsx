@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, memo } from "react";
 import "prismjs/themes/prism.css";
 import Prism from "prismjs";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -45,7 +45,7 @@ const FontSize = Extension.create({
   },
 });
 
-const RichTextEditor = ({ onEditorChange, initialContent = "" }) => {
+const RichTextEditor = memo(({ onEditorChange, initialContent = "" }) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -86,7 +86,10 @@ const RichTextEditor = ({ onEditorChange, initialContent = "" }) => {
     <div className="p-4 bg-gray-50 rounded-lg shadow-md">
       {/* Toolbar */}
       <button
-        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+        onClick={(e) => {
+          e.preventDefault();
+          editor.chain().focus().toggleCodeBlock().run();
+        }}
         className={`px-3 py-1 border rounded ${
           editor.isActive("codeBlock")
             ? "bg-gray-800 text-white"
@@ -99,7 +102,10 @@ const RichTextEditor = ({ onEditorChange, initialContent = "" }) => {
       <div className="mb-4 flex flex-wrap gap-2">
         {/* Bold, Italic */}
         <button
-          onClick={() => editor.chain().focus().toggleBold().run()}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.chain().focus().toggleBold().run();
+          }}
           className={`px-3 py-1 border rounded ${
             editor.isActive("bold") ? "bg-gray-800 text-white" : "bg-gray-200"
           }`}
@@ -107,7 +113,10 @@ const RichTextEditor = ({ onEditorChange, initialContent = "" }) => {
           Bold
         </button>
         <button
-          onClick={() => editor.chain().focus().toggleItalic().run()}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.chain().focus().toggleItalic().run();
+          }}
           className={`px-3 py-1 border rounded ${
             editor.isActive("italic") ? "bg-gray-800 text-white" : "bg-gray-200"
           }`}
@@ -117,7 +126,10 @@ const RichTextEditor = ({ onEditorChange, initialContent = "" }) => {
 
         {/* Bullet & Ordered List */}
         <button
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.chain().focus().toggleBulletList().run();
+          }}
           className={`px-3 py-1 border rounded ${
             editor.isActive("bulletList")
               ? "bg-gray-800 text-white"
@@ -127,7 +139,10 @@ const RichTextEditor = ({ onEditorChange, initialContent = "" }) => {
           Bullet List
         </button>
         <button
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.chain().focus().toggleOrderedList().run();
+          }}
           className={`px-3 py-1 border rounded ${
             editor.isActive("orderedList")
               ? "bg-gray-800 text-white"
@@ -141,9 +156,10 @@ const RichTextEditor = ({ onEditorChange, initialContent = "" }) => {
         {[1, 2, 3, 4, 5, 6].map((level) => (
           <button
             key={level}
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level }).run()
-            }
+            onClick={(e) => {
+              e.preventDefault();
+              editor.chain().focus().toggleHeading({ level }).run();
+            }}
             className={`px-3 py-1 border rounded ${
               editor.isActive("heading", { level })
                 ? "bg-gray-800 text-white"
@@ -156,7 +172,10 @@ const RichTextEditor = ({ onEditorChange, initialContent = "" }) => {
 
         {/* Paragraph */}
         <button
-          onClick={() => editor.chain().focus().setParagraph().run()}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.chain().focus().setParagraph().run();
+          }}
           className={`px-3 py-1 border rounded ${
             editor.isActive("paragraph")
               ? "bg-gray-800 text-white"
@@ -168,19 +187,28 @@ const RichTextEditor = ({ onEditorChange, initialContent = "" }) => {
 
         {/* Text Alignment */}
         <button
-          onClick={() => editor.chain().focus().setTextAlign("left").run()}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.chain().focus().setTextAlign("left").run();
+          }}
           className="px-3 py-1 border rounded"
         >
           Left
         </button>
         <button
-          onClick={() => editor.chain().focus().setTextAlign("center").run()}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.chain().focus().setTextAlign("center").run();
+          }}
           className="px-3 py-1 border rounded"
         >
           Center
         </button>
         <button
-          onClick={() => editor.chain().focus().setTextAlign("right").run()}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.chain().focus().setTextAlign("right").run();
+          }}
           className="px-3 py-1 border rounded"
         >
           Right
@@ -188,9 +216,10 @@ const RichTextEditor = ({ onEditorChange, initialContent = "" }) => {
 
         {/* Font Size Input */}
         <select
-          onChange={(e) =>
-            editor.chain().focus().setFontSize(e.target.value).run()
-          }
+          onChange={(e) => {
+            e.preventDefault();
+            editor.chain().focus().setFontSize(e.target.value).run();
+          }}
           className="px-3 py-1 border rounded"
         >
           <option value="14px">14px</option>
@@ -204,46 +233,60 @@ const RichTextEditor = ({ onEditorChange, initialContent = "" }) => {
         {/* Color Picker */}
         <input
           type="color"
-          onInput={(event) =>
-            editor.chain().focus().setColor(event.target.value).run()
-          }
+          onInput={(event) => {
+            event.preventDefault();
+            editor.chain().focus().setColor(event.target.value).run();
+          }}
           value={editor.getAttributes("textStyle").color || "#000000"}
           className="w-10 h-8 border rounded"
         />
 
         {/* Table Actions */}
         <button
-          onClick={() =>
+          onClick={(e) => {
+            e.preventDefault();
             editor
               .chain()
               .focus()
               .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-              .run()
-          }
+              .run();
+          }}
           className="px-3 py-1 border rounded bg-blue-500 text-white"
         >
           Insert Table
         </button>
         <button
-          onClick={() => editor.chain().focus().addRowAfter().run()}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.chain().focus().addRowAfter().run();
+          }}
           className="px-3 py-1 border rounded bg-green-500 text-white"
         >
           Add Row
         </button>
         <button
-          onClick={() => editor.chain().focus().addColumnAfter().run()}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.chain().focus().addColumnAfter().run();
+          }}
           className="px-3 py-1 border rounded bg-green-500 text-white"
         >
           Add Column
         </button>
         <button
-          onClick={() => editor.chain().focus().deleteRow().run()}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.chain().focus().deleteRow().run();
+          }}
           className="px-3 py-1 border rounded bg-red-500 text-white"
         >
           Delete Row
         </button>
         <button
-          onClick={() => editor.chain().focus().deleteColumn().run()}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.chain().focus().deleteColumn().run();
+          }}
           className="px-3 py-1 border rounded bg-red-500 text-white"
         >
           Delete Column
@@ -286,6 +329,6 @@ const RichTextEditor = ({ onEditorChange, initialContent = "" }) => {
       `}</style>
     </div>
   );
-};
+});
 
 export default RichTextEditor;

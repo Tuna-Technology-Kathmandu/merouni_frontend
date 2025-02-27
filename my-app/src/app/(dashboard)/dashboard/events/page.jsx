@@ -592,6 +592,7 @@ export default function EventManager() {
             {...register("description")}
             placeholder="Description"
             className="w-full p-2 border rounded"
+            rows="5"
           />
         </div>
 
