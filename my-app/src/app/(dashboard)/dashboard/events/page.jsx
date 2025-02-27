@@ -16,10 +16,11 @@ import debounce from "lodash/debounce";
 import { fetchCategories } from "../category/action";
 import { X } from "lucide-react";
 
+import RichTextEditor from "@/app/components/RichTextEditor";
+
 export default function EventManager() {
   const author_id = useSelector((state) => state.user.data.id);
   console.log("author", author_id);
-
   const {
     register,
     handleSubmit,
@@ -59,15 +60,13 @@ export default function EventManager() {
     total: 0,
   });
   const [categories, setCategories] = useState([]);
-  // const [collegeSearch, setCollegeSearch] = useState("");
-  // const [searchResults, setSearchResults] = useState([]);
-  // const [selectedCollege, setSelectedCollege] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState(null);
   const [selectedColleges, setSelectedColleges] = useState([]);
   const [collegeSearch, setCollegeSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [editorContent, setEditorContent] = useState("");
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -87,61 +86,6 @@ export default function EventManager() {
   useEffect(() => {
     loadEvents();
   }, []);
-
-  // const searchCollege = async (e) => {
-  //   const query = e.target.value;
-  //   setCollegeSearch(query);
-  //   if (query.length < 2) return;
-
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.baseUrl}${process.env.version}/college?q=${query}`
-  //     );
-  //     const data = await response.json();
-  //     setSearchResults(data.items || []);
-  //   } catch (error) {
-  //     console.error("College Search Error:", error);
-  //   }
-  // };
-
-  // Create a debounced version of your API call
-  // const debouncedSearch = useMemo(
-  //   () =>
-  //     debounce(async (query) => {
-  //       try {
-  //         const response = await fetch(
-  //           `${process.env.baseUrl}${process.env.version}/college?q=${query}`
-  //         );
-  //         const data = await response.json();
-  //         setSearchResults(data.items || []);
-  //       } catch (error) {
-  //         console.error("College Search Error:", error);
-  //       }
-  //     }, 300),
-  //   []
-  // );
-
-  // const searchCollege = (e) => {
-  //   const query = e.target.value;
-  //   setCollegeSearch(query);
-
-  //   if (selectedCollege && query === selectedCollege.name) {
-  //     setSearchResults([]);
-  //     return;
-  //   }
-  //   if (query.length < 2) {
-  //     setSearchResults([]);
-  //     return;
-  //   }
-  //   debouncedSearch(query);
-  // };
-
-  // const handleCollegeSelect = (college) => {
-  //   setValue("college_id", college.id);
-  //   setSelectedCollege(college);
-  //   setCollegeSearch(college.name);
-  //   setSearchResults([]);
-  // };
 
   const searchCollege = async (e) => {
     const query = e.target.value;
@@ -191,8 +135,8 @@ export default function EventManager() {
     setEditingEventId(null);
     setUploadedFiles({ image: "" });
     setCollegeSearch("");
-    // setSelectedCollege(null);
     setSelectedColleges(null);
+    setEditorContent("");
   };
 
   const handleSearch = async (query) => {
@@ -251,6 +195,7 @@ export default function EventManager() {
         ...data,
         is_featured: Number(data.is_featured),
         image: uploadedFiles.image,
+        content: editorContent,
       };
 
       // Include event ID for update operation
@@ -289,6 +234,7 @@ export default function EventManager() {
       setUploadedFiles({ image: "" });
       setCollegeSearch("");
       setSelectedColleges([]);
+      setEditorContent("");
       loadEvents(); // Refresh the event list
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Network error occurred";
@@ -346,7 +292,7 @@ export default function EventManager() {
         const collegeId = collegeData.items[0]?.id;
 
         if (collegeId) {
-          setValue("college_id", collegeId); 
+          setValue("college_id", collegeId);
 
           const colgData = [
             {
@@ -357,7 +303,6 @@ export default function EventManager() {
           setSelectedColleges(colgData);
         }
       }
-
 
       setValue("description", eventData.description);
       setValue("content", eventData.content);
@@ -389,7 +334,6 @@ export default function EventManager() {
     }
   };
 
- 
   const handleDeleteClick = (id) => {
     setDeleteId(id);
     setIsDialogOpen(true);
@@ -581,37 +525,6 @@ export default function EventManager() {
           </select>
         </div>
 
-        {/* <div className="mb-4">
-          <label htmlFor="colleges">Colleges *</label>
-          <input
-            {...register("college_id", { required: true })}
-            type="hidden"
-          />
-          <input
-            type="text"
-            value={collegeSearch}
-            onChange={searchCollege}
-            className="border rounded w-full p-2"
-            placeholder="Type college name..."
-          />
-          {errors.college_id && (
-            <span className="text-red-500">College is required</span>
-          )}
-          {searchResults.length > 0 && (
-            <ul className="border rounded mt-2">
-              {searchResults.map((college) => (
-                <li
-                  key={college.id}
-                  className="cursor-pointer p-2 hover:bg-gray-200"
-                  onClick={() => handleCollegeSelect(college)}
-                >
-                  {college.name}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div> */}
-
         <div className="mb-4">
           <label className="block mb-2">College</label>
           <div className="flex flex-wrap gap-2 mb-2">
@@ -684,11 +597,11 @@ export default function EventManager() {
 
         <div className="mb-4">
           <label htmlFor="content">Content </label>
-
-          <textarea
-            {...register("content")}
-            placeholder="Content"
-            className="w-full p-2 border rounded"
+          <RichTextEditor
+            onEditorChange={(content) => {
+              setEditorContent(content);
+            }}
+            initialContent={editorContent}
           />
         </div>
 
