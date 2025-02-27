@@ -16,6 +16,7 @@ const AdLayout = ({ banners = [], size = "", number = 1 }) => {
           id: banner.id,
           title: banner.title,
           imageUrl: mediumImage?.url,
+          websiteUrl: banner.website_url,
         };
       });
   };
@@ -26,7 +27,7 @@ const AdLayout = ({ banners = [], size = "", number = 1 }) => {
     <div className="mb-5 mt-4 ">
       <div className="flex flex-col md:flex-row justify-between gap-4">
         {selectedBanners.slice(0, number).map((banner, index) => (
-          <Link href={`${banner.website_url}`}>
+          <Link href={`${banner.websiteUrl}`}>
             <div key={`${banner.id}-${index}`} className="w-full md:w-auto">
               <img
                 src={"/images/Large-Banner.jpg" || banner.imageUrl}

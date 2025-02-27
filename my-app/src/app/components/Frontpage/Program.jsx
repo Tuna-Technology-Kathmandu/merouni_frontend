@@ -2,6 +2,7 @@
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { getCourses, getExams } from "@/app/action";
+import Link from "next/link";
 
 const Program = () => {
   const [courses, setCourses] = useState([]);
@@ -25,8 +26,7 @@ const Program = () => {
     }
   };
 
-  useEffect(() => {
-  }, [courses]);
+  useEffect(() => {}, [courses]);
 
   useEffect(() => {
     fetchExams();
@@ -45,8 +45,7 @@ const Program = () => {
     }
   };
 
-  useEffect(() => {
-  }, [exams]);
+  useEffect(() => {}, [exams]);
 
   return (
     <>
@@ -67,7 +66,6 @@ const Program = () => {
         </div>
         <div className="max-w-[1600px] mx-auto">
           <div className="flex justify-around  gap-64 mt-20 lp:mt-40">
-            
             <div className="flex flex-col  bg-white rounded-lg shadow-[8px_10px_4px_rgba(0,0,0,0.1)] max-w-[650px] w-full p-8">
               <div className="flex items-center">
                 <Image
@@ -110,12 +108,14 @@ const Program = () => {
                 goals, Browse through programs based on your interests and
                 career goals
               </div>
-              <button className="w-[130px] text-center border border-black rounded-xl  flex items-center justify-center p-2 font-bold mt-2">
-                View all
-                <div className="w-6 h-6 rounded-full bg-black text-white mx-2">
-                  &gt;
-                </div>
-              </button>
+              <Link href="/courses">
+                <button className="w-[130px] text-center border border-black rounded-xl  flex items-center justify-center p-2 font-bold mt-2">
+                  View all
+                  <div className="w-6 h-6 rounded-full bg-black text-white mx-2">
+                    &gt;
+                  </div>
+                </button>
+              </Link>
             </div>
 
             <div className="flex flex-col items-start md:items-start bg-white rounded-lg shadow-[8px_10px_4px_rgba(0,0,0,0.1)] max-w-[600px] w-full p-8 ml-auto mb-4">

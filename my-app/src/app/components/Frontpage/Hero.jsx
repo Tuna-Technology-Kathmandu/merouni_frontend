@@ -1,8 +1,7 @@
 "use client";
-import ImageCarousel from "./ImageCarousel"; // Importing the modified carousel
 import FrontPageCard from "./frontpageCard";
 import React, { useState, useEffect } from "react";
-import { getFeaturedColleges, getColleges, getBanners } from "@/app/action";
+import { getColleges, getBanners } from "@/app/action";
 import AdLayout from "./AdLayout";
 
 const Hero = () => {
@@ -37,6 +36,7 @@ const Hero = () => {
     try {
       setLoading(true);
       const response = await getBanners();
+      console.log("From Hero: ", response);
       setBanner(response.items);
     } catch (error) {
       console.error("Error fetching banner content:", error);

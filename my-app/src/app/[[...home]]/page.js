@@ -24,7 +24,7 @@ const page = () => {
       <Program />
       <Sponsore />
       <Colleges />
-      <TU />
+      {/* <TU /> */}
       <Degree />
       <Event />
       <Blogs />
