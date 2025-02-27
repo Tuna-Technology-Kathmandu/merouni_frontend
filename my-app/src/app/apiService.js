@@ -26,7 +26,6 @@ class ApiService {
     try {
       // const url = queryParams ? `${this.baseUrl}?${queryParams}` : this.baseUrl;
       const url = this.buildUrl(this.baseUrl, params);
-      console.log("Final URL:", url); // Debug log
       const response = await fetch(url, {
         cache: "no-store",
       });
@@ -66,7 +65,6 @@ class ApiService {
         },
         body: JSON.stringify(data),
       });
-      console.log("Response of create:", response.json());
       return await response.json();
     } catch (error) {
       throw new Error(`Failed to create item`);

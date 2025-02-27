@@ -10,7 +10,7 @@ const Newsletter = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage(""); // Clear previous messages
+    setMessage("");
 
     if (!email) {
       setMessage("Please enter a valid email.");
@@ -32,7 +32,7 @@ const Newsletter = () => {
       const data = await response.json();
       if (response.ok) {
         setMessage("Subscribed successfully!");
-        setEmail(""); // Clear input field
+        setEmail("");
       } else {
         setMessage(data.message || "Something went wrong.");
       }

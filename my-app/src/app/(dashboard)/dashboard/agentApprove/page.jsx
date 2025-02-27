@@ -1,117 +1,3 @@
-// "use client";
-// import React, { useState, useEffect } from "react";
-
-// const page = () => {
-//   const [pendingUsers, setPendingUsers] = useState([]);
-//   const [loading, setLoading] = useState(false);
-
-//   useEffect(() => {
-//     fetchPendingRoles();
-//   }, []);
-
-//   const fetchPendingRoles = async () => {
-//     try {
-//       const response = await fetch(
-//         `${process.env.baseUrl}${process.env.version}/users/pending-role?role=agent`,
-//         {
-//           cache: "no-store",
-//         }
-//       );
-//       const data = await response.json();
-//       setPendingUsers(data.items);
-//     } catch (error) {
-//       console.error("Error fetching the pending roles" || error);
-//     }
-//   };
-
-//   useEffect(() => {
-//     console.log("Pending users:", pendingUsers);
-//   }, [pendingUsers]);
-
-//   const handleApproval = async (userId, action) => {
-//     setLoading(true);
-//     try {
-//       const response = await fetch(
-//         `${process.env.baseUrl}${process.env.version}/users/review-agent`,
-//         {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//           },
-//           body: JSON.stringify({
-//             userId: userId,
-//             action: action,
-//           }),
-//         }
-//       );
-
-//       if (response.ok) {
-//         fetchPendingRoles();
-//       } else {
-//         console.error("Failed to approve users");
-//       }
-//     } catch (error) {
-//       console.error("Error approving user:", error);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <>
-//       <div className="p-6">
-//         <h1 className="text-2xl font-bold mb-6">Agent Approval Requests</h1>
-
-//         <div className="overflow-x-auto">
-//           <table>
-//             <thead>
-//               <tr>
-//                 <th>Name</th>
-//                 <th>Email</th>
-//                 <th>Phone</th>
-//                 <th>Created At</th>
-//                 <th>Actions</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {pendingUsers.map((user) => (
-//                 <tr key={user.id}>
-//                   <td>
-//                     {`${user.firstName} ${user.middleName || ""} ${
-//                       user.lastName
-//                     }`}
-//                   </td>
-//                   <td>{user.email}</td>
-//                   <td>{user.phoneNo}</td>
-//                   <td>{new Date(user.createdAt).toLocaleDateString()}</td>
-//                   <td>
-//                     <button
-//                       onClick={() => handleApproval(user.id, "approve")}
-//                       disabled={loading}
-//                     >
-//                       {loading ? "Processing..." : "Approve"}
-//                     </button>
-//                     <button
-//                       onClick={() => handleApproval(user.id, "approve")}
-//                       disabled={loading}
-//                     >
-//                       {loading ? "Processing..." : "Reject"}
-//                     </button>
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-
-//           {pendingUsers.length === 0 && <div>No pending requests found</div>}
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default page;
-
 "use client";
 import { authFetch } from "@/app/utils/authFetch";
 import React, { useState, useEffect } from "react";
@@ -135,7 +21,6 @@ const Page = () => {
         }
       );
       const data = await response.json();
-      console.log("Pen:",data)
       setPendingUsers(data.items);
     } catch (error) {
       console.error("Error fetching the pending roles:", error);
@@ -143,15 +28,12 @@ const Page = () => {
   };
 
   useEffect(() => {
-    console.log("Current cookies:", document.cookie);
   }, []);
 
   const handleApproval = async (user_id, action) => {
     // setLoading(true);
     setLoading((prev) => ({ ...prev, [user_id]: true }));
     try {
-      console.log("Sending request with:", { user_id, action }); // Debug log
-
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/users/review-agent`,
         {
@@ -168,11 +50,9 @@ const Page = () => {
       );
 
       // Log the response status and status text
-      console.log("Response status:", response.status, response.statusText);
 
       // Try to get the response body even if it's an error
       const responseData = await response.json().catch((e) => null);
-      console.log("Response data:", responseData);
 
       if (response.ok) {
         await fetchPendingRoles();

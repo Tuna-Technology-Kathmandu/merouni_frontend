@@ -127,7 +127,6 @@ export async function getToken() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token");
   if (!token) {
-    console.log("No token found in cookies");
     return null;
   }
   return token;
@@ -157,7 +156,6 @@ export async function getColleges(isFeatured=null, pinned=null, limit=10, page=1
 }
 
 export async function getFeaturedColleges() {
-  console.log("HEllo");
   try {
     const response = await fetch(
       `${process.env.baseUrl}${process.env.version}/college/featured-college`,
@@ -165,7 +163,6 @@ export async function getFeaturedColleges() {
         cache: "no-store",
       }
     );
-    console.log("Response status:", response.status);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -191,13 +188,6 @@ export async function getExams(limit, page) {
 
 export async function getBannerById(id) {
   try {
-    // console.log("Fetching college details for slug:", slug);
-    console.log("Banner detail fetching");
-    console.log(
-      "FULL URL:",
-      `${process.env.baseUrl}${process.env.version}/banner/${id}`
-    );
-
     const response = await fetch(
       `${process.env.baseUrl}${process.env.version}/banner/${id}`,
       {
@@ -214,7 +204,6 @@ export async function getBannerById(id) {
     }
 
     const data = await response.json();
-    console.log("Raw api  banner response:", data);
     return data?.items || data;
   } catch (error) {
     console.error("Error fetching banner details:", error);

@@ -2,8 +2,6 @@ import Link from "next/link";
 import React from "react";
 
 const AdLayout = ({ banners = [], size = "", number = 1 }) => {
-  console.log("Banner data from params:", banners);
-
   const getRandomBanners = () => {
     return banners
       .filter((banner) => banner.banner_galleries?.length > 0)

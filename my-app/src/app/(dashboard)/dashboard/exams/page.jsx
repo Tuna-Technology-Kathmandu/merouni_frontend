@@ -149,7 +149,7 @@ export default function ExamManager() {
   const loadExams = async (page = 1) => {
     try {
       const response = await getAllExams(page);
-      console.log("edam", response);
+      
       setExams(response.items);
       setPagination({
         currentPage: response.pagination.currentPage,
@@ -158,7 +158,6 @@ export default function ExamManager() {
       });
     } catch (error) {
       setError("Failed to load exams");
-      console.error("Error loading exams:", error);
     } finally {
       setLoading(false);
     }
@@ -185,7 +184,6 @@ export default function ExamManager() {
           });
         }
       } else {
-        console.error("Error fetching exams:", response.statusText);
         setExams([]);
       }
     } catch (error) {
@@ -256,7 +254,7 @@ export default function ExamManager() {
   };
 
   const handleEdit = (exam) => {
-    console.log("while editing", exam);
+    
     setFormData({
       title: exam.title,
       description: exam.description,

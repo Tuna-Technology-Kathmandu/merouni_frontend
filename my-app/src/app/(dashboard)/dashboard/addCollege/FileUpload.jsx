@@ -43,7 +43,7 @@ const FileUpload = ({ onUploadComplete, label, defaultPreview = null }) => {
       }
 
       const data = await response.json();
-      console.log("Upload complete:", data);
+
       onUploadComplete(data.media.url);
     } catch (error) {
       console.error("Upload failed:", error);

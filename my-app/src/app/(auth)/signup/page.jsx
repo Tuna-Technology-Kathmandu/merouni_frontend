@@ -8,9 +8,7 @@ import { useRouter } from "next/navigation";
 
 const SignUp = () => {
   const baseUrl = process.env.baseUrl;
-  console.log(baseUrl);
   const version = process.env.version;
-  console.log(version);
   const router = useRouter();
 
   const [signupForm, setSignupForm] = useState({
@@ -85,14 +83,6 @@ const SignUp = () => {
 
     if (Object.keys(newErrors).length === 0) {
       try {
-        console.log("Sending signup request with data:", {
-          firstName: signupForm.firstName,
-          lastName: signupForm.lastName,
-          email: signupForm.email,
-          phone_no: signupForm.phone_no,
-          password: signupForm.password,
-        });
-
         const response = await fetch(`${baseUrl}${version}/auth/register`, {
           method: "POST",
           headers: {
@@ -107,10 +97,8 @@ const SignUp = () => {
           }),
         });
 
-        console.log("Raw Response:", response);
 
         const data = await response.json();
-        console.log("Response Data:", data);
 
         if (response.ok) {
           setSignupForm({
@@ -121,9 +109,8 @@ const SignUp = () => {
             password: "",
             confirmPassword: "",
           });
-          console.log("Signup successful:", data);
           alert(data.message || "Registration successful!");
-          router.push('/verifyemail')
+          router.push("/verifyemail");
         } else {
           console.error("Signup failed:", data);
           alert(data.message || "Registration failed");
@@ -137,7 +124,6 @@ const SignUp = () => {
         alert("Unable to connect to server. Please check your connection.");
       }
     } else {
-      console.log("Form submission failed due to validation errors.");
     }
   };
 

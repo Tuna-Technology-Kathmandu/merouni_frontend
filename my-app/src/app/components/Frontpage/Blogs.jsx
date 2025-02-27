@@ -15,11 +15,9 @@ const Blogs = () => {
     setLoading(true);
     try {
       const response = await getBlogs(1);
-      console.log("Response of blogs:", response);
       setBlogs(response.items.slice(0, 4));
     } catch (error) {
       setError("Failed to fetch Blogs");
-      console.error("Failed to fetch blogs and articles");
     } finally {
       setLoading(false);
     }
@@ -53,7 +51,6 @@ const Blogs = () => {
   };
 
   useEffect(() => {
-    console.log("Blogs HOme:", blogs);
   }, [blogs]);
 
   return (

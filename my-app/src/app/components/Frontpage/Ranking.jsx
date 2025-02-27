@@ -27,7 +27,6 @@ const Ranking = () => {
   };
 
   useEffect(() => {
-    console.log("Ranking from the news:", ranking);
   }, [ranking]);
 
   return (

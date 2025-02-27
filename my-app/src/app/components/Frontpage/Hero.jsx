@@ -22,7 +22,6 @@ const Hero = () => {
       setFeaturedColleges(response.items);
       setIsCollegeLoading(false);
     } catch (error) {
-      console.error("Error fetching the colleges data:", error);
       setError("Failed to load featured Colleges");
       setIsCollegeLoading(false);
     } finally {
@@ -38,7 +37,6 @@ const Hero = () => {
     try {
       setLoading(true);
       const response = await getBanners();
-      console.log("Banner data:", response);
       setBanner(response.items);
     } catch (error) {
       console.error("Error fetching banner content:", error);

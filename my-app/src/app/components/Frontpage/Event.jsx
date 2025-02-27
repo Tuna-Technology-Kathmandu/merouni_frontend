@@ -14,7 +14,6 @@ const Event = () => {
     setLoading(true);
     try {
       const response = await getEvents(1);
-      console.log("This is the events response in front page:", response);
       setEvents(response.items.slice(0, 3));
     } catch (error) {
       setError("Failed to fetch events");
@@ -53,7 +52,6 @@ const Event = () => {
   };
 
   useEffect(() => {
-    console.log("EVENTS HOme:", events);
   }, [events]);
 
   return (

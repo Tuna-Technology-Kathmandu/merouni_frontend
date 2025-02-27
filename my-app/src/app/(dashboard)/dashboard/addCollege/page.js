@@ -420,8 +420,7 @@ export default function CollegeForm() {
 
       // Set courses from collegeCourses
       //here course means programs
-      console.log("collegeData", collegeData);
-      console.log("courses", courses);
+
       const courseIds = collegeData.collegeCourses?.map(
         (course) => courses.find((c) => c.title === course.program.title)?.id
       );
@@ -438,7 +437,7 @@ export default function CollegeForm() {
       });
 
       // Address
-      console.log("address");
+
       if (collegeData.collegeAddress) {
         setValue("address.country", collegeData.collegeAddress.country);
         setValue("address.state", collegeData.collegeAddress.state);
@@ -448,14 +447,14 @@ export default function CollegeForm() {
       }
 
       // Contacts
-      console.log("contact");
+
       const contacts = collegeData.collegeContacts?.map(
         (contact) => contact.contact_number
       ) || ["", ""];
       setValue("contacts", contacts);
 
       // Images
-      console.log("files");
+
       setUploadedFiles({
         logo: collegeData.college_logo || "",
         featured: collegeData.featured_img || "",
@@ -531,10 +530,10 @@ export default function CollegeForm() {
   };
 
   const handleSearch = async (query) => {
-    console.log("q",query)
+    console.log("q", query);
     if (!query) {
       // getColleges();
-      loadColleges()
+      loadColleges();
       return;
     }
 

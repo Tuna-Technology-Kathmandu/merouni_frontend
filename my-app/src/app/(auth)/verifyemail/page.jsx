@@ -5,45 +5,31 @@ const verifyEmail = () => {
   const [otp, setOtp] = useState("");
   const baseUrl = process.env.baseUrl;
   const version = process.env.version;
-    // const session = useSession()
-    // console.log("session",sess)
   const handleChange = (e) => {
-    console.log(e.target.value);
     setOtp(e.target.value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    console.log("click");
 
     try {
-      console.log("Sending signup request with data:", {
-        otp: parseInt(otp),
-      });
-
       const response = await fetch(`${baseUrl}${version}/auth/verify-email`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         // withCredentials: true,
         body: JSON.stringify({
           otp: parseInt(otp),
         }),
       });
 
-      console.log("Raw Response:", response);
-
       const data = await response.json();
-      console.log("Response Data:", data);
 
       if (response.ok) {
         setOtp("");
-        console.log("Verification successful:", data);
         alert(data.message || "Registration successful!");
-        //   router.push("/verifyemail");
       } else {
         console.error("Veification failed:", data);
         alert(data.message || "Registration failed");

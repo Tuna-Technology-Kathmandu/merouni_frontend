@@ -21,10 +21,8 @@ const Colleges = () => {
 
   const fetchFeaturedColleges = async () => {
     try {
-      console.log("Hlo zero");
       // const response = await getFeaturedColleges();
       const response = await getColleges(true, undefined);
-      console.log("RESOPHOSG:", response.items);
       setFeaturedColleges(response.items);
     } catch (error) {
       console.error("Error fetching the colleges data:", error);
@@ -35,7 +33,6 @@ const Colleges = () => {
   };
 
   useEffect(() => {
-    console.log("FEatured College Data:", featuredColleges);
   }, [featuredColleges]);
 
   const scrollContainerRef = useRef(null);
