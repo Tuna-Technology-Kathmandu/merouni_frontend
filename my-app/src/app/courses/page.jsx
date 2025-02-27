@@ -8,8 +8,12 @@ import Footer from "../components/Frontpage/Footer";
 import Header from "../components/Frontpage/Header";
 import Shimmer from "../components/Shimmer";
 
+import { getBanners } from "../action";
+import AdLayout from "../components/Frontpage/AdLayout";
+
 const CoursePage = () => {
   const [courses, setCourses] = useState([]);
+  const [banner, setBanner] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -29,6 +33,17 @@ const CoursePage = () => {
     getCourses();
   }, []);
 
+  useEffect(() => {
+    fetchBanner();
+  }, []);
+
+  const fetchBanner = async () => {
+    try {
+      const response = await getBanners();
+      setBanner(response.items);
+    } catch (error) {}
+  };
+
   // Filter courses based on search term
   const filteredCourses = courses.filter((course) =>
     course.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -38,6 +53,7 @@ const CoursePage = () => {
     <>
       <Header />
       <Navbar />
+      <AdLayout banners={banner} size="medium" number={3} />
 
       <div className="container mx-auto p-6">
         <div className="border-b-2 border-[#0A70A7] w-[45px] mt-8 mb-4 pl-2">

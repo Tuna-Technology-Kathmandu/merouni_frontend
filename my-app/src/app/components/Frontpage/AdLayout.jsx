@@ -24,7 +24,7 @@ const AdLayout = ({ banners = [], size = "", number = 1 }) => {
   const selectedBanners = getRandomBanners();
 
   return (
-    <div className="mb-5 mt-4 ">
+    <div className="my-5">
       <div className="flex flex-col md:flex-row justify-between gap-4">
         {selectedBanners.slice(0, number).map((banner, index) => (
           <Link href={`${banner.websiteUrl}`}>

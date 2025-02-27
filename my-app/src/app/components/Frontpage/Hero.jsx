@@ -36,7 +36,6 @@ const Hero = () => {
     try {
       setLoading(true);
       const response = await getBanners();
-      console.log("From Hero: ", response);
       setBanner(response.items);
     } catch (error) {
       console.error("Error fetching banner content:", error);
