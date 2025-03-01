@@ -17,8 +17,6 @@ const UniversityCard = ({
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector((state) => state.user.data);
 
- 
-
   useEffect(() => {
     if (user?.id) {
       checkWishlistStatus();
@@ -103,7 +101,7 @@ const UniversityCard = ({
     <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300">
       <div className="flex justify-between items-start mb-4">
         <img
-          src="/images/pu.png"
+          src={logo || `https://avatar.iran.liara.run/username?username=${name}`}
           alt={`${name} logo`}
           className="w-12 h-12 object-contain"
         />
@@ -136,9 +134,9 @@ const UniversityCard = ({
           </button>
         </Link>
         <Link href={`/colleges/apply/${slug}`}>
-        <button className="flex-1 py-2 px-4 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 text-sm font-medium">
-          Apply Now
-        </button>
+          <button className="flex-1 py-2 px-4 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 text-sm font-medium">
+            Apply Now
+          </button>
         </Link>
       </div>
     </div>

@@ -8,12 +8,13 @@ import { LiaUniversitySolid } from "react-icons/lia";
 import { BsGlobe2 } from "react-icons/bs";
 
 const ImageSection = ({ college }) => {
+  console.log(college);
   return (
     <>
       <div className="flex flex-col items-center relative ">
         <div>
           <Image
-            src={college.featured_img || "/images/collegePhoto.png"}
+            src={college.featured_img || "https://dummyimage.com/600x180/000/fff"}
             width={2400}
             height={600}
             alt="College Photo"
@@ -23,7 +24,7 @@ const ImageSection = ({ college }) => {
             {/* Logo Container */}
             <div className="flex items-center justify-center rounded-full bg-white -translate-y-8 overflow-hidden w-24 h-24 md:w-32 md:h-32">
               <Image
-                src={college.college_logo || "/images/texas_logo.png"}
+                src={college.college_logo || `https://avatar.iran.liara.run/username?username=${college?.name}`}
                 width={120}
                 height={120}
                 alt="College Logo"

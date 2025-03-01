@@ -48,8 +48,14 @@ body {
 }
 
 .parent-div::-webkit-scrollbar {
+  position: relative;
   width: 0; /* Webkit browsers */
   height: 0; /* For horizontal scrollbar */
+}
+
+.sticky {
+  position: -webkit-sticky; /* For Safari */
+  top: 0;
 }
 
 @keyframes shimmer {

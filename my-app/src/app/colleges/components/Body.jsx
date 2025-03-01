@@ -9,7 +9,6 @@ import UniversityCard from "./UniversityCard";
 import { useState, useEffect, useCallback } from "react";
 import { getColleges, searchColleges } from "../actions";
 import { debounce } from "lodash";
-import Link from "next/link";
 import UniversityCardShimmer from "./UniversityShimmerCard";
 import Pagination from "@/app/blogs/components/Pagination";
 
@@ -45,7 +44,6 @@ const CollegeFinder = () => {
       if (query) {
         setIsSearching(true);
         const results = await searchColleges(query);
-        console.log("Search Results in college:", results);
         setUniversities(results.colleges);
         setPagination(results.pagination);
         setIsSearching(false);
@@ -56,7 +54,6 @@ const CollegeFinder = () => {
 
   const handleSearchChange = (e) => {
     const query = e.target.value;
-    console.log("querY:", query);
     setSearchQuery(query);
     debouncedSearch(query);
   };
@@ -64,9 +61,7 @@ const CollegeFinder = () => {
   const fetchColleges = async (page) => {
     setIsLoading(true);
     try {
-      console.log("INside fetch college");
       const data = await getColleges(page, selectedFilters);
-      console.log("Getting data in college page:", data);
       setUniversities(data.colleges);
       setPagination(data.pagination);
     } catch (error) {
@@ -186,7 +181,7 @@ const CollegeFinder = () => {
           ))}
           <DegreeSection />
           <AffiliationSection />
-          <CourseFeeSection />
+          {/* <CourseFeeSection /> */}
         </div>
         <div className="flex justify-end mt-4">
           <button
@@ -201,7 +196,6 @@ const CollegeFinder = () => {
   );
   
   const handlePageChange = (page) => {
-    console.log("Pages response from pagination controle:", page);
     if (page > 0 && page <= pagination.totalPages) {
       setPagination((prev) => ({
         ...prev,
@@ -295,7 +289,7 @@ const CollegeFinder = () => {
           ))}
           <DegreeSection />
           <AffiliationSection />
-          <CourseFeeSection />
+          {/* <CourseFeeSection /> */}
         </div>
 
         <div className=" md:w-3/4">

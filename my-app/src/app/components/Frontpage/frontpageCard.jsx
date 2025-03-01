@@ -42,7 +42,7 @@ export default function FrontPageCard({ colleges, isLoading }) {
             className="w-full rounded-2xl bg-gray-100 overflow-hidden shadow-lg"
           >
             <div className="relative">
-              <Link href={`/college/${college.slugs}`}>
+              <Link href={`/colleges/${college.slugs}`}>
                 <Image
                   src={college.featured_img || "/images/course_description.png"}
                   alt={college.name}
