@@ -1,10 +1,15 @@
 import axios from "axios";
 
-export const fetchCourses = async (credits = "", duration = "") => {
+export const fetchCourses = async (
+  credits = "",
+  duration = "",
+  faculty = ""
+) => {
   try {
     const params = {};
     if (credits) params.credits = credits;
     if (duration) params.duration = duration;
+    if (faculty) params.faculty = faculty;
 
     const response = await axios.get(
       `${process.env.baseUrl}${process.env.version}/course`,

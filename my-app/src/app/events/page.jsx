@@ -64,7 +64,7 @@ const Events = () => {
       const eventHost = featured?.event_host
         ? JSON.parse(featured.event_host)
         : null;
-      featured.eventHost = eventHost; // Attach the parsed eventHost to the featuredEvent
+      //featured.eventHost = eventHost; // Attach the parsed eventHost to the featuredEvent
 
       setFeaturedEvent(featured);
       setThisWeekEvents(thisWeek.events);
@@ -122,20 +122,18 @@ const Events = () => {
             <div className="flex flex-col md:flex-row items-center justify-between p-0 md:p-10 max-w-[1600px] mx-auto mb-10 ">
               <div className="order-1 md:order-2 w-full md:w-1/2 flex justify-center mt-0 mb-2 md:mb-0 md:mt-0">
                 {isMobile ? (
-                  // For mobile: use layout="responsive" so the image fills the container width
                   <Image
                     src="/images/events.png"
-                    alt={featuredEvent.title}
+                    alt={featuredEvent.title ?? "Featured Event"}
                     className="md:rounded-lg rounded-none shadow-md"
                     width={400}
                     height={450}
                     layout="responsive"
                   />
                 ) : (
-                  // For larger screens: use layout="intrinsic" to respect the intrinsic dimensions
                   <Image
                     src="/images/events.png"
-                    alt={featuredEvent.title}
+                    alt={featuredEvent.title ?? "Featured Event"}
                     className="md:rounded-lg rounded-none shadow-md"
                     width={400}
                     height={450}
@@ -147,10 +145,10 @@ const Events = () => {
               {/* Featured Event Content */}
               <div className="order-2 md:order-1 md:w-1/2 flex flex-col">
                 <h2 className="text-2xl md:text-3xl font-bold mb-4 mt-4 md:mt-0 text-center md:text-start">
-                  {featuredEvent.title}
+                  {featuredEvent.title ?? "No Title Available"}
                 </h2>
                 <p className="md:mb-6 text-center md:text-start">
-                  {featuredEvent.description}
+                  {featuredEvent.description ?? "No Description Available"}
                 </p>
 
                 {/* Event Details */}
@@ -159,7 +157,8 @@ const Events = () => {
                     <p className="text-sm font-bold">Starts</p>
                     <p className="whitespace-nowrap">
                       {new Date(
-                        JSON.parse(featuredEvent.event_host).start_date
+                        JSON.parse(featuredEvent.event_host)?.start_date ??
+                          new Date()
                       ).toLocaleDateString()}
                     </p>
                   </div>
@@ -170,7 +169,8 @@ const Events = () => {
                     <p className="text-sm font-bold">Ends</p>
                     <p className="whitespace-nowrap">
                       {new Date(
-                        JSON.parse(featuredEvent.event_host).end_date
+                        JSON.parse(featuredEvent.event_host)?.end_date ??
+                          new Date()
                       ).toLocaleDateString()}
                     </p>
                   </div>
@@ -180,7 +180,8 @@ const Events = () => {
                   <div className="flex flex-col items-center">
                     <p className="text-sm font-bold whitespace-nowrap">Time</p>
                     <p className="whitespace-nowrap">
-                      {JSON.parse(featuredEvent.event_host).time}
+                      {JSON.parse(featuredEvent.event_host)?.time ??
+                        "No Time Available"}
                     </p>
                   </div>
                 </div>
@@ -221,8 +222,29 @@ const Events = () => {
                 </span>
               </div>
             </div>
-
             <div className="w-full md:w-3/4">
+              <div className="overflow-x-auto md:no-scrollbar">
+                <div className="flex md:gap-6 pb-4  md:ml-20">
+                  {thisWeekEvents?.length > 0 ? (
+                    thisWeekEvents.map((event, index) => (
+                      <Link href={`/events/${event.slugs}`} key={index}>
+                        <div
+                          key={index}
+                          className="transition-all duration-300 ease-in-out"
+                          style={{ minWidth: "max-content" }}
+                        >
+                          <EventCard event={event} />
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <p>No events this week.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* <div className="w-full md:w-3/4">
               <div className="overflow-x-auto md:no-scrollbar">
                 <div className="flex md:gap-6 pb-4  md:ml-20">
                   {thisWeekEvents.map((event, index) => (
@@ -238,7 +260,7 @@ const Events = () => {
                   ))}
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="flex flex-col md:flex-row md:max-w-[2000px] bg-[#F1F1F1] md:bg-[#30AD8F] md:bg-opacity-5 md:mx-auto items-center justify-center py-20">

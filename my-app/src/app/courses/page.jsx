@@ -20,6 +20,7 @@ const CoursePage = () => {
   const [filters, setFilters] = useState({
     credits: { min: "", max: "" },
     duration: { min: "", max: "" },
+    faculty: "",
   });
 
   const debounce = (func, delay) => {
@@ -35,10 +36,9 @@ const CoursePage = () => {
       setLoading(true);
       try {
         const response = await fetchCourses(
-          filters.credits.min,
-          filters.credits.max,
-          filters.duration.min,
-          filters.duration.max
+          `${filters.credits.min}-${filters.credits.max}`,
+          `${filters.duration.min}-${filters.duration.max}`,
+          filters.faculty
         );
         setCourses(response.items);
       } catch (error) {
@@ -69,29 +69,31 @@ const CoursePage = () => {
     const matchesSearchTerm = course.title
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-
+  
     const filterCredits =
       filters.credits.min && filters.credits.max
         ? `${filters.credits.min}-${filters.credits.max}`
         : null;
-
+  
     const filterDuration =
       filters.duration.min && filters.duration.max
         ? `${filters.duration.min}-${filters.duration.max}`
         : null;
-
-    // Filter courses based on the range of credits and duration
+  
+    // Filter courses based on the range of credits, duration, and faculty
     const matchesCredits = filterCredits
-      ? course.credits >= filters.credits.min &&
-        course.credits <= filters.credits.max
+      ? course.credits >= filters.credits.min && course.credits <= filters.credits.max
       : true;
     const matchesDuration = filterDuration
-      ? course.duration >= filters.duration.min &&
-        course.duration <= filters.duration.max
+      ? course.duration >= filters.duration.min && course.duration <= filters.duration.max
       : true;
-
-    return matchesSearchTerm && matchesCredits && matchesDuration;
+    const matchesFaculty = filters.faculty
+      ? course.faculty === filters.faculty
+      : true;
+  
+    return matchesSearchTerm && matchesCredits && matchesDuration && matchesFaculty;
   });
+  
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -113,6 +115,25 @@ const CoursePage = () => {
         <div className="w-full lg:w-1/4 lg:pr-6 mb-6 lg:mb-0">
           <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
             <h3 className="font-semibold text-xl mb-4">Filters</h3>
+
+            {/* faculty filter */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-600 mb-2">
+                Faculty
+              </label>
+              <select
+                name="faculty"
+                value={filters.faculty}
+                onChange={handleFilterChange}
+                className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Faculty</option>
+                <option value="Science">Science</option>
+                <option value="Management">Management</option>
+                <option value="HM">HM</option>
+                <option value="Education">Education</option>
+              </select>
+            </div>
 
             {/* Credits Filter (Range) */}
             <div className="mb-4">
