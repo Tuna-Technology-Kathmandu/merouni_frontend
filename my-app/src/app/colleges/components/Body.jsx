@@ -19,7 +19,6 @@ const CollegeFinder = () => {
     totalPages: 1,
     currentPage: 1,
     totalCount: 1,
-   
   });
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");

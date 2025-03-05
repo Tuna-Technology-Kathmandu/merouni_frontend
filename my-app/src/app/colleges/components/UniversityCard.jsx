@@ -101,7 +101,9 @@ const UniversityCard = ({
     <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300">
       <div className="flex justify-between items-start mb-4">
         <img
-          src={logo || `https://avatar.iran.liara.run/username?username=${name}`}
+          src={
+            logo || `https://avatar.iran.liara.run/username?username=${name}`
+          }
           alt={`${name} logo`}
           className="w-12 h-12 object-contain"
         />
@@ -126,7 +128,11 @@ const UniversityCard = ({
       </div>
 
       <h3 className="font-semibold text-lg mb-1">{name}</h3>
-      <p className="text-black text-sm my-4">{description}</p>
+      <p className="text-black text-sm my-4">
+        {description.length > 100
+          ? `${description.slice(0, 100)}...`
+          : description}
+      </p>
       <div className="flex gap-3">
         <Link href={`/colleges/${slug}`} key={collegeId}>
           <button className="flex-1 py-2 px-4 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-50 text-sm font-medium">
