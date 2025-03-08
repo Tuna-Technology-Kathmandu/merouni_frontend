@@ -11,6 +11,8 @@ import Loading from "../../../components/Loading";
 import Table from "../../../components/Table";
 import { Edit2, Trash2 } from "lucide-react";
 import { authFetch } from "@/app/utils/authFetch";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 export default function ScholarshipManager() {
   const author_id = useSelector((state) => state.user.data.id);
@@ -211,7 +213,6 @@ export default function ScholarshipManager() {
       if (response.ok) {
         const data = await response.json();
         setScholarships(data.scholarships);
-        
 
         if (data.pagination) {
           setPagination({
@@ -225,7 +226,10 @@ export default function ScholarshipManager() {
         setScholarships([]);
       }
     } catch (error) {
-      console.error("Error fetching scholarhsip search results:", error.message);
+      console.error(
+        "Error fetching scholarhsip search results:",
+        error.message
+      );
       setScholarships([]);
     }
   };
@@ -255,13 +259,16 @@ export default function ScholarshipManager() {
         </div>
 
         <div>
-          <textarea
-            placeholder="Description"
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-            className="w-full p-2 border rounded"
+          <CKEditor
+            editor={ClassicEditor}
+            data={formData.description}
+            config={{
+              licenseKey: process.env.ckeditor,
+            }}
+            onChange={(event, editor) => {
+              const content = editor.getData();
+              setFormData({ ...formData, description: content });
+            }}
           />
         </div>
 

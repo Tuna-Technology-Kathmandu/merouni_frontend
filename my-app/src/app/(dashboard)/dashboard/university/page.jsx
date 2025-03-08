@@ -8,6 +8,8 @@ import { Edit2, Trash2 } from "lucide-react";
 import { authFetch } from "@/app/utils/authFetch";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../addCollege/ConfirmationDialog";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 export default function UniversityForm() {
   const author_id = useSelector((state) => state.user.data.id);
@@ -36,6 +38,7 @@ export default function UniversityForm() {
     setValue,
     reset,
     formState: { errors },
+    getValues,
   } = useForm({
     defaultValues: {
       fullname: "",
@@ -378,9 +381,16 @@ export default function UniversityForm() {
 
                 <div>
                   <label className="block mb-2">Description</label>
-                  <textarea
-                    {...register("description")}
-                    className="w-full p-2 border rounded"
+                  <CKEditor
+                    editor={ClassicEditor}
+                    data={getValues("description")}
+                    config={{
+                      licenseKey: process.env.ckeditor,
+                    }}
+                    onChange={(event, editor) => {
+                      const content = editor.getData();
+                      setValue("description", content);
+                    }}
                   />
                 </div>
               </div>
