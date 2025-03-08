@@ -8,6 +8,8 @@ import { Edit2, Trash2 } from "lucide-react";
 import { authFetch } from "@/app/utils/authFetch";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../addCollege/ConfirmationDialog";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 export default function CareerForm() {
   const author_id = useSelector((state) => state.user.data.id);
@@ -34,6 +36,7 @@ export default function CareerForm() {
     setValue,
     reset,
     formState: { errors },
+    getValues,
   } = useForm({
     defaultValues: {
       title: "",
@@ -286,10 +289,16 @@ export default function CareerForm() {
 
                 <div>
                   <label className="block mb-2">Content</label>
-                  <textarea
-                    {...register("content")}
-                    className="w-full p-2 border rounded"
-                    rows="6"
+                  <CKEditor
+                    editor={ClassicEditor}
+                    data={getValues("content")}
+                    config={{
+                      licenseKey: process.env.ckeditor,
+                    }}
+                    onChange={(event, editor) => {
+                      const content = editor.getData();
+                      setValue("content", content);
+                    }}
                   />
                 </div>
 

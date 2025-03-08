@@ -12,6 +12,8 @@ import { Globe, MapPin } from "lucide-react";
 import { authFetch } from "@/app/utils/authFetch";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "./ConfirmationDialog";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 export default function CollegeForm() {
   const [universities, setUniversities] = useState([]);
@@ -635,20 +637,17 @@ export default function CollegeForm() {
 
                 <div className="md:col-span-2">
                   <label className="block mb-2">Content</label>
-                  <textarea
-                    {...register("content")}
-                    className="w-full p-2 border rounded h-24"
-                  />
-                  {/* <CKEditor
+                  <CKEditor
                     editor={ClassicEditor}
                     data={getValues("content")}
                     config={{
                       licenseKey: process.env.ckeditor,
                     }}
                     onChange={(event, editor) => {
-                      setEditorContent(editor.getData());
+                      const content = editor.getData();
+                      setValue("content", content);
                     }}
-                  /> */}
+                  />
                 </div>
               </div>
             </div>
@@ -905,9 +904,16 @@ export default function CollegeForm() {
                   </div>
                   <div className="md:col-span-2">
                     <label className="block mb-2">Description</label>
-                    <textarea
-                      {...register(`admissions.${index}.description`)}
-                      className="w-full p-2 border rounded"
+                    <CKEditor
+                      editor={ClassicEditor}
+                      data={getValues(`admissions.${index}.description`)}
+                      config={{
+                        licenseKey: process.env.ckeditor,
+                      }}
+                      onChange={(event, editor) => {
+                        const content = editor.getData();
+                        setValue(`admissions.${index}.description`, content);
+                      }}
                     />
                   </div>
                   {index > 0 && (
