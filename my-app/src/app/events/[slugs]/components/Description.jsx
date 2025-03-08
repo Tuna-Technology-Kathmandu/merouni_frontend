@@ -1,57 +1,42 @@
 import React from "react";
+import DOMPurify from "dompurify";
 
 const Description = ({ event }) => {
-  console.log(event);
+  const cleanHTML = event?.content ? DOMPurify.sanitize(event.content) : "";
   return (
-    <>
-      <div className="ml-4 mt-4 flex flex-col md:flex-row max-w-full md:max-w-[1600px] md:mx-auto  items-start ">
-        {/* Description Section */}
-        <div className="mb-6 w-full md:w-1/2">
-          <div className="text-2xl font-bold text-left md:text-left">
-            Description
-          </div>
-          <div className="text-base mt-2 leading-8 text-left md:text-left">
-            {event?.description}
-          </div>
-          <div
-            className="text-base mt-4 leading-8 text-left md:text-left"
-            dangerouslySetInnerHTML={{ __html: event?.content }}
-          />
-        </div>
+    <div className="ml-4 mt-4 flex flex-col md:flex-row max-w-full md:max-w-[1600px] md:mx-auto items-start">
+      {/* Description Section */}
+      <div className="mb-6 w-full md:w-1/2">
+        <h2 className="text-2xl font-bold">Description</h2>
+        <p className="text-base mt-2 leading-8">{event?.description}</p>
 
-        {/* Event Location Section */}
-        <div className="mb-6 w-full md:w-1/3 md:ml-auto md:mr-20 flex flex-col">
-          <div className="text-2xl font-bold md:my-0 my-6 text-left md:text-left">
-            Event Location
-          </div>
+        <div className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl prose-slate max-w-full">
+          <div dangerouslySetInnerHTML={{ __html: cleanHTML }} />
+        </div>
+      </div>
+
+      {/* Event Location Section */}
+      <div className="mb-6 w-full md:w-1/3 md:ml-auto md:mr-20 flex flex-col">
+        <h2 className="text-2xl font-bold my-6 md:my-0">Event Location</h2>
+
+        {/* Render map HTML if available */}
+        {event?.event_host?.map_url && (
           <div
-            className="mt-2 rounded-md w-full h-[300px] md:h-[350px]" // Added fixed height
+            className="mt-2 rounded-md w-full h-[300px] md:h-[350px]"
             style={{
-              minWidth: "300px", // Minimum width
-              maxWidth: "100%", // Maximum width
-              overflow: "hidden", 
+              minWidth: "300px",
+              maxWidth: "100%",
+              overflow: "hidden",
             }}
-            dangerouslySetInnerHTML={{ __html: event?.event_host?.map_url }}
+            dangerouslySetInnerHTML={{ __html: event.event_host.map_url }}
           />
-          <div className="text-xl font-sm mt-4 text-center md:text-center ">
-            {event?.event_host.host}
-          </div>
-        </div>
-      </div>
+        )}
 
-      {/* Events Highlights */}
-      <div className="md:max-w-[1600px] ml-4  max-w-full md:mx-auto leading-8 flex flex-col md:flex-row ">
-        <div className="w-full md:w-1/2">
-          <div className="font-bold text-2xl text-left md:text-left">
-            Events Highlights
-          </div>
-          <div
-            className="text-base mt-4 leading-8 text-left md:text-left m-4"
-            dangerouslySetInnerHTML={{ __html: event?.content }}
-          />
-        </div>
+        <p className="text-xl font-sm mt-4 text-center">
+          {event?.event_host?.host}
+        </p>
       </div>
-    </>
+    </div>
   );
 };
 

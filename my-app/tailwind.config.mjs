@@ -43,5 +43,6 @@ export default {
       });
     },
     require("tailwind-scrollbar"),
+    require("@tailwindcss/typography"),
   ],
 };

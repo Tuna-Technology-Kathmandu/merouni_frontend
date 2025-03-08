@@ -2,9 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-.ck-editor__editable {
-  min-height: 200px;
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
 }
+
+.prose th, .prose td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.prose tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+
 
 /* :root {
   --background: #ffffff;
