@@ -11,6 +11,7 @@ import { getColleges, searchColleges } from "../actions";
 import { debounce } from "lodash";
 import UniversityCardShimmer from "./UniversityShimmerCard";
 import Pagination from "@/app/blogs/components/Pagination";
+import Link from "next/link";
 
 const CollegeFinder = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,9 +35,9 @@ const CollegeFinder = () => {
 
   useEffect(() => {
     if (!searchQuery) {
-      fetchColleges(pagination.currentPage,selectedFilters);
+      fetchColleges(pagination.currentPage, selectedFilters);
     }
-  }, [pagination.currentPage, searchQuery,selectedFilters]);
+  }, [pagination.currentPage, searchQuery, selectedFilters]);
 
   const debouncedSearch = useCallback(
     debounce(async (query) => {
@@ -193,7 +194,7 @@ const CollegeFinder = () => {
       </div>
     </div>
   );
-  
+
   const handlePageChange = (page) => {
     if (page > 0 && page <= pagination.totalPages) {
       setPagination((prev) => ({
@@ -203,27 +204,27 @@ const CollegeFinder = () => {
     }
   };
 
-  const PaginationControls = () => (
-    <div className="flex justify-center items-center gap-4 mt-8">
-      <button
-        onClick={() => handlePageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="px-4 py-2 bg-gray-300 rounded-full mx-2 disabled:opacity-50"
-      >
-        &lt;
-      </button>
-      <span className="text-gray-600">
-        Page {currentPage} of {pagination.totalPages}
-      </span>
-      <button
-        onClick={() => handlePageChange(currentPage + 1)}
-        disabled={currentPage === pagination.totalPages}
-        className="px-4 py-2 bg-gray-300 rounded-full mx-2 disabled:opacity-50"
-      >
-        &gt;
-      </button>
-    </div>
-  );
+  // const PaginationControls = () => (
+  //   <div className="flex justify-center items-center gap-4 mt-8">
+  //     <button
+  //       onClick={() => handlePageChange(currentPage - 1)}
+  //       disabled={currentPage === 1}
+  //       className="px-4 py-2 bg-gray-300 rounded-full mx-2 disabled:opacity-50"
+  //     >
+  //       &lt;
+  //     </button>
+  //     <span className="text-gray-600">
+  //       Page {currentPage} of {pagination.totalPages}
+  //     </span>
+  //     <button
+  //       onClick={() => handlePageChange(currentPage + 1)}
+  //       disabled={currentPage === pagination.totalPages}
+  //       className="px-4 py-2 bg-gray-300 rounded-full mx-2 disabled:opacity-50"
+  //     >
+  //       &gt;
+  //     </button>
+  //   </div>
+  // );
 
   const NoResultsFound = () => (
     <div className="flex flex-col items-center justify-center h-64">
@@ -303,7 +304,9 @@ const CollegeFinder = () => {
               {universities.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {universities.map((university, index) => (
-                    <UniversityCard key={index} {...university} />
+                    <Link href={`/colleges/${university.slug}`}>
+                      <UniversityCard key={index} {...university} />
+                    </Link>
                   ))}
                 </div>
               ) : (

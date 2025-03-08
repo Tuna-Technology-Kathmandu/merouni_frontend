@@ -8,7 +8,7 @@ const UniversityCard = ({
   name,
   location,
   description,
-  logo,
+  college_logo,
   collegeId,
   isWishlistPage = false,
   slug,
@@ -40,7 +40,6 @@ const UniversityCard = ({
       }
 
       const data = await response.json();
-      console.log("Wishlist data vitra:", data);
       const isInList = data.items.some((item) => item.college.id === collegeId);
 
       setIsInWishlist(isInList);
@@ -102,7 +101,7 @@ const UniversityCard = ({
       <div className="flex justify-between items-start mb-4">
         <img
           src={
-            logo || `https://avatar.iran.liara.run/username?username=${name}`
+            college_logo || `https://avatar.iran.liara.run/username?username=${name}`
           }
           alt={`${name} logo`}
           className="w-12 h-12 object-contain"
