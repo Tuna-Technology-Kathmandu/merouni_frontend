@@ -6,6 +6,8 @@ import Loading from "../../../components/Loading";
 import Table from "../../../components/Table";
 import { Edit2, Trash2 } from "lucide-react";
 import { authFetch } from "@/app/utils/authFetch";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 export default function ExamManager() {
   const author_id = useSelector((state) => state.user.data.id);
@@ -149,7 +151,7 @@ export default function ExamManager() {
   const loadExams = async (page = 1) => {
     try {
       const response = await getAllExams(page);
-      
+
       setExams(response.items);
       setPagination({
         currentPage: response.pagination.currentPage,
@@ -254,7 +256,6 @@ export default function ExamManager() {
   };
 
   const handleEdit = (exam) => {
-    
     setFormData({
       title: exam.title,
       description: exam.description,
@@ -322,14 +323,16 @@ export default function ExamManager() {
             className="w-full p-2 border rounded"
             required
           />
-          <textarea
-            placeholder="Description"
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-            className="w-full p-2 border rounded"
-            required
+          <CKEditor
+            editor={ClassicEditor}
+            data={formData.description}
+            config={{
+              licenseKey: process.env.ckeditor,
+            }}
+            onChange={(event, editor) => {
+              const content = editor.getData();
+              setFormData({ ...formData, description: content });
+            }}
           />
           <select
             value={formData.level_id}

@@ -8,6 +8,8 @@ import { authFetch } from "@/app/utils/authFetch";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../addCollege/ConfirmationDialog";
 import { getCourses } from "@/app/action";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 export default function CourseForm() {
   const author_id = useSelector((state) => state.user.data.id);
@@ -30,6 +32,7 @@ export default function CourseForm() {
     setValue,
     reset,
     formState: { errors },
+    getValues
   } = useForm({
     defaultValues: {
       title: "",
@@ -49,7 +52,7 @@ export default function CourseForm() {
     fetchFaculties();
   }, []);
 
-  const fetchCourses = async (page=1) => {
+  const fetchCourses = async (page = 1) => {
     setTableLoading(true);
     try {
       const response = await authFetch(
@@ -63,7 +66,7 @@ export default function CourseForm() {
         total: data.pagination.totalCount,
       });
     } catch (error) {
-      toast.error("Failed to fetch courses",error);
+      toast.error("Failed to fetch courses", error);
     } finally {
       setTableLoading(false);
     }
@@ -247,24 +250,6 @@ export default function CourseForm() {
     }
   };
 
-  // const loadCourses = async (page = 1) => {
-  //   try {
-  //     const response = await fetchCourses(page);
-
-  //     setCourses(response.items);
-  //     setPagination({
-  //       currentPage: response.pagination.currentPage,
-  //       totalPages: response.pagination.totalPages,
-  //       total: response.pagination.totalCount,
-  //     });
-  //   } catch (err) {
-  //     toast.error("Failed to load courses");
-  //     console.error("Error loading courses:", err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   return (
     <>
       <div className="text-2xl mr-auto p-4 ml-14 font-bold">
@@ -342,10 +327,16 @@ export default function CourseForm() {
 
                 <div>
                   <label className="block mb-2">Description</label>
-                  <textarea
-                    {...register("description")}
-                    className="w-full p-2 border rounded"
-                    rows="3"
+                  <CKEditor
+                    editor={ClassicEditor}
+                    data={getValues("description")}
+                    config={{
+                      licenseKey: process.env.ckeditor,
+                    }}
+                    onChange={(event, editor) => {
+                      const content = editor.getData();
+                      setValue("description", content);
+                    }}
                   />
                 </div>
 

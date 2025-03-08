@@ -12,13 +12,10 @@ import { MapPin } from "lucide-react";
 import { useSelector } from "react-redux";
 import { authFetch } from "@/app/utils/authFetch";
 import ConfirmationDialog from "../addCollege/ConfirmationDialog";
-import debounce from "lodash/debounce";
 import { fetchCategories } from "../category/action";
 import { X } from "lucide-react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-
-import RichTextEditor from "@/app/components/RichTextEditor";
 
 export default function EventManager() {
   const author_id = useSelector((state) => state.user.data.id);
@@ -572,26 +569,20 @@ export default function EventManager() {
             rows="5"
           />
         </div>
-
-        {/* <div className="mb-4">
-          <label htmlFor="content">Content </label>
-          <RichTextEditor
-            onEditorChange={(content) => {
-              setEditorContent(content);
+        
+        <div className="mb-4">
+          <label htmlFor="content">Content</label>
+          <CKEditor
+            editor={ClassicEditor}
+            data=""
+            config={{
+              licenseKey: process.env.ckeditor,
             }}
-            initialContent={editorContent}
+            onChange={(event, editor) => {
+              setEditorContent(editor.getData());
+            }}
           />
-        </div> */}
-        <CKEditor
-          editor={ClassicEditor}
-          data=""
-          config={{
-            licenseKey: process.env.ckeditor,
-          }}
-          onChange={(event, editor) => {
-            setEditorContent(editor.getData());
-          }}
-        />
+        </div>
 
         <div className="flex mb-4">
           <div className="w-1/2 mr-4">

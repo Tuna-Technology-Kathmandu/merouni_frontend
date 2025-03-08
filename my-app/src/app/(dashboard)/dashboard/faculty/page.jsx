@@ -11,6 +11,8 @@ import Loader from "@/app/components/Loading";
 import Table from "../../../components/Table"; // Adjust the import path as needed
 import { Edit2, Trash2 } from "lucide-react"; // For action icons
 import { authFetch } from "@/app/utils/authFetch";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 export default function FacultyManager() {
   const [faculties, setFaculties] = useState([]);
@@ -186,13 +188,16 @@ export default function FacultyManager() {
           />
         </div>
         <div className="mb-4">
-          <textarea
-            placeholder="Description"
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-            className="w-full p-2 border rounded"
+          <CKEditor
+            editor={ClassicEditor}
+            data={formData.description}
+            config={{
+              licenseKey: process.env.ckeditor,
+            }}
+            onChange={(event, editor) => {
+              const content = editor.getData();
+              setFormData({ ...formData, description: content });
+            }}
           />
         </div>
         <button

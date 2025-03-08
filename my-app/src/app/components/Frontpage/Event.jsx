@@ -73,7 +73,7 @@ const Event = () => {
             <Link href={`/events/${events[0].slugs}`}>
               <div className="w-[200px] h-[200px] md:w-[500px] md:h-[300px] relative">
                 <Image
-                  src={"/images/upcoming.png" || events[0]?.images}
+                  src={"/images/upcoming.png" || events[0]?.image}
                   layout="fill"
                   objectFit="contain"
                   alt={events[0].title || "Event Image"}
@@ -98,7 +98,7 @@ const Event = () => {
             <Link href={`/events/${event.slugs}`} key={index}>
               <div className="flex gap-4 items-center" key={index}>
                 <Image
-                  src={"/images/upcoming.png" || event.images}
+                  src={"/images/upcoming.png" || event.image}
                   width={200}
                   height={200}
                   alt={event.title || "Event logo"}

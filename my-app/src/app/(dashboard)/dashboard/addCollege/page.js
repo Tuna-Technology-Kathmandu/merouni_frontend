@@ -354,26 +354,6 @@ export default function CollegeForm() {
     setIsDialogOpen(false); // Close the dialog without deleting
     setDeleteId(null); // Reset the delete ID
   };
-
-  // const handleDelete = async (id) => {
-
-  //   console.log("id isss", id);
-  //   try {
-  //     const response = await authFetch(
-  //       `${process.env.baseUrl}${process.env.version}/college/${id}`,
-  //       {
-  //         method: "DELETE",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-  //     const res = await response.json();
-  //     toast.success(res.message);
-  //   } catch (err) {
-  //     toast.error(err.message);
-  //   }
-  // };
   const handleEdit = async (slug) => {
     try {
       setEditing(true);
@@ -659,6 +639,16 @@ export default function CollegeForm() {
                     {...register("content")}
                     className="w-full p-2 border rounded h-24"
                   />
+                  {/* <CKEditor
+                    editor={ClassicEditor}
+                    data={getValues("content")}
+                    config={{
+                      licenseKey: process.env.ckeditor,
+                    }}
+                    onChange={(event, editor) => {
+                      setEditorContent(editor.getData());
+                    }}
+                  /> */}
                 </div>
               </div>
             </div>

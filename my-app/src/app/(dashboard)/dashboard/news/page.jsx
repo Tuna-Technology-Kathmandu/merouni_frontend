@@ -14,6 +14,8 @@ import { useSelector } from "react-redux";
 import FileUpload from "../addCollege/FileUpload";
 import ConfirmationDialog from "../addCollege/ConfirmationDialog";
 import RichTextEditor from "@/app/components/RichTextEditor";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 export default function NewsManager() {
   const author_id = useSelector((state) => state.user.data.id);
@@ -596,17 +598,16 @@ export default function NewsManager() {
 
         <div className="mb-4">
           <label htmlFor="content">Content</label>
-          <RichTextEditor
-            onEditorChange={(content) => {
-              setValue("content", content);
+          <CKEditor
+            editor={ClassicEditor}
+            data=""
+            config={{
+              licenseKey: process.env.ckeditor,
             }}
-            initialContent={content}
+            onChange={(event, editor) => {
+              setValue(editor.getData());
+            }}
           />
-          {errors.content && (
-            <span className="text-red-500 text-sm">
-              {errors.content.message}
-            </span>
-          )}
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
