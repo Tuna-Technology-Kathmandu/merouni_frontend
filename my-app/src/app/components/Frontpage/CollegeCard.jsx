@@ -13,7 +13,7 @@ const CollegeCard = ({ logo, name, address, gradient }) => {
       <img
         src={logo}
         alt={`${name} logo`}
-        style={{ width: "120px", height: "120px", marginBottom: "10px" }}
+        className="w-24 h-24 md:w-32 md:h-32 rounded-full mb-2"
       />
       <p className="text-white font-semibold text-xl">{address}</p>
     </div>

@@ -82,7 +82,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      <div className="block md:hidden bg-[#30ad8f] h-28 pt-[10px]">
+      {/* <div className="block md:hidden bg-[#30ad8f] h-28 pt-[10px]">
         <div className="flex gap-8 md:gap-16 overflow-x-auto parent-div my-4 px-4">
           {["Tribhuvan", "Kathmandu", "Purbanchal", "Pokhara", "Paschimanchal"].map((university) => (
             <div
@@ -93,7 +93,7 @@ const Navbar = () => {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </>
   );
 };

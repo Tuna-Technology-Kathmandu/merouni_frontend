@@ -72,7 +72,7 @@ const Colleges = () => {
           {featuredColleges.map((college, index) => (
             <Link href={`/colleges/${college.slugs}`} key={index}>
               <CollegeCard
-                logo={college.logo}
+                logo={college.college_logo}
                 name={college.name}
                 address={`${college.address.city},${college.address.country}`}
                 key={index}
