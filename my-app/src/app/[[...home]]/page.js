@@ -14,6 +14,7 @@ import Event from "../components/Frontpage/Event";
 import Blogs from "../components/Frontpage/Blogs";
 import Newsletter from "../components/Frontpage/NewsLetter";
 
+
 const page = () => {
   return (
     <>

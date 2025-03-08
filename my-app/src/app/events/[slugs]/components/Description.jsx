@@ -1,6 +1,7 @@
 import React from "react";
 
 const Description = ({ event }) => {
+  console.log(event);
   return (
     <>
       <div className="ml-4 mt-4 flex flex-col md:flex-row max-w-full md:max-w-[1600px] md:mx-auto  items-start ">

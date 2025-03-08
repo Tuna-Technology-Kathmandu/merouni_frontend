@@ -15,12 +15,13 @@ import ConfirmationDialog from "../addCollege/ConfirmationDialog";
 import debounce from "lodash/debounce";
 import { fetchCategories } from "../category/action";
 import { X } from "lucide-react";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 import RichTextEditor from "@/app/components/RichTextEditor";
 
 export default function EventManager() {
   const author_id = useSelector((state) => state.user.data.id);
-  console.log("author", author_id);
   const {
     register,
     handleSubmit,
@@ -70,15 +71,10 @@ export default function EventManager() {
 
   useEffect(() => {
     const loadCategories = async () => {
-      console.log("fetching category");
       try {
         const categoriesList = await fetchCategories();
-        console.log("middle", categoriesList);
         setCategories(categoriesList.items);
-        console.log("cate1", categories);
-      } catch (error) {
-        console.error("Failed to fetch categories");
-      }
+      } catch (error) {}
     };
     loadCategories();
   }, []);
@@ -188,8 +184,6 @@ export default function EventManager() {
   };
 
   const onSubmit = async (data) => {
-    console.log("Cate2:", categories);
-
     try {
       const formData = {
         ...data,
@@ -197,14 +191,10 @@ export default function EventManager() {
         image: uploadedFiles.image,
         content: editorContent,
       };
-
       // Include event ID for update operation
       if (editing) {
         formData.id = editingEventId; // Add the event ID to the formData
       }
-
-      console.log("Form Data:", formData);
-
       // Use the same endpoint for both create and update
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/event`,
@@ -218,8 +208,6 @@ export default function EventManager() {
       );
 
       const responseData = await response.json();
-      console.log("REsponse data:", responseData);
-
       if (!response.ok) {
         throw new Error(responseData.message || "Failed to process event");
       }
@@ -227,7 +215,6 @@ export default function EventManager() {
       toast.success(
         editing ? "Event updated successfully" : "Event created successfully"
       );
-
       // Reset form and state
       reset();
       setEditing(false);
@@ -245,13 +232,9 @@ export default function EventManager() {
   };
 
   const handleEdit = async (data) => {
-    console.log("Cate3:", categories);
-
     try {
       setEditing(true);
       setLoading(true);
-      // console.log("Cate1:", categories);
-
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/event/${data.slugs}`,
         {
@@ -262,9 +245,6 @@ export default function EventManager() {
       );
       let eventData = await response.json();
       eventData = eventData.item; // Assuming the event data is nested under `item`
-
-      // let eventData=slug
-      console.log("Event data:", eventData);
       // console.log("Cate:", categories);
       setEditingEventId(eventData.id);
 
@@ -279,7 +259,6 @@ export default function EventManager() {
           (c) => c.title === eventData.category.title
         )?.id;
         if (categoryID) {
-          console.log("Cat id:", categoryID);
           setValue("category_id", categoryID);
         }
       }
@@ -324,8 +303,6 @@ export default function EventManager() {
       // Set college search input (if applicable)
       // setCollegeSearch(eventData.college.name);
       // setSelectedCollege(eventData.college);
-
-      console.log("Form populated with event data:", getValues());
     } catch (error) {
       console.error("Error fetching event data:", error);
       toast.error("Failed to fetch event data");
@@ -342,8 +319,6 @@ export default function EventManager() {
   const handleDeleteConfirm = async () => {
     if (!deleteId) return;
     try {
-      console.log("Deleting id is :", deleteId);
-
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/event?event_id=${deleteId}`,
         {
@@ -367,6 +342,10 @@ export default function EventManager() {
   const handleDialogClose = () => {
     setIsDialogOpen(false);
     setDeleteId(null);
+  };
+
+  const handleEditorChange = (event, editor) => {
+    const data = editor.getData(); // This is where you get the data from the editor
   };
 
   const columns = useMemo(
@@ -494,8 +473,6 @@ export default function EventManager() {
     <div className="p-4 w-4/5 mx-auto">
       <ToastContainer />
       <h1 className="text-2xl font-bold mb-4">Event Management</h1>
-      {console.log("Cate4:", categories)}
-
       <form onSubmit={handleSubmit(onSubmit)} className="mb-8">
         <div className="mb-4">
           <label htmlFor="title">Event Title </label>
@@ -596,7 +573,7 @@ export default function EventManager() {
           />
         </div>
 
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label htmlFor="content">Content </label>
           <RichTextEditor
             onEditorChange={(content) => {
@@ -604,7 +581,17 @@ export default function EventManager() {
             }}
             initialContent={editorContent}
           />
-        </div>
+        </div> */}
+        <CKEditor
+          editor={ClassicEditor}
+          data=""
+          config={{
+            licenseKey: process.env.ckeditor,
+          }}
+          onChange={(event, editor) => {
+            setEditorContent(editor.getData());
+          }}
+        />
 
         <div className="flex mb-4">
           <div className="w-1/2 mr-4">
