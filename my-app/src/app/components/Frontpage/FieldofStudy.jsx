@@ -6,12 +6,12 @@ const FieldofStudy = () => {
     {
       id: 1,
       title: "Engineering",
-      image: "https://placehold.co/600x400",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeFkRea-GyeWjSlr88zwu0ngFchRigG276wg&s",
     },
     {
       id: 2,
       title: "Bachelor of Computer Science and Information Technology (Bsc. CSIT)",
-      image: "https://placehold.co/600x400",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-hfVzc_dtKgvhBI8TW2w-kaSC8O6agNZ7vQ&s",
     },
     {
       id: 3,
@@ -60,7 +60,7 @@ const FieldofStudy = () => {
                   alt={item.title}
                   className="w-full h-48 object-cover transform transition-transform duration-300 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-end p-4">
+                <div className="absolute inset-0 bg-black bg-opacity-25 flex items-end p-4">
                   <h2 className="text-xl font-semibold text-white">
                     {item.title}
                   </h2>

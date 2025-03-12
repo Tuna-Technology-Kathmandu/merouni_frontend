@@ -4,15 +4,15 @@ const BannerLayout = () => {
   const banner = [
     {
       id: 1,
-      image: "https://placehold.co/600x400",
+      image: "https://media.edusanjal.com/bfs/Techspire_College_Edusanjal_2.jpg",
     },
     {
       id: 2,
-      image: "https://placehold.co/600x400",
+      image: "https://media.edusanjal.com/bfs/Techspire_College_Edusanjal_2.jpg",
     },
     {
       id: 3,
-      image: "https://placehold.co/600x400",
+      image: "https://media.edusanjal.com/bfs/Techspire_College_Edusanjal_2.jpg",
     },
   ];
   return (
@@ -21,7 +21,7 @@ const BannerLayout = () => {
         <img
           src={item.image}
           alt={item.id}
-          className="w-full h-24 object-cover rounded-lg"
+          className="w-full h-18 object-cover rounded-lg"
           key={item.id}
         />
       ))}

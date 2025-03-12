@@ -5,7 +5,7 @@ const LargeBanner = () => {
     <div className="bg-gray-100 py-8">
       <div className="container mx-auto px-4">
         <img
-          src="https://placehold.co/600x400"
+          src="https://media.edusanjal.com/bfs/edupatra-banner_RHpsuBl.webp"
           alt=""
           className="w-full h-32 object-cover rounded-lg"
         />
