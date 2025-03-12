@@ -1,0 +1,23 @@
+.admission-container {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .admission-cards {
+    width: 80%;
+  }
+  
+  .admission-image {
+    width: 20%;
+  }
+  
+  @media (max-width: 1024px) {
+    .admission-container {
+      flex-direction: column;
+    }
+    .admission-cards,
+    .admission-image {
+      width: 100%;
+    }
+  }
+  
