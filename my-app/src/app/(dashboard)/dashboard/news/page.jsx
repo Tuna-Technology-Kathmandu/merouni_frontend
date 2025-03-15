@@ -13,7 +13,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import FileUpload from "../addCollege/FileUpload";
 import ConfirmationDialog from "../addCollege/ConfirmationDialog";
-import RichTextEditor from "@/app/components/RichTextEditor";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
