@@ -26,7 +26,7 @@ export async function getItems(title) {
 export async function getFeaturedCollege() {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}/college/featured-college`,
+      `${process.env.baseUrl}${process.env.version}/college?pinned=true&page=1&limit=6`,
       {
         method: "GET",
         headers: {
