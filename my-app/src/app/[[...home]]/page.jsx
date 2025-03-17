@@ -59,7 +59,7 @@ const Page = () => {
 
       <Degree />
       {/* large banner */}
-      <LargeBanner />
+      {/* <LargeBanner /> */}
 
       {/* degree section for home page */}
       <FeaturedDegree />
