@@ -10,6 +10,7 @@ import FeaturedDegree from "../components/Frontpage/FeaturedDegree";
 import FieldofStudy from "../components/Frontpage/FieldofStudy";
 import Colleges from "../components/Frontpage/Colleges";
 import Degree from "../components/Frontpage/Degree";
+import ScrollToTop from "../components/ScrollToTop";
 
 const Page = () => {
   return (
@@ -66,6 +67,7 @@ const Page = () => {
       <Colleges />
       <FieldofStudy />
       <Footer />
+      <ScrollToTop />
     </>
   );
 };
