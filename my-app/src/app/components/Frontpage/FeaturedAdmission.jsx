@@ -51,7 +51,7 @@ const FeaturedAdmission = () => {
               <SkeletonLoader key={index} />
             ))
           : data.map((item) => (
-              <Link href={`/colleges/${item.slug}`} key={item.id}>
+              <Link href={`/colleges/${item.slugs}`} key={item.id}>
                 <div
                   key={item.id}
                   className="bg-white rounded-lg shadow-lg overflow-hidden"

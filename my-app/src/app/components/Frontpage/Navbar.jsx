@@ -23,6 +23,12 @@ const Navbar = () => {
         }`}
       >
         <div className="flex items-center mx-auto justify-center gap-8 md:gap-8 text-white">
+          {isScrolled && (
+            <Link href="/" className="hover:text-gray-200 cursor-pointer">
+              Home
+            </Link>
+          )}
+
           <Link href="/colleges" className="hover:text-gray-200 cursor-pointer">
             Colleges
           </Link>
@@ -32,16 +38,28 @@ const Navbar = () => {
           <Link href="/degree" className="hover:text-gray-200 cursor-pointer">
             Degrees
           </Link>
-          <Link href="/admission" className="hover:text-gray-200 cursor-pointer">
+          <Link
+            href="/admission"
+            className="hover:text-gray-200 cursor-pointer"
+          >
             Admission
           </Link>
-          <Link href="/scholarship" className="hover:text-gray-200 cursor-pointer">
+          <Link
+            href="/scholarship"
+            className="hover:text-gray-200 cursor-pointer"
+          >
             Scholarship
           </Link>
-          <Link href="/consultancy" className="hover:text-gray-200 cursor-pointer">
+          <Link
+            href="/consultancy"
+            className="hover:text-gray-200 cursor-pointer"
+          >
             Consultancy
           </Link>
-          <Link href="/materials" className="hover:text-gray-200 cursor-pointer">
+          <Link
+            href="/materials"
+            className="hover:text-gray-200 cursor-pointer"
+          >
             Materials
           </Link>
           <Link href="/events" className="hover:text-gray-200 cursor-pointer">
@@ -55,26 +73,50 @@ const Navbar = () => {
               <span>More</span>
               <RiArrowDropDownLine size={20} />
             </button>
-            <div className="absolute z-40 hidden pt-1 bg-[#30ad8f] group-hover:block" style={{ minWidth: "180px" }}>
-              <Link href="/exams" className="block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer">
+            <div
+              className="absolute z-40 hidden pt-1 bg-[#30ad8f] group-hover:block"
+              style={{ minWidth: "180px" }}
+            >
+              <Link
+                href="/exams"
+                className="block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer"
+              >
                 Exams
               </Link>
-              <Link href="/schools" className="block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer">
+              <Link
+                href="/schools"
+                className="block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer"
+              >
                 School
               </Link>
-              <Link href="/videos" className="block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer">
+              <Link
+                href="/videos"
+                className="block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer"
+              >
                 Videos
               </Link>
-              <Link href="/universities" className="block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer">
+              <Link
+                href="/universities"
+                className="block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer"
+              >
                 Universities
               </Link>
-              <Link href="/career" className="block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer">
+              <Link
+                href="/career"
+                className="block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer"
+              >
                 Career
               </Link>
-              <Link href="/vacancy" className="block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer">
+              <Link
+                href="/vacancy"
+                className="block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer"
+              >
                 Vacancy
               </Link>
-              <Link href="/wishlist" className="block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer">
+              <Link
+                href="/wishlist"
+                className="block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer"
+              >
                 Wishlist
               </Link>
             </div>

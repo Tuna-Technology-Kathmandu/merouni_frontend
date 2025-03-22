@@ -55,17 +55,6 @@ const Header = () => {
           showSidebar ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* className={`absolute top-[80px] left-0 h-[550px]  w-full bg-white shadow-lg border-t-2 transform transition-transform duration-300 ease-in-out z-50 ${ */}
-
-        {/* Close Button */}
-        {/* <div className="flex justify-end p-4">
-          <button
-            onClick={() => setShowSidebar(false)}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            <IoClose size={24} />
-          </button>
-        </div> */}
 
         {/* Menu Items */}
         <nav className="px-4 h-[70%] overflow-auto">
