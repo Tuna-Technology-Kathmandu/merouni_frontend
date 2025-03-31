@@ -79,9 +79,10 @@ export default function FacultyManager() {
     loadFaculties();
   }, []);
 
-  const loadFaculties = async (page = 1) => {
+  const loadFaculties = async (page = 2) => {
     try {
       const response = await getAllFaculty(page);
+      console.log;(response.items);
       setFaculties(response.items);
       setPagination({
         currentPage: response.pagination.currentPage,

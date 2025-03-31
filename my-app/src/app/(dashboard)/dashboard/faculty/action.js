@@ -4,7 +4,7 @@ let url = `${process.env.baseUrl}${process.env.version}/faculty`;
 
 export async function getAllFaculty(page) {
   try {
-    const response = await authFetch(`${url}?page-${page}`, {
+    const response = await authFetch(`${url}?page=${page}`, {
       cache: "no-store",
     });
     const data = await response.json();
