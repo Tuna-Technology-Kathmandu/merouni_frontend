@@ -47,10 +47,12 @@ const CollegeFinder = () => {
         setUniversities(results.colleges);
         setPagination(results.pagination);
         setIsSearching(false);
+
       }
     }, 1000), // 1000ms delay
     []
   );
+
 
   const handleSearchChange = (e) => {
     const query = e.target.value;
@@ -70,7 +72,7 @@ const CollegeFinder = () => {
     setIsLoading(false);
   };
 
-  useEffect(() => {}, [universities]);
+  useEffect(() => { }, [universities]);
 
   const filters = [
     {
@@ -252,7 +254,16 @@ const CollegeFinder = () => {
             </button>
             <button
               className="text-gray-600 text-sm"
-              onClick={() => setSearchQuery("")}
+              onClick={() => {
+                setSearchQuery(""); // Clear search query
+                setSelectedFilters({
+                  disciplines: [],
+                  state: [],
+                  degrees: [],
+                  affiliations: [],
+                  courseFees: { min: 0, max: 1000000 },
+                }); // Reset all filters
+              }}
             >
               Clear All
             </button>
@@ -302,12 +313,14 @@ const CollegeFinder = () => {
           ) : (
             <>
               {universities.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {universities.map((university, index) => (
-                    <Link href={`/colleges/${university.slug}`}>
-                      <UniversityCard key={index} {...university} />
-                    </Link>
-                  ))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {universities.map((university, index) => {
+                    return (
+                      <Link href={`/colleges/${university.slug}`}>
+                        <UniversityCard key={index} {...university} />
+                      </Link>
+                    )
+                  })}
                 </div>
               ) : (
                 <NoResultsFound />

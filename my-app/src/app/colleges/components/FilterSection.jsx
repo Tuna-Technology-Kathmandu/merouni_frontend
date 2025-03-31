@@ -6,7 +6,7 @@ const FilterSection = ({
   options,
   placeholder,
   selectedItems = [],
-  onSelectionChange = () => {},
+  onSelectionChange = () => { },
 }) => {
   const [searchText, setSearchText] = useState("");
 
@@ -15,10 +15,17 @@ const FilterSection = ({
   );
 
   const handleCheckBoxChange = (option) => {
+    //this is a previous code may need again
+    // if (selectedItems.includes(option.name)) {
+    //   onSelectionChange(selectedItems.filter((item) => item !== option.name));
+    // } else {
+    //   onSelectionChange([...selectedItems, option.name]);
+    // }
+
     if (selectedItems.includes(option.name)) {
-      onSelectionChange(selectedItems.filter((item) => item !== option.name));
+      onSelectionChange([]); // Uncheck all if clicking the same option
     } else {
-      onSelectionChange([...selectedItems, option.name]);
+      onSelectionChange([option.name]); // Only keep the newly selected option
     }
   };
 
@@ -46,7 +53,7 @@ const FilterSection = ({
           className="w-full pl-9 pr-3 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none"
         />
       </div>
-     
+
 
       <div className="mt-3 space-y-2 overflow-y-auto h-24 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-100">
         {filteredOptions.map((option, index) => (
@@ -54,7 +61,7 @@ const FilterSection = ({
             <input
               type="checkbox"
               className="rounded-full border-gray-300"
-              checked={selectedItems?.includes(option.name) }
+              checked={selectedItems?.includes(option.name)}
               onChange={() => handleCheckBoxChange(option)}
             />
             <span className="text-gray-700 text-sm">{option.name}</span>

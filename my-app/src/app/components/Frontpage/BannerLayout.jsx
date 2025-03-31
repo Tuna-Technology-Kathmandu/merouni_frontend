@@ -1,3 +1,5 @@
+'use client'
+
 import React from "react";
 
 const BannerLayout = () => {
@@ -20,25 +22,25 @@ const BannerLayout = () => {
   ];
 
   // Determine the number of items to display based on screen width
-  let displayedBanners = banner.slice(0, 1); // Default: 1 item for small screens
+  let displayedBanners = banner.slice(0, 3); // Default: 1 item for small screens
 
-  if (typeof window !== "undefined") {
-    if (window.innerWidth >= 768) {
-      displayedBanners = banner.slice(0, 2); // 2 items for medium screens
-    }
-    if (window.innerWidth >= 1024) {
-      displayedBanners = banner; // 3 items for large screens
-    }
-  }
+  // if (typeof window !== "undefined") {
+  //   if (window.innerWidth >= 768) {
+  //     displayedBanners = banner.slice(0, 2); // 2 items for medium screens
+  //   }
+  //   if (window.innerWidth >= 1024) {
+  //     displayedBanners = banner; // 3 items for large screens
+  //   }
+  // }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm-d:grid-cols-3 lg:grid-cols-3 gap-7 sm:gap-4 mb-5">
       {displayedBanners.map((item) => (
         <div key={item.id} className="w-full">
           <img
             src={item.image}
             alt={`Banner ${item.id}`}
-            className="w-full h-[48px] sm:h-[48px] md:h-[48px] lg:h-[48px] object-cover rounded-lg"
+            className="w-full h-[48px] sm:h-[48px] md:h-[48px] lg:h-[70px] object-contain rounded-lg"
           />
         </div>
       ))}

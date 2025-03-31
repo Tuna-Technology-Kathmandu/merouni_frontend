@@ -43,7 +43,7 @@ const Featured = () => {
     }
   };
 
-  useEffect(() => {}, [featuredColleges]);
+  useEffect(() => { }, [featuredColleges]);
 
   return (
     <div className="flex flex-col p-4">
@@ -66,7 +66,7 @@ const Featured = () => {
         ) : (
           <div
             ref={scrollRef}
-            className="flex gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200"
+            className="flex gap-1 w-full overflow-x-auto scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200"
           >
             {featuredColleges.map((college, index) => (
               <Fcollege

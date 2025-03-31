@@ -12,6 +12,7 @@ const UniversityCard = ({
   collegeId,
   isWishlistPage = false,
   slug,
+  collegeImage
 }) => {
   const [isInWishlist, setIsInWishlist] = useState(isWishlistPage);
   const [isLoading, setIsLoading] = useState(false);
@@ -95,17 +96,24 @@ const UniversityCard = ({
       setIsLoading(false);
     }
   };
+  console.log('college', collegeImage);
 
   return (
-    <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300">
-      <div className="flex justify-between items-start mb-4">
-        <img
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300">
+      <div className="flex justify-between items-start min-h-28 bg-slate-300"
+        style={{
+          backgroundImage: `url("${collegeImage || 'https://placehold.co/600x400'}")`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {/* <img
           src={
             college_logo || `https://avatar.iran.liara.run/username?username=${name}`
           }
           alt={`${name} logo`}
           className="w-12 h-12 object-contain"
-        />
+        /> */}
         <div className="flex gap-2">
           <button className="p-2 hover:bg-gray-100 rounded-full">
             <Share className="w-5 h-5 text-gray-600" />
@@ -117,32 +125,35 @@ const UniversityCard = ({
               disabled={isLoading}
             >
               <Heart
-                className={`w-5 h-5 transition-colors duration-200 ${
-                  isInWishlist ? "text-red-500 fill-red-500" : "text-gray-600"
-                } ${isLoading ? "opacity-50" : ""}`}
+                className={`w-5 h-5 transition-colors duration-200 ${isInWishlist ? "text-red-500 fill-red-500" : "text-gray-600"
+                  } ${isLoading ? "opacity-50" : ""}`}
               />
             </button>
           )}
         </div>
       </div>
+      <div className="p-4">
 
-      <h3 className="font-semibold text-lg mb-1">{name}</h3>
-      <p className="text-black text-sm my-4">
+
+        <h3 className="font-semibold text-base mb-2">{name}</h3>
+        <p className=" text-sm mb-3 text-gray-400">{location}</p>
+        {/* <p className="text-black text-sm my-4">
         {description.length > 100
           ? `${description.slice(0, 100)}...`
           : description}
-      </p>
-      <div className="flex gap-3">
-        <Link href={`/colleges/${slug}`} key={collegeId}>
-          <button className="flex-1 py-2 px-4 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-50 text-sm font-medium">
-            Details
-          </button>
-        </Link>
-        <Link href={`/colleges/apply/${slug}`}>
-          <button className="flex-1 py-2 px-4 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 text-sm font-medium">
-            Apply Now
-          </button>
-        </Link>
+      </p> */}
+        <div className="flex gap-3 justify-between">
+          <Link href={`/colleges/${slug}`} key={collegeId}>
+            <button className="flex-1 py-1.5 px-3 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-50 text-[13px] font-medium">
+              Details
+            </button>
+          </Link>
+          <Link href={`/colleges/apply/${slug}`}>
+            <button className="flex-1 py-1.5 px-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 text-[13px] font-medium">
+              Apply Now
+            </button>
+          </Link>
+        </div>
       </div>
     </div>
   );

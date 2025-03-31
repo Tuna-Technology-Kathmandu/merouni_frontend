@@ -83,14 +83,12 @@ export async function getColleges(page = 1, filters = {}) {
     // Log the final URL for debugging
     console.log(
       "Fetching URL:",
-      `${process.env.baseUrl}${
-        process.env.version
+      `${process.env.baseUrl}${process.env.version
       }/college?${queryParams.toString()}`
     );
 
     const response = await fetch(
-      `${process.env.baseUrl}${
-        process.env.version
+      `${process.env.baseUrl}${process.env.version
       }/college?${queryParams.toString()}`,
       {
         cache: "no-store",
@@ -112,6 +110,7 @@ export async function getColleges(page = 1, filters = {}) {
         instituteType: college.institute_type,
         slug: college.slugs,
         collegeId: college.id,
+        collegeImage: college.featured_img
       })),
       pagination: data.pagination || {
         currentPage: 1,

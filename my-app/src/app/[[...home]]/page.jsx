@@ -1,5 +1,4 @@
 import React from "react";
-
 import Navbar from "../components/Frontpage/Navbar";
 import Header from "../components/Frontpage/Header";
 import Footer from "../components/Frontpage/Footer";
@@ -17,18 +16,19 @@ const Page = () => {
     <>
       <Header />
       <Navbar />
-      <div className="bg-gray-100 py-4">
-        <div className="container mx-auto px-4">
+      <div className="py-4">
+        <div className="container mx-auto px-12">
+          <BannerLayout />
           {/* Flex container for horizontal layout */}
           <div className="flex flex-col lg:flex-row gap-6">
             {/* 80% Admission Cards */}
             <div className="w-full lg:w-4/5">
-              <BannerLayout />
+              {/* <BannerLayout /> */}
               <FeaturedAdmission />
             </div>
 
             {/* 20% Image */}
-            <div className="w-full lg:w-1/5">
+            <div className="w-full lg:w-1/5 mt-3">
               <div className="flex flex-col gap-4">
                 {" "}
                 {/* Added gap between images */}
