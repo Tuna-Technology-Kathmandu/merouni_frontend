@@ -34,13 +34,13 @@ const BannerLayout = () => {
   // }
 
   return (
-    <div className="grid grid-cols-1 sm-d:grid-cols-3 lg:grid-cols-3 gap-7 sm:gap-4 mb-5">
+    <div className="grid grid-cols-1 w-full sm-d:grid-cols-3 lg:grid-cols-3 gap-7 sm:gap-4 mb-5">
       {displayedBanners.map((item) => (
         <div key={item.id} className="w-full">
           <img
             src={item.image}
             alt={`Banner ${item.id}`}
-            className="w-full h-[48px] sm:h-[48px] md:h-[48px] lg:h-[70px] object-contain rounded-lg"
+            className="w-full h-[68px] sm:h-[48px] md:h-[48px] lg:h-[70px] rounded-lg"
           />
         </div>
       ))}
