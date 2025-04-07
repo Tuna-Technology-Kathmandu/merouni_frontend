@@ -37,7 +37,7 @@ const SideBanner = () => {
                     <img
                         src={item.banner_galleries?.[0]?.url || "/images/exampleBanner.jpg"}
                         alt="Admission Image"
-                        className="w-full h-36 rounded-lg shadow-lg border border-black"
+                        className="w-full h-36 rounded-lg shadow-lg"
                     />
                 </a>
             ))}
