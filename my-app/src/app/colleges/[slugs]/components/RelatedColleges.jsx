@@ -24,7 +24,7 @@ const RelatedColleges = ({ college }) => {
       console.log("Filtered Colleges:", filteredColleges);
       // setColleges(data.colleges);
       setColleges(filteredColleges);
-      
+
     } catch (error) {
       console.error("Error fetching colleges:", error);
     } finally {
@@ -33,12 +33,12 @@ const RelatedColleges = ({ college }) => {
   };
 
   useEffect(() => {
-    console.log("Obtained Colleges:",colleges)
+    console.log("Obtained Colleges:", colleges)
   }, [])
-  
+
 
   return (
-    <div className="flex flex-col max-w-[1600px] mx-auto mb-20">
+    <div className="flex flex-col max-w-[1600px] mx-auto mb-20 px-24">
       <h2 className="font-bold text-xl md:text-3xl leading-10 m-4">
         Colleges you may like
       </h2>

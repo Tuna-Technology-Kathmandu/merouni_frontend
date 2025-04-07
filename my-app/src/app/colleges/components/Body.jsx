@@ -27,7 +27,7 @@ const CollegeFinder = () => {
 
   const [selectedFilters, setSelectedFilters] = useState({
     disciplines: [],
-    state: [],
+    state:'',
     degrees: [],
     affiliations: [],
     courseFees: { min: 0, max: 1000000 },
@@ -157,12 +157,14 @@ const CollegeFinder = () => {
         { name: "Madhesh" },
         { name: "Sudurpashchim" },
       ],
-      selectedItems: selectedFilters.states,
+      selectedItems: selectedFilters.state,
       onSelectionChange: (items) => {
-        setSelectedFilters((prev) => ({ ...prev, states: items }));
+        setSelectedFilters((prev) => ({ ...prev, state: items }));
       },
     },
   ];
+
+  console.log(selectedFilters)
 
   const FilterModal = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">

@@ -10,6 +10,7 @@ import FieldofStudy from "../components/Frontpage/FieldofStudy";
 import Colleges from "../components/Frontpage/Colleges";
 import Degree from "../components/Frontpage/Degree";
 import ScrollToTop from "../components/ScrollToTop";
+import SideBanner from "../components/Frontpage/SideBanner";
 
 const Page = () => {
   return (
@@ -17,42 +18,21 @@ const Page = () => {
       <Header />
       <Navbar />
       <div className="py-4">
-        <div className="container mx-auto px-12">
-          <BannerLayout />
+        <div className="px-16">
           {/* Flex container for horizontal layout */}
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* 80% Admission Cards */}
-            <div className="w-full lg:w-4/5">
-              {/* <BannerLayout /> */}
-              <FeaturedAdmission />
+          <div className="flex gap-6">
+            <div className="flex flex-col md:w-4/5 sm:w-full">
+              <BannerLayout />
+              {/* 80% Admission Cards */}
+              <div className="w-full lg:w-full">
+                {/* <BannerLayout /> */}
+                <FeaturedAdmission />
+              </div>
             </div>
 
             {/* 20% Image */}
-            <div className="w-full lg:w-1/5 mt-3">
-              <div className="flex flex-col gap-4">
-                {" "}
-                {/* Added gap between images */}
-                <img
-                  src="https://placehold.co/600x400"
-                  alt="Admission Image"
-                  className="w-full h-auto rounded-lg shadow-lg"
-                />
-                <img
-                  src="https://placehold.co/600x400"
-                  alt="Admission Image"
-                  className="w-full h-auto rounded-lg shadow-lg"
-                />
-                <img
-                  src="https://placehold.co/600x400"
-                  alt="Admission Image"
-                  className="w-full h-auto rounded-lg shadow-lg"
-                />
-                <img
-                  src="https://placehold.co/600x400"
-                  alt="Admission Image"
-                  className="w-full h-auto rounded-lg shadow-lg"
-                />
-              </div>
+            <div className="w-full md:w-1/5 hidden md:block">
+              <SideBanner />
             </div>
           </div>
         </div>
