@@ -105,10 +105,12 @@ export async function getEvents(page) {
 }
 
 //Blogs actions
-export async function getBlogs(page) {
+export async function getBlogs(page, category_title, is_featured) {
   // const q = `page=${queryParams}`;
   const params = {
     page,
+    category_title,
+    is_featured
   };
   return services.news.getAll(params);
 }
@@ -145,7 +147,7 @@ export async function getBannersById(id) {
   return services.banner.getById(params);
 }
 
-export async function getColleges(isFeatured=null, pinned=null, limit=10, page=1) {
+export async function getColleges(isFeatured = null, pinned = null, limit = 10, page = 1) {
   const params = {
     limit,
     page,

@@ -16,6 +16,7 @@ const FeaturedBlogs = () => {
   const [Blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const category_title = 'News'
 
   useEffect(() => {
     loadPageNumber(pagination.currentPage);
@@ -25,7 +26,7 @@ const FeaturedBlogs = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getBlogs(page);
+      const response = await getBlogs(page, category_title);
       console.log("Response of blogs:", response);
 
       if (response && response.pagination) {

@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 import { getMaterials } from "../action";
 import Pagination from "../../blogs/components/Pagination";
 import Shimmer from "../../components/Shimmer";
+import { MdOutlineRemoveRedEye } from "react-icons/md";
 import Link from "next/link";
 
 const MaterialCard = () => {
@@ -38,10 +39,10 @@ const MaterialCard = () => {
     setError(null);
     try {
       const response = await getMaterials(page, debouncedSearch); // Pass search term to API
-  
+
       if (response && response.pagination) {
         setBlogs(response.materials);
-  
+
         setPagination((prev) => ({
           ...prev,
           ...response.pagination,
@@ -139,13 +140,23 @@ const MaterialCard = () => {
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-4">
-                  <h1 className="text-lg font-semibold mb-2">{blog.title}</h1>
-                  <button
-                    className="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-                    onClick={() => window.open(blog.downloadUrl, "_blank")}
+                  <div className="flex justify-between items-center">
+                    <h1 className="text-lg font-semibold mb-2">{blog.title}</h1>
+                    <MdOutlineRemoveRedEye className="w-6 h-6 cursor-pointer"
+                      onClick={() => window.open(blog.downloadUrl, "_blank")}
+                    />
+                  </div>
+                  <a
+                    href={blog.downloadUrl} // The link to the PDF
+                    download
+                    className="w-full h-full"
                   >
-                    Download Now
-                  </button>
+                    <button
+                      className="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                    >
+                      Download Now
+                    </button>
+                  </a>
                 </div>
               </div>
             ))}
