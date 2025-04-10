@@ -23,9 +23,9 @@ const FilterSection = ({
     // }
 
     if (selectedItems.includes(option.name)) {
-      onSelectionChange([]); // Uncheck all if clicking the same option
+      onSelectionChange(''); // Uncheck all if clicking the same option
     } else {
-      onSelectionChange([option.name]); // Only keep the newly selected option
+      onSelectionChange(option.name); // Only keep the newly selected option
     }
   };
 

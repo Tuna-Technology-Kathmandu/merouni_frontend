@@ -63,37 +63,26 @@ export async function getColleges(page = 1, filters = {}) {
       page: page.toString(),
     });
 
-    // Check if any filters are actually selected before applying them
-    const hasActiveFilters =
-      filters.disciplines?.length > 0 ||
-      filters.states?.length > 0 ||
-      filters.degrees?.length > 0 ||
-      filters.affiliations?.length > 0;
+    // Only add filter parameters if provided
+    if (filters.degree) {
+      queryParams.append("degree", filters.degree);
+    }
 
-    // Only add filter parameters if there are active filters
-    if (hasActiveFilters) {
-      if (filters.disciplines?.length > 0) {
-        queryParams.append("degree", filters.disciplines.join(","));
-      }
-      if (filters.states?.length > 0) {
-        queryParams.append("state", filters.states.join(","));
-      }
+    if (filters.state) {
+      queryParams.append("state", filters.state);
+    }
+
+    if (filters.uni) {
+      queryParams.append("university", filters.uni);
     }
 
     // Log the final URL for debugging
-    console.log(
-      "Fetching URL:",
-      `${process.env.baseUrl}${process.env.version
-      }/college?${queryParams.toString()}`
-    );
+    const url = `${process.env.baseUrl}${process.env.version}/college?${queryParams.toString()}`;
+    console.log("Fetching URL:", url);
 
-    const response = await fetch(
-      `${process.env.baseUrl}${process.env.version
-      }/college?${queryParams.toString()}`,
-      {
-        cache: "no-store",
-      }
-    );
+    const response = await fetch(url, {
+      cache: "no-store",
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -104,7 +93,7 @@ export async function getColleges(page = 1, filters = {}) {
     return {
       colleges: data.items.map((college) => ({
         name: college.name,
-        location: `${college.address.city}, ${college.address.state}`,
+        location: `${college.address?.city || ""}, ${college.address?.state || ""}`,
         description: college.description,
         googleMapUrl: college.google_map_url,
         instituteType: college.institute_type,
@@ -130,6 +119,7 @@ export async function getColleges(page = 1, filters = {}) {
     };
   }
 }
+
 
 // export async function searchColleges(query) {
 //   console.log(
@@ -295,3 +285,62 @@ export async function getCollegeBySlug(slug) {
     throw error;
   }
 }
+
+//to get degrees/program
+export async function getPrograms() {
+  try {
+    const url = `${process.env.baseUrl}${process.env.version}/program`;
+    console.log("Fetching programs from:", url);
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    console.log("Response:", response);
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch Programs");
+    }
+
+    const data = await response.json();
+    console.log("Data:", data);
+    return data.items || []; // Adjust according to actual API structure
+  } catch (error) {
+    console.error("Error fetching programs:", error);
+    throw error;
+  }
+}
+
+//for getting university name
+export async function getUniversity() {
+  try {
+    const url = `${process.env.baseUrl}${process.env.version}/university`;
+    console.log("Fetching programs from:", url);
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    console.log("Response:", response);
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch Programs");
+    }
+
+    const data = await response.json();
+    console.log("Data:", data);
+    return data.items || []; // Adjust according to actual API structure
+  } catch (error) {
+    console.error("Error fetching programs:", error);
+    throw error;
+  }
+}
+

@@ -14,7 +14,7 @@ const ImageSection = ({ college }) => {
       <div className="flex flex-col items-center relative ">
 
         {/* college image.names and location in cirlce */}
-        <div className="w-full h-[600px]">
+        <div className="w-full h-[600px] xl:mb-16 2xl:mb-32">
           <Image
             src={college.featured_img || "https://dummyimage.com/600x180/000/fff"}
             width={2400}
@@ -55,7 +55,7 @@ const ImageSection = ({ college }) => {
           <div className="bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex items-center justify-center flex-wrap sm:justify-between md:justify-around md:gap-10 mb-8  items-left w-full l:w-[80%] gap-6 lg:gap-6 p-7 ">
             <div className="flex flex-col items-center gap-2 text-center ">
               <FaUniversity size={30} />
-              <p className="">{college?.university?.fullname || "N/A"}</p>
+              <p className="max-w-36">{college?.university?.fullname || "N/A"}</p>
             </div>
             <div className=" items-center hidden xl:block">
               <PiLineVerticalThin size={60} />
