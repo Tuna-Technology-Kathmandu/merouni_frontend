@@ -8,13 +8,13 @@ import { LiaUniversitySolid } from "react-icons/lia";
 import { BsGlobe2 } from "react-icons/bs";
 
 const ImageSection = ({ college }) => {
-  console.log(college);
+  console.log(college.college_logo);
   return (
     <>
       <div className="flex flex-col items-center relative ">
 
         {/* college image.names and location in cirlce */}
-        <div className="w-full h-[600px]">
+        <div className="w-full h-[600px] xl:mb-16 2xl:mb-32">
           <Image
             src={college.featured_img || "https://dummyimage.com/600x180/000/fff"}
             width={2400}
@@ -51,16 +51,16 @@ const ImageSection = ({ college }) => {
         </div>
 
         {/* college all details */}
-        <div className="px-24 w-full">
-          <div className="bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex items-center flex-wrap justify-between md:justify-center md:gap-10 mb-8  items-left w-full l:w-[80%] gap-4 lg:gap-6  p-8 ">
-            <div className="flex flex-row lg:flex-col items-center gap-2 ">
+        <div className="px-24 -mt-72 md:-mt-48 lg:-mt-32 xl:-mt-20 2xl:-mt-16 w-full">
+          <div className="bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex items-center justify-center flex-wrap sm:justify-between md:justify-around md:gap-10 mb-8  items-left w-full l:w-[80%] gap-6 lg:gap-6 p-7 ">
+            <div className="flex flex-col items-center gap-2 text-center ">
               <FaUniversity size={30} />
-              <p className="lg:text-base md:text-sm sm:text-xs">{college?.university?.fullname || "N/A"}</p>
+              <p className="max-w-36">{college?.university?.fullname || "N/A"}</p>
             </div>
             <div className=" items-center hidden xl:block">
               <PiLineVerticalThin size={60} />
             </div>
-            <div className="flex flex-row lg:flex-col items-center gap-2 ">
+            <div className="flex flex-col items-center gap-2 text-center  ">
               <LiaUniversitySolid size={30} />
               <p className="whitespace-nowrap ">
                 {college?.institute_type || "N/A"}
@@ -69,14 +69,14 @@ const ImageSection = ({ college }) => {
             <div className="items-center hidden xl:block">
               <PiLineVerticalThin size={60} />
             </div>
-            <div className="flex flex-row lg:flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-2 text-center ">
               <img src="/images/level.png" alt="level" className="w-10" />
               <p className="whitespace-nowrap">+2, Bachelor Program</p>
             </div>
             <div className="items-center hidden xl:block">
               <PiLineVerticalThin size={60} />
             </div>
-            <div className="flex flex-row lg:flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-2 text-center ">
               <FaPhoneAlt size={25} />
               {(college?.collegeContacts || []).map((contact, index) => (
                 <div key={index} className="flex flex-row">
@@ -87,7 +87,7 @@ const ImageSection = ({ college }) => {
             <div className="items-center hidden xl:block">
               <PiLineVerticalThin size={60} />
             </div>
-            <div className="flex flex-row lg:flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-2 text-center ">
               {/* <IoMdMail size={25} /> */}
               <BsGlobe2 size={25} />
               <a href={college.website_url} target="_blank">

@@ -26,7 +26,20 @@ const SideBanner = () => {
     }, []);
 
 
-    if (loading) return <div>Loading banners...</div>;
+    if (loading) {
+        return (
+            <div className="flex flex-col gap-4">
+
+                {[...Array(4)].map((_, index) => (
+
+                    <div key={index}
+                        className="w-full h-36 rounded-lg shadow-lg animate-pulse bg-slate-300"
+                    />
+
+                ))}
+            </div>
+        )
+    }
     return (
         <div className="flex flex-col gap-4">
 

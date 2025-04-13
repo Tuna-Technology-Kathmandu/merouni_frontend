@@ -45,7 +45,21 @@ const BannerLayout = () => {
     fetchData();
   }, []);
 
-  if (loading) return <div>Loading banners...</div>;
+  if (loading) {
+    return (
+
+      <div className="flex gap-4 md:gap-3 lg:gap-3 justify-center flex-wrap sm:flex-nowrap xl:flex-nowrap">
+
+        {
+          [...Array(3)].map((_, index) => (
+            <div key={index} className=" w-full sm:w-[350px] lg:w-[340px] xl:w-full h-[48px] md:h-[58px] lg:h-[70px] rounded-lg animate-pulse bg-slate-300">
+
+            </div>
+          ))
+        }
+      </div>
+    )
+  }
 
 
 
@@ -65,9 +79,12 @@ const BannerLayout = () => {
 
   return (
     // <div className="grid grid-cols-1 w-full sm-d:grid-cols-3 lg:grid-cols-3 gap-7 sm:gap-4 mb-5">
-    <div className="flex gap-4 md:gap-3 lg:gap-3 justify-center flex-wrap md:flex-nowrap xl:flex-nowrap">
-      {banners.map((item) => (
-        <div key={item.id} className=" w-full md:w-[350px] lg:w-[340px] xl:w-full cursor-pointer">
+    <div className="grid grid-cols-2 gap-4 sm:flex md:gap-3 lg:gap-3 justify-center sm:flex-nowrap xl:flex-nowrap">
+      {banners.map((item, index) => (
+        <div key={item.id}
+          className={`sm:w-[350px] lg:w-[340px] xl:w-full cursor-pointer
+           ${index === 2 ? 'w-[calc(200%+16px)] sm:w-[350px]' : 'w-full'}
+          `}>
           <a href={item.website_url} target="_blank" rel="noopener noreferrer">
             <img
               src={item.banner_galleries?.[0]?.url || "/images/exampleBanner.jpg"}
@@ -75,7 +92,7 @@ const BannerLayout = () => {
                 e.target.src = "/images/exampleBanner.jpg";
               }}
               alt={`Banner ${item.id}`}
-              className="w-full h-[64px] sm:h-[70px]  md:h-[58px] lg:h-[70px] rounded-lg cursor-pointer"
+              className="w-full h-[44px] md:h-[58px] lg:h-[70px] rounded-lg cursor-pointer"
             />
           </a>
         </div>

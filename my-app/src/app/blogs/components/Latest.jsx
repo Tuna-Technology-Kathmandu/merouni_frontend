@@ -12,6 +12,9 @@ const Latest = () => {
   const [blogs, setBlogs] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const page = 1;
+  const is_featured = 1;
+  const category_title = 'News';
 
   const scrollLeft = () => {
     scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
@@ -29,8 +32,10 @@ const Latest = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getBlogs(1);
+      const response = await getBlogs(page, category_title, is_featured);
       setBlogs(response.items);
+      console.log('featued', response.items);
+
     } catch (error) {
       setError("Failed to load latest Blogs");
       console.error("Error fetching latest blogs:", error);

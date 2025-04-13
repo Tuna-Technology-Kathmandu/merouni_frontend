@@ -2,12 +2,11 @@
 import { Search } from "lucide-react";
 import { FaExpandAlt } from "react-icons/fa";
 import FilterSection from "./FilterSection";
-import DegreeSection from "./DegreeSection";
-import AffiliationSection from "./AffiliationSection";
-import CourseFeeSection from "./CourseFeeSection";
+// import AffiliationSection from "./AffiliationSection";
+// import CourseFeeSection from "./CourseFeeSection";
 import UniversityCard from "./UniversityCard";
 import { useState, useEffect, useCallback } from "react";
-import { getColleges, searchColleges } from "../actions";
+import { getColleges, searchColleges, getPrograms, getUniversity } from "../actions";
 import { debounce } from "lodash";
 import UniversityCardShimmer from "./UniversityShimmerCard";
 import Pagination from "@/app/blogs/components/Pagination";
@@ -24,14 +23,16 @@ const CollegeFinder = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [degree, setDegree] = useState([]);
+  const [uni, setUni] = useState([]);
 
   const [selectedFilters, setSelectedFilters] = useState({
-    disciplines: [],
-    state:'',
-    degrees: [],
-    affiliations: [],
+    state: "",       // instead of []
+    degree: "",      // instead of []
+    uni: "",         // instead of []
     courseFees: { min: 0, max: 1000000 },
   });
+  console.log('filter', selectedFilters);
 
   useEffect(() => {
     if (!searchQuery) {
@@ -52,6 +53,31 @@ const CollegeFinder = () => {
     }, 1000), // 1000ms delay
     []
   );
+  // for getting programs
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      const programData = await getPrograms();
+      const programTitles = programData.map((prog) => ({
+        name: prog.title,
+      }));
+      setDegree(programTitles);
+    };
+
+    fetchPrograms();
+  }, []);
+
+  // for getting university
+  useEffect(() => {
+    const fetchUniversity = async () => {
+      const universityData = await getUniversity();
+      const Titles = universityData.map((uni) => ({
+        name: uni.fullname,
+      }));
+      setUni(Titles);
+    };
+
+    fetchUniversity();
+  }, []);
 
 
   const handleSearchChange = (e) => {
@@ -78,71 +104,10 @@ const CollegeFinder = () => {
     {
       title: "Discipline ",
       placeholder: "Search by discipline",
-      options: [
-        { name: "Agriculture" },
-        { name: "Agriculture, Forestry, and Animal Sciences" },
-        { name: "Allied Health Sciences" },
-        { name: "Animal Sciences" },
-        { name: "Architecture" },
-        { name: "Ayurveda" },
-        { name: "Biotechnology" },
-        { name: "Chemical Engineering" },
-        { name: "Civil Engineering" },
-        { name: "Computer Engineering" },
-        { name: "Computer and Information Technology" },
-        { name: "Dentistry and Oral Health" },
-        { name: "Development Studies" },
-        { name: "Education" },
-        { name: "Electrical Engineering" },
-        { name: "Electronics Engineering" },
-        { name: "Energy and Power Engineering" },
-        { name: "Engineering" },
-        { name: "Environmental Sciences" },
-        { name: "Fashion Technology" },
-        { name: "Finance and Accounting" },
-        { name: "Fine Arts and Performing Arts" },
-        { name: "Fisheries" },
-        { name: "Forestry" },
-        { name: "Geology" },
-        { name: "Health Sciences" },
-        { name: "Hospitality and Tourism" },
-        { name: "Humanities" },
-        { name: "Journalism and Mass Communication" },
-        { name: "Law" },
-        { name: "Library and Information Sciences" },
-        { name: "Linguistics and Languages" },
-        { name: "Management" },
-        { name: "Mathematics and Statistics" },
-        { name: "Mechanical Engineering" },
-        { name: "Medical Sciences" },
-        { name: "Medicine" },
-        { name: "Microbiology" },
-        { name: "Military Sciences" },
-        { name: "Music" },
-        { name: "Nanotechnology" },
-        { name: "Nursing" },
-        { name: "Optometry" },
-        { name: "Paramedical Sciences" },
-        { name: "Pharmaceutical Sciences" },
-        { name: "Philosophy" },
-        { name: "Physical Education and Sports" },
-        { name: "Physics" },
-        { name: "Physiotherapy" },
-        { name: "Political Science and International Relations" },
-        { name: "Psychology" },
-        { name: "Public Administration" },
-        { name: "Public Health" },
-        { name: "Rural Development" },
-        { name: "Science and Technology" },
-        { name: "Social Sciences" },
-        { name: "Sociology" },
-        { name: "Space Science" },
-        { name: "Veterinary Sciences" },
-        { name: "Yoga" },
-      ],
-      selectedItems: selectedFilters.disciplines,
-      onSelectionChange: (items) => {
-        setSelectedFilters((prev) => ({ ...prev, disciplines: items }));
+      options: degree,
+      selectedItems: selectedFilters.degree,
+      onSelectionChange: (item) => {
+        setSelectedFilters((prev) => ({ ...prev, degree: item }));
       },
     },
     {
@@ -158,8 +123,17 @@ const CollegeFinder = () => {
         { name: "Sudurpashchim" },
       ],
       selectedItems: selectedFilters.state,
-      onSelectionChange: (items) => {
-        setSelectedFilters((prev) => ({ ...prev, state: items }));
+      onSelectionChange: (item) => {
+        setSelectedFilters((prev) => ({ ...prev, state: item }));
+      },
+    },
+    {
+      title: "University ",
+      placeholder: "Search by University",
+      options: uni,
+      selectedItems: selectedFilters.uni,
+      onSelectionChange: (item) => {
+        setSelectedFilters((prev) => ({ ...prev, uni: item }));
       },
     },
   ];
@@ -183,8 +157,8 @@ const CollegeFinder = () => {
           {filters.map((filter, index) => (
             <FilterSection key={index} {...filter} />
           ))}
-          <DegreeSection />
-          <AffiliationSection />
+
+          {/* <AffiliationSection /> */}
           {/* <CourseFeeSection /> */}
         </div>
         <div className="flex justify-end mt-4">
@@ -259,9 +233,8 @@ const CollegeFinder = () => {
               onClick={() => {
                 setSearchQuery(""); // Clear search query
                 setSelectedFilters({
-                  disciplines: [],
                   state: [],
-                  degrees: [],
+                  degree: [],
                   affiliations: [],
                   courseFees: { min: 0, max: 1000000 },
                 }); // Reset all filters
@@ -300,8 +273,8 @@ const CollegeFinder = () => {
           {filters.map((filter, index) => (
             <FilterSection key={index} {...filter} />
           ))}
-          <DegreeSection />
-          <AffiliationSection />
+
+          {/* <AffiliationSection /> */}
           {/* <CourseFeeSection /> */}
         </div>
 

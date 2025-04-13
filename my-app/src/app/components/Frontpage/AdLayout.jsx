@@ -24,15 +24,17 @@ const AdLayout = ({ banners = [], size = "", number = 1 }) => {
   const selectedBanners = getRandomBanners();
 
   return (
-    <div className="my-5">
-      <div className="flex flex-col md:flex-row justify-between gap-4">
+    <div className="my-5 p-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 sm:grid-cols-2 md:px-20 w-full">
         {selectedBanners.slice(0, number).map((banner, index) => (
           <Link href={`${banner.websiteUrl}`}>
-            <div key={`${banner.id}-${index}`} className="w-full md:w-auto">
+            <div key={`${banner.id}-${index}`}
+              className={`h-[48px]  md:h-[58px] lg:h-[70px] ${index == 2 ? 'col-span-2 w-[calc(200%+12px)] flex justify-center' : ''}`}
+            >
               <img
                 src={"/images/Large-Banner.jpg" || banner.imageUrl}
                 alt={`Banner ${banner.title}`}
-                className="w-full h-auto object-cover border bg-gray-100 rounded-lg"
+                className={`w-full h-full object-fill rounded-lg ${index == 2 ? 'sm:w-[50%] ' : ''}`}
               />
             </div>
           </Link>
