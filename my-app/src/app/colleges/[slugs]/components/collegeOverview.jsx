@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { FaUser } from "react-icons/fa";
 import { IoMdMail } from "react-icons/io";
 import { PiLineVerticalThin } from "react-icons/pi";
+import he from 'he';
 
 const CollegeOverview = ({ college }) => {
   const middleRef = useRef(null);
@@ -65,12 +66,12 @@ const CollegeOverview = ({ college }) => {
   }, [inView, activeOption, lastScrollTime]);
 
   return (
-    <div className="px-24 w-full "
+    <div className=" w-full min-[491px]:px-24 px-7 "
       ref={middleRef}
     >
       <div
 
-        className={`w-full lp:w-[80%] mx-auto bg-white border-2 shadow-md rounded-2xl mb-10 pb-5 overflow-x-visible parent-div`}
+        className={`w-full mx-auto bg-white border-2 shadow-md rounded-2xl mb-10 pb-5 overflow-x-visible parent-div`}
 
       >
         {/* Tabs */}
@@ -79,7 +80,7 @@ const CollegeOverview = ({ college }) => {
             <button
               key={tab}
               onClick={() => setActiveOption(tab)}
-              className={`py-3 text-xs sm:text-sm md:text-base xl:text-lg font-semibold text-center transition-all duration-300 ${activeOption === tab
+              className={`py-3 text-[9px] min-[367px]:text-xs sm:text-sm md:text-base xl:text-lg font-semibold text-center transition-all duration-300 ${activeOption === tab
                 ? "text-[#30AD8F] border-b-2 border-[#30AD8F] bg-white rounded-t-2xl"
                 : "text-gray-500 bg-[#D9D9D9] rounded-t-2xl"
                 }`}
@@ -94,10 +95,23 @@ const CollegeOverview = ({ college }) => {
           <div className="mt-6 sm:mt-8 px-4 sm:px-8">
             <h2 className="text-sm md:text-lg lg:text-xl font-bold">About</h2>
             <p className="text-gray-700 mt-4 leading-7 text-xs md:text-sm lg:text-base">{college.description}</p>
-            <p className="text-gray-700 mt-4 leading-7 text-xs md:text-sm lg:text-base">{college.content}</p>
+            <div
+              dangerouslySetInnerHTML={{ __html: he.decode(college.content) }}
+              className="text-gray-700 mt-4 leading-7 
+             [&>iframe]:w-full 
+             [&>iframe]:max-w-[calc(100vw-40px)] 
+             [&>iframe]:aspect-video 
+             [&>iframe]:h-auto
+             [&>iframe]:rounded-lg 
+             [&>iframe]:mt-4
+             [&>iframe]:mx-auto
+             [&>iframe]:block
+             text-xs md:text-sm lg:text-base
+             overflow-x-hidden"
+            ></div>
 
             <h2 className=" font-bold text-sm md:text-lg lg:text-xl mt-6">Institution Type</h2>
-            <p className="text-gray-700 mt-4">{college.institute_type}</p>
+            <p className="text-gray-700 mt-4 text-xs md:text-sm lg:text-base">{college.institute_type}</p>
           </div>
         )}
 

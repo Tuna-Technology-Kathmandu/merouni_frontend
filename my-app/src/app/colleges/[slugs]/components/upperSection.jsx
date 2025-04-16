@@ -51,18 +51,18 @@ const ImageSection = ({ college }) => {
         </div>
 
         {/* college all details */}
-        <div className="px-24 -mt-72 md:-mt-48 lg:-mt-32 xl:-mt-20 2xl:-mt-16 w-full">
+        <div className="px-24 -mt-80 sm:-mt-72 md:-mt-48 lg:-mt-32 xl:-mt-20 2xl:-mt-16 w-full">
           <div className="bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex items-center justify-center flex-wrap sm:justify-between md:justify-around md:gap-10 mb-8  items-left w-full l:w-[80%] gap-6 lg:gap-6 p-7 ">
             <div className="flex flex-col items-center gap-2 text-center ">
               <FaUniversity size={30} />
-              <p className="max-w-36">{college?.university?.fullname || "N/A"}</p>
+              <p className="max-w-36 sm:text-base text-xs font-semibold">{college?.university?.fullname || "N/A"}</p>
             </div>
             <div className=" items-center hidden xl:block">
               <PiLineVerticalThin size={60} />
             </div>
             <div className="flex flex-col items-center gap-2 text-center  ">
               <LiaUniversitySolid size={30} />
-              <p className="whitespace-nowrap ">
+              <p className="whitespace-nowrap sm:text-base text-xs font-semibold">
                 {college?.institute_type || "N/A"}
               </p>
             </div>
@@ -71,7 +71,7 @@ const ImageSection = ({ college }) => {
             </div>
             <div className="flex flex-col items-center gap-2 text-center ">
               <img src="/images/level.png" alt="level" className="w-10" />
-              <p className="whitespace-nowrap">+2, Bachelor Program</p>
+              <p className="whitespace-nowrap  sm:text-base text-xs font-semibold">+2, Bachelor Program</p>
             </div>
             <div className="items-center hidden xl:block">
               <PiLineVerticalThin size={60} />
@@ -80,7 +80,7 @@ const ImageSection = ({ college }) => {
               <FaPhoneAlt size={25} />
               {(college?.collegeContacts || []).map((contact, index) => (
                 <div key={index} className="flex flex-row">
-                  <p>{contact?.contact_number || '1234567890,'}</p>
+                  <p className="sm:text-base text-xs font-semibold">{contact?.contact_number || '1234567890,'}</p>
                 </div>
               ))}
             </div>
@@ -91,7 +91,7 @@ const ImageSection = ({ college }) => {
               {/* <IoMdMail size={25} /> */}
               <BsGlobe2 size={25} />
               <a href={college.website_url} target="_blank">
-                <p className="whitespace-nowrap hover:underline hover:text-blue-500 hover:cursor-pointer">
+                <p className="whitespace-nowrap hover:underline hover:text-blue-500 hover:cursor-pointer sm:text-base text-xs font-semibold">
                   {college.website_url || "www.check.com"}
                 </p>
               </a>
