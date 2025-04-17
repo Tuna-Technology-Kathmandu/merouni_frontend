@@ -56,14 +56,14 @@ const FeaturedAdmission = () => {
                 key={item.id}
                 className="bg-white rounded-lg shadow-lg overflow-hidden lg:min-h-[12rem]"
               >
-                <img
-                  src={
-                    item.featured_image ||
-                    "https://media.edusanjal.com/__sized__/cover_photo/thames-cover-crop-c0-5__0-5-302x128-70.jpg"
-                  }
-                  alt={item.name}
-                  className="w-full h-32 sm:h-24 object-cover"
-                />
+                <div className="w-full h-32 sm:h-24 bg-gray-300">
+                  <img
+                    src={
+                      item.featured_img}
+                    alt={item.name}
+                    className="w-full h-32 sm:h-24 object-cover"
+                  />
+                </div>
                 <div className="p-4">
                   <h2 className="text-lg font-semibold text-gray-800 mb-2">
                     {item.name}
@@ -78,7 +78,7 @@ const FeaturedAdmission = () => {
                       </p>
                     </div>
                     <Link href={`/colleges/apply/${item.slugs}`}>
-                      <button className="flex items-center mt-3 sm:mt-0 bg-blue-500 text-white text-sm px-3 py-2 rounded-md hover:bg-blue-600 transition duration-300">
+                      <button className="flex items-center mt-3 sm:mt-0 bg-clientBtn text-white text-sm px-3 py-2 rounded-md hover:bg-blue-600 transition duration-300">
                         Apply Now
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

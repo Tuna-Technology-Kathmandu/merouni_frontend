@@ -10,6 +10,7 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        clientBtn: 'rgb(10, 111, 167)'
       },
       screens: {
         lp: "1325px", // Custom screen size

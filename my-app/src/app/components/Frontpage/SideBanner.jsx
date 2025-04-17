@@ -48,7 +48,7 @@ const SideBanner = () => {
             {banners.map((item) => (
                 <a href={item.website_url} target="_blank" rel="noopener noreferrer" key={item.id}>
                     <img
-                        src={item.banner_galleries?.[0]?.url || "/images/exampleBanner.jpg"}
+                        src={item.banner_galleries?.[0]?.url || "/images/meroUniSmall.gif"}
                         alt="Admission Image"
                         className="w-full h-36 rounded-lg shadow-lg"
                     />

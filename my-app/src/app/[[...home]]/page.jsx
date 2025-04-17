@@ -18,20 +18,22 @@ const Page = () => {
       <Header />
       <Navbar />
       <div className="py-4">
-        <div className="px-16">
+        <div className="container px-4 mx-auto">
+          <BannerLayout />
           {/* Flex container for horizontal layout */}
           <div className="flex gap-6">
-            <div className="flex flex-col md:w-4/5 sm:w-full">
-              <BannerLayout />
+
+            <div className="flex flex-col md:w-4/5 w-full sm:w-full">
+
               {/* 80% Admission Cards */}
-              <div className="w-full lg:w-full">
-                {/* <BannerLayout /> */}
-                <FeaturedAdmission />
-              </div>
+
+              {/* <BannerLayout /> */}
+              <FeaturedAdmission />
+
             </div>
 
             {/* 20% Image */}
-            <div className="w-full md:w-1/5 hidden md:block">
+            <div className="w-full md:w-1/5 hidden md:block mt-8">
               <SideBanner />
             </div>
           </div>

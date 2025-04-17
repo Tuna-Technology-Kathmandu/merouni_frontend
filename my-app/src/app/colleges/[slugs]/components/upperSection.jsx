@@ -51,7 +51,7 @@ const ImageSection = ({ college }) => {
         </div>
 
         {/* college all details */}
-        <div className="px-24 -mt-80 sm:-mt-72 md:-mt-48 lg:-mt-32 xl:-mt-20 2xl:-mt-16 w-full">
+        <div className="sm:px-24 px-12 -mt-80 sm:-mt-72 md:-mt-48 lg:-mt-32 xl:-mt-20 2xl:-mt-16 w-full">
           <div className="bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex items-center justify-center flex-wrap sm:justify-between md:justify-around md:gap-10 mb-8  items-left w-full l:w-[80%] gap-6 lg:gap-6 p-7 ">
             <div className="flex flex-col items-center gap-2 text-center ">
               <FaUniversity size={30} />
