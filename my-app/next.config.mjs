@@ -6,7 +6,7 @@ const nextConfig = {
     mediaUrl: "https://uploads.merouni.com",
     version: "/api/v1",
     jwtsecret: "somethingisdown",
-    ckeditor: "eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NDQ1ODg3OTksImp0aSI6ImU1MmNhNGJhLWZkMTgtNDA1NS1hZWE2LTkxZjM5ZTdjMTUxMyIsInVzYWdlRW5kcG9pbnQiOiJodHRwczovL3Byb3h5LWV2ZW50LmNrZWRpdG9yLmNvbSIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsiY2xvdWQiLCJkcnVwYWwiLCJzaCJdLCJ3aGl0ZUxhYmVsIjp0cnVlLCJsaWNlbnNlVHlwZSI6InRyaWFsIiwiZmVhdHVyZXMiOlsiKiJdLCJ2YyI6IjQ0MjYwYjAwIn0.ynboY1sC58KyhDfRVV0QlAqC1JQWYdNpXWj5u7FStei3u-1d4xsurdqlfIaOd4VJdISi3i9EzFMQ1cQ4e7rkcw"
+    ckeditor: "eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NzQ5MTUxOTksImp0aSI6IjdkZmM3YjRlLTY3NWItNDc1OC05NGFhLTRlNTg5ZWNiZjNiZCIsInVzYWdlRW5kcG9pbnQiOiJodHRwczovL3Byb3h5LWV2ZW50LmNrZWRpdG9yLmNvbSIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsiY2xvdWQiLCJkcnVwYWwiXSwiZmVhdHVyZXMiOlsiRFJVUCJdLCJ2YyI6IjQ4YTBlODgwIn0.toQyBxQzjesVdJUe0jxAbaqjKm_QTffoDKK8goeMlEv32_kL32ugD68xI4xEKxE3p1HubStc4s8NzroCOWXTxQ"
   },
   eslint: {
     ignoreDuringBuilds: true,
