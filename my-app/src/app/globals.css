@@ -7,7 +7,8 @@
   border-collapse: collapse;
 }
 
-.prose th, .prose td {
+.prose th,
+.prose td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
@@ -17,6 +18,9 @@
   background-color: #f9f9f9;
 }
 
+.client-btn {
+  background-color: #387CAE;
+}
 
 
 /* :root {
@@ -60,18 +64,23 @@ body {
 
 /* Hide scrollbar */
 .parent-div {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* Internet Explorer 10+ */
 }
 
 .parent-div::-webkit-scrollbar {
   position: relative;
-  width: 0; /* Webkit browsers */
-  height: 0; /* For horizontal scrollbar */
+  width: 0;
+  /* Webkit browsers */
+  height: 0;
+  /* For horizontal scrollbar */
 }
 
 .sticky {
-  position: -webkit-sticky; /* For Safari */
+  position: -webkit-sticky;
+  /* For Safari */
   top: 0;
 }
 
@@ -79,6 +88,7 @@ body {
   0% {
     background-position: -200px 0;
   }
+
   100% {
     background-position: 200px 0;
   }
@@ -92,19 +102,25 @@ body {
 
 /* Add this to your global CSS file or within a <style> tag */
 .thin-scrollbar::-webkit-scrollbar {
-  width: 6px; /* Adjust the width as needed */
+  width: 6px;
+  /* Adjust the width as needed */
 }
 
 .thin-scrollbar::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Track color */
-  border-radius: 3px; /* Rounded corners */
+  background: #f1f1f1;
+  /* Track color */
+  border-radius: 3px;
+  /* Rounded corners */
 }
 
 .thin-scrollbar::-webkit-scrollbar-thumb {
-  background: #888; /* Thumb color */
-  border-radius: 3px; /* Rounded corners */
+  background: #888;
+  /* Thumb color */
+  border-radius: 3px;
+  /* Rounded corners */
 }
 
 .thin-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #555; /* Thumb color on hover */
+  background: #555;
+  /* Thumb color on hover */
 }
