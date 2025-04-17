@@ -77,9 +77,9 @@ const Navbar = () => {
           menuOpen ? "flex" : "hidden"
         } flex-col gap-2 p-4 md:flex md:flex-row md:justify-center md:gap-6 md:p-2`}
       >
-        <Link href="/courses" className="hover:bg-[#0362C7] p-2 rounded">
+        {/* <Link href="/courses" className="hover:bg-[#0362C7] p-2 rounded">
           Courses
-        </Link>
+        </Link> */}
         <Link href="/colleges" className="hover:bg-[#0362C7] p-2 rounded">
           Colleges
         </Link>
