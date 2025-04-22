@@ -44,6 +44,7 @@ const BannerLayout = () => {
 
     fetchData();
   }, []);
+  console.log('banners',banners)
 
   if (loading) {
     return (

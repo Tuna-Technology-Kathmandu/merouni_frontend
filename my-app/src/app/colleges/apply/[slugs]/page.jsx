@@ -113,13 +113,15 @@ const ApplyPage = ({ params }) => {
   }, [college]);
 
   return (
-    <>
+    <main className="w-full">
       <Header />
       <Navbar />
-      <ImageSection college={college} />
-      <FormSection id={college?.id} />
+
+      <ImageSection college={college} loading={loading} />
+      <FormSection college={college}/>
+
       <Footer />
-    </>
+    </main>
   );
 };
 

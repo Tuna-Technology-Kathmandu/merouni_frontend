@@ -80,7 +80,7 @@ const ImageSection = ({ college }) => {
               <FaPhoneAlt size={25} />
               {(college?.collegeContacts || []).map((contact, index) => (
                 <div key={index} className="flex flex-row">
-                  <p className="sm:text-base text-xs font-semibold">{contact?.contact_number || '1234567890,'}</p>
+                  <p className="sm:text-base text-xs font-semibold">{contact?.contact_number || 'contact coming soon'}</p>
                 </div>
               ))}
             </div>
