@@ -128,8 +128,8 @@ const CollegeFinder = () => {
       },
     },
     {
-      title: "University ",
-      placeholder: "Search by University",
+      title: "Affiliation ",
+      placeholder: "Search by Affiliation",
       options: uni,
       selectedItems: selectedFilters.uni,
       onSelectionChange: (item) => {

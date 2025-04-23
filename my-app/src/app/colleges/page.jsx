@@ -31,6 +31,9 @@ const Page = () => {
     }
   };
 
+  console.log('banners',banners);
+  
+
   return (
     <>
       <Header />
