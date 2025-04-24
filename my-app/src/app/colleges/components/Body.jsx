@@ -32,7 +32,6 @@ const CollegeFinder = () => {
     uni: "",         // instead of []
     courseFees: { min: 0, max: 1000000 },
   });
-  console.log('filter', selectedFilters);
 
   useEffect(() => {
     if (!searchQuery) {

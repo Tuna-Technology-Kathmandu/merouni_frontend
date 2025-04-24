@@ -96,7 +96,6 @@ const UniversityCard = ({
       setIsLoading(false);
     }
   };
-  console.log('college', collegeImage);
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300">
