@@ -46,7 +46,7 @@ const Featured = () => {
   useEffect(() => { }, [featuredColleges]);
 
   return (
-    <div className="flex flex-col p-4">
+    <div className="flex flex-col px-4">
       <div className="border-b-2 border-[#0A70A7] w-[45px] mt-8 mb-4 pl-2">
         <span className="text-2xl font-bold mr-2">Featured</span>
         <span className="text-[#0A70A7] text-2xl font-bold">Colleges</span>

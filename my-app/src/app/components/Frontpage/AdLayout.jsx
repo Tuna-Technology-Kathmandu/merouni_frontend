@@ -61,14 +61,14 @@ const AdLayout = ({ banners = [], size = "", number = 1, loading = false }) => {
 
 
   return (
-    <div className="my-5 p-4">
+    <div className="mt-2 p-4">
 
       <div className="grid grid-cols-2 gap-3 sm:gap-5 sm:grid-cols-2 md:px-20 w-full">
         {loading
-          ? [...Array(number)].map((_, index) => (
+          ? [...Array(2)].map((_, index) => (
             <div
               key={index}
-              className={`rounded-lg animate-pulse bg-slate-30 h-[48px] md:h-[58px] lg:h-[70px] ${index === 2
+              className={`rounded-lg animate-pulse bg-slate-300 h-[48px] md:h-[58px] lg:h-[70px] ${index === 2
                 ? "col-span-2 w-[calc(200%+12px)] flex justify-center"
                 : ""
                 }`}

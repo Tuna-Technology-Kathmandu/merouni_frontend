@@ -8,7 +8,6 @@ import { LiaUniversitySolid } from "react-icons/lia";
 import { BsGlobe2 } from "react-icons/bs";
 
 const ImageSection = ({ college }) => {
-  console.log(college.college_logo);
   return (
     <>
       <div className="flex flex-col items-center relative ">
@@ -71,7 +70,13 @@ const ImageSection = ({ college }) => {
             </div>
             <div className="flex flex-col items-center gap-2 text-center ">
               <img src="/images/level.png" alt="level" className="w-10" />
-              <p className="whitespace-nowrap  sm:text-base text-xs font-semibold">+2, Bachelor Program</p>
+              {
+                (college?.collegeCourses || []).map((course, index) => (
+                  <div key={index}>
+                    <p className="max-w-36 sm:text-base text-xs font-semibold">{course.program.title}</p>
+                  </div>
+                ))
+              }
             </div>
             <div className="items-center hidden xl:block">
               <PiLineVerticalThin size={60} />
@@ -80,7 +85,7 @@ const ImageSection = ({ college }) => {
               <FaPhoneAlt size={25} />
               {(college?.collegeContacts || []).map((contact, index) => (
                 <div key={index} className="flex flex-row">
-                  <p className="sm:text-base text-xs font-semibold">{contact?.contact_number || 'contact coming soon'}</p>
+                  <p className="sm:text-base text-xs font-semibold">{contact?.contact_number || 'N/A'}</p>
                 </div>
               ))}
             </div>

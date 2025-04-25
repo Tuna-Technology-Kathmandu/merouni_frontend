@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 
 const Gallery = ({ college }) => {
-  console.log("Galle:", college);
+
   return (
     <div className="flex flex-col max-w-[1600px] mx-auto mb-20 px-24">
       <h2 className="font-bold text-3xl leading-10 mb-4">Gallery</h2>

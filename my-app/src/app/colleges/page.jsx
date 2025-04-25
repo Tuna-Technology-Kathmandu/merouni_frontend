@@ -10,7 +10,7 @@ import AdLayout from "../components/Frontpage/AdLayout";
 
 
 const Page = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [banners, setBanners] = useState([]);
   const [error, setError] = useState(""); // Added error state to handle errors
 
