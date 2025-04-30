@@ -7,10 +7,10 @@ import Featured from "./components/Featured";
 import Body from "./components/Body";
 import { getBanners } from "../action";
 import AdLayout from "../components/Frontpage/AdLayout";
-import AdLayoutShimmer from "../components/Frontpage/AdLayoutShimmer";
+
 
 const Page = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [banners, setBanners] = useState([]);
   const [error, setError] = useState(""); // Added error state to handle errors
 
@@ -31,11 +31,14 @@ const Page = () => {
     }
   };
 
+  console.log('parent bnner', banners);
+  
+
   return (
     <>
       <Header />
       <Navbar />
-      <AdLayout banners={banners} size="medium" number={3} />
+      <AdLayout banners={banners} size="medium" number={3} loading={loading} />
       <Featured />
       <Body />
       <Footer />

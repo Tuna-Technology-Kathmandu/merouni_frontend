@@ -99,7 +99,9 @@ export async function getColleges(page = 1, filters = {}) {
         instituteType: college.institute_type,
         slug: college.slugs,
         collegeId: college.id,
-        collegeImage: college.featured_img
+        collegeImage: college.featured_img,
+        logo: college.college_logo,
+  
       })),
       pagination: data.pagination || {
         currentPage: 1,

@@ -32,7 +32,6 @@ const CollegeFinder = () => {
     uni: "",         // instead of []
     courseFees: { min: 0, max: 1000000 },
   });
-  console.log('filter', selectedFilters);
 
   useEffect(() => {
     if (!searchQuery) {
@@ -128,8 +127,8 @@ const CollegeFinder = () => {
       },
     },
     {
-      title: "University ",
-      placeholder: "Search by University",
+      title: "Affiliation ",
+      placeholder: "Search by Affiliation",
       options: uni,
       selectedItems: selectedFilters.uni,
       onSelectionChange: (item) => {

@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaUser } from "react-icons/fa";
 import { IoMdMail } from "react-icons/io";
-import { PiLineVerticalThin } from "react-icons/pi";
 import he from 'he';
+import GoogleMap from "./GoogleMap";
+import { BsGlobe2 } from "react-icons/bs";
+import { FaUniversity, FaPhoneAlt } from "react-icons/fa";
 
 const CollegeOverview = ({ college }) => {
   const middleRef = useRef(null);
@@ -117,17 +119,18 @@ const CollegeOverview = ({ college }) => {
 
         {activeOption === "Programs" && (
           <div className="mt-6 sm:mt-8 px-4 sm:px-8">
-            <h2 className="text-sm md:text-lg lg:text-xl font-bold">
-              OFFERED PROGRAMS - {college.university.fullname}
+            <h2 className="text-[13px] md:text-[15px] lg:text-[17px] font-bold ">
+              {/* OFFERED PROGRAMS - {college.university.fullname} */}
+              OFFERED PROGRAMS
             </h2>
             {college.collegeCourses.map((course, index) => (
-              <div key={index} className="mt-2">
-                <h2 className="text-sm md:text-lg lg:text-xl mb-1">
+              <div key={index} className="mt-7">
+                <h2 className="text-[13px] md:text-[15px] lg:text-[17px] mb-1 font-semibold">
                   {course.program.title}
                 </h2>
                 <button
                   type="button"
-                  className="bg-[#2981B2] text-xs md:text-sm lg:text-base p-1 px-2 rounded-lg text-white"
+                  className="bg-[#2981B2] text-[11px] md:text-[15px] lg:text-[15px] p-1 px-2 rounded-lg text-white"
                 >
                   Apply Now
                 </button>
@@ -139,7 +142,8 @@ const CollegeOverview = ({ college }) => {
         {activeOption === "Members" && (
           <div className="mt-6 sm:mt-8 px-4 sm:px-8">
             <h2 className="text-sm md:text-lg lg:text-xl font-bold">Members</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-4">
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-4"> */}
+            <div className="grid grid-cols-1 gap-4 mt-4">
               {college.collegeMembers.map((member, index) => (
                 <div className="flex flex-row mb-8" key={index}>
                   <div className="flex flex-col">
@@ -161,7 +165,7 @@ const CollegeOverview = ({ college }) => {
                     </div>
                     <div className="flex flex-row mb-2 gap-2 items-center">
                       <IoMdMail />
-                      <p className="text-xs md:text-sm lg:text-base">{member.description}</p>
+                      <p className="text-xs md:text-sm lg:text-base text-justify ">{member.description}</p>
                     </div>
                   </div>
                 </div>
@@ -171,29 +175,67 @@ const CollegeOverview = ({ college }) => {
         )}
 
         {activeOption === "Contact" && (
-          <div className="flex flex-col mt-6 sm:mt-8 px-4 sm:px-8">
-            <h2 className="text-sm md:text-lg lg:text-xl font-bold">Contact Info</h2>
-            {college.collegeContacts.map((contact, index) => (
-              <p key={index} className="mt-2 text-xs md:text-sm lg:text-base">{contact.contact_number}</p>
-            ))}
-            <h2 className="text-sm md:text-lg lg:text-xl font-bold mt-4">Website</h2>
-            <a
-              href={college.website_url}
-              className="underline text-blue-600"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {college.website_url || "N/A"}
-            </a>
+          <div className="grid-cols-3 max-[670px]:grid-cols-2 grid gap-6 max-[395px]:gap-4 justify-content-center place-items-center mt-6 sm:mt-8 px-4 sm:px-8">
+            <div className='bg-[#30AD8F1A] w-[130px] h-[130px] max-[395px]:h-[100px] max-[395px]:w-[100px] hidden 
+            rounded-full border-2 overflow-hidden border-[#D9D9D9] shadow-lg max-[670px]:block col-span-2'>
+              <img
+                src={college.college_logo}
+                alt="College Logo"
+                className="w-full h-full object-cover hover:scale-110 transition-all duration-300"
+                loading="lazy"
+              />
+            </div>
+            {/* Left: Contact Details */}
+            <div className="p-7 max-[395px]:p-3 bg-[#30AD8F1A] h-[150px] max-[670px]:h-[130px]  max-[395px]:h-[100px]  w-full rounded-lg flex 
+            hover:scale-105 transition-all duration-300 ease-in-out
+            flex-col items-center justify-center shadow-lg ">
+              <FaPhoneAlt size={25} className="max-[395px]:hidden" />
+              <FaPhoneAlt size={19} className="max-[395px]:block hidden" />
+              {college.collegeContacts.map((contact, index) => (
+                <p key={index} className="mt-2 text-xs md:text-[13px] lg:text-base">
+                  {contact.contact_number}
+                </p>
+              ))}
+            </div>
+            <div className='bg-[#30AD8F1A] w-[200px] h-[200px] 
+            max-[916px]:w-[150px] max-[916px]:h-[150px] 
+            rounded-full border-2 overflow-hidden border-[#D9D9D9] shadow-lg max-[670px]:hidden'>
+              <img
+                src={college.college_logo}
+                alt="College Logo"
+                className="w-full h-full object-cover hover:scale-110 transition-all duration-300"
+                loading="lazy"
+              />
+            </div>
+            <div className="p-7 max-[395px]:p-3 bg-[#30AD8F1A] h-[150px] max-[670px]:h-[130px] max-[395px]:h-[100px] w-full rounded-lg 
+            hover:scale-105 transition-all duration-300 ease-in-out
+            flex flex-col items-center justify-center shadow-lg">
+              <BsGlobe2 size={25} className="max-[395px]:hidden" />
+              <BsGlobe2 size={19} className="max-[395px]:block hidden" />
+              <a
+                href={college.website_url}
+                className="underline text-blue-600 mt-2 text-xs md:text-[13px] lg:text-base "
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {college.website_url || "N/A"}
+              </a>
+            </div>
+
           </div>
         )}
 
         {activeOption === "Address" && (
-          <div className="flex flex-col mt-6 sm:mt-8 px-4 sm:px-8">
-            <h2 className="text-sm md:text-lg lg:text-xl font-bold">Address</h2>
-            <p className="text-xs md:text-sm lg:text-base">{college.collegeAddress.country}</p>
-            <p className="text-xs md:text-sm lg:text-base">{college.collegeAddress.state}</p>
-            <p className="text-xs md:text-sm lg:text-base">{college.collegeAddress.city}</p>
+          <div className="flex flex-col items-center sm:flex-row gap-6 mt-6 sm:mt-8 px-4 sm:px-8">
+            <div className="flex flex-col w-full sm:w-1/2">
+              <h2 className="text-sm md:text-lg lg:text-xl font-bold">Address</h2>
+              <p className="text-xs md:text-sm lg:text-base">{college.collegeAddress.country}</p>
+              <p className="text-xs md:text-sm lg:text-base">{college.collegeAddress.state}</p>
+              <p className="text-xs md:text-sm lg:text-base">{college.collegeAddress.city}</p>
+            </div>
+            <div className="sm:w-1/2 w-full bg-slate-200 h-[200px] rounded-lg ">
+              <GoogleMap mapUrl={college.google_map_url} />
+            </div>
           </div>
         )}
       </div>
