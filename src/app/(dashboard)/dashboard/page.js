@@ -117,4 +117,4 @@ const AdminPage = () => {
   )
 }
 
-export default withAuth(AdminPage)
+export default AdminPage
