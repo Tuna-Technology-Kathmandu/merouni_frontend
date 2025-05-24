@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.prose tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.client-btn {
+  background-color: #387cae;
+}
+
+/* :root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.con{
+  margin-left: auto;
+  margin-right: auto;
+} */
+
+.react-calendar {
+  width: 100% !important;
+  border: none !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.react-calendar__navigation__label__labelText {
+  font-weight: 600;
+}
+
+.react-calendar__tile--active {
+  background-color: #c3ebfa !important;
+  color: black !important;
+}
+
+/* Hide scrollbar */
+.parent-div {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* Internet Explorer 10+ */
+}
+
+.parent-div::-webkit-scrollbar {
+  position: relative;
+  width: 0;
+  /* Webkit browsers */
+  height: 0;
+  /* For horizontal scrollbar */
+}
+
+.sticky {
+  position: -webkit-sticky;
+  /* For Safari */
+  top: 0;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+
+  100% {
+    background-position: 200px 0;
+  }
+}
+
+.shimmer {
+  animation: shimmer 1.5s infinite linear;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+}
+
+/* Add this to your global CSS file or within a <style> tag */
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  /* Adjust the width as needed */
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  /* Track color */
+  border-radius: 3px;
+  /* Rounded corners */
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+  /* Thumb color */
+  border-radius: 3px;
+  /* Rounded corners */
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* Thumb color on hover */
+}
