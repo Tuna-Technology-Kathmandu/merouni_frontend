@@ -3,6 +3,7 @@ import './globals.css'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
 import ReduxProvider from './components/ReduxProvider'
+import ReactQueryContainer from '@/container/HOC/ReactQueryContainer'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -26,15 +27,17 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ReduxProvider>
-          <main>{children}</main>
-          <ToastContainer
-            position='top-right'
-            autoClose={3000}
-            hideProgressBar={false}
-            closeOnClick
-            pauseOnHover
-            draggable
-          />
+          <ReactQueryContainer>
+            <main>{children}</main>
+            <ToastContainer
+              position='top-right'
+              autoClose={3000}
+              hideProgressBar={false}
+              closeOnClick
+              pauseOnHover
+              draggable
+            />
+          </ReactQueryContainer>
         </ReduxProvider>
       </body>
     </html>

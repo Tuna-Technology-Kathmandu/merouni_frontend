@@ -1,7 +1,8 @@
+'use client'
+import useAuthGuard from '@/core/hooks/useAuthGuard'
+
 export default function RootLayout({ children }) {
-  return (
-    <html lang='en'>
-      <body>{children}</body>
-    </html>
-  )
+  const { isBooted } = useAuthGuard()
+
+  return <>{isBooted ? children : ''}</>
 }

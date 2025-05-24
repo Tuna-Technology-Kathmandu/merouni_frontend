@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addUser } from '../utils/userSlice'
 import { jwtDecode } from 'jwt-decode'
 import Link from 'next/link'
+import { useMutation } from '@tanstack/react-query'
+import axios from 'axios'
 
 const SignInPage = () => {
   const dispatch = useDispatch()
@@ -30,7 +32,6 @@ const SignInPage = () => {
   }
 
   const [isLogin, setIsLogin] = useState(true)
-  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -91,83 +92,12 @@ const SignInPage = () => {
     }
   }
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   const deviceId = getDeviceId();
-  //   if (!validateForm()) return;
-
-  //   setLoading(true);
-  //   try {
-  //     const endpoint = isLogin ? "/api/v1/auth/login" : "/api/v1/auth/register";
-
-  //     const filteredData = isLogin
-  //       ? {
-  //           email: formData.email,
-  //           password: formData.password,
-  //           deviceName: navigator.userAgent,
-  //         }
-  //       : {
-  //           firstName: formData.firstName,
-  //           lastName: formData.lastName,
-  //           email: formData.email,
-  //           phoneNo: formData.phoneNo,
-  //           password: formData.password,
-  //         };
-
-  //     const response = await fetch(`${process.env.baseUrl}${endpoint}`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         ...(isLogin && { "device-id": getDeviceId() }),
-
-  //       },
-  //       credentials: "include",
-  //       body: JSON.stringify(filteredData),
-  //     });
-
-  //     console.log("Response:", response);
-  //     const data = await response.json();
-  //     console.log(`Data:`, data);
-
-  //     const tokenObj = await getToken();
-  //     const decodedToken = jwtDecode(tokenObj.value);
-  //     dispatch(addUser({ ...decodedToken })); // Store both decoded token and raw token
-  //     if (response.ok) {
-  //       if (isLogin) {
-  //         toast.success("Login successful!");
-  //         router.push("/dashboard");
-  //       } else {
-  //         setFormData({
-  //           firstName: "",
-  //           email: "",
-  //           lastName: "",
-  //           password: "",
-  //           phoneNo: "",
-  //         });
-  //         toast.success("Account created! Please verify your email.");
-
-  //         // router.push(`/verify-otp?email=${formData.email}`);
-  //       }
-  //     } else {
-  //       toast.error(data.message || "Something went wrong. Please try again.");
-  //     }
-  //   } catch (err) {
-  //     toast.error("Connection error. Please check your network. " + err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    const deviceId = getDeviceId()
-    if (!validateForm()) return
-
-    setLoading(true)
-    try {
+  /**
+   * SIGN IN FORM MUTATION
+   */
+  const signInFormMutation = useMutation({
+    mutationFn: async () => {
       const endpoint = isLogin ? '/api/v1/auth/login' : '/api/v1/auth/register'
-
-      // Define filteredData based on isLogin
       const filteredData = isLogin
         ? {
             email: formData.email,
@@ -182,62 +112,53 @@ const SignInPage = () => {
             password: formData.password
           }
 
-      const response = await fetch(`${process.env.baseUrl}${endpoint}`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-          // "device-id": deviceId,
-        },
-        body: JSON.stringify(filteredData)
-      })
+      const response = await axios.post(
+        `${process.env.baseUrl}${endpoint}`,
+        filteredData,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
+        }
+      )
 
       // Get all response headers
-      const refreshToken = response.headers.get('x-refresh-token')
-      console.log('All headers:', [...response.headers.entries()])
-      console.log('Refresh token:', refreshToken)
+      const accessToken = response?.data?.accessToken
+      localStorage.setItem('access_token', accessToken)
 
-      if (refreshToken) {
-        localStorage.setItem('refreshToken', refreshToken)
-      }
-
-      let tokenObj = await response.json()
-      console.log('token Response:', tokenObj.accessToken)
-
-      tokenObj = tokenObj.accessToken
-      console.log('Obt:', tokenObj)
-
-      if (response.ok) {
-        console.log('am i here')
-
-        if (isLogin) {
-          // const tokenObj = await getToken();
-          console.log('token obj isss', tokenObj)
-          const decodedToken = jwtDecode(tokenObj)
-          dispatch(addUser({ ...decodedToken }))
-          toast.success('Login successful!')
-          router.push('/dashboard')
-        } else {
-          setFormData({
-            firstName: '',
-            email: '',
-            lastName: '',
-            password: '',
-            phoneNo: ''
-          })
-          toast.success('Account created! Please verify your email.')
-          router.push(`/verify-otp?email=${formData.email}`) // Use formData.email correctly
-        }
+      if (isLogin) {
+        const decodedToken = jwtDecode(accessToken)
+        dispatch(addUser({ ...decodedToken }))
+        toast.success('Login successful!')
+        router.push('/dashboard')
       } else {
-        // Handle unsuccessful responses
-        toast.error(data?.message || 'Something went wrong. Please try again.')
+        setFormData({
+          firstName: '',
+          email: '',
+          lastName: '',
+          password: '',
+          phoneNo: ''
+        })
+        toast.success('Account created! Please verify your email.')
+        router.push(`/verify-otp?email=${formData.email}`)
       }
-    } catch (err) {
-      console.log(err)
-      toast.error('Connection error: ' + err.message)
-    } finally {
-      setLoading(false)
+    },
+    throwOnError: (error) => {
+      toast.error(error?.message || 'Something went wrong. Please try again.')
     }
+  })
+
+  /**
+   * HANDLE FORM SUBMIT
+   * @param e
+   * @returns {Promise<void>}
+   */
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const deviceId = getDeviceId()
+    if (!validateForm()) return
+    signInFormMutation.mutate()
   }
 
   return (
@@ -363,10 +284,14 @@ const SignInPage = () => {
           <div>
             <button
               type='submit'
-              disabled={loading}
+              disabled={signInFormMutation?.isPending}
               className='w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300'
             >
-              {loading ? 'Processing...' : isLogin ? 'Sign in' : 'Sign up'}
+              {signInFormMutation?.isPending
+                ? 'Processing...'
+                : isLogin
+                  ? 'Sign in'
+                  : 'Sign up'}
             </button>
           </div>
         </form>

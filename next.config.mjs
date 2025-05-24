@@ -1,24 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: {
-    // baseUrl: "http://localhost:8000",
-    baseUrl: "https://backend.merouni.com",
-    mediaUrl: "https://uploads.merouni.com",
-    version: "/api/v1",
-    jwtsecret: "somethingisdown",
-    ckeditor: "eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NDgwNDQ3OTksImp0aSI6IjAwNzRjMGNlLWU1OWQtNDEwOC1hZmJiLTg4NTU5YzkxMmY1MSIsInVzYWdlRW5kcG9pbnQiOiJodHRwczovL3Byb3h5LWV2ZW50LmNrZWRpdG9yLmNvbSIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsiY2xvdWQiLCJkcnVwYWwiLCJzaCJdLCJ3aGl0ZUxhYmVsIjp0cnVlLCJsaWNlbnNlVHlwZSI6InRyaWFsIiwiZmVhdHVyZXMiOlsiKiJdLCJ2YyI6IjRhY2ZmYzU5In0.xubQ9FITqkAxpvQf36505midisFEOzXQqeoRjNQJreWy6-Kzk0UKm0KE1ilCgCDB2goi2aG79fh0ZEHUQenTVA"
+    baseUrl: process.env.NEXT_APP_API_BASE_URL,
+    mediaUrl: process.env.NEXT_APP_MEDIA_BASE_URL,
+    version: process.env.NEXT_APP_API_VERSION_URL_PREFIX,
+    ckeditor: process.env.NEXT_APP_CK_EDITOR_KEY
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true
   },
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "**",
-      },
-    ],
-  },
-};
+        protocol: 'https',
+        hostname: '**'
+      }
+    ]
+  }
+}
 
-export default nextConfig;
+export default nextConfig

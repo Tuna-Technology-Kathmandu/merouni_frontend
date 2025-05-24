@@ -4,52 +4,39 @@ import CollegeCard from './CollegeCard'
 import { useRef } from 'react'
 import { getColleges } from '@/app/action'
 import Link from 'next/link'
+import { useQuery } from '@tanstack/react-query'
+import { useScrollContainer } from '@/core/hooks/useScrollContainer'
+
+const gradients = [
+  'linear-gradient(150deg,#00ADEF, #B5F1F8)',
+  'linear-gradient(150deg, #FF4B54, #FF6A88)',
+  'linear-gradient(150deg, #0049FF, #C7D6FE)'
+]
 
 const Colleges = () => {
-  const [featuredColleges, setFeaturedColleges] = useState([])
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const gradients = [
-    'linear-gradient(150deg,#00ADEF, #B5F1F8)',
-    'linear-gradient(150deg, #FF4B54, #FF6A88)',
-    'linear-gradient(150deg, #0049FF, #C7D6FE)'
-  ]
+  /**
+   * COMPONENT HOOKS
+   */
+  const { scrollContainerRef, scroll } = useScrollContainer()
 
-  useEffect(() => {
-    fetchFeaturedColleges()
-  }, [])
-
+  /**
+   * FETCH FEATURED COLLEGES
+   * @returns {Promise<*>}
+   */
   const fetchFeaturedColleges = async () => {
-    try {
-      // const response = await getFeaturedColleges();
-      const response = await getColleges(true, undefined)
-      setFeaturedColleges(response.items)
-    } catch (error) {
-      console.error('Error fetching the colleges data:', error)
-      setError('Failed to load featured Colleges')
-    } finally {
-      setLoading(false)
+    const response = await getColleges(true, undefined)
+    return response.items
+  }
+
+  /**
+   * REACT QUERY FUNCTION TO FETCH FEATURED COLLEGES LIST
+   */
+  const { isLoading: loading, data: featuredColleges } = useQuery({
+    queryKey: ['home-page-featured-colleges'],
+    queryFn: async () => {
+      return await fetchFeaturedColleges()
     }
-  }
-
-  useEffect(() => {}, [featuredColleges])
-
-  const scrollContainerRef = useRef(null)
-
-  const scroll = (direction) => {
-    const container = scrollContainerRef.current
-    if (!container) return
-
-    const scrollAmount = 520
-    const targetScroll =
-      container.scrollLeft +
-      (direction === 'left' ? -scrollAmount : scrollAmount)
-
-    container.scrollTo({
-      left: targetScroll,
-      behavior: 'smooth'
-    })
-  }
+  })
 
   return (
     <div className='relative max-w-[2500px] mx-auto my-16'>
@@ -68,7 +55,7 @@ const Colleges = () => {
             msOverflowStyle: 'none'
           }}
         >
-          {featuredColleges.map((college, index) => (
+          {(featuredColleges ?? [])?.map((college, index) => (
             <Link href={`/colleges/${college.slugs}`} key={index}>
               <CollegeCard
                 logo={college.college_logo}
