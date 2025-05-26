@@ -2,7 +2,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { createCollege, fetchCourse, fetchUniversities } from './actions'
-import { get } from 'lodash'
 import { useSelector } from 'react-redux'
 import FileUpload from './FileUpload'
 import Table from '@/app/components/Table'
@@ -14,10 +13,31 @@ import { toast } from 'react-toastify'
 import ConfirmationDialog from './ConfirmationDialog'
 import { CKEditor } from '@ckeditor/ckeditor5-react'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+import { useDebounce } from 'use-debounce'
 
 export default function CollegeForm() {
+  //for university search
+  const [uniSearch, setUniSearch] = useState('')
+  const [debouncedUni] = useDebounce(uniSearch, 300)
   const [universities, setUniversities] = useState([])
+  const [loadUni, setLoadUni] = useState(false)
+  const [showUniDrop, setShowUniDrop] = useState(false)
+  const [hasSelectedUni, setHasSelectedUni] = useState(false)
+
+  //for course in college
+  const [courseSearch, setCourseSearch] = useState('')
+  const [debouncedCourse] = useDebounce(courseSearch, 300)
   const [courses, setCourses] = useState([])
+  const [hasSelectedCourse, setHasSelectedCourse] = useState(false)
+
+  //for admission course
+  const [adCourseSearch, setAdCourseSearch] = useState('')
+  const [adDebouncedCourse] = useDebounce(adCourseSearch, 300)
+  const [adCourses, setAdCourses] = useState([])
+  const [showAdCourseDrop, setShowAdCourseDrop] = useState(false)
+  const [hasAdSelectedCourse, setHasAdSelectedCourse] = useState(false)
+  const [loadAdCourse, setLoadAdCourse] = useState(false)
+
   const [uploadedFiles, setUploadedFiles] = useState({
     logo: '',
     featured: '',
@@ -136,22 +156,35 @@ export default function CollegeForm() {
     }
   }
 
+  //for uni in add college
   useEffect(() => {
+    if (hasSelectedUni) return
+
     const getUniversities = async () => {
+      setLoadUni(true)
       try {
-        const universityList = await fetchUniversities()
+        const universityList = await fetchUniversities(debouncedUni)
         setUniversities(universityList)
+        setShowUniDrop(true)
+        setLoadUni(false)
       } catch (error) {
         console.error('Error fetching universities:', error)
       }
     }
-    getUniversities()
-  }, [])
+    if (debouncedUni !== '') {
+      getUniversities()
+    } else {
+      setShowUniDrop(false)
+    }
+  }, [debouncedUni])
 
+  //for add college fro course
   useEffect(() => {
+    if (hasSelectedCourse) return
+
     const getCourses = async () => {
       try {
-        const courseList = await fetchCourse()
+        const courseList = await fetchCourse(debouncedCourse)
         console.log('courseList', courseList)
         setCourses(courseList)
         console.log(courses)
@@ -161,7 +194,29 @@ export default function CollegeForm() {
     }
 
     getCourses()
-  }, [])
+  }, [debouncedCourse])
+
+  //for course in admission section
+  useEffect(() => {
+    if (hasAdSelectedCourse) return
+
+    const getCourses = async () => {
+      setLoadAdCourse(true)
+      try {
+        const courseList = await fetchCourse(adDebouncedCourse)
+        setAdCourses(courseList)
+        setShowAdCourseDrop(true)
+        setLoadAdCourse(false)
+      } catch (error) {
+        console.error('Error fetching courses:', error)
+      }
+    }
+    if (adDebouncedCourse !== '') {
+      getCourses()
+    } else {
+      setShowAdCourseDrop(false)
+    }
+  }, [adDebouncedCourse])
 
   useEffect(() => {
     const loadColleges = async () => {
@@ -388,7 +443,7 @@ export default function CollegeForm() {
       setValue('is_featured', collegeData.isFeatured === 1)
       setValue('pinned', collegeData.pinned === 1)
       // Set university_id from university data
-      console.log('Univerisites data of clz add', universities)
+
       if (collegeData.university) {
         const universityId = universities.find(
           (u) => u.fullname === collegeData.university.fullname
@@ -604,25 +659,53 @@ export default function CollegeForm() {
                   </div>
                 </div>
 
-                <div>
+                <div className='relative'>
                   <label className='block mb-2'>University *</label>
-                  <select
-                    {...register('university_id', {
-                      required: true
-                    })}
-                    className='w-full p-2 border rounded'
-                    onChange={(e) =>
-                      setValue('university_id', Number(e.target.value))
-                    }
-                  >
-                    <option value=''>Select University</option>
 
-                    {universities.map((university) => (
-                      <option key={university.id} value={university.id}>
-                        {university.fullname}
-                      </option>
-                    ))}
-                  </select>
+                  <input
+                    type='text'
+                    className='w-full p-2 border rounded'
+                    value={uniSearch}
+                    onChange={(e) => {
+                      setUniSearch(e.target.value)
+                      setHasSelectedUni(false)
+                    }}
+                    placeholder='Search University'
+                  />
+
+                  {/* Hidden input for react-hook-form binding */}
+                  <input
+                    type='hidden'
+                    {...register('university_id', { required: true })}
+                  />
+                  {loadUni ? (
+                    <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
+                      Loading...
+                    </div>
+                  ) : showUniDrop ? (
+                    universities.length > 0 ? (
+                      <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
+                        {universities.map((uni) => (
+                          <li
+                            key={uni.id}
+                            className='p-2 cursor-pointer hover:bg-gray-100'
+                            onClick={() => {
+                              setValue('university_id', Number(uni.id))
+                              setUniSearch(uni.fullname)
+                              setShowUniDrop(false)
+                              setHasSelectedUni(true)
+                            }}
+                          >
+                            {uni.fullname}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
+                        No universities found.
+                      </div>
+                    )
+                  ) : null}
                 </div>
 
                 <div className='md:col-span-2'>
@@ -638,9 +721,6 @@ export default function CollegeForm() {
                   <CKEditor
                     editor={ClassicEditor}
                     data={getValues('content')}
-                    config={{
-                      licenseKey: process.env.ckeditor
-                    }}
                     onChange={(event, editor) => {
                       const content = editor.getData()
                       setValue('content', content)
@@ -653,7 +733,19 @@ export default function CollegeForm() {
             {/* Courses Section */}
 
             <div className='bg-white p-6 rounded-lg shadow-md'>
-              <h2 className='text-xl font-semibold mb-4'>Courses</h2>
+              <div className='mb-7'>
+                <h2 className='text-xl font-semibold mb-4'>Courses</h2>
+                <input
+                  type='text'
+                  className='w-full p-2 border rounded'
+                  value={courseSearch}
+                  onChange={(e) => {
+                    setCourseSearch(e.target.value)
+                    setHasSelectedCourse(false)
+                  }}
+                  placeholder='Search Course/Program'
+                />
+              </div>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {courses.map((course) => (
                   <label key={course.id} className='flex items-center'>
@@ -865,19 +957,59 @@ export default function CollegeForm() {
                   key={field.id}
                   className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border rounded'
                 >
-                  <div>
-                    <label className='block mb-2'>Course</label>
-                    <select
-                      {...register(`admissions.${index}.course_id`)}
+                  <div className='relative'>
+                    <label className='block mb-2'>Course *</label>
+
+                    <input
+                      type='text'
                       className='w-full p-2 border rounded'
-                    >
-                      <option value=''>Select Course</option>
-                      {courses.map((course) => (
-                        <option key={course.id} value={course.id}>
-                          {course.title}
-                        </option>
-                      ))}
-                    </select>
+                      value={adCourseSearch}
+                      onChange={(e) => {
+                        setAdCourseSearch(e.target.value)
+                        setHasAdSelectedCourse(false)
+                      }}
+                      placeholder='Search Course'
+                    />
+
+                    {/* Hidden input for react-hook-form binding */}
+                    <input
+                      type='hidden'
+                      {...register(`admissions.${index}.course_id`, {
+                        required: true
+                      })}
+                    />
+
+                    {loadAdCourse ? (
+                      <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
+                        Loading...
+                      </div>
+                    ) : showAdCourseDrop ? (
+                      adCourses.length > 0 ? (
+                        <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
+                          {adCourses.map((course) => (
+                            <li
+                              key={course.id}
+                              className='p-2 cursor-pointer hover:bg-gray-100'
+                              onClick={() => {
+                                setValue(
+                                  `admissions.${index}.course_id`,
+                                  Number(course.id)
+                                )
+                                setAdCourseSearch(course.title)
+                                setShowAdCourseDrop(false)
+                                setHasAdSelectedCourse(true)
+                              }}
+                            >
+                              {course.title}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
+                          No courses found.
+                        </div>
+                      )
+                    ) : null}
                   </div>
                   <div>
                     <label className='block mb-2'>Eligibility Criteria</label>

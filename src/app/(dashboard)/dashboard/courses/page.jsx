@@ -7,11 +7,21 @@ import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { getCourses } from '@/app/action'
+// import { getCourses } from '@/app/action'
+import { fetchFaculties } from './action'
 import { CKEditor } from '@ckeditor/ckeditor5-react'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+import { useDebounce } from 'use-debounce'
 
 export default function CourseForm() {
+  //for faculties search
+  const [facSearch, setFacSearch] = useState('')
+  const [debouncedFac] = useDebounce(facSearch, 300)
+  const [faculties, setFaculties] = useState([])
+  const [loadFac, setLoadFac] = useState(false)
+  const [showFacDrop, setShowFacDrop] = useState(false)
+  const [hasSelectedFac, setHasSelectedFac] = useState(false)
+
   const author_id = useSelector((state) => state.user.data.id)
   const [isOpen, setIsOpen] = useState(false)
   const [courses, setCourses] = useState([])
@@ -20,7 +30,6 @@ export default function CourseForm() {
   const [editing, setEditing] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [faculties, setFaculties] = useState([])
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -72,17 +81,26 @@ export default function CourseForm() {
     }
   }
 
-  const fetchFaculties = async () => {
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/faculty`
-      )
-      const data = await response.json()
-      setFaculties(data.items)
-    } catch (error) {
-      toast.error('Failed to fetch faculties')
+  useEffect(() => {
+    if (hasSelectedFac) return
+
+    const getFaculties = async () => {
+      setLoadFac(true)
+      try {
+        const facultyList = await fetchFaculties(debouncedFac)
+        setFaculties(facultyList)
+        setShowFacDrop(true)
+        setLoadFac(false)
+      } catch (error) {
+        console.error('Error fetching Facultiews:', error)
+      }
     }
-  }
+    if (debouncedFac !== '') {
+      getFaculties()
+    } else {
+      setShowFacDrop(false)
+    }
+  }, [debouncedFac])
 
   const onSubmit = async (data) => {
     try {
@@ -135,7 +153,7 @@ export default function CourseForm() {
       setValue('code', course.code)
       setValue('duration', course.duration)
       setValue('description', course.description)
-      // setValue("facultyId", course.coursefaculty.id);
+      setValue('facultyId', course.coursefaculty.id)
 
       if (course.coursefaculty) {
         const faculty = faculties.find(
@@ -310,7 +328,7 @@ export default function CourseForm() {
                   />
                 </div>
 
-                <div>
+                {/* <div>
                   <label className='block mb-2'>Faculty *</label>
                   <select
                     {...register('facultyId', { required: true })}
@@ -323,6 +341,55 @@ export default function CourseForm() {
                       </option>
                     ))}
                   </select>
+                </div> */}
+
+                <div className='relative'>
+                  <label className='block mb-2'>Faculty *</label>
+
+                  <input
+                    type='text'
+                    className='w-full p-2 border rounded'
+                    value={facSearch}
+                    onChange={(e) => {
+                      setFacSearch(e.target.value)
+                      setHasSelectedFac(false)
+                    }}
+                    placeholder='Search Faculty'
+                  />
+
+                  {/* Hidden input for react-hook-form binding */}
+                  <input
+                    type='hidden'
+                    {...register('facultyId', { required: true })}
+                  />
+                  {loadFac ? (
+                    <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
+                      Loading...
+                    </div>
+                  ) : showFacDrop ? (
+                    faculties.length > 0 ? (
+                      <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
+                        {faculties.map((fac) => (
+                          <li
+                            key={fac.id}
+                            className='p-2 cursor-pointer hover:bg-gray-100'
+                            onClick={() => {
+                              setValue('facultyId', Number(fac.id))
+                              setFacSearch(fac.title)
+                              setShowFacDrop(false)
+                              setHasSelectedFac(true)
+                            }}
+                          >
+                            {fac.title}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
+                        No faculty found.
+                      </div>
+                    )
+                  ) : null}
                 </div>
 
                 <div>

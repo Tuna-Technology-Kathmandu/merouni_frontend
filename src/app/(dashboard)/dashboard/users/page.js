@@ -111,11 +111,11 @@ export default function UsersManager() {
     try {
       const tokenObj = await getToken()
       console.log('TOKEN OBJ:', tokenObj)
-      const token = tokenObj.value
+      const token = tokenObj?.value
       console.log('TOKEN:', token)
-      const decodedToken = jwtDecode(tokenObj.value)
+      const decodedToken = jwtDecode(tokenObj?.value)
       console.log('DECODED TOKEN:', decodedToken)
-      const roleObject = JSON.parse(decodedToken.data.role)
+      const roleObject = JSON.parse(decodedToken?.data?.role)
       console.log('ROLE OBJECT:', roleObject)
       const refreshToken = localStorage.getItem('refreshToken')
       console.log('refresh TOKEN:', refreshToken)

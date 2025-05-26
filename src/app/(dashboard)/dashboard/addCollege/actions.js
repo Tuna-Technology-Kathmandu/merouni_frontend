@@ -20,10 +20,10 @@ export async function createCollege(data) {
   return response.json()
 }
 
-export const fetchUniversities = async () => {
+export const fetchUniversities = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/university`
+      `${process.env.baseUrl}${process.env.version}/university${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch universities')
@@ -36,11 +36,12 @@ export const fetchUniversities = async () => {
   }
 }
 
-export const fetchCourse = async () => {
+export const fetchCourse = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/program`
+      `${process.env.baseUrl}${process.env.version}/program${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
+
     if (!response.ok) {
       throw new Error('Failed to fetch universities')
     }
