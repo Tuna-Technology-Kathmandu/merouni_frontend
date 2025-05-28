@@ -718,10 +718,14 @@ export default function CollegeForm() {
 
                 <div className='md:col-span-2'>
                   <label className='block mb-2'>Content</label>
+
                   <CKEditor
                     editor={ClassicEditor}
-                    data={getValues('content')}
-                    onChange={(event, editor) => {
+                    data={getValues('content') || ''}
+                    config={{
+                      licenseKey: process.env.ckeditor
+                    }}
+                    onChange={(_, editor) => {
                       const content = editor.getData()
                       setValue('content', content)
                     }}
