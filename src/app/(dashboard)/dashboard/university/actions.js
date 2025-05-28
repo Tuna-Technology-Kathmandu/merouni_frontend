@@ -66,3 +66,20 @@ export async function deleteUniversity(id) {
     throw new Error('Failed to delete university')
   }
 }
+
+//for level search
+export const fetchLevel = async (searchQuery = '') => {
+  try {
+    const response = await authFetch(
+      `${process.env.baseUrl}${process.env.version}/level${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+    )
+    if (!response.ok) {
+      throw new Error('Failed to fetch level')
+    }
+    const data = await response.json()
+    return data.items
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}

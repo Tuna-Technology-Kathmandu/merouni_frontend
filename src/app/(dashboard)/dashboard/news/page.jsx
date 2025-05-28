@@ -173,9 +173,10 @@ export default function NewsManager() {
   }, [tags])
 
   useEffect(() => {
+    const limit = 1000
     const loadCategories = async () => {
       try {
-        const categoriesList = await getCategories()
+        const categoriesList = await getCategories({ limit })
         setCategories(categoriesList.items)
       } catch (error) {
         console.error('Failed to fetch categories')

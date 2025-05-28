@@ -45,3 +45,37 @@ export async function deleteExam(id) {
     throw new Error(error)
   }
 }
+
+//for search university
+export const fetchUniversities = async (searchQuery = '') => {
+  try {
+    const response = await authFetch(
+      `${process.env.baseUrl}${process.env.version}/university${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+    )
+    if (!response.ok) {
+      throw new Error('Failed to fetch universities')
+    }
+    const data = await response.json()
+    return data.items
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+//for level search
+export const fetchLevel = async (searchQuery = '') => {
+  try {
+    const response = await authFetch(
+      `${process.env.baseUrl}${process.env.version}/level${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+    )
+    if (!response.ok) {
+      throw new Error('Failed to fetch level')
+    }
+    const data = await response.json()
+    return data.items
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}

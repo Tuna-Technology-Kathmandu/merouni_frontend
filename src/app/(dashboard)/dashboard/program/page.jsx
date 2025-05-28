@@ -8,6 +8,14 @@ import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { X } from 'lucide-react'
+import {
+  fetchFaculties,
+  fetchLevel,
+  fetchScholarship,
+  fetchExam
+} from './actions'
+import { useDebounce } from 'use-debounce'
+import CourseSearch from './CourseSearch'
 
 export default function ProgramForm() {
   const author_id = useSelector((state) => state.user.data.id)
@@ -20,11 +28,38 @@ export default function ProgramForm() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   // States for dropdowns
+  //for faculties search
+  const [facSearch, setFacSearch] = useState('')
+  const [debouncedFac] = useDebounce(facSearch, 300)
   const [faculties, setFaculties] = useState([])
+  const [loadFac, setLoadFac] = useState(false)
+  const [showFacDrop, setShowFacDrop] = useState(false)
+  const [hasSelectedFac, setHasSelectedFac] = useState(false)
+
+  //for level search
+  const [levelSearch, setLevelSearch] = useState('')
+  const [debouncedLevel] = useDebounce(levelSearch, 300)
   const [levels, setLevels] = useState([])
+  const [loadLevel, setLoadLevel] = useState(false)
+  const [showLevelDrop, setShowLevelDrop] = useState(false)
+  const [hasSelectedLevel, setHasSelectedLevel] = useState(false)
+
+  //for scholarship search
+  const [scholarSearch, setScholarSearch] = useState('')
+  const [debouncedScholar] = useDebounce(scholarSearch, 300)
   const [scholarships, setScholarships] = useState([])
+  const [loadScholar, setLoadScholar] = useState(false)
+  const [showScholarDrop, setShowScholarDrop] = useState(false)
+  const [hasSelectedScholar, setHasSelectedScholar] = useState(false)
+
+  //for exam searchs
+  const [examSearch, setExamSearch] = useState('')
+  const [debouncedExam] = useDebounce(examSearch, 300)
   const [exams, setExams] = useState([])
-  const [courses, setCourses] = useState([])
+  const [loadExam, setLoadExam] = useState(false)
+  const [showExamDrop, setShowExamDrop] = useState(false)
+  const [hasSelectedExam, setHasSelectedExam] = useState(false)
+
   const [colleges, setColleges] = useState([])
   const [collegeSearch, setCollegeSearch] = useState('')
   const [selectedColleges, setSelectedColleges] = useState([])
@@ -81,6 +116,7 @@ export default function ProgramForm() {
     handleSubmit,
     setValue,
     reset,
+    watch,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -120,13 +156,96 @@ export default function ProgramForm() {
   // Fetch all necessary data on component mount
   useEffect(() => {
     fetchPrograms()
-    fetchFaculties()
-    fetchLevels()
-    fetchScholarships()
-    fetchExams()
-    fetchCourses()
     fetchColleges()
   }, [])
+
+  //for faculties
+  useEffect(() => {
+    if (hasSelectedFac) return
+
+    const getFaculties = async () => {
+      setLoadFac(true)
+      try {
+        const facultyList = await fetchFaculties(debouncedFac)
+        setFaculties(facultyList)
+        setShowFacDrop(true)
+        setLoadFac(false)
+      } catch (error) {
+        console.error('Error fetching Faculties:', error)
+      }
+    }
+    if (debouncedFac !== '') {
+      getFaculties()
+    } else {
+      setShowFacDrop(false)
+    }
+  }, [debouncedFac])
+
+  //for level searching
+  useEffect(() => {
+    if (hasSelectedLevel) return
+
+    const getLevels = async () => {
+      setLoadLevel(true)
+      try {
+        const levelList = await fetchLevel(debouncedLevel)
+        setLevels(levelList)
+        setShowLevelDrop(true)
+        setLoadLevel(false)
+      } catch (error) {
+        console.error('Error fetching levels:', error)
+      }
+    }
+    if (debouncedLevel !== '') {
+      getLevels()
+    } else {
+      setShowLevelDrop(false)
+    }
+  }, [debouncedLevel])
+
+  //for scholarships searching
+  useEffect(() => {
+    if (hasSelectedScholar) return
+
+    const getScholarship = async () => {
+      setLoadScholar(true)
+      try {
+        const ScholarList = await fetchScholarship(debouncedScholar)
+        setScholarships(ScholarList)
+        setShowScholarDrop(true)
+        setLoadScholar(false)
+      } catch (error) {
+        console.error('Error fetching scholarships:', error)
+      }
+    }
+    if (debouncedScholar !== '') {
+      getScholarship()
+    } else {
+      setShowScholarDrop(false)
+    }
+  }, [debouncedScholar])
+
+  //for exams searching
+  useEffect(() => {
+    if (hasSelectedExam) return
+
+    const getExam = async () => {
+      setLoadExam(true)
+      try {
+        const ExamList = await fetchExam(debouncedExam)
+        setExams(ExamList)
+        setShowExamDrop(true)
+        setLoadExam(false)
+      } catch (error) {
+        console.error('Error fetching exams:', error)
+      }
+    }
+    if (debouncedExam !== '') {
+      getExam()
+    } else {
+      setShowExamDrop(false)
+    }
+  }, [debouncedExam])
 
   // Fetch functions for all dropdown data
   const fetchPrograms = async (page = 1) => {
@@ -149,53 +268,6 @@ export default function ProgramForm() {
     }
   }
 
-  const fetchFaculties = async () => {
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/faculty`
-      )
-      const data = await response.json()
-      setFaculties(data.items)
-    } catch (error) {
-      toast.error('Failed to fetch faculties')
-    }
-  }
-
-  const fetchLevels = async () => {
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/level`
-      )
-      const data = await response.json()
-      setLevels(data.items)
-    } catch (error) {
-      toast.error('Failed to fetch levels')
-    }
-  }
-  const fetchScholarships = async () => {
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/scholarship`
-      )
-      const data = await response.json()
-      setScholarships(data.scholarships)
-    } catch (error) {
-      toast.error('Failed to fetch levels')
-    }
-  }
-
-  const fetchExams = async () => {
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/exam`
-      )
-      const data = await response.json()
-      setExams(data.items)
-    } catch (error) {
-      toast.error('Failed to fetch levels')
-    }
-  }
-
   const fetchColleges = async () => {
     try {
       const response = await authFetch(
@@ -203,18 +275,6 @@ export default function ProgramForm() {
       )
       const data = await response.json()
       setColleges(data.items)
-    } catch (error) {
-      toast.error('Failed to fetch levels')
-    }
-  }
-
-  const fetchCourses = async () => {
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/course`
-      )
-      const data = await response.json()
-      setCourses(data.items)
     } catch (error) {
       toast.error('Failed to fetch levels')
     }
@@ -486,7 +546,7 @@ export default function ProgramForm() {
                   )}
                 </div>
 
-                <div>
+                {/* <div>
                   <label className='block mb-2'>Faculty *</label>
                   <select
                     {...register('faculty_id', { required: true })}
@@ -499,6 +559,55 @@ export default function ProgramForm() {
                       </option>
                     ))}
                   </select>
+                </div> */}
+
+                <div className='relative'>
+                  <label className='block mb-2'>Faculty *</label>
+
+                  <input
+                    type='text'
+                    className='w-full p-2 border rounded'
+                    value={facSearch}
+                    onChange={(e) => {
+                      setFacSearch(e.target.value)
+                      setHasSelectedFac(false)
+                    }}
+                    placeholder='Search Faculty'
+                  />
+
+                  {/* Hidden input for react-hook-form binding */}
+                  <input
+                    type='hidden'
+                    {...register('faculty_id', { required: true })}
+                  />
+                  {loadFac ? (
+                    <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
+                      Loading...
+                    </div>
+                  ) : showFacDrop ? (
+                    faculties.length > 0 ? (
+                      <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
+                        {faculties.map((fac) => (
+                          <li
+                            key={fac.id}
+                            className='p-2 cursor-pointer hover:bg-gray-100'
+                            onClick={() => {
+                              setValue('facultyId', Number(fac.id))
+                              setFacSearch(fac.title)
+                              setShowFacDrop(false)
+                              setHasSelectedFac(true)
+                            }}
+                          >
+                            {fac.title}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
+                        No faculty found.
+                      </div>
+                    )
+                  ) : null}
                 </div>
 
                 <div>
@@ -519,7 +628,7 @@ export default function ProgramForm() {
                   />
                 </div>
 
-                <div>
+                {/* <div>
                   <label className='block mb-2'>Level *</label>
                   <select
                     {...register('level_id', { required: true })}
@@ -532,6 +641,54 @@ export default function ProgramForm() {
                       </option>
                     ))}
                   </select>
+                </div> */}
+
+                {/* level search box */}
+                <div className='relative'>
+                  <label className='block mb-2'>Level *</label>
+                  <input
+                    type='text'
+                    className='w-full p-2 border rounded'
+                    value={levelSearch}
+                    onChange={(e) => {
+                      setLevelSearch(e.target.value)
+                      setHasSelectedLevel(false)
+                    }}
+                    placeholder='Search Levels'
+                  />
+
+                  {/* Hidden input for react-hook-form binding */}
+                  <input
+                    type='hidden'
+                    {...register('level_id', { required: true })}
+                  />
+                  {loadLevel ? (
+                    <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
+                      Loading...
+                    </div>
+                  ) : showLevelDrop ? (
+                    levels.length > 0 ? (
+                      <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
+                        {levels.map((level) => (
+                          <li
+                            key={level.id}
+                            className='p-2 cursor-pointer hover:bg-gray-100'
+                            onClick={() => {
+                              setLevelSearch(level.title)
+                              setShowLevelDrop(false)
+                              setHasSelectedLevel(true)
+                            }}
+                          >
+                            {level.title}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
+                        No levels found.
+                      </div>
+                    )
+                  ) : null}
                 </div>
 
                 <div>
@@ -638,33 +795,34 @@ export default function ProgramForm() {
                 </button>
               </div>
 
-              {syllabusFields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 border rounded'
-                >
-                  <div>
-                    <label className='block mb-2'>Year</label>
-                    <input
-                      type='number'
-                      {...register(`syllabus.${index}.year`)}
-                      className='w-full p-2 border rounded'
-                      min='1'
-                    />
-                  </div>
+              {syllabusFields.map((field, index) => {
+                return (
+                  <div
+                    key={field.id}
+                    className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 border rounded'
+                  >
+                    <div>
+                      <label className='block mb-2'>Year</label>
+                      <input
+                        type='number'
+                        {...register(`syllabus.${index}.year`)}
+                        className='w-full p-2 border rounded'
+                        min='1'
+                      />
+                    </div>
 
-                  <div>
-                    <label className='block mb-2'>Semester</label>
-                    <input
-                      type='number'
-                      {...register(`syllabus.${index}.semester`)}
-                      className='w-full p-2 border rounded'
-                      min='1'
-                      max='2'
-                    />
-                  </div>
+                    <div>
+                      <label className='block mb-2'>Semester</label>
+                      <input
+                        type='number'
+                        {...register(`syllabus.${index}.semester`)}
+                        className='w-full p-2 border rounded'
+                        min='1'
+                        max='2'
+                      />
+                    </div>
 
-                  <div>
+                    {/* <div>
                     <label className='block mb-2'>Course</label>
                     <select
                       {...register(`syllabus.${index}.course_id`)}
@@ -677,19 +835,27 @@ export default function ProgramForm() {
                         </option>
                       ))}
                     </select>
-                  </div>
+                  </div> */}
 
-                  {index > 0 && (
-                    <button
-                      type='button'
-                      onClick={() => removeSyllabus(index)}
-                      className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600'
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-              ))}
+                    <CourseSearch
+                      value={watch(`syllabus.${index}.course_id`)}
+                      onChange={(id) =>
+                        setValue(`syllabus.${index}.course_id`, id)
+                      }
+                    />
+
+                    {index > 0 && (
+                      <button
+                        type='button'
+                        onClick={() => removeSyllabus(index)}
+                        className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600'
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
             </div>
 
             {/* Additional Information */}
@@ -698,7 +864,7 @@ export default function ProgramForm() {
                 Additional Information
               </h2>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div>
+                {/* <div>
                   <label className='block mb-2'>Scholarship</label>
                   <select
                     {...register('scholarship_id')}
@@ -711,21 +877,97 @@ export default function ProgramForm() {
                       </option>
                     ))}
                   </select>
+                </div> */}
+
+                {/* for scholarships */}
+                <div className='relative'>
+                  <label className='block mb-2'>Scholarship</label>
+                  <input
+                    type='text'
+                    className='w-full p-2 border rounded'
+                    value={scholarSearch}
+                    onChange={(e) => {
+                      setScholarSearch(e.target.value)
+                      setHasSelectedScholar(false)
+                    }}
+                    placeholder='Search Scholarships'
+                  />
+
+                  {/* Hidden input for react-hook-form binding */}
+                  <input type='hidden' {...register('scholarship_id')} />
+                  {loadScholar ? (
+                    <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
+                      Loading...
+                    </div>
+                  ) : showScholarDrop ? (
+                    scholarships.length > 0 ? (
+                      <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
+                        {scholarships.map((item) => (
+                          <li
+                            key={item.id}
+                            className='p-2 cursor-pointer hover:bg-gray-100'
+                            onClick={() => {
+                              setScholarSearch(item.title)
+                              setShowScholarDrop(false)
+                              setHasSelectedScholar(true)
+                            }}
+                          >
+                            {item.title}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
+                        No scholarships found.
+                      </div>
+                    )
+                  ) : null}
                 </div>
 
-                <div>
-                  <label className='block mb-2'>Entrance Exam</label>
-                  <select
-                    {...register('exam_id')}
+                {/* for exam */}
+
+                <div className='relative'>
+                  <label className='block mb-2'>Exam</label>
+                  <input
+                    type='text'
                     className='w-full p-2 border rounded'
-                  >
-                    <option value=''>Select Exam</option>
-                    {exams.map((exam) => (
-                      <option key={exam.id} value={exam.id}>
-                        {exam.title}
-                      </option>
-                    ))}
-                  </select>
+                    value={examSearch}
+                    onChange={(e) => {
+                      setExamSearch(e.target.value)
+                      setHasSelectedExam(false)
+                    }}
+                    placeholder='Search Exams'
+                  />
+
+                  {/* Hidden input for react-hook-form binding */}
+                  <input type='hidden' {...register('exam_id')} />
+                  {loadExam ? (
+                    <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
+                      Loading...
+                    </div>
+                  ) : showExamDrop ? (
+                    exams.length > 0 ? (
+                      <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
+                        {exams.map((item) => (
+                          <li
+                            key={item.id}
+                            className='p-2 cursor-pointer hover:bg-gray-100'
+                            onClick={() => {
+                              setExamSearch(item.title)
+                              setShowExamDrop(false)
+                              setHasSelectedExam(true)
+                            }}
+                          >
+                            {item.title}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
+                        No exams found.
+                      </div>
+                    )
+                  ) : null}
                 </div>
 
                 <div>

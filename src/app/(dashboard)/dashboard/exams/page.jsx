@@ -8,12 +8,29 @@ import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { CKEditor } from '@ckeditor/ckeditor5-react'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+import { useDebounce } from 'use-debounce'
+import { fetchUniversities, fetchLevel } from './actions'
 
 export default function ExamManager() {
   const author_id = useSelector((state) => state.user.data.id)
-  const [exams, setExams] = useState([])
-  const [levels, setLevels] = useState([])
+
+  //for university search
+  const [uniSearch, setUniSearch] = useState('')
+  const [debouncedUni] = useDebounce(uniSearch, 300)
   const [universities, setUniversities] = useState([])
+  const [loadUni, setLoadUni] = useState(false)
+  const [showUniDrop, setShowUniDrop] = useState(false)
+  const [hasSelectedUni, setHasSelectedUni] = useState(false)
+
+  //for level search
+  const [levelSearch, setLevelSearch] = useState('')
+  const [debouncedLevel] = useDebounce(levelSearch, 300)
+  const [levels, setLevels] = useState([])
+  const [loadLevel, setLoadLevel] = useState(false)
+  const [showLevelDrop, setShowLevelDrop] = useState(false)
+  const [hasSelectedLevel, setHasSelectedLevel] = useState(false)
+
+  const [exams, setExams] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [editingId, setEditingId] = useState(null)
@@ -49,27 +66,51 @@ export default function ExamManager() {
     }
   })
 
-  // Fetch levels and universities
+  console.log('formData', formData)
+
+  //for level searching
   useEffect(() => {
-    const fetchData = async () => {
+    if (hasSelectedLevel) return
+
+    const getLevels = async () => {
+      setLoadLevel(true)
       try {
-        const [levelsResponse, universitiesResponse] = await Promise.all([
-          fetch(`${process.env.baseUrl}${process.env.version}/level`).then(
-            (res) => res.json()
-          ),
-          fetch(`${process.env.baseUrl}${process.env.version}/university`).then(
-            (res) => res.json()
-          )
-        ])
-        setLevels(levelsResponse.items)
-        setUniversities(universitiesResponse.items)
+        const levelList = await fetchLevel(debouncedLevel)
+        setLevels(levelList)
+        setShowLevelDrop(true)
+        setLoadLevel(false)
       } catch (error) {
-        console.error('Error fetching data:', error)
-        setError('Failed to load form data')
+        console.error('Error fetching levels:', error)
       }
     }
-    fetchData()
-  }, [])
+    if (debouncedLevel !== '') {
+      getLevels()
+    } else {
+      setShowLevelDrop(false)
+    }
+  }, [debouncedLevel])
+
+  //for university searching
+  useEffect(() => {
+    if (hasSelectedUni) return
+
+    const getUniversities = async () => {
+      setLoadUni(true)
+      try {
+        const universityList = await fetchUniversities(debouncedUni)
+        setUniversities(universityList)
+        setShowUniDrop(true)
+        setLoadUni(false)
+      } catch (error) {
+        console.error('Error fetching universities:', error)
+      }
+    }
+    if (debouncedUni !== '') {
+      getUniversities()
+    } else {
+      setShowUniDrop(false)
+    }
+  }, [debouncedUni])
 
   // Validate dates
   const validateDates = () => {
@@ -334,36 +375,95 @@ export default function ExamManager() {
               setFormData({ ...formData, description: content })
             }}
           />
-          <select
-            value={formData.level_id}
-            onChange={(e) =>
-              setFormData({ ...formData, level_id: e.target.value })
-            }
-            className='w-full p-2 border rounded'
-            required
-          >
-            <option value=''>Select Level</option>
-            {levels.map((level) => (
-              <option key={level.id} value={level.id}>
-                {level.title}
-              </option>
-            ))}
-          </select>
-          <select
-            value={formData.affiliation}
-            onChange={(e) =>
-              setFormData({ ...formData, affiliation: e.target.value })
-            }
-            className='w-full p-2 border rounded'
-            required
-          >
-            <option value=''>Select University</option>
-            {universities.map((university) => (
-              <option key={university.id} value={university.id}>
-                {university.fullname}
-              </option>
-            ))}
-          </select>
+          {/* level search box */}
+          <div className='relative'>
+            <input
+              type='text'
+              className='w-full p-2 border rounded'
+              value={levelSearch}
+              onChange={(e) => {
+                setLevelSearch(e.target.value)
+                setHasSelectedLevel(false)
+              }}
+              placeholder='Search Levels'
+            />
+
+            {/* Hidden input for react-hook-form binding */}
+            <input type='hidden' />
+            {loadLevel ? (
+              <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
+                Loading...
+              </div>
+            ) : showLevelDrop ? (
+              levels.length > 0 ? (
+                <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
+                  {levels.map((level) => (
+                    <li
+                      key={level.id}
+                      className='p-2 cursor-pointer hover:bg-gray-100'
+                      onClick={() => {
+                        setFormData({ ...formData, level_id: level.id })
+                        setLevelSearch(level.title)
+                        setShowLevelDrop(false)
+                        setHasSelectedLevel(true)
+                      }}
+                    >
+                      {level.title}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
+                  No levels found.
+                </div>
+              )
+            ) : null}
+          </div>
+
+          {/* unversity search box */}
+          <div className='relative'>
+            <input
+              type='text'
+              className='w-full p-2 border rounded'
+              value={uniSearch}
+              onChange={(e) => {
+                setUniSearch(e.target.value)
+                setHasSelectedUni(false)
+              }}
+              placeholder='Search University'
+            />
+
+            {/* Hidden input for react-hook-form binding */}
+            <input type='hidden' />
+            {loadUni ? (
+              <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
+                Loading...
+              </div>
+            ) : showUniDrop ? (
+              universities.length > 0 ? (
+                <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
+                  {universities.map((uni) => (
+                    <li
+                      key={uni.id}
+                      className='p-2 cursor-pointer hover:bg-gray-100'
+                      onClick={() => {
+                        setFormData({ ...formData, affiliation: uni.id })
+                        setUniSearch(uni.fullname)
+                        setShowUniDrop(false)
+                        setHasSelectedUni(true)
+                      }}
+                    >
+                      {uni.fullname}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
+                  No universities found.
+                </div>
+              )
+            ) : null}
+          </div>
           <textarea
             placeholder='Syllabus'
             value={formData.syllabus}

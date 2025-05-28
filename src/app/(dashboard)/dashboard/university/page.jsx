@@ -10,6 +10,8 @@ import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { CKEditor } from '@ckeditor/ckeditor5-react'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+import { fetchLevel } from './actions'
+import { useDebounce } from 'use-debounce'
 
 export default function UniversityForm() {
   const author_id = useSelector((state) => state.user.data.id)
@@ -17,7 +19,13 @@ export default function UniversityForm() {
   const [universities, setUniversities] = useState([])
   const [tableLoading, setTableLoading] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [level, setLevel] = useState([])
+
+  //for level search
+  const [levelSearch, setLevelSearch] = useState('')
+  const [debouncedLevel] = useDebounce(levelSearch, 300)
+  const [levels, setLevels] = useState([])
+  const [hasSelectedLevel, setHasSelectedLevel] = useState(false)
+
   const [editing, setEditing] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState({
     featured: '',
@@ -111,21 +119,22 @@ export default function UniversityForm() {
       setTableLoading(false)
     }
   }
-  const fetchlevel = async () => {
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/level`
-      )
-      const data = await response.json()
-      setLevel(data.items)
-    } catch (error) {
-      toast.error('Failed to fetch universities')
-    } finally {
-    }
-  }
+
+  //for level searching
   useEffect(() => {
-    fetchlevel()
-  }, [])
+    if (hasSelectedLevel) return
+
+    const getLevels = async () => {
+      try {
+        const levelList = await fetchLevel(debouncedLevel)
+        setLevels(levelList)
+      } catch (error) {
+        console.error('Error fetching levels:', error)
+      }
+    }
+    getLevels()
+  }, [debouncedLevel])
+
   const onSubmit = async (data) => {
     try {
       // Format the data
@@ -607,9 +616,23 @@ export default function UniversityForm() {
 
             {/* Levels Section */}
             <div className='bg-white p-6 rounded-lg shadow-md'>
-              <h2 className='text-xl font-semibold mb-4'>Educational Levels</h2>
-              <div className='space-y-2'>
-                {level.map((level) => (
+              <div>
+                <h2 className='text-xl font-semibold mb-4'>
+                  Educational Levels
+                </h2>
+                <input
+                  type='text'
+                  className='w-full p-2 border rounded'
+                  value={levelSearch}
+                  onChange={(e) => {
+                    setLevelSearch(e.target.value)
+                    setHasSelectedLevel(false)
+                  }}
+                  placeholder='Search levels'
+                />
+              </div>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-7'>
+                {levels.map((level) => (
                   <label key={level.id} className='flex items-center'>
                     <input
                       type='checkbox'

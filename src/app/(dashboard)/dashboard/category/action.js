@@ -4,9 +4,11 @@ import { authFetch } from '@/app/utils/authFetch'
 
 let url = `${process.env.baseUrl}${process.env.version}/category`
 
-export async function fetchCategories(page = 1) {
+export async function fetchCategories(page = 1, limit = 1000) {
   try {
-    const response = await fetch(`${url}?page=${page}`, { cache: 'no-store' })
+    const response = await fetch(`${url}?page=${page}&limit=${limit}`, {
+      cache: 'no-store'
+    })
 
     if (!response.ok) {
       throw new Error('Failed to fetch categories')

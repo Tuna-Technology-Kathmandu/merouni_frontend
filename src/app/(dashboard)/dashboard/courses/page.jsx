@@ -81,6 +81,7 @@ export default function CourseForm() {
     }
   }
 
+  //for faculties
   useEffect(() => {
     if (hasSelectedFac) return
 
