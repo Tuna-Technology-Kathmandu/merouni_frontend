@@ -3,35 +3,30 @@ import Image from 'next/image'
 import { IoIosGlobe } from 'react-icons/io'
 import { PiLineVerticalThin } from 'react-icons/pi'
 import { FaUniversity, FaPhoneAlt } from 'react-icons/fa'
-import { IoMdMail } from 'react-icons/io'
 import { LiaUniversitySolid } from 'react-icons/lia'
 import { BsGlobe2 } from 'react-icons/bs'
 
 const ImageSection = ({ college }) => {
   return (
     <>
-      <div className='flex flex-col items-center relative '>
+      <div className='flex flex-col items-center relative gap-16 max-md:gap-12'>
         {/* college image.names and location in cirlce */}
-        <div className='w-full h-[600px] xl:mb-16 2xl:mb-32'>
-          <Image
+        <div className='w-full'>
+          <img
             src={
               college.featured_img || 'https://dummyimage.com/600x180/000/fff'
             }
-            width={2400}
-            height={600}
             alt='College Photo'
-            // className="h-[25vh] md:h-[50vh] object-fill"
+            className='h-[25vh] w-full md:h-[400px] object-cover'
           />
-          <div className='flex flex-row lg:h-[95px] bg-[#30AD8F] bg-opacity-5sw lg:mb-20 items-center p-0 px-8 sm:px-14 md:px-24'>
+          <div className='flex flex-row lg:h-[95px] bg-[#30AD8F] bg-opacity-5 items-center p-0 px-8 sm:px-14 md:px-24'>
             {/* Logo Container */}
             <div className='flex items-center justify-center rounded-full bg-white -translate-y-8 overflow-hidden w-24 h-24 md:w-32 md:h-32'>
-              <Image
+              <img
                 src={
                   college.college_logo ||
                   `https://avatar.iran.liara.run/username?username=${college?.name}`
                 }
-                width={120}
-                height={120}
                 alt='College Logo'
                 className='object-cover w-full h-full rounded-full aspect-square' // Ensures the image is circular
               />
@@ -54,8 +49,8 @@ const ImageSection = ({ college }) => {
         </div>
 
         {/* college all details */}
-        <div className='sm:px-24 px-12 -mt-80 sm:-mt-72 md:-mt-48 lg:-mt-32 xl:-mt-20 2xl:-mt-16 w-full'>
-          <div className='bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex items-center justify-center flex-wrap sm:justify-between md:justify-around md:gap-10 mb-8  items-left w-full l:w-[80%] gap-6 lg:gap-6 p-7 '>
+        <div className='sm:px-24 px-12  w-full'>
+          <div className='bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex items-center justify-center flex-wrap sm:justify-between md:justify-around md:gap-10  items-left w-full l:w-[80%] gap-6 lg:gap-6 p-7 '>
             <div className='flex flex-col items-center gap-2 text-center '>
               <FaUniversity size={30} />
               <p className='max-w-36 sm:text-base text-xs font-semibold'>
@@ -111,12 +106,24 @@ const ImageSection = ({ college }) => {
             </div>
           </div>
         </div>
-        <div className='space-y-4 text-[#b0b2c3] fixed left-4 top-[30%] lg:block md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col'>
+        <div className='space-y-4 text-[#b0b2c3] fixed right-4 top-[30%] lg:block md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col'>
           <div className='text-black font-bold text-sm'>Share</div>
-          <img src='/images/fb.png' alt='Facebook' className='w-6' />
-          <img src='/images/insta.png' alt='Instagram' className='w-6' />
-          <img src='/images/linkedin.png' alt='LinkedIn' className='w-6' />
-          <img src='/images/twitter.png' alt='Twitter' className='w-6' />
+          <img src='/images/fb.png' alt='Facebook' className='w-6 mx-auto' />
+          <img
+            src='/images/insta.png'
+            alt='Instagram'
+            className='w-6  mx-auto'
+          />
+          <img
+            src='/images/linkedin.png'
+            alt='LinkedIn'
+            className='w-6  mx-auto'
+          />
+          <img
+            src='/images/twitter.png'
+            alt='Twitter'
+            className='w-6  mx-auto'
+          />
         </div>
       </div>
     </>

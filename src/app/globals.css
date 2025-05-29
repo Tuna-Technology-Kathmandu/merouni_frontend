@@ -7,6 +7,10 @@
   border-collapse: collapse;
 }
 
+.font-poppins {
+  font-family: var(--font-poppins), sans-serif;
+}
+
 .prose th,
 .prose td {
   border: 1px solid #ddd;

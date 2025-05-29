@@ -16,6 +16,11 @@ export default {
         lp: '1325px', // Custom screen size
         tb: '915px'
       },
+
+      fontFamily: {
+        sans: ['var(--font-poppins)', 'sans-serif'], 
+        poppins: ['var(--font-poppins)', 'sans-serif'], 
+      },
       animation: {
         'featured-shimmer': 'featured-shimmer 1.5s infinite ease-in-out'
       },
