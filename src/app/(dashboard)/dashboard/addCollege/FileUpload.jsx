@@ -1,5 +1,7 @@
 import { Upload } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { toast } from 'react-toastify'
+import axios from 'axios'
 
 const FileUpload = ({ onUploadComplete, label, defaultPreview = null }) => {
   const [isUploading, setIsUploading] = useState(false)
@@ -22,6 +24,7 @@ const FileUpload = ({ onUploadComplete, label, defaultPreview = null }) => {
     }
 
     setIsUploading(true)
+
     const formData = new FormData()
     formData.append('title', file.name)
     formData.append('altText', file.name)
@@ -30,23 +33,36 @@ const FileUpload = ({ onUploadComplete, label, defaultPreview = null }) => {
     formData.append('authorId', '1')
 
     try {
-      const response = await fetch(
+      const response = await axios.post(
         'https://uploads.merouni.com/api/v1/media/upload',
+        formData,
         {
-          method: 'POST',
-          body: formData
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
         }
       )
 
-      if (!response.ok) {
-        throw new Error('Failed to upload media')
+      // Response success
+      const data = response.data
+
+      if (data.success === false) {
+        toast.error(data.message || 'Upload failed.')
+        return
       }
 
-      const data = await response.json()
-
+      toast.success('File uploaded successfully!')
       onUploadComplete(data.media.url)
     } catch (error) {
       console.error('Upload failed:', error)
+
+      if (error.response) {
+        toast.error(error.response.data?.message || 'Upload failed.')
+      } else if (error.request) {
+        toast.error('No response from server.')
+      } else {
+        toast.error('Error: ' + error.message)
+      }
     } finally {
       setIsUploading(false)
     }

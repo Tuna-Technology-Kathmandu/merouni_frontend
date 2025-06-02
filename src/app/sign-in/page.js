@@ -125,7 +125,9 @@ const SignInPage = () => {
 
       // Get all response headers
       const accessToken = response?.data?.accessToken
+      const refreshToken = response?.data?.refreshToken
       localStorage.setItem('access_token', accessToken)
+      localStorage.setItem('refreshToken', refreshToken)
 
       if (isLogin) {
         const decodedToken = jwtDecode(accessToken)

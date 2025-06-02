@@ -140,8 +140,6 @@ const CollegeFinder = () => {
     }
   ]
 
-  console.log(selectedFilters)
-
   const FilterModal = () => (
     <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center'>
       <div className='bg-white rounded-xl p-6 w-full max-w-[90%] md:max-w-[80%] lg:max-w-[60%] h-full max-h-[90%] overflow-y-auto'>
@@ -215,6 +213,8 @@ const CollegeFinder = () => {
       </p>
     </div>
   )
+
+  console.log('universities', universities)
   return (
     <div className='max-w-[1600px] mx-auto p-6'>
       <div className='flex flex-col md:flex-row justify-between items-center mb-6 gap-4 md:gap-0'>

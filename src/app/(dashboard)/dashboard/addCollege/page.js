@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useMemo } from 'react'
+import dynamic from 'next/dynamic'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { createCollege, fetchCourse, fetchUniversities } from './actions'
 import { useSelector } from 'react-redux'
@@ -9,10 +10,11 @@ import { getColleges } from '@/app/action'
 import { Edit2, Trash2 } from 'lucide-react'
 import { Globe, MapPin } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from './ConfirmationDialog'
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+const CKEditor4 = dynamic(() => import('../component/CKEditor4'), {
+  ssr: false
+})
 import { useDebounce } from 'use-debounce'
 
 export default function CollegeForm() {
@@ -127,16 +129,18 @@ export default function CollegeForm() {
   } = useFieldArray({ control, name: 'images' })
 
   const onSubmit = async (data) => {
+    console.log('click')
+
     try {
       data.is_featured = +data.is_featured
       data.pinned = +data.pinned
       data.university_id = parseInt(data.university_id)
       data.courses = data.courses.map((course) => parseInt(course))
 
-      // Ensure all image URLs are included
-      data.college_logo = uploadedFiles.logo
-      data.featured_img = uploadedFiles.featured
-      data.images = uploadedFiles.additional.filter((url) => url)
+      // // Ensure all image URLs are included
+      // data.college_logo = uploadedFiles.logo
+      // data.featured_img = uploadedFiles.featured
+      // data.images = uploadedFiles.additional.filter((url) => url)
 
       console.log('final data is', data)
       await createCollege(data)
@@ -152,7 +156,7 @@ export default function CollegeForm() {
         additional: []
       })
     } catch (error) {
-      alert(error.message || 'Failed to create college')
+      toast.error(error.message || 'Failed to create college')
     }
   }
 
@@ -600,6 +604,7 @@ export default function CollegeForm() {
   return (
     <>
       <div className='text-2xl mr-auto p-4 ml-14 font-bold'>
+        <ToastContainer />
         <div className='text-center'>College Management</div>
         <div className='flex justify-left mt-2'>
           <button
@@ -719,16 +724,10 @@ export default function CollegeForm() {
                 <div className='md:col-span-2'>
                   <label className='block mb-2'>Content</label>
 
-                  <CKEditor
-                    editor={ClassicEditor}
-                    data={getValues('content') || ''}
-                    config={{
-                      licenseKey: process.env.ckeditor
-                    }}
-                    onChange={(_, editor) => {
-                      const content = editor.getData()
-                      setValue('content', content)
-                    }}
+                  <CKEditor4
+                    id='editor-content'
+                    initialData={getValues('content')}
+                    onChange={(data) => setValue('content', data)}
                   />
                 </div>
               </div>
@@ -1038,16 +1037,15 @@ export default function CollegeForm() {
                   </div>
                   <div className='md:col-span-2'>
                     <label className='block mb-2'>Description</label>
-                    <CKEditor
-                      editor={ClassicEditor}
-                      data={getValues(`admissions.${index}.description`)}
-                      config={{
-                        licenseKey: process.env.ckeditor
-                      }}
-                      onChange={(event, editor) => {
-                        const content = editor.getData()
-                        setValue(`admissions.${index}.description`, content)
-                      }}
+                    <CKEditor4
+                      key={field.id}
+                      id={`editor-description-${index}`}
+                      initialData={
+                        getValues(`admissions.${index}.description`) || ''
+                      }
+                      onChange={(data) =>
+                        setValue(`admissions.${index}.description`, data)
+                      }
                     />
                   </div>
                   {index > 0 && (
