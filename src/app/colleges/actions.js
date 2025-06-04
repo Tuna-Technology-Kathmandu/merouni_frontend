@@ -226,6 +226,7 @@ export async function searchColleges(query) {
         id: clz.id,
         name: clz.name,
         slug: clz.slugs,
+        collegeImage: clz.featured_img,
         location: `${clz.address.city}, ${clz.address.state}`,
         description: clz.description || 'No description available.',
         logo: clz.college_logo || 'default_logo.png', // Provide a fallback

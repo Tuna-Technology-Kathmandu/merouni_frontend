@@ -59,6 +59,22 @@ export const fetchAllCourse = async () => {
       `${process.env.baseUrl}${process.env.version}/program?limit=999999`
     )
     if (!response.ok) {
+      throw new Error('Failed to fetch courses')
+    }
+    const data = await response.json()
+    return data.items
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+export const fetchAllUniversity = async () => {
+  try {
+    const response = await authFetch(
+      `${process.env.baseUrl}${process.env.version}/university?limit=999999`
+    )
+    if (!response.ok) {
       throw new Error('Failed to fetch universities')
     }
     const data = await response.json()

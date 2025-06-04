@@ -2,7 +2,12 @@
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useForm, useFieldArray } from 'react-hook-form'
-import { createCollege, fetchUniversities, fetchAllCourse } from './actions'
+import {
+  createCollege,
+  fetchUniversities,
+  fetchAllCourse,
+  fetchAllUniversity
+} from './actions'
 import { useSelector } from 'react-redux'
 import FileUpload from './FileUpload'
 import Table from '@/app/components/Table'
@@ -26,6 +31,8 @@ export default function CollegeForm() {
   const [loadUni, setLoadUni] = useState(false)
   const [showUniDrop, setShowUniDrop] = useState(false)
   const [hasSelectedUni, setHasSelectedUni] = useState(false)
+
+  const [allUniversity, setAllUniversity] = useState([])
 
   //for allcourse
   const [courses, setCourses] = useState([])
@@ -185,15 +192,27 @@ export default function CollegeForm() {
     const getCourses = async () => {
       try {
         const courseList = await fetchAllCourse()
-        console.log('courseList', courseList)
         setCourses(courseList)
-        console.log(courses)
       } catch (error) {
         console.error('Error fetching courses:', error)
       }
     }
 
     getCourses()
+  }, [])
+
+  //for all fetching of university
+  useEffect(() => {
+    const getUniversities = async () => {
+      try {
+        const uniList = await fetchAllUniversity()
+        setAllUniversity(uniList)
+      } catch (error) {
+        console.error('Error all university:', error)
+      }
+    }
+
+    getUniversities()
   }, [])
 
   useEffect(() => {
@@ -403,12 +422,11 @@ export default function CollegeForm() {
 
       let collegeData = await response.json()
       collegeData = collegeData.item
-      console.log('detail', collegeData)
       // Basic Information
-      console.log('id is', collegeData.id)
       console.log('edit', collegeData)
       setValue('id', collegeData.id)
       setValue('name', collegeData.name)
+      console.log('uni name', collegeData?.university?.fullname)
 
       setValue('institute_type', collegeData.institute_type)
       setValue(
@@ -422,13 +440,26 @@ export default function CollegeForm() {
       setValue('is_featured', collegeData.isFeatured === 1)
       setValue('pinned', collegeData.pinned === 1)
       // Set university_id from university data
-
       if (collegeData.university) {
-        const universityId = universities.find(
+        setHasSelectedUni(true)
+        setUniSearch(collegeData.university.fullname)
+
+        const universityId = allUniversity.find(
           (u) => u.fullname === collegeData.university.fullname
         )?.id
+
+        console.log('uniId', universityId)
+
         if (universityId) {
-          setValue('university_id', universityId)
+          setValue('university_id', Number(universityId), {
+            shouldValidate: true,
+            shouldDirty: true
+          })
+        } else {
+          console.warn(
+            'No matching university found for:',
+            collegeData.university.fullname
+          )
         }
       }
 
@@ -542,6 +573,8 @@ export default function CollegeForm() {
       setLoading(false)
     }
   }
+
+  console.log('uniSearch', uniSearch)
 
   const handleSearch = async (query) => {
     console.log('q', query)
@@ -935,16 +968,22 @@ export default function CollegeForm() {
                 </button>
               </div>
 
-              {admissionFields.map((field, index) => (
-                <AdmissionItem
-                  key={field.id}
-                  index={index}
-                  remove={removeAdmission}
-                  register={register}
-                  setValue={setValue}
-                  getValues={getValues}
-                />
-              ))}
+              {admissionFields.map((field, index) => {
+                const courseId = getValues(`admissions.${index}.course_id`)
+                const courseTitle =
+                  courses.find((c) => c.id === courseId)?.title || ''
+                return (
+                  <AdmissionItem
+                    key={field.id}
+                    index={index}
+                    remove={removeAdmission}
+                    register={register}
+                    setValue={setValue}
+                    getValues={getValues}
+                    initialCourseTitle={courseTitle} // 🆕
+                  />
+                )
+              })}
             </div>
 
             {/* Address Section */}

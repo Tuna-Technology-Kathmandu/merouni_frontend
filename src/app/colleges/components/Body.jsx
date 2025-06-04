@@ -293,8 +293,8 @@ const CollegeFinder = () => {
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
                   {universities.map((university, index) => {
                     return (
-                      <Link href={`/colleges/${university.slug}`}>
-                        <UniversityCard key={index} {...university} />
+                      <Link key={index} href={`/colleges/${university.slug}`}>
+                        <UniversityCard {...university} />
                       </Link>
                     )
                   })}

@@ -47,6 +47,19 @@ const CollegeOverview = ({ college }) => {
     })
   }
 
+  // if all field are empty form cms, because the one and only member couldn't be deleted from cms
+  //we find validmembers which has fields, if no then never show member section
+  const validMembers = (college.collegeMembers || []).filter((member) => {
+    return (
+      member.name?.trim() ||
+      member.role?.trim() ||
+      member.contact_number?.trim() ||
+      member.description?.trim()
+    )
+  })
+
+  //do same in admission later
+
   return (
     <section className='px-[75px] max-md:px-[30px] mb-20 max-md:mb-10 flex justify-between gap-16 max-md:gap-2 w-full max-md:flex-col-reverse max-md:items-between'>
       {/* Sidebar */}
@@ -80,9 +93,11 @@ const CollegeOverview = ({ college }) => {
         <div className='min-h-[200px] w-full' ref={programsRef}>
           <ProgramSection college={college} />
         </div>
-        <div className='min-h-[200px] w-full' ref={membersRef}>
-          <MemberSection college={college} />
-        </div>
+        {validMembers.length !== 0 && (
+          <div className='min-h-[200px] w-full' ref={membersRef}>
+            <MemberSection validMembers={validMembers} />
+          </div>
+        )}
         <div className='min-h-[200px] w-full' ref={facilityRef}>
           <FacilitySection college={college} />
         </div>

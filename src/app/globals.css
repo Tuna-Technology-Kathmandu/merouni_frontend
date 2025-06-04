@@ -7,6 +7,10 @@
   border-collapse: collapse;
 }
 
+.cke_notification,
+.cke_notifications_area {
+  display: none !important;
+}
 .font-poppins {
   font-family: var(--font-poppins), sans-serif;
 }

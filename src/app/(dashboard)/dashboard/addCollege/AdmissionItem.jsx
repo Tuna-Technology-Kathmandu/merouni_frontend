@@ -7,12 +7,20 @@ const CKEditor4 = dynamic(() => import('../component/CKEditor4'), {
   ssr: false
 })
 
-const AdmissionItem = ({ index, remove, register, setValue, getValues }) => {
-  const [courseSearch, setCourseSearch] = useState('')
+const AdmissionItem = ({
+  index,
+  remove,
+  register,
+  setValue,
+  getValues,
+  initialCourseTitle
+}) => {
+  const [courseSearch, setCourseSearch] = useState(initialCourseTitle || '')
   const [debouncedCourseSearch] = useDebounce(courseSearch, 300)
   const [courses, setCourses] = useState([])
   const [showCourseDrop, setShowCourseDrop] = useState(false)
-  const [hasSelectedCourse, setHasSelectedCourse] = useState(false)
+  const [hasSelectedCourse, setHasSelectedCourse] =
+    useState(!!initialCourseTitle)
   const [loadingCourses, setLoadingCourses] = useState(false)
 
   useEffect(() => {
@@ -31,7 +39,7 @@ const AdmissionItem = ({ index, remove, register, setValue, getValues }) => {
       }
     }
 
-    if (debouncedCourseSearch) {
+    if (debouncedCourseSearch && !hasSelectedCourse) {
       fetchCourses()
     } else {
       setShowCourseDrop(false)
