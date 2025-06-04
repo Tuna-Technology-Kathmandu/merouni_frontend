@@ -1,35 +1,6 @@
 import React from 'react'
-import Image from 'next/image'
 
-const GallerySection = () => {
-  const college = {
-    collegeGallery: [
-      {
-        img_url:
-          'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996'
-      },
-      {
-        img_url:
-          'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996'
-      },
-      {
-        img_url:
-          'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996'
-      },
-      {
-        img_url:
-          'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996'
-      },
-      {
-        img_url:
-          'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996'
-      },
-      {
-        img_url:
-          'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996'
-      }
-    ]
-  }
+const GallerySection = ({ college }) => {
   return (
     <div>
       <h2 className='text-sm md:text-lg lg:text-xl font-bold'>Gallery</h2>

@@ -1,8 +1,8 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useForm, useFieldArray } from 'react-hook-form'
-import { createCollege, fetchCourse, fetchUniversities } from './actions'
+import { createCollege, fetchUniversities, fetchAllCourse } from './actions'
 import { useSelector } from 'react-redux'
 import FileUpload from './FileUpload'
 import Table from '@/app/components/Table'
@@ -11,6 +11,7 @@ import { Edit2, Trash2 } from 'lucide-react'
 import { Globe, MapPin } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
+import AdmissionItem from './AdmissionItem'
 import ConfirmationDialog from './ConfirmationDialog'
 const CKEditor4 = dynamic(() => import('../component/CKEditor4'), {
   ssr: false
@@ -26,19 +27,10 @@ export default function CollegeForm() {
   const [showUniDrop, setShowUniDrop] = useState(false)
   const [hasSelectedUni, setHasSelectedUni] = useState(false)
 
-  //for course in college
-  const [courseSearch, setCourseSearch] = useState('')
-  const [debouncedCourse] = useDebounce(courseSearch, 300)
+  //for allcourse
   const [courses, setCourses] = useState([])
-  const [hasSelectedCourse, setHasSelectedCourse] = useState(false)
-
-  //for admission course
-  const [adCourseSearch, setAdCourseSearch] = useState('')
-  const [adDebouncedCourse] = useDebounce(adCourseSearch, 300)
-  const [adCourses, setAdCourses] = useState([])
-  const [showAdCourseDrop, setShowAdCourseDrop] = useState(false)
-  const [hasAdSelectedCourse, setHasAdSelectedCourse] = useState(false)
-  const [loadAdCourse, setLoadAdCourse] = useState(false)
+  const [courseSearch, setCourseSearch] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   const [uploadedFiles, setUploadedFiles] = useState({
     logo: '',
@@ -129,18 +121,17 @@ export default function CollegeForm() {
   } = useFieldArray({ control, name: 'images' })
 
   const onSubmit = async (data) => {
-    console.log('click')
-
     try {
+      setSubmitting(true)
       data.is_featured = +data.is_featured
       data.pinned = +data.pinned
       data.university_id = parseInt(data.university_id)
       data.courses = data.courses.map((course) => parseInt(course))
 
-      // // Ensure all image URLs are included
-      // data.college_logo = uploadedFiles.logo
-      // data.featured_img = uploadedFiles.featured
-      // data.images = uploadedFiles.additional.filter((url) => url)
+      //Ensure all image URLs are included
+      data.college_logo = uploadedFiles.logo
+      data.featured_img = uploadedFiles.featured
+      data.images = uploadedFiles.additional.filter((url) => url)
 
       console.log('final data is', data)
       await createCollege(data)
@@ -155,8 +146,11 @@ export default function CollegeForm() {
         featured: '',
         additional: []
       })
+      setUniSearch('')
     } catch (error) {
       toast.error(error.message || 'Failed to create college')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -182,13 +176,15 @@ export default function CollegeForm() {
     }
   }, [debouncedUni])
 
-  //for add college fro course
+  //search college
+  const filteredCourses = courses.filter((course) =>
+    course.title.toLowerCase().includes(courseSearch.toLowerCase())
+  )
+  //for all fetching of college
   useEffect(() => {
-    if (hasSelectedCourse) return
-
     const getCourses = async () => {
       try {
-        const courseList = await fetchCourse(debouncedCourse)
+        const courseList = await fetchAllCourse()
         console.log('courseList', courseList)
         setCourses(courseList)
         console.log(courses)
@@ -198,29 +194,7 @@ export default function CollegeForm() {
     }
 
     getCourses()
-  }, [debouncedCourse])
-
-  //for course in admission section
-  useEffect(() => {
-    if (hasAdSelectedCourse) return
-
-    const getCourses = async () => {
-      setLoadAdCourse(true)
-      try {
-        const courseList = await fetchCourse(adDebouncedCourse)
-        setAdCourses(courseList)
-        setShowAdCourseDrop(true)
-        setLoadAdCourse(false)
-      } catch (error) {
-        console.error('Error fetching courses:', error)
-      }
-    }
-    if (adDebouncedCourse !== '') {
-      getCourses()
-    } else {
-      setShowAdCourseDrop(false)
-    }
-  }, [adDebouncedCourse])
+  }, [])
 
   useEffect(() => {
     const loadColleges = async () => {
@@ -432,6 +406,7 @@ export default function CollegeForm() {
       console.log('detail', collegeData)
       // Basic Information
       console.log('id is', collegeData.id)
+      console.log('edit', collegeData)
       setValue('id', collegeData.id)
       setValue('name', collegeData.name)
 
@@ -464,7 +439,6 @@ export default function CollegeForm() {
         (course) => courses.find((c) => c.title === course.program.title)?.id
       )
 
-      console.log(courseIds)
       setValue('courses', courseIds || [])
       courseIds?.forEach((id) => {
         const checkbox = document.querySelector(
@@ -494,14 +468,15 @@ export default function CollegeForm() {
 
       // Images
 
+      const additionalImages =
+        collegeData.collegeGallery?.map((img) => img.img_url) || []
+
+      setValue('images', additionalImages.length ? additionalImages : [''])
       setUploadedFiles({
         logo: collegeData.college_logo || '',
         featured: collegeData.featured_img || '',
-        additional: collegeData.collegeGallery?.map((img) => img.img_url) || [
-          ''
-        ]
+        additional: additionalImages
       })
-
       const memberData = collegeData.collegeMembers?.length
         ? collegeData.collegeMembers
         : [
@@ -600,6 +575,8 @@ export default function CollegeForm() {
       setColleges([])
     }
   }
+
+  console.log('state', uploadedFiles)
 
   return (
     <>
@@ -736,21 +713,19 @@ export default function CollegeForm() {
             {/* Courses Section */}
 
             <div className='bg-white p-6 rounded-lg shadow-md'>
-              <div className='mb-7'>
-                <h2 className='text-xl font-semibold mb-4'>Courses</h2>
+              <div className='flex justify-between items-center mb-4'>
+                <h2 className='text-xl font-semibold'>Courses</h2>
                 <input
                   type='text'
-                  className='w-full p-2 border rounded'
+                  placeholder='Search courses'
+                  className='border p-2 rounded w-60'
                   value={courseSearch}
-                  onChange={(e) => {
-                    setCourseSearch(e.target.value)
-                    setHasSelectedCourse(false)
-                  }}
-                  placeholder='Search Course/Program'
+                  onChange={(e) => setCourseSearch(e.target.value)}
                 />
               </div>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                {courses.map((course) => (
+
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-scroll'>
+                {filteredCourses.map((course) => (
                   <label key={course.id} className='flex items-center'>
                     <input
                       type='checkbox'
@@ -761,6 +736,11 @@ export default function CollegeForm() {
                     {course.title}
                   </label>
                 ))}
+                {filteredCourses.length === 0 && (
+                  <p className='text-gray-500 col-span-full'>
+                    No matching courses found.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -807,9 +787,9 @@ export default function CollegeForm() {
                 </div>
               </div>
 
-              <div className='mt-4'>
+              <div className='mt-7'>
                 <div className='flex justify-between items-center mb-4'>
-                  <label className='block'>Additional Images</label>
+                  <label className='block text-xl font-semibold'>Gallery</label>
                   <button
                     type='button'
                     onClick={() => {
@@ -824,22 +804,22 @@ export default function CollegeForm() {
                     Add Image
                   </button>
                 </div>
-                {imageFields.map((field, index) => (
-                  <div key={field.id} className='mb-4'>
-                    <FileUpload
-                      label={`Additional Image ${index + 1}`}
-                      onUploadComplete={(url) => {
-                        const newAdditional = [...uploadedFiles.additional]
-                        newAdditional[index] = url
-                        setUploadedFiles((prev) => ({
-                          ...prev,
-                          additional: newAdditional
-                        }))
-                        setValue(`images.${index}`, url)
-                      }}
-                      defaultPreview={uploadedFiles.additional[index]}
-                    />
-                    {index > 0 && (
+                <div className='w-full grid grid-cols-3 gap-7'>
+                  {imageFields.map((field, index) => (
+                    <div key={field.id} className='mb-4'>
+                      <FileUpload
+                        label={`Additional Image ${index + 1}`}
+                        onUploadComplete={(url) => {
+                          const newAdditional = [...uploadedFiles.additional]
+                          newAdditional[index] = url
+                          setUploadedFiles((prev) => ({
+                            ...prev,
+                            additional: newAdditional
+                          }))
+                          setValue(`images.${index}`, url)
+                        }}
+                        defaultPreview={uploadedFiles.additional[index]}
+                      />
                       <button
                         type='button'
                         onClick={() => {
@@ -855,9 +835,9 @@ export default function CollegeForm() {
                       >
                         Remove
                       </button>
-                    )}
-                  </div>
-                ))}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -956,108 +936,14 @@ export default function CollegeForm() {
               </div>
 
               {admissionFields.map((field, index) => (
-                <div
+                <AdmissionItem
                   key={field.id}
-                  className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border rounded'
-                >
-                  <div className='relative'>
-                    <label className='block mb-2'>Course *</label>
-
-                    <input
-                      type='text'
-                      className='w-full p-2 border rounded'
-                      value={adCourseSearch}
-                      onChange={(e) => {
-                        setAdCourseSearch(e.target.value)
-                        setHasAdSelectedCourse(false)
-                      }}
-                      placeholder='Search Course'
-                    />
-
-                    {/* Hidden input for react-hook-form binding */}
-                    <input
-                      type='hidden'
-                      {...register(`admissions.${index}.course_id`, {
-                        required: true
-                      })}
-                    />
-
-                    {loadAdCourse ? (
-                      <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
-                        Loading...
-                      </div>
-                    ) : showAdCourseDrop ? (
-                      adCourses.length > 0 ? (
-                        <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
-                          {adCourses.map((course) => (
-                            <li
-                              key={course.id}
-                              className='p-2 cursor-pointer hover:bg-gray-100'
-                              onClick={() => {
-                                setValue(
-                                  `admissions.${index}.course_id`,
-                                  Number(course.id)
-                                )
-                                setAdCourseSearch(course.title)
-                                setShowAdCourseDrop(false)
-                                setHasAdSelectedCourse(true)
-                              }}
-                            >
-                              {course.title}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
-                          No courses found.
-                        </div>
-                      )
-                    ) : null}
-                  </div>
-                  <div>
-                    <label className='block mb-2'>Eligibility Criteria</label>
-                    <input
-                      {...register(`admissions.${index}.eligibility_criteria`)}
-                      className='w-full p-2 border rounded'
-                    />
-                  </div>
-                  <div>
-                    <label className='block mb-2'>Admission Process</label>
-                    <input
-                      {...register(`admissions.${index}.admission_process`)}
-                      className='w-full p-2 border rounded'
-                    />
-                  </div>
-                  <div>
-                    <label className='block mb-2'>Fee Details</label>
-                    <input
-                      {...register(`admissions.${index}.fee_details`)}
-                      className='w-full p-2 border rounded'
-                    />
-                  </div>
-                  <div className='md:col-span-2'>
-                    <label className='block mb-2'>Description</label>
-                    <CKEditor4
-                      key={field.id}
-                      id={`editor-description-${index}`}
-                      initialData={
-                        getValues(`admissions.${index}.description`) || ''
-                      }
-                      onChange={(data) =>
-                        setValue(`admissions.${index}.description`, data)
-                      }
-                    />
-                  </div>
-                  {index > 0 && (
-                    <button
-                      type='button'
-                      onClick={() => removeAdmission(index)}
-                      className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600'
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
+                  index={index}
+                  remove={removeAdmission}
+                  register={register}
+                  setValue={setValue}
+                  getValues={getValues}
+                />
               ))}
             </div>
 
@@ -1148,7 +1034,13 @@ export default function CollegeForm() {
               type='submit'
               className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors'
             >
-              {editing ? 'Update College' : 'Create College'}
+              {submitting
+                ? editing
+                  ? 'Updating...'
+                  : 'Creating...'
+                : editing
+                  ? 'Update College'
+                  : 'Create College'}
             </button>
           </form>
         </div>
