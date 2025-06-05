@@ -128,6 +128,16 @@ export default function CollegeForm() {
   } = useFieldArray({ control, name: 'images' })
 
   const onSubmit = async (data) => {
+    console.log('admission', data.admissions)
+
+    data.admissions = data.admissions.filter((admission) => {
+      // Remove admission if all fields are empty or whitespace
+      return Object.values(admission).some((val) => {
+        if (typeof val === 'string') return val.trim() !== ''
+        return val !== null && val !== undefined
+      })
+    })
+
     try {
       setSubmitting(true)
       data.is_featured = +data.is_featured
@@ -608,8 +618,6 @@ export default function CollegeForm() {
       setColleges([])
     }
   }
-
-  console.log('state', uploadedFiles)
 
   return (
     <>

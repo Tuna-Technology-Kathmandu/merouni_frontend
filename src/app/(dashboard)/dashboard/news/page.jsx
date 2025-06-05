@@ -1,5 +1,5 @@
 'use client'
-
+import dynamic from 'next/dynamic'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { fetchNews, fetchTags } from './action'
@@ -13,8 +13,9 @@ import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+const CKEditor4 = dynamic(() => import('../component/CKEditor4'), {
+  ssr: false
+})
 
 export default function NewsManager() {
   const author_id = useSelector((state) => state.user.data.id)
@@ -63,6 +64,12 @@ export default function NewsManager() {
   })
 
   const content = watch('content')
+
+  const initialContent = useRef('')
+
+  useEffect(() => {
+    initialContent.current = watch('content')
+  }, [])
 
   const columns = useMemo(
     () => [
@@ -264,6 +271,8 @@ export default function NewsManager() {
       setLoading(false)
     }
   }
+
+  console.log('news', news)
 
   const createNews = async (data) => {
     try {
@@ -598,15 +607,11 @@ export default function NewsManager() {
 
         <div className='mb-4'>
           <label htmlFor='content'>Content</label>
-          <CKEditor
-            editor={ClassicEditor}
-            data=''
-            config={{
-              licenseKey: process.env.ckeditor
-            }}
-            onChange={(event, editor) => {
-              setValue(editor.getData())
-            }}
+
+          <CKEditor4
+            id='editor-content'
+            initialData={initialContent.current} // Set only once
+            onChange={(data) => setValue('content', data)}
           />
         </div>
 

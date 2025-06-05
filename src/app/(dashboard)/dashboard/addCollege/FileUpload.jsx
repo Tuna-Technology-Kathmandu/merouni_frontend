@@ -58,6 +58,7 @@ const FileUpload = ({ onUploadComplete, label, defaultPreview = null }) => {
 
       if (error.response) {
         toast.error(error.response.data?.message || 'Upload failed.')
+        setPreview(defaultPreview)
       } else if (error.request) {
         toast.error('No response from server.')
       } else {

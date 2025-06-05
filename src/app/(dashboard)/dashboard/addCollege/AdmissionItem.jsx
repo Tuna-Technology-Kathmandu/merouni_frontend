@@ -55,18 +55,18 @@ const AdmissionItem = ({
           className='w-full p-2 border rounded'
           value={courseSearch}
           onChange={(e) => {
-            setCourseSearch(e.target.value)
+            const val = e.target.value
+            setCourseSearch(val)
             setHasSelectedCourse(false)
+
+            if (val.trim() === '') {
+              setValue(`admissions.${index}.course_id`, '')
+            }
           }}
           placeholder='Search Course'
         />
 
-        <input
-          type='hidden'
-          {...register(`admissions.${index}.course_id`, {
-            required: true
-          })}
-        />
+        <input type='hidden' {...register(`admissions.${index}.course_id`)} />
 
         {loadingCourses ? (
           <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>

@@ -16,7 +16,7 @@ const FeaturedBlogs = () => {
   const [Blogs, setBlogs] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const category_title = 'News'
+  const category_title = ''
 
   useEffect(() => {
     loadPageNumber(pagination.currentPage)

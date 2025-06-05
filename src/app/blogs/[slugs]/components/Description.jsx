@@ -9,7 +9,12 @@ const Description = ({ news }) => {
     <>
       <div className='p-4 flex md:max-w-[1600px] md:mx-auto  items-center md:leading-[200px]'>
         <div className='mb-6'>
-          <div className='text-xl font-bold'>Content</div>
+          <div className='text-xl font-bold'>Description</div>
+          <div
+            className='text-base mt-4 leading-8'
+            dangerouslySetInnerHTML={{ __html: news?.description }}
+          />
+
           <div
             className='text-base mt-4 leading-8'
             dangerouslySetInnerHTML={{ __html: news?.content }}

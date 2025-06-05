@@ -12,7 +12,7 @@ const Blogs = () => {
       <Navbar />
       <div>
         <>
-          <Latest />
+          {/* <Latest /> */}
           <FeaturedBlogs />
         </>
       </div>
