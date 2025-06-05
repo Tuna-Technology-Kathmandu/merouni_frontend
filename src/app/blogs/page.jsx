@@ -10,11 +10,9 @@ const Blogs = () => {
     <>
       <Header />
       <Navbar />
-      <div>
-        <>
-          {/* <Latest /> */}
-          <FeaturedBlogs />
-        </>
+      <Latest />
+      <div className='px-4 py-4'>
+        <FeaturedBlogs />
       </div>
       <Footer />
     </>

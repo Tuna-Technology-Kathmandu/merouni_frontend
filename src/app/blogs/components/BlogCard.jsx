@@ -57,8 +57,8 @@ const BlogCard = ({ image, date, title, description, slug }) => {
     })
   }
   return (
-    <div className='md:min-w-[350px] md:max-w-[350px] my-2 bg-white rounded-2xl shadow-md border border-gray-300 mb-10'>
-      <div className='h-[200px] relative'>
+    <div className=' my-2 bg-white rounded-2xl shadow-md border border-gray-300 hover:-translate-y-2 transition-all duration-300 ease-in-out '>
+      <div className='h-[170px] relative'>
         <img
           src={image}
           alt={`${title} logo`}
@@ -69,14 +69,14 @@ const BlogCard = ({ image, date, title, description, slug }) => {
       {/* Content Section */}
       <div className='p-4'>
         {/* Date */}
-        <p className='text-gray-600 mb-2'>{date}</p>
+        <p className='text-gray-600 mb-1 text-[13px]'>{date}</p>
 
         {/* Title */}
-        <h2 className='text-2xl font-bold text-gray-900 mb-3'>{title}</h2>
+        <h2 className='text-lg font-bold text-gray-900 mb-2'>{title}</h2>
 
         {/* Description */}
         <div
-          className='text-gray-600 text-sm mb-4'
+          className='text-gray-600 text-[13px] mb-4'
           style={{ minHeight: '60px' }} // Ensures consistent height
         >
           {description}

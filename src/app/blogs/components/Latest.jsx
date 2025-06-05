@@ -13,8 +13,6 @@ const Latest = () => {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
   const page = 1
-  const is_featured = 1
-  const category_title = 'News'
 
   const scrollLeft = () => {
     scrollRef.current.scrollBy({ left: -300, behavior: 'smooth' })
@@ -32,7 +30,7 @@ const Latest = () => {
     setLoading(true)
     setError(null)
     try {
-      const response = await getBlogs(page, category_title, is_featured)
+      const response = await getBlogs(page)
       setBlogs(response.items)
       console.log('featued', response.items)
     } catch (error) {
@@ -63,15 +61,15 @@ const Latest = () => {
   }
 
   return (
-    <div className='bg-[#F1F1F1]'>
+    <div className='bg-[#F1F1F1] w-full h-[500px] max-md:h-[480px] relative'>
       <div className='flex flex-col max-w-[1600px] mx-auto px-4 sm:px-8'>
-        <div className='border-b-2 border-[#0A70A7] w-[45px] mt-10'>
+        <div className='border-b-2 border-[#0A70A7] w-[45px] mt-10 mb-7'>
           <span className='text-2xl font-bold mr-2'>Latest</span>
           <span className='text-[#0A70A7] text-2xl font-bold'>Blogs</span>
         </div>
 
         {loading ? (
-          <div className='relative mb-10'>
+          <div className=' mb-10'>
             <div className='flex overflow-x-auto scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200 p-2'>
               {[...Array(4)].map((_, i) => (
                 <LatestBlogsShimmer key={i} />
@@ -79,16 +77,16 @@ const Latest = () => {
             </div>
           </div>
         ) : (
-          <div className='relative mb-10'>
+          <div className=' mb-10'>
             <button
               onClick={scrollLeft}
-              className='absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-200 hover:bg-gray-300 p-2 rounded-full shadow-md z-10'
+              className='absolute right-24 bottom-7  bg-gray-300 hover:bg-gray-300 p-2 rounded-full shadow-md z-10'
             >
               <GoArrowLeft />
             </button>
             <button
               onClick={scrollRight}
-              className='absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-200 hover:bg-gray-300 p-2 rounded-full shadow-md z-10'
+              className='absolute right-10 bottom-7 bg-gray-300 hover:bg-gray-300 p-2 rounded-full shadow-md z-10'
             >
               <GoArrowRight />
             </button>
@@ -104,8 +102,7 @@ const Latest = () => {
                       title={truncateString(blog.title, 30)}
                       description={truncateString(blog.description, 100)}
                       image={
-                        blog?.featuredImage ||
-                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ718nztPNJfCbDJjZG8fOkejBnBAeQw5eAUA&s'
+                        blog?.featuredImage || 'https://placehold.co/600x400'
                       } // Use blog.image if available
                       date={formatDate(blog.createdAt)}
                     />
