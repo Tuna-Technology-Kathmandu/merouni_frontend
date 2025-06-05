@@ -275,7 +275,8 @@ export default function NewsManager() {
       // Send tags directly as an array of numbers
       const formattedData = {
         ...data,
-        tags: selectedTags.map((tag) => tag.id), // Convert selected tags to array of IDs
+        category: Number(data.category), // 🛠️ Coerce category to number
+        tags: selectedTags.map((tag) => Number(tag.id)), // 🛠️ Ensure numeric IDs
         featuredImage: uploadedFiles.featuredImage
       }
 
@@ -304,10 +305,10 @@ export default function NewsManager() {
       // Send tags directly as an array of numbers
       const formattedData = {
         ...data,
-        tags: selectedTags.map((tag) => tag.id), // Convert selected tags to array of IDs
+        category: Number(data.category), // 🛠️ Coerce category to number
+        tags: selectedTags.map((tag) => Number(tag.id)), // 🛠️ Ensure numeric IDs
         featuredImage: uploadedFiles.featuredImage
       }
-
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/blogs?id=${id}`,
         {
