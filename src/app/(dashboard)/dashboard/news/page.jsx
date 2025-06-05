@@ -13,7 +13,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-const CKEditor4 = dynamic(() => import('../component/CKEditor4'), {
+const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
 
@@ -47,6 +47,7 @@ export default function NewsManager() {
     handleSubmit,
     reset,
     setValue,
+    getValues,
     watch,
     formState: { errors }
   } = useForm({
@@ -63,13 +64,8 @@ export default function NewsManager() {
     }
   })
 
-  const content = watch('content')
-
-  const initialContent = useRef('')
-
-  useEffect(() => {
-    initialContent.current = watch('content')
-  }, [])
+  const editorRef = useRef(null)
+  const hasSetContent = useRef(false)
 
   const columns = useMemo(
     () => [
@@ -333,6 +329,7 @@ export default function NewsManager() {
   }
 
   const handleEdit = async (blog) => {
+    hasSetContent.current = false
     setEditingId(blog.id)
 
     // Attempt to parse blog.tags if it's a string
@@ -390,6 +387,7 @@ export default function NewsManager() {
       'tags',
       existingTags.map((tag) => tag.id)
     )
+    setValue('content', blog.content)
 
     // Populate other form fields from blog
     Object.keys(blog).forEach((key) => {
@@ -608,10 +606,10 @@ export default function NewsManager() {
         <div className='mb-4'>
           <label htmlFor='content'>Content</label>
 
-          <CKEditor4
-            id='editor-content'
-            initialData={initialContent.current} // Set only once
+          <CKBlogs
+            initialData={getValues('content')}
             onChange={(data) => setValue('content', data)}
+            id='editor1'
           />
         </div>
 

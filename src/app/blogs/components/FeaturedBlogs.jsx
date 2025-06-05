@@ -96,7 +96,7 @@ const FeaturedBlogs = () => {
                   <BlogCard
                     date={formatDate(blog.createdAt)}
                     description={truncateString(blog.description, 100)}
-                    image='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ718nztPNJfCbDJjZG8fOkejBnBAeQw5eAUA&s'
+                    image={blog.featuredImage || 'https://placehold.co/600x400'}
                     title={truncateString(blog.title, 20)}
                     slug={blog.slug}
                   />

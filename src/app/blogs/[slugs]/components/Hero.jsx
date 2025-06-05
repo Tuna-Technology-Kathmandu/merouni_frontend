@@ -34,7 +34,7 @@ const Hero = ({ news }) => {
   return (
     <div className='relative'>
       <img
-        src={'/images/eventsdesc.png'}
+        src={news.featuredImage || 'https://placehold.co/600x400'}
         alt={news.title || 'News'}
         layout='fill'
         objectFit='cover'
