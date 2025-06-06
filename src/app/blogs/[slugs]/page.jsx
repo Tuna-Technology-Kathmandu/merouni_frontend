@@ -58,8 +58,10 @@ const NewsDetailsPage = ({ params }) => {
       ) : (
         <>
           <Hero news={news} />
-          <Description news={news} />
-          <Cardlist news={relatedNews} />
+          <div className='p-12 px-18 flex w-full gap-16'>
+            <Description news={news} />
+            {/* <Cardlist news={relatedNews} /> */}
+          </div>
         </>
       )}
 

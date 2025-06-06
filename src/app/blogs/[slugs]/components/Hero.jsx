@@ -1,6 +1,4 @@
 import React from 'react'
-import { FiMapPin } from 'react-icons/fi'
-import Image from 'next/image'
 
 const Hero = ({ news }) => {
   const handleShare = (platform) => {
@@ -33,50 +31,51 @@ const Hero = ({ news }) => {
 
   return (
     <div className='relative'>
-      <img
-        src={news.featuredImage || 'https://placehold.co/600x400'}
-        alt={news.title || 'News'}
-        layout='fill'
-        objectFit='cover'
-        className='w-full h-[50vh] md:h-[70vh]'
-      />
+      <div className='w-full h-[250px] sm:h-[400px] md:h-[480px]'>
+        <img
+          src={news.featuredImage || 'https://placehold.co/600x400'}
+          alt={news.title || 'News'}
+          className='w-full h-full'
+        />
 
-      <div className='absolute top-3/4 left-4 md:left-36 transform -translate-y-1/2 text-white text-3xl md:text-4xl font-extrabold max-w-full px-4'>
-        <div className='text-4xl md:text-5xl'>{news.title.split(':')[0]}</div>
-        <div className='text-5xl md:text-6xl my-2'>
-          {news.title.split(':')[1] || ''}
-        </div>
-        <div className='font-medium text-sm my-6'>
-          By - {news.newsAuthor.firstName} {news.newsAuthor.middleName || ''}{' '}
-          {news.newsAuthor.lastName}
+        <div className='absolute bg-black/40 w-full h-full inset-0 '></div>
+
+        <div className='absolute left-5 md:left-10 lg:left-20 bottom-[20%] text-white w-[15rem] min-[433px]:w-[20rem] sm:w-[30rem] lg:w-[50rem] md:w-[40rem] font-bold  px-4'>
+          <p className='text-lg leading-1 md:text-3xl lg:text-4xl '>
+            {news.title}
+          </p>
+          <div className='font-medium text-xs my-2'>
+            - {news.newsAuthor.firstName} {news.newsAuthor.middleName || ''}{' '}
+            {news.newsAuthor.lastName}
+          </div>
         </div>
       </div>
 
       {/* Social share icons remain the same */}
-      <div className='fixed md:left-8 right-2 md:right-auto top-[30%] md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col space-y-4 text-[#b0b2c3] z-10'>
+      <div className='space-y-4 text-[#b0b2c3] fixed left-4 top-[30%] lg:block md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col'>
         <div className='text-black font-bold text-sm'>Share</div>
         <img
           src='/images/fb.png'
           alt='Facebook'
-          className='w-6 cursor-pointer'
+          className='w-6 cursor-pointer mx-auto'
           onClick={() => handleShare('facebook')}
         />
         <img
           src='/images/insta.png'
           alt='Instagram'
-          className='w-6 cursor-pointer'
+          className='w-6 cursor-pointer mx-auto'
           onClick={() => handleShare('instagram')}
         />
         <img
           src='/images/linkedin.png'
           alt='LinkedIn'
-          className='w-6 cursor-pointer'
+          className='w-6 cursor-pointer mx-auto'
           onClick={() => handleShare('linkedin')}
         />
         <img
           src='/images/twitter.png'
           alt='Twitter'
-          className='w-6 cursor-pointer'
+          className='w-6 cursor-pointer mx-auto'
           onClick={() => handleShare('twitter')}
         />
       </div>

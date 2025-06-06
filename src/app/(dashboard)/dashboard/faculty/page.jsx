@@ -6,17 +6,22 @@ import {
   updateFaculty,
   deleteFaculty
 } from './action'
+// import dynamic from 'next/dynamic'
 import { useSelector } from 'react-redux'
 import Loader from '@/app/components/Loading'
 import Table from '../../../components/Table' // Adjust the import path as needed
 import { Edit2, Trash2 } from 'lucide-react' // For action icons
 import { authFetch } from '@/app/utils/authFetch'
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+import { toast } from 'react-toastify'
+
+// const CKEditor4 = dynamic(() => import('../component/CKEditor4'), {
+//   ssr: false
+// })
 
 export default function FacultyManager() {
   const [faculties, setFaculties] = useState([])
   const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
     description: ''
@@ -101,6 +106,7 @@ export default function FacultyManager() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      setSubmitting(true)
       const requestData = { ...formData, author: author_id }
 
       if (editingId) {
@@ -112,8 +118,12 @@ export default function FacultyManager() {
       setFormData({ title: '', description: '' })
       setEditingId(null)
       loadFaculties()
+      setSubmitting(false)
+      toast.success('Successfully completed')
     } catch (error) {
-      console.error('Error saving faculty:', error)
+      toast.error(error.message || 'Failed to create college')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -164,6 +174,16 @@ export default function FacultyManager() {
       setFaculties([])
     }
   }
+
+  // const MemoizedCKEditor4 = useMemo(() => (
+  //   <CKEditor4
+  //     id="editor-content"
+  //     initialData={formData.description}
+  //     onChange={(data) =>
+  //       setFormData((prevData) => ({ ...prevData, description: data }))
+  //     }
+  //   />
+  // ), [])
   if (loading)
     return (
       <div className='mx-auto'>
@@ -190,23 +210,29 @@ export default function FacultyManager() {
           />
         </div>
         <div className='mb-4'>
-          <CKEditor
-            editor={ClassicEditor}
-            data={formData.description}
-            config={{
-              licenseKey: process.env.ckeditor
-            }}
-            onChange={(event, editor) => {
-              const content = editor.getData()
-              setFormData({ ...formData, description: content })
-            }}
+          {/* {MemoizedCKEditor4} */}
+
+          <textarea
+            placeholder='Faculty Description'
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+            className='w-full p-2 border rounded min-h-[150px]'
+            rows={6}
           />
         </div>
         <button
           type='submit'
           className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
         >
-          {editingId ? 'Update Faculty' : 'Add Faculty'}
+          {submitting
+            ? editingId
+              ? 'Updating...'
+              : 'Adding...'
+            : editingId
+              ? 'Update'
+              : 'Add Faculty'}
         </button>
       </form>
 

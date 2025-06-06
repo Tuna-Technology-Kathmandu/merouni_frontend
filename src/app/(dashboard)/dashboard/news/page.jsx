@@ -275,8 +275,8 @@ export default function NewsManager() {
       // Send tags directly as an array of numbers
       const formattedData = {
         ...data,
-        category: Number(data.category), // 🛠️ Coerce category to number
-        tags: selectedTags.map((tag) => Number(tag.id)), // 🛠️ Ensure numeric IDs
+        category: data.category,
+        tags: selectedTags.map((tag) => tag.id),
         featuredImage: uploadedFiles.featuredImage
       }
 
@@ -305,8 +305,8 @@ export default function NewsManager() {
       // Send tags directly as an array of numbers
       const formattedData = {
         ...data,
-        category: Number(data.category), // 🛠️ Coerce category to number
-        tags: selectedTags.map((tag) => Number(tag.id)), // 🛠️ Ensure numeric IDs
+        category: data.category,
+        tags: selectedTags.map((tag) => tag.id),
         featuredImage: uploadedFiles.featuredImage
       }
       const response = await authFetch(

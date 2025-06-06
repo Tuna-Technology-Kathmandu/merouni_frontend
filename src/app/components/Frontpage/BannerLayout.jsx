@@ -71,7 +71,7 @@ const BannerLayout = () => {
   return (
     // <div className="grid grid-cols-1 w-full sm-d:grid-cols-3 lg:grid-cols-3 gap-7 sm:gap-4 mb-5">
     <div className=' flex flex-col sm:flex-row gap-4 md:gap-3 lg:gap-3 justify-center sm:flex-nowrap xl:flex-nowrap'>
-      {banners.map((item, index) => (
+      {banners.map((item) => (
         <div
           key={item.id}
           className={`w-full sm:w-[350px] lg:w-[340px] xl:w-full cursor-pointer bg-slate-400 rounded-lg `}

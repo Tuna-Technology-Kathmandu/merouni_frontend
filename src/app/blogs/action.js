@@ -75,3 +75,27 @@ export async function getRelatedNews() {
     throw error
   }
 }
+
+export async function getBanner(page = 1, limit = 3) {
+  try {
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/banner?page=${page}&limit=${limit}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        cache: 'no-store'
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch banners')
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error('Error fetching banners:', error)
+    throw error
+  }
+}

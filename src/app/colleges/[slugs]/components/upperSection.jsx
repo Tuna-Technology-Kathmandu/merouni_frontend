@@ -1,5 +1,4 @@
 import React from 'react'
-import Image from 'next/image'
 import { IoIosGlobe } from 'react-icons/io'
 import { PiLineVerticalThin } from 'react-icons/pi'
 import { FaUniversity, FaPhoneAlt } from 'react-icons/fa'

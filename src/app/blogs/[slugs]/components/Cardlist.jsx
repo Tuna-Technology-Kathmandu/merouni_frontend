@@ -1,6 +1,7 @@
 import React from 'react'
-import BlogCard from './Cards' // Import the EventCard component
 import Link from 'next/link'
+import RelatedCard from './RelatedCard'
+import Banner from './Banner'
 
 const Cardlist = ({ news }) => {
   console.log('Blogs obtained after passing :', news)
@@ -17,16 +18,14 @@ const Cardlist = ({ news }) => {
   }
 
   return (
-    <div className='px-4 py-8 bg-[#E7E7E7] p-8 mt-20 rounded-md'>
-      <div className='max-w-[1600px] mx-auto'>
-        <div className='text-xl md:text-2xl font-semibold mb-6 text-center md:text-start'>
-          Other blogs you may like
-        </div>
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+    <div className='flex gap-5'>
+      <div>
+        <h1 className='text-xl font-bold'>Related Blogs</h1>
+        <div className='flex flex-col gap-1'>
           {news.map((blog) => (
             <Link href={`/blogs/${blog.slug}`} key={blog.id}>
-              <BlogCard
-                image={'/images/eventsdesc.png' || blog.featuredImage}
+              <RelatedCard
+                image={blog.featuredImage || 'https://placehold.co/600x400'}
                 date={formatDate(blog.createdAt)}
                 description={truncateString(blog.description, 100)}
                 title={truncateString(blog.title, 20)}
@@ -37,6 +36,7 @@ const Cardlist = ({ news }) => {
           ))}
         </div>
       </div>
+      <Banner />
     </div>
   )
 }
