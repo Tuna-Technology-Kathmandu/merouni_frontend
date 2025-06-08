@@ -11,7 +11,7 @@ const RelatedCard = ({ image, date, title, description, slug }) => {
     })
   }
   return (
-    <div className='relative my-2 bg-white rounded-2xl shadow-md border border-gray-300 w-[270px] h-[300px]'>
+    <div className='relative my-2 bg-white rounded-2xl shadow-md border border-gray-300 w-[270px] max-[1016px]:w-[250px] h-[300px] max-[1016px]:h-[290px]'>
       <div className='h-[170px] relative'>
         <img
           src={image}
@@ -30,7 +30,7 @@ const RelatedCard = ({ image, date, title, description, slug }) => {
 
         {/* Description */}
         <div
-          className='text-gray-600 text-[13px] mb-4'
+          className='text-gray-600 text-[13px] mb-4 max-[1016px]:text-xs'
           style={{ minHeight: '60px' }} // Ensures consistent height
         >
           {description}

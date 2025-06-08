@@ -38,8 +38,7 @@ const Hero = ({ news }) => {
           className='w-full h-full'
         />
 
-        <div className='absolute bg-black/40 w-full h-full inset-0 '></div>
-
+        <div className='absolute bg-black/50 w-full h-full inset-0 '></div>
         <div className='absolute left-5 md:left-10 lg:left-20 bottom-[20%] text-white w-[15rem] min-[433px]:w-[20rem] sm:w-[30rem] lg:w-[50rem] md:w-[40rem] font-bold  px-4'>
           <p className='text-lg leading-1 md:text-3xl lg:text-4xl '>
             {news.title}
@@ -52,7 +51,7 @@ const Hero = ({ news }) => {
       </div>
 
       {/* Social share icons remain the same */}
-      <div className='space-y-4 text-[#b0b2c3] fixed left-4 top-[30%] lg:block md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col'>
+      <div className='space-y-4 z-10 text-[#b0b2c3] fixed left-4 top-[30%] lg:block md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col'>
         <div className='text-black font-bold text-sm'>Share</div>
         <img
           src='/images/fb.png'

@@ -8,6 +8,7 @@ import Hero from './components/Hero'
 import Description from './components/Description'
 import Cardlist from './components/Cardlist'
 import Loading from '../../components/Loading'
+import SmallCardList from './components/SmallCardList'
 
 const NewsDetailsPage = ({ params }) => {
   const [news, setNews] = useState(null)
@@ -58,9 +59,12 @@ const NewsDetailsPage = ({ params }) => {
       ) : (
         <>
           <Hero news={news} />
-          <div className='p-12 px-18 flex w-full gap-16'>
+          <div className='p-12 px-18 flex w-full gap-16 max-[855px]:gap-10 max-[400px]:gap-8'>
             <Description news={news} />
-            {/* <Cardlist news={relatedNews} /> */}
+            <Cardlist news={relatedNews} />
+          </div>
+          <div className='p-12 px-18 -mt-8 hidden max-[855px]:block '>
+            <SmallCardList news={relatedNews} />
           </div>
         </>
       )}

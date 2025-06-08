@@ -15,7 +15,7 @@ const Description = ({ news }) => {
         />
 
         <div
-          className='text-[13px] md:text-sm lg:text-base mt-4 !leading-7 [&_ul]:list-disc [&_ol]:list-decimal [&_li]:ml-10 [&_li]:mb-1 [&_li]:mt-3 !max-w-none text-black'
+          className='text-[13px] md:text-sm lg:text-base mt-4 !leading-7 [&_ul]:list-disc [&_ol]:list-decimal [&_li]:ml-10 [&_li]:mb-1 [&_li]:mt-1 !max-w-none text-black'
           dangerouslySetInnerHTML={{ __html: news?.content }}
         />
       </div>
