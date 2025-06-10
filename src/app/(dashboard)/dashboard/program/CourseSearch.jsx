@@ -2,18 +2,29 @@ import { useEffect, useState } from 'react'
 import { useDebounce } from 'use-debounce'
 import { fetchCourse } from './actions'
 
-export default function CourseSearch({ value, onChange }) {
+export default function CourseSearch({ value, onChange, title }) {
   const [search, setSearch] = useState('')
   const [debouncedSearch] = useDebounce(search, 300)
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
-  const [hasSelected, setHasSelected] = useState(false)
 
+  // Set initial title only once on mount
   useEffect(() => {
-    if (hasSelected) return
+    if (title && !search) {
+      setSearch(title)
+    }
+  }, [title])
 
+  // Fetch courses based on search
+  useEffect(() => {
     const getCourses = async () => {
+      if (!debouncedSearch) {
+        setCourses([])
+        setShowDropdown(false)
+        return
+      }
+
       setLoading(true)
       try {
         const data = await fetchCourse(debouncedSearch)
@@ -26,12 +37,8 @@ export default function CourseSearch({ value, onChange }) {
       }
     }
 
-    if (debouncedSearch !== '') {
-      getCourses()
-    } else {
-      setShowDropdown(false)
-    }
-  }, [debouncedSearch, hasSelected])
+    getCourses()
+  }, [debouncedSearch])
 
   return (
     <div className='relative'>
@@ -41,7 +48,10 @@ export default function CourseSearch({ value, onChange }) {
         value={search}
         onChange={(e) => {
           setSearch(e.target.value)
-          setHasSelected(false)
+          // Clear selection if user starts typing something else
+          if (value) {
+            onChange('')
+          }
         }}
         className='w-full p-2 border rounded'
         placeholder='Search Course'
@@ -63,7 +73,6 @@ export default function CourseSearch({ value, onChange }) {
                 onChange(course.id)
                 setSearch(course.title)
                 setShowDropdown(false)
-                setHasSelected(true)
               }}
             >
               {course.title}

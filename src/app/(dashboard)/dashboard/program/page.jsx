@@ -225,6 +225,13 @@ export default function ProgramForm() {
     }
   }, [debouncedScholar])
 
+  //watch form data
+  const formData = watch()
+
+  useEffect(() => {
+    console.log('Form data:', formData)
+  }, [formData]) // Runs every time formData changes
+
   //for exams searching
   useEffect(() => {
     if (hasSelectedExam) return
@@ -281,6 +288,7 @@ export default function ProgramForm() {
   }
 
   const onSubmit = async (data) => {
+    console.log('form', data)
     try {
       const url = `${process.env.baseUrl}${process.env.version}/program`
       const method = 'POST'
@@ -305,12 +313,29 @@ export default function ProgramForm() {
       reset()
       fetchPrograms()
       setIsOpen(false)
+
+      setFacSearch('')
+      setHasSelectedFac(false)
+      setScholarSearch('')
+      setHasSelectedScholar(false)
+      setExamSearch('')
+      setHasSelectedExam(false)
+      setLevelSearch('')
+      setHasSelectedLevel(false)
     } catch (error) {
       toast.error(error.message || 'Failed to save program')
     }
   }
 
   const handleEdit = async (slug) => {
+    setFacSearch('')
+    setHasSelectedFac(false)
+    setScholarSearch('')
+    setHasSelectedScholar(false)
+    setExamSearch('')
+    setHasSelectedExam(false)
+    setLevelSearch('')
+    setHasSelectedLevel(false)
     try {
       setEditing(true)
       setLoading(true)
@@ -320,7 +345,7 @@ export default function ProgramForm() {
         `${process.env.baseUrl}${process.env.version}/program/${slug}`
       )
       const program = await response.json()
-
+      console.log('program', program)
       // Set basic information
       setValue('id', program.id)
       setValue('title', program.title)
@@ -334,42 +359,44 @@ export default function ProgramForm() {
       setValue('delivery_type', program.delivery_type)
       setValue('delivery_mode', program.delivery_mode)
       setValue('careers', program.careers)
-      setValue('syllabus', program.syllabus)
-
-      // Set faculty_id from programfaculty
-      if (program.programfaculty) {
-        const faculty = faculties.find(
-          (f) => f.title === program.programfaculty.title
-        )
-        if (faculty) {
-          setValue('faculty_id', faculty.id)
+      const enrichedSyllabus = program.syllabus.map((item) => ({
+        year: item.year,
+        semester: item.semester,
+        course_id: item.course_id,
+        course: {
+          title: item.programCourse?.title || ''
         }
+      }))
+
+      setValue('syllabus', enrichedSyllabus)
+
+      if (program.programfaculty?.title) {
+        setFacSearch(program.programfaculty.title)
+      } else {
+        setFacSearch('')
+        setHasSelectedFac(true) // Don't auto-open if there's nothing to pre-fill
       }
 
-      // Set level_id from programlevel
-      if (program.programlevel) {
-        const level = levels.find((l) => l.title === program.programlevel.title)
-        if (level) {
-          setValue('level_id', level.id)
-        }
+      if (program.programscholarship?.name) {
+        setScholarSearch(program.programscholarship.name)
+      } else {
+        setScholarSearch('')
+        setHasSelectedScholar(true)
       }
 
-      // Set scholarship_id from programscholarship
-      if (program.programscholarship) {
-        const scholarship = scholarships.find(
-          (s) => s.name === program.programscholarship.name
-        )
-        if (scholarship) {
-          setValue('scholarship_id', scholarship.id)
-        }
+      if (program.programexam?.title) {
+        setExamSearch(program.programexam.title)
+      } else {
+        setExamSearch('')
+        setHasSelectedExam(true)
       }
 
-      // Set exam_id from programexam
-      if (program.programexam) {
-        const exam = exams.find((e) => e.title === program.programexam.title)
-        if (exam) {
-          setValue('exam_id', exam.id)
-        }
+      if (program.programlevel?.title) {
+        setLevelSearch(program.programlevel.title)
+        setHasSelectedLevel(false) // allow dropdown to auto-open
+      } else {
+        setLevelSearch('')
+        setHasSelectedLevel(true) // prevent auto-opening dropdown
       }
 
       // Set colleges - extract college_ids from program_college
@@ -392,23 +419,6 @@ export default function ProgramForm() {
           collegeData.map((c) => c.id)
         )
       }
-
-      // Set syllabus
-      // if (program.syllabus) {
-      //   // Clear existing syllabus fields first
-      //   while (syllabusFields.length) {
-      //     removeSyllabus(0);
-      //   }
-
-      //   // Add new syllabus entries
-      //   program.syllabus.forEach((item, index) => {
-      //     appendSyllabus({
-      //       year: item.year,
-      //       semester: item.semester,
-      //       course_id: item.course_id,
-      //     });
-      //   });
-      // }
     } catch (error) {
       console.error('Error in handleEdit:', error)
       toast.error('Failed to fetch program details')
@@ -416,6 +426,31 @@ export default function ProgramForm() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (facSearch && faculties.length > 0 && !hasSelectedFac) {
+      setShowFacDrop(true)
+    }
+  }, [facSearch, faculties])
+
+  useEffect(() => {
+    if (scholarSearch && scholarships.length > 0 && !hasSelectedScholar) {
+      setShowScholarDrop(true)
+    }
+  }, [scholarSearch, scholarships])
+
+  useEffect(() => {
+    if (examSearch && exams.length > 0 && !hasSelectedExam) {
+      setShowExamDrop(true)
+    }
+  }, [examSearch, exams])
+
+  useEffect(() => {
+    if (levelSearch && levels.length > 0 && !hasSelectedLevel) {
+      setShowLevelDrop(true)
+    }
+  }, [levelSearch, levels])
+
   const handleDeleteConfirm = async () => {
     if (!deleteId) return
 
@@ -592,7 +627,7 @@ export default function ProgramForm() {
                             key={fac.id}
                             className='p-2 cursor-pointer hover:bg-gray-100'
                             onClick={() => {
-                              setValue('facultyId', Number(fac.id))
+                              setValue('faculty_id', fac.id)
                               setFacSearch(fac.title)
                               setShowFacDrop(false)
                               setHasSelectedFac(true)
@@ -674,6 +709,7 @@ export default function ProgramForm() {
                             key={level.id}
                             className='p-2 cursor-pointer hover:bg-gray-100'
                             onClick={() => {
+                              setValue('level_id', level.id)
                               setLevelSearch(level.title)
                               setShowLevelDrop(false)
                               setHasSelectedLevel(true)
@@ -842,6 +878,7 @@ export default function ProgramForm() {
                       onChange={(id) =>
                         setValue(`syllabus.${index}.course_id`, id)
                       }
+                      title={watch(`syllabus.${index}.course.title`)}
                     />
 
                     {index > 0 && (
@@ -907,12 +944,13 @@ export default function ProgramForm() {
                             key={item.id}
                             className='p-2 cursor-pointer hover:bg-gray-100'
                             onClick={() => {
-                              setScholarSearch(item.title)
+                              setValue('scholarship_id', item.id)
+                              setScholarSearch(item.name)
                               setShowScholarDrop(false)
                               setHasSelectedScholar(true)
                             }}
                           >
-                            {item.title}
+                            {item.name}
                           </li>
                         ))}
                       </ul>
@@ -953,6 +991,7 @@ export default function ProgramForm() {
                             key={item.id}
                             className='p-2 cursor-pointer hover:bg-gray-100'
                             onClick={() => {
+                              setValue('exam_id', item.id)
                               setExamSearch(item.title)
                               setShowExamDrop(false)
                               setHasSelectedExam(true)

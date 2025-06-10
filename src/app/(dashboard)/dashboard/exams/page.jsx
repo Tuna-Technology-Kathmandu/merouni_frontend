@@ -1,15 +1,18 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
+import dynamic from 'next/dynamic'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { getAllExams, createExam, updateExam, deleteExam } from './actions'
 import Loading from '../../../components/Loading'
 import Table from '../../../components/Table'
 import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+import { toast } from 'react-toastify'
 import { useDebounce } from 'use-debounce'
 import { fetchUniversities, fetchLevel } from './actions'
+const CKExam = dynamic(() => import('../component/CKExam'), {
+  ssr: false
+})
 
 export default function ExamManager() {
   const author_id = useSelector((state) => state.user.data.id)
@@ -65,6 +68,8 @@ export default function ExamManager() {
       closing_date: ''
     }
   })
+
+  const editorRef = useRef(null)
 
   console.log('formData', formData)
 
@@ -240,6 +245,7 @@ export default function ExamManager() {
     if (!validateDates()) return
 
     try {
+      setLoading(true)
       const formattedData = {
         ...formData,
         author: author_id,
@@ -287,12 +293,17 @@ export default function ExamManager() {
           closing_date: ''
         }
       })
+      setLoading(false)
       setEditingId(null)
       setError(null)
       loadExams()
+
+      toast.success(`Successfully ${editingId ? 'updated' : 'created'} exam`)
     } catch (error) {
-      setError(`Failed to ${editingId ? 'update' : 'create'} exam`)
+      toast.error(`Failed to ${editingId ? 'update' : 'create'} exam`)
       console.error('Error saving exam:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -338,7 +349,14 @@ export default function ExamManager() {
       }
     }
   }
-
+  const handleDescriptionChange = (value) => {
+    if (value !== formData.description) {
+      setFormData((prev) => ({
+        ...prev,
+        description: value
+      }))
+    }
+  }
   if (loading)
     return (
       <div className='mx-auto'>
@@ -359,21 +377,18 @@ export default function ExamManager() {
             placeholder='Exam Title'
             value={formData.title}
             onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
+              setFormData((prev) => ({
+                ...prev,
+                title: e.target.value
+              }))
             }
             className='w-full p-2 border rounded'
             required
           />
-          <CKEditor
-            editor={ClassicEditor}
-            data={formData.description}
-            config={{
-              licenseKey: process.env.ckeditor
-            }}
-            onChange={(event, editor) => {
-              const content = editor.getData()
-              setFormData({ ...formData, description: content })
-            }}
+          <CKExam
+            id='exam-description'
+            initialData={formData.description}
+            onChange={handleDescriptionChange}
           />
           {/* level search box */}
           <div className='relative'>
@@ -402,7 +417,11 @@ export default function ExamManager() {
                       key={level.id}
                       className='p-2 cursor-pointer hover:bg-gray-100'
                       onClick={() => {
-                        setFormData({ ...formData, level_id: level.id })
+                        setFormData((prev) => ({
+                          ...prev,
+                          level_id: level.id
+                        }))
+
                         setLevelSearch(level.title)
                         setShowLevelDrop(false)
                         setHasSelectedLevel(true)
@@ -447,7 +466,10 @@ export default function ExamManager() {
                       key={uni.id}
                       className='p-2 cursor-pointer hover:bg-gray-100'
                       onClick={() => {
-                        setFormData({ ...formData, affiliation: uni.id })
+                        setFormData((prev) => ({
+                          ...prev,
+                          affiliation: uni.id
+                        }))
                         setUniSearch(uni.fullname)
                         setShowUniDrop(false)
                         setHasSelectedUni(true)
@@ -468,20 +490,25 @@ export default function ExamManager() {
             placeholder='Syllabus'
             value={formData.syllabus}
             onChange={(e) =>
-              setFormData({ ...formData, syllabus: e.target.value })
+              setFormData((prev) => ({
+                ...prev,
+                syllabus: e.target.value
+              }))
             }
             className='w-full p-2 border rounded'
             required
           />
           <input
-            type='url'
+            type='text'
             placeholder='Past Question URL'
             value={formData.pastQuestion}
             onChange={(e) =>
-              setFormData({ ...formData, pastQuestion: e.target.value })
+              setFormData((prev) => ({
+                ...prev,
+                pastQuestion: e.target.value
+              }))
             }
             className='w-full p-2 border rounded'
-            required
           />
         </div>
 
@@ -491,15 +518,15 @@ export default function ExamManager() {
           <select
             value={formData.examDetails[0].exam_type}
             onChange={(e) =>
-              setFormData({
-                ...formData,
+              setFormData((prev) => ({
+                ...prev,
                 examDetails: [
                   {
-                    ...formData.examDetails[0],
+                    ...prev.examDetails[0],
                     exam_type: e.target.value
                   }
                 ]
-              })
+              }))
             }
             className='w-full p-2 border rounded'
             required
@@ -513,15 +540,15 @@ export default function ExamManager() {
             placeholder='Full Marks'
             value={formData.examDetails[0].full_marks}
             onChange={(e) =>
-              setFormData({
-                ...formData,
+              setFormData((prev) => ({
+                ...prev,
                 examDetails: [
                   {
-                    ...formData.examDetails[0],
+                    ...prev.examDetails[0],
                     full_marks: e.target.value
                   }
                 ]
-              })
+              }))
             }
             className='w-full p-2 border rounded'
             required
@@ -531,15 +558,15 @@ export default function ExamManager() {
             placeholder='Pass Marks'
             value={formData.examDetails[0].pass_marks}
             onChange={(e) =>
-              setFormData({
-                ...formData,
+              setFormData((prev) => ({
+                ...prev,
                 examDetails: [
                   {
-                    ...formData.examDetails[0],
+                    ...prev.examDetails[0],
                     pass_marks: e.target.value
                   }
                 ]
-              })
+              }))
             }
             className='w-full p-2 border rounded'
             required
@@ -549,15 +576,15 @@ export default function ExamManager() {
             placeholder='Number of Questions'
             value={formData.examDetails[0].number_of_question}
             onChange={(e) =>
-              setFormData({
-                ...formData,
+              setFormData((prev) => ({
+                ...prev,
                 examDetails: [
                   {
-                    ...formData.examDetails[0],
+                    ...prev.examDetails[0],
                     number_of_question: e.target.value
                   }
                 ]
-              })
+              }))
             }
             className='w-full p-2 border rounded'
             required
@@ -565,15 +592,15 @@ export default function ExamManager() {
           <select
             value={formData.examDetails[0].question_type}
             onChange={(e) =>
-              setFormData({
-                ...formData,
+              setFormData((prev) => ({
+                ...prev,
                 examDetails: [
                   {
-                    ...formData.examDetails[0],
+                    ...prev.examDetails[0],
                     question_type: e.target.value
                   }
                 ]
-              })
+              }))
             }
             className='w-full p-2 border rounded'
             required
@@ -587,15 +614,15 @@ export default function ExamManager() {
             placeholder='Duration (e.g., 2 hours)'
             value={formData.examDetails[0].duration}
             onChange={(e) =>
-              setFormData({
-                ...formData,
+              setFormData((prev) => ({
+                ...prev,
                 examDetails: [
                   {
-                    ...formData.examDetails[0],
+                    ...prev.examDetails[0],
                     duration: e.target.value
                   }
                 ]
-              })
+              }))
             }
             className='w-full p-2 border rounded'
             required
@@ -612,13 +639,13 @@ export default function ExamManager() {
             placeholder='Normal fee (e.g., 2000)'
             value={formData.applicationDetails.normal_fee}
             onChange={(e) =>
-              setFormData({
-                ...formData,
+              setFormData((prevFormData) => ({
+                ...prevFormData,
                 applicationDetails: {
-                  ...formData.applicationDetails,
+                  ...prevFormData.applicationDetails,
                   normal_fee: e.target.value
                 }
-              })
+              }))
             }
             className='w-full p-2 border rounded'
             required
@@ -629,13 +656,13 @@ export default function ExamManager() {
             placeholder='Late fee (e.g., 2000)'
             value={formData.applicationDetails.late_fee}
             onChange={(e) =>
-              setFormData({
-                ...formData,
+              setFormData((prev) => ({
+                ...prev,
                 applicationDetails: {
-                  ...formData.applicationDetails,
+                  ...prev.applicationDetails,
                   late_fee: e.target.value
                 }
-              })
+              }))
             }
             className='w-full p-2 border rounded'
             required
@@ -649,13 +676,13 @@ export default function ExamManager() {
               value={formData.applicationDetails.exam_date}
               min={formData.applicationDetails.closing_date || undefined}
               onChange={(e) =>
-                setFormData({
-                  ...formData,
+                setFormData((prev) => ({
+                  ...prev,
                   applicationDetails: {
-                    ...formData.applicationDetails,
+                    ...prev.applicationDetails,
                     exam_date: e.target.value
                   }
-                })
+                }))
               }
               className='w-full p-2 border rounded'
               required
@@ -670,13 +697,13 @@ export default function ExamManager() {
               value={formData.applicationDetails.opening_date}
               max={formData.applicationDetails.closing_date || undefined}
               onChange={(e) =>
-                setFormData({
-                  ...formData,
+                setFormData((prev) => ({
+                  ...prev,
                   applicationDetails: {
-                    ...formData.applicationDetails,
+                    ...prev.applicationDetails,
                     opening_date: e.target.value
                   }
-                })
+                }))
               }
               className='w-full p-2 border rounded'
               required
@@ -692,13 +719,13 @@ export default function ExamManager() {
               min={formData.applicationDetails.opening_date || undefined}
               max={formData.applicationDetails.exam_date || undefined}
               onChange={(e) =>
-                setFormData({
-                  ...formData,
+                setFormData((prev) => ({
+                  ...prev,
                   applicationDetails: {
-                    ...formData.applicationDetails,
+                    ...prev.applicationDetails,
                     closing_date: e.target.value
                   }
-                })
+                }))
               }
               className='w-full p-2 border rounded'
               required
@@ -711,8 +738,9 @@ export default function ExamManager() {
         <button
           type='submit'
           className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
+          disabled={loading}
         >
-          {editingId ? 'Update Exam' : 'Add Exam'}
+          {loading ? 'Processing...' : editingId ? 'Update Exam' : 'Add'}
         </button>
       </form>
 

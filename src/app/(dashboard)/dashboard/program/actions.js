@@ -38,7 +38,7 @@ export const fetchLevel = async (searchQuery = '') => {
 export const fetchCourse = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/program${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${process.env.baseUrl}${process.env.version}/course${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
 
     if (!response.ok) {
@@ -88,3 +88,5 @@ export const fetchExam = async (searchQuery = '') => {
     throw error
   }
 }
+
+//fetch degree

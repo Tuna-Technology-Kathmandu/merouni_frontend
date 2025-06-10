@@ -1,31 +1,47 @@
+'use client'
 import { Search } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const FilterSection = ({
   title,
   options,
   placeholder,
   selectedItems = [],
-  onSelectionChange = () => {}
+  onSelectionChange = () => {},
+  onSearchInputChange = null
 }) => {
   const [searchText, setSearchText] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [filteredOptions, setFilteredOptions] = useState(options)
 
-  const filteredOptions = options.filter((option) =>
-    option.name.toLowerCase().includes(searchText.toLowerCase())
-  )
+  // Update filteredOptions when options prop changes (external updates)
+  useEffect(() => {
+    setFilteredOptions(options)
+  }, [options])
+
+  useEffect(() => {
+    if (onSearchInputChange) {
+      setIsLoading(true)
+      const debounceTimeout = setTimeout(async () => {
+        await onSearchInputChange(searchText)
+        setIsLoading(false)
+      }, 500)
+
+      return () => clearTimeout(debounceTimeout)
+    } else {
+      // If not using backend search, just filter locally
+      const filtered = options.filter((option) =>
+        option.name.toLowerCase().includes(searchText.toLowerCase())
+      )
+      setFilteredOptions(filtered)
+    }
+  }, [searchText])
 
   const handleCheckBoxChange = (option) => {
-    //this is a previous code may need again
-    // if (selectedItems.includes(option.name)) {
-    //   onSelectionChange(selectedItems.filter((item) => item !== option.name));
-    // } else {
-    //   onSelectionChange([...selectedItems, option.name]);
-    // }
-
-    if (selectedItems.includes(option.name)) {
-      onSelectionChange('') // Uncheck all if clicking the same option
+    if (selectedItems === option.name) {
+      onSelectionChange('') // Unselect
     } else {
-      onSelectionChange(option.name) // Only keep the newly selected option
+      onSelectionChange(option.name) // Select
     }
   }
 
@@ -33,15 +49,6 @@ const FilterSection = ({
     <div className='bg-white rounded-xl p-4 border border-gray-200 shadow-lg'>
       <div className='flex justify-between items-center mb-3'>
         <h3 className='text-gray-800 font-medium'>{title}</h3>
-        <svg
-          className='w-4 h-4'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-        >
-          <path d='M19 9l-7 7-7-7' />
-        </svg>
       </div>
       <div className='relative'>
         <Search className='absolute left-3 top-2.5 w-4 h-4 text-gray-400' />
@@ -55,19 +62,26 @@ const FilterSection = ({
       </div>
 
       <div className='mt-3 space-y-2 overflow-y-auto h-24 scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-100'>
-        {filteredOptions.map((option, index) => (
-          <label key={index} className='flex items-center gap-2'>
-            <input
-              type='checkbox'
-              className='rounded-full border-gray-300'
-              checked={selectedItems?.includes(option.name)}
-              onChange={() => handleCheckBoxChange(option)}
-            />
-            <span className='text-gray-700 text-sm'>{option.name}</span>
-          </label>
-        ))}
+        {isLoading ? (
+          <div className='text-center text-sm text-gray-400'>Loading...</div>
+        ) : filteredOptions.length === 0 ? (
+          <div className='text-center text-sm text-gray-400'>No data found</div>
+        ) : (
+          filteredOptions.map((option, index) => (
+            <label key={index} className='flex items-center gap-2'>
+              <input
+                type='checkbox'
+                className='rounded-full border-gray-300'
+                checked={selectedItems?.includes(option.name)}
+                onChange={() => handleCheckBoxChange(option)}
+              />
+              <span className='text-gray-700 text-sm'>{option.name}</span>
+            </label>
+          ))
+        )}
       </div>
     </div>
   )
 }
+
 export default FilterSection

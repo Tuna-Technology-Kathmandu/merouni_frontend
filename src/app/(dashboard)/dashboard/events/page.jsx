@@ -1,5 +1,5 @@
 'use client'
-
+import dynamic from 'next/dynamic'
 import { useState, useEffect, useMemo } from 'react'
 import Table from '../../../components/Table'
 import { Edit2, Trash2 } from 'lucide-react'
@@ -14,8 +14,9 @@ import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { fetchCategories } from '../category/action'
 import { X } from 'lucide-react'
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
+  ssr: false
+})
 
 export default function EventManager() {
   const author_id = useSelector((state) => state.user.data.id)
@@ -185,8 +186,7 @@ export default function EventManager() {
       const formData = {
         ...data,
         is_featured: Number(data.is_featured),
-        image: uploadedFiles.image,
-        content: editorContent
+        image: uploadedFiles.image
       }
       // Include event ID for update operation
       if (editing) {
@@ -259,6 +259,7 @@ export default function EventManager() {
           setValue('category_id', categoryID)
         }
       }
+      console.log(eventData)
 
       if (eventData?.college) {
         const response = await authFetch(
@@ -283,7 +284,7 @@ export default function EventManager() {
       setValue('description', eventData.description)
       setValue('content', eventData.content)
       setValue('image', eventData.image)
-      setUploadedFiles((prev) => ({ ...prev, image: eventData.image })) // Set uploaded image URL
+      setUploadedFiles((prev) => ({ ...prev, image: eventData.image }))
 
       const eventHost = eventData.event_host
 
@@ -336,13 +337,10 @@ export default function EventManager() {
     }
   }
 
+  console.log('selectedColleges', selectedColleges)
   const handleDialogClose = () => {
     setIsDialogOpen(false)
     setDeleteId(null)
-  }
-
-  const handleEditorChange = (event, editor) => {
-    const data = editor.getData() // This is where you get the data from the editor
   }
 
   const columns = useMemo(
@@ -572,15 +570,10 @@ export default function EventManager() {
 
         <div className='mb-4'>
           <label htmlFor='content'>Content</label>
-          <CKEditor
-            editor={ClassicEditor}
-            data=''
-            config={{
-              licenseKey: process.env.ckeditor
-            }}
-            onChange={(event, editor) => {
-              setEditorContent(editor.getData())
-            }}
+          <CKBlogs
+            initialData={getValues('content')}
+            onChange={(data) => setValue('content', data)}
+            id='editor1'
           />
         </div>
 

@@ -128,6 +128,13 @@ const FeaturedBlogs = () => {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
 
+  const getVisibleBlogs = () => {
+    if (pagination.currentPage === 1) {
+      return blogs.slice(10) // Skip the first 10 on the first page
+    }
+    return blogs // Show all items on page 2 and beyond
+  }
+
   return (
     <>
       <div className='flex flex-col max-w-[1600px] mx-auto px-4 sm:px-8 mt-10'>
@@ -156,7 +163,7 @@ const FeaturedBlogs = () => {
         ) : (
           <>
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full mb-10'>
-              {blogs.map((blog, index) => (
+              {getVisibleBlogs().map((blog, index) => (
                 <Link href={`/blogs/${blog.slug}`} key={index}>
                   <div>
                     <BlogCard

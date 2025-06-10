@@ -32,9 +32,10 @@ const CollegeFinder = () => {
   const [uni, setUni] = useState([])
 
   const [selectedFilters, setSelectedFilters] = useState({
-    state: '', // instead of []
-    degree: '', // instead of []
-    uni: '', // instead of []
+    state: '',
+    degree: '',
+    uni: '',
+    level: '',
     courseFees: { min: 0, max: 1000000 }
   })
 
@@ -94,6 +95,7 @@ const CollegeFinder = () => {
       const data = await getColleges(page, selectedFilters)
       setUniversities(data.colleges)
       setPagination(data.pagination)
+      console.log('data response', data)
     } catch (error) {
       console.error('Error fetching colleges:', error)
     }
@@ -102,6 +104,30 @@ const CollegeFinder = () => {
 
   useEffect(() => {}, [universities])
 
+  const fetchFilteredPrograms = async (searchTerm) => {
+    if (!searchTerm) {
+      // Load all programs if search is empty
+      const allPrograms = await getPrograms()
+      setDegree(allPrograms.map((p) => ({ name: p.title })))
+      return
+    }
+
+    // Call your backend API with searchTerm to get filtered programs
+    // Assuming you have a backend function to support search like getPrograms(searchTerm)
+    const filteredPrograms = await getPrograms(searchTerm)
+    setDegree(filteredPrograms.map((p) => ({ name: p.title })))
+  }
+
+  const fetchFilteredUniversities = async (searchTerm) => {
+    if (!searchTerm) {
+      const allUniversities = await getUniversity()
+      setUni(allUniversities.map((u) => ({ name: u.fullname })))
+      return
+    }
+
+    const filteredUniversities = await getUniversity(searchTerm)
+    setUni(filteredUniversities.map((u) => ({ name: u.fullname })))
+  }
   const filters = [
     {
       title: 'Discipline ',
@@ -110,20 +136,102 @@ const CollegeFinder = () => {
       selectedItems: selectedFilters.degree,
       onSelectionChange: (item) => {
         setSelectedFilters((prev) => ({ ...prev, degree: item }))
-      }
+      },
+      onSearchInputChange: fetchFilteredPrograms
     },
     {
-      title: 'State ',
-      placeholder: 'Search by state',
+      title: 'District',
+      placeholder: 'Search by district',
+      // options: [
+      //   { name: 'Bagmati' },
+      //   { name: 'Gandaki' },
+      //   { name: 'Karnali' },
+      //   { name: 'Koshi' },
+      //   { name: 'Lumbini' },
+      //   { name: 'Madhesh' },
+      //   { name: 'Sudurpashchim' }
+      // ],
+
       options: [
-        { name: 'Bagmati' },
-        { name: 'Gandaki' },
-        { name: 'Karnali' },
-        { name: 'Koshi' },
-        { name: 'Lumbini' },
-        { name: 'Madhesh' },
-        { name: 'Sudurpashchim' }
+        { name: 'Bhojpur' },
+        { name: 'Dhankuta' },
+        { name: 'Ilam' },
+        { name: 'Jhapa' },
+        { name: 'Khotang' },
+        { name: 'Morang' },
+        { name: 'Okhaladhunga' },
+        { name: 'Panchthar' },
+        { name: 'Sankhuwasabha' },
+        { name: 'Solukhumbu' },
+        { name: 'Sunsari' },
+        { name: 'Taplejung' },
+        { name: 'Terhathum' },
+        { name: 'Udayapur' },
+        { name: 'Bara' },
+        { name: 'Dhanusha' },
+        { name: 'Mahottari' },
+        { name: 'Parsa' },
+        { name: 'Rautahat' },
+        { name: 'Saptari' },
+        { name: 'Sarlahi' },
+        { name: 'Siraha' },
+        { name: 'Bhaktapur' },
+        { name: 'Chitawan' },
+        { name: 'Dhading' },
+        { name: 'Dolakha' },
+        { name: 'Kathmandu' },
+        { name: 'Kavrepalanchok' },
+        { name: 'Lalitpur' },
+        { name: 'Makwanpur' },
+        { name: 'Nuwakot' },
+        { name: 'Ramechhap' },
+        { name: 'Rasuwa' },
+        { name: 'Sindhuli' },
+        { name: 'Sindhupalchok' },
+        { name: 'Baglung' },
+        { name: 'Gorkha' },
+        { name: 'Kaski' },
+        { name: 'Lamjung' },
+        { name: 'Manang' },
+        { name: 'Mustang' },
+        { name: 'Myagdi' },
+        { name: 'Nawalpur' },
+        { name: 'Parbat' },
+        { name: 'Syangja' },
+        { name: 'Tanahu' },
+        { name: 'Arghakhanchi' },
+        { name: 'Banke' },
+        { name: 'Bardiya' },
+        { name: 'Dang' },
+        { name: 'Gulmi' },
+        { name: 'Kapilbastu' },
+        { name: 'Nawalparasi' },
+        { name: 'Palpa' },
+        { name: 'Pyuthan' },
+        { name: 'Rolpa' },
+        { name: 'Rukum Purba' },
+        { name: 'Rupandehi' },
+        { name: 'Dailekh' },
+        { name: 'Dolpa' },
+        { name: 'Humla' },
+        { name: 'Jajarkot' },
+        { name: 'Jumla' },
+        { name: 'Kalikot' },
+        { name: 'Mugu' },
+        { name: 'Rukum Paschim' },
+        { name: 'Salyan' },
+        { name: 'Surkhet' },
+        { name: 'Achham' },
+        { name: 'Baitadi' },
+        { name: 'Bajhang' },
+        { name: 'Bajura' },
+        { name: 'Dadeldhura' },
+        { name: 'Darchula' },
+        { name: 'Doti' },
+        { name: 'Kailali' },
+        { name: 'Kanchanpur' }
       ],
+
       selectedItems: selectedFilters.state,
       onSelectionChange: (item) => {
         setSelectedFilters((prev) => ({ ...prev, state: item }))
@@ -136,10 +244,21 @@ const CollegeFinder = () => {
       selectedItems: selectedFilters.uni,
       onSelectionChange: (item) => {
         setSelectedFilters((prev) => ({ ...prev, uni: item }))
+      },
+      onSearchInputChange: fetchFilteredUniversities
+    },
+    {
+      title: 'Institute Level ',
+      placeholder: 'Search by institute level',
+      options: [{ name: 'School' }, { name: 'College' }],
+      selectedItems: selectedFilters.level,
+      onSelectionChange: (item) => {
+        setSelectedFilters((prev) => ({ ...prev, level: item }))
       }
     }
   ]
 
+  console.log('filter', selectedFilters)
   const FilterModal = () => (
     <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center'>
       <div className='bg-white rounded-xl p-6 w-full max-w-[90%] md:max-w-[80%] lg:max-w-[60%] h-full max-h-[90%] overflow-y-auto'>

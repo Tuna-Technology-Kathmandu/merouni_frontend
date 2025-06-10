@@ -3,6 +3,7 @@ import DOMPurify from 'dompurify'
 
 const Description = ({ event }) => {
   const cleanHTML = event?.content ? DOMPurify.sanitize(event.content) : ''
+  console.log(cleanHTML)
   return (
     <div className='ml-4 mt-4 flex flex-col md:flex-row max-w-full md:max-w-[1600px] md:mx-auto items-start'>
       {/* Description Section */}

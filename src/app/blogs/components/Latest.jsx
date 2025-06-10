@@ -102,7 +102,7 @@ const Latest = () => {
                       title={truncateString(blog.title, 30)}
                       description={truncateString(blog.description, 100)}
                       image={
-                        blog?.featuredImage || 'https://placehold.co/600x400'
+                        blog.featuredImage || 'https://placehold.co/600x400'
                       } // Use blog.image if available
                       date={formatDate(blog.createdAt)}
                     />

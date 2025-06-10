@@ -60,7 +60,8 @@ export async function getColleges(page = 1, filters = {}) {
   try {
     // Initialize query parameters with page
     const queryParams = new URLSearchParams({
-      page: page.toString()
+      page: page.toString(),
+      limit: '24'
     })
 
     // Only add filter parameters if provided
@@ -74,6 +75,9 @@ export async function getColleges(page = 1, filters = {}) {
 
     if (filters.uni) {
       queryParams.append('university', filters.uni)
+    }
+    if (filters.level) {
+      queryParams.append('level', filters.level)
     }
 
     // Log the final URL for debugging
@@ -289,9 +293,15 @@ export async function getCollegeBySlug(slug) {
 }
 
 //to get degrees/program
-export async function getPrograms() {
+export async function getPrograms(searchQuery = '') {
   try {
-    const url = `${process.env.baseUrl}${process.env.version}/program`
+    // Build query string
+    const queryParams = new URLSearchParams()
+    if (searchQuery) {
+      queryParams.append('q', searchQuery) // Assuming your API supports `q` for search
+    }
+
+    const url = `${process.env.baseUrl}${process.env.version}/program?${queryParams.toString()}`
     console.log('Fetching programs from:', url)
 
     const response = await fetch(url, {
@@ -302,26 +312,29 @@ export async function getPrograms() {
       cache: 'no-store'
     })
 
-    console.log('Response:', response)
-
     if (!response.ok) {
       throw new Error('Failed to fetch Programs')
     }
 
     const data = await response.json()
-    console.log('Data:', data)
-    return data.items || [] // Adjust according to actual API structure
+    return data.items || [] // Adjust if your API returns differently
   } catch (error) {
     console.error('Error fetching programs:', error)
-    throw error
+    return []
   }
 }
 
 //for getting university name
-export async function getUniversity() {
+export async function getUniversity(searchQuery = '') {
   try {
-    const url = `${process.env.baseUrl}${process.env.version}/university`
-    console.log('Fetching programs from:', url)
+    // Add query param if searching
+    const queryParams = new URLSearchParams()
+    if (searchQuery) {
+      queryParams.append('q', searchQuery) // or change 'q' to whatever your API expects
+    }
+
+    const url = `${process.env.baseUrl}${process.env.version}/university?${queryParams.toString()}`
+    console.log('Fetching universities from:', url)
 
     const response = await fetch(url, {
       method: 'GET',
@@ -331,17 +344,14 @@ export async function getUniversity() {
       cache: 'no-store'
     })
 
-    console.log('Response:', response)
-
     if (!response.ok) {
-      throw new Error('Failed to fetch Programs')
+      throw new Error('Failed to fetch universities')
     }
 
     const data = await response.json()
-    console.log('Data:', data)
-    return data.items || [] // Adjust according to actual API structure
+    return data.items || []
   } catch (error) {
-    console.error('Error fetching programs:', error)
-    throw error
+    console.error('Error fetching universities:', error)
+    return []
   }
 }

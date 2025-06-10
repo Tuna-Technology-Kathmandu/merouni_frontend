@@ -7,13 +7,11 @@ const LatestBlogs = ({ image, title, date, description }) => {
     max-md:h-[14.7rem] p-6 mb-8 hover:shadow-2xl transition-shadow duration-300 overflow-hidden m-2 text-white'
     >
       {/* Background Image */}
-      <div
-        className='absolute inset-0 bg-cover bg-center  rounded-xl'
-        style={{
-          backgroundImage: `url(${image})`,
-          objectFit: 'cover'
-        }}
-      ></div>
+      <img
+        className='absolute inset-0 bg-cover bg-center w-full h-full rounded-xl'
+        src={image}
+        alt={title}
+      ></img>
       <div className='absolute inset-0 bg-black bg-opacity-60 rounded-xl'></div>
 
       {/* Content */}

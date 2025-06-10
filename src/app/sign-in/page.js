@@ -145,8 +145,16 @@ const SignInPage = () => {
         router.push(`/verify-otp?email=${formData.email}`)
       }
     },
-    throwOnError: (error) => {
-      toast.error(error?.message || 'Something went wrong. Please try again.')
+    onError: (error) => {
+      // Axios errors have a response object with data.message
+      if (axios.isAxiosError(error)) {
+        const message =
+          error.response?.data?.message ||
+          'Something went wrong. Please try again.'
+        toast.error(message)
+      } else {
+        toast.error('Something went wrong. Please try again.')
+      }
     }
   })
 

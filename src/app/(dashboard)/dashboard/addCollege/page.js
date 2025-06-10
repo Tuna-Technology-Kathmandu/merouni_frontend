@@ -266,7 +266,7 @@ export default function CollegeForm() {
       accessorKey: 'address.country'
     },
     {
-      header: 'State',
+      header: 'District',
       accessorKey: 'address.state'
     },
     {
@@ -1002,7 +1002,9 @@ export default function CollegeForm() {
                   (field) => (
                     <div key={field}>
                       <label className='block mb-2 capitalize'>
-                        {field.replace('_', ' ')} *
+                        {field !== 'state'
+                          ? `${field.replace('_', ' ')} *`
+                          : 'District *'}
                       </label>
                       <input
                         {...register(`address.${field}`, { required: true })}

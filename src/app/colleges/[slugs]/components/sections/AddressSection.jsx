@@ -1,5 +1,5 @@
 import React from 'react'
-import GoogleMap from './../GoogleMap'
+// import GoogleMap from './../GoogleMap'
 
 const AddressSection = ({ college }) => {
   console.log(college)
@@ -7,9 +7,9 @@ const AddressSection = ({ college }) => {
     <div>
       <h2 className='text-sm md:text-lg lg:text-xl font-bold'>Address</h2>
 
-      <div className=' w-full bg-slate-200 h-[200px] rounded-lg mt-12 max-[1120px]:mt-9'>
+      {/* <div className=' w-full bg-slate-200 h-[200px] rounded-lg mt-12 max-[1120px]:mt-9'>
         <GoogleMap mapUrl={college.google_map_url} />
-      </div>
+      </div> */}
 
       <div className='w-full mt-7 grid grid-cols-3 gap-4 max-[550px]:grid-cols-2 max-[400px]:grid-cols-1 '>
         <div className=' text-center shadow-lg h-auto p-2 border border-gray-300 rounded-md hover:scale-105 transition-all duration-300 ease-in-out'>
@@ -21,7 +21,9 @@ const AddressSection = ({ college }) => {
           </p>
         </div>
         <div className=' text-center shadow-lg h-auto p-2 border border-gray-300 rounded-md hover:scale-105 transition-all duration-300 ease-in-out'>
-          <p className='text-xs md:text-sm lg:text-base font-semibold'>State</p>
+          <p className='text-xs md:text-sm lg:text-base font-semibold'>
+            District
+          </p>
           <p className='text-xs md:text-[13px] font-medium lg:text-[15px] mt-2'>
             {college?.collegeAddress?.state || 'N/A'}
           </p>

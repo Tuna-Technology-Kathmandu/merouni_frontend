@@ -1,8 +1,8 @@
 import React from 'react'
-import { FaRegFaceLaugh } from 'react-icons/fa6'
-import { FaRegFaceAngry } from 'react-icons/fa6'
-import { FaRegSadCry } from 'react-icons/fa'
-import { AiOutlineLike } from 'react-icons/ai'
+// import { FaRegFaceLaugh } from 'react-icons/fa6'
+// import { FaRegFaceAngry } from 'react-icons/fa6'
+// import { FaRegSadCry } from 'react-icons/fa'
+// import { AiOutlineLike } from 'react-icons/ai'
 
 const Description = ({ news }) => {
   return (
@@ -10,12 +10,12 @@ const Description = ({ news }) => {
       <div className='mb-6 full'>
         <div className='text-xl font-bold'>Description</div>
         <div
-          className='text-[13px] mt-4 leading-7 max-md:leading-5  md:text-sm lg:text-base '
+          className='text-[13px] mt-4 leading-7 max-md:leading-5  md:text-sm lg:text-base text-justify'
           dangerouslySetInnerHTML={{ __html: news?.description }}
         />
 
         <div
-          className='text-[13px] md:text-sm lg:text-base mt-4 !leading-7 [&_ul]:list-disc [&_ol]:list-decimal [&_li]:ml-10 [&_li]:mb-1 [&_li]:mt-1 !max-w-none text-black'
+          className='text-[13px] md:text-sm text-justify lg:text-base mt-4 !leading-7 [&_ul]:list-disc [&_ol]:list-decimal [&_li]:ml-10 [&_li]:mb-1 [&_li]:mt-1 !max-w-none text-black'
           dangerouslySetInnerHTML={{ __html: news?.content }}
         />
       </div>

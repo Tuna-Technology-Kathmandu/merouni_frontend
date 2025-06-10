@@ -15,6 +15,7 @@ export default function LevelForm() {
   const [tableLoading, setTableLoading] = useState(false)
   const [loading, setLoading] = useState(false)
   const [editing, setEditing] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [editId, setEditingId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -62,6 +63,7 @@ export default function LevelForm() {
 
   const onSubmit = async (data) => {
     try {
+      setSubmitting(true)
       const url = `${process.env.baseUrl}${process.env.version}/level`
       const method = editing ? 'PUT' : 'POST'
 
@@ -95,8 +97,11 @@ export default function LevelForm() {
       reset()
       fetchLevels()
       setIsOpen(false)
+      setSubmitting(false)
     } catch (error) {
       toast.error(error.message || 'Failed to save level')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -242,10 +247,10 @@ export default function LevelForm() {
             <div className='flex justify-end'>
               <button
                 type='submit'
-                disabled={loading}
+                disabled={submitting}
                 className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
               >
-                {loading
+                {submitting
                   ? 'Processing...'
                   : editing
                     ? 'Update Level'

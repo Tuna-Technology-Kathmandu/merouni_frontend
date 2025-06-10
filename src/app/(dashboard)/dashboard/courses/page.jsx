@@ -1,4 +1,5 @@
 'use client'
+import dynamic from 'next/dynamic'
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
@@ -9,9 +10,10 @@ import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 // import { getCourses } from '@/app/action'
 import { fetchFaculties } from './action'
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 import { useDebounce } from 'use-debounce'
+const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
+  ssr: false
+})
 
 export default function CourseForm() {
   //for faculties search
@@ -394,21 +396,6 @@ export default function CourseForm() {
                 </div>
 
                 <div>
-                  <label className='block mb-2'>Description</label>
-                  <CKEditor
-                    editor={ClassicEditor}
-                    data={getValues('description')}
-                    config={{
-                      licenseKey: process.env.ckeditor
-                    }}
-                    onChange={(event, editor) => {
-                      const content = editor.getData()
-                      setValue('description', content)
-                    }}
-                  />
-                </div>
-
-                <div>
                   <label className='block mb-2'>Syllabus Topics</label>
                   <textarea
                     {...register('syllabus')}
@@ -420,6 +407,14 @@ export default function CourseForm() {
                     Enter topics separated by commas
                   </p>
                 </div>
+              </div>
+              <div>
+                <label className='block mb-2'>Description</label>
+                <CKBlogs
+                  initialData={getValues('description')} // Value from react-hook-form
+                  onChange={(data) => setValue('description', data)} // Update react-hook-form value
+                  id='editor1' // Unique ID for the textarea
+                />
               </div>
             </div>
 

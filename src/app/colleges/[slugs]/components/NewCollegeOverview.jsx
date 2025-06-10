@@ -12,7 +12,7 @@ const sections = [
   'Overview',
   'Programs',
   'Members',
-  'Facility',
+  // 'Facility',
   'Contact',
   'Address',
   'Gallery'
@@ -98,9 +98,9 @@ const CollegeOverview = ({ college }) => {
             <MemberSection validMembers={validMembers} />
           </div>
         )}
-        <div className='min-h-[200px] w-full' ref={facilityRef}>
+        {/* <div className='min-h-[200px] w-full' ref={facilityRef}>
           <FacilitySection college={college} />
-        </div>
+        </div> */}
 
         <div className='min-h-[200px] w-full' ref={contactRef}>
           <ContactSection college={college} />

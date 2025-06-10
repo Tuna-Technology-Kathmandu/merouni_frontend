@@ -41,6 +41,7 @@ export default function NewsManager() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [tagsLoading, setTagsLoading] = useState(false)
   const searchTimeout = useRef(null)
+  const [submitting, setSubmitting] = useState(false)
 
   const {
     register,
@@ -437,6 +438,7 @@ export default function NewsManager() {
   }
 
   const onSubmit = async (data) => {
+    setSubmitting(true)
     try {
       if (editingId) {
         await updateNews(data, editingId)
@@ -450,12 +452,15 @@ export default function NewsManager() {
       setSelectedTags([])
       setUploadedFiles({ featuredImage: '' })
       loadData()
+      setSubmitting(false)
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Network error occurred'
       toast.error(
         `Failed to ${editingId ? 'update' : 'create'} news: ${errorMsg}`
       )
       console.error('Error saving news:', err)
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -650,8 +655,15 @@ export default function NewsManager() {
           <button
             type='submit'
             className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
+            disabled={submitting}
           >
-            {editingId ? 'Update News' : 'Add News'}
+            {editingId
+              ? submitting
+                ? 'Updating...'
+                : 'Update News'
+              : submitting
+                ? 'Adding...'
+                : 'Add News'}
           </button>
           {editingId && (
             <button
