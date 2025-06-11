@@ -19,6 +19,28 @@ const OverviewSection = ({ college }) => {
              [&>iframe]:mt-4
              [&>iframe]:mx-auto
              [&>iframe]:block
+
+              [&_table]:w-full
+    [&_table]:my-4
+    [&_table]:border-collapse
+    [&_th]:bg-gray-100
+    [&_th]:p-2
+    [&_th]:text-left
+    [&_th]:border
+    [&_th]:border-gray-300
+    [&_td]:p-2
+    [&_td]:border
+    [&_td]:border-gray-300
+    [&_tr:nth-child(even)]:bg-gray-50
+
+    [&_h1]:text-2xl
+    [&_h1]:font-bold
+    [&_h1]:mt-8
+    [&_h1]:mb-4
+    [&_h2]:text-xl
+    [&_h2]:font-bold
+    [&_h2]:mt-6
+    [&_h2]:mb-3
              text-xs md:text-sm lg:text-base
              overflow-x-hidden'
       ></div>

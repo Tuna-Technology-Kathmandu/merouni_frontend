@@ -1,5 +1,6 @@
 'use client'
-import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
+import { useState, useEffect, useMemo } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
@@ -8,10 +9,12 @@ import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 import { fetchLevel } from './actions'
 import { useDebounce } from 'use-debounce'
+
+const CKUni = dynamic(() => import('../component/CKUni'), {
+  ssr: false
+})
 
 export default function UniversityForm() {
   const author_id = useSelector((state) => state.user.data.id)
@@ -45,6 +48,7 @@ export default function UniversityForm() {
     handleSubmit,
     setValue,
     reset,
+    watch,
     formState: { errors },
     getValues
   } = useForm({
@@ -99,6 +103,9 @@ export default function UniversityForm() {
   useEffect(() => {
     fetchUniversities()
   }, [])
+
+  const formData = watch()
+  console.log('fromData', formData)
 
   const fetchUniversities = async (page = 1) => {
     setTableLoading(true)
@@ -181,6 +188,7 @@ export default function UniversityForm() {
       )
       const data = await response.json()
       const university = data
+      console.log('university', university)
 
       // Set basic fields
       setValue('id', university.id)
@@ -329,6 +337,7 @@ export default function UniversityForm() {
       setUniversities([])
     }
   }
+
   return (
     <>
       <div className='text-2xl mr-auto p-4 ml-14 font-bold'>
@@ -387,21 +396,15 @@ export default function UniversityForm() {
                     className='w-full p-2 border rounded'
                   />
                 </div>
+              </div>
+              <div>
+                <label className='block mb-2'>Description</label>
 
-                <div>
-                  <label className='block mb-2'>Description</label>
-                  <CKEditor
-                    editor={ClassicEditor}
-                    data={getValues('description')}
-                    config={{
-                      licenseKey: process.env.ckeditor
-                    }}
-                    onChange={(event, editor) => {
-                      const content = editor.getData()
-                      setValue('description', content)
-                    }}
-                  />
-                </div>
+                <CKUni
+                  id='editor-content'
+                  initialData={getValues('description')}
+                  onChange={(data) => setValue('description', data)}
+                />
               </div>
             </div>
             {editing ? <input type='hidden' {...register('id')} /> : <></>}

@@ -14,13 +14,6 @@ import axios from 'axios'
 const SignInPage = () => {
   const dispatch = useDispatch()
   const router = useRouter()
-  // const user = useSelector((state) => state.user?.data);
-  // useEffect(() => {
-  //   if (user) {
-  //     router.replace("/dashboard");
-  //   }
-  // }, [user, router]);
-
   const getDeviceId = () => {
     let deviceId = localStorage.getItem('deviceId')
     if (!deviceId) {

@@ -8,6 +8,7 @@ import { FaUniversity } from 'react-icons/fa'
 import { MdDateRange } from 'react-icons/md'
 import { LiaUniversitySolid } from 'react-icons/lia'
 import { IoMdMail } from 'react-icons/io'
+import he from 'he'
 
 const ImageSection = ({ university }) => {
   return (
@@ -100,10 +101,22 @@ const ImageSection = ({ university }) => {
         <h2 className='font-bold text-xl md:text-3xl leading-10 m-4'>
           Why Study in {university.fullname}?
         </h2>
-        <p className='pt-6 leading-7'>
-          {university?.description ||
-            ' This university has good environment for excelling'}
-        </p>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: he.decode(university?.description)
+          }}
+          className='pt-6 leading-7   text-justify 
+                     [&>iframe]:w-full 
+                     [&>iframe]:max-w-[calc(100vw-40px)] 
+                     [&>iframe]:aspect-video 
+                     [&>iframe]:h-auto
+                     [&>iframe]:rounded-lg 
+                     [&>iframe]:mt-4
+                     [&>iframe]:mx-auto
+                     [&>iframe]:block
+                     text-xs md:text-sm lg:text-base
+                     overflow-x-hidden'
+        ></div>
         {/* <p className="pt-4 leading-7">
           The objective of the BCA program of Tribhuvan University is to produce
           high quality computer application users and developers. The program of

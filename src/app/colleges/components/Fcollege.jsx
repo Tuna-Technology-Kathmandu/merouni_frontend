@@ -18,10 +18,11 @@ const Fcollege = ({ name, description, image, slug }) => {
         <div className='text-black text-sm mb-4 line-clamp-3 w-3/4 min-h-16'>
           {description}
         </div>
-        <Link href={`/colleges/apply/${slug}`}>
-          <button className='mt-auto px-4 py-2 bg-[#387CAE] text-white rounded-lg  transition duration-200 w-1/2'>
-            Apply
-          </button>
+        <Link
+          href={`/colleges/apply/${slug}`}
+          className='mt-auto px-4 py-2 bg-[#387CAE] text-white rounded-lg inline-block text-center transition duration-200 w-1/2'
+        >
+          Apply
         </Link>
       </div>
     </Link>

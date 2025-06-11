@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import { useForm, useFieldArray } from 'react-hook-form'
 import {
@@ -18,10 +18,13 @@ import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import AdmissionItem from './AdmissionItem'
 import ConfirmationDialog from './ConfirmationDialog'
-const CKEditor4 = dynamic(() => import('../component/CKEditor4'), {
+
+const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
 })
 import { useDebounce } from 'use-debounce'
+import GallerySection from './GallerySection'
+import VideoSection from './VideoSection'
 
 export default function CollegeForm() {
   //for university search
@@ -42,7 +45,8 @@ export default function CollegeForm() {
   const [uploadedFiles, setUploadedFiles] = useState({
     logo: '',
     featured: '',
-    additional: []
+    images: [],
+    videos: []
   })
   const [isOpen, setIsOpen] = useState(false)
   const [colleges, setColleges] = useState([])
@@ -80,7 +84,7 @@ export default function CollegeForm() {
       featured_img: '',
       is_featured: false,
       pinned: false,
-      images: [''],
+      images: [],
       address: {
         country: '',
         state: '',
@@ -121,17 +125,16 @@ export default function CollegeForm() {
     remove: removeAdmission
   } = useFieldArray({ control, name: 'admissions' })
 
-  const {
-    fields: imageFields,
-    append: appendImage,
-    remove: removeImage
-  } = useFieldArray({ control, name: 'images' })
+  // const {
+  //   fields: imageFields,
+  //   append: appendImage,
+  //   remove: removeImage
+  // } = useFieldArray({ control, name: 'images' })
 
   const onSubmit = async (data) => {
     console.log('admission', data.admissions)
 
     data.admissions = data.admissions.filter((admission) => {
-      // Remove admission if all fields are empty or whitespace
       return Object.values(admission).some((val) => {
         if (typeof val === 'string') return val.trim() !== ''
         return val !== null && val !== undefined
@@ -140,28 +143,44 @@ export default function CollegeForm() {
 
     try {
       setSubmitting(true)
+      // Convert boolean values to numbers
       data.is_featured = +data.is_featured
       data.pinned = +data.pinned
+      // Convert IDs to numbers
       data.university_id = parseInt(data.university_id)
       data.courses = data.courses.map((course) => parseInt(course))
 
-      //Ensure all image URLs are included
       data.college_logo = uploadedFiles.logo
       data.featured_img = uploadedFiles.featured
-      data.images = uploadedFiles.additional.filter((url) => url)
 
-      console.log('final data is', data)
+      //before sending the image , we combine all selected images and videos
+      data.images = [...uploadedFiles.images, ...uploadedFiles.videos]
+
+      //if we have no images after remove button clicked in allimages, we send this empty values
+      if (editing && data.images.length === 0) {
+        data.images = [
+          {
+            file_type: '',
+            url: ''
+          }
+        ]
+      }
+
       await createCollege(data)
 
+      // Show success message
       editing
         ? toast.success('College updated successfully!')
         : toast.success('College created successfully!')
+
+      // Reset form and state
       setEditing(false)
       reset()
       setUploadedFiles({
         logo: '',
         featured: '',
-        additional: []
+        images: [],
+        videos: []
       })
       setUniSearch('')
     } catch (error) {
@@ -170,7 +189,6 @@ export default function CollegeForm() {
       setSubmitting(false)
     }
   }
-
   //for uni in add college
   useEffect(() => {
     if (hasSelectedUni) return
@@ -404,11 +422,12 @@ export default function CollegeForm() {
       toast.success(res.message)
       const updatedColleges = await getColleges()
       setColleges(updatedColleges.items)
+      setEditing(false)
     } catch (err) {
       toast.error(err.message)
     } finally {
-      setIsDialogOpen(false) // Close the dialog
-      setDeleteId(null) // Reset the delete ID
+      setIsDialogOpen(false)
+      setDeleteId(null)
     }
   }
 
@@ -509,15 +528,37 @@ export default function CollegeForm() {
 
       // Images
 
-      const additionalImages =
-        collegeData.collegeGallery?.map((img) => img.img_url) || []
+      const galleryItems = collegeData.collegeGallery || []
 
-      setValue('images', additionalImages.length ? additionalImages : [''])
+      let images = galleryItems
+        .filter((item) => item.file_type === 'image' && item.file_url) // Only include items with file_url
+        .map((img) => ({
+          url: img.file_url,
+          file_type: 'image'
+        }))
+
+      // Special case: if single empty image, set to empty array
+      if (images.length === 1 && !images[0].url) {
+        images = []
+      }
+
+      const videos = galleryItems
+        .filter((item) => item.file_type === 'video')
+        .map((vid) => ({
+          url: vid.file_url,
+          file_type: 'video'
+        }))
+
       setUploadedFiles({
         logo: collegeData.college_logo || '',
         featured: collegeData.featured_img || '',
-        additional: additionalImages
+        images,
+        videos
       })
+
+      // Combine for form values if needed
+      setValue('images', [...images, ...videos])
+
       const memberData = collegeData.collegeMembers?.length
         ? collegeData.collegeMembers
         : [
@@ -584,8 +625,6 @@ export default function CollegeForm() {
     }
   }
 
-  console.log('uniSearch', uniSearch)
-
   const handleSearch = async (query) => {
     console.log('q', query)
     if (!query) {
@@ -619,6 +658,12 @@ export default function CollegeForm() {
     }
   }
 
+  // //watch form data
+  // const formData = watch()
+
+  // useEffect(() => {
+  //   console.log('Form data:', formData)
+  // }, [formData]) // Runs every time formData changes
   return (
     <>
       <div className='text-2xl mr-auto p-4 ml-14 font-bold'>
@@ -742,7 +787,7 @@ export default function CollegeForm() {
                 <div className='md:col-span-2'>
                   <label className='block mb-2'>Content</label>
 
-                  <CKEditor4
+                  <CKUni
                     id='editor-content'
                     initialData={getValues('content')}
                     onChange={(data) => setValue('content', data)}
@@ -755,10 +800,10 @@ export default function CollegeForm() {
 
             <div className='bg-white p-6 rounded-lg shadow-md'>
               <div className='flex justify-between items-center mb-4'>
-                <h2 className='text-xl font-semibold'>Courses</h2>
+                <h2 className='text-xl font-semibold'>Programs</h2>
                 <input
                   type='text'
-                  placeholder='Search courses'
+                  placeholder='Search Programs'
                   className='border p-2 rounded w-60'
                   value={courseSearch}
                   onChange={(e) => setCourseSearch(e.target.value)}
@@ -828,58 +873,24 @@ export default function CollegeForm() {
                 </div>
               </div>
 
-              <div className='mt-7'>
-                <div className='flex justify-between items-center mb-4'>
-                  <label className='block text-xl font-semibold'>Gallery</label>
-                  <button
-                    type='button'
-                    onClick={() => {
-                      appendImage('')
-                      setUploadedFiles((prev) => ({
-                        ...prev,
-                        additional: [...prev.additional, '']
-                      }))
-                    }}
-                    className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600'
-                  >
-                    Add Image
-                  </button>
-                </div>
-                <div className='w-full grid grid-cols-3 gap-7'>
-                  {imageFields.map((field, index) => (
-                    <div key={field.id} className='mb-4'>
-                      <FileUpload
-                        label={`Additional Image ${index + 1}`}
-                        onUploadComplete={(url) => {
-                          const newAdditional = [...uploadedFiles.additional]
-                          newAdditional[index] = url
-                          setUploadedFiles((prev) => ({
-                            ...prev,
-                            additional: newAdditional
-                          }))
-                          setValue(`images.${index}`, url)
-                        }}
-                        defaultPreview={uploadedFiles.additional[index]}
-                      />
-                      <button
-                        type='button'
-                        onClick={() => {
-                          removeImage(index)
-                          const newAdditional = [...uploadedFiles.additional]
-                          newAdditional.splice(index, 1)
-                          setUploadedFiles((prev) => ({
-                            ...prev,
-                            additional: newAdditional
-                          }))
-                        }}
-                        className='mt-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600'
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              {/* for image only */}
+              <GallerySection
+                control={control}
+                setValue={setValue}
+                uploadedFiles={uploadedFiles}
+                setUploadedFiles={setUploadedFiles}
+                getValues={getValues}
+              />
+
+              {/* for videos only */}
+
+              <VideoSection
+                control={control}
+                setValue={setValue}
+                uploadedFiles={uploadedFiles}
+                setUploadedFiles={setUploadedFiles}
+                getValues={getValues}
+              />
             </div>
 
             {/* Members Section */}
@@ -942,15 +953,24 @@ export default function CollegeForm() {
                       className='w-full p-2 border rounded'
                     />
                   </div>
-                  {index > 0 && (
-                    <button
-                      type='button'
-                      onClick={() => removeMember(index)}
-                      className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600'
-                    >
-                      Remove
-                    </button>
-                  )}
+                  <button
+                    type='button'
+                    onClick={() => {
+                      if (memberFields.length > 1) {
+                        removeMember(index)
+                      } else {
+                        setValue(`members.${index}`, {
+                          name: '',
+                          contact_number: '',
+                          role: '',
+                          description: ''
+                        })
+                      }
+                    }}
+                    className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600'
+                  >
+                    {memberFields.length > 1 ? 'Remove' : 'Clear'}
+                  </button>
                 </div>
               ))}
             </div>
@@ -988,7 +1008,8 @@ export default function CollegeForm() {
                     register={register}
                     setValue={setValue}
                     getValues={getValues}
-                    initialCourseTitle={courseTitle} // 🆕
+                    admissionFields={admissionFields}
+                    initialCourseTitle={courseTitle}
                   />
                 )
               })}
@@ -1004,10 +1025,10 @@ export default function CollegeForm() {
                       <label className='block mb-2 capitalize'>
                         {field !== 'state'
                           ? `${field.replace('_', ' ')} *`
-                          : 'District *'}
+                          : 'District'}
                       </label>
                       <input
-                        {...register(`address.${field}`, { required: true })}
+                        {...register(`address.${field}`)}
                         className='w-full p-2 border rounded'
                       />
                       {errors.address?.[field] && (

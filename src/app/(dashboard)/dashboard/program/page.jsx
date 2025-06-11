@@ -121,6 +121,7 @@ export default function ProgramForm() {
   } = useForm({
     defaultValues: {
       title: '',
+      code: 'test',
       author: author_id,
       faculty_id: '',
       duration: '',

@@ -5,6 +5,8 @@ const CKEditor4 = ({ onChange, initialData = '', id = 'editor1' }) => {
   const textareaRef = useRef(null)
   const [editorLoaded, setEditorLoaded] = useState(false)
 
+  const editorRef = useRef(null)
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (!window.CKEDITOR) {
@@ -19,8 +21,8 @@ const CKEditor4 = ({ onChange, initialData = '', id = 'editor1' }) => {
   }, [])
 
   useEffect(() => {
-    if (editorLoaded && textareaRef.current) {
-      // Destroy existing editor for this ID
+    if (editorLoaded && textareaRef.current && !editorRef.current) {
+      // Destroy existing editor if somehow already exists
       if (window.CKEDITOR.instances[id]) {
         window.CKEDITOR.instances[id].destroy(true)
       }
@@ -31,34 +33,7 @@ const CKEditor4 = ({ onChange, initialData = '', id = 'editor1' }) => {
         removePlugins: 'image,uploadimage,easyimage,cloudservices'
       })
 
-      window.CKEDITOR.on('dialogDefinition', function (ev) {
-        const dialogName = ev.data.name
-        const dialogDefinition = ev.data.definition
-
-        if (dialogName === 'image') {
-          const infoTab = dialogDefinition.getContents('info')
-          const previewField = infoTab.get('preview')
-
-          // Ensure preview area is empty when dialog opens
-          dialogDefinition.onShow = function () {
-            const dialog = this
-            const previewElement = dialog.getContentElement('info', 'preview')
-            if (previewElement && previewElement.getElement()) {
-              previewElement
-                .getElement()
-                .setHtml(
-                  '<div style="text-align:center; color:#999;">No preview available</div>'
-                )
-            }
-          }
-
-          // Optional: prevent default lorem ipsum from being set
-          if (previewField) {
-            previewField.html =
-              '<div style="text-align:center; color:#999;">No preview available</div>'
-          }
-        }
-      })
+      editorRef.current = editor
 
       editor.on('change', () => {
         const data = editor.getData()
@@ -67,7 +42,20 @@ const CKEditor4 = ({ onChange, initialData = '', id = 'editor1' }) => {
 
       editor.setData(initialData)
     }
-  }, [editorLoaded, id, initialData])
+    return () => {
+      if (window.CKEDITOR.instances[id]) {
+        window.CKEDITOR.instances[id].destroy(true)
+        editorRef.current = null
+      }
+    }
+  }, [editorLoaded, id])
+
+  // Optional: update editor content only if `initialData` changes externally
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.getData() !== initialData) {
+      editorRef.current.setData(initialData)
+    }
+  }, [initialData])
 
   return (
     <div>

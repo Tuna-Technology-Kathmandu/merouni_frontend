@@ -3,7 +3,8 @@ import dynamic from 'next/dynamic'
 import { useFormContext } from 'react-hook-form'
 import { useDebounce } from 'use-debounce'
 import { fetchCourse } from './actions'
-const CKEditor4 = dynamic(() => import('../component/CKEditor4'), {
+
+const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
 })
 
@@ -13,7 +14,8 @@ const AdmissionItem = ({
   register,
   setValue,
   getValues,
-  initialCourseTitle
+  initialCourseTitle,
+  admissionFields
 }) => {
   const [courseSearch, setCourseSearch] = useState(initialCourseTitle || '')
   const [debouncedCourseSearch] = useDebounce(courseSearch, 300)
@@ -24,7 +26,7 @@ const AdmissionItem = ({
   const [loadingCourses, setLoadingCourses] = useState(false)
 
   useEffect(() => {
-    if (hasSelectedCourse) return
+    if (hasSelectedCourse || courseSearch == '') return
 
     const fetchCourses = async () => {
       setLoadingCourses(true)
@@ -124,7 +126,7 @@ const AdmissionItem = ({
 
       <div className='md:col-span-2'>
         <label className='block mb-2'>Description</label>
-        <CKEditor4
+        <CKUni
           key={`editor-${index}`}
           id={`editor-description-${index}`}
           initialData={getValues(`admissions.${index}.description`) || ''}
@@ -132,15 +134,29 @@ const AdmissionItem = ({
         />
       </div>
 
-      {index > 0 && (
-        <button
-          type='button'
-          onClick={() => remove(index)}
-          className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600'
-        >
-          Remove
-        </button>
-      )}
+      <button
+        type='button'
+        onClick={() => {
+          if (admissionFields.length > 1) {
+            // Remove the member if there are multiple
+            remove(index)
+          } else {
+            // Clear values but keep the field if it's the last one
+            setValue(`admissions.${index}`, {
+              course_id: '',
+              eligibility_criteria: '',
+              admission_process: '',
+              fee_details: '',
+              description: ''
+            })
+            setCourseSearch('')
+            setHasSelectedCourse(false)
+          }
+        }}
+        className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600'
+      >
+        {admissionFields.length > 1 ? 'Remove' : 'Clear'}
+      </button>
     </div>
   )
 }

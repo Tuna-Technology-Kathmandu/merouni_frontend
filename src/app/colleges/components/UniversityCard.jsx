@@ -107,13 +107,6 @@ const UniversityCard = ({
           backgroundPosition: 'center'
         }}
       >
-        {/* <img
-          src={
-            college_logo || `https://avatar.iran.liara.run/username?username=${name}`
-          }
-          alt={`${name} logo`}
-          className="w-12 h-12 object-contain"
-        /> */}
         <div className='flex gap-2'>
           <button className='p-2 hover:bg-gray-100 rounded-full'>
             <Share className='w-5 h-5 text-gray-600' />
@@ -136,11 +129,6 @@ const UniversityCard = ({
       <div className='p-4'>
         <h3 className='font-semibold text-base mb-2'>{name}</h3>
         <p className=' text-sm mb-3 text-gray-400'>{location}</p>
-        {/* <p className="text-black text-sm my-4">
-        {description.length > 100
-          ? `${description.slice(0, 100)}...`
-          : description}
-      </p> */}
         <div className='flex gap-3 justify-between'>
           <Link href={`/colleges/${slug}`} key={collegeId}>
             <button className='flex-1 py-1.5 px-3 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-50 text-[13px] font-medium'>
