@@ -70,13 +70,15 @@ const ImageSection = ({ college }) => {
             </div>
             <div className='flex flex-col items-center gap-2 text-center '>
               <img src='/images/level.png' alt='level' className='w-10' />
-              {(college?.collegeCourses || []).map((course, index) => (
-                <div key={index}>
-                  <p className='max-w-36 sm:text-base text-xs font-semibold'>
-                    {course.program.title}
-                  </p>
-                </div>
-              ))}
+              {JSON.parse(college?.institute_level || '[]').map(
+                (level, index) => (
+                  <div key={index}>
+                    <p className='max-w-36 sm:text-base text-xs font-semibold'>
+                      {level}
+                    </p>
+                  </div>
+                )
+              )}
             </div>
             <div className='items-center hidden xl:block'>
               <PiLineVerticalThin size={60} />
@@ -86,7 +88,7 @@ const ImageSection = ({ college }) => {
               {(college?.collegeContacts || []).map((contact, index) => (
                 <div key={index} className='flex flex-row'>
                   <p className='sm:text-base text-xs font-semibold'>
-                    {contact?.contact_number || 'N/A'}
+                    {contact?.contact_number || ''}
                   </p>
                 </div>
               ))}

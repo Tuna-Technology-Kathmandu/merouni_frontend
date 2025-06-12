@@ -125,24 +125,19 @@ export default function CollegeForm() {
     remove: removeAdmission
   } = useFieldArray({ control, name: 'admissions' })
 
-  // const {
-  //   fields: imageFields,
-  //   append: appendImage,
-  //   remove: removeImage
-  // } = useFieldArray({ control, name: 'images' })
-
   const onSubmit = async (data) => {
     console.log('admission', data.admissions)
 
-    data.admissions = data.admissions.filter((admission) => {
-      return Object.values(admission).some((val) => {
-        if (typeof val === 'string') return val.trim() !== ''
-        return val !== null && val !== undefined
-      })
-    })
-
     try {
       setSubmitting(true)
+
+      //   this makes empty [] when all clear is done
+      data.admissions = data.admissions.filter((admission) => {
+        return Object.values(admission).some((val) => {
+          if (typeof val === 'string') return val.trim() !== ''
+          return val !== null && val !== undefined
+        })
+      })
       // Convert boolean values to numbers
       data.is_featured = +data.is_featured
       data.pinned = +data.pinned
@@ -664,6 +659,7 @@ export default function CollegeForm() {
   // useEffect(() => {
   //   console.log('Form data:', formData)
   // }, [formData]) // Runs every time formData changes
+
   return (
     <>
       <div className='text-2xl mr-auto p-4 ml-14 font-bold'>

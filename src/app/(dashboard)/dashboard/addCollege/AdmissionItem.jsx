@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { useFormContext } from 'react-hook-form'
 import { useDebounce } from 'use-debounce'
 import { fetchCourse } from './actions'
 
@@ -51,7 +50,7 @@ const AdmissionItem = ({
   return (
     <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border rounded'>
       <div className='relative'>
-        <label className='block mb-2'>Course *</label>
+        <label className='block mb-2'>Program*</label>
         <input
           type='text'
           className='w-full p-2 border rounded'

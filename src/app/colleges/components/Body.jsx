@@ -248,7 +248,6 @@ const CollegeFinder = () => {
     }
   ]
 
-  console.log('filter', selectedFilters)
   const FilterModal = () => (
     <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center'>
       <div className='bg-white rounded-xl p-6 w-full max-w-[90%] md:max-w-[80%] lg:max-w-[60%] h-full max-h-[90%] overflow-y-auto'>

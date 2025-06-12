@@ -43,8 +43,6 @@ const Featured = () => {
     }
   }
 
-  console.log('featured colleges', featuredColleges)
-
   useEffect(() => {}, [featuredColleges])
 
   return (

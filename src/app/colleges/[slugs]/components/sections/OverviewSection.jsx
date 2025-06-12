@@ -5,12 +5,12 @@ const OverviewSection = ({ college }) => {
   return (
     <div>
       <h2 className='text-sm md:text-lg lg:text-xl font-bold'>Description</h2>
-      <p className='text-gray-700 mt-9 max-[1120px]:mt-5 leading-7 max-md:leading-5 text-xs md:text-sm lg:text-base text-justify'>
+      <p className='text-gray-800 mt-9 max-[1120px]:mt-5 leading-7 max-md:leading-5 text-xs md:text-sm lg:text-base text-justify'>
         {college?.description}
       </p>
       <div
         dangerouslySetInnerHTML={{ __html: he.decode(college?.content) }}
-        className='text-gray-700 mt-4 leading-7   text-justify 
+        className='text-gray-800 mt-4 leading-7   text-justify 
              [&>iframe]:w-full 
              [&>iframe]:max-w-[calc(100vw-40px)] 
              [&>iframe]:aspect-video 
