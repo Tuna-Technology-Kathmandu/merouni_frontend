@@ -50,10 +50,6 @@ const CourseDescription = ({ params }) => {
     }
   }
 
-  useEffect(() => {
-    console.log('Degree data:', degree)
-  }, [degree])
-
   if (loading) {
     return <Loading />
   }

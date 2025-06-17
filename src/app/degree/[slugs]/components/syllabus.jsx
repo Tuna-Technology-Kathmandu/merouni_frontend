@@ -1,137 +1,151 @@
-import React from 'react'
-
-// {
-// 	"id": 17,
-// 	"title": "Bachelor of Electronics In Thapathali",
-// 	"slugs": "bachelor-of-electronics-in-thapathali",
-// 	"duration": "4 years",
-// 	"credits": 120,
-// 	"language": "English",
-// 	"eligibility_criteria": "High school diploma with a minimum GPA of 3.0",
-// 	"fee": "5000 USD per year",
-// 	"curriculum": "Core programming, Algorithms, Data Structures, AI, ML, Web Development",
-// 	"learning_outcomes": "Strong programming skills, problem-solving ability, software development expertise",
-// 	"delivery_type": "Full-time",
-// 	"delivery_mode": "On-campus",
-// 	"careers": "Software Developer, Data Scientist, IT Consultant",
-// 	"createdAt": "2025-02-06T06:20:26.000Z",
-// 	"updatedAt": "2025-02-06T06:33:27.000Z",
-// 	"programfaculty": {
-// 		"title": "Science",
-// 		"slugs": "science"
-// 	},
-// 	"syllabus": [
-// 		{
-// 			"id": 7,
-// 			"year": 1,
-// 			"semester": 1,
-// 			"is_elective": false,
-// 			"program_id": 17,
-// 			"course_id": 5,
-// 			"createdAt": "2025-02-06T06:20:27.000Z",
-// 			"updatedAt": "2025-02-06T06:20:27.000Z",
-// 			"programCourse": {
-// 				"id": 5,
-// 				"title": "Excel Training",
-// 				"description": "asda asd adasd asdas dasdasd",
-// 				"credits": 3
-// 			}
-// 		},
-// 		{
-// 			"id": 8,
-// 			"year": 1,
-// 			"semester": 2,
-// 			"is_elective": false,
-// 			"program_id": 17,
-// 			"course_id": 3,
-// 			"createdAt": "2025-02-06T06:20:27.000Z",
-// 			"updatedAt": "2025-02-06T06:20:27.000Z",
-// 			"programCourse": {
-// 				"id": 3,
-// 				"title": "Big Data",
-// 				"description": "asda asd adasd asdas dasdasd",
-// 				"credits": 3
-// 			}
-// 		},
-// 		{
-// 			"id": 9,
-// 			"year": 2,
-// 			"semester": 1,
-// 			"is_elective": true,
-// 			"program_id": 17,
-// 			"course_id": 1,
-// 			"createdAt": "2025-02-06T06:20:27.000Z",
-// 			"updatedAt": "2025-02-06T06:20:27.000Z",
-// 			"programCourse": {
-// 				"id": 1,
-// 				"title": "Digital Logic",
-// 				"description": "asda asd adasd asdas dasdasd",
-// 				"credits": 3
-// 			}
-// 		}
-// 	],
-// 	"programlevel": {
-// 		"title": "+2",
-// 		"slugs": "2"
-// 	},
-// 	"programscholarship": {
-// 		"name": "Funding Nepal Check Update"
-// 	},
-// 	"programexam": {
-// 		"title": "Engineering Entrance Exam"
-// 	},
-// 	"programauthorDetails": {
-// 		"firstName": "Admin",
-// 		"middleName": "adasd",
-// 		"lastName": "Tuna"
-// 	}
-// }
+import React, { useState } from 'react'
+import he from 'he'
+import Link from 'next/link'
 
 const Syllabus = ({ degree }) => {
+  // First group by year, then by semester
   const groupedSyllabus = degree?.syllabus?.reduce((acc, course) => {
-    if (!acc[course.year]) {
-      acc[course.year] = []
+    const year = course.year
+    const semester = course.semester
+
+    if (!acc[year]) {
+      acc[year] = {}
     }
-    acc[course.year].push(course)
+
+    // For semester 0 (yearly courses)
+    if (semester === 0) {
+      if (!acc[year].yearly) {
+        acc[year].yearly = []
+      }
+      acc[year].yearly.push(course)
+    } else {
+      if (!acc[year][semester]) {
+        acc[year][semester] = []
+      }
+      acc[year][semester].push(course)
+    }
+
     return acc
   }, {})
 
-  console.log('Grouped Syllabus:', groupedSyllabus)
   return (
-    <>
-      <div className='bg-[#D9D9D9] bg-opacity-20 flex flex-col items-center '>
-        <h2 className='font-bold text-3xl leading-10 mt-8'>Syllabus</h2>
-        <div className='flex flex-col'>
-          {groupedSyllabus &&
-            Object.entries(groupedSyllabus).map(([year, courses]) => (
-              <div className='mb-10'>
-                <p className='mb-4 mt-10 text-xl font-semibold'>Year {year}</p>
-                <div className='grid grid-cols-2 gap-x-96 gap-y-10 '>
-                  {courses.map((course) => (
-                    <div
-                      key={course.id}
-                      className='bg-white w-[350px] h-[120px] flex flex-col rounded-2xl'
-                    >
-                      <div className='pl-4 pt-4'>
-                        <h2 className=' text-lg'>
-                          {course.programCourse.title}
-                        </h2>
-                        <h3 className='text-sm text-gray-700'>
-                          Course Code: {course.programCourse.code}
-                        </h3>
+    <div className='bg-[#D9D9D9] bg-opacity-20 flex flex-col items-center mt-10'>
+      <h2 className='font-bold text-3xl leading-10 mt-8'>Syllabus</h2>
+      <div className='flex flex-col w-full max-w-6xl px-4'>
+        {groupedSyllabus &&
+          Object.entries(groupedSyllabus)
+            .sort(([yearA], [yearB]) => yearA - yearB)
+            .map(([year, semesters]) => (
+              <div
+                key={year}
+                className='mb-4 border-b-2 border-b-[#2981b2] pb-4'
+              >
+                <p className='mb-1 mt-10 text-2xl font-semibold text-center'>
+                  Year {year}
+                </p>
 
-                        <h3 className='text-sm text-gray-700'>
-                          Credits: {course.programCourse.credits}
-                        </h3>
+                {semesters.yearly && (
+                  <div className='mb-8'>
+                    <h3 className='text-lg font-medium mb-4'>Yearly Courses</h3>
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-16'>
+                      {semesters.yearly.map((course) => (
+                        <CourseCard key={course.id} course={course} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {Object.entries(semesters)
+                  .filter(([key]) => key !== 'yearly')
+                  .sort(([semesterA], [semesterB]) => semesterA - semesterB)
+                  .map(([semester, courses]) => (
+                    <div key={semester} className='mb-8'>
+                      <h3 className='text-lg font-medium mb-4 text-center underline'>
+                        Semester {semester}
+                      </h3>
+                      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                        {courses.map((course) => (
+                          <CourseCard key={course.id} course={course} />
+                        ))}
                       </div>
                     </div>
                   ))}
-                </div>
               </div>
             ))}
-        </div>
       </div>
-    </>
+    </div>
+  )
+}
+
+const CourseCard = ({ course }) => {
+  // Safely handle the content decoding
+  const decodedContent = course?.programCourse?.description
+    ? he.decode(course.programCourse.description.slice(0, 140) + '...')
+    : ''
+
+  return (
+    <Link href={`/degree/single-subject/${course?.programCourse.slugs}`}>
+      <div className='bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer'>
+        <h2 className='text-xl font-semibold'>
+          {course?.programCourse?.title}
+        </h2>
+        <h3 className='text-sm text-gray-700'>
+          Credits: {course?.programCourse?.credits || 'N/A'}
+        </h3>
+
+        {decodedContent && (
+          <div
+            dangerouslySetInnerHTML={{ __html: decodedContent }}
+            className='text-gray-800 mt-4 leading-7 
+            [&>iframe]:w-full 
+            [&>iframe]:max-w-[calc(100vw-40px)] 
+            [&>iframe]:aspect-video 
+            [&>iframe]:h-auto
+            [&>iframe]:rounded-lg 
+            [&>iframe]:mt-4
+            [&>iframe]:mx-auto
+            [&>iframe]:block
+            [&_table]:w-full
+            [&_table]:my-4
+            [&_table]:border-collapse
+            [&_th]:bg-gray-100
+            [&_th]:p-2
+            [&_th]:text-left
+            [&_th]:border
+            [&_th]:border-gray-300
+            [&_td]:p-2
+            [&_td]:border
+            [&_td]:border-gray-300
+            [&_tr:nth-child(even)]:bg-gray-50
+            [&_h1]:text-2xl
+            [&_h1]:font-bold
+            [&_h1]:mt-8
+            [&_h1]:mb-4
+            [&_h2]:text-xl
+            [&_h2]:font-bold
+            [&_h2]:mt-6
+            [&_h2]:mb-3
+            text-xs md:text-sm lg:text-base
+            overflow-x-hidden
+            [&_ol]:list-decimal 
+[&_ol]:pl-8 
+[&_ol]:my-4
+[&_ol]:space-y-2
+[&_ul]:list-disc 
+[&_ul]:pl-8 
+[&_ul]:my-4
+[&_ul]:space-y-2
+[&_li]:pl-2'
+          />
+        )}
+
+        {course.is_elective && (
+          <span className='inline-block mt-1 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full'>
+            Elective
+          </span>
+        )}
+      </div>
+    </Link>
   )
 }
 

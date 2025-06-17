@@ -42,7 +42,19 @@ const OverviewSection = ({ college }) => {
     [&_h2]:mt-6
     [&_h2]:mb-3
              text-xs md:text-sm lg:text-base
-             overflow-x-hidden'
+             overflow-x-hidden
+              [&_ol]:pl-8 
+  [&_ol]:my-4
+  [&_ol]:space-y-2
+  [&_ul]:list-disc 
+  [&_ul]:pl-8 
+  [&_ul]:my-4
+  [&_ul]:space-y-2
+  [&_li]:pl-2
+  max-lg:[&_ol]:text-sm
+  max-lg:[&_ul]:text-sm
+  max-lg:[&_ol]:space-y-1
+  max-lg:[&_ul]:space-y-1'
       ></div>
 
       <h2 className='text-[13px] md:text-[15px] lg:text-[17px] font-bold mt-6'>

@@ -10,66 +10,60 @@ const VideoSection = ({
   getValues
 }) => {
   const [isUploading, setIsUploading] = useState(false)
-  const fileInputRef = useRef(null)
+  const [youtubeLink, setYoutubeLink] = useState('')
+  const [isValidLink, setIsValidLink] = useState(true)
+  const inputRef = useRef(null)
 
-  const handleBulkUpload = async (event) => {
-    const files = Array.from(event.target.files)
-    if (files.length === 0) return
+  const extractYouTubeId = (url) => {
+    // Regular expressions for different YouTube URL formats
+    const regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
+    const match = url.match(regExp)
+    return match && match[2].length === 11 ? match[2] : null
+  }
 
-    // Filter only video files
-    const videoFiles = files.filter((file) => file.type.includes('video'))
-    if (videoFiles.length === 0) {
-      toast.error('Please select video files only')
+  const validateYouTubeUrl = (url) => {
+    if (!url) return false
+    const youtubeId = extractYouTubeId(url)
+    return !!youtubeId
+  }
+
+  const handleAddYoutubeLink = () => {
+    if (!youtubeLink.trim()) {
+      toast.error('Please enter a YouTube URL')
       return
     }
 
-    setIsUploading(true)
-    const newVideos = []
-
-    try {
-      for (const file of videoFiles) {
-        const formData = new FormData()
-        formData.append('title', file.name)
-        formData.append('altText', file.name)
-        formData.append('description', '')
-        formData.append('file', file)
-        formData.append('authorId', '1')
-
-        const response = await axios.post(
-          'https://uploads.merouni.com/api/v1/media/upload',
-          formData,
-          { headers: { 'Content-Type': 'multipart/form-data' } }
-        )
-
-        if (response.data.success) {
-          newVideos.push({
-            url: response.data.media.url,
-            file_type: 'video',
-            thumbnail: response.data.media.thumbnail || null // Add thumbnail if available
-          })
-        }
-      }
-
-      // Update all uploaded files at once
-      setUploadedFiles((prev) => ({
-        ...prev,
-        videos: [...prev.videos, ...newVideos]
-      }))
-
-      // Update react-hook-form values
-      const currentImages = getValues('images') || []
-      setValue('images', [...currentImages, ...newVideos])
-
-      toast.success(`Uploaded ${newVideos.length} videos successfully!`)
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Upload failed')
-    } finally {
-      setIsUploading(false)
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
+    if (!validateYouTubeUrl(youtubeLink)) {
+      setIsValidLink(false)
+      toast.error('Please enter a valid YouTube URL')
+      return
     }
+
+    setIsValidLink(true)
+    const youtubeId = extractYouTubeId(youtubeLink)
+    const embedUrl = `https://www.youtube.com/embed/${youtubeId}`
+    const thumbnailUrl = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
+
+    const newVideo = {
+      url: embedUrl,
+      file_type: 'video',
+      thumbnail: thumbnailUrl,
+      youtubeId: youtubeId
+    }
+
+    // Update uploaded files
+    setUploadedFiles((prev) => ({
+      ...prev,
+      videos: [...prev.videos, newVideo]
+    }))
+
+    // Update react-hook-form values
+    const currentImages = getValues('images') || []
+    setValue('images', [...currentImages, newVideo])
+
+    toast.success('YouTube video added successfully!')
+    setYoutubeLink('')
   }
 
   const removeVideo = (videoUrl) => {
@@ -86,27 +80,29 @@ const VideoSection = ({
   }
 
   const showVideos = uploadedFiles.videos
+
   return (
     <div className='mt-7'>
       <div className='flex justify-between items-center mb-4'>
         <label className='block text-xl font-semibold'>Videos</label>
+      </div>
+
+      <div className='mb-6 flex gap-2'>
+        <input
+          type='text'
+          ref={inputRef}
+          value={youtubeLink}
+          onChange={(e) => setYoutubeLink(e.target.value)}
+          placeholder='Enter YouTube URL (e.g., https://www.youtube.com/watch?v=...)'
+          className={`flex-1 p-2 border rounded ${!isValidLink ? 'border-red-500' : 'border-gray-300'}`}
+        />
         <button
           type='button'
-          onClick={() => fileInputRef.current.click()}
-          disabled={isUploading}
-          className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-green-300'
+          onClick={handleAddYoutubeLink}
+          className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600'
         >
-          {isUploading ? 'Uploading...' : 'Add Videos'}
+          Add Video
         </button>
-        <input
-          type='file'
-          ref={fileInputRef}
-          onChange={handleBulkUpload}
-          accept='video/*'
-          multiple
-          className='hidden'
-          disabled={isUploading}
-        />
       </div>
 
       <div className='w-full grid grid-cols-3 gap-7'>
@@ -115,25 +111,14 @@ const VideoSection = ({
             <div className='border-2 border-dashed border-gray-300 rounded-lg p-4 h-48'>
               {video?.url ? (
                 <div className='relative w-full h-full'>
-                  <video
-                    controls
-                    className='w-full h-full object-cover rounded'
-                  >
-                    <source
-                      src={video.url}
-                      type={`video/${video.url.split('.').pop()}`}
-                    />
-                    Your browser does not support the video tag.
-                  </video>
-                  {video.thumbnail && (
-                    <div className='absolute inset-0 flex items-center justify-center'>
-                      <img
-                        src={video.thumbnail}
-                        alt='Video thumbnail'
-                        className='w-full h-full object-cover rounded'
-                      />
-                    </div>
-                  )}
+                  <iframe
+                    src={video.url}
+                    title={`YouTube video ${index}`}
+                    frameBorder='0'
+                    allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                    allowFullScreen
+                    className='w-full h-full rounded'
+                  ></iframe>
                 </div>
               ) : (
                 <div className='w-full h-full flex items-center justify-center bg-gray-100 rounded'>
@@ -151,17 +136,6 @@ const VideoSection = ({
           </div>
         ))}
       </div>
-
-      {isUploading && (
-        <div className='mt-4 p-4 bg-blue-50 rounded-lg'>
-          <p>Uploading {fileInputRef.current?.files?.length} videos...</p>
-          <progress
-            className='w-full mt-2'
-            max='100'
-            value={isUploading ? '50' : '0'}
-          />
-        </div>
-      )}
     </div>
   )
 }

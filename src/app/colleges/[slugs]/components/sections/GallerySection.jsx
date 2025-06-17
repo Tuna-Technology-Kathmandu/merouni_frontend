@@ -42,10 +42,14 @@ const GallerySection = ({ college }) => {
         <div className='w-full mt-12 max-[1120px]:mt-9'>
           {videos.map((item, index) => {
             return (
-              <div key={index} className='w-full mb-6'>
-                <video width='100%' height='100%' controls>
-                  <source src={item.file_url} type='video/mp4' />
-                </video>
+              <div key={index} className='w-full mb-6 relative '>
+                <iframe
+                  src={item.file_url}
+                  title={`YouTube video ${index}`}
+                  allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                  allowFullScreen
+                  className='w-full h-96 max-[1024px]:h-72 rounded '
+                ></iframe>
               </div>
             )
           })}

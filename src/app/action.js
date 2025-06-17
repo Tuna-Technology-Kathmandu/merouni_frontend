@@ -161,27 +161,6 @@ export async function getColleges(
   return services.college.getAll(params)
 }
 
-// export async function getFeaturedColleges() {
-//   try {
-//     const response = await fetch(
-//       `${process.env.baseUrl}${process.env.version}/college/featured-college`,
-//       {
-//         cache: 'no-store'
-//       }
-//     )
-
-//     if (!response.ok) {
-//       throw new Error(`HTTP error! status: ${response.status}`)
-//     }
-
-//     const data = await response.json()
-//     return data
-//   } catch (error) {
-//     console.error('Error fetching featured colleges:', error)
-//     throw error
-//   }
-// }
-
 export async function getFilteredPinFeatColleges(
   is_featured = null,
   pinned = null,

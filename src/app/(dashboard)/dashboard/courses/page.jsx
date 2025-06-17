@@ -32,6 +32,7 @@ export default function CourseForm() {
   const [editing, setEditing] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -106,6 +107,7 @@ export default function CourseForm() {
   }, [debouncedFac])
 
   const onSubmit = async (data) => {
+    setSubmitting(true)
     try {
       const url = `${process.env.baseUrl}${process.env.version}/course`
       const method = 'POST'
@@ -136,6 +138,8 @@ export default function CourseForm() {
       setIsOpen(false)
     } catch (error) {
       toast.error(error.message || 'Failed to save course')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -157,6 +161,7 @@ export default function CourseForm() {
       setValue('duration', course.duration)
       setValue('description', course.description)
       setValue('facultyId', course.coursefaculty.id)
+      setFacSearch(course.coursefaculty.title)
 
       if (course.coursefaculty) {
         const faculty = faculties.find(
@@ -331,21 +336,6 @@ export default function CourseForm() {
                   />
                 </div>
 
-                {/* <div>
-                  <label className='block mb-2'>Faculty *</label>
-                  <select
-                    {...register('facultyId', { required: true })}
-                    className='w-full p-2 border rounded'
-                  >
-                    <option value=''>Select Faculty</option>
-                    {faculties.map((faculty) => (
-                      <option key={faculty.id} value={faculty.id}>
-                        {faculty.title}
-                      </option>
-                    ))}
-                  </select>
-                </div> */}
-
                 <div className='relative'>
                   <label className='block mb-2'>Faculty *</label>
 
@@ -425,7 +415,7 @@ export default function CourseForm() {
                 disabled={loading}
                 className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
               >
-                {loading
+                {submitting
                   ? 'Processing...'
                   : editing
                     ? 'Update Course'

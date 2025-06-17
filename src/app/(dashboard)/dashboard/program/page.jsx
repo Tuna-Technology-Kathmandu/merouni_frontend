@@ -16,6 +16,7 @@ import {
 } from './actions'
 import { useDebounce } from 'use-debounce'
 import CourseSearch from './CourseSearch'
+import Syllabus from './Syllabus'
 
 export default function ProgramForm() {
   const author_id = useSelector((state) => state.user.data.id)
@@ -26,6 +27,11 @@ export default function ProgramForm() {
   const [editing, setEditing] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  //new syllabus
+  const [currentYear, setCurrentYear] = useState(1)
+  const [currentSemester, setCurrentSemester] = useState(1)
+  const [currentCourse, setCurrentCourse] = useState({ id: '', title: '' })
 
   // States for dropdowns
   //for faculties search
@@ -64,6 +70,8 @@ export default function ProgramForm() {
   const [collegeSearch, setCollegeSearch] = useState('')
   const [selectedColleges, setSelectedColleges] = useState([])
   const [searchResults, setSearchResults] = useState([])
+
+  const [syllabusSearch, setSyllabusSearch] = useState('')
 
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -121,7 +129,7 @@ export default function ProgramForm() {
   } = useForm({
     defaultValues: {
       title: '',
-      code: 'test',
+      code: '',
       author: author_id,
       faculty_id: '',
       duration: '',
@@ -141,7 +149,8 @@ export default function ProgramForm() {
         {
           year: 1,
           semester: 1,
-          course_id: ''
+          course_id: '',
+          _title: ''
         }
       ],
       colleges: []
@@ -289,18 +298,26 @@ export default function ProgramForm() {
   }
 
   const onSubmit = async (data) => {
-    console.log('form', data)
     try {
+      const cleanedData = {
+        ...data,
+        syllabus: data.syllabus.map((item) => ({
+          year: item.year,
+          semester: item.semester,
+          course_id: item.course_id
+          // _title and _code are automatically excluded
+        }))
+      }
       const url = `${process.env.baseUrl}${process.env.version}/program`
       const method = 'POST'
-      console.log('while submiting data is', data)
+      console.log('while submiting data is', cleanedData)
 
       const response = await authFetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(cleanedData)
       })
 
       const result = await response.json()
@@ -360,13 +377,13 @@ export default function ProgramForm() {
       setValue('delivery_type', program.delivery_type)
       setValue('delivery_mode', program.delivery_mode)
       setValue('careers', program.careers)
+      setValue('code', program.code)
+
       const enrichedSyllabus = program.syllabus.map((item) => ({
         year: item.year,
         semester: item.semester,
         course_id: item.course_id,
-        course: {
-          title: item.programCourse?.title || ''
-        }
+        _title: item.programCourse?.title || ''
       }))
 
       setValue('syllabus', enrichedSyllabus)
@@ -549,6 +566,41 @@ export default function ProgramForm() {
       setPrograms([])
     }
   }
+  const getCurrentSemesterCourses = () => {
+    return syllabusFields
+      .filter(
+        (field) =>
+          field.year === currentYear && field.semester === currentSemester
+      )
+      .map((field) => ({
+        id: field.course_id,
+        title: field._title || 'Unknown Course'
+      }))
+  }
+  const handleAddCourse = () => {
+    if (currentCourse.id) {
+      appendSyllabus({
+        year: currentYear,
+        semester: currentSemester,
+        course_id: currentCourse.id,
+        _title: currentCourse.title
+      })
+      setCurrentCourse({ id: '', title: '' })
+      setSyllabusSearch('')
+    }
+  }
+
+  const handleRemoveCourse = (courseId) => {
+    const index = syllabusFields.findIndex(
+      (field) =>
+        field.course_id === courseId &&
+        field.year === currentYear &&
+        field.semester === currentSemester
+    )
+    if (index >= 0) removeSyllabus(index)
+  }
+
+  const clearSearch = () => {}
 
   return (
     <>
@@ -582,20 +634,13 @@ export default function ProgramForm() {
                   )}
                 </div>
 
-                {/* <div>
-                  <label className='block mb-2'>Faculty *</label>
-                  <select
-                    {...register('faculty_id', { required: true })}
+                <div>
+                  <label className='block mb-2'>Program Code</label>
+                  <input
+                    {...register('code')}
                     className='w-full p-2 border rounded'
-                  >
-                    <option value=''>Select Faculty</option>
-                    {faculties.map((faculty) => (
-                      <option key={faculty.id} value={faculty.id}>
-                        {faculty.title}
-                      </option>
-                    ))}
-                  </select>
-                </div> */}
+                  />
+                </div>
 
                 <div className='relative'>
                   <label className='block mb-2'>Faculty *</label>
@@ -663,21 +708,6 @@ export default function ProgramForm() {
                     className='w-full p-2 border rounded'
                   />
                 </div>
-
-                {/* <div>
-                  <label className='block mb-2'>Level *</label>
-                  <select
-                    {...register('level_id', { required: true })}
-                    className='w-full p-2 border rounded'
-                  >
-                    <option value=''>Select Level</option>
-                    {levels.map((level) => (
-                      <option key={level.id} value={level.id}>
-                        {level.title}
-                      </option>
-                    ))}
-                  </select>
-                </div> */}
 
                 {/* level search box */}
                 <div className='relative'>
@@ -813,110 +843,13 @@ export default function ProgramForm() {
               </div>
             </div>
 
-            {/* Syllabus Section */}
-            <div className='bg-white p-6 rounded-lg shadow-md'>
-              <div className='flex justify-between items-center mb-4'>
-                <h2 className='text-xl font-semibold'>Syllabus</h2>
-                <button
-                  type='button'
-                  onClick={() =>
-                    appendSyllabus({
-                      year: 1,
-                      semester: 1,
-                      course_id: ''
-                    })
-                  }
-                  className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600'
-                >
-                  Add Course
-                </button>
-              </div>
-
-              {syllabusFields.map((field, index) => {
-                return (
-                  <div
-                    key={field.id}
-                    className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 border rounded'
-                  >
-                    <div>
-                      <label className='block mb-2'>Year</label>
-                      <input
-                        type='number'
-                        {...register(`syllabus.${index}.year`)}
-                        className='w-full p-2 border rounded'
-                        min='1'
-                      />
-                    </div>
-
-                    <div>
-                      <label className='block mb-2'>Semester</label>
-                      <input
-                        type='number'
-                        {...register(`syllabus.${index}.semester`)}
-                        className='w-full p-2 border rounded'
-                        min='1'
-                        max='2'
-                      />
-                    </div>
-
-                    {/* <div>
-                    <label className='block mb-2'>Course</label>
-                    <select
-                      {...register(`syllabus.${index}.course_id`)}
-                      className='w-full p-2 border rounded'
-                    >
-                      <option value=''>Select Course</option>
-                      {courses.map((course) => (
-                        <option key={course.id} value={course.id}>
-                          {course.title}
-                        </option>
-                      ))}
-                    </select>
-                  </div> */}
-
-                    <CourseSearch
-                      value={watch(`syllabus.${index}.course_id`)}
-                      onChange={(id) =>
-                        setValue(`syllabus.${index}.course_id`, id)
-                      }
-                      title={watch(`syllabus.${index}.course.title`)}
-                    />
-
-                    {index > 0 && (
-                      <button
-                        type='button'
-                        onClick={() => removeSyllabus(index)}
-                        className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600'
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-
             {/* Additional Information */}
             <div className='bg-white p-6 rounded-lg shadow-md'>
               <h2 className='text-xl font-semibold mb-4'>
                 Additional Information
               </h2>
+              Plus
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                {/* <div>
-                  <label className='block mb-2'>Scholarship</label>
-                  <select
-                    {...register('scholarship_id')}
-                    className='w-full p-2 border rounded'
-                  >
-                    <option value=''>Select Scholarship</option>
-                    {scholarships.map((scholarship) => (
-                      <option key={scholarship.id} value={scholarship.id}>
-                        {scholarship.name}
-                      </option>
-                    ))}
-                  </select>
-                </div> */}
-
                 {/* for scholarships */}
                 <div className='relative'>
                   <label className='block mb-2'>Scholarship</label>
@@ -1020,25 +953,6 @@ export default function ProgramForm() {
                   />
                 </div>
 
-                {/* <div>
-                  <label className="block mb-2">Associated Colleges</label>
-                  <select
-                    multiple
-                    {...register("colleges")}
-                    className="w-full p-2 border rounded"
-                    size="4"
-                  >
-                    {colleges.map((college) => (
-                      <option key={college.id} value={college.id}>
-                        {college.name}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Hold Ctrl/Cmd to select multiple colleges
-                  </p>
-                </div> */}
-
                 <div className='mb-4'>
                   <label className='block mb-2'>Colleges</label>
                   <div className='flex flex-wrap gap-2 mb-2'>
@@ -1085,6 +999,146 @@ export default function ProgramForm() {
                 </div>
               </div>
             </div>
+            {/* new one */}
+
+            <div className='bg-white p-6 rounded-lg shadow-md'>
+              <label className='block text-lg font-medium mb-2'>
+                Curriculum Structure
+              </label>
+
+              {/* Year/Semester Navigation */}
+              <div className='flex flex-wrap gap-4 mb-6 p-3 bg-gray-50 rounded-lg'>
+                {[1, 2, 3, 4].map((year) => (
+                  <div key={year} className='flex-1 min-w-[150px]'>
+                    <h3 className='font-medium mb-2'>Year {year}</h3>
+                    <div className='space-y-2'>
+                      {[0, 1, 2].map((sem) => (
+                        <button
+                          key={sem}
+                          type='button'
+                          onClick={() => {
+                            setCurrentYear(year)
+                            setCurrentSemester(sem)
+                          }}
+                          className={`w-full py-2 px-3 rounded text-sm ${
+                            currentYear === year && currentSemester === sem
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-white border hover:bg-gray-100'
+                          }`}
+                        >
+                          {sem !== 0
+                            ? `
+                            Semester ${sem}`
+                            : `Yearly Basis`}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Current Semester Header */}
+              <div className='flex items-center justify-between mb-4 p-3 bg-blue-50 rounded-lg'>
+                <h3 className='font-medium text-lg'>
+                  {currentSemester == 0
+                    ? ` Year ${currentYear}`
+                    : ` Year ${currentYear} - Semester ${currentSemester}`}
+                </h3>
+              </div>
+
+              {/* Course Management */}
+              <div className='space-y-4'>
+                {/* Course Search - Quick Add */}
+                <div className='flex gap-2 items-end'>
+                  <div className='flex-1'>
+                    <CourseSearch
+                      search={syllabusSearch}
+                      setSearch={setSyllabusSearch}
+                      value={currentCourse.id}
+                      onChange={(id, title) => setCurrentCourse({ id, title })}
+                      title={currentCourse.title}
+                      placeholder='Search courses to add...'
+                    />
+                  </div>
+                  <div>
+                    <button
+                      type='button'
+                      onClick={handleAddCourse}
+                      disabled={!currentCourse.id}
+                      className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-gray-300'
+                    >
+                      Add Course
+                    </button>
+                  </div>
+                </div>
+
+                {/* Current Semester Courses */}
+                {getCurrentSemesterCourses().length > 0 ? (
+                  <div className='border rounded-lg overflow-hidden'>
+                    <table className='w-full'>
+                      <thead className='bg-gray-50'>
+                        <tr>
+                          <th className='p-3 text-left w-[50px]'></th>
+                          <th className='p-3 text-left'>Course</th>
+                          <th className='p-3 text-left w-[100px]'>Id</th>
+                          <th className='p-3 text-right w-[50px]'>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {getCurrentSemesterCourses().map((course, index) => {
+                          // Get the actual form field index for this course
+                          const fieldIndex = syllabusFields.findIndex(
+                            (field) =>
+                              field.course_id === course.id &&
+                              field.year === currentYear &&
+                              field.semester === currentSemester
+                          )
+
+                          // Get title from either:
+                          // 1. The currentCourse state (for newly added)
+                          // 2. The watched field value (for existing)
+                          const title =
+                            fieldIndex >= 0
+                              ? watch(`syllabus.${fieldIndex}._title`) ||
+                                course.title ||
+                                'Unknown Course'
+                              : course.title || 'Unknown Course'
+
+                          return (
+                            <tr
+                              key={course.id}
+                              className='border-t hover:bg-gray-50'
+                            >
+                              <td className='p-3 text-gray-500'>
+                                {index + 1}.
+                              </td>
+                              <td className='p-3 font-medium'>{title}</td>
+                              <td className='p-3 text-gray-600'>
+                                {course.id || '-'}
+                              </td>
+                              <td className='p-3 text-right'>
+                                <button
+                                  type='button'
+                                  onClick={() => handleRemoveCourse(course.id)}
+                                  className='text-red-500 hover:text-red-700 p-1'
+                                  title='Remove course'
+                                >
+                                  <Trash2 className='w-4 h-4' />
+                                </button>
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className='p-6 text-center text-gray-500 bg-gray-50 rounded-lg'>
+                    No courses added for this semester yet
+                  </div>
+                )}
+              </div>
+            </div>
 
             {/* Submit Button */}
             <div className='flex justify-end'>
@@ -1129,4 +1183,73 @@ export default function ProgramForm() {
       />
     </>
   )
+}
+
+{
+  /* <div className='bg-white p-6 rounded-lg shadow-md'>
+              <div className='flex justify-between items-center mb-4'>
+                <h2 className='text-xl font-semibold'>Syllabus</h2>
+                <button
+                  type='button'
+                  onClick={() =>
+                    appendSyllabus({
+                      year: 1,
+                      semester: 1,
+                      course_id: ''
+                    })
+                  }
+                  className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600'
+                >
+                  Add Course
+                </button>
+              </div>
+
+              {syllabusFields.map((field, index) => {
+                return (
+                  <div
+                    key={field.id}
+                    className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 border rounded'
+                  >
+                    <div>
+                      <label className='block mb-2'>Year</label>
+                      <input
+                        type='number'
+                        {...register(`syllabus.${index}.year`)}
+                        className='w-full p-2 border rounded'
+                        min='1'
+                      />
+                    </div>
+
+                    <div>
+                      <label className='block mb-2'>Semester</label>
+                      <input
+                        type='number'
+                        {...register(`syllabus.${index}.semester`)}
+                        className='w-full p-2 border rounded'
+                        min='1'
+                        max='2'
+                      />
+                    </div>
+
+                    <CourseSearch
+                      value={watch(`syllabus.${index}.course_id`)}
+                      onChange={(id) =>
+                        setValue(`syllabus.${index}.course_id`, id)
+                      }
+                      title={watch(`syllabus.${index}.course.title`)}
+                    />
+
+                    {index > 0 && (
+                      <button
+                        type='button'
+                        onClick={() => removeSyllabus(index)}
+                        className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600'
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
+            </div> */
 }

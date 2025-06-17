@@ -653,12 +653,12 @@ export default function CollegeForm() {
     }
   }
 
-  // //watch form data
-  // const formData = watch()
+  //watch form data
+  const formData = watch()
 
-  // useEffect(() => {
-  //   console.log('Form data:', formData)
-  // }, [formData]) // Runs every time formData changes
+  useEffect(() => {
+    console.log('Form data:', formData)
+  }, [formData]) // Runs every time formData changes
 
   return (
     <>
