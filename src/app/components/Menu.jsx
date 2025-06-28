@@ -169,6 +169,7 @@ const Menu = () => {
       document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
       dispatch(removeUser())
       localStorage.removeItem('access_token')
+      localStorage.removeItem('refreshToken')
       router.push('/sign-in')
     } catch (error) {
       console.error('Logout error:', error)

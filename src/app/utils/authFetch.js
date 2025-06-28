@@ -27,10 +27,17 @@ export const authFetch = async (url, options = {}) => {
       })
 
       if (!newResponse.ok) {
-        if (newResponse.status === 401) {
-          // Clear tokens on authentication failure
-          // localStorage.removeItem("refreshToken");
-          throw new Error('Session expired. Please login again.')
+        // if (newResponse.status === 401) {
+        //   // Clear tokens on authentication failure
+        //   // localStorage.removeItem("refreshToken");
+        //   throw new Error('Session expired. Please login again.')
+        // }
+
+        if (newResponse.status === 401 || newResponse.status === 403) {
+          // Clear all storage and redirect to logout
+          localStorage.clear()
+          window.location.href = '/sign-in' // Change this to your actual logout route
+          return // Stop further execution
         }
         throw new Error(`Request failed with status ${newResponse.status}`)
       }
