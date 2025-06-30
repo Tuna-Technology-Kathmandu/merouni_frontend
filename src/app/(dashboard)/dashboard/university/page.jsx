@@ -11,7 +11,7 @@ import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { fetchLevel } from './actions'
 import { useDebounce } from 'use-debounce'
-
+import { fetchAllCourse } from './actions'
 const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
 })
@@ -28,6 +28,10 @@ export default function UniversityForm() {
   const [debouncedLevel] = useDebounce(levelSearch, 300)
   const [levels, setLevels] = useState([])
   const [hasSelectedLevel, setHasSelectedLevel] = useState(false)
+
+  //for allcourse
+  const [courses, setCourses] = useState([])
+  const [courseSearch, setCourseSearch] = useState('')
 
   const [editing, setEditing] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState({
@@ -70,6 +74,7 @@ export default function UniversityForm() {
         phone_number: ''
       },
       levels: [],
+      courses: [],
       members: [
         {
           role: '',
@@ -107,6 +112,23 @@ export default function UniversityForm() {
   const formData = watch()
   console.log('fromData', formData)
 
+  //for courses
+  useEffect(() => {
+    const getCourses = async () => {
+      try {
+        const courseList = await fetchAllCourse()
+        setCourses(courseList)
+      } catch (error) {
+        console.error('Error fetching courses:', error)
+      }
+    }
+
+    getCourses()
+  }, [])
+
+  const filteredCourses = courses.filter((course) =>
+    course.title.toLowerCase().includes(courseSearch.toLowerCase())
+  )
   const fetchUniversities = async (page = 1) => {
     setTableLoading(true)
     try {
@@ -148,6 +170,29 @@ export default function UniversityForm() {
       data.assets.featured_image = uploadedFiles.featured
       data.gallery = uploadedFiles.gallery.filter((url) => url)
       data.levels = data.levels.map((l) => parseInt(l))
+
+      // Validate and format courses
+      data.courses = Array.isArray(data.courses)
+        ? data.courses.map((course) => parseInt(course))
+        : []
+
+      // Filter out invalid course IDs and verify they exist in available courses
+      const validCourseIds = data.courses.filter(
+        (id) =>
+          !isNaN(id) &&
+          id !== null &&
+          id !== undefined &&
+          courses.some((course) => course.id === id) // Check if ID exists in your courses list
+      )
+
+      // Optional: Show error if no valid courses selected
+      if (validCourseIds.length === 0 && courses.length > 0) {
+        toast.error('Please select at least one valid course')
+        return
+      }
+
+      // Use only validated courses
+      data.courses = validCourseIds
 
       const url = `${process.env.baseUrl}${process.env.version}/university`
       const method = 'POST'
@@ -647,6 +692,40 @@ export default function UniversityForm() {
                     {level.title}
                   </label>
                 ))}
+              </div>
+            </div>
+
+            {/* Courses Section */}
+
+            <div className='bg-white p-6 rounded-lg shadow-md'>
+              <div className='flex justify-between items-center mb-4'>
+                <h2 className='text-xl font-semibold'>Programs</h2>
+                <input
+                  type='text'
+                  placeholder='Search Programs'
+                  className='border p-2 rounded w-60'
+                  value={courseSearch}
+                  onChange={(e) => setCourseSearch(e.target.value)}
+                />
+              </div>
+
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-scroll'>
+                {filteredCourses.map((course) => (
+                  <label key={course.id} className='flex items-center'>
+                    <input
+                      type='checkbox'
+                      {...register('courses')}
+                      value={course.id}
+                      className='mr-2'
+                    />
+                    {course.title}
+                  </label>
+                ))}
+                {filteredCourses.length === 0 && (
+                  <p className='text-gray-500 col-span-full'>
+                    No matching courses found.
+                  </p>
+                )}
               </div>
             </div>
 

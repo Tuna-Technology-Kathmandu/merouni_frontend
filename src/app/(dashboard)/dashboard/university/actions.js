@@ -1,5 +1,4 @@
 import { authFetch } from '@/app/utils/authFetch'
-import { University } from 'lucide-react'
 
 export async function getUniversities(page = 1) {
   try {
@@ -75,6 +74,22 @@ export const fetchLevel = async (searchQuery = '') => {
     )
     if (!response.ok) {
       throw new Error('Failed to fetch level')
+    }
+    const data = await response.json()
+    return data.items
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+export const fetchAllCourse = async () => {
+  try {
+    const response = await authFetch(
+      `${process.env.baseUrl}${process.env.version}/program?limit=999999`
+    )
+    if (!response.ok) {
+      throw new Error('Failed to fetch courses')
     }
     const data = await response.json()
     return data.items

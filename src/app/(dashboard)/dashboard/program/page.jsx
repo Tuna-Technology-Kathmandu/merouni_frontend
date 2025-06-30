@@ -72,6 +72,7 @@ export default function ProgramForm() {
   const [searchResults, setSearchResults] = useState([])
 
   const [syllabusSearch, setSyllabusSearch] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -150,7 +151,8 @@ export default function ProgramForm() {
           year: 1,
           semester: 1,
           course_id: '',
-          _title: ''
+          _title: '',
+          is_elective: false
         }
       ],
       colleges: []
@@ -236,11 +238,11 @@ export default function ProgramForm() {
   }, [debouncedScholar])
 
   //watch form data
-  const formData = watch()
+  // const formData = watch()
 
-  useEffect(() => {
-    console.log('Form data:', formData)
-  }, [formData]) // Runs every time formData changes
+  // useEffect(() => {
+  //   console.log('Form data:', formData)
+  // }, [formData]) // Runs every time formData changes
 
   //for exams searching
   useEffect(() => {
@@ -299,13 +301,15 @@ export default function ProgramForm() {
 
   const onSubmit = async (data) => {
     try {
+      setSubmitting(true)
       const cleanedData = {
         ...data,
         syllabus: data.syllabus.map((item) => ({
           year: item.year,
           semester: item.semester,
-          course_id: item.course_id
+          course_id: item.course_id,
           // _title and _code are automatically excluded
+          is_elective: item.is_elective || false
         }))
       }
       const url = `${process.env.baseUrl}${process.env.version}/program`
@@ -320,6 +324,13 @@ export default function ProgramForm() {
         body: JSON.stringify(cleanedData)
       })
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(
+          errorData.error || `HTTP error! status: ${response.status}`
+        )
+      }
+
       const result = await response.json()
 
       toast.success(
@@ -327,7 +338,7 @@ export default function ProgramForm() {
           ? 'Program updated successfully!'
           : 'Program created successfully!'
       )
-      setEditing(false)
+      setSubmitting(false)
       reset()
       fetchPrograms()
       setIsOpen(false)
@@ -341,7 +352,19 @@ export default function ProgramForm() {
       setLevelSearch('')
       setHasSelectedLevel(false)
     } catch (error) {
-      toast.error(error.message || 'Failed to save program')
+      // Handle different error types
+      if (
+        error.message.includes('timeout') ||
+        error.message === 'Operation timeout'
+      ) {
+        toast.error('operation timed out. Please try again.')
+      } else if (error.name === 'AbortError') {
+        toast.error('Request was aborted.')
+      } else {
+        toast.error(error.message || 'Failed to save program')
+      }
+    } finally {
+      setSubmitting(false) // This will always run
     }
   }
 
@@ -363,7 +386,7 @@ export default function ProgramForm() {
         `${process.env.baseUrl}${process.env.version}/program/${slug}`
       )
       const program = await response.json()
-      console.log('program', program)
+      // console.log('program', program)
       // Set basic information
       setValue('id', program.id)
       setValue('title', program.title)
@@ -383,7 +406,8 @@ export default function ProgramForm() {
         year: item.year,
         semester: item.semester,
         course_id: item.course_id,
-        _title: item.programCourse?.title || ''
+        _title: item.programCourse?.title || '',
+        is_elective: item.is_elective || false
       }))
 
       setValue('syllabus', enrichedSyllabus)
@@ -583,7 +607,8 @@ export default function ProgramForm() {
         year: currentYear,
         semester: currentSemester,
         course_id: currentCourse.id,
-        _title: currentCourse.title
+        _title: currentCourse.title,
+        is_elective: false // Default to false when adding new course
       })
       setCurrentCourse({ id: '', title: '' })
       setSyllabusSearch('')
@@ -600,7 +625,7 @@ export default function ProgramForm() {
     if (index >= 0) removeSyllabus(index)
   }
 
-  const clearSearch = () => {}
+  // const clearSearch = () => { }
 
   return (
     <>
@@ -704,8 +729,12 @@ export default function ProgramForm() {
                   <label className='block mb-2'>Credits *</label>
                   <input
                     type='number'
-                    {...register('credits', { required: true })}
+                    {...register('credits', {
+                      required: true,
+                      valueAsNumber: true
+                    })}
                     className='w-full p-2 border rounded'
+                    step='0.1' //
                   />
                 </div>
 
@@ -1081,12 +1110,12 @@ export default function ProgramForm() {
                           <th className='p-3 text-left w-[50px]'></th>
                           <th className='p-3 text-left'>Course</th>
                           <th className='p-3 text-left w-[100px]'>Id</th>
+                          <th className='p-3 text-left w-[100px]'>Elective</th>
                           <th className='p-3 text-right w-[50px]'>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {getCurrentSemesterCourses().map((course, index) => {
-                          // Get the actual form field index for this course
                           const fieldIndex = syllabusFields.findIndex(
                             (field) =>
                               field.course_id === course.id &&
@@ -1094,9 +1123,6 @@ export default function ProgramForm() {
                               field.semester === currentSemester
                           )
 
-                          // Get title from either:
-                          // 1. The currentCourse state (for newly added)
-                          // 2. The watched field value (for existing)
                           const title =
                             fieldIndex >= 0
                               ? watch(`syllabus.${fieldIndex}._title`) ||
@@ -1115,6 +1141,26 @@ export default function ProgramForm() {
                               <td className='p-3 font-medium'>{title}</td>
                               <td className='p-3 text-gray-600'>
                                 {course.id || '-'}
+                              </td>
+                              <td className='p-3'>
+                                <label className='flex items-center'>
+                                  <input
+                                    type='checkbox'
+                                    checked={
+                                      watch(
+                                        `syllabus.${fieldIndex}.is_elective`
+                                      ) || false
+                                    }
+                                    onChange={(e) =>
+                                      setValue(
+                                        `syllabus.${fieldIndex}.is_elective`,
+                                        e.target.checked
+                                      )
+                                    }
+                                    className='h-4 w-4 text-blue-600 rounded'
+                                  />
+                                  <span className='ml-2 text-sm'>Elective</span>
+                                </label>
                               </td>
                               <td className='p-3 text-right'>
                                 <button
@@ -1147,7 +1193,7 @@ export default function ProgramForm() {
                 disabled={loading}
                 className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
               >
-                {loading
+                {submitting
                   ? 'Processing...'
                   : editing
                     ? 'Update Program'

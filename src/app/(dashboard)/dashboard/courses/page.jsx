@@ -331,8 +331,12 @@ export default function CourseForm() {
                   <label className='block mb-2'>Credits *</label>
                   <input
                     type='number'
-                    {...register('credits', { required: true })}
+                    {...register('credits', {
+                      required: true,
+                      valueAsNumber: true
+                    })}
                     className='w-full p-2 border rounded'
+                    step='0.1' //
                   />
                 </div>
 
