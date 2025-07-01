@@ -1,12 +1,13 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { useForm, useFieldArray } from 'react-hook-form'
 import {
   createCollege,
   fetchUniversities,
   fetchAllCourse,
-  fetchAllUniversity
+  fetchAllUniversity,
+  getUniversityBySlug
 } from './actions'
 import { useSelector } from 'react-redux'
 import FileUpload from './FileUpload'
@@ -34,6 +35,14 @@ export default function CollegeForm() {
   const [loadUni, setLoadUni] = useState(false)
   const [showUniDrop, setShowUniDrop] = useState(false)
   const [hasSelectedUni, setHasSelectedUni] = useState(false)
+
+  // for programs that is related to selected University
+  const [uniSlug, setUniSlug] = useState('')
+  const [collectUni, setCollectUni] = useState([])
+  const [collectUniError, setCollectUniError] = useState('')
+
+  //show programs only fro selected University;
+  const [loadingPrograms, setLoadingPrograms] = useState(false)
 
   const [allUniversity, setAllUniversity] = useState([])
 
@@ -126,7 +135,10 @@ export default function CollegeForm() {
   } = useFieldArray({ control, name: 'admissions' })
 
   const onSubmit = async (data) => {
-    console.log('admission', data.admissions)
+    if (!data.courses || data.courses.length === 0) {
+      toast.error('Please select at least one program')
+      return
+    }
 
     try {
       setSubmitting(true)
@@ -143,6 +155,7 @@ export default function CollegeForm() {
       data.pinned = +data.pinned
       // Convert IDs to numbers
       data.university_id = parseInt(data.university_id)
+
       data.courses = data.courses.map((course) => parseInt(course))
 
       data.college_logo = uploadedFiles.logo
@@ -223,6 +236,9 @@ export default function CollegeForm() {
 
     getCourses()
   }, [])
+
+  console.log('courses', courses)
+  console.log('collectUni', collectUni)
 
   //for all fetching of university
   useEffect(() => {
@@ -435,23 +451,21 @@ export default function CollegeForm() {
       setEditing(true)
       setLoading(true)
       setIsOpen(true)
+
+      // First reset the form to clear any existing values
+      reset()
+
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/college/${slug}`,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+        { headers: { 'Content-Type': 'application/json' } }
       )
 
       let collegeData = await response.json()
       collegeData = collegeData.item
+
       // Basic Information
-      console.log('edit', collegeData)
       setValue('id', collegeData.id)
       setValue('name', collegeData.name)
-      console.log('uni name', collegeData?.university?.fullname)
-
       setValue('institute_type', collegeData.institute_type)
       setValue(
         'institute_level',
@@ -463,49 +477,41 @@ export default function CollegeForm() {
       setValue('google_map_url', collegeData.google_map_url)
       setValue('is_featured', collegeData.isFeatured === 1)
       setValue('pinned', collegeData.pinned === 1)
+
       // Set university_id from university data
       if (collegeData.university) {
         setHasSelectedUni(true)
         setUniSearch(collegeData.university.fullname)
+        setUniSlug(collegeData.university.slugs)
 
         const universityId = allUniversity.find(
           (u) => u.fullname === collegeData.university.fullname
         )?.id
-
-        console.log('uniId', universityId)
 
         if (universityId) {
           setValue('university_id', Number(universityId), {
             shouldValidate: true,
             shouldDirty: true
           })
-        } else {
-          console.warn(
-            'No matching university found for:',
-            collegeData.university.fullname
-          )
         }
       }
 
-      // Set courses from collegeCourses
-      //here course means programs
+      // Set programs
+      const programIds =
+        collegeData.collegeCourses
+          ?.map((course) => {
+            const foundCourse = courses.find(
+              (c) => c.title === course.program.title
+            )
+            return foundCourse?.id
+          })
+          .filter((id) => id !== undefined) || []
 
-      const courseIds = collegeData.collegeCourses?.map(
-        (course) => courses.find((c) => c.title === course.program.title)?.id
-      )
-
-      setValue('courses', courseIds || [])
-      courseIds?.forEach((id) => {
-        const checkbox = document.querySelector(
-          `input[type="checkbox"][value="${id}"]`
-        )
-        if (checkbox && !checkbox.checked) {
-          checkbox.click() // Trigger click event on the checkbox
-        }
-      })
+      // Remove duplicates and set values
+      const uniqueProgramIds = [...new Set(programIds)]
+      setValue('courses', uniqueProgramIds)
 
       // Address
-
       if (collegeData.collegeAddress) {
         setValue('address.country', collegeData.collegeAddress.country)
         setValue('address.state', collegeData.collegeAddress.state)
@@ -515,27 +521,20 @@ export default function CollegeForm() {
       }
 
       // Contacts
-
       const contacts = collegeData.collegeContacts?.map(
         (contact) => contact.contact_number
       ) || ['', '']
       setValue('contacts', contacts)
 
       // Images
-
       const galleryItems = collegeData.collegeGallery || []
 
-      let images = galleryItems
-        .filter((item) => item.file_type === 'image' && item.file_url) // Only include items with file_url
+      const images = galleryItems
+        .filter((item) => item.file_type === 'image' && item.file_url)
         .map((img) => ({
           url: img.file_url,
           file_type: 'image'
         }))
-
-      // Special case: if single empty image, set to empty array
-      if (images.length === 1 && !images[0].url) {
-        images = []
-      }
 
       const videos = galleryItems
         .filter((item) => item.file_type === 'video')
@@ -547,13 +546,13 @@ export default function CollegeForm() {
       setUploadedFiles({
         logo: collegeData.college_logo || '',
         featured: collegeData.featured_img || '',
-        images,
+        images: images.length === 1 && !images[0].url ? [] : images,
         videos
       })
 
-      // Combine for form values if needed
       setValue('images', [...images, ...videos])
 
+      // Members
       const memberData = collegeData.collegeMembers?.length
         ? collegeData.collegeMembers
         : [
@@ -564,9 +563,9 @@ export default function CollegeForm() {
               description: ''
             }
           ]
-
       setValue('members', memberData)
 
+      // Admissions
       const admissionData = collegeData.collegeAdmissions?.length
         ? collegeData.collegeAdmissions.map((admission) => {
             const courseId = courses.find(
@@ -589,14 +588,10 @@ export default function CollegeForm() {
               description: ''
             }
           ]
-
       setValue('admissions', admissionData)
-
-      // Open the form
-      setIsOpen(true)
     } catch (error) {
       console.error('Error fetching college data:', error)
-      alert('Failed to fetch college data')
+      toast.error('Failed to fetch college data')
     } finally {
       setLoading(false)
     }
@@ -659,6 +654,26 @@ export default function CollegeForm() {
   useEffect(() => {
     console.log('Form data:', formData)
   }, [formData]) // Runs every time formData changes
+
+  const fetchUniversityDetails = async (slugs) => {
+    try {
+      setLoadingPrograms(true)
+      setCollectUniError('')
+      const universityData = await getUniversityBySlug(slugs)
+      setCollectUni(universityData.programs || [])
+    } catch (error) {
+      setCollectUniError(error.message)
+    } finally {
+      setLoadingPrograms(false)
+    }
+  }
+  useEffect(() => {
+    fetchUniversityDetails(uniSlug)
+  }, [uniSlug])
+
+  const filteredPrograms = useMemo(() => {
+    return courses.filter((course) => collectUni.includes(course.title.trim()))
+  }, [courses, collectUni])
 
   return (
     <>
@@ -758,6 +773,7 @@ export default function CollegeForm() {
                               setUniSearch(uni.fullname)
                               setShowUniDrop(false)
                               setHasSelectedUni(true)
+                              setUniSlug(uni.slugs)
                             }}
                           >
                             {uni.fullname}
@@ -794,36 +810,64 @@ export default function CollegeForm() {
             {editing ? <input type='hidden' {...register('id')} /> : <></>}
             {/* Courses Section */}
 
+            {/* Programs Section */}
             <div className='bg-white p-6 rounded-lg shadow-md'>
               <div className='flex justify-between items-center mb-4'>
                 <h2 className='text-xl font-semibold'>Programs</h2>
-                <input
-                  type='text'
-                  placeholder='Search Programs'
-                  className='border p-2 rounded w-60'
-                  value={courseSearch}
-                  onChange={(e) => setCourseSearch(e.target.value)}
-                />
               </div>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-scroll'>
-                {filteredCourses.map((course) => (
-                  <label key={course.id} className='flex items-center'>
-                    <input
-                      type='checkbox'
-                      {...register('courses')}
-                      value={course.id}
-                      className='mr-2'
-                    />
-                    {course.title}
-                  </label>
-                ))}
-                {filteredCourses.length === 0 && (
-                  <p className='text-gray-500 col-span-full'>
-                    No matching courses found.
-                  </p>
-                )}
-              </div>
+              {loadingPrograms ? (
+                <p>Loading programs...</p>
+              ) : collectUniError ? (
+                <p className='text-red-500'>{collectUniError}</p>
+              ) : (
+                <>
+                  <div className='text-sm text-gray-500 mb-2'>
+                    {getValues('courses')?.length || 0} programs selected
+                  </div>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-scroll'>
+                    {filteredPrograms.map((course) => {
+                      const isChecked = getValues('courses')?.includes(
+                        course.id
+                      )
+                      return (
+                        <label key={course.id} className='flex items-center'>
+                          <input
+                            type='checkbox'
+                            value={course.id}
+                            checked={isChecked}
+                            onChange={(e) => {
+                              const currentCourses = getValues('courses') || []
+                              if (e.target.checked) {
+                                setValue('courses', [
+                                  ...currentCourses,
+                                  course.id
+                                ])
+                              } else {
+                                setValue(
+                                  'courses',
+                                  currentCourses.filter(
+                                    (id) => id !== course.id
+                                  )
+                                )
+                              }
+                            }}
+                            className='mr-2'
+                          />
+                          {course.title}
+                        </label>
+                      )
+                    })}
+                    {filteredPrograms.length === 0 && (
+                      <p className='text-gray-500 col-span-full'>
+                        {collectUni.length > 0
+                          ? 'No matching programs found for the selected university'
+                          : 'No Programs Available'}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
 
             {/*author section */}

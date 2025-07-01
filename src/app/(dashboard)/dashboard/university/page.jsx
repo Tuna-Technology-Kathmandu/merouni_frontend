@@ -74,7 +74,8 @@ export default function UniversityForm() {
         phone_number: ''
       },
       levels: [],
-      courses: [],
+      // courses:[]
+      programs: [],
       members: [
         {
           role: '',
@@ -170,29 +171,27 @@ export default function UniversityForm() {
       data.assets.featured_image = uploadedFiles.featured
       data.gallery = uploadedFiles.gallery.filter((url) => url)
       data.levels = data.levels.map((l) => parseInt(l))
-
-      // Validate and format courses
-      data.courses = Array.isArray(data.courses)
-        ? data.courses.map((course) => parseInt(course))
+      data.programs = Array.isArray(data.programs)
+        ? data.programs.map((program) => parseInt(program))
         : []
 
-      // Filter out invalid course IDs and verify they exist in available courses
-      const validCourseIds = data.courses.filter(
+      // Filter out invalid program IDs and verify they exist in available courses
+      const validProgramIds = data.programs.filter(
         (id) =>
           !isNaN(id) &&
           id !== null &&
           id !== undefined &&
-          courses.some((course) => course.id === id) // Check if ID exists in your courses list
+          courses.some((course) => course.id === id)
       )
 
-      // Optional: Show error if no valid courses selected
-      if (validCourseIds.length === 0 && courses.length > 0) {
-        toast.error('Please select at least one valid course')
+      // Optional: Show error if no valid programs selected
+      if (validProgramIds.length === 0 && courses.length > 0) {
+        toast.error('Please select at least one valid program')
         return
       }
 
-      // Use only validated courses
-      data.courses = validCourseIds
+      // Use only validated programs
+      data.programs = validProgramIds
 
       const url = `${process.env.baseUrl}${process.env.version}/university`
       const method = 'POST'
@@ -255,6 +254,31 @@ export default function UniversityForm() {
       university?.levels?.forEach((element) => {
         const checkbox = document.querySelector(
           `input[type="checkbox"][value="${element}"][identity="level"]`
+        )
+        if (checkbox && !checkbox.checked) {
+          checkbox.click()
+        }
+      })
+
+      // Map program names to their corresponding IDs
+      const programIds =
+        university.programs
+          ?.map((programName) => {
+            // Find the course that matches the program name
+            const matchingCourse = courses.find(
+              (course) => course.title === programName
+            )
+            return matchingCourse ? matchingCourse.id : null
+          })
+          .filter((id) => id !== null) || []
+
+      // Set the program IDs in the form
+      setValue('programs', programIds)
+
+      // Check the corresponding checkboxes
+      programIds.forEach((id) => {
+        const checkbox = document.querySelector(
+          `input[type="checkbox"][value="${id}"][name="programs"]`
         )
         if (checkbox && !checkbox.checked) {
           checkbox.click()
@@ -714,7 +738,7 @@ export default function UniversityForm() {
                   <label key={course.id} className='flex items-center'>
                     <input
                       type='checkbox'
-                      {...register('courses')}
+                      {...register('programs')}
                       value={course.id}
                       className='mr-2'
                     />
