@@ -1,7 +1,8 @@
 'use client'
+
 import React, { useState } from 'react'
 import axios from 'axios'
-import { FaUser, FaLock } from 'react-icons/fa'
+import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
@@ -12,12 +13,17 @@ const ProfileUpdate = () => {
   const [showNameModal, setShowNameModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const [nameForm, setNameForm] = useState({
     firstName: userData?.firstName || '',
     middleName: userData?.middleName || '',
     lastName: userData?.lastName || ''
   })
+
+  console.log('userData', userData)
 
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -90,12 +96,14 @@ const ProfileUpdate = () => {
       setIsLoading(false)
     }
   }
+
   const roles = userData?.role
     ? Object.entries(JSON.parse(userData.role))
-        .filter(([_, value]) => value) // Get only roles that are true
-        .map(([key]) => key.toUpperCase()) // Convert keys to uppercase
-        .join(', ') // Join them with a comma
-    : 'No Role Assigned' // Default text if no role is found
+        .filter(([_, value]) => value)
+        .map(([key]) => key.toUpperCase())
+        .join(', ')
+    : 'No Role Assigned'
+
   return (
     <div className='min-h-screen bg-gray-100 p-4'>
       <ToastContainer position='top-right' />
@@ -227,52 +235,95 @@ const ProfileUpdate = () => {
                     <label className='block text-sm font-medium text-gray-700'>
                       Current Password
                     </label>
-                    <input
-                      type='password'
-                      value={passwordForm.currentPassword}
-                      onChange={(e) =>
-                        setPasswordForm({
-                          ...passwordForm,
-                          currentPassword: e.target.value
-                        })
-                      }
-                      className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-                      required
-                    />
+                    <div className='relative'>
+                      <input
+                        type={showCurrentPassword ? 'text' : 'password'}
+                        value={passwordForm.currentPassword}
+                        onChange={(e) =>
+                          setPasswordForm({
+                            ...passwordForm,
+                            currentPassword: e.target.value
+                          })
+                        }
+                        className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pr-10'
+                        required
+                      />
+                      <button
+                        type='button'
+                        className='absolute inset-y-0 right-0 pr-3 flex items-center'
+                        onClick={() =>
+                          setShowCurrentPassword(!showCurrentPassword)
+                        }
+                      >
+                        {showCurrentPassword ? (
+                          <FaEyeSlash className='h-5 w-5 text-gray-500' />
+                        ) : (
+                          <FaEye className='h-5 w-5 text-gray-500' />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className='block text-sm font-medium text-gray-700'>
                       New Password
                     </label>
-                    <input
-                      type='password'
-                      value={passwordForm.newPassword}
-                      onChange={(e) =>
-                        setPasswordForm({
-                          ...passwordForm,
-                          newPassword: e.target.value
-                        })
-                      }
-                      className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-                      required
-                    />
+                    <div className='relative'>
+                      <input
+                        type={showNewPassword ? 'text' : 'password'}
+                        value={passwordForm.newPassword}
+                        onChange={(e) =>
+                          setPasswordForm({
+                            ...passwordForm,
+                            newPassword: e.target.value
+                          })
+                        }
+                        className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pr-10'
+                        required
+                      />
+                      <button
+                        type='button'
+                        className='absolute inset-y-0 right-0 pr-3 flex items-center'
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                      >
+                        {showNewPassword ? (
+                          <FaEyeSlash className='h-5 w-5 text-gray-500' />
+                        ) : (
+                          <FaEye className='h-5 w-5 text-gray-500' />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className='block text-sm font-medium text-gray-700'>
                       Confirm New Password
                     </label>
-                    <input
-                      type='password'
-                      value={passwordForm.confirmPassword}
-                      onChange={(e) =>
-                        setPasswordForm({
-                          ...passwordForm,
-                          confirmPassword: e.target.value
-                        })
-                      }
-                      className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-                      required
-                    />
+                    <div className='relative'>
+                      <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        value={passwordForm.confirmPassword}
+                        onChange={(e) =>
+                          setPasswordForm({
+                            ...passwordForm,
+                            confirmPassword: e.target.value
+                          })
+                        }
+                        className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pr-10'
+                        required
+                      />
+                      <button
+                        type='button'
+                        className='absolute inset-y-0 right-0 pr-3 flex items-center'
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <FaEyeSlash className='h-5 w-5 text-gray-500' />
+                        ) : (
+                          <FaEye className='h-5 w-5 text-gray-500' />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   <p className='text-xs text-gray-600'>
                     Password must contain at least 8 characters, including

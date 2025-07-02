@@ -1,4 +1,5 @@
-import React from 'react'
+'use client'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Frontpage/Navbar'
 import Header from '../components/Frontpage/Header'
 import Footer from '../components/Frontpage/Footer'
@@ -11,15 +12,32 @@ import Colleges from '../components/Frontpage/Colleges'
 import Degree from '../components/Frontpage/Degree'
 import ScrollToTop from '../components/ScrollToTop'
 import SideBanner from '../components/Frontpage/SideBanner'
+import { getBanner } from '../[[...home]]/action'
 
 const Page = () => {
+  const [banners, setBanners] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getBanner(1, 99999999)
+        setBanners(data.items)
+      } catch (err) {
+        console.error('Error loading banners', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
   return (
     <>
       <Header />
       <Navbar />
       <div className='py-4'>
         <div className='container px-4 mx-auto'>
-          <BannerLayout />
+          <BannerLayout banners={banners} loading={loading} />
           {/* Flex container for horizontal layout */}
           <div className='flex gap-6'>
             <div className='flex flex-col md:w-4/5 w-full sm:w-full'>
@@ -31,7 +49,7 @@ const Page = () => {
 
             {/* 20% Image */}
             <div className='w-full md:w-1/5 hidden md:block mt-8'>
-              <SideBanner />
+              <SideBanner banners={banners} loading={loading} />
             </div>
           </div>
         </div>
