@@ -1,7 +1,10 @@
 import React from 'react'
-import Image from 'next/image'
 
 const EventCard = ({ event }) => {
+  let events = {
+    description:
+      'This is test. Explore diverse fields of study to find the best fit for your academic and career goals test test test test test test test test test test test'
+  }
   // console.log("Month and day in event card:", event_host.start_date, day);
   let month = ''
   let day = ''
@@ -14,29 +17,35 @@ const EventCard = ({ event }) => {
     console.error('Error parsing event_host:', error)
   }
   return (
-    <div className='min-w-[300px] max-w-[350px] mx-2 my-2 bg-white rounded-2xl  shadow-md border border-gray-300  '>
+    <div className='w-[300px] h-[350px] rounded-2xl  shadow-md border border-gray-300  '>
       {/* <!-- Top Section: Image --> */}
       {/* <div className="flex justify-center mb-4"> */}
-      <div className='md:h-[300px]'>
+      <div className='h-[200px]'>
         <img
           src='/images/upcoming.png'
           alt={`${event.title} logo`}
-          className='w-full  object-cover rounded-t-2xl'
+          className='w-full h-full object-cover rounded-t-2xl'
         />
       </div>
-      {/* </div> */}
 
-      <div className='flex items-start space-x-4 mb-4'>
+      <div className='flex items-start space-x-3 p-1'>
         {/* Month and Day */}
-        <div className='flex flex-col justify-between '>
-          <p className='text-blue-600 text-lg font-bold p-2'>{month}</p>
-          <p className='text-2xl font-extrabold text-gray-700 p-2'>{day}</p>
+        <div className='flex flex-col items-center '>
+          <p className='text-blue-600 text-xl font-bold p-2'>{month}</p>
+          <p className='text-lg font-extrabold text-gray-700 p-2'>{day}</p>
         </div>
 
         {/* Title and Description */}
         <div className='flex-1'>
-          <h3 className='text-lg font-bold text-gray-900 p-2'>{event.title}</h3>
-          <p className='text-gray-700 text-sm p-2'>{event.description}</p>
+          <h3 className='text-lg font-bold text-gray-900 p-2'>
+            {event.title.slice(0, 15) + '...'}
+          </h3>
+          <p
+            className='text-gray-700 text-sm p-2 '
+            dangerouslySetInnerHTML={{
+              __html: events?.description.slice(0, 80) + '...' || ''
+            }}
+          />
         </div>
       </div>
     </div>

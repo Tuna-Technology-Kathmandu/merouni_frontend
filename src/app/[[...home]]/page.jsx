@@ -5,7 +5,7 @@ import Header from '../components/Frontpage/Header'
 import Footer from '../components/Frontpage/Footer'
 import BannerLayout from '../components/Frontpage/BannerLayout'
 import FeaturedAdmission from '../components/Frontpage/FeaturedAdmission'
-import LargeBanner from '../components/Frontpage/LargeBanner'
+// import LargeBanner from '../components/Frontpage/LargeBanner'
 import FeaturedDegree from '../components/Frontpage/FeaturedDegree'
 import FieldofStudy from '../components/Frontpage/FieldofStudy'
 import Colleges from '../components/Frontpage/Colleges'
@@ -54,7 +54,7 @@ const Page = () => {
           </div>
         </div>
       </div>
-
+      {/* <FeaturedAdmission /> */}
       <Degree />
       {/* large banner */}
       {/* <LargeBanner /> */}

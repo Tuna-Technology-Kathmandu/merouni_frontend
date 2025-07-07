@@ -1,5 +1,6 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
+import dynamic from 'next/dynamic'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import {
   getAllScholarships,
@@ -11,13 +12,17 @@ import Loading from '../../../components/Loading'
 import Table from '../../../components/Table'
 import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+const CKEditor = dynamic(() => import('../component/CKStable'), {
+  ssr: false
+})
 
 export default function ScholarshipManager() {
   const author_id = useSelector((state) => state.user.data.id)
   const [scholarships, setScholarships] = useState([])
   const [loading, setLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -132,6 +137,7 @@ export default function ScholarshipManager() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      setIsSubmitting(true)
       const formattedData = {
         ...formData,
         amount: Number(formData.amount),
@@ -157,9 +163,15 @@ export default function ScholarshipManager() {
       setEditingId(null)
       setError(null)
       loadScholarships()
+      setIsSubmitting(false)
+      toast.success(
+        `Successfully ${editingId ? 'updated' : 'created'} scholarship`
+      )
     } catch (error) {
       setError(`Failed to ${editingId ? 'update' : 'create'} scholarship`)
-      console.error('Error saving scholarship:', error)
+      toast.error('Error saving scholarship:', error)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -231,6 +243,13 @@ export default function ScholarshipManager() {
     }
   }
 
+  const handleEditorChange = useCallback((content) => {
+    setFormData((prev) => ({
+      ...prev,
+      description: content
+    }))
+  }, [])
+
   if (loading)
     return (
       <div className='mx-auto'>
@@ -240,6 +259,7 @@ export default function ScholarshipManager() {
 
   return (
     <div className='p-4 w-4/5 mx-auto'>
+      <ToastContainer />
       <h1 className='text-2xl font-bold mb-4'>Scholarship Management</h1>
 
       {/* Form */}
@@ -257,15 +277,9 @@ export default function ScholarshipManager() {
 
         <div>
           <CKEditor
-            editor={ClassicEditor}
-            data={formData.description}
-            config={{
-              licenseKey: process.env.ckeditor
-            }}
-            onChange={(event, editor) => {
-              const content = editor.getData()
-              setFormData({ ...formData, description: content })
-            }}
+            value={formData.description}
+            onChange={handleEditorChange}
+            id='scholarship-description-editor'
           />
         </div>
 
@@ -337,9 +351,14 @@ export default function ScholarshipManager() {
 
         <button
           type='submit'
+          disabled={loading}
           className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
         >
-          {editingId ? 'Update Scholarship' : 'Add Scholarship'}
+          {isSubmitting
+            ? 'Processing...'
+            : editingId
+              ? 'Update Scholarship'
+              : 'Add Scholarship'}
         </button>
       </form>
 

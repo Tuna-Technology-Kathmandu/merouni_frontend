@@ -109,20 +109,27 @@ const SignInPage = () => {
         filteredData,
         {
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'device-id': getDeviceId()
           },
-          withCredentials: true
+          withCredentials: false
         }
       )
 
-      // Get all response headers
-      const accessToken = response?.data?.accessToken
-      const refreshToken = response?.data?.refreshToken
+      // Validate response
+      if (!response.data?.accessToken || !response.data?.refreshToken) {
+        throw new Error('Authentication tokens missing in response')
+      }
+
+      const { accessToken, refreshToken } = response.data
       localStorage.setItem('access_token', accessToken)
       localStorage.setItem('refreshToken', refreshToken)
 
+      return response.data
+    },
+    onSuccess: (data, variables, context) => {
       if (isLogin) {
-        const decodedToken = jwtDecode(accessToken)
+        const decodedToken = jwtDecode(data.accessToken)
         dispatch(addUser({ ...decodedToken }))
         toast.success('Login successful!')
         router.push('/dashboard')
@@ -139,10 +146,10 @@ const SignInPage = () => {
       }
     },
     onError: (error) => {
-      // Axios errors have a response object with data.message
       if (axios.isAxiosError(error)) {
         const message =
           error.response?.data?.message ||
+          error.response?.data?.error ||
           'Something went wrong. Please try again.'
         toast.error(message)
       } else {
@@ -151,18 +158,11 @@ const SignInPage = () => {
     }
   })
 
-  /**
-   * HANDLE FORM SUBMIT
-   * @param e
-   * @returns {Promise<void>}
-   */
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const deviceId = getDeviceId()
     if (!validateForm()) return
     signInFormMutation.mutate()
   }
-
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8'>
       <div className='max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-md'>

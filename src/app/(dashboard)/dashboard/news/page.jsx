@@ -269,8 +269,6 @@ export default function NewsManager() {
     }
   }
 
-  console.log('news', news)
-
   const createNews = async (data) => {
     try {
       // Send tags directly as an array of numbers

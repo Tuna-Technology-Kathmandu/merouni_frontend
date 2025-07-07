@@ -1,5 +1,5 @@
 'use client'
-
+import { authFetch } from '@/app/utils/authFetch'
 import React, { useState } from 'react'
 import axios from 'axios'
 import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
@@ -13,20 +13,20 @@ const ProfileUpdate = () => {
   const [showNameModal, setShowNameModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const [nameForm, setNameForm] = useState({
     firstName: userData?.firstName || '',
     middleName: userData?.middleName || '',
-    lastName: userData?.lastName || ''
+    lastName: userData?.lastName || '',
+    email: userData?.email || '',
+    phoneNo: userData?.phoneNo || ''
   })
 
   console.log('userData', userData)
 
   const [passwordForm, setPasswordForm] = useState({
-    currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   })
@@ -52,18 +52,32 @@ const ProfileUpdate = () => {
 
     setIsLoading(true)
     try {
-      await axios.post(
-        `${process.env.baseUrl}${process.env.version}/users/edit-profile`,
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/users/edit-profile?user_id=${userData.id}`,
         {
-          firstName: nameForm.firstName,
-          middleName: nameForm.middleName,
-          lastName: nameForm.lastName
+          method: 'PUT',
+          body: JSON.stringify({
+            firstName: nameForm.firstName,
+            middleName: nameForm.middleName,
+            lastName: nameForm.lastName,
+            email: nameForm.email,
+            phoneNo: nameForm.phoneNo
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
       )
+
+      if (!response.ok) {
+        throw new Error('Failed to update name')
+      }
+
       toast.success('Name updated successfully')
       setShowNameModal(false)
     } catch (error) {
-      toast.error('Failed to update name')
+      console.error('Update error:', error)
+      toast.error(error.message || 'Failed to update name')
     } finally {
       setIsLoading(false)
     }
@@ -71,10 +85,14 @@ const ProfileUpdate = () => {
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault()
+
+    // Validate password requirements
     if (!validatePassword(passwordForm.newPassword)) {
       toast.error("Password doesn't meet requirements")
       return
     }
+
+    // Check password confirmation
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       toast.error("Passwords don't match")
       return
@@ -82,21 +100,42 @@ const ProfileUpdate = () => {
 
     setIsLoading(true)
     try {
-      await axios.post(
+      const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/users/edit-profile?user_id=${userData.id}`,
         {
-          password: passwordForm.newPassword
+          method: 'PUT',
+          body: JSON.stringify({
+            password: passwordForm.newPassword
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
       )
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Failed to update password')
+      }
+
       toast.success('Password updated successfully')
       setShowPasswordModal(false)
+      // Clear password fields after successful update
+      setPasswordForm({
+        newPassword: ''
+      })
     } catch (error) {
-      toast.error('Failed to update password')
+      console.error('Password update error:', error)
+      toast.error(error.message || 'Failed to update password')
+
+      // Handle specific error cases if needed
+      if (error.message.includes('current password')) {
+        toast.error('Incorrect current password')
+      }
     } finally {
       setIsLoading(false)
     }
   }
-
   const roles = userData?.role
     ? Object.entries(JSON.parse(userData.role))
         .filter(([_, value]) => value)
@@ -144,7 +183,7 @@ const ProfileUpdate = () => {
             className='p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all flex flex-col items-center'
           >
             <FaUser className='text-2xl text-blue-500 mb-2' />
-            <h2 className='text-sm font-semibold'>Update Name</h2>
+            <h2 className='text-sm font-semibold'>Update Information</h2>
           </button>
 
           <button
@@ -203,6 +242,34 @@ const ProfileUpdate = () => {
                       required
                     />
                   </div>
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700'>
+                      Email
+                    </label>
+                    <input
+                      type='text'
+                      value={nameForm.email}
+                      onChange={(e) =>
+                        setNameForm({ ...nameForm, email: e.target.value })
+                      }
+                      className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700'>
+                      Phone
+                    </label>
+                    <input
+                      type='text'
+                      value={nameForm.phoneNo}
+                      onChange={(e) =>
+                        setNameForm({ ...nameForm, phoneNo: e.target.value })
+                      }
+                      className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
+                      required
+                    />
+                  </div>
                 </div>
                 <div className='mt-4 flex justify-end space-x-3'>
                   <button
@@ -217,7 +284,7 @@ const ProfileUpdate = () => {
                     disabled={isLoading}
                     className='px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50'
                   >
-                    {isLoading ? 'Updating...' : 'Update Name'}
+                    {isLoading ? 'Updating...' : 'Update Information'}
                   </button>
                 </div>
               </form>
@@ -233,38 +300,6 @@ const ProfileUpdate = () => {
                 <div className='space-y-3'>
                   <div>
                     <label className='block text-sm font-medium text-gray-700'>
-                      Current Password
-                    </label>
-                    <div className='relative'>
-                      <input
-                        type={showCurrentPassword ? 'text' : 'password'}
-                        value={passwordForm.currentPassword}
-                        onChange={(e) =>
-                          setPasswordForm({
-                            ...passwordForm,
-                            currentPassword: e.target.value
-                          })
-                        }
-                        className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pr-10'
-                        required
-                      />
-                      <button
-                        type='button'
-                        className='absolute inset-y-0 right-0 pr-3 flex items-center'
-                        onClick={() =>
-                          setShowCurrentPassword(!showCurrentPassword)
-                        }
-                      >
-                        {showCurrentPassword ? (
-                          <FaEyeSlash className='h-5 w-5 text-gray-500' />
-                        ) : (
-                          <FaEye className='h-5 w-5 text-gray-500' />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700'>
                       New Password
                     </label>
                     <div className='relative'>
@@ -274,7 +309,7 @@ const ProfileUpdate = () => {
                         onChange={(e) =>
                           setPasswordForm({
                             ...passwordForm,
-                            newPassword: e.target.value
+                            newPassword: e.target.value.trim()
                           })
                         }
                         className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pr-10'
@@ -304,7 +339,7 @@ const ProfileUpdate = () => {
                         onChange={(e) =>
                           setPasswordForm({
                             ...passwordForm,
-                            confirmPassword: e.target.value
+                            confirmPassword: e.target.value.trim()
                           })
                         }
                         className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pr-10'
