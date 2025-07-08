@@ -6,13 +6,16 @@ import {
   updateUser,
   deleteUser
 } from '../../../actions/userActions'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
+
 import Loading from '@/app/components/Loading'
 import Table from '../../../components/Table'
 import { Edit2, Trash2 } from 'lucide-react'
-import { getToken } from '@/app/action'
-import { jwtDecode } from 'jwt-decode'
+// import { getToken } from '@/app/action'
+// import { jwtDecode } from 'jwt-decode'
 import { authFetch } from '@/app/utils/authFetch'
 import ExportModal from './ExportModal'
+import { useSelector } from 'react-redux'
 export default function UsersManager() {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
@@ -22,12 +25,12 @@ export default function UsersManager() {
     lastName: '',
     email: '',
     password: '',
-    phoneNo: ''
-    // roles: {
-    //   student: false,
-    //   teacher: false,
-    //   admin: false,
-    // },
+    phoneNo: '',
+    roles: {
+      // student: false,
+      editor: false,
+      admin: false
+    }
   })
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -37,9 +40,10 @@ export default function UsersManager() {
 
   const [editingId, setEditingId] = useState(null)
   const [error, setError] = useState(null)
-  const [userId, setUserId] = useState(null)
-  const [userRole, setUserRole] = useState(null)
+  const [showPasswordField, setShowPasswordField] = useState(false)
+  const [showPasswordValue, setShowPasswordValue] = useState(false)
 
+  const userData = useSelector((state) => state.user.data)
   const columns = useMemo(
     () => [
       {
@@ -91,7 +95,7 @@ export default function UsersManager() {
               <Edit2 className='w-4 h-4' />
             </button>
             <button
-              onClick={() => handleDelete(row.original._id)}
+              onClick={() => handleDelete(row.original.id)}
               className='p-1 text-red-600 hover:text-red-800'
             >
               <Trash2 className='w-4 h-4' />
@@ -109,26 +113,27 @@ export default function UsersManager() {
 
   const loadUsers = async (page = 1) => {
     try {
-      const tokenObj = await getToken()
-      console.log('TOKEN OBJ:', tokenObj)
-      const token = tokenObj?.value
+      const token = localStorage.getItem('access_token')
+      // const tokenObj = await getToken()
+      // console.log('TOKEN OBJ:', tokenObj)
+      // const token = tokenObj
       console.log('TOKEN:', token)
-      const decodedToken = jwtDecode(tokenObj?.value)
-      console.log('DECODED TOKEN:', decodedToken)
-      const roleObject = JSON.parse(decodedToken?.data?.role)
-      console.log('ROLE OBJECT:', roleObject)
+      // const decodedToken = jwtDecode(tokenObj?.value)
+      // console.log('DECODED TOKEN:', decodedToken)
+      // const roleObject = JSON.parse(decodedToken?.data?.item?.role)
+      // console.log('ROLE OBJECT:', roleObject)
       const refreshToken = localStorage.getItem('refreshToken')
       console.log('refresh TOKEN:', refreshToken)
       // Extract the role name based on the condition
-      const roleName = Object.keys(roleObject).filter(
-        (key) => roleObject[key] === true
-      )
-      console.log('ROLE NAME:', roleName)
+      // const roleName = Object.keys(roleObject).filter(
+      //   (key) => roleObject[key] === true
+      // )
+      // console.log('ROLE NAME:', roleName)
       if (!token) {
         throw new Error('Token not found')
       }
       setLoading(true)
-      const response = await getUsers(page, token, roleName)
+      const response = await getUsers(page, token)
       console.log('Response of users:', response)
       setUsers(response.items)
       setPagination({
@@ -156,20 +161,21 @@ export default function UsersManager() {
       return
     }
     try {
+      const token = localStorage.getItem('access_token')
       console.log('Query:', query)
-      const tokenObj = await getToken()
-      const token = tokenObj.value
-      const decodedToken = jwtDecode(tokenObj.value)
-      const roleObject = decodedToken.data.role
-      const roleName = Object.keys(roleObject).filter(
-        (key) => roleObject[key] === 'true'
-      )
+      // const tokenObj = await getToken()
+      // const token = tokenObj.value
+      // const decodedToken = jwtDecode(tokenObj.value)
+      // const roleObject = decodedToken.data.role
+      // const roleName = Object.keys(roleObject).filter(
+      //   (key) => roleObject[key] === 'true'
+      // )
 
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/users?q=${query}`,
         {
           headers: {
-            Role: roleName.join(',')
+            Authorization: `Bearer ${token}`
           }
         }
       )
@@ -205,7 +211,13 @@ export default function UsersManager() {
     e.preventDefault()
     try {
       if (editingId) {
-        await updateUser(editingId, formData)
+        const updatedData = { ...formData }
+
+        // Only send password if it’s shown and not empty
+        if (!showPasswordField || !formData.password) {
+          delete updatedData.password
+        }
+        await updateUser(editingId, updatedData)
       } else {
         console.log('Form Data:', formData)
         await createUser(formData)
@@ -215,12 +227,12 @@ export default function UsersManager() {
         lastName: '',
         email: '',
         password: '',
-        phoneNo: ''
-        // roles: {
-        //   student: false,
-        //   teacher: false,
-        //   admin: false,
-        // },
+        phoneNo: '',
+        roles: {
+          student: false,
+          teacher: false,
+          admin: false
+        }
       })
       setEditingId(null)
       setError(null)
@@ -232,21 +244,31 @@ export default function UsersManager() {
   }
 
   const handleEdit = (user) => {
+    let parsedRoles = {}
+    try {
+      parsedRoles =
+        typeof user.roles === 'string' ? JSON.parse(user.roles) : user.roles
+    } catch (e) {
+      console.error('Failed to parse roles:', e)
+    }
+
     setFormData({
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      phoneNo: user.phoneNo
-      // roles: { ...user.roles },
+      phoneNo: user.phoneNo,
+      password: user.password ?? '',
+      roles: parsedRoles || {}
     })
-    setEditingId(user._id)
+    setEditingId(user.id)
     setError(null)
   }
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        await deleteUser(id)
+        console.log('selectedDelete', id)
+        await deleteUser(id, userData)
         loadUsers()
         setError(null)
       } catch (err) {
@@ -256,15 +278,15 @@ export default function UsersManager() {
     }
   }
 
-  // const handleRoleToggle = (role) => {
-  //   setFormData({
-  //     ...formData,
-  //     roles: {
-  //       ...formData.roles,
-  //       [role]: !formData.roles[role],
-  //     },
-  //   });
-  // };
+  const handleRoleToggle = (role) => {
+    setFormData({
+      ...formData,
+      roles: {
+        ...formData.roles,
+        [role]: !formData.roles[role]
+      }
+    })
+  }
 
   if (loading)
     return (
@@ -278,122 +300,140 @@ export default function UsersManager() {
       <h1 className='text-2xl font-bold mb-4'>User Management</h1>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className='mb-8 space-y-4'>
-        <div>
-          <input
-            type='text'
-            placeholder='First Name'
-            value={formData.firstName}
-            onChange={(e) =>
-              setFormData({ ...formData, firstName: e.target.value })
-            }
-            className='w-full p-2 border rounded'
-            required
-          />
-        </div>
-
-        <div>
-          <input
-            type='text'
-            placeholder='Last Name'
-            value={formData.lastName}
-            onChange={(e) =>
-              setFormData({ ...formData, lastName: e.target.value })
-            }
-            className='w-full p-2 border rounded'
-            required
-          />
-        </div>
-
-        <div>
-          <input
-            type='email'
-            placeholder='Email'
-            value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-            className='w-full p-2 border rounded'
-            required
-          />
-        </div>
-
-        <div>
-          <input
-            type='tel'
-            name='phoneNo'
-            placeholder='Phone Number'
-            value={formData.phoneNo}
-            onChange={(e) =>
-              setFormData({ ...formData, phoneNo: e.target.value })
-            }
-            className='w-full p-2 border rounded'
-            required
-            maxLength={10}
-          />
-        </div>
-
-        {!editingId && (
+      {editingId && (
+        <form onSubmit={handleSubmit} className='mb-8 space-y-4'>
           <div>
             <input
-              type='password'
-              placeholder='Password'
-              value={formData.password}
+              type='text'
+              placeholder='First Name'
+              value={formData.firstName}
               onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
+                setFormData({ ...formData, firstName: e.target.value })
               }
               className='w-full p-2 border rounded'
               required
             />
           </div>
-        )}
 
-        {/* <div className="flex gap-4">
-          {["student", "teacher", "admin"].map((role) => (
-            <label key={role} className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={formData.roles[role]}
-                onChange={() => handleRoleToggle(role)}
-                className="rounded"
-              />
-              <span className="capitalize">{role}</span>
-            </label>
-          ))}
-        </div> */}
+          <div>
+            <input
+              type='text'
+              placeholder='Last Name'
+              value={formData.lastName}
+              onChange={(e) =>
+                setFormData({ ...formData, lastName: e.target.value })
+              }
+              className='w-full p-2 border rounded'
+              required
+            />
+          </div>
 
-        {error && <div className='text-red-500'>{error}</div>}
+          <div>
+            <input
+              type='email'
+              placeholder='Email'
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+              className='w-full p-2 border rounded'
+              required
+            />
+          </div>
 
-        <button
-          type='submit'
-          className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
-        >
-          {editingId ? 'Update User' : 'Add User'}
-        </button>
+          <div>
+            <input
+              type='tel'
+              name='phoneNo'
+              placeholder='Phone Number'
+              value={formData.phoneNo}
+              onChange={(e) =>
+                setFormData({ ...formData, phoneNo: e.target.value })
+              }
+              className='w-full p-2 border rounded'
+              required
+              maxLength={10}
+            />
+          </div>
 
-        {editingId && (
+          <div>
+            <button
+              type='button'
+              className='text-sm text-blue-600 underline mb-1'
+              onClick={() => {
+                setShowPasswordField((prev) => !prev)
+                if (!showPasswordField) {
+                  setFormData((prev) => ({ ...prev, password: '' }))
+                }
+              }}
+            >
+              {showPasswordField ? 'Hide Password Field' : 'Edit Password'}
+            </button>
+
+            {showPasswordField && (
+              <div className='relative'>
+                <input
+                  type={showPasswordValue ? 'text' : 'password'}
+                  placeholder='New Password'
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  className='w-full p-2 border rounded pr-10'
+                />
+                <span
+                  className='absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-600 cursor-pointer'
+                  onClick={() => setShowPasswordValue((prev) => !prev)}
+                >
+                  {showPasswordValue ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className='flex gap-4'>
+            {['editor', 'admin'].map((role) => (
+              <label key={role} className='flex items-center space-x-2'>
+                <input
+                  type='checkbox'
+                  checked={formData.roles[role]}
+                  onChange={() => handleRoleToggle(role)}
+                  className='rounded'
+                />
+                <span className='capitalize'>{role}</span>
+              </label>
+            ))}
+          </div>
+
+          {error && <div className='text-red-500'>{error}</div>}
+
+          <button
+            type='submit'
+            className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
+          >
+            Update User
+          </button>
+
           <button
             type='button'
             onClick={() => {
               setEditingId(null)
+              setShowPasswordField(false)
               setFormData({
                 firstName: '',
                 lastName: '',
                 email: '',
+                phoneNo: '',
                 password: '',
-                roles: {
-                  student: false,
-                  teacher: false,
-                  admin: false
-                }
+                roles: { editor: false, admin: false }
               })
             }}
             className='ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600'
           >
             Cancel
           </button>
-        )}
-      </form>
+        </form>
+      )}
 
       {/* Button to open modal */}
       <button

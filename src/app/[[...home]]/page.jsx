@@ -54,6 +54,9 @@ const Page = () => {
           </div>
         </div>
       </div>
+      <div className='w-full md:w-1/5 block md:hidden mt-8'>
+        <SideBanner banners={banners} loading={loading} />
+      </div>
       {/* <FeaturedAdmission /> */}
       <Degree />
       {/* large banner */}

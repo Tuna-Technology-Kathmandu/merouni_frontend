@@ -2,14 +2,17 @@
 
 import { authFetch } from '../utils/authFetch'
 
-export async function getUsers(page = 1, token, role) {
+export async function getUsers(page = 1, token) {
+  if (!token) {
+    throw new Error('No authentication token provided')
+  }
   try {
     const response = await authFetch(
       `${process.env.baseUrl}${process.env.version}/users?page=${page}`,
       {
         headers: {
-          // Authorization: `Bearer ${token}`,
-          Role: role.join(',')
+          Authorization: `Bearer ${token}`
+          // Role: role.join(',')
         },
         cache: 'no-store'
       }
@@ -66,15 +69,16 @@ export async function createUser(formData) {
 
 export async function updateUser(userId, formData) {
   try {
-    const userData = Object.fromEntries(formData)
-    const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/users/${userId}`,
+    // const userData = Object.fromEntries(formData)
+    console.log('formDatafromAPi', formData)
+    const response = await authFetch(
+      `${process.env.baseUrl}${process.env.version}/users/edit-profile?user_id=${userId}`,
       {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(userData)
+        body: JSON.stringify(formData)
       }
     )
 
@@ -89,17 +93,25 @@ export async function updateUser(userId, formData) {
   }
 }
 
-export async function deleteUser(userId) {
+export async function deleteUser(userId, userData) {
   try {
-    const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/users/${userId}`,
+    const response = await authFetch(
+      `${process.env.baseUrl}${process.env.version}/users`,
       {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          role: userData?.role
+        })
       }
     )
 
     if (!response.ok) {
-      throw new Error('Failed to delete user')
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.message || 'Failed to delete user')
     }
 
     return true

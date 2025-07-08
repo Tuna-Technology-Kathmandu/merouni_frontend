@@ -117,13 +117,15 @@ const SignInPage = () => {
       )
 
       // Validate response
-      if (!response.data?.accessToken || !response.data?.refreshToken) {
-        throw new Error('Authentication tokens missing in response')
-      }
+      if (isLogin) {
+        if (!response.data?.accessToken || !response.data?.refreshToken) {
+          throw new Error('Authentication tokens missing in response')
+        }
 
-      const { accessToken, refreshToken } = response.data
-      localStorage.setItem('access_token', accessToken)
-      localStorage.setItem('refreshToken', refreshToken)
+        const { accessToken, refreshToken } = response.data
+        localStorage.setItem('access_token', accessToken)
+        localStorage.setItem('refreshToken', refreshToken)
+      }
 
       return response.data
     },

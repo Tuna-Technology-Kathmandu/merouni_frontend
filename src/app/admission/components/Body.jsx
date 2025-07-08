@@ -1,8 +1,9 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Search } from 'lucide-react'
 import { getAdmission } from '../actions'
 import Link from 'next/link'
+import Pagination from '../../blogs/components/Pagination'
 
 // Define a simple Shimmer component for loading state
 const Shimmer = ({ width, height }) => (
@@ -14,6 +15,12 @@ const Body = () => {
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0
+  })
+  const [isScrolling, setIsScrolling] = useState(false)
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -25,20 +32,38 @@ const Body = () => {
     }
   }, [searchTerm])
 
-  useEffect(() => {
-    fetchAdmission()
-  }, [])
-
-  const fetchAdmission = async () => {
+  const fetchAdmission = useCallback(async (page = 1, search = '') => {
     setLoading(true)
     try {
-      const response = await getAdmission()
-      console.log('Admission data:', response)
-      setAdmission(response)
+      const response = await getAdmission(search, page)
+      setAdmission(response.items)
+      setPagination(response.pagination)
     } catch (error) {
       console.error('Error:', error)
+      setAdmission([])
     } finally {
       setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchAdmission(pagination.currentPage, debouncedSearch)
+  }, [debouncedSearch, pagination.currentPage, fetchAdmission])
+
+  const handlePageChange = (page) => {
+    if (page > 0 && page <= pagination.totalPages) {
+      setIsScrolling(true)
+      setPagination((prev) => ({
+        ...prev,
+        currentPage: page
+      }))
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      })
+
+      // Wait for scroll to complete
+      setTimeout(() => setIsScrolling(false), 500)
     }
   }
 
@@ -66,7 +91,7 @@ const Body = () => {
           <Search className='absolute left-3 top-2.5 h-5 w-5 text-gray-400' />
         </div>
       </div>
-      {loading ? (
+      {loading || isScrolling ? (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
           {Array(6)
             .fill('')
@@ -93,52 +118,61 @@ const Body = () => {
             ))}
         </div>
       ) : (
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-          {filteredAdmissions.map((admis, index) => (
-            <div
-              key={index}
-              className='border-2 border-gray-200 rounded-lg shadow-lg p-6 bg-white'
-            >
-              <Link
-                href={`/degree/${admis?.program?.slugs}`}
-                className='hover:underline hover:decoration-[#30AD8F]'
-              >
-                <h2 className='text-xl font-semibold mb-2'>
-                  {admis.program.title}
-                </h2>
-              </Link>
-
-              <p className='text-gray-700 mb-2'>
-                <Link
-                  href={`/colleges/${admis?.collegeAdmissionCollege?.slugs}`}
-                  className='hover:underline hover:decoration-[#30AD8F]'
+        <>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            {filteredAdmissions.length === 0 ? (
+              <div className='text-center text-gray-500 mt-8 col-span-full'>
+                No admission details available.
+              </div>
+            ) : (
+              filteredAdmissions.map((admis, index) => (
+                <div
+                  key={index}
+                  className='border-2 border-gray-200 rounded-lg shadow-lg p-6 bg-white'
                 >
-                  <span className='font-semibold'>College:</span>{' '}
-                  {admis.collegeAdmissionCollege.name}
-                </Link>
-              </p>
-              <p className='text-gray-700 mb-2'>
-                <span className='font-semibold'>Admission Process:</span>{' '}
-                {admis.admission_process}
-              </p>
-              <p className='text-gray-700 mb-2'>
-                <span className='font-semibold'>Eligibility:</span>{' '}
-                {admis.eligibility_criteria}
-              </p>
-              <p className='text-gray-700 mb-2'>
-                <span className='font-semibold'>Fee Details:</span>{' '}
-                {admis.fee_details}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
+                  <Link
+                    href={`/degree/${admis?.program?.slugs}`}
+                    className='hover:underline hover:decoration-[#30AD8F]'
+                  >
+                    <h2 className='text-xl font-semibold mb-2'>
+                      {admis.program.title}
+                    </h2>
+                  </Link>
 
-      {/* No Results Message */}
-      {!loading && filteredAdmissions.length === 0 && (
-        <div className='text-center text-gray-500 mt-8'>
-          No admission details available.
-        </div>
+                  <p className='text-gray-700 mb-2'>
+                    <Link
+                      href={`/colleges/${admis?.collegeAdmissionCollege?.slugs}`}
+                      className='hover:underline hover:decoration-[#30AD8F]'
+                    >
+                      <span className='font-semibold'>College:</span>{' '}
+                      {admis.collegeAdmissionCollege.name}
+                    </Link>
+                  </p>
+                  <p className='text-gray-700 mb-2'>
+                    <span className='font-semibold'>Admission Process:</span>{' '}
+                    {admis.admission_process}
+                  </p>
+                  <p className='text-gray-700 mb-2'>
+                    <span className='font-semibold'>Eligibility:</span>{' '}
+                    {admis.eligibility_criteria}
+                  </p>
+                  <p className='text-gray-700 mb-2'>
+                    <span className='font-semibold'>Fee Details:</span>{' '}
+                    {admis.fee_details}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+          {pagination.totalPages > 1 && (
+            <div className='mt-8 flex justify-center'>
+              <Pagination
+                pagination={pagination}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   )

@@ -25,7 +25,7 @@ const Sponsors = () => {
   )
 
   return (
-    <div className='bg-[#E8E8E8] py-20 w-full'>
+    <div className='bg-[#E8E8E8] py-10  lg:py-14 w-full'>
       <Marquee speed={50} gradient={false} pauseOnHover={true}>
         <div className='flex items-center gap-8 px-4'>
           {' '}
@@ -51,7 +51,7 @@ const Sponsors = () => {
                       e.target.src = '/images/meroUniSmall.gif'
                     }}
                     alt={`Banner position ${banner.display_position}`}
-                    className='h-36 w-auto rounded-lg shadow-lg object-cover min-w-[300px]'
+                    className='h-16 md:h-20 lg:h-36 rounded-lg shadow-lg'
                   />
                 </a>
               </div>

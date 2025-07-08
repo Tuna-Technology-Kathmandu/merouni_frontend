@@ -170,7 +170,7 @@ const Menu = () => {
       dispatch(removeUser())
       localStorage.removeItem('access_token')
       localStorage.removeItem('refreshToken')
-      router.push('/sign-in')
+      router.replace('/sign-in')
     } catch (error) {
       console.error('Logout error:', error)
     }

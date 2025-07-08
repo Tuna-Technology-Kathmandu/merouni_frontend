@@ -17,7 +17,7 @@ const EventCard = ({ event }) => {
     console.error('Error parsing event_host:', error)
   }
   return (
-    <div className='w-[300px] h-[350px] rounded-2xl  shadow-md border border-gray-300  '>
+    <div className='w-full sm:w-[300px] sm:h-[350px] h-[320px] rounded-2xl  shadow-md border border-gray-300  '>
       {/* <!-- Top Section: Image --> */}
       {/* <div className="flex justify-center mb-4"> */}
       <div className='h-[200px]'>

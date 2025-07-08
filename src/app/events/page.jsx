@@ -301,6 +301,60 @@ const Events = () => {
                           </div>
                         </Link>
                       ))}
+                  {allLoading
+                    ? [...Array(6)].map((_, i) => (
+                        <div
+                          key={i}
+                          className='bg-gray-100 rounded-lg h-80 animate-pulse'
+                        ></div>
+                      ))
+                    : allEvents.map((event) => (
+                        <Link
+                          href={`/events/${event.slugs}`}
+                          key={event.id}
+                          passHref
+                        >
+                          <div className='transition-transform duration-300 hover:scale-[1.02]'>
+                            <EventCard event={event} />
+                          </div>
+                        </Link>
+                      ))}
+                  {allLoading
+                    ? [...Array(6)].map((_, i) => (
+                        <div
+                          key={i}
+                          className='bg-gray-100 rounded-lg h-80 animate-pulse'
+                        ></div>
+                      ))
+                    : allEvents.map((event) => (
+                        <Link
+                          href={`/events/${event.slugs}`}
+                          key={event.id}
+                          passHref
+                        >
+                          <div className='transition-transform duration-300 hover:scale-[1.02]'>
+                            <EventCard event={event} />
+                          </div>
+                        </Link>
+                      ))}
+                  {allLoading
+                    ? [...Array(6)].map((_, i) => (
+                        <div
+                          key={i}
+                          className='bg-gray-100 rounded-lg h-80 animate-pulse'
+                        ></div>
+                      ))
+                    : allEvents.map((event) => (
+                        <Link
+                          href={`/events/${event.slugs}`}
+                          key={event.id}
+                          passHref
+                        >
+                          <div className='transition-transform duration-300 hover:scale-[1.02]'>
+                            <EventCard event={event} />
+                          </div>
+                        </Link>
+                      ))}
                 </div>
 
                 {/* Pagination - Centered with responsive margin */}

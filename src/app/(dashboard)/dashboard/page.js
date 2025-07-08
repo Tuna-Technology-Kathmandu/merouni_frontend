@@ -1,5 +1,5 @@
 'use client'
-import withAuth from '@/app/components/withAuth'
+// import withAuth from '@/app/components/withAuth'
 import { motion } from 'framer-motion'
 import { useEffect } from 'react'
 import { FaUniversity, FaBookOpen, FaCalendarAlt } from 'react-icons/fa'

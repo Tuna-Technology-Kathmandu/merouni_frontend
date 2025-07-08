@@ -1,7 +1,7 @@
 'use client'
 import { authFetch } from '@/app/utils/authFetch'
 import React, { useState } from 'react'
-import axios from 'axios'
+// import axios from 'axios'
 import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'

@@ -123,16 +123,14 @@ export async function getRankings(limit, page, category_title) {
   }
   return services.news.getAll(params)
 }
-
 export async function getToken() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get('token')
-  if (!token) {
-    return null
+  // Check if localStorage is available (client-side)
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('access_token')
+    return token || null
   }
-  return token
+  return null
 }
-
 // Banner Actions
 
 export async function getBanners() {
