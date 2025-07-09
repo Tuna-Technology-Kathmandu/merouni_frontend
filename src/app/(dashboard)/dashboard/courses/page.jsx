@@ -6,11 +6,12 @@ import { useSelector } from 'react-redux'
 import Table from '@/app/components/Table'
 import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 // import { getCourses } from '@/app/action'
 import { fetchFaculties } from './action'
 import { useDebounce } from 'use-debounce'
+import useAdminPermission from '@/core/hooks/useAdminPermission'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
@@ -57,6 +58,16 @@ export default function CourseForm() {
       syllabus: []
     }
   })
+
+  const { requireAdmin } = useAdminPermission()
+
+  const handleDeleteClick = (id) => {
+    console.log('courseId', id)
+    requireAdmin(() => {
+      setDeleteId(id)
+      setIsDialogOpen(true)
+    })
+  }
 
   // Fetch all necessary data on component mount
   useEffect(() => {
@@ -232,10 +243,7 @@ export default function CourseForm() {
             <Edit2 className='w-4 h-4' />
           </button>
           <button
-            onClick={() => {
-              setDeleteId(row.original.id)
-              setIsDialogOpen(true)
-            }}
+            onClick={() => handleDeleteClick(row.original.id)}
             className='p-1 text-red-600 hover:text-red-800'
           >
             <Trash2 className='w-4 h-4' />
@@ -279,7 +287,8 @@ export default function CourseForm() {
   return (
     <>
       <div className='text-2xl mr-auto p-4 ml-14 font-bold'>
-        <div className='text-center'>Course Management</div>
+        <ToastContainer />
+        <div className='text-center'>Subject Management</div>
         <div className='flex justify-left mt-2'>
           <button
             className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'

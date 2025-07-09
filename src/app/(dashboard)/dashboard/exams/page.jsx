@@ -7,9 +7,10 @@ import Loading from '../../../components/Loading'
 import Table from '../../../components/Table'
 import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import { useDebounce } from 'use-debounce'
 import { fetchUniversities, fetchLevel } from './actions'
+import useAdminPermission from '@/core/hooks/useAdminPermission'
 const CKExam = dynamic(() => import('../component/CKExam'), {
   ssr: false
 })
@@ -71,7 +72,9 @@ export default function ExamManager() {
 
   const editorRef = useRef(null)
 
-  console.log('formData', formData)
+  // console.log('formData', formData)
+
+  const { requireAdmin } = useAdminPermission()
 
   //for level searching
   useEffect(() => {
@@ -338,17 +341,20 @@ export default function ExamManager() {
   }
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this exam?')) {
-      try {
-        await deleteExam(id)
-        loadExams()
-        setError(null)
-      } catch (error) {
-        setError('Failed to delete exam')
-        console.error('Error deleting exam:', error)
+    requireAdmin(async () => {
+      if (window.confirm('Are you sure you want to delete this exam?')) {
+        try {
+          await deleteExam(id)
+          loadExams()
+          setError(null)
+        } catch (error) {
+          setError('Failed to delete exam')
+          console.error('Error deleting exam:', error)
+        }
       }
-    }
+    }, 'You do not have permission to delete exams.')
   }
+
   const handleDescriptionChange = (value) => {
     if (value !== formData.description) {
       setFormData((prev) => ({

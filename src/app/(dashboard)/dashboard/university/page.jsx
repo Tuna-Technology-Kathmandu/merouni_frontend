@@ -7,11 +7,12 @@ import FileUpload from '../addCollege/FileUpload'
 import Table from '@/app/components/Table'
 import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { fetchLevel } from './actions'
 import { useDebounce } from 'use-debounce'
 import { fetchAllCourse } from './actions'
+import useAdminPermission from '@/core/hooks/useAdminPermission'
 const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
 })
@@ -109,6 +110,8 @@ export default function UniversityForm() {
   useEffect(() => {
     fetchUniversities()
   }, [])
+
+  const { requireAdmin } = useAdminPermission()
 
   const formData = watch()
   console.log('fromData', formData)
@@ -302,8 +305,10 @@ export default function UniversityForm() {
   }
 
   const handleDeleteClick = (id) => {
-    setDeleteId(id) // Store the ID of the item to delete
-    setIsDialogOpen(true) // Open the confirmation dialog
+    requireAdmin(() => {
+      setDeleteId(id) // Store the ID of the item to delete
+      setIsDialogOpen(true) // Open the confirmation dialog
+    })
   }
 
   const handleDialogClose = () => {
@@ -410,6 +415,7 @@ export default function UniversityForm() {
   return (
     <>
       <div className='text-2xl mr-auto p-4 ml-14 font-bold'>
+        <ToastContainer />
         <div className='text-center'>University Management</div>
         <div className='flex justify-left mt-2'>
           <button

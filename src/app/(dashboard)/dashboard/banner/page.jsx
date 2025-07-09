@@ -4,8 +4,9 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import FileUpload from '../addCollege/FileUpload'
 import { Eye, Trash2, Plus, X } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import useAdminPermission from '@/core/hooks/useAdminPermission'
 
 export default function BannerForm() {
   const [maxPosition, setMaxPosition] = useState(1)
@@ -97,6 +98,7 @@ export default function BannerForm() {
     }
   }
 
+  const { requireAdmin } = useAdminPermission()
   const searchCollege = async (query) => {
     setValue('collegeSearch', query)
 
@@ -248,8 +250,10 @@ export default function BannerForm() {
   }
 
   const handleDeleteClick = (id) => {
-    setDeleteId(id)
-    setIsDialogOpen(true)
+    requireAdmin(() => {
+      setDeleteId(id)
+      setIsDialogOpen(true)
+    })
   }
 
   const addNewPosition = () => {
@@ -310,6 +314,7 @@ export default function BannerForm() {
 
   return (
     <div className='container mx-auto p-4'>
+      <ToastContainer />
       <div className='text-2xl font-bold text-center mb-6'>
         Banner Management
       </div>

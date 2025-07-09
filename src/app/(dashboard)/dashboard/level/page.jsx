@@ -5,8 +5,9 @@ import { useSelector } from 'react-redux'
 import Table from '@/app/components/Table'
 import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import useAdminPermission from '@/core/hooks/useAdminPermission'
 
 export default function LevelForm() {
   const author_id = useSelector((state) => state.user.data.id)
@@ -36,6 +37,8 @@ export default function LevelForm() {
       author: author_id
     }
   })
+
+  const { requireAdmin } = useAdminPermission()
 
   useEffect(() => {
     fetchLevels()
@@ -114,8 +117,10 @@ export default function LevelForm() {
   }
 
   const handleDeleteClick = (id) => {
-    setDeleteId(id)
-    setIsDialogOpen(true)
+    requireAdmin(() => {
+      setDeleteId(id)
+      setIsDialogOpen(true)
+    })
   }
 
   const handleDialogClose = () => {

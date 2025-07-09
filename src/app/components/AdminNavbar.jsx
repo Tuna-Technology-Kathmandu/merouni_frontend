@@ -105,7 +105,10 @@ const AdminNavbar = () => {
             {userData ? `${userData.firstName} ${userData.lastName}` : ''}
           </span>
           <span className='text-[10px] text-gray-500 text-right'>
-            {Object.keys(userRoles).join(', ')}
+            {Object.entries(userRoles)
+              .filter(([_, value]) => value) // Keep only roles set to true
+              .map(([role]) => role)
+              .join(', ')}
           </span>
         </div>
         <CiPower />

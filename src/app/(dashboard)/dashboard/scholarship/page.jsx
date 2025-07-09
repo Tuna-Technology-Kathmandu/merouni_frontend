@@ -14,6 +14,7 @@ import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import useAdminPermission from '@/core/hooks/useAdminPermission'
 const CKEditor = dynamic(() => import('../component/CKStable'), {
   ssr: false
 })
@@ -98,6 +99,8 @@ export default function ScholarshipManager() {
   useEffect(() => {
     loadScholarships()
   }, [])
+
+  const { requireAdmin } = useAdminPermission()
 
   const loadScholarships = async (page = 1) => {
     try {
@@ -191,17 +194,19 @@ export default function ScholarshipManager() {
   }
 
   const handleDelete = async (id) => {
-    console.log('ids0', id)
-    if (window.confirm('Are you sure you want to delete this scholarship?')) {
-      try {
-        await deleteScholarship(id)
-        loadScholarships()
-        setError(null)
-      } catch (error) {
-        setError('Failed to delete scholarship')
-        console.error('Error deleting scholarship:', error)
+    requireAdmin(async () => {
+      console.log('ids0', id)
+      if (window.confirm('Are you sure you want to delete this scholarship?')) {
+        try {
+          await deleteScholarship(id)
+          loadScholarships()
+          setError(null)
+        } catch (error) {
+          setError('Failed to delete scholarship')
+          console.error('Error deleting scholarship:', error)
+        }
       }
-    }
+    }, 'You do not have permission to delete scholarships.')
   }
 
   const formatDate = (date) => {

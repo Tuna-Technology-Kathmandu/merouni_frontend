@@ -8,11 +8,12 @@ import { authFetch } from '@/app/utils/authFetch'
 import Loader from '@/app/components/Loading'
 import Table from '../../../components/Table'
 import { Edit2, Trash2 } from 'lucide-react'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import useAdminPermission from '@/core/hooks/useAdminPermission'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
@@ -236,6 +237,8 @@ export default function NewsManager() {
   useEffect(() => {
     loadData()
   }, [])
+
+  const { requireAdmin } = useAdminPermission()
 
   // Function to add a tag from search results
   const handleSelectTag = (tag) => {
@@ -470,8 +473,10 @@ export default function NewsManager() {
   }
 
   const handleDeleteClick = (id) => {
-    setDeleteId(id)
-    setIsDialogOpen(true)
+    requireAdmin(() => {
+      setDeleteId(id)
+      setIsDialogOpen(true)
+    })
   }
 
   const handleDeleteConfirm = async () => {
@@ -511,6 +516,7 @@ export default function NewsManager() {
 
   return (
     <div className='p-4 w-4/5 mx-auto'>
+      <ToastContainer />
       <h1 className='text-2xl font-bold mb-4'>News Management</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className='mb-8'>

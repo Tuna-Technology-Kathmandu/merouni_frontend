@@ -9,6 +9,7 @@ import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { X } from 'lucide-react'
+import useAdminPermission from '@/core/hooks/useAdminPermission'
 
 export default function MaterialForm() {
   const author_id = useSelector((state) => state.user.data.id)
@@ -98,6 +99,8 @@ export default function MaterialForm() {
     fetchMaterials()
     fetchTags()
   }, [])
+
+  const { requireAdmin } = useAdminPermission()
 
   const fetchTags = async () => {
     try {
@@ -226,8 +229,10 @@ export default function MaterialForm() {
   }
 
   const handleDeleteClick = (id) => {
-    setDeleteId(id)
-    setIsDialogOpen(true)
+    requireAdmin(() => {
+      setDeleteId(id)
+      setIsDialogOpen(true)
+    })
   }
 
   const handleDialogClose = () => {

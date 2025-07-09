@@ -6,9 +6,10 @@ import FileUpload from '../addCollege/FileUpload'
 import Table from '@/app/components/Table'
 import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { X } from 'lucide-react'
+import useAdminPermission from '@/core/hooks/useAdminPermission'
 
 export default function ConsultancyForm() {
   const author_id = useSelector((state) => state.user.data.id)
@@ -62,6 +63,8 @@ export default function ConsultancyForm() {
   useEffect(() => {
     fetchConsultancies()
   }, [])
+
+  const { requireAdmin } = useAdminPermission()
 
   const fetchConsultancies = async (page = 1) => {
     setTableLoading(true)
@@ -206,8 +209,10 @@ export default function ConsultancyForm() {
   }
 
   const handleDeleteClick = (id) => {
-    setDeleteId(id)
-    setIsDialogOpen(true)
+    requireAdmin(() => {
+      setDeleteId(id)
+      setIsDialogOpen(true)
+    })
   }
 
   const handleDialogClose = () => {
@@ -321,6 +326,7 @@ export default function ConsultancyForm() {
   return (
     <>
       <div className='text-2xl mr-auto p-4 ml-14 font-bold'>
+        <ToastContainer />
         <div className='text-center'>Consultancy Management</div>
         <div className='flex justify-left mt-2'>
           <button

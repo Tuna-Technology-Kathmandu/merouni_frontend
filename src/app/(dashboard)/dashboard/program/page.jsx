@@ -17,6 +17,7 @@ import {
 import { useDebounce } from 'use-debounce'
 import CourseSearch from './CourseSearch'
 import Syllabus from './Syllabus'
+import useAdminPermission from '@/core/hooks/useAdminPermission'
 
 export default function ProgramForm() {
   const author_id = useSelector((state) => state.user.data.id)
@@ -170,6 +171,8 @@ export default function ProgramForm() {
     fetchPrograms()
     fetchColleges()
   }, [])
+
+  const { requireAdmin } = useAdminPermission()
 
   //for faculties
   useEffect(() => {
@@ -548,8 +551,10 @@ export default function ProgramForm() {
           </button>
           <button
             onClick={() => {
-              setDeleteId(row.original.id)
-              setIsDialogOpen(true)
+              requireAdmin(() => {
+                setDeleteId(row.original.id)
+                setIsDialogOpen(true)
+              }, 'You do not have permission to delete this item.')
             }}
             className='p-1 text-red-600 hover:text-red-800'
           >

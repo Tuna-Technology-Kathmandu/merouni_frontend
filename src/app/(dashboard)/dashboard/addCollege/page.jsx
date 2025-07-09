@@ -26,6 +26,7 @@ const CKUni = dynamic(() => import('../component/CKUni'), {
 import { useDebounce } from 'use-debounce'
 import GallerySection from './GallerySection'
 import VideoSection from './VideoSection'
+import useAdminPermission from '@/core/hooks/useAdminPermission'
 
 export default function CollegeForm() {
   //for university search
@@ -69,6 +70,8 @@ export default function CollegeForm() {
   const [editing, setEditing] = useState(false)
 
   const author_id = useSelector((state) => state.user.data.id)
+
+  const { requireAdmin } = useAdminPermission()
   const {
     register,
     control,
@@ -412,8 +415,10 @@ export default function CollegeForm() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   const handleDeleteClick = (id) => {
-    setDeleteId(id) // Store the ID of the item to delete
-    setIsDialogOpen(true) // Open the confirmation dialog
+    requireAdmin(() => {
+      setDeleteId(id)
+      setIsDialogOpen(true)
+    })
   }
 
   const handleDeleteConfirm = async () => {

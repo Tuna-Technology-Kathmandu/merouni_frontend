@@ -66,14 +66,16 @@ export default function UsersManager() {
           const roles = JSON.parse(row.original.roles || '{}') // Parse the string to an object
           return (
             <div className='flex gap-1'>
-              {Object.keys(roles).map((role) => (
-                <span
-                  key={role}
-                  className='px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800'
-                >
-                  {role}
-                </span>
-              ))}
+              {Object.entries(roles)
+                .filter(([_, value]) => value) // keep only true roles
+                .map(([role]) => (
+                  <span
+                    key={role}
+                    className='px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800'
+                  >
+                    {role}
+                  </span>
+                ))}
             </div>
           )
         }

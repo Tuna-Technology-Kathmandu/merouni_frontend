@@ -12,7 +12,8 @@ import Loader from '@/app/components/Loading'
 import Table from '../../../components/Table' // Adjust the import path as needed
 import { Edit2, Trash2 } from 'lucide-react' // For action icons
 import { authFetch } from '@/app/utils/authFetch'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
+import useAdminPermission from '@/core/hooks/useAdminPermission'
 
 // const CKEditor4 = dynamic(() => import('../component/CKEditor4'), {
 //   ssr: false
@@ -80,6 +81,7 @@ export default function FacultyManager() {
     []
   )
 
+  const { requireAdmin } = useAdminPermission()
   useEffect(() => {
     loadFaculties()
   }, [])
@@ -136,15 +138,18 @@ export default function FacultyManager() {
   }
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this faculty?')) {
-      try {
-        await deleteFaculty(id)
-        loadFaculties()
-      } catch (error) {
-        console.error('Error deleting faculty:', error)
+    requireAdmin(async () => {
+      if (window.confirm('Are you sure you want to delete this faculty?')) {
+        try {
+          await deleteFaculty(id)
+          loadFaculties()
+        } catch (error) {
+          console.error('Error deleting faculty:', error)
+        }
       }
-    }
+    }, 'You do not have permission to delete faculty.')
   }
+
   const handleSearch = async (query) => {
     if (!query) {
       loadFaculties()

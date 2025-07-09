@@ -14,6 +14,7 @@ import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { fetchCategories } from '../category/action'
 import { X } from 'lucide-react'
+import useAdminPermission from '@/core/hooks/useAdminPermission'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
@@ -80,6 +81,8 @@ export default function EventManager() {
   useEffect(() => {
     loadEvents()
   }, [])
+
+  const { requireAdmin } = useAdminPermission()
 
   const searchCollege = async (e) => {
     const query = e.target.value
@@ -311,8 +314,10 @@ export default function EventManager() {
   }
 
   const handleDeleteClick = (id) => {
-    setDeleteId(id)
-    setIsDialogOpen(true)
+    requireAdmin(() => {
+      setDeleteId(id)
+      setIsDialogOpen(true)
+    })
   }
 
   const handleDeleteConfirm = async () => {

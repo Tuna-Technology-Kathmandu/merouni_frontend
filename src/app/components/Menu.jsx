@@ -17,7 +17,7 @@ import {
 } from 'react-icons/fa'
 import { BsNewspaper, BsCalendarEvent } from 'react-icons/bs'
 import { HiOutlineUsers, HiOutlineAcademicCap } from 'react-icons/hi'
-import { MdInsights, MdCategory, MdOutlinePermMedia } from 'react-icons/md'
+import { MdCategory, MdOutlinePermMedia } from 'react-icons/md'
 import { IoSchoolSharp } from 'react-icons/io5'
 import { RiUserSettingsLine } from 'react-icons/ri'
 import { BiLogOut } from 'react-icons/bi'
@@ -47,7 +47,7 @@ const menuItems = [
         icon: <HiOutlineUsers className='text-xl' />,
         label: 'Users',
         href: '/dashboard/users',
-        visible: ['admin', 'superadmin', 'editor']
+        visible: ['admin', 'superadmin']
       },
       {
         icon: <HiOutlineAcademicCap className='text-xl' />,
@@ -152,6 +152,8 @@ const Menu = () => {
     const roleData = state.user?.data?.role
     return roleData ? JSON.parse(roleData) : {}
   })
+
+  console.log('role', role)
 
   const handleLogout = async (e) => {
     e.preventDefault()
