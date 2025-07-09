@@ -117,15 +117,6 @@ const ImageSection = ({ university }) => {
                      text-xs md:text-sm lg:text-base
                      overflow-x-hidden'
         ></div>
-        {/* <p className="pt-4 leading-7">
-          The objective of the BCA program of Tribhuvan University is to produce
-          high quality computer application users and developers. The program of
-          study for Bachelor of Arts in Computer Application (BCA) is over a
-          period of eight semesters (four academic years). The academic year
-          begins in September and February of each year. The medium of
-          instruction and examination in the Bachelor of Arts in Computer
-          Application (BCA) program is English.
-        </p> */}
       </div>
     </div>
   )

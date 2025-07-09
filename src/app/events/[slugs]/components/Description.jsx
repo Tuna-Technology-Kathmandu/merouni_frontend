@@ -2,8 +2,16 @@ import React from 'react'
 import DOMPurify from 'dompurify'
 
 const Description = ({ event }) => {
-  const cleanHTML = event?.content ? DOMPurify.sanitize(event.content) : ''
-  console.log(cleanHTML)
+  // Function to wrap tables in a scrollable container
+  const processContent = (html) => {
+    if (!html) return ''
+    const cleanHTML = DOMPurify.sanitize(html)
+    return cleanHTML.replace(
+      /<table([^>]*)>([\s\S]*?)<\/table>/g,
+      '<div class="table-wrapper"><table$1>$2</table></div>'
+    )
+  }
+
   return (
     <div className='ml-4 mt-4 flex flex-col md:flex-row max-w-full md:max-w-[1600px] md:mx-auto items-start'>
       {/* Description Section */}
@@ -12,7 +20,26 @@ const Description = ({ event }) => {
         <p className='text-base mt-2 leading-8'>{event?.description}</p>
 
         <div className='prose prose-sm sm:prose lg:prose-lg xl:prose-xl prose-slate max-w-full'>
-          <div dangerouslySetInnerHTML={{ __html: cleanHTML }} />
+          <div
+            dangerouslySetInnerHTML={{ __html: processContent(event?.content) }}
+            className='[&_.table-wrapper]:overflow-x-auto 
+                      [&_.table-wrapper]:my-4 
+                      [&_.table-wrapper]:w-full
+                      [&_.table-wrapper]:[scrollbar-width:thin]
+                      [&_.table-wrapper]:[scrollbar-color:gray-300_transparent]
+                      
+                      [&_table]:min-w-full
+                      [&_table]:border-collapse
+                      [&_th]:bg-gray-100
+                      [&_th]:p-2
+                      [&_th]:text-left
+                      [&_th]:border
+                      [&_th]:border-gray-300
+                      [&_td]:p-2
+                      [&_td]:border
+                      [&_td]:border-gray-300
+                      [&_tr:nth-child(even)]:bg-gray-50'
+          />
         </div>
       </div>
 
