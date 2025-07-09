@@ -1,5 +1,4 @@
 'use client'
-
 import React from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
@@ -152,8 +151,6 @@ const Menu = () => {
     const roleData = state.user?.data?.role
     return roleData ? JSON.parse(roleData) : {}
   })
-
-  console.log('role', role)
 
   const handleLogout = async (e) => {
     e.preventDefault()

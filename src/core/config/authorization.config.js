@@ -28,7 +28,8 @@ export const PERMISSIONS_VIA_ROLE = {
     '/dashboard/exams',
     '/dashboard/courses',
     '/dashboard/banner',
-    '/dashboard/referrals'
+    '/dashboard/referrals',
+    '/dashboard/material'
   ],
   [APP_ROLES.editor]: [
     '/dashboard',
@@ -55,7 +56,7 @@ export const PERMISSIONS_VIA_ROLE = {
     '/dashboard/tag',
     '/dashboard/material'
   ],
-  [APP_ROLES.agent]: ['/dashboard/referStudent'],
+  [APP_ROLES.agent]: ['/dashboard/referStudent', '/dashboard/profile'],
   [APP_ROLES.teacher]: [
     '/dashboard',
     '/dashboard/material',

@@ -27,7 +27,7 @@ export default function UsersManager() {
     password: '',
     phoneNo: '',
     roles: {
-      // student: false,
+      student: false,
       editor: false,
       admin: false
     }
@@ -394,7 +394,7 @@ export default function UsersManager() {
           </div>
 
           <div className='flex gap-4'>
-            {['editor', 'admin'].map((role) => (
+            {['student', 'editor', 'admin'].map((role) => (
               <label key={role} className='flex items-center space-x-2'>
                 <input
                   type='checkbox'
