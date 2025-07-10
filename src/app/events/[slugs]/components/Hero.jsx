@@ -1,36 +1,23 @@
 import React from 'react'
 import { FiMapPin } from 'react-icons/fi'
-import Image from 'next/image'
 
 const Hero = ({ event }) => {
-  const handleShare = (platform) => {
-    const url = encodeURIComponent(window.location.href)
-    const title = encodeURIComponent(event?.title || 'Check out this event!')
+  // Get current page URL to share
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
+  const shareTitle = `Check out events happening on our platform`
 
-    let shareUrl = ''
-
-    switch (platform) {
-      case 'facebook':
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`
-        break
-      case 'twitter':
-        shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`
-        break
-      case 'linkedin':
-        shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}`
-        break
-      case 'instagram':
-        alert(
-          'Instagram does not support direct link sharing. Please share manually.'
-        )
-        return
-      default:
-        return
-    }
-
-    window.open(shareUrl, '_blank', 'noopener,noreferrer')
+  // Social share URLs
+  const socialLinks = {
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}&display=popup&ref=plugin&src=share_button`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`,
+    x: `https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(shareTitle)}`,
+    whatsapp: `https://wa.me/?text=${encodeURIComponent(`${shareTitle} ${currentUrl}`)}`
   }
 
+  const handleInstagram = () => {
+    navigator.clipboard.writeText(`${shareTitle}\n${currentUrl}`)
+    alert('Link copied to clipboard! You can now paste it in Instagram')
+  }
   return (
     <div className='relative '>
       {' '}
@@ -67,30 +54,53 @@ const Hero = ({ event }) => {
       {/* Social share icons */}
       <div className='fixed md:left-8 right-2 md:right-auto top-[30%] md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col space-y-4 text-[#b0b2c3] z-10'>
         <div className='text-black font-bold text-sm'>Share</div>
-        <img
-          src='/images/fb.png'
-          alt='Facebook'
-          className='w-6 cursor-pointer'
-          onClick={() => handleShare('facebook')}
-        />
-        <img
-          src='/images/insta.png'
-          alt='Instagram'
-          className='w-6 cursor-pointer'
-          onClick={() => handleShare('instagram')}
-        />
-        <img
-          src='/images/linkedin.png'
-          alt='LinkedIn'
-          className='w-6 cursor-pointer'
-          onClick={() => handleShare('linkedin')}
-        />
-        <img
-          src='/images/twitter.png'
-          alt='Twitter'
-          className='w-6 cursor-pointer'
-          onClick={() => handleShare('twitter')}
-        />
+        <div className='flex flex-col gap-4 items-center'>
+          {/* Facebook */}
+          <a
+            href={socialLinks.facebook}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='hover:opacity-80 transition-opacity hover:scale-110'
+          >
+            <img src='/images/fb.png' alt='Share on Facebook' className='w-6' />
+          </a>
+
+          {/* Twitter/X */}
+          <a
+            href={socialLinks.x}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='hover:opacity-80 transition-opacity hover:scale-110'
+          >
+            <img src='/images/twitter.png' alt='Share on X' className='w-6' />
+          </a>
+
+          {/* LinkedIn */}
+          <a
+            href={socialLinks.linkedin}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='hover:opacity-80 transition-opacity hover:scale-110'
+          >
+            <img
+              src='/images/linkedin.png'
+              alt='Share on LinkedIn'
+              className='w-6'
+            />
+          </a>
+
+          {/* Instagram */}
+          <button
+            onClick={handleInstagram}
+            className='hover:opacity-80 transition-opacity hover:scale-110'
+          >
+            <img
+              src='/images/insta.png'
+              alt='Share on Instagram'
+              className='w-6'
+            />
+          </button>
+        </div>
       </div>
     </div>
   )
