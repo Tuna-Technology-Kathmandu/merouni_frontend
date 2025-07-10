@@ -72,12 +72,12 @@ const WishlistCollegeCard = ({
           className='w-12 h-12 object-contain'
         />
         <div className='flex gap-2'>
-          <button
+          {/* <button
             className='p-2 hover:bg-gray-100 rounded-full'
             aria-label='Share college'
           >
             <Share className='w-5 h-5 text-gray-600' />
-          </button>
+          </button> */}
           <button
             className='p-2 hover:bg-gray-100 rounded-full'
             onClick={handleWishlistRemove}

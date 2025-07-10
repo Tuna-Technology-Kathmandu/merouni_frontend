@@ -34,31 +34,30 @@ const ImageSection = ({ college }) => {
       'width=550,height=420'
     )
   }
-
-  const handleWhatsAppShare = () => {
-    window.open(
-      `https://wa.me/?text=${encodeURIComponent(`${shareTitle} ${currentUrl}`)}`,
-      'whatsapp-share-dialog',
-      'width=550,height=420'
-    )
-  }
-
   const handleInstagramShare = () => {
     navigator.clipboard.writeText(`${shareTitle}\n${currentUrl}`)
     alert('Link copied to clipboard! You can now paste it in Instagram')
   }
 
-  const handleNativeShare = async () => {
-    try {
-      await navigator.share({
-        title: shareTitle,
-        text: `Check out ${college?.name}`,
-        url: currentUrl
-      })
-    } catch (err) {
-      console.log('Native share not supported', err)
-    }
-  }
+  // const handleWhatsAppShare = () => {
+  //   window.open(
+  //     `https://wa.me/?text=${encodeURIComponent(`${shareTitle} ${currentUrl}`)}`,
+  //     'whatsapp-share-dialog',
+  //     'width=550,height=420'
+  //   )
+  // }
+
+  // const handleNativeShare = async () => {
+  //   try {
+  //     await navigator.share({
+  //       title: shareTitle,
+  //       text: `Check out ${college?.name}`,
+  //       url: currentUrl
+  //     })
+  //   } catch (err) {
+  //     console.log('Native share not supported', err)
+  //   }
+  // }
 
   return (
     <div className='flex flex-col items-center relative gap-16 max-md:gap-12'>
@@ -208,13 +207,13 @@ const ImageSection = ({ college }) => {
           </button>
 
           {/* WhatsApp */}
-          <button
+          {/* <button
             onClick={handleWhatsAppShare}
             className='hover:opacity-80 transition-opacity hover:scale-110'
             aria-label='Share on WhatsApp'
           >
             <img src='/images/whatsapp.png' alt='WhatsApp' className='w-6' />
-          </button>
+          </button> */}
 
           {/* Instagram */}
           <button
@@ -226,13 +225,13 @@ const ImageSection = ({ college }) => {
           </button>
 
           {/* Native Share */}
-          <button
+          {/* <button
             onClick={handleNativeShare}
             className='hover:opacity-80 transition-opacity hover:scale-110'
             aria-label='Share'
           >
             <img src='/images/share.png' alt='Share' className='w-6' />
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

@@ -7,8 +7,7 @@ export default function ContactForm() {
     fullname: '',
     email: '',
     subject: '',
-    message: '',
-    status: 'unread'
+    message: ''
   })
 
   const [loading, setLoading] = useState(false)

@@ -108,9 +108,9 @@ const UniversityCard = ({
         }}
       >
         <div className='flex gap-2'>
-          <button className='p-2 hover:bg-gray-100 rounded-full'>
+          {/* <button className='p-2 hover:bg-gray-100 rounded-full'>
             <Share className='w-5 h-5 text-gray-600' />
-          </button>
+          </button> */}
           {user && (
             <button
               className='p-2 hover:bg-gray-100 rounded-full'

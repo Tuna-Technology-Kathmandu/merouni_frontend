@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { getNewsBySlug, getRelatedNews } from '../action'
+import { getNewsBySlug } from '../../blogs/action'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
@@ -41,6 +41,10 @@ const NewsDetailsPage = ({ params }) => {
 
     fetchNewsDetails()
   }, [params]) // Add params.slugs to dependency array
+
+  useEffect(() => {
+    console.log('News:', news)
+  }, [news])
 
   // if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>

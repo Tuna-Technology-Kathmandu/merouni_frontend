@@ -6,8 +6,8 @@ export default function ContactHeroSection() {
           Contact Us
         </h1>
         <p className='text-gray-600 max-w-2xl mx-auto'>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit
-          tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
+          We're here to help and answer any questions you may have.We'd love to
+          hear from you
         </p>
       </div>
       {/* Decorative arrows */}

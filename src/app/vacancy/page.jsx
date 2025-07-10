@@ -73,14 +73,16 @@ export default function VacanciesPage({ searchParams }) {
               ))
             : data.items.map((vacancy) => (
                 <Link
-                  href={`/vacancies/${vacancy.slug}`}
+                  href={`/vacancy/${vacancy.slug}`}
                   key={vacancy.id}
                   className='block hover:transform hover:scale-105 transition-all duration-300'
                 >
                   <div className='bg-white rounded-lg shadow-lg overflow-hidden h-full border border-gray-200'>
                     <div className='relative h-48 w-full'>
                       <Image
-                        src={'/images/islington.png'}
+                        src={
+                          vacancy?.featuredImage ?? '/images/meroUniSmall.gif'
+                        }
                         alt={vacancy.title}
                         fill
                         className='object-cover'
