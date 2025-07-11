@@ -9,12 +9,12 @@ import {
   fetchAllUniversity,
   getUniversityBySlug
 } from './actions'
+import axios from 'axios'
 import { useSelector } from 'react-redux'
 import FileUpload from './FileUpload'
 import Table from '@/app/components/Table'
 import { getColleges } from '@/app/action'
-import { Edit2, Trash2 } from 'lucide-react'
-import { Globe, MapPin } from 'lucide-react'
+import { Edit2, Trash2, Globe, MapPin, Upload } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import AdmissionItem from './AdmissionItem'
@@ -28,6 +28,135 @@ import GallerySection from './GallerySection'
 import VideoSection from './VideoSection'
 import useAdminPermission from '@/core/hooks/useAdminPermission'
 
+const FileUploadWithPreview = ({
+  onUploadComplete,
+  label,
+  defaultPreview = null,
+  accept = 'image/*',
+  onClear
+}) => {
+  const [isUploading, setIsUploading] = useState(false)
+  const [preview, setPreview] = useState(defaultPreview)
+
+  useEffect(() => {
+    setPreview(defaultPreview)
+  }, [defaultPreview])
+
+  const handleClear = () => {
+    setPreview(null)
+    if (onClear) onClear()
+  }
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+
+    // Create preview for images
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onloadend = () => setPreview(reader.result)
+      reader.readAsDataURL(file)
+    }
+
+    setIsUploading(true)
+
+    const formData = new FormData()
+    formData.append('title', file.name)
+    formData.append('altText', file.name)
+    formData.append('description', '')
+    formData.append('file', file)
+    formData.append('authorId', '1')
+
+    try {
+      const response = await axios.post(
+        'https://uploads.merouni.com/api/v1/media/upload',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      )
+
+      const data = response.data
+      if (data.success === false) {
+        toast.error(data.message || 'Upload failed.')
+        return
+      }
+
+      toast.success('File uploaded successfully!')
+      onUploadComplete(data.media.url)
+    } catch (error) {
+      console.error('Upload failed:', error)
+      toast.error(error.response?.data?.message || 'Upload failed.')
+      setPreview(defaultPreview)
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  return (
+    <div className='space-y-4'>
+      <label className='block mb-2'>{label}</label>
+      <div className='border-2 border-dashed border-gray-300 rounded-lg p-6'>
+        <div className='flex flex-col items-center'>
+          {!preview && <Upload className='h-12 w-12 text-gray-400' />}
+          <div className='mt-4 text-center'>
+            <label className='cursor-pointer'>
+              <span className='text-blue-500 hover:text-blue-600'>
+                {preview ? 'Change file' : 'Click to upload'}
+              </span>
+              <input
+                type='file'
+                className='hidden'
+                onChange={handleFileUpload}
+                accept={accept}
+                disabled={isUploading}
+              />
+            </label>
+          </div>
+        </div>
+        {isUploading && (
+          <div className='mt-4 text-center text-sm text-gray-500'>
+            Uploading...
+          </div>
+        )}
+        {preview && (
+          <div className='mt-4'>
+            {accept === 'image/*' ? (
+              <img
+                src={preview}
+                alt='Preview'
+                className='mx-auto max-h-40 rounded-lg'
+              />
+            ) : (
+              <div className='text-center'>
+                <p className='text-sm text-gray-600'>PDF File Selected</p>
+                <a
+                  href={preview}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='text-blue-500 hover:underline'
+                >
+                  View File
+                </a>
+              </div>
+            )}
+          </div>
+        )}
+        <div className='flex justify-end'>
+          <button
+            type='button'
+            onClick={handleClear}
+            className='bg-red-500 text-white p-2 rounded-md '
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 export default function CollegeForm() {
   //for university search
   const [uniSearch, setUniSearch] = useState('')
@@ -97,6 +226,14 @@ export default function CollegeForm() {
       is_featured: false,
       pinned: false,
       images: [],
+      college_broucher: '',
+      facilities: [
+        {
+          title: '',
+          description: '',
+          icon: ''
+        }
+      ],
       address: {
         country: '',
         state: '',
@@ -137,6 +274,11 @@ export default function CollegeForm() {
     remove: removeAdmission
   } = useFieldArray({ control, name: 'admissions' })
 
+  const {
+    fields: facilityFields,
+    append: appendFacility,
+    remove: removeFacility
+  } = useFieldArray({ control, name: 'facilities' })
   const onSubmit = async (data) => {
     if (!data.courses || data.courses.length === 0) {
       toast.error('Please select at least one program')
@@ -166,6 +308,16 @@ export default function CollegeForm() {
 
       //before sending the image , we combine all selected images and videos
       data.images = [...uploadedFiles.images, ...uploadedFiles.videos]
+
+      data.college_broucher = data.college_broucher || ''
+
+      //   Filter out empty facilities
+      data.facilities = data.facilities.filter(
+        (facility) =>
+          facility.title.trim() !== '' ||
+          facility.description.trim() !== '' ||
+          facility.icon.trim() !== ''
+      )
 
       //if we have no images after remove button clicked in allimages, we send this empty values
       if (editing && data.images.length === 0) {
@@ -240,9 +392,6 @@ export default function CollegeForm() {
     getCourses()
   }, [])
 
-  console.log('courses', courses)
-  console.log('collectUni', collectUni)
-
   //for all fetching of university
   useEffect(() => {
     const getUniversities = async () => {
@@ -294,6 +443,7 @@ export default function CollegeForm() {
       accessorKey: 'institute_type'
     },
     {
+      // if (onClear) onClear();
       header: 'Country',
       accessorKey: 'address.country'
     },
@@ -468,6 +618,8 @@ export default function CollegeForm() {
       let collegeData = await response.json()
       collegeData = collegeData.item
 
+      console.log('CData', collegeData)
+
       // Basic Information
       setValue('id', collegeData.id)
       setValue('name', collegeData.name)
@@ -570,6 +722,25 @@ export default function CollegeForm() {
           ]
       setValue('members', memberData)
 
+      //college_broucher
+      if (collegeData.college_broucher) {
+        setValue('college_broucher', collegeData.college_broucher)
+      }
+
+      // Set facilities
+      // const facilityData = collegeData.collegeFacilities?.length
+      //   ? collegeData.collegeFacilities.map(facility => ({
+      //     title: facility.title || '',
+      //     description: facility.description || '',
+      //     icon: facility.icon || ''
+      //   }))
+      //   : [{
+      //     title: '',
+      //     description: '',
+      //     icon: ''
+      //   }];
+      // setValue('facilities', facilityData);
+
       // Admissions
       const admissionData = collegeData.collegeAdmissions?.length
         ? collegeData.collegeAdmissions.map((admission) => {
@@ -658,7 +829,7 @@ export default function CollegeForm() {
 
   useEffect(() => {
     console.log('Form data:', formData)
-  }, [formData]) // Runs every time formData changes
+  }, [formData])
 
   const fetchUniversityDetails = async (slugs) => {
     try {
@@ -936,8 +1107,98 @@ export default function CollegeForm() {
                 setUploadedFiles={setUploadedFiles}
                 getValues={getValues}
               />
+
+              {/* brochure */}
+              <div className='md:col-span-2'>
+                <FileUploadWithPreview
+                  label='College Brochure (PDF)'
+                  onUploadComplete={(url) => {
+                    setValue('college_broucher', url)
+                  }}
+                  onClear={() => {
+                    setValue('college_broucher', '')
+                  }}
+                  defaultPreview={getValues('college_broucher')}
+                  accept='application/pdf'
+                />
+              </div>
             </div>
 
+            <div className='bg-white p-6 rounded-lg shadow-md'>
+              <div className='flex justify-between items-center mb-4'>
+                <h2 className='text-xl font-semibold'>Facilities</h2>
+                <button
+                  type='button'
+                  onClick={() =>
+                    appendFacility({
+                      title: '',
+                      description: '',
+                      icon: ''
+                    })
+                  }
+                  className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600'
+                >
+                  Add Facility
+                </button>
+              </div>
+
+              {facilityFields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border rounded'
+                >
+                  <div>
+                    <label className='block mb-2'>Title *</label>
+                    <input
+                      {...register(`facilities.${index}.title`, {
+                        required: true
+                      })}
+                      className='w-full p-2 border rounded'
+                    />
+                    {errors.facilities?.[index]?.title && (
+                      <span className='text-red-500'>
+                        This field is required
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <label className='block mb-2'>Description</label>
+                    <textarea
+                      {...register(`facilities.${index}.description`)}
+                      className='w-full p-2 border rounded'
+                    />
+                  </div>
+                  <div>
+                    <label className='block mb-2'>Icon Image</label>
+                    <FileUploadWithPreview
+                      onUploadComplete={(url) => {
+                        setValue(`facilities.${index}.icon`, url)
+                      }}
+                      defaultPreview={getValues(`facilities.${index}.icon`)}
+                    />
+                  </div>
+                  <div className='flex items-end'>
+                    <button
+                      type='button'
+                      onClick={() => {
+                        if (facilityFields.length > 1) {
+                          removeFacility(index)
+                        } else {
+                          setValue(`facilities.${index}`, {
+                            title: '',
+                            description: '',
+                            icon: ''
+                          })
+                        }
+                      }}
+                      className='bg-red-500 text-white px-4 h-[20%] w-full rounded hover:bg-red-600'
+                    >
+                      {facilityFields.length > 1 ? 'Remove' : 'Clear'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
             {/* Members Section */}
             <div className='bg-white p-6 rounded-lg shadow-md'>
               <div className='flex justify-between items-center mb-4'>

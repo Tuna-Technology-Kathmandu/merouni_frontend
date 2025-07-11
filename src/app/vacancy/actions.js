@@ -18,6 +18,7 @@ export async function getCareers(page = 1) {
     return data
   } catch (error) {
     console.error('Error fetching careers:', error)
-    throw error
+    // Return empty structure that matches successful response
+    return { items: [] }
   }
 }

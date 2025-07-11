@@ -4,12 +4,14 @@ import ProgramSection from './sections/ProgramSection'
 import MemberSection from './sections/MemberSection'
 import GoogleMap from './GoogleMap'
 import GallerySection from './sections/GallerySection'
+import BrochureSection from './sections/BrochureSection'
 
 const CollegeOverview = ({ college }) => {
   const overviewRef = useRef(null)
   const programsRef = useRef(null)
   const membersRef = useRef(null)
   const galleryRef = useRef(null)
+  const bronchureRef = useRef(null)
 
   const validMembers = (college.collegeMembers || []).filter(
     (member) =>
@@ -29,6 +31,12 @@ const CollegeOverview = ({ college }) => {
       ),
       ref: overviewRef,
       component: <OverviewSection college={college} />
+    },
+    {
+      name: 'Bronchure',
+      visible: college?.college_broucher !== '',
+      ref: bronchureRef,
+      component: <BrochureSection college={college} />
     },
     {
       name: 'Programs',
@@ -63,6 +71,8 @@ const CollegeOverview = ({ college }) => {
       behavior: 'smooth'
     })
   }
+
+  console.log('visibleSections', visibleSections)
 
   return (
     <section className='px-[75px] max-md:px-[30px] mb-20 max-md:mb-10 flex justify-between gap-16 max-md:gap-2 w-full max-md:flex-col-reverse max-md:items-between'>
