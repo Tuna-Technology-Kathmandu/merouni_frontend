@@ -98,11 +98,11 @@ const ImageSection = ({ college }) => {
 
       {/* College details section */}
       <div className='sm:px-24 px-12 w-full'>
-        <div className='bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex items-center justify-center flex-wrap sm:justify-between md:justify-around md:gap-10 items-left w-full l:w-[80%] gap-6 lg:gap-6 p-7'>
+        <div className='bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex items-center justify-center md:flex-wrap flex-col md:flex-row  sm:justify-between md:justify-around md:gap-10 items-left w-full l:w-[80%] gap-6 lg:gap-6 p-7'>
           {/* University */}
           <div className='flex flex-col items-center gap-2 text-center'>
             <FaUniversity size={30} />
-            <p className='max-w-36 sm:text-base text-xs font-semibold'>
+            <p className='md:max-w-36 sm:text-base text-xs font-semibold'>
               {college?.university?.fullname || 'N/A'}
             </p>
           </div>

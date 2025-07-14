@@ -1,7 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
 import { PiLineVerticalThin } from 'react-icons/pi'
-import { MdOutlineArrowRight } from 'react-icons/md'
 
 const ImageSection = ({ degree }) => {
   return (
@@ -38,16 +37,16 @@ const ImageSection = ({ degree }) => {
         </div>
       </div>
 
-      <div className='  bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex flex-row  mb-8  items-center justify-center w-[1150px] h-[150px] p-8'>
-        <div className=' flex flex-col items-center pr-14'>
+      <div className='  bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex md:flex-row md:gap-0 gap-5  mb-8  items-center justify-center w-full flex-col md:w-[1150px] h-auto md:h-[150px] p-8'>
+        <div className=' flex flex-col items-center md:pr-14'>
           {/* <p className="text-sm font-bold">Starts</p> */}
           <img src='/images/course_year.png' alt='year' className='w-8' />
           <p className='whitespace-nowrap'>{degree?.duration || '4 Years'}</p>
         </div>
-        <div className='flex items-center pr-5'>
+        <div className='md:flex items-center pr-5 hidden'>
           <PiLineVerticalThin size={60} />
         </div>
-        <div className=' flex flex-col items-center pl-14 pr-14'>
+        <div className=' flex flex-col items-center md:pl-14 md:pr-14'>
           {/* <p className="text-sm font-bold">Starts</p> */}
           <img
             src='/images/course_faculty.png'
@@ -59,10 +58,10 @@ const ImageSection = ({ degree }) => {
               'Faculty of Humanities and Social Sciences'}
           </p>
         </div>
-        <div className='flex items-center pr-5'>
+        <div className='md:flex hidden items-center pr-5'>
           <PiLineVerticalThin size={60} />
         </div>
-        <div className=' flex flex-col items-center pl-14'>
+        <div className=' flex flex-col items-center md:pl-14'>
           {/* <p className="text-sm font-bold">Ends</p> */}
           <img src='/images/course_hour.png' alt='level' className='w-10' />
 

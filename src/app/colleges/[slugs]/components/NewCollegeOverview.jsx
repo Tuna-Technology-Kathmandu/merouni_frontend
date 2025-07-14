@@ -5,6 +5,7 @@ import MemberSection from './sections/MemberSection'
 import GoogleMap from './GoogleMap'
 import GallerySection from './sections/GallerySection'
 import BrochureSection from './sections/BrochureSection'
+import FacilitySection from './sections/FacilitySection'
 
 const CollegeOverview = ({ college }) => {
   const overviewRef = useRef(null)
@@ -12,6 +13,7 @@ const CollegeOverview = ({ college }) => {
   const membersRef = useRef(null)
   const galleryRef = useRef(null)
   const bronchureRef = useRef(null)
+  const facilityRef = useRef(null)
 
   const validMembers = (college.collegeMembers || []).filter(
     (member) =>
@@ -43,6 +45,12 @@ const CollegeOverview = ({ college }) => {
       visible: college?.collegeCourses?.length !== 0,
       ref: programsRef,
       component: <ProgramSection college={college} />
+    },
+    {
+      name: 'Facility',
+      visible: college?.collegeFacility?.length !== 0,
+      ref: facilityRef,
+      component: <FacilitySection college={college} />
     },
     {
       name: 'Members',

@@ -728,18 +728,20 @@ export default function CollegeForm() {
       }
 
       // Set facilities
-      // const facilityData = collegeData.collegeFacilities?.length
-      //   ? collegeData.collegeFacilities.map(facility => ({
-      //     title: facility.title || '',
-      //     description: facility.description || '',
-      //     icon: facility.icon || ''
-      //   }))
-      //   : [{
-      //     title: '',
-      //     description: '',
-      //     icon: ''
-      //   }];
-      // setValue('facilities', facilityData);
+      const facilityData = collegeData.collegeFacility?.length
+        ? collegeData.collegeFacility.map((facility) => ({
+            title: facility.title || '',
+            description: facility.description || '',
+            icon: facility.icon || ''
+          }))
+        : [
+            {
+              title: '',
+              description: '',
+              icon: ''
+            }
+          ]
+      setValue('facilities', facilityData)
 
       // Admissions
       const admissionData = collegeData.collegeAdmissions?.length
@@ -987,9 +989,19 @@ export default function CollegeForm() {
             {/* Courses Section */}
 
             {/* Programs Section */}
+            {/* Programs Section */}
             <div className='bg-white p-6 rounded-lg shadow-md'>
               <div className='flex justify-between items-center mb-4'>
                 <h2 className='text-xl font-semibold'>Programs</h2>
+                <div className='w-1/3'>
+                  <input
+                    type='text'
+                    placeholder='Search programs...'
+                    className='w-full p-2 border rounded'
+                    value={courseSearch}
+                    onChange={(e) => setCourseSearch(e.target.value)}
+                  />
+                </div>
               </div>
 
               {loadingPrograms ? (
@@ -1001,39 +1013,46 @@ export default function CollegeForm() {
                   <div className='text-sm text-gray-500 mb-2'>
                     {getValues('courses')?.length || 0} programs selected
                   </div>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-scroll'>
-                    {filteredPrograms.map((course) => {
-                      const isChecked = getValues('courses')?.includes(
-                        course.id
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto'>
+                    {filteredPrograms
+                      .filter((program) =>
+                        program.title
+                          .toLowerCase()
+                          .includes(courseSearch.toLowerCase())
                       )
-                      return (
-                        <label key={course.id} className='flex items-center'>
-                          <input
-                            type='checkbox'
-                            value={course.id}
-                            checked={isChecked}
-                            onChange={(e) => {
-                              const currentCourses = getValues('courses') || []
-                              if (e.target.checked) {
-                                setValue('courses', [
-                                  ...currentCourses,
-                                  course.id
-                                ])
-                              } else {
-                                setValue(
-                                  'courses',
-                                  currentCourses.filter(
-                                    (id) => id !== course.id
+                      .map((course) => {
+                        const isChecked = getValues('courses')?.includes(
+                          course.id
+                        )
+                        return (
+                          <label key={course.id} className='flex items-center'>
+                            <input
+                              type='checkbox'
+                              value={course.id}
+                              checked={isChecked}
+                              onChange={(e) => {
+                                const currentCourses =
+                                  getValues('courses') || []
+                                if (e.target.checked) {
+                                  setValue('courses', [
+                                    ...currentCourses,
+                                    course.id
+                                  ])
+                                } else {
+                                  setValue(
+                                    'courses',
+                                    currentCourses.filter(
+                                      (id) => id !== course.id
+                                    )
                                   )
-                                )
-                              }
-                            }}
-                            className='mr-2'
-                          />
-                          {course.title}
-                        </label>
-                      )
-                    })}
+                                }
+                              }}
+                              className='mr-2'
+                            />
+                            {course.title}
+                          </label>
+                        )
+                      })}
                     {filteredPrograms.length === 0 && (
                       <p className='text-gray-500 col-span-full'>
                         {collectUni.length > 0

@@ -1,5 +1,4 @@
 import React from 'react'
-import Image from 'next/image'
 import { IoIosGlobe } from 'react-icons/io'
 import { PiLineVerticalThin } from 'react-icons/pi'
 import { FaUniversity, FaPhoneAlt } from 'react-icons/fa'
@@ -40,7 +39,7 @@ const ImageSection = ({ college, loading }) => {
               )
             )}
           </div>
-          <div className='flex flex-row bg-[#30AD8F] bg-opacity-5 h-[110px]  items-center p-0 md:pl-32'>
+          <div className='flex flex-row bg-[#30AD8F] bg-opacity-5 h-[110px]  items-center p-0 md:pl-32 mt-4 sm:mt-0'>
             <div className='w-[100px] h-[100px] md:h-[150px] md:w-[150px] bg-slate-400 rounded-full flex justify-center items-center overflow-hidden'>
               {/* {
                 college && college.college_logo !== '' && college.college_logo !== null && (
@@ -84,10 +83,10 @@ const ImageSection = ({ college, loading }) => {
 
         {/* college all details */}
         <div className='sm:px-24 px-12 mt-8  w-full'>
-          <div className='bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex items-center justify-center flex-wrap sm:justify-between md:justify-around md:gap-10 mb-8  items-left w-full l:w-[80%] gap-6 lg:gap-6 p-7 '>
+          <div className='bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex items-center justify-center md:flex-wrap flex-col md:flex-row sm:justify-between md:justify-around md:gap-10 mb-8  items-left w-full l:w-[80%] gap-6 lg:gap-6 p-7 '>
             <div className='flex flex-col items-center gap-2 text-center '>
               <FaUniversity size={30} />
-              <p className='max-w-36 sm:text-base text-xs font-semibold'>
+              <p className='md:max-w-36 sm:text-base text-xs font-semibold'>
                 {college?.university?.fullname || 'N/A'}
               </p>
             </div>

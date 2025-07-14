@@ -43,7 +43,7 @@ const ImageSection = ({ college }) => {
           </div>
         </div>
 
-        <div className='bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex flex-row mb-8 items-center justify-between w-[1150px] h-[150px] p-8'>
+        <div className='bg-[#30AD8F] bg-opacity-10 text-black rounded-md mb-8 flex items-center justify-center md:flex-wrap flex-col md:flex-row  sm:justify-between md:justify-around md:gap-10 w-[1150px] h-[150px] p-8'>
           <div className='flex flex-col items-center'>
             <FaUniversity size={30} />
             <p className='whitespace-nowrap'>
