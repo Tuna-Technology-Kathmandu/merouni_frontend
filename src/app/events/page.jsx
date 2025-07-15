@@ -4,7 +4,6 @@ import { PiLineVerticalThin } from 'react-icons/pi'
 import { IoIosArrowDroprightCircle } from 'react-icons/io'
 import { IoArrowUp } from 'react-icons/io5'
 import Sponsors from './Sponsors'
-import Image from 'next/image'
 import EventCard from '../components/Frontpage/EventCard'
 import { IoIosSearch } from 'react-icons/io'
 import Thisweek from './Thisweek'
@@ -283,7 +282,7 @@ const Events = () => {
               <div className='w-full lg:w-3/4'>
                 {/* Responsive Grid */}
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'>
-                  {allLoading
+                  {/* {allLoading
                     ? [...Array(6)].map((_, i) => (
                         <div
                           key={i}
@@ -300,8 +299,8 @@ const Events = () => {
                             <EventCard event={event} />
                           </div>
                         </Link>
-                      ))}
-                  {allLoading
+                      ))} */}
+                  {/* {allLoading
                     ? [...Array(6)].map((_, i) => (
                         <div
                           key={i}
@@ -318,8 +317,8 @@ const Events = () => {
                             <EventCard event={event} />
                           </div>
                         </Link>
-                      ))}
-                  {allLoading
+                      ))} */}
+                  {/* {allLoading
                     ? [...Array(6)].map((_, i) => (
                         <div
                           key={i}
@@ -336,7 +335,7 @@ const Events = () => {
                             <EventCard event={event} />
                           </div>
                         </Link>
-                      ))}
+                      ))} */}
                   {allLoading
                     ? [...Array(6)].map((_, i) => (
                         <div

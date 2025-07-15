@@ -69,3 +69,26 @@ export async function getBanner(page = 1, limit = 99999999) {
     throw error
   }
 }
+
+export async function getEvents() {
+  try {
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/event?is_featured=true&limit=99999`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        cache: 'no-store'
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch events')
+    }
+    return await response.json()
+  } catch (error) {
+    console.error('Error fetching events:', error)
+    throw error
+  }
+}

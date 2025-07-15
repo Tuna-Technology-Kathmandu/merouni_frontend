@@ -48,40 +48,33 @@ const AdLayout = ({ banners = [], size = '', number = 1, loading = false }) => {
 
   return (
     <div className='mt-2 p-4'>
-      <div className='grid grid-cols-2 gap-3 sm:gap-5 sm:grid-cols-2 md:px-20 w-full'>
+      <div className='flex flex-col sm:flex-row gap-4 md:gap-3 lg:gap-3 justify-center sm:flex-nowrap xl:flex-nowrap'>
         {displayBanners.map((banner, index) => (
           <div
-            className={`h-[48px] md:h-[58px] ${!banner ? 'bg-gray-100' : ''} lg:h-[70px] ${
-              index === 2 ? ' flex justify-center w-full col-span-2' : ''
-            }`}
+            key={index}
+            className={`w-full sm:w-[350px] lg:w-[340px] xl:w-full rounded-lg overflow-hidden ${!banner ? 'bg-gray-100' : ''}`}
           >
             {banner ? (
               <a
                 href={banner.website_url}
                 target='_blank'
                 rel=''
-                className='w-full h-full'
+                className='block h-full'
               >
                 <img
                   src={
                     banner.banner_galleries.find((g) => g.size === 'small')
-                      ?.url || '/images/UTCBanners/UTCLarge.gif'
+                      ?.url || '/images/meroUniLarge.gif'
                   }
                   onError={(e) => {
-                    e.target.src = '/images/UTCBanners/UTCLarge.gif'
+                    e.target.src = '/images/meroUniLarge.gif'
                   }}
                   alt={`Banner ${banner.title}`}
-                  className={`w-full h-full object-fill rounded-lg ${
-                    index === 2 ? 'sm:w-[50%] mx-auto' : ''
-                  }`}
+                  className='w-full h-[44px] md:h-[58px] lg:h-[70px] object-cover'
                 />
               </a>
             ) : (
-              <div
-                className={`h-[48px]  md:h-[58px] flex justify-center items-center lg:h-[70px] ${
-                  index === 2 ? 'col-span-2 w-[calc(200%+12px)] ' : ''
-                }`}
-              >
+              <div className='w-full h-[44px] md:h-[58px] lg:h-[70px] flex items-center justify-center text-gray-500'>
                 Contact for Ads
               </div>
             )}

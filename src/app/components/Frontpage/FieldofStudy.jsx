@@ -51,7 +51,7 @@ const FieldofStudy = () => {
   return (
     <div className='bg-gray-100 py-8'>
       <div className='container mx-auto px-4'>
-        <h1 className='text-4xl text-xl font-semibold text-gray-800 my-8'>
+        <h1 className=' text-xl font-semibold text-gray-800 my-8'>
           Field of Study
         </h1>
         <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6'>

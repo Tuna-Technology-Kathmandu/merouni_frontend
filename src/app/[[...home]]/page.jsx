@@ -59,6 +59,8 @@ const Page = () => {
       </div>
       {/* <FeaturedAdmission /> */}
       <Degree />
+
+      {/* the degree is the upcoming events section, not to be confused */}
       {/* large banner */}
       {/* <LargeBanner /> */}
 
