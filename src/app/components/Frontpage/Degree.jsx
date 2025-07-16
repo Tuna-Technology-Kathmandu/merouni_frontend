@@ -1,9 +1,10 @@
 'use client'
 import React, { useRef, useState, useEffect } from 'react'
-import { FaArrowCircleRight } from 'react-icons/fa'
 import { getEvents } from '@/app/[[...home]]/action'
+import { useRouter } from 'next/navigation'
 
 const DegreeScroller = () => {
+  const router = useRouter()
   const [allEvents, setAllEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const fieldsScrollerRef = useRef(null)
@@ -26,7 +27,9 @@ const DegreeScroller = () => {
       setLoading(false)
     }
   }
-  console.log('evnets', allEvents)
+  const handleCardClick = (slug) => {
+    router.push(`/events/${slug}`)
+  }
   return (
     <div className='md:p-12 bg-gradient-to-r from-blue-50 to-purple-50 py-12'>
       {/* Content Container */}
@@ -50,7 +53,8 @@ const DegreeScroller = () => {
           {allEvents.map((field, index) => (
             <div
               key={index}
-              className='flex-shrink-0 border-2 border-gray-200 h-[200px] md:h-[250px] p-6 rounded-2xl flex flex-col items-start justify-center gap-4 bg-white hover:shadow-lg transition-all transform hover:scale-105 relative overflow-hidden w-[300px]' // Fixed width here
+              onClick={() => handleCardClick(field.slugs)}
+              className='cursor-pointer flex-shrink-0 border-2 border-gray-200 h-[200px] md:h-[250px] p-6 rounded-2xl flex flex-col items-start justify-center gap-4 bg-white hover:shadow-lg transition-all transform hover:scale-105 relative overflow-hidden w-[300px]' // Fixed width here
               style={{
                 backgroundImage: `url(${field?.image ? field.image.replace(/ /g, '%20') : '/images/events.png'})`,
                 backgroundSize: 'cover',

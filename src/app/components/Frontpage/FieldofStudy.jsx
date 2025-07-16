@@ -1,65 +1,62 @@
-import Link from 'next/link'
-import React from 'react'
+'use client'
+import React, { useEffect, useState } from 'react'
+import { ImCross } from 'react-icons/im'
 
 const FieldofStudy = () => {
-  const degree = [
-    {
-      id: 1,
-      title: 'Engineering',
-      image:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeFkRea-GyeWjSlr88zwu0ngFchRigG276wg&s'
-    },
-    {
-      id: 2,
-      title:
-        'Bachelor of Computer Science and Information Technology (Bsc. CSIT)',
-      image:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-hfVzc_dtKgvhBI8TW2w-kaSC8O6agNZ7vQ&s'
-    },
-    {
-      id: 3,
-      title: 'Management',
-      image: 'https://placehold.co/600x400'
-    },
-    {
-      id: 4,
-      title: 'Hospitality Management',
-      image: 'https://placehold.co/600x400'
-    },
-    {
-      id: 5,
-      title: 'Science & Technology',
-      image: 'https://placehold.co/600x400'
-    },
-    {
-      id: 6,
-      title: 'Admission Title 5',
-      image: 'https://placehold.co/600x400'
-    },
-    {
-      id: 7,
-      title: 'Admission Title 5',
-      image: 'https://placehold.co/600x400'
-    },
-    {
-      id: 8,
-      title: 'Admission Title 5',
-      image: 'https://placehold.co/600x400'
-    }
+  const [study, setStudy] = useState([])
+  const [selectedStudy, setSelectedStudy] = useState({
+    title: '',
+    description: ''
+  })
+
+  const images = [
+    '/images/st1.webp',
+    '/images/st2.webp',
+    '/images/st3.webp',
+    '/images/st4.webp',
+    '/images/st5.webp',
+    '/images/st6.webp',
+    '/images/st7.webp',
+    '/images/st8.webp'
   ]
 
+  useEffect(() => {
+    getStudy()
+  }, [])
+
+  const getStudy = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.baseUrl}${process.env.version}/faculty?limit=8`
+      )
+      const data = await response.json()
+      setStudy(data?.items)
+    } catch (error) {
+      console.error('College Search Error:', error)
+      toast.error('Failed to search colleges')
+    }
+  }
+
   return (
-    <div className='bg-gray-100 py-8'>
+    <div className='bg-gray-100 py-8 relative'>
       <div className='container mx-auto px-4'>
         <h1 className=' text-xl font-semibold text-gray-800 my-8'>
           Field of Study
         </h1>
         <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6'>
-          {degree.map((item) => (
-            <Link href='#' key={item.id}>
-              <div className='relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300'>
+          {study.map((item, index) => (
+            <div
+              key={item.id}
+              onClick={() =>
+                setSelectedStudy({
+                  title: item?.title || '',
+                  description: item?.description || ''
+                })
+              }
+            >
+              <div className='relative group cursor-pointer overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300'>
                 <img
-                  src={item.image}
+                  src={images[index]}
                   alt={item.title}
                   className='w-full h-48 object-cover transform transition-transform duration-300 group-hover:scale-105'
                 />
@@ -69,10 +66,26 @@ const FieldofStudy = () => {
                   </h2>
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </div>
+      {selectedStudy && (selectedStudy.title || selectedStudy.description) && (
+        <div className='fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 px-7 md:px-14'>
+          <div className='w-full h-auto max-h-[500px] bg-white rounded-md p-4 md:p-10 overflow-y-auto'>
+            <h1 className='mb-4 font-semibold text-lg md:text-xl'>
+              {selectedStudy.title}
+            </h1>
+            <p className='text-xs sm:text-sm'>{selectedStudy.description}</p>
+          </div>
+          <button
+            onClick={() => setSelectedStudy(null)}
+            className='cursor-pointer'
+          >
+            <ImCross className=' cursor-pointer absolute right-3 top-7 z-10 text-white sm:text-lg md:text-2xl lg:text-3xl' />
+          </button>
+        </div>
+      )}
     </div>
   )
 }
