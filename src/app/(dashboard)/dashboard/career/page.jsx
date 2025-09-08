@@ -1,4 +1,8 @@
+// eslint-disable-next-line react-hooks/rules-of-hooks
+
 'use client'
+
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
@@ -8,9 +12,13 @@ import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { CKEditor } from '@ckeditor/ckeditor5-react'
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 import useAdminPermission from '@/core/hooks/useAdminPermission'
+import dynamic from 'next/dynamic'
+
+// Dynamically import CKEditor to avoid SSR issues
+const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
+  ssr: false
+})
 
 export default function CareerForm() {
   const author_id = useSelector((state) => state.user.data.id)
@@ -37,7 +45,8 @@ export default function CareerForm() {
     setValue,
     reset,
     formState: { errors },
-    getValues
+    getValues,
+    watch
   } = useForm({
     defaultValues: {
       title: '',
@@ -73,6 +82,7 @@ export default function CareerForm() {
       setTableLoading(false)
     }
   }
+
   const handleSearch = async (query) => {
     if (!query) {
       fetchCareers()
@@ -103,6 +113,7 @@ export default function CareerForm() {
       setCareers([])
     }
   }
+
   const onSubmit = async (data) => {
     try {
       data.featuredImage = uploadedFiles.featured
@@ -161,7 +172,6 @@ export default function CareerForm() {
       setEditingId(career.id)
 
       // Set form fields
-      //   setValue("id", career.id);//because backend have put method and id shouldbe passed in query so not here
       setValue('title', career.title)
       setValue('description', career.description)
       setValue('content', career.content)
@@ -295,16 +305,10 @@ export default function CareerForm() {
 
                 <div>
                   <label className='block mb-2'>Content</label>
-                  <CKEditor
-                    editor={ClassicEditor}
-                    data={getValues('content')}
-                    config={{
-                      licenseKey: process.env.ckeditor
-                    }}
-                    onChange={(event, editor) => {
-                      const content = editor.getData()
-                      setValue('content', content)
-                    }}
+                  <CKBlogs
+                    initialData={getValues('content')}
+                    onChange={(data) => setValue('content', data)}
+                    id='editor1'
                   />
                 </div>
 

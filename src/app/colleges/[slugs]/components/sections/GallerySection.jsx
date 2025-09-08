@@ -22,6 +22,7 @@ const GallerySection = ({ college }) => {
             <div
               className='rounded-md overflow-hidden w-full cursor-pointer'
               onClick={() => setSelectedImage(photo.file_url)}
+              key={index}
             >
               <img
                 alt='college photo'

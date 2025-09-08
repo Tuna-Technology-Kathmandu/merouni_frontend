@@ -210,20 +210,24 @@ const Events = () => {
 
           {/* This Week's Events */}
 
-          <Thisweek
-            title='This week Events'
-            subtitle='Connect, learn, and celebrate together'
-            thisWeekEvents={thisWeekEvents}
-          />
+          {thisWeekEvents.length > 1 && (
+            <Thisweek
+              title='This week Events'
+              subtitle='Connect, learn, and celebrate together'
+              thisWeekEvents={thisWeekEvents}
+            />
+          )}
 
           {/* Upcoming Events */}
-          <div className='mt-8'>
-            <Thisweek
-              title='Upcoming Events'
-              subtitle='Don’t miss what’s happening around you'
-              thisWeekEvents={nextWeekEvents}
-            />
-          </div>
+          {nextWeekEvents.length > 1 && (
+            <div className='mt-8'>
+              <Thisweek
+                title='Upcoming Events'
+                subtitle='Don’t miss what’s happening around you'
+                thisWeekEvents={nextWeekEvents}
+              />
+            </div>
+          )}
 
           {/* All events */}
           <div className='container mx-auto px-4 py-12 md:py-20 mb-10 md:mb-20'>
@@ -255,7 +259,7 @@ const Events = () => {
                 </div>
 
                 {/* Archive Section - Hidden on mobile, visible from lg+ */}
-                <div className='hidden lg:block bg-white p-4 rounded-lg shadow-sm'>
+                {/* <div className='hidden lg:block bg-white p-4 rounded-lg shadow-sm'>
                   <h2 className='text-lg font-semibold mb-3 text-gray-800'>
                     Archive
                   </h2>
@@ -275,7 +279,7 @@ const Events = () => {
                       </li>
                     ))}
                   </ul>
-                </div>
+                </div> */}
               </div>
 
               {/* Right Section - Events Grid */}

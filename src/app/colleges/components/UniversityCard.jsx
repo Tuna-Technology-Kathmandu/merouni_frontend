@@ -1,14 +1,14 @@
+'use client'
+
 import { useState, useEffect } from 'react'
 import { Share, Heart } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
-import Link from 'next/link'
 import { authFetch } from '@/app/utils/authFetch'
+import { useRouter } from 'next/navigation'
 const UniversityCard = ({
   name,
   location,
-  description,
-  college_logo,
   collegeId,
   isWishlistPage = false,
   slug,
@@ -17,6 +17,8 @@ const UniversityCard = ({
   const [isInWishlist, setIsInWishlist] = useState(isWishlistPage)
   const [isLoading, setIsLoading] = useState(false)
   const user = useSelector((state) => state.user.data)
+
+  const router = useRouter()
 
   useEffect(() => {
     if (user?.id) {
@@ -130,16 +132,19 @@ const UniversityCard = ({
         <h3 className='font-semibold text-base mb-2'>{name}</h3>
         <p className=' text-sm mb-3 text-gray-400'>{location}</p>
         <div className='flex gap-3 justify-between'>
-          <Link href={`/colleges/${slug}`} key={collegeId}>
-            <button className='flex-1 py-1.5 px-3 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-50 text-[13px] font-medium'>
-              Details
-            </button>
-          </Link>
-          <Link href={`/colleges/apply/${slug}`}>
-            <button className='flex-1 py-1.5 px-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 text-[13px] font-medium'>
-              Apply Now
-            </button>
-          </Link>
+          <button className='flex-1 py-1.5 px-3 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-50 text-[13px] font-medium text-center'>
+            Details
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              router.push(`/colleges/apply/${slug}`)
+            }}
+            className='flex-1 py-1.5 px-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 text-[13px] font-medium text-center'
+          >
+            Apply Now
+          </button>
         </div>
       </div>
     </div>

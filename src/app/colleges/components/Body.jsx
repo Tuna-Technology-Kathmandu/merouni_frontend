@@ -57,6 +57,8 @@ const CollegeFinder = () => {
     }, 1000), // 1000ms delay
     []
   )
+
+  console.log('selected filters', selectedFilters)
   // for getting programs
   useEffect(() => {
     const fetchPrograms = async () => {
