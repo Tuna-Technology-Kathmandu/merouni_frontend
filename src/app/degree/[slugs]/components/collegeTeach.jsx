@@ -4,12 +4,12 @@ import Link from 'next/link'
 const CollegeTeach = ({ degree }) => {
   return (
     <>
-      <div className='flex flex-col items-center'>
-        <h2 className='font-bold text-3xl leading-10 mt-8'>
+      <div className='flex flex-col items-center  '>
+        <h2 className='font-bold text-2xl md:text-3xl leading-10 mb-6 text-center md:text-left mt-8'>
           Colleges offering course
         </h2>
 
-        <div className='w-[800px] max-h-[600px] overflow-y-auto mt-3 mb-2 border border-gray-300 rounded-lg'>
+        <div className='w-[800px] max-[875px]:w-full max-h-[600px] overflow-y-auto mt-3 mb-2 border border-gray-300 rounded-lg'>
           {degree?.colleges?.map((college, index) => {
             // Find the matching address for each college
             const collegeAddress = degree.collegesAddress.find(

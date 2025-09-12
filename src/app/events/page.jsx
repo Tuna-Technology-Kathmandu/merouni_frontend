@@ -124,7 +124,7 @@ const Events = () => {
       ) : (
         <div className='mx-auto'>
           {featuredEvent && featuredEvent.event_host && (
-            <div className='flex flex-col lg:flex-row items-center justify-between p-0 lg:p-10 max-w-[1600px] mx-auto mb-10 '>
+            <div className='flex flex-col lg:flex-row items-center justify-between p-0 lg:p-10 max-w-[1600px] mx-auto '>
               <div className='order-1 lg:order-2 w-full lg:w-1/3 flex justify-end mt-0 mb-2 lg:mb-0 lg:mt-0 bg-red-100 h-[400px]'>
                 {isMobile ? (
                   <img
@@ -210,32 +210,32 @@ const Events = () => {
 
           {/* This Week's Events */}
 
-          {thisWeekEvents.length > 1 && (
-            <Thisweek
-              title='This week Events'
-              subtitle='Connect, learn, and celebrate together'
-              thisWeekEvents={thisWeekEvents}
-            />
-          )}
+          {/* {thisWeekEvents.length > 1 && ( */}
+          <Thisweek
+            title='This week Events'
+            subtitle='Connect, learn, and celebrate together'
+            thisWeekEvents={thisWeekEvents}
+          />
+          {/* )} */}
 
           {/* Upcoming Events */}
-          {nextWeekEvents.length > 1 && (
-            <div className='mt-8'>
-              <Thisweek
-                title='Upcoming Events'
-                subtitle='Don’t miss what’s happening around you'
-                thisWeekEvents={nextWeekEvents}
-              />
-            </div>
-          )}
+          {/* {nextWeekEvents.length > 1 && ( */}
+          <div className='mt-8'>
+            <Thisweek
+              title='Upcoming Events'
+              subtitle='Don’t miss what’s happening around you'
+              thisWeekEvents={nextWeekEvents}
+            />
+          </div>
+          {/* )} */}
 
           {/* All events */}
-          <div className='container mx-auto px-4 py-12 md:py-20 mb-10 md:mb-20'>
-            <div className='flex flex-col lg:flex-row gap-6 lg:gap-12'>
+          <div className='container mx-auto px-4 py-12 md:py-20'>
+            <div className='flex flex-col min-[1330px]:flex-row gap-6 min-[1330px]:gap-12 items-center min-[1330px]:items-start max-sm:px-9'>
               {/* Left Section - Filters & Archive */}
-              <div className='w-full lg:w-1/4 space-y-6 lg:space-y-8'>
+              <div className='w-full lg:w-1/4 space-y-6 min-[1330px]:space-y-8'>
                 {/* Heading */}
-                <h1 className='text-2xl md:text-3xl font-bold text-[#0A6FA7] text-center lg:text-left'>
+                <h1 className='text-2xl md:text-3xl font-bold text-[#0A6FA7] text-center min-[1330px]:text-left'>
                   All Events
                 </h1>
 
@@ -257,89 +257,12 @@ const Events = () => {
                     </div>
                   )}
                 </div>
-
-                {/* Archive Section - Hidden on mobile, visible from lg+ */}
-                {/* <div className='hidden lg:block bg-white p-4 rounded-lg shadow-sm'>
-                  <h2 className='text-lg font-semibold mb-3 text-gray-800'>
-                    Archive
-                  </h2>
-                  <div className='border-b border-gray-200 w-full mb-3'></div>
-                  <ul className='space-y-2'>
-                    {[
-                      'January 2025',
-                      'December 2024',
-                      'November 2024',
-                      'October 2024'
-                    ].map((month, index) => (
-                      <li
-                        key={index}
-                        className='text-gray-600 hover:text-[#0A6FA7] cursor-pointer transition-colors duration-200'
-                      >
-                        {month}
-                      </li>
-                    ))}
-                  </ul>
-                </div> */}
               </div>
 
               {/* Right Section - Events Grid */}
               <div className='w-full lg:w-3/4'>
                 {/* Responsive Grid */}
-                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'>
-                  {/* {allLoading
-                    ? [...Array(6)].map((_, i) => (
-                        <div
-                          key={i}
-                          className='bg-gray-100 rounded-lg h-80 animate-pulse'
-                        ></div>
-                      ))
-                    : allEvents.map((event) => (
-                        <Link
-                          href={`/events/${event.slugs}`}
-                          key={event.id}
-                          passHref
-                        >
-                          <div className='transition-transform duration-300 hover:scale-[1.02]'>
-                            <EventCard event={event} />
-                          </div>
-                        </Link>
-                      ))} */}
-                  {/* {allLoading
-                    ? [...Array(6)].map((_, i) => (
-                        <div
-                          key={i}
-                          className='bg-gray-100 rounded-lg h-80 animate-pulse'
-                        ></div>
-                      ))
-                    : allEvents.map((event) => (
-                        <Link
-                          href={`/events/${event.slugs}`}
-                          key={event.id}
-                          passHref
-                        >
-                          <div className='transition-transform duration-300 hover:scale-[1.02]'>
-                            <EventCard event={event} />
-                          </div>
-                        </Link>
-                      ))} */}
-                  {/* {allLoading
-                    ? [...Array(6)].map((_, i) => (
-                        <div
-                          key={i}
-                          className='bg-gray-100 rounded-lg h-80 animate-pulse'
-                        ></div>
-                      ))
-                    : allEvents.map((event) => (
-                        <Link
-                          href={`/events/${event.slugs}`}
-                          key={event.id}
-                          passHref
-                        >
-                          <div className='transition-transform duration-300 hover:scale-[1.02]'>
-                            <EventCard event={event} />
-                          </div>
-                        </Link>
-                      ))} */}
+                <div className='grid grid-cols-1 sm:grid-cols-2 min-[1330px]:grid-cols-3 gap-4 md:gap-6'>
                   {allLoading
                     ? [...Array(6)].map((_, i) => (
                         <div

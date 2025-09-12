@@ -14,16 +14,25 @@ import CollegeTeach from './components/collegeTeach'
 
 const CourseDescription = ({ params }) => {
   const [degree, setDegree] = useState(null)
-  const [loading, setLoading] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(true)
+
+  function slugify(str) {
+    return str
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-') // spaces → -
+      .replace(/[^\w\-]+/g, '') // remove non-word chars
+      .replace(/\-\-+/g, '-') // collapse multiple -
+  }
 
   useEffect(() => {
     const fetchDegree = async () => {
       try {
         const resolvedParams = await params
-        const slugs = resolvedParams.slugs
-        console.log('SLUGS degree:', slugs)
-        fetchDegreeDetails(slugs)
+        const slugs = decodeURIComponent(resolvedParams.slugs)
+        const finalSlug = slugify(slugs)
+        fetchDegreeDetails(finalSlug)
       } catch (error) {
         console.error('Error resolving params:', error)
       }

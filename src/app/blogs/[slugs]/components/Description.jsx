@@ -16,7 +16,7 @@ const Description = ({ news }) => {
 
   return (
     <>
-      <div className='mb-6 full'>
+      <div className='mb-6 full max-[868px]:w-full'>
         <div className='text-xl font-bold'>Description</div>
         <div
           className='text-[13px] mt-4 leading-7 max-md:leading-5 md:text-sm lg:text-base text-justify'
@@ -60,21 +60,3 @@ const Description = ({ news }) => {
 }
 
 export default Description
-
-// <div className='md:max-w-[1600px] md:mx-auto flex md:justify-start items-center justify-center mt-4'>
-//         <div className='flex flex-row gap-4 md:items-start '>
-//           <button type='button' className='p-2  rounded hover:bg-blue-600'>
-//             <FaRegFaceLaugh size={25} />
-//           </button>
-//           <button type='button' className='p-2   rounded hover:bg-red-600'>
-//             <FaRegFaceAngry size={25} />
-//           </button>
-//           <button type='button' className='p-2 rounded hover:bg-yellow-600'>
-//             <FaRegSadCry size={25} />
-//           </button>
-//           <button type='button' className='p-2  hover:bg-green-600'>
-//             <AiOutlineLike size={25} />
-//           </button>
-//         </div>
-//         {/* <div className="mx-auto font-bold text-2xl">Share with friends</div> */}
-//       </div>

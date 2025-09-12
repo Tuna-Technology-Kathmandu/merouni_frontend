@@ -18,8 +18,8 @@ const Cardlist = ({ news }) => {
   }
 
   return (
-    <div className='flex gap-5 '>
-      <div className='max-[855px]:hidden'>
+    <div className='flex gap-5 relative max-[868px]:hidden'>
+      <div className=''>
         <h1 className='text-xl font-bold'>Related Blogs</h1>
         <div className='flex flex-col gap-1'>
           {news.map((blog) => (

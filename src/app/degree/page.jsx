@@ -8,7 +8,6 @@ import Header from '../components/Frontpage/Header'
 import Shimmer from '../components/Shimmer'
 import Link from 'next/link'
 import Pagination from '../blogs/components/Pagination'
-import { debounce } from 'lodash'
 
 const DegreePage = () => {
   const [courses, setCourses] = useState([])
@@ -138,7 +137,7 @@ const DegreePage = () => {
               ) : (
                 courses.map((degree, index) => (
                   <Link href={`/degree/${degree.slugs}`} key={index}>
-                    <div className='border rounded-lg p-6 hover:shadow-lg transition-shadow bg-[#e2ece9]'>
+                    <div className='border rounded-lg p-6 hover:shadow-lg bg-[#e2ece9] hover:scale-105 transition-all'>
                       <div className='mb-4'>
                         <h2 className='text-xl font-semibold mb-4 md:min-h-20'>
                           {degree.title}
@@ -156,10 +155,6 @@ const DegreePage = () => {
                         <div className='flex justify-between'>
                           <span className='text-gray-600'>Language:</span>
                           <span>{degree.language}</span>
-                        </div>
-                        <div className='flex justify-between'>
-                          <span className='text-gray-600'>Fee:</span>
-                          <span>{degree.fee}</span>
                         </div>
                         <div className='flex justify-between'>
                           <span className='text-gray-600'>Delivery:</span>

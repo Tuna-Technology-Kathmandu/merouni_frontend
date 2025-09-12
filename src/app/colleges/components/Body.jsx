@@ -5,7 +5,7 @@ import FilterSection from './FilterSection'
 // import AffiliationSection from "./AffiliationSection";
 // import CourseFeeSection from "./CourseFeeSection";
 import UniversityCard from './UniversityCard'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import {
   getColleges,
   searchColleges,
@@ -15,7 +15,6 @@ import {
 import { debounce } from 'lodash'
 import UniversityCardShimmer from './UniversityShimmerCard'
 import Pagination from '@/app/blogs/components/Pagination'
-import Link from 'next/link'
 
 const CollegeFinder = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -39,6 +38,8 @@ const CollegeFinder = () => {
     courseFees: { min: 0, max: 1000000 }
   })
 
+  const upRef = useRef()
+
   useEffect(() => {
     if (!searchQuery) {
       fetchColleges(pagination.currentPage, selectedFilters)
@@ -58,7 +59,6 @@ const CollegeFinder = () => {
     []
   )
 
-  console.log('selected filters', selectedFilters)
   // for getting programs
   useEffect(() => {
     const fetchPrograms = async () => {
@@ -104,7 +104,16 @@ const CollegeFinder = () => {
     setIsLoading(false)
   }
 
-  useEffect(() => {}, [universities])
+  useEffect(() => {
+    const goTop = () => {
+      if (upRef.current) {
+        const y =
+          upRef.current.getBoundingClientRect().top + window.scrollY - 150
+        window.scrollTo({ top: y, behavior: 'smooth' })
+      }
+    }
+    goTop()
+  }, [pagination])
 
   const fetchFilteredPrograms = async (searchTerm) => {
     if (!searchTerm) {
@@ -304,7 +313,7 @@ const CollegeFinder = () => {
 
   console.log('universities', universities)
   return (
-    <div className='max-w-[1600px] mx-auto p-6'>
+    <div className='max-w-[1600px] mx-auto p-6 px-8' ref={upRef}>
       <div className='flex flex-col md:flex-row justify-between items-center mb-6 gap-4 md:gap-0'>
         <div className='flex items-center gap-4'>
           <h2 className='text-xl font-semibold'>Filters</h2>
@@ -380,11 +389,7 @@ const CollegeFinder = () => {
               {universities.length > 0 ? (
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
                   {universities.map((university, index) => {
-                    return (
-                      <Link key={index} href={`/colleges/${university.slug}`}>
-                        <UniversityCard {...university} />
-                      </Link>
-                    )
+                    return <UniversityCard {...university} key={index} />
                   })}
                 </div>
               ) : (

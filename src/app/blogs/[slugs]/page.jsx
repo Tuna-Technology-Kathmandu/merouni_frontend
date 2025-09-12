@@ -9,6 +9,7 @@ import Description from './components/Description'
 import Cardlist from './components/Cardlist'
 import Loading from '../../components/Loading'
 import SmallCardList from './components/SmallCardList'
+import Banner from './components/Banner'
 
 const NewsDetailsPage = ({ params }) => {
   const [news, setNews] = useState(null)
@@ -20,12 +21,8 @@ const NewsDetailsPage = ({ params }) => {
     const fetchNewsDetails = async () => {
       try {
         const resolvedParams = await params
-        const slugs = resolvedParams.slugs // No need to await params.slugs
+        const slugs = resolvedParams.slugs
         console.log('NEws slug:', slugs)
-        // const [newsData, allNews] = await Promise.all([
-        //   getNewsBySlug(slugs),
-        //   getRelatedNews(),
-        // ]);
         const newsData = await getNewsBySlug(slugs)
 
         setNews(newsData.blog || null) // Set eventData directly
@@ -55,11 +52,14 @@ const NewsDetailsPage = ({ params }) => {
       ) : (
         <>
           <Hero news={news} />
-          <div className='p-12 px-18 flex w-full gap-16 max-[855px]:gap-10 max-[400px]:gap-8'>
+          <div className='p-12 px-18 flex w-full gap-16 max-[868px]:gap-0 max-[868px]:pb-0'>
             <Description news={news} />
             <Cardlist news={relatedNews} />
           </div>
-          <div className='p-12 px-18 -mt-8 hidden max-[855px]:block '>
+          <div className='hidden max-[868px]:block'>
+            <Banner />
+          </div>
+          <div className='p-12 px-18 hidden max-[868px]:block '>
             <SmallCardList news={relatedNews} />
           </div>
         </>

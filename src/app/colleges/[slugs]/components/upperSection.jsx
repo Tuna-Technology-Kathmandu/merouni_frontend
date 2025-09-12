@@ -64,7 +64,7 @@ const ImageSection = ({ college }) => {
       {/* College image, name and location */}
       <div className='w-full'>
         <img
-          src={college.featured_img || 'https://dummyimage.com/600x180/000/fff'}
+          src={college?.featured_img || '/images/degreeHero.webp'}
           alt='College Photo'
           className='h-[25vh] w-full md:h-[400px] object-cover'
         />
@@ -72,7 +72,7 @@ const ImageSection = ({ college }) => {
           <div className='flex items-center justify-center rounded-full bg-white -translate-y-8 overflow-hidden w-24 h-24 md:w-32 md:h-32'>
             <img
               src={
-                college.college_logo ||
+                college?.college_logo ||
                 `https://avatar.iran.liara.run/username?username=${college?.name}`
               }
               alt='College Logo'

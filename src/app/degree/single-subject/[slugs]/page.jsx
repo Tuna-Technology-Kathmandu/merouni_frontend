@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react'
 import { getCourseBySlug } from '../../actions'
 import he from 'he'
 import Loader from '@/app/components/Loading'
+import Navbar from '../../../components/Frontpage/Navbar'
+import Footer from '../../../components/Frontpage/Footer'
+import Header from '../../../components/Frontpage/Header'
 
 const SingleSubject = ({ params }) => {
   const [course, setCourse] = useState(null)
@@ -39,21 +42,24 @@ const SingleSubject = ({ params }) => {
     return <Loader />
   }
   return (
-    <div className='container mx-auto p-6'>
-      <h2 className='font-bold text-3xl leading-10 mt-8 text-center'>
-        {course?.title}
-      </h2>
-      <p className='mb-7 mt-4 text-2xl font-semibold text-center'>
-        {course?.code}
-      </p>
-      <div className='flex w-full justify-between'>
-        <p> Credits: {course?.credits || 'N/A'}</p>
-        <p>-{course?.coursefaculty?.title}</p>
-      </div>
-      {decodedContent && (
-        <div
-          dangerouslySetInnerHTML={{ __html: decodedContent }}
-          className='text-gray-800 mt-4 leading-7 
+    <>
+      <Header />
+      <Navbar />
+      <div className='container mx-auto p-6'>
+        <h2 className='font-bold text-3xl leading-10 mt-8 text-center'>
+          {course?.title}
+        </h2>
+        <p className='mb-7 mt-4 text-2xl font-semibold text-center'>
+          {course?.code}
+        </p>
+        <div className='flex w-full justify-between'>
+          <p> Credits: {course?.credits || 'N/A'}</p>
+          <p>-{course?.coursefaculty?.title}</p>
+        </div>
+        {decodedContent && (
+          <div
+            dangerouslySetInnerHTML={{ __html: decodedContent }}
+            className='text-gray-800 mt-4 leading-7 
             [&>iframe]:w-full 
             [&>iframe]:max-w-[calc(100vw-40px)] 
             [&>iframe]:aspect-video 
@@ -97,19 +103,21 @@ const SingleSubject = ({ params }) => {
   max-lg:[&_ul]:text-sm
   max-lg:[&_ol]:space-y-1
   max-lg:[&_ul]:space-y-1'
-        />
-      )}
-      <div className='mt-7'>
-        <h2 className='text-lg font-bold'>Syllabus</h2>
-        <ul className='list-disc pl-8 my-4 space-y-2'>
-          {syllabusArray.map((item, index) => (
-            <li key={index} className='pl-2'>
-              {item}
-            </li>
-          ))}
-        </ul>
+          />
+        )}
+        <div className='mt-7'>
+          <h2 className='text-lg font-bold'>Syllabus</h2>
+          <ul className='list-disc pl-8 my-4 space-y-2'>
+            {syllabusArray.map((item, index) => (
+              <li key={index} className='pl-2'>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   )
 }
 export default SingleSubject

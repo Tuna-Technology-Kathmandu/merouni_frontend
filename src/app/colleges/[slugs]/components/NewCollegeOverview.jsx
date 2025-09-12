@@ -25,6 +25,12 @@ const CollegeOverview = ({ college }) => {
 
   const allSections = [
     {
+      name: 'Bronchure',
+      visible: college?.college_broucher !== '',
+      ref: bronchureRef,
+      component: <BrochureSection college={college} />
+    },
+    {
       name: 'Overview',
       visible: !!(
         college?.description &&
@@ -34,12 +40,7 @@ const CollegeOverview = ({ college }) => {
       ref: overviewRef,
       component: <OverviewSection college={college} />
     },
-    {
-      name: 'Bronchure',
-      visible: college?.college_broucher !== '',
-      ref: bronchureRef,
-      component: <BrochureSection college={college} />
-    },
+
     {
       name: 'Programs',
       visible: college?.collegeCourses?.length !== 0,
@@ -80,7 +81,7 @@ const CollegeOverview = ({ college }) => {
     })
   }
 
-  console.log('visibleSections', visibleSections)
+  console.log('visibleSections', college?.google_map_url)
 
   return (
     <section className='px-[75px] max-md:px-[30px] mb-20 max-md:mb-10 flex justify-between gap-16 max-md:gap-2 w-full max-md:flex-col-reverse max-md:items-between'>
@@ -120,13 +121,17 @@ const CollegeOverview = ({ college }) => {
       {/* Right sidebar (location) - Unchanged */}
       <aside className='sticky top-52 h-fit self-start max-lg:hidden'>
         <div className='mt-20 max-[1144px]:w-[200px] max-[938px]:w-[150px]'>
-          <p className='font-semibold text-[20px] max-md:text-center tracking-[0.01em] text-black'>
-            Location
-          </p>
+          {college?.google_map_url && (
+            <>
+              <p className='font-semibold text-[20px] max-md:text-center tracking-[0.01em] text-black'>
+                Location
+              </p>
 
-          <div className='mt-7 w-full h-52 tw:max-[938px]:h-40'>
-            <GoogleMap mapUrl={college.google_map_url} />
-          </div>
+              <div className='mt-7 w-full h-52 tw:max-[938px]:h-40'>
+                <GoogleMap mapUrl={college.google_map_url} />
+              </div>
+            </>
+          )}
 
           <div className='mt-7 w-full h-52 tw:max-[938px]:h-40'>
             <div className='text-center shadow-lg h-auto p-2 border border-gray-300 rounded-md hover:scale-105 transition-all duration-300 ease-in-out'>

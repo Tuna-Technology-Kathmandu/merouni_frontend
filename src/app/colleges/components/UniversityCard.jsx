@@ -100,7 +100,12 @@ const UniversityCard = ({
   }
 
   return (
-    <div className='bg-white rounded-xl border border-gray-200 overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300'>
+    <div
+      onClick={() => {
+        router.push(`/colleges/${slug}`)
+      }}
+      className='bg-white rounded-xl border border-gray-200 overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300'
+    >
       <div
         className='flex justify-between items-start min-h-28 bg-slate-300'
         style={{
@@ -152,3 +157,5 @@ const UniversityCard = ({
 }
 
 export default UniversityCard
+
+//  <Link key={index} href={`/colleges/${university.slug}`}>

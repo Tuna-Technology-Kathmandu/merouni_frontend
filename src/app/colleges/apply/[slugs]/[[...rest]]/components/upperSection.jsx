@@ -14,56 +14,34 @@ const ImageSection = ({ college, loading }) => {
     <>
       <div className='flex flex-col items-center w-full'>
         <div className='w-full'>
-          <div className='h-[450px] w-full bg-slate-400 flex justify-center items-center'>
-            {/* {
-              college && college.featured_img !== '' && college.featured_img !== null && (
-                <img
-                  src={college.featured_img}
-                  className='object-cover w-full h-full'
-                  alt="College Photo"
-                  loading="lazy"
-
-                />
-              )
-            } */}
+          <div className='h-[450px] w-full flex justify-center items-center'>
             {loading ? (
               <div className={clsx(shimmerStyle, 'w-full h-full')} />
             ) : (
-              college?.featured_img && (
-                <img
-                  src={college.featured_img}
-                  className='object-cover w-full h-full'
-                  alt='College Photo'
-                  loading='lazy'
-                />
-              )
+              <img
+                src={college?.featured_img || '/images/degreeHero.webp'}
+                className='object-cover w-full h-full'
+                alt='College Photo'
+                loading='lazy'
+              />
             )}
           </div>
           <div className='flex flex-row bg-[#30AD8F] bg-opacity-5 h-[110px]  items-center p-0 md:pl-32 mt-4 sm:mt-0'>
             <div className='w-[100px] h-[100px] md:h-[150px] md:w-[150px] bg-slate-400 rounded-full flex justify-center items-center overflow-hidden'>
-              {/* {
-                college && college.college_logo !== '' && college.college_logo !== null && (
-                  <img
-                    src={college.college_logo}
-                    alt="College Logo"
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                )
-              } */}
               {loading ? (
                 <div
                   className={clsx(shimmerStyle, 'w-full h-full rounded-full')}
                 />
               ) : (
-                college?.college_logo && (
-                  <img
-                    src={college.college_logo}
-                    alt='College Logo'
-                    className='w-full h-full object-cover'
-                    loading='lazy'
-                  />
-                )
+                <img
+                  src={
+                    college?.college_logo ||
+                    `https://avatar.iran.liara.run/username?username=${college?.name}`
+                  }
+                  alt='College Logo'
+                  className='w-full h-full object-cover'
+                  loading='lazy'
+                />
               )}
             </div>
             <div className='ml-8'>

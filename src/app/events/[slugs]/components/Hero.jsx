@@ -43,7 +43,7 @@ const Hero = ({ event }) => {
         alt={event?.title || 'Event'}
         layout='fill'
         objectFit='cover'
-        className='w-full h-[50vh] md:h-[70vh]'
+        className='w-full  h-[250px] sm:h-[400px] md:h-[480px]'
       />
       <div className='absolute top-3/4 left-4 md:left-36 transform -translate-y-1/2 text-white text-3xl md:text-4xl font-extrabold max-w-full px-4'>
         <div className='text-4xl md:text-5xl'>{event.title.split(':')[0]}</div>

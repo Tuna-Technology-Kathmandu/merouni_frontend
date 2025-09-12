@@ -30,7 +30,9 @@ const Syllabus = ({ degree }) => {
 
   return (
     <div className='bg-[#D9D9D9] bg-opacity-20 flex flex-col items-center mt-10'>
-      <h2 className='font-bold text-3xl leading-10 mt-8'>Syllabus</h2>
+      <h2 className='font-bold text-2xl md:text-3xl leading-10 mb-6 text-center md:text-left mt-8'>
+        Syllabus
+      </h2>
       <div className='flex flex-col w-full max-w-6xl px-4'>
         {groupedSyllabus &&
           Object.entries(groupedSyllabus)
@@ -85,8 +87,8 @@ const CourseCard = ({ course }) => {
 
   return (
     <Link href={`/degree/single-subject/${course?.programCourse.slugs}`}>
-      <div className='bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer'>
-        <h2 className='text-xl font-semibold'>
+      <div className='bg-white p-4 rounded-2xl shadow-sm hover:-translate-y-1 transition group cursor-pointer'>
+        <h2 className='text-base font-semibold group-hover:text-[#0A6FA7] transition'>
           {course?.programCourse?.title}
         </h2>
         <h3 className='text-sm text-gray-700'>

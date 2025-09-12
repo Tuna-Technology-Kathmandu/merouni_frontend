@@ -1,7 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+body {
+  max-width: 1800px;
+  margin: 0px auto;
+}
 .prose table {
   width: 100%;
   border-collapse: collapse;
