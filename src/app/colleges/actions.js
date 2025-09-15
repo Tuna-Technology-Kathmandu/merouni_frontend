@@ -77,7 +77,7 @@ export async function getColleges(page = 1, filters = {}) {
       queryParams.append('university', filters.uni)
     }
     if (filters.level) {
-      queryParams.append('level', filters.level)
+      queryParams.append('type', filters.level)
     }
 
     // Log the final URL for debugging

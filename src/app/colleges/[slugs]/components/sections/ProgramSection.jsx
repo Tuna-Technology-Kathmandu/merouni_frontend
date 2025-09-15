@@ -42,6 +42,13 @@ const ProgramSection = ({ college }) => {
           Please visit us later...
         </p>
       )}
+
+      <h2 className='text-[13px] md:text-[15px] lg:text-[17px] font-bold mt-16'>
+        Institution Type
+      </h2>
+      <p className='text-gray-700 mt-4 text-xs md:text-sm lg:text-base'>
+        {college?.institute_type}
+      </p>
     </div>
   )
 }

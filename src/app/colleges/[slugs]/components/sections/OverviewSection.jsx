@@ -74,13 +74,6 @@ const OverviewSection = ({ college }) => {
              max-lg:[&_ol]:space-y-1
              max-lg:[&_ul]:space-y-1'
       ></div>
-
-      <h2 className='text-[13px] md:text-[15px] lg:text-[17px] font-bold mt-6'>
-        Institution Type
-      </h2>
-      <p className='text-gray-700 mt-4 text-xs md:text-sm lg:text-base'>
-        {college?.institute_type}
-      </p>
     </div>
   )
 }
