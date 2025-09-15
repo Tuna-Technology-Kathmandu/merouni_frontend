@@ -1,55 +1,52 @@
-import React, { useState } from 'react'
+import React from 'react'
 import he from 'he'
 import Link from 'next/link'
 
 const Syllabus = ({ degree }) => {
-  // First group by year, then by semester
+  // Group syllabus by year and semester
   const groupedSyllabus = degree?.syllabus?.reduce((acc, course) => {
     const year = course.year
     const semester = course.semester
 
-    if (!acc[year]) {
-      acc[year] = {}
-    }
+    if (!acc[year]) acc[year] = {}
 
-    // For semester 0 (yearly courses)
     if (semester === 0) {
-      if (!acc[year].yearly) {
-        acc[year].yearly = []
-      }
+      if (!acc[year].yearly) acc[year].yearly = []
       acc[year].yearly.push(course)
     } else {
-      if (!acc[year][semester]) {
-        acc[year][semester] = []
-      }
+      if (!acc[year][semester]) acc[year][semester] = []
       acc[year][semester].push(course)
     }
-
     return acc
   }, {})
 
   return (
-    <div className='bg-[#D9D9D9] bg-opacity-20 flex flex-col items-center mt-10'>
-      <h2 className='font-bold text-2xl md:text-3xl leading-10 mb-6 text-center md:text-left mt-8'>
-        Syllabus
-      </h2>
-      <div className='flex flex-col w-full max-w-6xl px-4'>
+    <section className='bg-gradient-to-b from-[#f8fafc] to-[#edf6f9] pt-10 px-6 mt-12 rounded-xl'>
+      <div className='max-w-6xl mx-auto'>
+        <h2 className='text-xl md:text-2xl font-extrabold text-gray-800 text-center mb-12'>
+          📘 Syllabus
+        </h2>
+
         {groupedSyllabus &&
           Object.entries(groupedSyllabus)
-            .sort(([yearA], [yearB]) => yearA - yearB)
+            .sort(([a], [b]) => a - b)
             .map(([year, semesters]) => (
               <div
                 key={year}
-                className='mb-4 border-b-2 border-b-[#2981b2] pb-4'
+                className='mb-12 pb-8 border-b border-gray-300 last:border-none'
               >
-                <p className='mb-1 mt-10 text-2xl font-semibold text-center'>
+                {/* Year heading */}
+                <p className='text-xl font-bold text-center text-[#0A6FA7] mb-8'>
                   Year {year}
                 </p>
 
+                {/* Yearly courses */}
                 {semesters.yearly && (
-                  <div className='mb-8'>
-                    <h3 className='text-lg font-medium mb-4'>Yearly Courses</h3>
-                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-16'>
+                  <div className='mb-10'>
+                    <h3 className='text-lg font-semibold text-gray-700 mb-6 text-center md:text-left'>
+                      📖 Yearly Courses
+                    </h3>
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
                       {semesters.yearly.map((course) => (
                         <CourseCard key={course.id} course={course} />
                       ))}
@@ -57,15 +54,16 @@ const Syllabus = ({ degree }) => {
                   </div>
                 )}
 
+                {/* Semesters */}
                 {Object.entries(semesters)
                   .filter(([key]) => key !== 'yearly')
-                  .sort(([semesterA], [semesterB]) => semesterA - semesterB)
+                  .sort(([a], [b]) => a - b)
                   .map(([semester, courses]) => (
-                    <div key={semester} className='mb-8'>
-                      <h3 className='text-lg font-medium mb-4 text-center underline'>
-                        Semester {semester}
+                    <div key={semester} className='mb-10'>
+                      <h3 className='text-lg font-semibold text-gray-700 mb-6 text-center md:text-left'>
+                        📚 Semester {semester}
                       </h3>
-                      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
                         {courses.map((course) => (
                           <CourseCard key={course.id} course={course} />
                         ))}
@@ -75,74 +73,33 @@ const Syllabus = ({ degree }) => {
               </div>
             ))}
       </div>
-    </div>
+    </section>
   )
 }
 
 const CourseCard = ({ course }) => {
-  // Safely handle the content decoding
+  // Decode + truncate description
   const decodedContent = course?.programCourse?.description
     ? he.decode(course.programCourse.description.slice(0, 140) + '...')
     : ''
 
   return (
     <Link href={`/degree/single-subject/${course?.programCourse.slugs}`}>
-      <div className='bg-white p-4 rounded-2xl shadow-sm hover:-translate-y-1 transition group cursor-pointer'>
-        <h2 className='text-base font-semibold group-hover:text-[#0A6FA7] transition'>
+      <div className='bg-white p-5 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group'>
+        {/* Title */}
+        <h2 className='text-lg font-semibold text-gray-800 mb-1 group-hover:text-[#0A6FA7] transition'>
           {course?.programCourse?.title}
         </h2>
-        <h3 className='text-sm text-gray-700'>
-          Credits: {course?.programCourse?.credits || 'N/A'}
-        </h3>
+        <p className='text-sm text-gray-600 mb-3'>
+          Credits:{' '}
+          <span className='font-medium'>
+            {course?.programCourse?.credits || 'N/A'}
+          </span>
+        </p>
 
-        {decodedContent && (
-          <div
-            dangerouslySetInnerHTML={{ __html: decodedContent }}
-            className='text-gray-800 mt-4 leading-7 
-            [&>iframe]:w-full 
-            [&>iframe]:max-w-[calc(100vw-40px)] 
-            [&>iframe]:aspect-video 
-            [&>iframe]:h-auto
-            [&>iframe]:rounded-lg 
-            [&>iframe]:mt-4
-            [&>iframe]:mx-auto
-            [&>iframe]:block
-            [&_table]:w-full
-            [&_table]:my-4
-            [&_table]:border-collapse
-            [&_th]:bg-gray-100
-            [&_th]:p-2
-            [&_th]:text-left
-            [&_th]:border
-            [&_th]:border-gray-300
-            [&_td]:p-2
-            [&_td]:border
-            [&_td]:border-gray-300
-            [&_tr:nth-child(even)]:bg-gray-50
-            [&_h1]:text-2xl
-            [&_h1]:font-bold
-            [&_h1]:mt-8
-            [&_h1]:mb-4
-            [&_h2]:text-xl
-            [&_h2]:font-bold
-            [&_h2]:mt-6
-            [&_h2]:mb-3
-            text-xs md:text-sm lg:text-base
-            overflow-x-hidden
-            [&_ol]:list-decimal 
-[&_ol]:pl-8 
-[&_ol]:my-4
-[&_ol]:space-y-2
-[&_ul]:list-disc 
-[&_ul]:pl-8 
-[&_ul]:my-4
-[&_ul]:space-y-2
-[&_li]:pl-2'
-          />
-        )}
-
+        {/* Elective badge */}
         {course.is_elective && (
-          <span className='inline-block mt-1 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full'>
+          <span className='inline-block mt-4 px-3 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-full'>
             Elective
           </span>
         )}

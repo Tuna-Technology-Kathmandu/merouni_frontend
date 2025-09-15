@@ -8,6 +8,7 @@ import { getConsultancies } from './actions'
 import Header from '../components/Frontpage/Header'
 import Navbar from '../components/Frontpage/Navbar'
 import Footer from '../components/Frontpage/Footer'
+import Shimmer from '../components/Shimmer'
 
 export default function ConsultanciesPage() {
   const searchParams = useSearchParams()
@@ -22,21 +23,28 @@ export default function ConsultanciesPage() {
     items: [],
     pagination: {}
   })
+  const [loading, setLoading] = useState(false)
 
   // Debouncing logic
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm)
     }, 500)
-
     return () => clearTimeout(handler)
   }, [searchTerm])
 
   // Fetch data when search or page changes
   useEffect(() => {
     async function fetchData() {
-      const data = await getConsultancies(currentPage, debouncedSearch)
-      setConsultancyData(data)
+      setLoading(true)
+      try {
+        const data = await getConsultancies(currentPage, debouncedSearch)
+        setConsultancyData(data)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
     }
     fetchData()
   }, [currentPage, debouncedSearch])
@@ -47,129 +55,168 @@ export default function ConsultanciesPage() {
     }
   }, [debouncedSearch, queryParam, router])
 
+  console.log(consultancyData)
+
   return (
     <>
       <Header />
       <Navbar />
-      <div className='container mx-auto px-4 py-8'>
-        <div className='border-b-2 border-[#0A70A7] w-[45px] mt-8 mb-4 pl-2'>
-          <span className='text-2xl font-bold mr-2'>Explore</span>
-          <span className='text-[#0A70A7] text-2xl font-bold'>
-            Consultancies
-          </span>
-        </div>
-
-        {/* Search Bar */}
-        <div className='flex justify-end w-full'>
-          <div className='relative w-full max-w-md mb-6'>
-            <input
-              type='text'
-              placeholder='Search consultancy...'
-              className='w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-              onChange={(e) => setSearchTerm(e.target.value)}
-              value={searchTerm}
-            />
-            <Search className='absolute left-3 top-2.5 h-5 w-5 text-gray-400' />
+      <div className='min-h-screen bg-gradient-to-b from-[#f7fbfc] to-[#e9f3f7] py-12 px-6'>
+        <div className='container mx-auto'>
+          <div className='text-center mb-12'>
+            <h1 className='text-2xl md:text-3xl font-extrabold text-gray-800'>
+              Explore <span className='text-[#0A70A7]'>Consultancies</span>
+            </h1>
+            <p className='mt-3 text-gray-600 max-w-2xl mx-auto text-sm'>
+              Discover trusted consultancies that guide you through admissions,
+              applications, and career opportunities abroad.
+            </p>
           </div>
-        </div>
 
-        {/* Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-          {consultancyData.items.map((consultancy) => {
-            const destinations = JSON.parse(consultancy.destination)
-            const address = JSON.parse(consultancy.address)
+          {/* Search Bar */}
+          <div className='flex justify-center mb-10 md:mb-20 w-full'>
+            <div className='relative w-full max-w-lg'>
+              <input
+                type='text'
+                placeholder='Search consultancy...'
+                className='w-full px-5 py-3 pl-12 rounded-2xl border border-gray-300 shadow-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all'
+                onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchTerm}
+              />
+              <Search className='absolute left-4 top-3.5 h-5 w-5 text-gray-400' />
+            </div>
+          </div>
 
-            return (
-              <Link
-                href={`/consultancies/${consultancy.slugs}`}
-                key={consultancy.id}
-                className='block hover:shadow-xl transition-all duration-300'
-              >
-                <div className='bg-white rounded-lg shadow-md overflow-hidden h-full'>
-                  <div className='relative h-48 w-full'>
-                    <Image
-                      src={'/images/islington.png'}
-                      alt={consultancy.title}
-                      fill
-                      className='object-cover'
-                      priority
-                    />
-                  </div>
-
-                  <div className='p-6'>
-                    {consultancy.pinned === 1 && (
-                      <div className='top-4 right-4'>
-                        <span className='bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium'>
-                          Featured
-                        </span>
+          {/* Grid */}
+          {loading ? (
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+              {Array(6)
+                .fill('')
+                .map((_, index) => (
+                  <div
+                    key={index}
+                    className='bg-white rounded-xl p-6 border border-gray-200 shadow-lg'
+                  >
+                    <div className='flex flex-col gap-4'>
+                      <div className='w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center'>
+                        <Shimmer width='100%' height='100%' />
                       </div>
-                    )}
+                      <Shimmer width='80%' height='20px' />
+                      <Shimmer width='60%' height='18px' />
+                      <Shimmer width='90%' height='15px' />
+                      <div className='flex gap-2'>
+                        <Shimmer width='40%' height='15px' />
+                        <Shimmer width='30%' height='15px' />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+              {consultancyData.items.map((consultancy) => {
+                const destinations = JSON.parse(consultancy.destination)
+                const address = JSON.parse(consultancy.address)
 
-                    <h2 className='text-xl font-semibold text-gray-900 mb-4'>
-                      {consultancy.title}
-                    </h2>
+                return (
+                  <Link
+                    href={`/consultancies/${consultancy.slugs}`}
+                    key={consultancy.id}
+                    className='block group'
+                  >
+                    <div className='bg-white rounded-2xl shadow-md overflow-hidden h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1'>
+                      {/* Banner */}
+                      <div className='relative h-48 w-full bg-green-100'>
+                        <Image
+                          src={
+                            consultancy?.featured_image ||
+                            'https://placehold.co/600x400'
+                          }
+                          alt={consultancy.title}
+                          fill
+                          className='object-cover group-hover:scale-105 transition-transform duration-300'
+                          priority
+                        />
 
-                    <div className='mb-4'>
-                      <h3 className='text-sm font-medium text-gray-700 mb-2'>
-                        Destinations:
-                      </h3>
-                      <div className='flex flex-wrap gap-2'>
-                        {destinations.map((dest, index) => (
-                          <span
-                            key={index}
-                            className='bg-blue-50 text-blue-700 px-2 py-1 rounded-md text-sm'
-                          >
-                            {dest.city}, {dest.country}
+                        {consultancy.pinned === 1 && (
+                          <span className='absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md'>
+                            Featured
                           </span>
-                        ))}
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className='p-6 flex flex-col'>
+                        {/* Title */}
+                        <h2 className='text-lg md:text-xl font-bold text-gray-800 group-hover:text-[#0A70A7] transition-colors mb-3 line-clamp-2'>
+                          {consultancy.title}
+                        </h2>
+
+                        {/* Destinations */}
+                        <div className='mb-3'>
+                          <h3 className='text-sm font-semibold text-gray-700 mb-1'>
+                            Destinations
+                          </h3>
+                          <div className='flex flex-wrap gap-2'>
+                            {destinations.map((dest, index) => (
+                              <span
+                                key={index}
+                                className='bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium'
+                              >
+                                {dest.city}, {dest.country}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Address */}
+                        <div className='mb-3'>
+                          <h3 className='text-sm font-semibold text-gray-700 mb-1'>
+                            Address
+                          </h3>
+                          <p className='text-gray-600 text-sm leading-relaxed'>
+                            {address.street}, {address.city}, {address.state}{' '}
+                            {address.zip}
+                          </p>
+                        </div>
+
+                        {/* Footer */}
+                        <div className='mt-auto pt-4 border-t border-gray-100'>
+                          <p className='text-[#0A70A7] font-semibold text-sm group-hover:underline'>
+                            Courses Available →
+                          </p>
+                        </div>
                       </div>
                     </div>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
 
-                    <div className='mb-4'>
-                      <h3 className='text-sm font-medium text-gray-700 mb-2'>
-                        Address:
-                      </h3>
-                      <p className='text-gray-600 text-sm'>
-                        {address.street}, {address.city}, {address.state}{' '}
-                        {address.zip}
-                      </p>
-                    </div>
-
-                    <div className='mt-4 pt-4 border-t border-gray-100'>
-                      <p className='text-blue-600 font-medium'>
-                        {consultancy.courses} Courses Available
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            )
-          })}
+          {/* Pagination */}
+          {consultancyData.pagination?.totalPages > 1 && (
+            <div className='mt-8 flex justify-center gap-2'>
+              {Array.from(
+                { length: consultancyData.pagination.totalPages },
+                (_, i) => i + 1
+              ).map((page) => (
+                <Link
+                  key={page}
+                  href={`/consultancies?page=${page}`}
+                  className={`px-4 py-2 rounded ${
+                    currentPage === page
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  {page}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
-
-        {/* Pagination */}
-        {consultancyData.pagination?.totalPages > 1 && (
-          <div className='mt-8 flex justify-center gap-2'>
-            {Array.from(
-              { length: consultancyData.pagination.totalPages },
-              (_, i) => i + 1
-            ).map((page) => (
-              <Link
-                key={page}
-                href={`/consultancies?page=${page}`}
-                className={`px-4 py-2 rounded ${
-                  currentPage === page
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                {page}
-              </Link>
-            ))}
-          </div>
-        )}
       </div>
-
       <Footer />
     </>
   )

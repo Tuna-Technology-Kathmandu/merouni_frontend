@@ -69,8 +69,8 @@ const CourseDescription = ({ params }) => {
         <Header />
         <Navbar />
         <ImageSection degree={degree} />
-        <CollegeTeach degree={degree} />
         <Syllabus degree={degree} />
+        <CollegeTeach degree={degree} />
         {/* <ApplyNow degree={degree} /> */}
         <RelatedCourses degree={degree} />
         <Footer />
