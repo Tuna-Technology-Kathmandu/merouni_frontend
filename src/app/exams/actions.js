@@ -1,21 +1,22 @@
-export async function getExams() {
+export async function getExams(page = 1, search = '') {
   try {
-    const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/exam/`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+    const baseUrl = `${process.env.baseUrl}${process.env.version}/exam`
+    const url = search
+      ? `${baseUrl}?q=${encodeURIComponent(search)}&page=${page}&limit=1`
+      : `${baseUrl}?page=${page}&limit=1`
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
       }
-    )
+    })
 
     if (!response.ok) {
       throw new Error('Failed to fetch exams')
     }
 
-    const data = await response.json()
-    return data
+    return await response.json()
   } catch (error) {
     console.error('Error fetching exams:', error)
     throw error
