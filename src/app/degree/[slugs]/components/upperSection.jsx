@@ -2,14 +2,13 @@ import React from 'react'
 import { PiLineVerticalThin } from 'react-icons/pi'
 
 const ImageSection = ({ degree }) => {
-  console.log(degree)
   return (
     <div className='flex flex-col items-center w-full'>
       <div className='w-full'>
         <div className='h-[25vh] w-full md:h-[400px] relative'>
           <img
             src={'/images/degreeHero.webp'}
-            alt='College Photo'
+            alt={degree?.title || 'Degree Image'}
             className='object-cover w-full h-full'
           />
           <div className='absolute w-full h-full inset-0 bg-black/25 z-10'></div>
