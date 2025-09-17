@@ -1,8 +1,6 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useLayoutEffect } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
-import { useSearchParams, useRouter } from 'next/navigation'
 import { Search } from 'lucide-react'
 import { getConsultancies } from './actions'
 import Header from '../components/Frontpage/Header'
@@ -10,23 +8,20 @@ import Navbar from '../components/Frontpage/Navbar'
 import Footer from '../components/Frontpage/Footer'
 import Shimmer from '../components/Shimmer'
 import SingleConsultancy from './components/SingleConsultancy'
+import Pagination from '../blogs/components/Pagination'
 
 export default function ConsultanciesPage() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-
-  const currentPage = Number(searchParams.get('page')) || 1
-  const queryParam = searchParams.get('q') || ''
-
-  const [searchTerm, setSearchTerm] = useState(queryParam)
-  const [debouncedSearch, setDebouncedSearch] = useState(queryParam)
-  const [consultancyData, setConsultancyData] = useState({
-    items: [],
-    pagination: {}
+  const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [consultancyData, setConsultancyData] = useState([])
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0
   })
   const [loading, setLoading] = useState(false)
 
-  //for ssingle consultancy since backend donkey didn't provide endpoint
+  // for single consultancy since backend donkey didn't provide endpoint
   const [showSingle, setShowSingle] = useState(false)
   const [singleConsultancy, setSingleConsultancy] = useState([])
 
@@ -38,34 +33,50 @@ export default function ConsultanciesPage() {
     return () => clearTimeout(handler)
   }, [searchTerm])
 
-  // Fetch data when search or page changes
+  // Reset page on search change
+  useLayoutEffect(() => {
+    setPagination((prev) =>
+      prev.currentPage !== 1 ? { ...prev, currentPage: 1 } : prev
+    )
+  }, [debouncedSearch])
+
+  // Fetch consultancies
   useEffect(() => {
     async function fetchData() {
       setLoading(true)
       try {
-        const data = await getConsultancies(currentPage, debouncedSearch)
-        setConsultancyData(data)
+        const data = await getConsultancies(
+          pagination.currentPage,
+          debouncedSearch
+        )
+
+        setConsultancyData(data.items)
+        setPagination((prev) => ({
+          ...prev,
+          totalPages: data.pagination.totalPages,
+          totalCount: data.pagination.totalCount
+        }))
       } catch (err) {
         console.error(err)
+        setConsultancyData([])
       } finally {
         setLoading(false)
       }
     }
     fetchData()
-  }, [currentPage, debouncedSearch])
-
-  useEffect(() => {
-    if (debouncedSearch !== queryParam) {
-      router.push(`/consultancy?q=${debouncedSearch}`, { scroll: false })
-    }
-  }, [debouncedSearch, queryParam, router])
+  }, [pagination.currentPage, debouncedSearch])
 
   const handleClick = (slugs) => {
-    let single = consultancyData?.items.filter((items) => {
-      return items.slugs === slugs
-    })
+    const single = consultancyData.filter((items) => items.slugs === slugs)
     setSingleConsultancy(single)
     setShowSingle(true)
+  }
+
+  const handlePageChange = (page) => {
+    if (page > 0 && page <= pagination.totalPages) {
+      setPagination((prev) => ({ ...prev, currentPage: page }))
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   return (
@@ -126,7 +137,7 @@ export default function ConsultanciesPage() {
               </div>
             ) : (
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                {consultancyData.items.map((consultancy) => {
+                {consultancyData.map((consultancy) => {
                   const destinations = JSON.parse(consultancy.destination)
                   const address = JSON.parse(consultancy.address)
 
@@ -200,24 +211,12 @@ export default function ConsultanciesPage() {
             )}
 
             {/* Pagination */}
-            {consultancyData.pagination?.totalPages > 1 && (
-              <div className='mt-8 flex justify-center gap-2'>
-                {Array.from(
-                  { length: consultancyData.pagination.totalPages },
-                  (_, i) => i + 1
-                ).map((page) => (
-                  <Link
-                    key={page}
-                    href={`/consultancies?page=${page}`}
-                    className={`px-4 py-2 rounded ${
-                      currentPage === page
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
-                  >
-                    {page}
-                  </Link>
-                ))}
+            {pagination.totalPages > 1 && (
+              <div className='mt-12 flex justify-center'>
+                <Pagination
+                  pagination={pagination}
+                  onPageChange={handlePageChange}
+                />
               </div>
             )}
           </div>
@@ -229,74 +228,3 @@ export default function ConsultanciesPage() {
     </>
   )
 }
-
-// <Link
-//   href={`/consultancy/${consultancy.slugs}`}
-//   key={consultancy.id}
-//   className='block group'
-// >
-//   <div className='bg-white rounded-2xl shadow-md overflow-hidden h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1'>
-//     {/* Banner */}
-//     <div className='relative h-48 w-full bg-green-100'>
-//       <Image
-//         src={
-//           consultancy?.featured_image ||
-//           'https://placehold.co/600x400'
-//         }
-//         alt={consultancy.title}
-//         fill
-//         className='object-cover group-hover:scale-105 transition-transform duration-300'
-//         priority
-//       />
-
-//       {consultancy.pinned === 1 && (
-//         <span className='absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md'>
-//           Featured
-//         </span>
-//       )}
-//     </div>
-
-//     {/* Content */}
-//     <div className='p-6 flex flex-col'>
-//       {/* Title */}
-//       <h2 className='text-lg md:text-xl font-bold text-gray-800 group-hover:text-[#0A70A7] transition-colors mb-3 line-clamp-2'>
-//         {consultancy.title}
-//       </h2>
-
-//       {/* Destinations */}
-//       <div className='mb-3'>
-//         <h3 className='text-sm font-semibold text-gray-700 mb-1'>
-//           Destinations
-//         </h3>
-//         <div className='flex flex-wrap gap-2'>
-//           {destinations.map((dest, index) => (
-//             <span
-//               key={index}
-//               className='bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium'
-//             >
-//               {dest.city}, {dest.country}
-//             </span>
-//           ))}
-//         </div>
-//       </div>
-
-//       {/* Address */}
-//       <div className='mb-3'>
-//         <h3 className='text-sm font-semibold text-gray-700 mb-1'>
-//           Address
-//         </h3>
-//         <p className='text-gray-600 text-sm leading-relaxed'>
-//           {address.street}, {address.city}, {address.state}{' '}
-//           {address.zip}
-//         </p>
-//       </div>
-
-//       {/* Footer */}
-//       <div className='mt-auto pt-4 border-t border-gray-100'>
-//         <p className='text-[#0A70A7] font-semibold text-sm group-hover:underline'>
-//           Courses Available →
-//         </p>
-//       </div>
-//     </div>
-//   </div>
-// </Link>

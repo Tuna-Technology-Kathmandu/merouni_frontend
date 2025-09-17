@@ -1,7 +1,7 @@
 export async function getAdmission(search = '', page = 1) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/college/admission?q=${search}&page=${page}&limit=9`,
+      `${process.env.baseUrl}${process.env.version}/college/admission?q=${search}&page=${page}&limit=15`,
       {
         method: 'GET',
         headers: {

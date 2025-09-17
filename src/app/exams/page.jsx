@@ -150,29 +150,6 @@ export default function ExamsPage() {
                         </span>
                       </div>
 
-                      {/* {exam.exam_details?.map((ed) => (
-                      <div key={ed.id} className='bg-gray-50 p-3 rounded-lg mb-3'>
-                        <div className='flex justify-between text-sm text-gray-700 mb-1'>
-                          <span>Type:</span>
-                          <span>{ed.exam_type}</span>
-                        </div>
-                        <div className='flex justify-between text-sm text-gray-700 mb-1'>
-                          <span>Marks:</span>
-                          <span>
-                            {ed.pass_marks} / {ed.full_marks}
-                          </span>
-                        </div>
-                        <div className='flex justify-between text-sm text-gray-700 mb-1'>
-                          <span>Questions:</span>
-                          <span>{ed.number_of_question}</span>
-                        </div>
-                        <div className='flex justify-between text-sm text-gray-700'>
-                          <span>Duration:</span>
-                          <span>{ed.duration}</span>
-                        </div>
-                      </div>
-                    ))} */}
-
                       {/* Application details */}
                       {exam.application_details?.map((ad) => (
                         <div key={ad.id} className='text-sm text-gray-500 mb-3'>

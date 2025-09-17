@@ -2,8 +2,8 @@ export async function getExams(page = 1, search = '') {
   try {
     const baseUrl = `${process.env.baseUrl}${process.env.version}/exam`
     const url = search
-      ? `${baseUrl}?q=${encodeURIComponent(search)}&page=${page}&limit=1`
-      : `${baseUrl}?page=${page}&limit=1`
+      ? `${baseUrl}?q=${encodeURIComponent(search)}&page=${page}&limit=15`
+      : `${baseUrl}?page=${page}&limit=15`
 
     const response = await fetch(url, {
       method: 'GET',

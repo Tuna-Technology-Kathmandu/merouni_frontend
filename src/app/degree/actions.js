@@ -2,7 +2,7 @@
 export const fetchDegrees = async (search = '', page = 1) => {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/program?q=${search}&page=${page}&limit=9`
+      `${process.env.baseUrl}${process.env.version}/program?q=${search}&page=${page}&limit=15`
     )
     const data = await response.json()
     return data

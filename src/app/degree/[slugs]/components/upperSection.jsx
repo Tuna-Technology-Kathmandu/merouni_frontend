@@ -59,9 +59,63 @@ const ImageSection = ({ degree }) => {
 
       <div className=' bg-opacity-10 text-black rounded-md flex flex-col w-full  mb-8 pt-10 px-[75px] max-md:px-[30px]'>
         <h2 className='font-bold text-2xl md:text-3xl leading-10 mb-6 text-center md:text-left'>
-          Why Study this course?
+          Description
         </h2>
-        <p className='pt-6 leading-7 text-justify '>
+        <p
+          className='pt-6 leading-7 text-justify
+        [&>iframe]:w-full 
+             [&>iframe]:max-w-[calc(100vw-40px)] 
+             [&>iframe]:aspect-video 
+             [&>iframe]:h-auto
+             [&>iframe]:rounded-lg 
+             [&>iframe]:mt-4
+             [&>iframe]:mx-auto
+             [&>iframe]:block
+
+             /* Table wrapper styles */
+             [&_.table-wrapper]:overflow-x-auto
+             [&_.table-wrapper]:my-4
+             [&_.table-wrapper]:w-full
+             [&_.table-wrapper]:[scrollbar-width:thin]
+             [&_.table-wrapper]:[scrollbar-color:gray-300_transparent]
+
+             /* Table styles */
+             [&_table]:min-w-full
+             [&_table]:border-collapse
+             [&_th]:bg-gray-100
+             [&_th]:p-2
+             [&_th]:text-left
+             [&_th]:border
+             [&_th]:border-gray-300
+             [&_td]:p-2
+             [&_td]:border
+             [&_td]:border-gray-300
+             [&_tr:nth-child(even)]:bg-gray-50
+
+             /* Other styles */
+             [&_h1]:text-2xl
+             [&_h1]:font-bold
+             [&_h1]:mt-8
+             [&_h1]:mb-4
+             [&_h2]:text-xl
+             [&_h2]:font-bold
+             [&_h2]:mt-6
+             [&_h2]:mb-3
+             text-xs md:text-sm lg:text-base
+             [&_ol]:pl-8 
+             [&_ol]:my-4
+             [&_ol]:space-y-2
+             [&_ul]:list-disc 
+             [&_ul]:pl-8 
+             [&_ul]:my-4
+             [&_ul]:space-y-2
+             [&_li]:pl-2
+             max-lg:[&_ol]:text-sm
+             max-lg:[&_ul]:text-sm
+             max-lg:[&_ol]:space-y-1
+             max-lg:[&_ul]:space-y-1
+        '
+        >
           {degree?.learning_outcomes || ''}
         </p>
       </div>

@@ -1,4 +1,5 @@
 'use client'
+import dynamic from 'next/dynamic'
 import { useState, useEffect } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useSelector } from 'react-redux'
@@ -18,6 +19,9 @@ import { useDebounce } from 'use-debounce'
 import CourseSearch from './CourseSearch'
 import Syllabus from './Syllabus'
 import useAdminPermission from '@/core/hooks/useAdminPermission'
+const CKUni = dynamic(() => import('../component/CKUni'), {
+  ssr: false
+})
 
 export default function ProgramForm() {
   const author_id = useSelector((state) => state.user.data.id)
@@ -127,6 +131,7 @@ export default function ProgramForm() {
     setValue,
     reset,
     watch,
+    getValues,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -807,6 +812,14 @@ export default function ProgramForm() {
               <h2 className='text-xl font-semibold mb-4'>Program Details</h2>
               <div className='grid grid-cols-1 gap-4'>
                 <div>
+                  <label className='block mb-2'>Description</label>
+                  <CKUni
+                    id='learning-outcomes-editor'
+                    initialData={getValues('learning_outcomes')}
+                    onChange={(data) => setValue('learning_outcomes', data)}
+                  />
+                </div>
+                <div>
                   <label className='block mb-2'>Eligibility Criteria</label>
                   <textarea
                     {...register('eligibility_criteria')}
@@ -828,15 +841,6 @@ export default function ProgramForm() {
                   <label className='block mb-2'>Curriculum</label>
                   <textarea
                     {...register('curriculum')}
-                    className='w-full p-2 border rounded'
-                    rows='3'
-                  />
-                </div>
-
-                <div>
-                  <label className='block mb-2'>Learning Outcomes</label>
-                  <textarea
-                    {...register('learning_outcomes')}
                     className='w-full p-2 border rounded'
                     rows='3'
                   />

@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { fetchUniversities } from './actions'
 import { Search } from 'lucide-react'
 import Navbar from '../components/Frontpage/Navbar'
@@ -7,55 +7,97 @@ import Footer from '../components/Frontpage/Footer'
 import Header from '../components/Frontpage/Header'
 import Link from 'next/link'
 import UniversityShimmer from './components/UniversityShimmer'
+import Pagination from '../blogs/components/Pagination'
 
 const UniversityPage = () => {
   const [universities, setUniversities] = useState([]) // Renamed for clarity
   const [loading, setLoading] = useState(false)
+  const [isScrolling, setIsScrolling] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0
+  })
 
+  // Debounce search
   useEffect(() => {
-    const getUniversities = async () => {
-      setLoading(true)
-      try {
-        const response = await fetchUniversities()
-        console.log('RESPONS Universities:', response)
-        setUniversities(response.items || []) // Handle potential missing 'items'
-      } catch (error) {
-        console.error('Error:', error)
-        setUniversities([]) // Set to empty array on error to avoid rendering issues
-      } finally {
-        setLoading(false)
-      }
-    }
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm)
+    }, 500)
+    return () => clearTimeout(handler)
+  }, [searchTerm])
 
-    getUniversities()
+  const loadUniversity = useCallback(async (page = 1, search = '') => {
+    setLoading(true)
+    try {
+      const response = await fetchUniversities(search, page)
+      setUniversities(response.items)
+      console.log('uniresponse', response)
+      setPagination((prev) => ({
+        ...prev,
+        totalPages: response?.totalPages,
+        totalCount: response?.totalItems
+      }))
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
-  // Removed unnecessary useEffect that just logged the universities
+  // Reset to page 1 when search changes (only if not already page 1)
+  useLayoutEffect(() => {
+    setPagination((prev) =>
+      prev.currentPage !== 1 ? { ...prev, currentPage: 1 } : prev
+    )
+  }, [debouncedSearch])
+
+  // Fetch when page or search changes
+  useEffect(() => {
+    loadUniversity(pagination.currentPage, debouncedSearch)
+  }, [debouncedSearch, pagination.currentPage, loadUniversity])
+
+  // Handle page change
+  const handlePageChange = (page) => {
+    if (page > 0 && page <= pagination.totalPages) {
+      setIsScrolling(true)
+      setPagination((prev) => ({ ...prev, currentPage: page }))
+      setTimeout(() => setIsScrolling(false), 500)
+    }
+  }
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [pagination.currentPage])
 
   return (
     <>
       <Header />
       <Navbar />
-      <div className='container mx-auto p-6'>
-        <div className='mb-8'>
-          <div className='border-b-2 border-[#0A70A7] w-[45px] mt-8 mb-4 pl-2'>
-            <span className='text-2xl font-bold mr-2'>Available</span>
-            <span className='text-[#0A70A7] text-2xl font-bold'>
-              Universities
-            </span>
+      <div className='min-h-screen bg-gradient-to-b from-[#f7fbfc] to-[#e9f3f7] py-12 px-6'>
+        <div className='container mx-auto'>
+          <div className='text-center mb-12'>
+            <h1 className='text-2xl md:text-3xl font-extrabold text-gray-800'>
+              Available <span className='text-[#0A70A7]'>Universities</span>
+            </h1>
+            <p className='mt-3 text-gray-600 max-w-2xl mx-auto text-sm'>
+              Discover a wide range of degree programs designed to help you
+              achieve your academic and career goals.
+            </p>
           </div>
 
           {/* Search Bar */}
-          <div className='flex justify-end w-full mb-6'>
-            <div className='relative w-full max-w-md'>
+          <div className='flex justify-center mb-10 md:mb-20 '>
+            <div className='relative w-full max-w-lg'>
               <input
                 type='text'
                 placeholder='Search university...'
-                className='w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                className='w-full px-5 py-3 pl-12 rounded-2xl border border-gray-300 shadow-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all'
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <Search className='absolute left-3 top-2.5 h-5 w-5 text-gray-400' />
+              <Search className='absolute left-4 top-3.5 h-5 w-5 text-gray-400' />
             </div>
           </div>
         </div>
@@ -83,9 +125,12 @@ const UniversityPage = () => {
                     <div className='mb-4 flex justify-between items-center'>
                       <h2 className='text-xl font-semibold'>{uni.fullname}</h2>
                       <img
-                        src='https://placehold.co/600x400' // Consider using a placeholder or actual university logo
+                        src={
+                          uni?.featured_image ||
+                          `https://avatar.iran.liara.run/username?username=${uni?.fullname}`
+                        } // Consider using a placeholder or actual university logo
                         alt={uni.fullname + ' Logo'} // Add alt text for accessibility
-                        className='w-[65px] h-[75px] rounded-2xl'
+                        className='w-[65px] h-[65px] rounded-2xl'
                         onError={(e) => {
                           e.target.onerror = null
                           e.target.src = 'https://placehold.co/600x400'
@@ -94,7 +139,6 @@ const UniversityPage = () => {
                     </div>
                     <div className='space-y-2'>
                       <div className='flex justify-between'>
-                        <span className='text-gray-600'>Address:</span>
                         <span>
                           {uni.city}, {uni.state} {uni.country}
                         </span>
@@ -103,6 +147,16 @@ const UniversityPage = () => {
                   </div>
                 </Link>
               ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {pagination.totalPages > 1 && (
+          <div className='mt-12 flex justify-center'>
+            <Pagination
+              pagination={pagination}
+              onPageChange={handlePageChange}
+            />
           </div>
         )}
       </div>

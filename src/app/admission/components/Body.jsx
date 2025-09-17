@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react'
 import { Search } from 'lucide-react'
 import { getAdmission } from '../actions'
 import Link from 'next/link'
@@ -30,13 +30,26 @@ const AdmissionPage = () => {
     return () => clearTimeout(handler)
   }, [searchTerm])
 
+  // Reset to page 1 when search changes
+  useLayoutEffect(() => {
+    setPagination((prev) =>
+      prev.currentPage !== 1 ? { ...prev, currentPage: 1 } : prev
+    )
+  }, [debouncedSearch])
+
   // Fetch admission data
   const fetchAdmission = useCallback(async (page = 1, search = '') => {
     setLoading(true)
     try {
       const response = await getAdmission(search, page)
       setAdmission(response.items)
-      setPagination(response.pagination)
+
+      // Do not overwrite currentPage from API → only update totals
+      setPagination((prev) => ({
+        ...prev,
+        totalPages: response.pagination.totalPages,
+        totalCount: response.pagination.totalCount
+      }))
     } catch (error) {
       console.error('Error:', error)
       setAdmission([])

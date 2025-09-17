@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useLayoutEffect } from 'react'
 import { fetchDegrees } from './actions'
 import { Search } from 'lucide-react'
 import Navbar from '../components/Frontpage/Navbar'
@@ -22,6 +22,7 @@ const DegreePage = () => {
   })
   const [isSearching, setIsSearching] = useState(false)
 
+  // Debounce search
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm)
@@ -29,16 +30,17 @@ const DegreePage = () => {
     return () => clearTimeout(handler)
   }, [searchTerm])
 
+  // Load degrees
   const loadDegrees = useCallback(async (page = 1, search = '') => {
     setLoading(true)
     try {
       const response = await fetchDegrees(search, page)
       setCourses(response.items)
-      setPagination({
-        currentPage: response.pagination.currentPage,
+      setPagination((prev) => ({
+        ...prev,
         totalPages: response.pagination.totalPages,
         totalCount: response.pagination.totalCount
-      })
+      }))
     } catch (error) {
       console.error('Error:', error)
     } finally {
@@ -46,10 +48,19 @@ const DegreePage = () => {
     }
   }, [])
 
+  // Reset to page 1 when search changes (only if not already page 1)
+  useLayoutEffect(() => {
+    setPagination((prev) =>
+      prev.currentPage !== 1 ? { ...prev, currentPage: 1 } : prev
+    )
+  }, [debouncedSearch])
+
+  // Fetch when page or search changes
   useEffect(() => {
     loadDegrees(pagination.currentPage, debouncedSearch)
   }, [debouncedSearch, pagination.currentPage, loadDegrees])
 
+  // Handle page change
   const handlePageChange = (page) => {
     if (page > 0 && page <= pagination.totalPages) {
       setIsScrolling(true)

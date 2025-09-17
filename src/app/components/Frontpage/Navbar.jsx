@@ -90,12 +90,6 @@ const Navbar = () => {
                 School
               </Link>
               <Link
-                href='/videos'
-                className='block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer'
-              >
-                Videos
-              </Link>
-              <Link
                 href='/universities'
                 className='block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer'
               >

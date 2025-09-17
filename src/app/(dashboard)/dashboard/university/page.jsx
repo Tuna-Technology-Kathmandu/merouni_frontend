@@ -13,6 +13,7 @@ import { fetchLevel } from './actions'
 import { useDebounce } from 'use-debounce'
 import { fetchAllCourse } from './actions'
 import useAdminPermission from '@/core/hooks/useAdminPermission'
+import GallerySection from './GallerySection'
 const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
 })
@@ -90,6 +91,7 @@ export default function UniversityForm() {
         featured_image: '',
         videos: ''
       },
+      featured_img: '',
       gallery: ['']
     }
   })
@@ -99,12 +101,6 @@ export default function UniversityForm() {
     append: appendMember,
     remove: removeMember
   } = useFieldArray({ control, name: 'members' })
-
-  const {
-    fields: galleryFields,
-    append: appendGallery,
-    remove: removeGallery
-  } = useFieldArray({ control, name: 'gallery' })
 
   // Fetch universities on component mount
   useEffect(() => {
@@ -290,6 +286,9 @@ export default function UniversityForm() {
 
       // Set members
       setValue('members', university.members)
+
+      //set featured_image that means logo
+      setValue('featured_img', university.featured_img || '')
 
       // Set assets and gallery
       setUploadedFiles({
@@ -617,6 +616,18 @@ export default function UniversityForm() {
             <div className='bg-white p-6 rounded-lg shadow-md'>
               <h2 className='text-xl font-semibold mb-4'>Media</h2>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                {/* Logo Upload */}
+                <div>
+                  <FileUpload
+                    label='Logo'
+                    onUploadComplete={(url) => {
+                      setValue('featured_img', url) // use outside featured_img
+                    }}
+                    defaultPreview={getValues('featured_img')}
+                  />
+                </div>
+
+                {/* Featured Image Upload */}
                 <div>
                   <FileUpload
                     label='Featured Image'
@@ -628,6 +639,7 @@ export default function UniversityForm() {
                   />
                 </div>
 
+                {/* Video URL */}
                 <div>
                   <label className='block mb-2'>Video URL</label>
                   <input
@@ -638,58 +650,14 @@ export default function UniversityForm() {
                 </div>
               </div>
 
-              <div className='mt-4'>
-                <div className='flex justify-between items-center mb-4'>
-                  <label className='block'>Gallery Images</label>
-                  <button
-                    type='button'
-                    onClick={() => {
-                      appendGallery('')
-                      setUploadedFiles((prev) => ({
-                        ...prev,
-                        gallery: [...prev.gallery, '']
-                      }))
-                    }}
-                    className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600'
-                  >
-                    Add Image
-                  </button>
-                </div>
-                {galleryFields.map((field, index) => (
-                  <div key={field.id} className='mb-4'>
-                    <FileUpload
-                      label={`Gallery Image ${index + 1}`}
-                      onUploadComplete={(url) => {
-                        const newGallery = [...uploadedFiles.gallery]
-                        newGallery[index] = url
-                        setUploadedFiles((prev) => ({
-                          ...prev,
-                          gallery: newGallery
-                        }))
-                        setValue(`gallery.${index}`, url)
-                      }}
-                      defaultPreview={uploadedFiles.gallery[index]}
-                    />
-                    {index > 0 && (
-                      <button
-                        type='button'
-                        onClick={() => {
-                          removeGallery(index)
-                          const newGallery = [...uploadedFiles.gallery]
-                          newGallery.splice(index, 1)
-                          setUploadedFiles((prev) => ({
-                            ...prev,
-                            gallery: newGallery
-                          }))
-                        }}
-                        className='mt-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600'
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
+              {/* this below is needed formultiple image */}
+              <GallerySection
+                control={control}
+                setValue={setValue}
+                uploadedFiles={uploadedFiles}
+                setUploadedFiles={setUploadedFiles}
+                getValues={getValues}
+              />
             </div>
 
             {/* Levels Section */}
