@@ -3,11 +3,12 @@
 import React, { useEffect, useState } from 'react'
 import { fetchUniversities } from '../../actions'
 import Link from 'next/link'
-import Loading from '@/app/(dashboard)/dashboard/users/loading'
 
 const RelatedUniversities = ({ university }) => {
   const [universities, setUniversities] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+
+  console.log('related', universities)
 
   useEffect(() => {
     if (university) {
@@ -53,13 +54,16 @@ const RelatedUniversities = ({ university }) => {
 
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
         {universities.map((university, index) => (
-          <Link href={`/universites/${university.slugs}`} key={index}>
+          <Link href={`/universities/${university?.slugs}`} key={index}>
             <div className='cursor-pointer p-4 w-full'>
               <div className='flex justify-center border-2 rounded-3xl items-center overflow-hidden mb-2 p-4'>
                 <img
-                  src={'/images/islington.png'}
+                  src={
+                    university?.assets?.featured_image ||
+                    `https://placehold.co/600x400?text=${university.fullname}`
+                  }
                   alt={university.fullname}
-                  className='w-48 h-48 object-cover'
+                  className='w-full h-48 object-cover rounded-2xl'
                 />
               </div>
               <div className='px-4 pb-4 flex flex-col'>
