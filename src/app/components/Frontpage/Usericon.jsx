@@ -54,11 +54,7 @@ export default function UserDropdown() {
                 Login
               </button>
             </Link>
-            <Link href='/contact'>
-              <button className='w-full py-2 mt-2 border border-blue-600 text-blue-600 rounded-lg font-bold'>
-                Join Us →
-              </button>
-            </Link>
+            <Link href='/contact'></Link>
           </ul>
         </div>
       )}
