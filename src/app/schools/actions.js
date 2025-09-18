@@ -3,12 +3,12 @@
 export async function getColleges(page = 1, sort = 'ASC') {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/college/list-school`,
+      `${process.env.baseUrl}${process.env.version}/college/list-school?page=${page}&sort=${sort}&limit=24`,
       {
         cache: 'no-store'
       }
     )
-    console.log(response)
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
@@ -18,17 +18,14 @@ export async function getColleges(page = 1, sort = 'ASC') {
     return {
       colleges: data.items.map((college) => ({
         name: college.name,
-        //location: `${college.address.city}, ${college.address.state}`,
         description: college.description,
         googleMapUrl: college.google_map_url,
         instituteType: college.institute_type,
-        // logo: college.assets.featured_img,
-        // programmes: college.programmes,
         slug: college.slugs,
         collegeId: college.id
       })),
       pagination: data.pagination || {
-        currentPage: 1,
+        currentPage: page,
         totalPages: 1,
         totalRecords: data.items.length,
         hasNextPage: false,
@@ -50,12 +47,10 @@ export async function getColleges(page = 1, sort = 'ASC') {
   }
 }
 
-export async function searchColleges(query) {
+export async function searchColleges(query, page = 1) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${
-        process.env.version
-      }/college/search?q=${encodeURIComponent(query)}`,
+      `${process.env.baseUrl}${process.env.version}/college/search?q=${encodeURIComponent(query)}&page=${page}&limit=24`,
       {
         cache: 'no-store'
       }
@@ -67,33 +62,32 @@ export async function searchColleges(query) {
 
     const data = await response.json()
 
-    // If no results found
-    if (!data[0]) {
-      return {
-        colleges: [],
-        pagination: data.pagination
-      }
+    if (!data[0] && !data.items) {
+      return { colleges: [], pagination: data.pagination }
     }
 
-    const colleges = Object.keys(data)
-      .filter((key) => !isNaN(key)) // Only process numeric keys (actual college data)
-      .map((key) => {
-        const college = data[key]
-        return {
-          name: college.fullname,
-          location: `${college.address.city}, ${college.address.state}`,
-          description: college.description,
-          logo: college.assets.featuredImage,
-          contactInfo: college.contactInfo,
-          facilities: college.facilities,
-          instituteType: college.instituteType,
-          programmes: college.programmes
-        }
-      })
+    const colleges = (data.items || Object.values(data))
+      .filter((c) => c && c.fullname)
+      .map((college) => ({
+        name: college.fullname,
+        location: `${college.address?.city || ''}, ${college.address?.state || ''}`,
+        description: college.description,
+        logo: college.assets?.featuredImage,
+        contactInfo: college.contactInfo,
+        facilities: college.facilities,
+        instituteType: college.instituteType,
+        programmes: college.programmes
+      }))
 
     return {
       colleges,
-      pagination: data.pagination
+      pagination: data.pagination || {
+        currentPage: page,
+        totalPages: 1,
+        totalRecords: colleges.length,
+        hasNextPage: false,
+        hasPreviousPage: false
+      }
     }
   } catch (error) {
     console.error('Failed to search colleges:', error)

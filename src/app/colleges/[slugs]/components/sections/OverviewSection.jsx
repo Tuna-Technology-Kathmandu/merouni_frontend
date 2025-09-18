@@ -2,7 +2,7 @@ import React from 'react'
 import he from 'he'
 
 const OverviewSection = ({ college }) => {
-  // Function to wrap tables in a scrollable container
+  // Wrap tables in a scrollable container
   const processContent = (html) => {
     if (!html) return ''
     return html.replace(
@@ -14,14 +14,20 @@ const OverviewSection = ({ college }) => {
   return (
     <div>
       <h2 className='text-sm md:text-lg lg:text-xl font-bold'>Description</h2>
-      <p className='text-gray-800 mt-9 max-[1120px]:mt-5 leading-7 max-md:leading-5 text-xs md:text-sm lg:text-base text-justify'>
+
+      {/* Plain description text */}
+      <p className='text-gray-800 mt-9 max-[1120px]:mt-5 leading-7 max-md:leading-5 text-justify text-xs md:text-sm lg:text-base'>
         {college?.description}
       </p>
+
+      {/* Rich HTML content */}
       <div
         dangerouslySetInnerHTML={{
           __html: he.decode(processContent(college?.content))
         }}
         className='text-gray-800 mt-4 leading-7 text-justify 
+             text-xs md:text-sm lg:text-base
+
              [&>iframe]:w-full 
              [&>iframe]:max-w-[calc(100vw-40px)] 
              [&>iframe]:aspect-video 
@@ -51,7 +57,7 @@ const OverviewSection = ({ college }) => {
              [&_td]:border-gray-300
              [&_tr:nth-child(even)]:bg-gray-50
 
-             /* Other styles */
+             /* Heading styles */
              [&_h1]:text-2xl
              [&_h1]:font-bold
              [&_h1]:mt-8
@@ -60,7 +66,8 @@ const OverviewSection = ({ college }) => {
              [&_h2]:font-bold
              [&_h2]:mt-6
              [&_h2]:mb-3
-             text-xs md:text-sm lg:text-base
+
+             /* List styles */
              [&_ol]:pl-8 
              [&_ol]:my-4
              [&_ol]:space-y-2
@@ -73,7 +80,7 @@ const OverviewSection = ({ college }) => {
              max-lg:[&_ul]:text-sm
              max-lg:[&_ol]:space-y-1
              max-lg:[&_ul]:space-y-1'
-      ></div>
+      />
     </div>
   )
 }

@@ -9,8 +9,7 @@ const FormSection = ({ id, college }) => {
     student_name: '',
     student_phone_no: '',
     student_email: '',
-    student_description: '',
-    course: '' //later change with the backend
+    student_description: ''
   })
 
   useEffect(() => {
@@ -22,8 +21,8 @@ const FormSection = ({ id, college }) => {
 
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
-  const [showDrop, setShowDrop] = useState(false)
-  const [selectedCourse, setSelectedCourse] = useState('select course')
+  // const [showDrop, setShowDrop] = useState(false)
+  // const [selectedCourse, setSelectedCourse] = useState('select course')
 
   const validateForm = () => {
     const newErrors = {}
@@ -108,35 +107,35 @@ const FormSection = ({ id, college }) => {
     }
   }
 
-  const courseOption = React.useMemo(() => {
-    if (!college?.collegeCourses) return []
+  // const courseOption = React.useMemo(() => {
+  //   if (!college?.collegeCourses) return []
 
-    if (id) {
-      const options = college.collegeCourses.filter((item) => item.id == id)
-      if (options.length > 0) {
-        setSelectedCourse(options[0]?.program?.title)
-        setFormData((prev) => ({ ...prev, course: options[0]?.id }))
-      }
-    }
-    return college.collegeCourses
-  }, [id, college?.collegeCourses])
+  //   if (id) {
+  //     const options = college.collegeCourses.filter((item) => item.id == id)
+  //     if (options.length > 0) {
+  //       setSelectedCourse(options[0]?.program?.title)
+  //       setFormData((prev) => ({ ...prev, course: options[0]?.id }))
+  //     }
+  //   }
+  //   return college.collegeCourses
+  // }, [id, college?.collegeCourses])
 
-  //for drop down selection
+  // //for drop down selection
 
-  const handleDrop = (courseId, courseTitle) => {
-    setShowDrop(false)
-    setSelectedCourse(courseTitle)
-    setFormData((prev) => ({
-      ...prev,
-      course: courseId
-    }))
-  }
+  // const handleDrop = (courseId, courseTitle) => {
+  //   setShowDrop(false)
+  //   setSelectedCourse(courseTitle)
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     course: courseId
+  //   }))
+  // }
 
   console.log(formData)
 
   return (
     <div className='flex flex-col items-center bg-[#D9D9D9] bg-opacity-30 p-6'>
-      <h2 className='text-center text-2xl font-bold mb-6'>Apply For College</h2>
+      <h2 className='text-center text-2xl font-bold mb-6'>Apply For School</h2>
       <div className='w-full max-w-3xl bg-white shadow-lg rounded-lg p-6'>
         <form className='space-y-4' onSubmit={handleSubmit}>
           <div>
@@ -178,7 +177,7 @@ const FormSection = ({ id, college }) => {
               <p className='text-red-500 text-sm'>{errors.student_phone_no}</p>
             )}
           </div>
-          <div className='relative'>
+          {/* <div className='relative'>
             <h1
               onClick={() => setShowDrop(!showDrop)}
               className={`${selectedCourse == 'select course' ? 'text-black/40' : 'text-black'} w-full px-4 py-2 border rounded-lg cursor-pointer `}
@@ -200,7 +199,7 @@ const FormSection = ({ id, college }) => {
                 })}
               </div>
             )}
-          </div>
+          </div> */}
           <div>
             <textarea
               name='student_description'

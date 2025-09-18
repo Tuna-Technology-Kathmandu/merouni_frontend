@@ -1,573 +1,171 @@
-// "use client";
-// import React, { useState } from "react";
-// import Image from "next/image";
-// import { FaUser } from "react-icons/fa";
-// import { FaPhoneAlt } from "react-icons/fa";
-// import { IoMdMail } from "react-icons/io";
-// import { PiLineVerticalThin } from "react-icons/pi";
-
-// const CollegeOverview = ({ college }) => {
-//   const [activeTab, setActiveTab] = useState("Overview");
-//   const programs = [
-//     "Bachelor (Hons) of Business Administration (BBA)",
-//     "Bachelor of Information Technology (BIT)",
-//     "Bachelor of Computer Science (Hons) Network Technology & Cyber Security (BCS)",
-//     "BSc Hons. in Hospitality Management (BHM)",
-//     "Master of Business Administration (MBA)",
-//     "Master of Computer Science (MCS)",
-//     "MBA in Hospitaily Management",
-//   ];
-
-//   const members = [
-//     {
-//       name: "Bhesh Raj Pokhrel",
-//       post: "Executive Chairman",
-//       phoneNumber: "981234578",
-//       email: "demo@gmail.com",
-//       image: "/images/college_member.png",
-//     },
-//     {
-//       name: "Bhesh Raj Pokhrel",
-//       post: "Executive Chairman",
-//       phoneNumber: "981234578",
-//       email: "demo@gmail.com",
-//       image: "/images/college_member.png",
-//     },
-//     {
-//       name: "Bhesh Raj Pokhrel",
-//       post: "Executive Chairman",
-//       phoneNumber: "981234578",
-//       email: "demo@gmail.com",
-//       image: "/images/college_member.png",
-//     },
-//     {
-//       name: "Bhesh Raj Pokhrel",
-//       post: "Executive Chairman",
-//       phoneNumber: "981234578",
-//       email: "demo@gmail.com",
-//       image: "/images/college_member.png",
-//     },
-//     {
-//       name: "Bhesh Raj Pokhrel",
-//       post: "Executive Chairman",
-//       phoneNumber: "981234578",
-//       email: "demo@gmail.com",
-//       image: "/images/college_member.png",
-//     },
-//     {
-//       name: "Bhesh Raj Pokhrel",
-//       post: "Executive Chairman",
-//       phoneNumber: "981234578",
-//       email: "demo@gmail.com",
-//       image: "/images/college_member.png",
-//     },
-//   ];
-//   console.log("Get college params:", college);
-//   return (
-//     <div className="w-[1150px]  mx-auto bg-white border-2 shadow-md rounded-2xl mb-10 pb-5">
-//       {/* Tabs Section */}
-
-//       <div className="grid grid-cols-6 rounded-t-2xl bg-[#D9D9D9]">
-//         {[
-//           "Overview",
-//           "Programs",
-//           "Members",
-//           "Facilities",
-//           "Contact",
-//           "Address",
-//         ].map((tab) => (
-//           <button
-//             key={tab}
-//             onClick={() => setActiveTab(tab)}
-//             className={`py-3 text-lg font-semibold text-center transition-all duration-300 ${
-//               activeTab === tab
-//                 ? "text-[#30AD8F] border-b-2 border-[#30AD8F] bg-white rounded-t-2xl"
-//                 : "text-gray-500 bg-[#D9D9D9] rounded-t-2xl"
-//             }`}
-//           >
-//             {tab}
-//           </button>
-//         ))}
-//       </div>
-
-//       {/* Overview Section */}
-//       {activeTab === "Overview" && (
-//         <div className="mt-6 ml-4">
-//           <h2 className="text-2xl font-bold">About</h2>
-//           <p className="text-gray-700 mt-4 leading-7">{college.description}</p>
-
-//           {/* Mission Section */}
-//           {/* <h2 className="text-2xl font-bold mt-6">Mission</h2>
-//           <ul className="list-disc list-inside mt-4 text-gray-700">
-//             <li>Being a truly international business school</li>
-//             <li>The excellence of our learning experience</li>
-//             <li>World-Class Research and thinking</li>
-//           </ul> */}
-
-//           {/* Vision Section */}
-//           <h2 className="text-2xl font-bold mt-6">Vision</h2>
-//           <p className="text-gray-700 mt-4">{college.visions}</p>
-//         </div>
-//       )}
-
-//       {activeTab === "Programs" && (
-//         <div className="mt-6 ml-4">
-//           <h2 className="text-2xl font-bold">
-//             OFFERED PROGRAMS - {college.fullname}
-//           </h2>
-//           {programs.map((program, index) => (
-//             <div className="mt-2">
-//               <h2 className="font-bold mb-1">{program}</h2>
-//               <button
-//                 type="button"
-//                 className="bg-[#2981B2] p-2 rounded-lg text-white"
-//               >
-//                 Apply Now
-//               </button>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-
-//       {activeTab === "Members" && (
-//         <div className="mt-6 ml-4">
-//           <h2 className="text-2xl font-bold">Members</h2>
-//           <div className="grid grid-cols-2 gap-4 mt-4">
-//             {college.members.map((member, index) => (
-//               <div className="flex flex-row mb-8 ml-14 " key={index}>
-//                 {/* <div className="mr-3 ">
-//                               <Image
-//                                 src={member.image}
-//                                 width={150}
-//                                 height={150}
-//                                 alt="Member Logo"
-//                               />
-//                             </div> */}
-//                 <div className="flex flex-col">
-//                   <div className="flex flex-row mb-2 gap-2 items-center">
-//                     <FaUser />
-//                     <p>
-//                       {member.salutation}
-//                       {member.name}
-//                     </p>
-//                   </div>
-//                   <div className="flex flex-row mb-2 gap-2 items-center">
-//                     <img
-//                       src="/images/Role icon.png"
-//                       alt="Role Icon"
-//                       className="w-4"
-//                     />
-//                     <p>{member.role}</p>
-//                   </div>
-//                   <div className="flex flex-row mb-2 gap-2 items-center">
-//                     <FaUser />
-
-//                     <p>{member.contactInfo.phone}</p>
-//                   </div>
-//                   <div className="flex flex-row mb-2 gap-2 items-center">
-//                     <IoMdMail />
-//                     <p>{member.contactInfo.email}</p>
-//                   </div>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//       )}
-
-//       {activeTab === "Facilities" && (
-//         <div className="mt-6 ml-4">
-//           {college.facilities.map((facility, index) => (
-//             <div key={index} className="mt-2">
-//               <h2 className="text-2xl font-bold">{facility.title}:</h2>
-//               <p className="text-gray-700 mt-2 leading-7">
-//                 {facility.description}
-//               </p>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-//       {activeTab === "Contact" && (
-//         <>
-//           <div className="flex flex-col mt-8 ml-8 mb-10">
-//             {/*Upper part section of contact */}
-//             <div className="grid grid-cols-3 gap-4">
-//               <div className="w-[250px] h-[180px] bg-[#30AD8F] bg-opacity-10 items-center flex flex-col rounded-lg">
-//                 <img
-//                   src="/images/contact_college.png"
-//                   alt="Contact Icon"
-//                   className="w-8 -translate-y-5"
-//                 />
-//                 <h2 className="text-2xl font-bold mt-2">Contact Info</h2>
-//                 {/* <p>{college.contactInfo.faxes}</p> */}
-//                 {college.contactInfo.phoneNumber.map((phone, index) => (
-//                   <p
-//                     key={index}
-//                     className="flex flex-col items-center justify-center"
-//                   >
-//                     {phone}
-//                   </p>
-//                 ))}
-//               </div>
-
-//               <div className="w-[250px] h-[180px] bg-[#30AD8F] bg-opacity-10 items-center flex flex-col rounded-lg">
-//                 <img
-//                   src="/images/fax_college.png"
-//                   alt="Fax Icon"
-//                   className="w-8 -translate-y-5"
-//                 />
-//                 <h2 className="text-2xl font-bold mt-2">Fax Info</h2>
-//                 <p>{college.contactInfo.faxes}</p>
-//               </div>
-
-//               <div className="w-[250px] h-[180px] bg-[#30AD8F] bg-opacity-10 items-center flex flex-col rounded-lg">
-//                 <img
-//                   src="/images/PO_college.png"
-//                   alt="PO Box Icon"
-//                   className="w-8 -translate-y-5"
-//                 />
-//                 <h2 className="text-2xl font-bold mt-2">PO Box Info</h2>
-//                 <p>{college.contactInfo.poboxes}</p>
-//               </div>
-//             </div>
-
-//             <div className="grid grid-cols-2 gap-8 mt-8 ml-28">
-//               <div className="w-[250px] h-[180px] bg-[#30AD8F] bg-opacity-10 items-center flex flex-col rounded-lg">
-//                 <img
-//                   src="/images/mail_college.png"
-//                   alt="Email Icon"
-//                   className="w-16 -translate-y-6 "
-//                 />
-//                 <h2 className="text-2xl font-bold ">Email</h2>
-//                 <p>{college.contactInfo.email}</p>
-//               </div>
-
-//               <div className="w-[250px] h-[180px] bg-[#30AD8F] bg-opacity-10 items-center flex flex-col rounded-lg">
-//                 <img
-//                   src="/images/website_college.png"
-//                   alt="Website Icon"
-//                   className="w-10 -translate-y-5"
-//                 />
-//                 <h2 className="text-2xl font-bold mt-6">Website</h2>
-//                 <a
-//                   href={college.contactInfo.websiteUrl}
-//                   className="underline text-blue-600"
-//                 >
-//                   {college.contactInfo.websiteUrl}
-//                 </a>
-//                 {/* <p>{college.contactInfo.websiteUrl}</p> */}
-//               </div>
-//             </div>
-//           </div>
-//         </>
-//       )}
-
-//       {activeTab === "Address" && (
-//         <>
-//           <div className="flex flex-col mt-8 ml-8 mb-10">
-//             <div className="  bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex flex-row  mb-8  items-center justify-between w-[1050px] h-[120px] p-8">
-//               <div className=" flex flex-col items-center">
-//                 {/* <p className="text-sm font-bold">Starts</p> */}
-//                 {/* <FaUniversity size={30} /> */}
-//                 <img
-//                   src="/images/country_college.png"
-//                   alt="level"
-//                   className="w-8"
-//                 />
-
-//                 <p className="whitespace-nowrap">{college.address.country}</p>
-//               </div>
-//               <div className="flex items-center">
-//                 <PiLineVerticalThin size={60} />
-//               </div>
-//               <div className=" flex flex-col items-center">
-//                 {/* <p className="text-sm font-bold">Starts</p> */}
-//                 {/* <LiaUniversitySolid size={30} /> */}
-//                 <img
-//                   src="/images/state_college.png"
-//                   alt="level"
-//                   className="w-8"
-//                 />
-
-//                 <p className="whitespace-nowrap">
-//                   {college.address.state} Province
-//                 </p>
-//               </div>
-//               <div className="flex items-center">
-//                 <PiLineVerticalThin size={60} />
-//               </div>
-//               <div className=" flex flex-col items-center">
-//                 {/* <p className="text-sm font-bold">Ends</p> */}
-//                 {/* <img src="/images/level.png" alt="level" className="w-10" /> */}
-//                 <img
-//                   src="/images/city_college.png"
-//                   alt="level"
-//                   className="w-8"
-//                 />
-
-//                 <p className="whitespace-nowrap">{college.address.city}</p>
-//               </div>
-//               <div className="flex items-center">
-//                 <PiLineVerticalThin size={60} />
-//               </div>
-//               <div className=" flex flex-col items-center">
-//                 {/* <p className="text-sm font-bold">Ends</p> */}
-//                 {/* <img src="/images/level.png" alt="level" className="w-10"/> */}
-//                 {/* <FaPhoneAlt size={25} /> */}
-//                 <img
-//                   src="/images/street_college.png"
-//                   alt="level"
-//                   className="w-6"
-//                 />
-
-//                 <p className="whitespace-nowrap">{college.address.street}</p>
-//               </div>
-//               <div className="flex items-center">
-//                 <PiLineVerticalThin size={60} />
-//               </div>
-//               <div className="  flex flex-col items-center">
-//                 {/* <p className="text-sm font-bold whitespace-nowrap">Time</p> */}
-//                 {/* <IoMdMail size={25} /> */}
-//                 <img
-//                   src="/images/postalCode_college.png"
-//                   alt="level"
-//                   className="w-8"
-//                 />
-
-//                 <p className="whitespace-nowrap ">
-//                   {college.address.postalCode}
-//                 </p>
-//               </div>
-//             </div>
-
-//             {/** Map portion*/}
-//             <div className="mt-10 flex flex-col">
-//               <h2 className="text-2xl font-bold mb-5">Get Direction</h2>
-//               <div className="mt-2 rounded-md">
-//                 <iframe
-//                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3532.727672774474!2d85.3403091!3d27.712974!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb1970a9ff7041%3A0xfcaa45db29104458!2sTexas%20International%20College!5e0!3m2!1sen!2snp!4v1706633788483!5m2!1sen!2snp"
-//                   style={{ border: "0", borderRadius: "8px" }}
-//                   className="w-[1050px] h-[300px] border-0 rounded-md"
-//                   allowFullScreen
-//                   loading="lazy"
-//                 ></iframe>
-//               </div>
-//             </div>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default CollegeOverview;
-
-import React, { useState } from 'react'
-import { FaUser } from 'react-icons/fa'
-import { IoMdMail } from 'react-icons/io'
-import { PiLineVerticalThin } from 'react-icons/pi'
+import React, { useRef } from 'react'
+import OverviewSection from '../../../colleges/[slugs]/components/sections/OverviewSection'
+import ProgramSection from '../../../colleges/[slugs]/components/sections/ProgramSection'
+import MemberSection from '../../../colleges/[slugs]/components/sections/MemberSection'
+import GoogleMap from '../../../colleges/[slugs]/components/GoogleMap'
+import GallerySection from '../../../colleges/[slugs]/components/sections/GallerySection'
+import BrochureSection from '../../../colleges/[slugs]/components/sections/BrochureSection'
+import FacilitySection from '../../../colleges/[slugs]/components/sections/FacilitySection'
 
 const CollegeOverview = ({ college }) => {
-  const [activeTab, setActiveTab] = useState('Overview')
+  const overviewRef = useRef(null)
+  const programsRef = useRef(null)
+  const membersRef = useRef(null)
+  const galleryRef = useRef(null)
+  const bronchureRef = useRef(null)
+  const facilityRef = useRef(null)
+
+  const validMembers = (college.collegeMembers || []).filter(
+    (member) =>
+      member.name?.trim() ||
+      member.role?.trim() ||
+      member.contact_number?.trim() ||
+      member.description?.trim()
+  )
+
+  const allSections = [
+    {
+      name: 'Bronchure',
+      visible: college?.college_broucher !== '',
+      ref: bronchureRef,
+      component: <BrochureSection college={college} />
+    },
+    {
+      name: 'Overview',
+      visible: !!(
+        college?.description &&
+        college?.content &&
+        college?.institute_type !== ''
+      ),
+      ref: overviewRef,
+      component: <OverviewSection college={college} />
+    },
+
+    // {
+    //   name: 'Programs',
+    //   visible: college?.collegeCourses?.length !== 0,
+    //   ref: programsRef,
+    //   component: <ProgramSection college={college} />
+    // },
+    {
+      name: 'Facility',
+      visible: college?.collegeFacility?.length !== 0,
+      ref: facilityRef,
+      component: <FacilitySection college={college} />
+    },
+    {
+      name: 'Members',
+      visible: validMembers.length !== 0,
+      ref: membersRef,
+      component: <MemberSection validMembers={validMembers} />
+    },
+    {
+      name: 'Gallery',
+      visible: college?.collegeGallery?.length !== 0,
+      ref: galleryRef,
+      component: <GallerySection college={college} />
+    }
+  ]
+
+  const visibleSections = allSections.filter((section) => section.visible)
+
+  const handleScroll = (index) => {
+    const target = visibleSections[index].ref.current
+    const headerOffset = 83
+    const elementPosition = target.getBoundingClientRect().top + window.scrollY
+    const offsetPosition = elementPosition - headerOffset
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    })
+  }
+
+  console.log('visibleSections', college?.google_map_url)
 
   return (
-    <div className='w-full max-w-[1150px] mx-auto bg-white border-2 shadow-md rounded-2xl mb-10 pb-5'>
-      <div className='grid grid-cols-6 rounded-t-2xl bg-[#D9D9D9]'>
-        {[
-          'Overview',
-          'Programs',
-          'Members',
-          'Facilities',
-          'Contact',
-          'Address'
-        ].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`py-3 text-lg font-semibold text-center transition-all duration-300 ${
-              activeTab === tab
-                ? 'text-[#30AD8F] border-b-2 border-[#30AD8F] bg-white rounded-t-2xl'
-                : 'text-gray-500 bg-[#D9D9D9] rounded-t-2xl'
-            }`}
-          >
-            {tab}
-          </button>
+    <section className='px-[75px] max-md:px-[30px] mb-20 max-md:mb-10 flex justify-between gap-16 max-md:gap-2 w-full max-md:flex-col-reverse max-md:items-between'>
+      {/* Sidebar - Only shows visible sections */}
+      {visibleSections.length > 0 && (
+        <aside className='sticky top-52 h-fit self-start max-md:static max-md:mx-auto'>
+          <div className='flex gap-1 max-md:gap-1 mt-20 max-md:mt-9'>
+            <div className='w-[4px] bg-[#0A6FA7] h-auto mr-2'></div>
+            <p className='font-semibold text-[20px] max-md:text-center tracking-[0.01em] text-black'>
+              About
+            </p>
+          </div>
+
+          <ul className='mt-7 max-md:text-center'>
+            {visibleSections.map((section, index) => (
+              <li
+                key={index}
+                onClick={() => handleScroll(index)}
+                className='text-base max-[1120px]:text-sm font-medium mb-4 max-lg:mb-2 cursor-pointer hover:underline tracking-[0.01em]'
+              >
+                {section.name}
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
+
+      {/* Content Area - Only renders visible sections */}
+      <div className='flex flex-col justify-start w-2/3 max-lg:w-full gap-14 max-md:w-full mt-20'>
+        {visibleSections.map((section, index) => (
+          <div key={index} className='min-h-[100px] w-full' ref={section.ref}>
+            {section.component}
+          </div>
         ))}
       </div>
 
-      {activeTab === 'Overview' && (
-        <div className='mt-6 ml-4'>
-          <h2 className='text-2xl font-bold'>About</h2>
-          <p className='text-gray-700 mt-4 leading-7'>{college.description}</p>
-          <h2 className='text-2xl font-bold mt-6'>Institution Type</h2>
-          <p className='text-gray-700 mt-4'>{college.institute_type}</p>
-        </div>
-      )}
+      {/* Right sidebar (location) - Unchanged */}
+      <aside className='sticky top-52 h-fit self-start max-lg:hidden'>
+        <div className='mt-20 max-[1144px]:w-[200px] max-[938px]:w-[150px]'>
+          {college?.google_map_url && (
+            <>
+              <p className='font-semibold text-[20px] max-md:text-center tracking-[0.01em] text-black'>
+                Location
+              </p>
 
-      {activeTab === 'Programs' && (
-        <div className='mt-6 ml-4'>
-          <h2 className='text-2xl font-bold'>
-            OFFERED PROGRAMS - {college.university.fullname}
-          </h2>
-          {college.collegeCourses.map((course, index) => (
-            <div key={index} className='mt-2'>
-              <h2 className='font-bold mb-1'>{course.program.title}</h2>
-              <button
-                type='button'
-                className='bg-[#2981B2] p-2 rounded-lg text-white'
-              >
-                Apply Now
-              </button>
+              <div className='mt-7 w-full h-52 tw:max-[938px]:h-40'>
+                <GoogleMap mapUrl={college.google_map_url} />
+              </div>
+            </>
+          )}
+
+          <div className='mt-7 w-full h-52 tw:max-[938px]:h-40'>
+            <div className='text-center shadow-lg h-auto p-2 border border-gray-300 rounded-md hover:scale-105 transition-all duration-300 ease-in-out'>
+              <p className='text-xs md:text-sm lg:text-base font-semibold'>
+                Address
+              </p>
+              <div className='text-xs md:text-[12px] font-medium lg:text-[14px] mt-2 w-full'>
+                {/* <span>{college?.collegeAddress?.country || ''},</span> */}
+                <span className='ml-1'>
+                  {college?.collegeAddress?.state || ''},
+                </span>
+                <span className='ml-1'>
+                  {college?.collegeAddress?.city || ''},
+                </span>
+                <br />
+                <span className='ml-1'>
+                  {college?.collegeAddress?.street || ''}
+                </span>
+              </div>
             </div>
-          ))}
-        </div>
-      )}
-
-      {activeTab === 'Members' && (
-        <div className='mt-6 ml-4'>
-          <h2 className='text-2xl font-bold'>Members</h2>
-          <div className='grid grid-cols-2 gap-4 mt-4'>
-            {college.collegeMembers.map((member, index) => (
-              <div className='flex flex-row mb-8 ml-14' key={index}>
-                <div className='flex flex-col'>
-                  <div className='flex flex-row mb-2 gap-2 items-center'>
-                    <FaUser />
-                    <p>{member.name}</p>
-                  </div>
-                  <div className='flex flex-row mb-2 gap-2 items-center'>
-                    <img
-                      src='/images/Role icon.png'
-                      alt='Role Icon'
-                      className='w-4'
-                    />
-                    <p>{member.role}</p>
-                  </div>
-                  <div className='flex flex-row mb-2 gap-2 items-center'>
-                    <FaUser />
-                    <p>{member.contact_number}</p>
-                  </div>
-                  <div className='flex flex-row mb-2 gap-2 items-center'>
-                    <IoMdMail />
-                    <p>{member.description}</p>
-                  </div>
+            {college?.collegeAddress?.postal_code && (
+              <div className='text-center shadow-lg h-auto p-2 mt-4 border border-gray-300 rounded-md hover:scale-105 transition-all duration-300 ease-in-out'>
+                <p className='text-xs md:text-sm lg:text-base font-semibold'>
+                  Postcode
+                </p>
+                <div className='text-xs md:text-[12px] font-medium lg:text-[14px] mt-2 w-full'>
+                  <span>{college?.collegeAddress?.postal_code}</span>
                 </div>
               </div>
-            ))}
+            )}
           </div>
         </div>
-      )}
-
-      {activeTab === 'Contact' && (
-        <div className='flex flex-col mt-8 ml-8 mb-10'>
-          <div className='grid grid-cols-3 gap-4'>
-            <div className='w-[250px] h-[180px] bg-[#30AD8F] bg-opacity-10 items-center flex flex-col rounded-lg'>
-              <img
-                src='/images/contact_college.png'
-                alt='Contact Icon'
-                className='w-8 -translate-y-5'
-              />
-              <h2 className='text-2xl font-bold mt-2'>Contact Info</h2>
-              {college.collegeContacts.map((contact, index) => (
-                <p
-                  key={index}
-                  className='flex flex-col items-center justify-center'
-                >
-                  {contact.contact_number}
-                </p>
-              ))}
-            </div>
-
-            <div className='w-[250px] h-[180px] bg-[#30AD8F] bg-opacity-10 items-center flex flex-col rounded-lg'>
-              <img
-                src='/images/website_college.png'
-                alt='Website Icon'
-                className='w-10 -translate-y-5'
-              />
-              <h2 className='text-2xl font-bold mt-6'>Website</h2>
-              <a href={college.website_url} className='underline text-blue-600'>
-                {college.website_url || 'Not Available'}
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'Address' && (
-        <div className='flex flex-col mt-8 ml-8 mb-10'>
-          <div className='bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex flex-row mb-8 items-center justify-between w-[1050px] h-[120px] p-8'>
-            <div className='flex flex-col items-center'>
-              <img
-                src='/images/country_college.png'
-                alt='level'
-                className='w-8'
-              />
-              <p className='whitespace-nowrap'>
-                {college.collegeAddress.country}
-              </p>
-            </div>
-            <div className='flex items-center'>
-              <PiLineVerticalThin size={60} />
-            </div>
-            <div className='flex flex-col items-center'>
-              <img
-                src='/images/state_college.png'
-                alt='level'
-                className='w-8'
-              />
-              <p className='whitespace-nowrap'>
-                {college.collegeAddress.state}
-              </p>
-            </div>
-            <div className='flex items-center'>
-              <PiLineVerticalThin size={60} />
-            </div>
-            <div className='flex flex-col items-center'>
-              <img src='/images/city_college.png' alt='level' className='w-8' />
-              <p className='whitespace-nowrap'>{college.collegeAddress.city}</p>
-            </div>
-            <div className='flex items-center'>
-              <PiLineVerticalThin size={60} />
-            </div>
-            <div className='flex flex-col items-center'>
-              <img
-                src='/images/street_college.png'
-                alt='level'
-                className='w-6'
-              />
-              <p className='whitespace-nowrap'>
-                {college.collegeAddress.street}
-              </p>
-            </div>
-            <div className='flex items-center'>
-              <PiLineVerticalThin size={60} />
-            </div>
-            <div className='flex flex-col items-center'>
-              <img
-                src='/images/postalCode_college.png'
-                alt='level'
-                className='w-8'
-              />
-              <p className='whitespace-nowrap'>
-                {college.collegeAddress.postal_code}
-              </p>
-            </div>
-          </div>
-
-          <div className='mt-10 flex flex-col'>
-            <h2 className='text-2xl font-bold mb-5'>Get Direction</h2>
-            <div className='mt-2 rounded-md'>
-              {/* <iframe
-                src={college.google_map_url}
-                style={{ border: "0", borderRadius: "8px" }}
-                className="w-[1050px] h-[300px] border-0 rounded-md"
-                allowFullScreen
-                loading="lazy"
-              ></iframe> */}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      </aside>
+    </section>
   )
 }
 

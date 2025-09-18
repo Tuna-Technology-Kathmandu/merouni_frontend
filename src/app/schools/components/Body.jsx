@@ -6,21 +6,21 @@ import DegreeSection from './DegreeSection'
 import AffiliationSection from './AffiliationSection'
 import CourseFeeSection from './CourseFeeSection'
 import UniversityCard from './UniversityCard'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { getColleges, searchColleges } from '../actions'
-// import { searchColleges } from "../actions";
 import { debounce } from 'lodash'
-import Link from 'next/link'
-// import { getColleges } from "@/app/action";
+import Pagination from '@/app/blogs/components/Pagination'
+import { ShimmerCard } from './ShimmerCard'
 
 const CollegeFinder = () => {
+  const topRef = useRef(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [universities, setUniversities] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [pagination, setPagination] = useState({
     totalPages: 1,
-    hasNextPage: false,
-    hasPreviousPage: false
+    currentPage: 1,
+    totalCount: 1
   })
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -52,9 +52,7 @@ const CollegeFinder = () => {
   const fetchColleges = async (page) => {
     setIsLoading(true)
     try {
-      console.log('INside fetch college')
       const data = await getColleges(page)
-      console.log('Getting data in college page:', data)
       setUniversities(data.colleges)
       setPagination(data.pagination)
     } catch (error) {
@@ -62,10 +60,6 @@ const CollegeFinder = () => {
     }
     setIsLoading(false)
   }
-
-  useEffect(() => {
-    console.log('UNiversity fetch:', universities[8])
-  }, [universities])
 
   const filters = [
     {
@@ -144,7 +138,28 @@ const CollegeFinder = () => {
     }
   ]
 
-  console.log('schools', universities)
+  const handlePageChange = (page) => {
+    if (page > 0 && page <= pagination.totalPages) {
+      setIsLoading(true)
+
+      // scroll immediately to top
+      topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+
+      setCurrentPage(page)
+
+      if (searchQuery) {
+        searchColleges(searchQuery, page).then((results) => {
+          setUniversities(results.colleges)
+          setPagination(results.pagination)
+          setIsLoading(false)
+        })
+      } else {
+        fetchColleges(page).then(() => {
+          setIsLoading(false)
+        })
+      }
+    }
+  }
 
   const FilterModal = () => (
     <div className='fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center'>
@@ -231,7 +246,7 @@ const CollegeFinder = () => {
     </div>
   )
   return (
-    <div className='max-w-[1600px] mx-auto p-6'>
+    <div className='max-w-[1600px] mx-auto p-6' ref={topRef}>
       <div className='flex justify-between items-center mb-6'>
         <div className='flex items-center gap-4'>
           <h2 className='text-xl font-semibold'>Filters</h2>
@@ -257,7 +272,7 @@ const CollegeFinder = () => {
           <div className='flex gap-4'>
             <h2 className='text-xl font-semibold'>Schools</h2>
             <span className='text-gray-500'>
-              ({pagination.totalRecords || '0'} Colleges)
+              ({pagination.totalCount || '0'} schools)
             </span>
           </div>
         </div>
@@ -294,8 +309,10 @@ const CollegeFinder = () => {
             ))}
           </div> */}
           {isLoading ? (
-            <div className='flex justify-center items-center h-64'>
-              <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500'></div>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+              {[...Array(6)].map((_, index) => (
+                <ShimmerCard key={index} />
+              ))}
             </div>
           ) : (
             // <>
@@ -310,42 +327,17 @@ const CollegeFinder = () => {
               {universities.length > 0 ? (
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
                   {universities.map((university, index) => (
-                    <Link href={`/colleges/${university.slug}`} key={index}>
-                      <UniversityCard key={index} {...university} />
-                    </Link>
+                    <UniversityCard key={index} {...university} />
                   ))}
                 </div>
               ) : (
                 <NoResultsFound />
               )}
               {!searchQuery && universities.length > 0 && (
-                <div className='flex justify-center items-center gap-4 mt-8'>
-                  <button
-                    onClick={() => setCurrentPage((prev) => prev - 1)}
-                    disabled={!pagination.hasPreviousPage}
-                    className={`px-4 py-2 rounded-lg ${
-                      pagination.hasPreviousPage
-                        ? 'bg-blue-500 text-white hover:bg-blue-600'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                  >
-                    Previous
-                  </button>
-                  <span className='text-gray-600'>
-                    Page {currentPage} of {pagination.totalPages}
-                  </span>
-                  <button
-                    onClick={() => setCurrentPage((prev) => prev + 1)}
-                    disabled={!pagination.hasNextPage}
-                    className={`px-4 py-2 rounded-lg ${
-                      pagination.hasNextPage
-                        ? 'bg-blue-500 text-white hover:bg-blue-600'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                  >
-                    Next
-                  </button>
-                </div>
+                <Pagination
+                  pagination={pagination}
+                  onPageChange={handlePageChange}
+                />
               )}
             </>
           )}

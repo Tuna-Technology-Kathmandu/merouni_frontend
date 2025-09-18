@@ -22,7 +22,7 @@ const ApplyNow = ({ college }) => {
       </div> */}
       <div className='flex flex-row items-center bg-[#0A6FA7] text-white rounded-lg p-2 cursor-pointer'>
         <a href={college.website_url} target='_blank'>
-          Apply Now
+          Visit School
         </a>
         <FaArrowRight className='ml-2' />
       </div>
