@@ -19,7 +19,7 @@ const CollegeTeach = ({ degree }) => {
             )
 
             return (
-              <Link href={`/college/${college.slugs}`} key={index}>
+              <Link href={`/colleges/${college.slugs}`} key={index}>
                 <div className=' m-2 flex items-center gap-4 p-4 border rounded-lg mb-3 hover:shadow-md transition-shadow cursor-pointer'>
                   <div className='w-12 h-12 relative flex-shrink-0'>
                     <img

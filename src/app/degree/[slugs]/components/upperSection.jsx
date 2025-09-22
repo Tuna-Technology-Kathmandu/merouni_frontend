@@ -115,9 +115,8 @@ const ImageSection = ({ degree }) => {
              max-lg:[&_ol]:space-y-1
              max-lg:[&_ul]:space-y-1
         '
-        >
-          {degree?.learning_outcomes || ''}
-        </p>
+          dangerouslySetInnerHTML={{ __html: degree?.learning_outcomes || '' }}
+        ></p>
       </div>
 
       {/* careers opportunities */}
