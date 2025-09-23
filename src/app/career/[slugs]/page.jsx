@@ -34,7 +34,6 @@ const ShowCareer = ({ params }) => {
         const resolvedParams = await params
         const slugs = resolvedParams.slugs
         const careerData = await getCareer(slugs)
-        console.log(careerData)
         setData(careerData.item)
       } catch (err) {
         setError(err.message)
@@ -86,72 +85,96 @@ const ShowCareer = ({ params }) => {
     )
   }
 
-  console.log('data', data.createdAt)
-
   return (
     <>
       <Header />
       <Navbar />
-      <main>
-        <div className='w-full h-[250px] sm:h-[400px] md:h-[480px] relative'>
+      <main className=''>
+        <div className='w-full h-[25vh] md:h-[400px] relative'>
           <img
-            src={data.featuredImage || 'https://placehold.co/600x400'}
+            src={data.featuredImage || '/images/job.webp'}
             alt={data.title || 'data'}
             className='w-full h-full object-cover'
           />
 
           <div className='absolute bg-black/50 w-full h-full inset-0 '></div>
         </div>
-        <div className='p-6'>
+        <div className='p-12 px-18 max-lg:py-8 w-full max-[868px]:gap-0 max-[868px]:pb-0'>
           <div className=' w-[15rem] min-[433px]:w-[20rem] sm:w-[30rem] lg:w-[50rem] md:w-[40rem] font-bold'>
-            <p className='text-lg leading-1 md:text-3xl lg:text-4xl '>
+            <p className='font-bold text-lg sm:text-2xl md:leading-10 '>
               {data?.title ?? ''}
             </p>
-            <div className='font-medium text-xs lg:text-[16px] my-2'>
-              {data?.careerAuthor?.firstName ?? 'Mero'}{' '}
-              {data?.careerAuthor?.middleName || ''}{' '}
-              {data?.careerAuthor?.lastName ?? 'Uni'}
-            </div>
-            <div className='font-medium text-xs  my-2 text-slate-600'>
+
+            <div className='font-medium text-xs my-3 text-slate-600'>
               {formatDate(data?.createdAt)}
             </div>
           </div>
 
           {/* description */}
-          <p className='text-[13px] mt-6 leading-7 max-md:leading-5 md:text-sm lg:text-base text-justify'>
+          <h2 className='font-bold text-base sm:text-lg leading-10 mb-4 max-sm:mb-2 text-left mt-6 max-'>
+            Description
+          </h2>
+          <p className='text-gray-800 leading-7 max-md:leading-5 text-justify text-xs md:text-sm lg:text-base'>
             {data?.description ?? ''}
           </p>
 
           {/* content */}
           <div
-            className='text-[13px] md:text-sm text-justify lg:text-base mt-4 !leading-7 
-          [&_ul]:list-disc 
-          [&_ol]:list-decimal 
-          [&_li]:ml-10 
-          [&_li]:mb-1 
-          [&_li]:mt-1 
-          !max-w-none 
-          text-black
-          
-          /* Table wrapper styles */
-          [&_.table-wrapper]:overflow-x-auto
-          [&_.table-wrapper]:my-4
-          [&_.table-wrapper]:w-full
-          [&_.table-wrapper]:[scrollbar-width:thin]
-          [&_.table-wrapper]:[scrollbar-color:gray-300_transparent]
-          
-          /* Table styles */
-          [&_table]:min-w-full
-          [&_table]:border-collapse
-          [&_th]:bg-gray-100
-          [&_th]:p-2
-          [&_th]:text-left
-          [&_th]:border
-          [&_th]:border-gray-300
-          [&_td]:p-2
-          [&_td]:border
-          [&_td]:border-gray-300
-          [&_tr:nth-child(even)]:bg-gray-50'
+            className='text-gray-800 mt-4 leading-7 text-justify 
+             text-xs md:text-sm lg:text-base
+
+             [&>iframe]:w-full 
+             [&>iframe]:max-w-[calc(100vw-40px)] 
+             [&>iframe]:aspect-video 
+             [&>iframe]:h-auto
+             [&>iframe]:rounded-lg 
+             [&>iframe]:mt-4
+             [&>iframe]:mx-auto
+             [&>iframe]:block
+
+             /* Table wrapper styles */
+             [&_.table-wrapper]:overflow-x-auto
+             [&_.table-wrapper]:my-4
+             [&_.table-wrapper]:w-full
+             [&_.table-wrapper]:[scrollbar-width:thin]
+             [&_.table-wrapper]:[scrollbar-color:gray-300_transparent]
+
+             /* Table styles */
+             [&_table]:min-w-full
+             [&_table]:border-collapse
+             [&_th]:bg-gray-100
+             [&_th]:p-2
+             [&_th]:text-left
+             [&_th]:border
+             [&_th]:border-gray-300
+             [&_td]:p-2
+             [&_td]:border
+             [&_td]:border-gray-300
+             [&_tr:nth-child(even)]:bg-gray-50
+
+             /* Heading styles */
+             [&_h1]:text-2xl
+             [&_h1]:font-bold
+             [&_h1]:mt-8
+             [&_h1]:mb-4
+             [&_h2]:text-xl
+             [&_h2]:font-bold
+             [&_h2]:mt-6
+             [&_h2]:mb-3
+
+             /* List styles */
+             [&_ol]:pl-8 
+             [&_ol]:my-4
+             [&_ol]:space-y-2
+             [&_ul]:list-disc 
+             [&_ul]:pl-8 
+             [&_ul]:my-4
+             [&_ul]:space-y-2
+             [&_li]:pl-2
+             max-lg:[&_ol]:text-sm
+             max-lg:[&_ul]:text-sm
+             max-lg:[&_ol]:space-y-1
+             max-lg:[&_ul]:space-y-1'
             dangerouslySetInnerHTML={{ __html: processContent(data?.content) }}
           />
         </div>
