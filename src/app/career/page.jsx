@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { getCareers } from './actions'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Search } from 'lucide-react'
 import Footer from '../components/Frontpage/Footer'
@@ -71,6 +70,12 @@ export default function CareersPage() {
     fetchData()
   }, [debouncedSearch, careersData.pagination.currentPage])
 
+  useEffect(() => {
+    if (careersData.items.length > 0) {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [careersData.items])
+
   const handlePageChange = (page) => {
     if (page > 0 && page <= careersData.pagination.totalPages) {
       setCareersData((prev) => ({
@@ -80,7 +85,6 @@ export default function CareersPage() {
           currentPage: page
         }
       }))
-      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
@@ -88,125 +92,128 @@ export default function CareersPage() {
     <>
       <Header />
       <Navbar />
-      <div className='container mx-auto px-4 py-8'>
-        <div className='mb-8'>
-          <div className='border-b-2 border-[#0A70A7] w-[45px] mt-8 mb-4 pl-2'>
-            <span className='text-2xl font-bold mr-2'>Career</span>
+      <div className='min-h-screen bg-gradient-to-b from-[#f7fbfc] to-[#e9f3f7] py-12 px-6'>
+        <div className='container mx-auto'>
+          {/* Title */}
+          <div className='text-center mb-12'>
+            <h1 className='text-2xl md:text-3xl font-extrabold text-gray-800'>
+              Explore Career{' '}
+              <span className='text-[#0A70A7]'>Opportunities</span>
+            </h1>
+            <p className='mt-3 text-gray-600 max-w-2xl mx-auto text-sm'>
+              Join our team and build a rewarding career with us. Browse open
+              positions and find the role that best fits your skills and
+              aspirations.
+            </p>
           </div>
-
-          {/* Search Bar */}
-          <div className='flex justify-end w-full mb-6'>
-            <div className='relative w-full max-w-md'>
+          {/* Search */}
+          <div className='flex justify-center mb-10 md:mb-20 '>
+            <div className='relative w-full max-w-lg'>
               <input
                 type='text'
                 placeholder='Search career...'
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value)
-                  // Reset to first page when searching
                   handlePageChange(1)
                 }}
-                className='w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                className='w-full px-5 py-3 pl-12 rounded-2xl border border-gray-300 shadow-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all'
               />
-              <Search className='absolute left-3 top-2.5 h-5 w-5 text-gray-400' />
+              <Search className='absolute left-4 top-3.5 h-5 w-5 text-gray-400' />
             </div>
           </div>
-        </div>
 
-        {/* Error State */}
-        {error && (
-          <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6'>
-            Error loading careers: {error}
-          </div>
-        )}
+          {/* Error State */}
+          {error && (
+            <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6'>
+              Error loading careers: {error}
+            </div>
+          )}
 
-        {/* No Results */}
-        {!loading && !error && careersData.items?.length === 0 && (
-          <div className='text-center py-12'>
-            <h3 className='text-lg font-medium text-gray-900'>
-              No careers found
-            </h3>
-            <p className='mt-2 text-gray-600'>
-              Try adjusting your search query
-            </p>
-          </div>
-        )}
+          {/* No Results */}
+          {!loading && !error && careersData.items?.length === 0 && (
+            <div className='text-center py-12'>
+              <h3 className='text-lg font-medium text-gray-900'>
+                No careers found
+              </h3>
+              <p className='mt-2 text-gray-600'>
+                Try adjusting your search query
+              </p>
+            </div>
+          )}
 
-        {/* Cards Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-          {loading
-            ? // Show shimmer cards while loading
-              Array.from({ length: 6 }).map((_, index) => (
-                <CareerCardShimmer key={`shimmer-${index}`} />
-              ))
-            : // Show actual career cards when not loading
-              careersData.items?.map((career) => (
-                <Link
-                  href={`/career/${career.slugs}`}
-                  key={career.id}
-                  className='block hover:shadow-xl transition-shadow duration-300'
-                >
-                  <div className='bg-white rounded-lg shadow-md overflow-hidden h-full'>
-                    <div className='relative h-48 w-full bg-slate-400'>
-                      {career?.featuredImage !== '' ? (
-                        <Image
-                          src={career?.featuredImage}
+          {/* Cards Grid */}
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+            {loading
+              ? // Show shimmer cards while loading
+                Array.from({ length: 6 }).map((_, index) => (
+                  <CareerCardShimmer key={`shimmer-${index}`} />
+                ))
+              : // Show actual career cards when not loading
+                careersData.items?.map((career) => (
+                  <Link
+                    href={`/career/${career.slugs}`}
+                    key={career.id}
+                    className='block hover:shadow-xl transition-shadow duration-300'
+                  >
+                    <div className='bg-white rounded-lg shadow-md overflow-hidden h-full'>
+                      <div className='h-48 w-full'>
+                        <img
+                          src={career?.featuredImage || '/images/job.webp'}
                           alt={career.title}
                           fill
-                          className='object-cover'
+                          className='object-cover w-full h-full '
                         />
-                      ) : (
-                        <div className='w-full h-full bg-transparent'></div>
-                      )}
-                    </div>
-                    <div className='p-4'>
-                      <h2 className='text-xl font-semibold text-gray-900 mb-2 line-clamp-2'>
-                        {career.title}
-                      </h2>
-                      <p className='text-gray-600 mb-4 line-clamp-3'>
-                        {career.description}
-                      </p>
-                      <div className='text-sm text-gray-500'>
-                        <p>Posted: {formatDate(career.createdAt)}</p>
+                      </div>
+                      <div className='p-4'>
+                        <h2 className='text-xl max-md:text-lg font-semibold text-gray-900 mb-2 line-clamp-2'>
+                          {career.title}
+                        </h2>
+                        <p className='text-gray-600 mb-4 line-clamp-3 max-sm:text-sm max-sm:mb-2'>
+                          {career.description}
+                        </p>
+                        <div className='text-sm text-gray-500'>
+                          <p>Posted: {formatDate(career.createdAt)}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
-        </div>
-
-        {/* Pagination */}
-        {!loading && careersData.pagination?.totalPages > 1 && (
-          <div className='flex items-center justify-center gap-4 mt-8'>
-            <button
-              onClick={() =>
-                handlePageChange(careersData.pagination.currentPage - 1)
-              }
-              disabled={careersData.pagination.currentPage === 1}
-              className='px-4 py-2 bg-gray-300 rounded-full mx-2 disabled:opacity-50'
-            >
-              &lt;
-            </button>
-
-            <span className='text-gray-700'>
-              Page {careersData.pagination.currentPage} of{' '}
-              {careersData.pagination.totalPages}
-            </span>
-
-            <button
-              onClick={() =>
-                handlePageChange(careersData.pagination.currentPage + 1)
-              }
-              disabled={
-                careersData.pagination.currentPage ===
-                careersData.pagination.totalPages
-              }
-              className='px-4 py-2 bg-gray-300 rounded-full mx-2 disabled:opacity-50'
-            >
-              &gt;
-            </button>
+                  </Link>
+                ))}
           </div>
-        )}
+
+          {/* Pagination */}
+          {!loading && careersData.pagination?.totalPages > 1 && (
+            <div className='flex items-center justify-center gap-4 mt-8'>
+              <button
+                onClick={() =>
+                  handlePageChange(careersData.pagination.currentPage - 1)
+                }
+                disabled={careersData.pagination.currentPage === 1}
+                className='px-4 py-2 bg-gray-300 rounded-full mx-2 disabled:opacity-50'
+              >
+                &lt;
+              </button>
+
+              <span className='text-gray-700'>
+                Page {careersData.pagination.currentPage} of{' '}
+                {careersData.pagination.totalPages}
+              </span>
+
+              <button
+                onClick={() =>
+                  handlePageChange(careersData.pagination.currentPage + 1)
+                }
+                disabled={
+                  careersData.pagination.currentPage ===
+                  careersData.pagination.totalPages
+                }
+                className='px-4 py-2 bg-gray-300 rounded-full mx-2 disabled:opacity-50'
+              >
+                &gt;
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       <Footer />
     </>

@@ -44,11 +44,11 @@ const Sponsors = () => {
                   <img
                     src={
                       banner.banner_galleries?.[0]?.url ||
-                      '/images/meroUniSmall.gif'
+                      '/images/meroUniLarge.gif'
                     }
                     onError={(e) => {
                       e.target.onerror = null
-                      e.target.src = '/images/meroUniSmall.gif'
+                      e.target.src = '/images/meroUniLarge.gif'
                     }}
                     alt={`Banner position ${banner.display_position}`}
                     className='h-16 md:h-20 lg:h-36 rounded-lg shadow-lg'

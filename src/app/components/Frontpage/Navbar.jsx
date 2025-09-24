@@ -102,12 +102,6 @@ const Navbar = () => {
                 Career
               </Link>
               <Link
-                href='/vacancy'
-                className='block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer'
-              >
-                Vacancy
-              </Link>
-              <Link
                 href='/wishlist'
                 className='block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer'
               >
@@ -117,19 +111,6 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-
-      {/* <div className="block md:hidden bg-[#30ad8f] h-28 pt-[10px]">
-        <div className="flex gap-8 md:gap-16 overflow-x-auto parent-div my-4 px-4">
-          {["Tribhuvan", "Kathmandu", "Purbanchal", "Pokhara", "Paschimanchal"].map((university) => (
-            <div
-              key={university}
-              className="border-2 rounded-full bg-[#D9DEE0] text-black p-2 px-6 font-bold whitespace-nowrap hover:bg-[#30ad8f] hover:text-white cursor-pointer"
-            >
-              {university} University
-            </div>
-          ))}
-        </div>
-      </div> */}
     </>
   )
 }

@@ -114,6 +114,7 @@ const Events = () => {
 
   if (error) return <div>Error: {error}</div>
 
+  // console.log('featuredEvents',featuredEvent)
   return (
     <>
       <Header />
