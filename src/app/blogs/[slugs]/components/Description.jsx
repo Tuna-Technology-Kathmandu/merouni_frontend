@@ -16,7 +16,7 @@ const Description = ({ news }) => {
 
   return (
     <>
-      <div className='mb-6 full max-[868px]:w-full'>
+      <div className='w-full'>
         <div className='text-xl font-bold'>Description</div>
         <div
           className='text-[13px] mt-4 leading-7 max-md:leading-5 md:text-sm lg:text-base text-justify'

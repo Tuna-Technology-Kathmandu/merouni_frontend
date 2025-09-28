@@ -29,33 +29,49 @@ const Hero = ({ news }) => {
       'width=550,height=420'
     )
   }
+  const formatDate = (dateString) => {
+    if (!dateString) return ''
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
   const handleInstagramShare = () => {
     navigator.clipboard.writeText(`${shareTitle}\n${currentUrl}`)
     alert('Link copied to clipboard! You can now paste it in Instagram')
   }
   return (
-    <div className='relative'>
-      <div className='w-full h-[250px] sm:h-[400px] md:h-[480px]'>
-        <img
-          src={news.featuredImage || 'https://placehold.co/600x400'}
-          alt={news.title || 'News'}
-          className='w-full h-full'
-        />
+    <div className='relative px-16 pt-14  max-sm:px-9 max-w-[1600px] mx-auto'>
+      <div className='w-full'>
+        <h1 className='font-bold text-[38px] max-1xl:text-[28px] max-md:text-[26px] leading-[44px] max-md:leading-[34px]  max-sm:text-[20px] max-sm:leading-[27px] '>
+          {news?.title}
+        </h1>
 
-        <div className='absolute bg-black/20 w-full h-full inset-0 '></div>
-        <div className='absolute left-5 bg-black/70 rounded-md p-3 md:left-10 lg:left-20 bottom-[20%] text-white w-[15rem] min-[433px]:w-[20rem] sm:w-[30rem] lg:w-[50rem] md:w-[40rem] font-bold  px-4'>
-          <p className='text-lg leading-1 md:text-3xl lg:text-4xl '>
-            {news.title}
+        <div className='mt-2'>
+          <p className='font-medium text-[12px] text-black/70'>
+            <span>{formatDate(news?.createdAt)}</span>
           </p>
-          <div className='font-medium text-xs my-2'>
-            - {news.newsAuthor.firstName} {news.newsAuthor.middleName || ''}{' '}
-            {news.newsAuthor.lastName}
-          </div>
         </div>
+        <div className='font-medium text-[12px] my-2 text-black/70'>
+          By {news.newsAuthor.firstName} {news.newsAuthor.middleName || ''}{' '}
+          {news.newsAuthor.lastName}
+        </div>
+
+        {news.featuredImage && (
+          <div className='w-full h-[456px] max-1xl:h-[380px] max-sm:h-[300px] overflow-hidden my-12 max-1xl:my-8 max-md:my-5'>
+            <img
+              src={news?.featuredImage}
+              alt={news?.title}
+              className='object-cover w-full h-full'
+            />
+          </div>
+        )}
       </div>
 
       {/* Social share icons remain the same */}
-      <div className='space-y-4 z-10 text-[#b0b2c3] fixed left-4 top-[30%] lg:block md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col'>
+      <div className='space-y-4 z-10 text-[#b0b2c3] fixed right-4 top-[30%] lg:block md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col'>
         <div className='text-black font-bold text-sm'>Share</div>
         <div className='flex flex-col gap-4 items-center'>
           {/* Facebook */}

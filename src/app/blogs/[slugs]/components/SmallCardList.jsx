@@ -13,10 +13,11 @@ const SmallCardList = ({ news }) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' }
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
+
   return (
     <div className=''>
-      <h1 className='text-xl font-bold mb-7'>Related Blogs</h1>
-      <div className='w-full flex gap-7 flex-wrap justify-center'>
+      <h1 className='text-2xl text-center font-bold mb-7'>Related Blogs</h1>
+      <div className='w-full grid grid-cols-4 gap-7 max-[1265px]:grid-cols-3 max-[795px]:grid-cols-2 max-[513px]:grid-cols-1 '>
         {news.map((blog) => (
           <Link href={`/blogs/${blog.slug}`} key={blog.id}>
             <RelatedCard

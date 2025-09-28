@@ -32,8 +32,6 @@ const FeaturedDegree = () => {
     getdegree()
   }, [])
 
-  console.log('degree', degree)
-
   const handleCardClick = (slug) => {
     console.log(slug)
     router.push(`degree/${slug}`)

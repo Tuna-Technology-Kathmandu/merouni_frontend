@@ -1,8 +1,6 @@
 'use client'
 
 const BannerLayout = ({ banners = [], loading = false }) => {
-  console.log('new', banners)
-
   if (loading) {
     return (
       <div className='flex gap-4 md:gap-3 lg:gap-3 justify-center flex-wrap sm:flex-nowrap xl:flex-nowrap'>

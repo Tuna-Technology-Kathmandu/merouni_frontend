@@ -11,7 +11,8 @@ const RelatedCard = ({ image, date, title, description, slug }) => {
     })
   }
   return (
-    <div className='relative my-2 bg-white rounded-2xl shadow-md border border-gray-300 w-[270px] max-[1016px]:w-[250px] h-[300px] max-[1016px]:h-[290px]'>
+    // <div className='relative my-2 bg-white rounded-2xl shadow-md border border-gray-300 w-[270px] max-[1016px]:w-[250px] h-[300px] max-[1016px]:h-[290px]'>
+    <div className='relative my-2 bg-white rounded-2xl shadow-md border border-gray-300 h-[300px] max-[914px]:h-auto'>
       <div className='h-[170px] relative'>
         <img
           src={image}
@@ -34,18 +35,6 @@ const RelatedCard = ({ image, date, title, description, slug }) => {
           style={{ minHeight: '60px' }} // Ensures consistent height
         >
           {description}
-        </div>
-
-        <div className='flex items-center text-gray-500 justify-between gap-3 absolute top-3 right-3'>
-          <button
-            onClick={handleShareClick}
-            className='flex flex-row bg-white p-1 rounded-full'
-          >
-            <Share size={20} />
-          </button>
-          <button className='flex flex-row gap-1 bg-white rounded-full p-1'>
-            <FaRegHeart size={20} />
-          </button>
         </div>
       </div>
     </div>

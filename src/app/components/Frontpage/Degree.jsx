@@ -18,7 +18,6 @@ const DegreeScroller = () => {
       console.log('running')
       const response = await getEvents()
       const events = response.items
-      console.log('Events:', response)
       setAllEvents(events)
     } catch (error) {
       setError('Failed to load Events')

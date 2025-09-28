@@ -22,7 +22,6 @@ const NewsDetailsPage = ({ params }) => {
       try {
         const resolvedParams = await params
         const slugs = resolvedParams.slugs
-        console.log('NEws slug:', slugs)
         const newsData = await getNewsBySlug(slugs)
 
         setNews(newsData.blog || null) // Set eventData directly
@@ -52,14 +51,15 @@ const NewsDetailsPage = ({ params }) => {
       ) : (
         <>
           <Hero news={news} />
-          <div className='p-12 px-18 flex w-full gap-16 max-[868px]:gap-0 max-[868px]:pb-0'>
-            <Description news={news} />
-            <Cardlist news={relatedNews} />
-          </div>
-          <div className='hidden max-[868px]:block'>
+          <div className='px-16 max-sm:px-9 max-w-[1600px] mx-auto'>
             <Banner />
           </div>
-          <div className='p-12 px-18 hidden max-[868px]:block '>
+          <div className=' px-16 max-sm:px-9 max-w-[1600px] mx-auto mt-12'>
+            <Description news={news} />
+            {/* <Cardlist news={relatedNews} /> */}
+          </div>
+
+          <div className=' px-16 max-sm:px-9 my-14 max-w-[1600px] mx-auto'>
             <SmallCardList news={relatedNews} />
           </div>
         </>

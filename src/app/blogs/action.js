@@ -43,7 +43,6 @@ export async function getNewsBySlug(slug) {
     }
 
     const data = await response.json()
-    console.log('Data:', data.blog)
     return data // Note the change from 'item' to 'event'
   } catch (error) {
     console.error('Error fetching blogs details:', error)

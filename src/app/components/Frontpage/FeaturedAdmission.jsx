@@ -23,7 +23,7 @@ const FeaturedAdmission = () => {
       setLoading(false)
     }
   }
-  console.log(data)
+
   // Skeleton loading component
   const SkeletonLoader = () => (
     <div className='bg-white rounded-lg shadow-lg overflow-hidden animate-pulse'>
