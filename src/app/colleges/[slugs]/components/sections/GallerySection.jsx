@@ -11,7 +11,6 @@ const GallerySection = ({ college }) => {
     return item.file_type == 'video'
   })
 
-  console.log('selectedImage', selectedImage)
   return (
     <div>
       <h2 className='text-sm md:text-lg lg:text-xl font-bold'>Gallery</h2>

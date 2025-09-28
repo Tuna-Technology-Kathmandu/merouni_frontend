@@ -42,9 +42,7 @@ const CourseDescription = ({ params }) => {
 
   const fetchDegreeDetails = async (slugs) => {
     try {
-      console.log('Fetching degree details for slug:', slugs)
       const degreeData = await getDegreeBySlug(slugs)
-      console.log('Fetched data:', degreeData)
 
       if (degreeData) {
         setDegree(degreeData)

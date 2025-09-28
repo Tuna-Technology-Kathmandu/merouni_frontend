@@ -2,8 +2,6 @@ import React from 'react'
 import EventCard from './Cards' // Import the EventCard component
 import Link from 'next/link'
 const Cardlist = ({ events }) => {
-  console.log(events)
-
   return (
     <div className=' px-16 max-sm:px-9 max-w-[1600px] mx-auto bg-[#E7E7E7] p-8 mt-20 rounded-md '>
       <div className='max-w-full md:max-w-[1600px] md:mx-auto'>

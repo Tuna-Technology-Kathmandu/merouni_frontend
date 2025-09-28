@@ -34,7 +34,6 @@ const UniversityPage = () => {
     try {
       const response = await fetchUniversities(search, page)
       setUniversities(response.items)
-      console.log('uniresponse', response)
       setPagination((prev) => ({
         ...prev,
         totalPages: response?.totalPages,

@@ -5,7 +5,6 @@ import Link from 'next/link'
 const SingleConsultancy = ({ consultancy }) => {
   window.scrollTo(0, 0)
   let data = consultancy[0]
-  console.log(data)
 
   const destinations = data?.destination ? JSON.parse(data.destination) : []
   const address = data?.address ? JSON.parse(data.address) : {}

@@ -9,7 +9,6 @@ const ProgramSection = ({ college }) => {
   }
   const handleDegree = (degree) => {
     route.push(`/degree/${degree}`)
-    console.log(degree)
   }
   return (
     <div>

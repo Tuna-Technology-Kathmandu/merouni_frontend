@@ -25,7 +25,6 @@ export async function getColleges(page = 1, filters = {}) {
 
     // Log the final URL for debugging
     const url = `${process.env.baseUrl}${process.env.version}/college?${queryParams.toString()}`
-    console.log('Fetching URL:', url)
 
     const response = await fetch(url, {
       cache: 'no-store'
@@ -69,11 +68,6 @@ export async function getColleges(page = 1, filters = {}) {
 }
 
 export async function searchColleges(query) {
-  console.log(
-    'URL OF search:',
-    `${process.env.baseUrl}${process.env.version}/college?q=${query}`
-  )
-
   try {
     const response = await fetch(
       `${process.env.baseUrl}${process.env.version}/college?q=${query}`,
@@ -87,7 +81,6 @@ export async function searchColleges(query) {
     }
 
     const data = await response.json()
-    console.log('College Search Results:', data)
 
     // Handle case where no colleges are found
     if (!data.items || data.items.length === 0) {
@@ -135,9 +128,6 @@ export async function searchColleges(query) {
 
 export async function getCollegeBySlug(slug) {
   try {
-    // console.log("Fetching college details for slug:", slug);
-    console.log(`${process.env.baseUrl}${process.env.version}/college/${slug}`)
-
     const response = await fetch(
       `${process.env.baseUrl}${process.env.version}/college/${slug}`,
       {
@@ -149,14 +139,11 @@ export async function getCollegeBySlug(slug) {
       }
     )
 
-    console.log('RESPOnse:', response)
-
     if (!response.ok) {
       throw new Error('Failed to fetch College Details')
     }
 
     const data = await response.json()
-    console.log('Data:', data)
     return data.item
   } catch (error) {
     console.error('Error fetching college details:', error)
@@ -174,7 +161,6 @@ export async function getPrograms(searchQuery = '') {
     }
 
     const url = `${process.env.baseUrl}${process.env.version}/program?${queryParams.toString()}`
-    console.log('Fetching programs from:', url)
 
     const response = await fetch(url, {
       method: 'GET',
@@ -206,7 +192,6 @@ export async function getUniversity(searchQuery = '') {
     }
 
     const url = `${process.env.baseUrl}${process.env.version}/university?${queryParams.toString()}`
-    console.log('Fetching universities from:', url)
 
     const response = await fetch(url, {
       method: 'GET',

@@ -26,8 +26,6 @@ export default function ExamsPage() {
     totalCount: 0
   })
 
-  console.log(exams)
-
   useEffect(() => {
     const fetchExams = async () => {
       setLoading(true)
@@ -50,8 +48,6 @@ export default function ExamsPage() {
 
     fetchExams()
   }, [debouncedSearch, pagination.currentPage])
-
-  console.log(debouncedSearch)
 
   const handleClick = (id) => {
     let single = exams.filter((items) => {

@@ -1,7 +1,6 @@
 import React from 'react'
 
 const EventCard = ({ event }) => {
-  console.log('events', event)
   let events = {
     description:
       'This is test. Explore diverse fields of study to find the best fit for your academic and career goals test test test test test test test test test test test'

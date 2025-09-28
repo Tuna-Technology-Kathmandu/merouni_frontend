@@ -8,8 +8,6 @@ const RelatedUniversities = ({ university }) => {
   const [universities, setUniversities] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
-  console.log('related', universities)
-
   useEffect(() => {
     if (university) {
       // Only fetch if degree prop exists

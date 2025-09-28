@@ -81,8 +81,6 @@ const CollegeOverview = ({ college }) => {
     })
   }
 
-  console.log('visibleSections', college?.google_map_url)
-
   return (
     <section className='px-[75px] max-md:px-[30px] mb-20 max-md:mb-10 flex justify-between gap-16 max-md:gap-2 w-full max-md:flex-col-reverse max-md:items-between'>
       {/* Sidebar - Only shows visible sections */}

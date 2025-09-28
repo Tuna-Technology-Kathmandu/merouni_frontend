@@ -82,7 +82,6 @@ const Events = () => {
   }
 
   const handlePageChange = (page) => {
-    console.log('Pages response from pagination controle:', page)
     if (page > 0 && page <= pagination.totalPages) {
       setPagination((prev) => ({
         ...prev,
@@ -96,7 +95,6 @@ const Events = () => {
       if (query) {
         setIsSearching(true)
         const results = await searchEvent(query)
-        console.log('Search Results in event:', results)
         setAllEvents(results.items)
         setPagination(results.pagination)
         setIsSearching(false)

@@ -15,7 +15,6 @@ const DegreeScroller = () => {
   const loadEvents = async () => {
     try {
       setLoading(true)
-      console.log('running')
       const response = await getEvents()
       const events = response.items
       setAllEvents(events)

@@ -79,16 +79,6 @@ const Header = () => {
               <span className='text-white font-bold text-lg'>Login</span>
             </button>
           </Link>
-
-          <div className='border-2  border-solid border-[#0A6FA7] rounded-lg'>
-            <button
-              type='button'
-              className='  w-[150px] p-2 flex flex-row justify-center items-center'
-            >
-              <span className=' font-bold text-lg'>Join Us</span>
-              <GoArrowUpRight size={25} />
-            </button>
-          </div>
         </div>
       </div>
 

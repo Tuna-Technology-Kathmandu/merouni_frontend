@@ -16,12 +16,9 @@ const RelatedColleges = ({ college }) => {
     setIsLoading(true)
     try {
       const data = await getColleges()
-      console.log('RElated clz', data)
-
       const filteredColleges = data.colleges.filter(
         (c) => c.collegeId !== college._id
       )
-      console.log('Filtered Colleges:', filteredColleges)
       // setColleges(data.colleges);
       setColleges(filteredColleges)
     } catch (error) {
@@ -31,9 +28,9 @@ const RelatedColleges = ({ college }) => {
     }
   }
 
-  useEffect(() => {
-    console.log('Obtained Colleges:', colleges)
-  }, [])
+  // useEffect(() => {
+  //   console.log('Obtained Colleges:', colleges)
+  // }, [])
 
   return (
     <div className='flex flex-col max-w-[1600px] mx-auto mb-20 px-24'>

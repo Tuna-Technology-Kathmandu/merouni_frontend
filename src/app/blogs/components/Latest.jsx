@@ -32,7 +32,6 @@ const Latest = () => {
     try {
       const response = await getBlogs(page)
       setBlogs(response.items)
-      console.log('featued', response.items)
     } catch (error) {
       setError('Failed to load latest Blogs')
       console.error('Error fetching latest blogs:', error)

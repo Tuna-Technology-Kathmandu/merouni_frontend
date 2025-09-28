@@ -14,10 +14,6 @@ export const fetchUniversities = async (search = '', page = 1) => {
 
 export const getUniversityBySlug = async (slug) => {
   try {
-    console.log('Fetching university details for slug:', slug)
-    console.log(
-      `${process.env.baseUrl}${process.env.version}/university/${slug}`
-    )
     const response = await fetch(
       `${process.env.baseUrl}${process.env.version}/university/${slug}`,
       {

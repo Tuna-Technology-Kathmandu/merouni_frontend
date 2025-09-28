@@ -16,7 +16,6 @@ export async function getAdmission(search = '', page = 1) {
     }
 
     const data = await response.json()
-    console.log('Admission API Response:', data)
 
     // Return the full response including pagination data
     return {

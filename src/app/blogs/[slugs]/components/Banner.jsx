@@ -9,7 +9,6 @@ const Banner = () => {
       try {
         const data = await getBanner(1, 9999) // Set page & limit here
         setBanners(data.items) // Adjust based on API structure
-        console.log('abnenrData', data)
       } catch (err) {
         console.error('Error loading banners', err)
       }

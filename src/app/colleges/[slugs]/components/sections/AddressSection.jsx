@@ -2,7 +2,6 @@ import React from 'react'
 // import GoogleMap from './../GoogleMap'
 
 const AddressSection = ({ college }) => {
-  console.log(college)
   return (
     <div>
       <h2 className='text-sm md:text-lg lg:text-xl font-bold'>Address</h2>

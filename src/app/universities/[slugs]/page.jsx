@@ -23,7 +23,6 @@ const UniversityDetailPage = ({ params }) => {
       try {
         const resolvedParams = await params
         const slugs = resolvedParams.slugs
-        console.log('SLUGS:', slugs)
         fetchUniversityDetails(slugs)
       } catch (error) {
         console.error('Error resolving params:', error)
@@ -35,9 +34,7 @@ const UniversityDetailPage = ({ params }) => {
 
   const fetchUniversityDetails = async (slugs) => {
     try {
-      console.log('Fetching university details for slug:', slugs)
       const universityData = await getUniversityBySlug(slugs)
-      console.log('Fetched data:', universityData)
 
       if (universityData) {
         setUniversity(universityData)
@@ -52,9 +49,9 @@ const UniversityDetailPage = ({ params }) => {
     }
   }
 
-  useEffect(() => {
-    console.log('University Data:', university)
-  }, [university])
+  // useEffect(() => {
+  //   console.log('University Data:', university)
+  // }, [university])
 
   if (loading) {
     return <Loading />
