@@ -51,7 +51,7 @@ const NewsDetailsPage = ({ params }) => {
       ) : (
         <>
           <Hero news={news} />
-          <div className='px-16 max-sm:px-9 max-w-[1600px] mx-auto'>
+          <div className='px-16 max-sm:px-9 pt-10 max-w-[1600px] mx-auto'>
             <Banner />
           </div>
           <div className=' px-16 max-sm:px-9 max-w-[1600px] mx-auto mt-12'>

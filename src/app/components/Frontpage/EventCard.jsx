@@ -23,7 +23,7 @@ const EventCard = ({ event }) => {
       {/* <div className="flex justify-center mb-4"> */}
       <div className='h-[200px]'>
         <img
-          src={event?.image || '/images/events.png'}
+          src={event?.image || '/images/events.webp'}
           alt={`${event.title} logo`}
           className='w-full h-full object-cover rounded-t-2xl'
         />

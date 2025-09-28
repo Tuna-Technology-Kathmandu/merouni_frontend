@@ -346,7 +346,7 @@ export default function EventManager() {
   const EditorMemo = React.memo(({ initialData, onChange }) => (
     <CKBlogs id='editor1' initialData={initialData} onChange={onChange} />
   ))
-  console.log('selectedColleges', selectedColleges)
+
   const handleDialogClose = () => {
     setIsDialogOpen(false)
     setDeleteId(null)
@@ -580,8 +580,8 @@ export default function EventManager() {
         <div className='mb-4'>
           <label htmlFor='content'>Content</label>
           <EditorMemo
-            initialData={getValues('description')}
-            onChange={(data) => setValue('description', data)}
+            initialData={getValues('content')}
+            onChange={(data) => setValue('content', data)}
           />
         </div>
 

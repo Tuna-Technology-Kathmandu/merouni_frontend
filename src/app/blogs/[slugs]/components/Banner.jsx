@@ -21,8 +21,6 @@ const Banner = () => {
   const displayBanners = [1, 2, 3].map((position) =>
     banners.find((banner) => banner.display_position === position)
   )
-  console.log('banners', banners)
-  console.log('display', displayBanners)
   return (
     // <div className='min-w-[80px] flex flex-col gap-6  max-[868px]:flex-row max-[868px]:w-full max-[886px]:px-12'>
     //   <img

@@ -58,7 +58,8 @@ const Page = () => {
       <div className='w-full md:w-1/5 block md:hidden mt-8'>
         <SideBanner banners={banners} loading={loading} />
       </div>
-      {/* <FeaturedAdmission /> */}
+
+      {/* <Events /> */}
       <Degree />
 
       {/* the degree is the upcoming events section, not to be confused */}

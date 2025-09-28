@@ -12,7 +12,7 @@ const ThisWeek = ({ thisWeekEvents, title, subtitle }) => {
       <div className='flex flex-col lg:flex-row gap-8 md:gap-24 max-w-7xl mx-auto'>
         {/* Text Content */}
         <div className='flex flex-col gap-4 px-4 md:px-8 lg:w-1/3'>
-          <h2 className='font-extrabold text-4xl md:text-5xl text-[#0A6FA7]'>
+          <h2 className='font-extrabold text-xl md:text-4xl text-[#0A6FA7]'>
             {title}
           </h2>
           <p className='font-bold text-sm md:text-base text-gray-600'>
@@ -30,8 +30,7 @@ const ThisWeek = ({ thisWeekEvents, title, subtitle }) => {
               <Link href={`/events/${event.slugs}`} key={index}>
                 <div
                   key={index}
-                  className='transition-all duration-300 ease-in-out'
-                  style={{ minWidth: 'max-content' }}
+                  className='transition-all duration-300 ease-in-out w-[300px]'
                 >
                   <EventCard event={event} />
                 </div>

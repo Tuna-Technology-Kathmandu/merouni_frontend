@@ -8,6 +8,7 @@ import Hero from './components/Hero'
 import Description from './components/Description'
 import Cardlist from './components/Cardlist'
 import Loading from '../../components/Loading'
+import Banner from '@/app/blogs/[slugs]/components/Banner'
 
 const EventDetailsPage = ({ params }) => {
   const [event, setEvent] = useState(null)
@@ -54,7 +55,12 @@ const EventDetailsPage = ({ params }) => {
       ) : (
         <>
           <Hero event={event} />
-          <Description event={event} />
+          <div className='px-16 max-sm:px-9 max-w-[1600px] pt-10 mx-auto'>
+            <Banner />
+          </div>
+          <div className=' px-16 max-sm:px-9 max-w-[1600px] mx-auto mt-12'>
+            <Description event={event} />
+          </div>
           <Cardlist events={relatedEvents} />
         </>
       )}

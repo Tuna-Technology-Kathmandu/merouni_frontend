@@ -1,15 +1,6 @@
 import React from 'react'
-import { FaEye, FaRegHeart } from 'react-icons/fa'
-import { Share } from 'lucide-react'
-import { toast, ToastContainer } from 'react-toastify'
 
-const RelatedCard = ({ image, date, title, description, slug }) => {
-  const handleShareClick = () => {
-    const blogUrl = `${window.location.origin}/blogs/${slug}`
-    navigator.clipboard.writeText(blogUrl).then(() => {
-      toast.success('Blog URL copied to clipboard!')
-    })
-  }
+const RelatedCard = ({ image, title, description }) => {
   return (
     // <div className='relative my-2 bg-white rounded-2xl shadow-md border border-gray-300 w-[270px] max-[1016px]:w-[250px] h-[300px] max-[1016px]:h-[290px]'>
     <div className='relative my-2 bg-white rounded-2xl shadow-md border border-gray-300 h-[300px] max-[914px]:h-auto'>

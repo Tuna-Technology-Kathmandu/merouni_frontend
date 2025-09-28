@@ -2,29 +2,41 @@ import React from 'react'
 import Image from 'next/image'
 
 const EventCard = ({ photo, month, day, title, description }) => {
+  const truncateString = (str, maxLength) => {
+    if (str.length > maxLength) {
+      return str.slice(0, maxLength) + '...'
+    }
+    return str
+  }
+
   return (
-    <div className='md:min-w-[350px] md:max-w-[350px] mx-2 my-2 bg-white rounded-2xl  shadow-md border border-gray-300 overflow-hidden '>
-      {/* <!-- Top Section: Image --> */}
-      {/* <div className="flex justify-center mb-4"> */}
-      <img src={photo} alt={`${title} logo`} className='w-full object-cover' />
-      {/* </div> */}
+    <div className='relative my-2 bg-white rounded-2xl shadow-md border border-gray-300 h-[320px] max-[914px]:h-auto'>
+      <div className='h-[170px] relative'>
+        <img
+          src={photo || '/images/events.webp'}
+          alt={`${title} logo`}
+          className='w-full h-full object-cover rounded-t-2xl'
+        />
+      </div>
 
-      <div className='flex items-start space-x-4 mb-4 p-3'>
-        {/* Month and Day */}
-        <div className='flex flex-col justify-between '>
-          <p className='text-blue-600 text-lg font-bold p-2'>{month}</p>
-          <p className='text-2xl font-extrabold text-gray-700 p-2'>{day}</p>
-        </div>
+      {/* Content Section */}
+      <div className='p-3'>
+        {/* Date */}
+        <p className=' mb-1 text-[13px] font-medium text-[#0A70A7]'>
+          {month} {day}
+        </p>
 
-        {/* Title and Description */}
-        <div className='flex-1'>
-          <h3 className='text-lg font-bold text-gray-900 p-2'>{title}</h3>
-          <p
-            className='text-gray-700 text-sm p-2'
-            dangerouslySetInnerHTML={{
-              __html: description.slice(0, 70) + '...'
-            }}
-          ></p>
+        {/* Title */}
+        <h2 className='text-lg font-bold text-gray-900 mb-2'>
+          {truncateString(title, 20)}
+        </h2>
+
+        {/* Description */}
+        <div
+          className='text-gray-600 text-[13px] mb-4 max-[1016px]:text-xs'
+          style={{ minHeight: '60px' }} // Ensures consistent height
+        >
+          {truncateString(description, 100)}
         </div>
       </div>
     </div>

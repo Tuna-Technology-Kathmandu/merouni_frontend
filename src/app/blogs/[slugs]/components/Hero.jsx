@@ -45,7 +45,7 @@ const Hero = ({ news }) => {
   return (
     <div className='relative px-16 pt-14  max-sm:px-9 max-w-[1600px] mx-auto'>
       <div className='w-full'>
-        <h1 className='font-bold text-[38px] max-1xl:text-[28px] max-md:text-[26px] leading-[44px] max-md:leading-[34px]  max-sm:text-[20px] max-sm:leading-[27px] '>
+        <h1 className='font-bold text-[28px] max-md:text-[26px] leading-[44px] max-md:leading-[34px]  max-sm:text-[20px] max-sm:leading-[27px] '>
           {news?.title}
         </h1>
 

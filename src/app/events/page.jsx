@@ -51,7 +51,6 @@ const Events = () => {
       setAllLoading(true)
       const response = await getEvents(page)
       const events = response.items
-      console.log('Events:', response)
       setAllEvents(events)
       setPagination({
         currentPage: response.pagination.currentPage,
@@ -114,7 +113,6 @@ const Events = () => {
 
   if (error) return <div>Error: {error}</div>
 
-  // console.log('featuredEvents',featuredEvent)
   return (
     <>
       <Header />
@@ -126,16 +124,16 @@ const Events = () => {
         <div className='mx-auto'>
           {featuredEvent && featuredEvent.event_host && (
             <div className='flex flex-col lg:flex-row items-center justify-between p-0 lg:p-10 max-w-[1600px] mx-auto '>
-              <div className='order-1 lg:order-2 w-full lg:w-1/3 flex justify-end mt-0 mb-2 lg:mb-0 lg:mt-0 bg-red-100 h-[400px]'>
+              <div className='order-1 lg:order-2 w-full lg:w-1/3 flex justify-end mt-0 mb-2 lg:mb-0 lg:mt-0 h-[400px] max-lg:h-[300px]'>
                 {isMobile ? (
                   <img
-                    src='/images/events.png'
+                    src={featuredEvent.image || '/images/events.webp'}
                     alt={featuredEvent.title ?? 'Featured Event'}
-                    className='lg:rounded-lg rounded-none shadow-md w-full h-full'
+                    className='shadow-md w-full h-full '
                   />
                 ) : (
                   <img
-                    src='/images/events.png'
+                    src={featuredEvent.image || '/images/events.webp'}
                     alt={featuredEvent.title ?? 'Featured Event'}
                     className='lg:rounded-lg rounded-none shadow-md w-full h-full'
                   />
@@ -180,27 +178,36 @@ const Events = () => {
                   <div className='flex flex-col items-center'>
                     <p className='text-sm font-bold whitespace-nowrap'>Time</p>
                     <p className='whitespace-nowrap'>
-                      {JSON.parse(featuredEvent.event_host)?.time ??
-                        'No Time Available'}
+                      {(() => {
+                        try {
+                          const host = JSON.parse(featuredEvent.event_host) // parse the JSON string
+                          return host?.time
+                            ? new Date(
+                                `1970-01-01T${host.time}:00`
+                              ).toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true
+                              })
+                            : 'No Time Available'
+                        } catch (e) {
+                          return 'Invalid Time Data'
+                        }
+                      })()}
                     </p>
                   </div>
                 </div>
 
                 {/* Buttons */}
                 <div className='order-1 lg:order-2  flex flex-row mb-6 lg:mb-0 items-center justify-center lg:items-center lg:justify-start lg:flex-row gap-4'>
-                  <button className='border-2 border-black text-black px-2 py-1 lg:px-6 lg:py-2 rounded-full lg:rounded-lg hover:bg-gray-800 hover:text-white transition-all flex flex-row items-center justify-between mt-5'>
-                    <span className='pr-2 lg:pr-4 font-semibold text-sm lg:text-base'>
-                      View More
-                    </span>
-                    <IoIosArrowDroprightCircle size={25} />
-                  </button>
-                  <a
-                    href='#'
-                    className='text-[#3D3D3D] hover:text-blue-700 underline flex items-center mt-5'
-                  >
-                    <span className='text-sm lg:text-base'>Apply Here</span>
-                    <IoArrowUp className='rotate-45' />
-                  </a>
+                  <Link href={`/events/${featuredEvent.slugs}`}>
+                    <button className='border-2 border-black text-black px-2 py-1 lg:px-6 lg:py-2 rounded-full lg:rounded-lg hover:bg-gray-800 hover:text-white transition-all duration-300 flex flex-row items-center justify-between mt-5'>
+                      <span className='pr-2 lg:pr-4 font-semibold text-sm lg:text-base'>
+                        View More
+                      </span>
+                      <IoIosArrowDroprightCircle size={25} />
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -211,24 +218,24 @@ const Events = () => {
 
           {/* This Week's Events */}
 
-          {/* {thisWeekEvents.length > 1 && ( */}
-          <Thisweek
-            title='This week Events'
-            subtitle='Connect, learn, and celebrate together'
-            thisWeekEvents={thisWeekEvents}
-          />
-          {/* )} */}
+          {thisWeekEvents.length > 0 && (
+            <Thisweek
+              title='This week Events'
+              subtitle='Connect, learn, and celebrate together'
+              thisWeekEvents={thisWeekEvents}
+            />
+          )}
 
           {/* Upcoming Events */}
-          {/* {nextWeekEvents.length > 1 && ( */}
-          <div className='mt-8'>
-            <Thisweek
-              title='Upcoming Events'
-              subtitle='Don’t miss what’s happening around you'
-              thisWeekEvents={nextWeekEvents}
-            />
-          </div>
-          {/* )} */}
+          {nextWeekEvents.length > 0 && (
+            <div className='mt-8'>
+              <Thisweek
+                title='Upcoming Events'
+                subtitle='Don’t miss what’s happening around you'
+                thisWeekEvents={nextWeekEvents}
+              />
+            </div>
+          )}
 
           {/* All events */}
           <div className='container mx-auto px-4 py-12 md:py-20'>
