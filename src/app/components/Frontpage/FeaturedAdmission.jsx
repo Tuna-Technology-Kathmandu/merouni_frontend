@@ -3,12 +3,14 @@ import React, { useEffect, useState } from 'react'
 import { getFeaturedCollege } from '../../[[...home]]/action'
 import { toast } from 'react-toastify'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 const FeaturedAdmission = () => {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  const router = useRouter()
   useEffect(() => {
     fetchItems()
   }, [])
@@ -49,7 +51,10 @@ const FeaturedAdmission = () => {
               <SkeletonLoader key={index} />
             ))
           : data.map((item) => (
-              <Link href={`/colleges/${item.slugs}`} key={item.id}>
+              <div
+                onClick={() => router.push(`/colleges/${item.slugs}`)}
+                key={item.id}
+              >
                 <div
                   key={item.id}
                   className='bg-white rounded-lg shadow-lg overflow-hidden lg:min-h-[12rem]'
@@ -71,10 +76,13 @@ const FeaturedAdmission = () => {
                           {item.address.city}, {item.address.country}
                         </p>
                         <p className='text-gray-400 text-[14px]'>
-                          {item.university.fullname}
+                          {item.university?.fullname}
                         </p>
                       </div>
-                      <Link href={`/colleges/apply/${item.slugs}`}>
+                      <Link
+                        href={`/colleges/apply/${item.slugs}`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <button className='flex items-center mt-3 sm:mt-0 bg-clientBtn text-white text-sm px-3 py-2 rounded-md hover:bg-blue-600 transition duration-300'>
                           Apply Now
                           <svg
@@ -96,7 +104,7 @@ const FeaturedAdmission = () => {
                     </div>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
       </div>
     </>

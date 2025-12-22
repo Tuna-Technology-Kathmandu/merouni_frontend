@@ -135,7 +135,7 @@ const MaterialCard = () => {
                 className='bg-white shadow-md rounded-2xl overflow-hidden transition-transform transform hover:scale-105'
               >
                 <img
-                  src='https://placehold.co/600x400'
+                  src={blog?.image}
                   alt={blog.title}
                   className='w-full h-48 object-cover'
                 />
@@ -144,11 +144,11 @@ const MaterialCard = () => {
                     <h1 className='text-lg font-semibold mb-2'>{blog.title}</h1>
                     <MdOutlineRemoveRedEye
                       className='w-6 h-6 cursor-pointer'
-                      onClick={() => window.open(blog.downloadUrl, '_blank')}
+                      onClick={() => window.open(blog?.file, '_blank')}
                     />
                   </div>
                   <a
-                    href={blog.downloadUrl} // The link to the PDF
+                    href={blog?.file} // The link to the PDF
                     download
                     className='w-full h-full'
                   >
