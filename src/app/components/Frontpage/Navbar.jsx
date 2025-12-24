@@ -101,6 +101,12 @@ const Navbar = () => {
               >
                 Career
               </Link>
+              {/* <Link
+                href='/courses'
+                className='block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer'
+              >
+               Courses
+              </Link> */}
               <Link
                 href='/wishlist'
                 className='block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer'

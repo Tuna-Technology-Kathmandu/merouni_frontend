@@ -3,16 +3,20 @@ import axios from 'axios'
 export const fetchCourses = async (
   credits = '',
   duration = '',
-  faculty = ''
+  faculty = '',
+  page = 1,
+  debouncedSearch
 ) => {
   try {
     const params = {}
     if (credits) params.credits = credits
     if (duration) params.duration = duration
     if (faculty) params.faculty = faculty
+    if (page) params.page = page
+    if (debouncedSearch) params.q = debouncedSearch
 
     const response = await axios.get(
-      `${process.env.baseUrl}${process.env.version}/course`,
+      `${process.env.baseUrl}${process.env.version}/course?limit=12`,
       { params }
     )
 
