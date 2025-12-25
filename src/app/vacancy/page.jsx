@@ -4,9 +4,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getCareers } from './actions'
 import { Search } from 'lucide-react'
-import Header from '../components/Frontpage/Header'
-import Navbar from '../components/Frontpage/Navbar'
-import Footer from '../components/Frontpage/Footer'
+import Header from '../../components/Frontpage/Header'
+import Navbar from '../../components/Frontpage/Navbar'
+import Footer from '../../components/Frontpage/Footer'
 import { useState, useEffect } from 'react'
 
 function formatDate(dateString) {

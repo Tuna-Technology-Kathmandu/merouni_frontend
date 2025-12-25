@@ -1,51 +1,92 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import { destr } from 'destr'
 import { toast } from 'react-toastify'
+import Link from 'next/link'
+import { useMutation } from '@tanstack/react-query'
+import { applyToCollege } from '../query/applyCollege.query'
 
 const FormSection = ({ id, college }) => {
+  const user = useSelector((state) => state.user?.data)
+  const parsedRole =
+    typeof user?.role === 'string' ? destr(user.role) || {} : user?.role || {}
+  const isStudent = !!parsedRole.student
+
+  // Check if user is logged in
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    // Check both Redux state and localStorage
+    const token =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('access_token')
+        : null
+    const hasUser = user !== null && user !== undefined
+    setIsLoggedIn(!!(token || hasUser))
+  }, [user])
+
   const [formData, setFormData] = useState({
     college_id: college?.id || 0,
     student_name: '',
     student_phone_no: '',
     student_email: '',
     student_description: '',
-    course: '' //later change with the backend
+    course: '' // later change with the backend
   })
 
   useEffect(() => {
     setFormData((prev) => ({
       ...prev,
-      college_id: college?.id || 0
+      college_id: college?.id || 0,
+      // Pre-fill student info if logged in
+      ...(isLoggedIn &&
+        user && {
+          student_name:
+            `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim(),
+          student_email: user?.email || '',
+          student_phone_no: user?.phoneNo || ''
+        })
     }))
-  }, [college?.id])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    college?.id,
+    isLoggedIn,
+    user?.firstName,
+    user?.lastName,
+    user?.email,
+    user?.phoneNo
+  ])
 
   const [errors, setErrors] = useState({})
-  const [loading, setLoading] = useState(false)
   const [showDrop, setShowDrop] = useState(false)
   const [selectedCourse, setSelectedCourse] = useState('select course')
+
+  // TanStack Query mutation for applying to college
+  const applyMutation = useMutation({
+    mutationFn: applyToCollege,
+    onSuccess: (data) => {
+      toast.success(data.message || 'College Applied Successfully')
+      setFormData({
+        college_id: '',
+        student_name: '',
+        student_phone_no: '',
+        student_email: '',
+        student_description: '',
+        course: ''
+      })
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Something went wrong. Please try again.')
+    }
+  })
 
   const validateForm = () => {
     const newErrors = {}
 
-    if (!formData.student_name.trim()) {
-      newErrors.student_name = 'Student name is required'
-    }
-
-    if (
-      !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(
-        formData.student_email
-      )
-    ) {
-      newErrors.student_email = 'Invalid email format'
-    }
-
-    if (!/^\d{10}$/.test(formData.student_phone_no)) {
-      newErrors.student_phone_no = 'Phone number must be exactly 10 digits'
-    }
-
     if (!formData.student_description.trim()) {
-      newErrors.student_description = 'Description is required'
+      // description is optional now; no error if empty
     }
     if (!formData.course) {
       newErrors.course = 'Please select a course'
@@ -74,38 +115,24 @@ const FormSection = ({ id, college }) => {
     e.preventDefault()
     if (!validateForm()) return
 
-    setLoading(true)
-    try {
-      const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/referral/self-apply`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
+    const payload = isStudent
+      ? {
+          student_id: user?.id,
+          referral_type: 'self',
+          college_id: formData.college_id,
+          course_id: formData.course || null,
+          description: formData.student_description
         }
-      )
+      : {
+          college_id: formData.college_id,
+          student_name: formData.student_name,
+          student_phone_no: formData.student_phone_no,
+          student_email: formData.student_email,
+          student_description: formData.student_description,
+          course: formData.course
+        }
 
-      const data = await response.json()
-      if (response.ok) {
-        toast.success(data.message || 'College Applied Successfully')
-        setFormData({
-          college_id: '',
-          student_name: '',
-          student_phone_no: '',
-          student_email: '',
-          student_description: '',
-          course: ''
-        })
-      } else {
-        toast.error(data?.message || 'Something went wrong. Please try again.')
-      }
-    } catch (error) {
-      toast.error('Connection error: ' + error.message)
-    } finally {
-      setLoading(false)
-    }
+    applyMutation.mutate({ payload, isStudent })
   }
 
   const courseOption = React.useMemo(() => {
@@ -134,99 +161,128 @@ const FormSection = ({ id, college }) => {
 
   console.log(formData)
 
-  return (
-    <div className='flex flex-col items-center bg-[#D9D9D9] bg-opacity-30 p-6'>
-      <h2 className='text-center text-2xl font-bold mb-6'>Apply For College</h2>
-      <div className='w-full max-w-3xl bg-white shadow-lg rounded-lg p-6'>
-        <form className='space-y-4' onSubmit={handleSubmit}>
-          <div>
-            <input
-              type='text'
-              name='student_name'
-              placeholder='Student Name'
-              value={formData.student_name}
-              onChange={handleChange}
-              className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-            />
-            {errors.student_name && (
-              <p className='text-red-500 text-sm'>{errors.student_name}</p>
-            )}
+  // If not logged in, show login/signup buttons
+  if (!isLoggedIn) {
+    return (
+      <div className='w-full max-w-3xl bg-white bg-opacity-95 backdrop-blur-sm shadow-lg rounded-lg p-8'>
+        <h2 className='text-center text-2xl font-bold mb-6'>
+          Apply For College
+        </h2>
+        <div className='text-center space-y-4'>
+          <p className='text-gray-700 text-lg'>
+            Please login or sign up to apply for this college.
+          </p>
+          <div className='flex items-center justify-center gap-4 pt-4'>
+            <Link href='/sign-in'>
+              <button className='px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors'>
+                Login
+              </button>
+            </Link>
+            <Link href='/signup'>
+              <button className='px-6 py-2 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors'>
+                Sign Up
+              </button>
+            </Link>
           </div>
-          <div>
-            <input
-              type='email'
-              name='student_email'
-              placeholder='Student Email'
-              value={formData.student_email}
-              onChange={handleChange}
-              className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-            />
-            {errors.student_email && (
-              <p className='text-red-500 text-sm'>{errors.student_email}</p>
-            )}
-          </div>
-          <div>
-            <input
-              type='tel'
-              name='student_phone_no'
-              placeholder='Student Phone Number'
-              value={formData.student_phone_no}
-              onChange={handleChange}
-              className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-            />
-            {errors.student_phone_no && (
-              <p className='text-red-500 text-sm'>{errors.student_phone_no}</p>
-            )}
-          </div>
-          <div className='relative'>
-            <h1
-              onClick={() => setShowDrop(!showDrop)}
-              className={`${selectedCourse == 'select course' ? 'text-black/40' : 'text-black'} w-full px-4 py-2 border rounded-lg cursor-pointer `}
-            >
-              {selectedCourse}
-            </h1>
-            {showDrop && (
-              <div className='absolute bg-white w-full rounded-lg mt-3 border border-ring-blue-500 overflow-hidden'>
-                {courseOption.map((item, index) => {
-                  return (
-                    <div
-                      onClick={() => handleDrop(item?.id, item?.program?.title)}
-                      key={index}
-                      className={`w-full hover:bg-slate-100 cursor-pointer py-2 px-4 ${index !== courseOption.length - 1 ? 'border-b-black/50 border-b-[0.4px]' : ''}`}
-                    >
-                      <p>{item?.program?.title}</p>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-          <div>
-            <textarea
-              name='student_description'
-              placeholder='Enter your description here..'
-              value={formData.student_description}
-              onChange={handleChange}
-              rows={3}
-              className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-            />
-            {errors.student_description && (
-              <p className='text-red-500 text-sm'>
-                {errors.student_description}
-              </p>
-            )}
-          </div>
-          <button
-            type='submit'
-            disabled={loading}
-            className={`w-full bg-[#011E3F] bg-opacity-80 text-white font-semibold py-2 rounded-lg transition duration-200 ${
-              loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#011E3F]'
-            }`}
-          >
-            {loading ? 'Submitting...' : 'Submit Application'}
-          </button>
-        </form>
+        </div>
       </div>
+    )
+  }
+
+  return (
+    <div className='w-full max-w-3xl bg-white bg-opacity-95 backdrop-blur-sm shadow-lg rounded-lg p-8'>
+      <h2 className='text-center text-2xl font-bold mb-6'>Apply For College</h2>
+      <form className='space-y-4' onSubmit={handleSubmit}>
+        <div>
+          <input
+            type='text'
+            name='student_name'
+            placeholder='Student Name'
+            value={formData.student_name}
+            onChange={handleChange}
+            disabled={isLoggedIn}
+            className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed'
+          />
+          {errors.student_name && (
+            <p className='text-red-500 text-sm'>{errors.student_name}</p>
+          )}
+        </div>
+        <div>
+          <input
+            type='email'
+            name='student_email'
+            placeholder='Student Email'
+            value={formData.student_email}
+            onChange={handleChange}
+            disabled={isLoggedIn}
+            className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed'
+          />
+          {errors.student_email && (
+            <p className='text-red-500 text-sm'>{errors.student_email}</p>
+          )}
+        </div>
+        <div>
+          <input
+            type='tel'
+            name='student_phone_no'
+            placeholder='Student Phone Number'
+            value={formData.student_phone_no}
+            onChange={handleChange}
+            disabled={isLoggedIn}
+            className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed'
+          />
+          {errors.student_phone_no && (
+            <p className='text-red-500 text-sm'>{errors.student_phone_no}</p>
+          )}
+        </div>
+        <div className='relative'>
+          <h1
+            onClick={() => setShowDrop(!showDrop)}
+            className={`${selectedCourse == 'select course' ? 'text-black/40' : 'text-black'} w-full px-4 py-2 border rounded-lg cursor-pointer `}
+          >
+            {selectedCourse}
+          </h1>
+          {showDrop && (
+            <div className='absolute bg-white w-full rounded-lg mt-3 border border-ring-blue-500 overflow-y-auto max-h-[200px] z-10 shadow-lg'>
+              {courseOption.map((item, index) => {
+                return (
+                  <div
+                    onClick={() => handleDrop(item?.id, item?.program?.title)}
+                    key={index}
+                    className={`w-full hover:bg-slate-100 cursor-pointer py-2 px-4 ${index !== courseOption.length - 1 ? 'border-b-black/50 border-b-[0.4px]' : ''}`}
+                  >
+                    <p>{item?.program?.title}</p>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+        <div>
+          <textarea
+            name='student_description'
+            placeholder='Enter your description here..'
+            value={formData.student_description}
+            onChange={handleChange}
+            rows={3}
+            className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+          />
+          {errors.student_description && (
+            <p className='text-red-500 text-sm'>{errors.student_description}</p>
+          )}
+        </div>
+        <button
+          type='submit'
+          disabled={applyMutation.isPending}
+          className={`w-full bg-[#011E3F] bg-opacity-80 text-white font-semibold py-2 rounded-lg transition duration-200 ${
+            applyMutation.isPending
+              ? 'opacity-50 cursor-not-allowed'
+              : 'hover:bg-[#011E3F]'
+          }`}
+        >
+          {applyMutation.isPending ? 'Submitting...' : 'Submit Application'}
+        </button>
+      </form>
     </div>
   )
 }

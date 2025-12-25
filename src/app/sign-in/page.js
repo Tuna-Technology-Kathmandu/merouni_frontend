@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/navigation'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { FaArrowLeft } from 'react-icons/fa'
 import { v4 as uuidv4 } from 'uuid'
 import { useDispatch, useSelector } from 'react-redux'
 import { addUser } from '../utils/userSlice'
@@ -11,7 +12,7 @@ import Link from 'next/link'
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
 
-const SignInPage = () => {
+const SignInPage = ({ defaultMode = 'login' }) => {
   const dispatch = useDispatch()
   const router = useRouter()
   const getDeviceId = () => {
@@ -23,7 +24,16 @@ const SignInPage = () => {
     return deviceId
   }
 
-  const [isLogin, setIsLogin] = useState(true)
+  // Check URL search params or prop to determine if we should show signup mode
+  const [isLogin, setIsLogin] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search)
+      const mode = searchParams.get('mode')
+      if (mode === 'signup') return false
+      if (mode === 'login') return true
+    }
+    return defaultMode === 'login'
+  })
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -169,6 +179,13 @@ const SignInPage = () => {
     <div className='min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8'>
       <div className='max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-md'>
         <div>
+          <Link
+            href='/'
+            className='inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 underline mb-4'
+          >
+            <FaArrowLeft className='w-3 h-3' />
+            <span>Back to homepage</span>
+          </Link>
           <h2 className='text-center text-3xl font-extrabold text-gray-900'>
             {isLogin ? 'Sign in to your account' : 'Create your account'}
           </h2>
@@ -278,7 +295,7 @@ const SignInPage = () => {
             )}
             {isLogin && (
               <Link href={`/forgot-password`} className='hover:cursor-pointer '>
-                <button className='text-blue-600 hover:underline'>
+                <button type='button' className='text-blue-600 hover:underline'>
                   Forgot Password?
                 </button>
               </Link>

@@ -3,13 +3,13 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { Search } from 'lucide-react'
 import { fetchCourses } from './actions' // Make sure this points to the updated version of fetchCourses
 
-import Navbar from '../components/Frontpage/Navbar'
-import Footer from '../components/Frontpage/Footer'
-import Header from '../components/Frontpage/Header'
-import Shimmer from '../components/Shimmer'
+import Navbar from '../../components/Frontpage/Navbar'
+import Footer from '../../components/Frontpage/Footer'
+import Header from '../../components/Frontpage/Header'
+import Shimmer from '../../components/Shimmer'
 
 import { getBanners } from '../action'
-import AdLayout from '../components/Frontpage/AdLayout'
+import AdLayout from '../../components/Frontpage/AdLayout'
 import Link from 'next/link'
 
 const CoursePage = () => {

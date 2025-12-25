@@ -72,7 +72,7 @@ export const fetchAllCourse = async () => {
 export const fetchAllUniversity = async () => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/university?limit=999999`
+      `${process.env.baseUrl}${process.env.version}/university?limit=100`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch universities')

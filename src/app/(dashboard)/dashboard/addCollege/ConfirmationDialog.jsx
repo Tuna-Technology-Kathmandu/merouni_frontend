@@ -16,37 +16,43 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 // Custom styled components
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialog-paper': {
-    borderRadius: '12px',
-    padding: theme.spacing(2),
-    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
-    background: theme.palette.background.paper
+    borderRadius: '8px',
+    padding: 0,
+    boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.15)',
+    background: theme.palette.background.paper,
+    minWidth: '320px',
+    maxWidth: '400px'
   }
 }))
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
-  fontSize: '1.5rem',
+  fontSize: '1.125rem',
   fontWeight: '600',
   textAlign: 'center',
   color: theme.palette.text.primary,
-  padding: theme.spacing(3)
+  padding: theme.spacing(2, 2, 1, 2),
+  margin: 0
 }))
 
 const StyledDialogContentText = styled(DialogContentText)(({ theme }) => ({
-  fontSize: '1rem',
+  fontSize: '0.875rem',
   textAlign: 'center',
   color: theme.palette.text.secondary,
-  padding: theme.spacing(2)
+  padding: theme.spacing(0, 2, 1, 2),
+  margin: 0
 }))
 
 const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
   justifyContent: 'center',
-  padding: theme.spacing(3),
+  padding: theme.spacing(1.5, 2, 2, 2),
+  gap: theme.spacing(1),
   '& .MuiButton-root': {
-    margin: theme.spacing(0, 2),
-    padding: theme.spacing(1, 4),
-    borderRadius: '8px',
+    margin: 0,
+    padding: theme.spacing(0.75, 2.5),
+    borderRadius: '6px',
     textTransform: 'none',
-    fontSize: '1rem'
+    fontSize: '0.875rem',
+    minWidth: '80px'
   }
 }))
 
@@ -62,7 +68,7 @@ const ConfirmationDialog = ({ open, onClose, onConfirm, title, message }) => {
       <StyledDialogTitle id='confirmation-dialog-title'>
         {title}
       </StyledDialogTitle>
-      <DialogContent>
+      <DialogContent sx={{ padding: '0 16px 8px 16px' }}>
         <StyledDialogContentText id='confirmation-dialog-description'>
           {message}
         </StyledDialogContentText>
@@ -73,9 +79,10 @@ const ConfirmationDialog = ({ open, onClose, onConfirm, title, message }) => {
           variant='outlined'
           color='primary'
           sx={{
-            border: '2px solid',
+            border: '1.5px solid',
             '&:hover': {
-              backgroundColor: 'rgba(25, 118, 210, 0.04)'
+              backgroundColor: 'rgba(25, 118, 210, 0.04)',
+              border: '1.5px solid'
             }
           }}
         >
@@ -84,15 +91,14 @@ const ConfirmationDialog = ({ open, onClose, onConfirm, title, message }) => {
         <Button
           onClick={onConfirm}
           variant='contained'
-          color='secondary'
           sx={{
-            backgroundColor: '#ff4444',
+            backgroundColor: '#ef4444',
             '&:hover': {
-              backgroundColor: '#cc0000'
+              backgroundColor: '#dc2626'
             }
           }}
         >
-          Confirm
+          Logout
         </Button>
       </StyledDialogActions>
     </StyledDialog>

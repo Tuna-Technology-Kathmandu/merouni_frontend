@@ -8,18 +8,25 @@ import {
 } from '../../../actions/userActions'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 
-import Loading from '@/app/components/Loading'
-import Table from '../../../components/Table'
-import { Edit2, Trash2 } from 'lucide-react'
+import Loading from '../../../../components/Loading'
+import Table from '../../../../components/Table'
+import { Edit2, Trash2, Search } from 'lucide-react'
 // import { getToken } from '@/app/action'
 // import { jwtDecode } from 'jwt-decode'
 import { authFetch } from '@/app/utils/authFetch'
 import ExportModal from './ExportModal'
+import { Modal } from '../../../../components/CreateUserModal'
 import { useSelector } from 'react-redux'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+
 export default function UsersManager() {
+  const { setHeading } = usePageHeading()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchTimeout, setSearchTimeout] = useState(null)
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false)
+  const [isFormOpen, setIsFormOpen] = useState(false)
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -110,8 +117,10 @@ export default function UsersManager() {
   )
 
   useEffect(() => {
+    setHeading('User Management')
     loadUsers()
-  }, [])
+    return () => setHeading(null)
+  }, [setHeading])
 
   const loadUsers = async (page = 1) => {
     try {
@@ -165,13 +174,6 @@ export default function UsersManager() {
     try {
       const token = localStorage.getItem('access_token')
       console.log('Query:', query)
-      // const tokenObj = await getToken()
-      // const token = tokenObj.value
-      // const decodedToken = jwtDecode(tokenObj.value)
-      // const roleObject = decodedToken.data.role
-      // const roleName = Object.keys(roleObject).filter(
-      //   (key) => roleObject[key] === 'true'
-      // )
 
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/users?q=${query}`,
@@ -205,6 +207,31 @@ export default function UsersManager() {
     }
   }
 
+  const handleSearchInput = (value) => {
+    setSearchQuery(value)
+
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    if (value === '') {
+      handleSearch('')
+    } else {
+      const timeoutId = setTimeout(() => {
+        handleSearch(value)
+      }, 300)
+      setSearchTimeout(timeoutId)
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout)
+      }
+    }
+  }, [searchTimeout])
+
   useEffect(() => {
     console.log('USErs searching:', users)
   }, [users])
@@ -237,7 +264,10 @@ export default function UsersManager() {
         }
       })
       setEditingId(null)
+      setShowPasswordField(false)
+      setShowPasswordValue(false)
       setError(null)
+      setIsFormOpen(false)
       loadUsers()
     } catch (err) {
       setError(`Failed to ${editingId ? 'update' : 'create'} user`)
@@ -259,10 +289,13 @@ export default function UsersManager() {
       lastName: user.lastName,
       email: user.email,
       phoneNo: user.phoneNo,
-      password: user.password ?? '',
+      password: '',
       roles: parsedRoles || {}
     })
     setEditingId(user.id)
+    setShowPasswordField(false)
+    setShowPasswordValue(false)
+    setIsFormOpen(true)
     setError(null)
   }
 
@@ -298,12 +331,75 @@ export default function UsersManager() {
     )
 
   return (
-    <div className='p-4 w-4/5 mx-auto'>
-      <h1 className='text-2xl font-bold mb-4'>User Management</h1>
+    <div className='p-4 w-full'>
+      <div className='flex justify-between items-center mb-4'>
+        {/* Search Bar */}
+        <div className='relative w-full max-w-md'>
+          <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+            <Search className='w-4 h-4 text-gray-500' />
+          </div>
+          <input
+            type='text'
+            value={searchQuery}
+            onChange={(e) => handleSearchInput(e.target.value)}
+            className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+            placeholder='Search users...'
+          />
+        </div>
+        {/* Buttons */}
+        <div className='flex gap-2'>
+          <button
+            onClick={() => {
+              setIsFormOpen(true)
+              setEditingId(null)
+              setShowPasswordField(false)
+              setShowPasswordValue(false)
+              setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: '',
+                phoneNo: '',
+                roles: {
+                  student: false,
+                  editor: false,
+                  admin: false
+                }
+              })
+            }}
+            className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
+          >
+            Add User
+          </button>
+          <button
+            onClick={() => setIsExportModalOpen(true)}
+            className='bg-gray-100 text-gray-800 px-4 py-2 rounded hover:bg-gray-200 border'
+          >
+            Export Users
+          </button>
+        </div>
+      </div>
 
-      {/* Form */}
-      {editingId && (
-        <form onSubmit={handleSubmit} className='mb-8 space-y-4'>
+      <Modal
+        isOpen={isFormOpen}
+        onClose={() => {
+          setIsFormOpen(false)
+          setEditingId(null)
+          setShowPasswordField(false)
+          setShowPasswordValue(false)
+          setFormData({
+            firstName: '',
+            lastName: '',
+            email: '',
+            phoneNo: '',
+            password: '',
+            roles: { student: false, editor: false, admin: false }
+          })
+        }}
+        title={editingId ? 'Edit User' : 'Add User'}
+        className='max-w-xl'
+      >
+        <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
             <input
               type='text'
@@ -409,43 +505,41 @@ export default function UsersManager() {
 
           {error && <div className='text-red-500'>{error}</div>}
 
-          <button
-            type='submit'
-            className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
-          >
-            Update User
-          </button>
-
-          <button
-            type='button'
-            onClick={() => {
-              setEditingId(null)
-              setShowPasswordField(false)
-              setFormData({
-                firstName: '',
-                lastName: '',
-                email: '',
-                phoneNo: '',
-                password: '',
-                roles: { editor: false, admin: false }
-              })
-            }}
-            className='ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600'
-          >
-            Cancel
-          </button>
+          <div className='flex justify-end gap-2 pt-2'>
+            <button
+              type='button'
+              onClick={() => {
+                setIsFormOpen(false)
+                setEditingId(null)
+                setShowPasswordField(false)
+                setShowPasswordValue(false)
+                setFormData({
+                  firstName: '',
+                  lastName: '',
+                  email: '',
+                  phoneNo: '',
+                  password: '',
+                  roles: { student: false, editor: false, admin: false }
+                })
+              }}
+              className='bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600'
+            >
+              Cancel
+            </button>
+            <button
+              type='submit'
+              className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
+            >
+              {editingId ? 'Update User' : 'Create User'}
+            </button>
+          </div>
         </form>
-      )}
+      </Modal>
 
-      {/* Button to open modal */}
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-4'
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
       >
-        Export User
-      </button>
-
-      <ExportModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <h2 className='text-xl font-bold mb-4'>Export Users</h2>
         <p>This is the modal content. You can add any form or content here.</p>
       </ExportModal>
@@ -457,6 +551,7 @@ export default function UsersManager() {
         pagination={pagination}
         onPageChange={(newPage) => loadUsers(newPage)}
         onSearch={handleSearch}
+        showSearch={false}
       />
     </div>
   )

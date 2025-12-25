@@ -8,13 +8,13 @@ import {
   updateScholarship,
   deleteScholarship
 } from './actions'
-import Loading from '../../../components/Loading'
-import Table from '../../../components/Table'
+import Loading from '../../../../components/Loading'
+import Table from '../../../../components/Table'
 import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import useAdminPermission from '@/core/hooks/useAdminPermission'
+import useAdminPermission from '@/hooks/useAdminPermission'
 const CKEditor = dynamic(() => import('../component/CKStable'), {
   ssr: false
 })

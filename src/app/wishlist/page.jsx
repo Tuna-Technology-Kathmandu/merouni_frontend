@@ -1,8 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
-import Navbar from '../components/Frontpage/Navbar'
-import Header from '../components/Frontpage/Header'
-import Footer from '../components/Frontpage/Footer'
+import Navbar from '../../components/Frontpage/Navbar'
+import Header from '../../components/Frontpage/Header'
+import Footer from '../../components/Frontpage/Footer'
 import UniversityCard from './Card'
 import { authFetch } from './authFetch'
 import { getToken } from '../action' // Import the function to get the token

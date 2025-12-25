@@ -1,120 +1,369 @@
 'use client'
-// import withAuth from '@/app/components/withAuth'
-import { motion } from 'framer-motion'
-import { useEffect } from 'react'
-import { FaUniversity, FaBookOpen, FaCalendarAlt } from 'react-icons/fa'
 
-const AdminPage = () => {
+import React, { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useSelector } from 'react-redux'
+import StudentEnrollmentGrowthChart from '../../../components/EnrollmentChart'
+import UserCard from '../../../components/UserCard'
+import Piechart from '../../../components/Piechart'
+import { destr } from 'destr'
+import { authFetch } from '@/app/utils/authFetch'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+
+const AdminDashboard = () => {
+  const { setHeading } = usePageHeading()
+  const [analytics, setAnalytics] = useState(null)
+  const [loading, setLoading] = useState(true)
+
   useEffect(() => {
-    document.title = 'MeroUni Admin Dashboard'
+    setHeading('Welcome to Admin Dashboard')
+    return () => setHeading(null)
+  }, [setHeading])
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadAnalytics = async () => {
+      try {
+        setLoading(true)
+        const res = await authFetch(
+          `${process.env.baseUrl}${process.env.version}/analytics/admin-overview`,
+          { cache: 'no-store' }
+        )
+
+        if (!res.ok) {
+          throw new Error('Failed to load analytics')
+        }
+
+        const json = await res.json()
+        if (!isMounted) return
+        setAnalytics(json?.data || null)
+      } catch (error) {
+        console.error('Error loading analytics:', error)
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadAnalytics()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
+
   return (
-    <div className='container mx-auto p-8'>
-      {/* Hero Section */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className='text-center mb-12'
-      >
-        <h1 className='text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
-          Welcome to MeroUni Dashboard
-        </h1>
-        <p className='text-lg text-gray-600 mb-6'>
-          Empowering students with the tools and resources to unlock their
-          educational potential in Nepal.
-        </p>
-      </motion.div>
-
-      {/* About Section */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className='bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg shadow-lg p-8 mb-8'
-      >
-        <h2 className='text-2xl font-semibold mb-6 text-gray-800'>
-          About MeroUni
-        </h2>
-        <p className='text-gray-700 leading-relaxed'>
-          MeroUni is Nepal&apos;s premier educational platform, dedicated to
-          bridging the gap between students and their dream institutions. We
-          offer a comprehensive database of colleges, universities, degree
-          programs, and entrance exam details, ensuring students have all the
-          information they need to make informed decisions about their future.
-        </p>
-      </motion.div>
-
-      {/* Features Grid */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className='grid grid-cols-1 md:grid-cols-3 gap-8'
-      >
-        {/* Feature 1: Find Colleges */}
-        <div className='bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 text-center'>
-          <div className='flex justify-center mb-4'>
-            <FaUniversity className='text-4xl text-blue-600' />
-          </div>
-          <h3 className='font-semibold mb-4 text-xl text-blue-600'>
-            Discover Institutions
-          </h3>
-          <p className='text-gray-600'>
-            Explore the best colleges and universities in Nepal, tailored to
-            your academic goals.
-          </p>
+    <div className='p-4 flex flex-col gap-8'>
+      <div className='w-full flex flex-col gap-8'>
+        {/* USER CARDS */}
+        <div className='flex gap-4 justify-between flex-wrap'>
+          <UserCard
+            type='Users'
+            value={analytics?.totalUsers}
+            loading={loading}
+          />
+          <UserCard
+            type='College'
+            value={analytics?.totalColleges}
+            loading={loading}
+          />
+          <UserCard
+            type='Agents'
+            value={analytics?.totalAgents}
+            loading={loading}
+          />
+          <UserCard
+            type='Events'
+            value={analytics?.totalEvents}
+            loading={loading}
+          />
+          <UserCard
+            type='Referrals'
+            value={analytics?.totalReferrals}
+            loading={loading}
+          />
         </div>
-
-        {/* Feature 2: Entrance Exams */}
-        <div className='bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 text-center'>
-          <div className='flex justify-center mb-4'>
-            <FaCalendarAlt className='text-4xl text-purple-600' />
+        {/* MIDDLE CHARTS */}
+        <div className='flex flex-col gap-8'>
+          <div className='w-full h-[450px]'>
+            <Piechart data={analytics?.educationalInstitutions} />
           </div>
-          <h3 className='font-semibold mb-4 text-xl text-purple-600'>
-            Entrance Exam Updates
-          </h3>
-          <p className='text-gray-600'>
-            Stay ahead with the latest information on upcoming entrance exams
-            and deadlines.
-          </p>
-        </div>
-
-        {/* Feature 3: Degree Programs */}
-        <div className='bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 text-center'>
-          <div className='flex justify-center mb-4'>
-            <FaBookOpen className='text-4xl text-blue-600' />
+          <div className='w-full h-[450px]'>
+            <StudentEnrollmentGrowthChart
+              data={analytics?.studentEnrollmentGrowth}
+            />
           </div>
-          <h3 className='font-semibold mb-4 text-xl text-blue-600'>
-            Explore Programs
-          </h3>
-          <p className='text-gray-600'>
-            Find the perfect degree program to match your interests and career
-            aspirations.
-          </p>
         </div>
-      </motion.div>
-
-      {/* Call to Action */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.6 }}
-        className='mt-12 text-center'
-      >
-        <h2 className='text-2xl font-semibold mb-4 text-gray-800'>
-          Ready to Take the Next Step?
-        </h2>
-        <p className='text-gray-600 mb-6'>
-          Join thousands of students who have found their path with MeroUni.
-          Start your journey today!
-        </p>
-        <button className='bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300'>
-          Get Started
-        </button>
-      </motion.div>
+      </div>
     </div>
   )
 }
 
-export default AdminPage
+const StudentDashboard = () => {
+  const user = useSelector((state) => state.user?.data)
+  const [applications, setApplications] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadApplications = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const res = await authFetch(
+          `${process.env.baseUrl}${process.env.version}/referral/user/referrals`,
+          { cache: 'no-store' }
+        )
+
+        if (!res.ok) {
+          throw new Error('Failed to load applied colleges')
+        }
+
+        const data = await res.json()
+        if (!isMounted) return
+        setApplications(Array.isArray(data) ? data : [])
+      } catch (err) {
+        console.error('Error loading applied colleges:', err)
+        if (isMounted) {
+          setError(err.message || 'Failed to load applied colleges')
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadApplications()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  return (
+    <div className='p-4 space-y-6'>
+      <div className='flex items-center justify-between mb-4'>
+        <div>
+          <h1 className='text-2xl font-bold'>
+            Welcome{user?.firstName ? `, ${user.firstName}` : ''} 👋
+          </h1>
+        </div>
+      </div>
+
+      <div className='grid gap-4 lg:grid-cols-5'>
+        {/* Applied Colleges - 80% width (4/5 columns) */}
+        <div className='lg:col-span-4'>
+          <div className='bg-white rounded-xl shadow p-4'>
+            <h2 className='text-lg font-semibold mb-2'>
+              Your Applied Colleges
+            </h2>
+            <p className='text-sm text-gray-600 mb-3'>
+              Track the status of the colleges you&apos;ve applied to.
+            </p>
+
+            {loading && (
+              <div className='flex justify-center items-center h-24'>
+                <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500'></div>
+              </div>
+            )}
+
+            {!loading && error && (
+              <p className='text-sm text-red-600'>Error: {error}</p>
+            )}
+
+            {!loading && !error && (
+              <>
+                {applications.length === 0 ? (
+                  <p className='text-sm text-gray-500'>
+                    You haven&apos;t applied to any colleges yet.
+                  </p>
+                ) : (
+                  <div className='space-y-3'>
+                    {applications.map((app) => (
+                      <div
+                        key={app.id}
+                        className='flex flex-col md:flex-row md:items-center justify-between border rounded-lg px-3 py-3 gap-2'
+                      >
+                        <div className='flex-1'>
+                          <div className='flex items-center gap-2 mb-1'>
+                            <p className='font-semibold text-gray-900'>
+                              {app?.referralCollege?.name || 'Unnamed College'}
+                            </p>
+                            {app?.status && (
+                              <span
+                                className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                                  app.status === 'ACCEPTED'
+                                    ? 'bg-green-100 text-green-800'
+                                    : app.status === 'REJECTED'
+                                      ? 'bg-red-100 text-red-800'
+                                      : 'bg-yellow-100 text-yellow-800'
+                                }`}
+                              >
+                                {app.status}
+                              </span>
+                            )}
+                          </div>
+                          <p className='text-xs text-gray-500 mt-1'>
+                            {app?.student_name}
+                            {app?.student_email
+                              ? ` • ${app.student_email}`
+                              : ''}
+                          </p>
+                          {app?.course && (
+                            <p className='text-xs text-gray-500 mt-1'>
+                              Course: {app.course.title}
+                            </p>
+                          )}
+                          {app?.createdAt && (
+                            <p className='text-xs text-gray-500 mt-1'>
+                              Applied:{' '}
+                              {new Date(app.createdAt).toLocaleDateString(
+                                'en-US',
+                                {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric'
+                                }
+                              )}
+                            </p>
+                          )}
+                          {app?.student_description && (
+                            <p className='text-xs text-gray-500 mt-1 line-clamp-2'>
+                              {app.student_description}
+                            </p>
+                          )}
+                          {app?.remarks && (
+                            <p className='text-xs text-gray-600 mt-2 italic border-l-2 border-gray-300 pl-2'>
+                              <span className='font-medium'>Remarks: </span>
+                              {app.remarks}
+                            </p>
+                          )}
+                        </div>
+                        {app?.referralCollege?.slugs && (
+                          <Link
+                            href={`/colleges/${app.referralCollege.slugs}`}
+                            className='inline-flex items-center text-sm font-medium text-blue-600 hover:underline'
+                          >
+                            View College
+                          </Link>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const InstitutionDashboard = () => {
+  const user = useSelector((state) => state.user?.data)
+  const [applicationsCount, setApplicationsCount] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadApplicationsCount = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const res = await authFetch(
+          `${process.env.baseUrl}${process.env.version}/referral/institution/applications`,
+          { cache: 'no-store' }
+        )
+
+        if (!res.ok) {
+          throw new Error('Failed to load applications')
+        }
+
+        const data = await res.json()
+        if (!isMounted) return
+        const applications = Array.isArray(data) ? data : []
+        setApplicationsCount(applications.length)
+      } catch (err) {
+        console.error('Error loading applications:', err)
+        if (isMounted) {
+          setError(err.message || 'Failed to load applications')
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadApplicationsCount()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  return (
+    <div className='p-4 space-y-6'>
+      <div className='flex items-center justify-between mb-4'>
+        <div>
+          <h1 className='text-2xl font-bold'>
+            Welcome{user?.firstName ? `, ${user.firstName}` : ''} 👋
+          </h1>
+          <p className='text-gray-600 text-sm mt-1'>
+            Manage applications for your institution.
+          </p>
+        </div>
+      </div>
+
+      <div className='flex gap-4 justify-between flex-wrap'>
+        <UserCard
+          type='Applications'
+          value={applicationsCount}
+          loading={loading}
+        />
+      </div>
+
+      {error && (
+        <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
+          <p className='text-sm text-red-600'>Error: {error}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const DashboardPage = () => {
+  const rawRole = useSelector((state) => state.user?.data?.role)
+  const role =
+    typeof rawRole === 'string' ? destr(rawRole) || {} : rawRole || {}
+
+  const isStudentOnly =
+    role?.student && !role?.admin && !role?.['super-admin'] && !role?.editor
+
+  const isInstitutionOnly =
+    role?.institution &&
+    !role?.admin &&
+    !role?.['super-admin'] &&
+    !role?.editor &&
+    !role?.student
+
+  if (isStudentOnly) {
+    return <StudentDashboard />
+  }
+
+  if (isInstitutionOnly) {
+    return <InstitutionDashboard />
+  }
+
+  return <AdminDashboard />
+}
+
+export default DashboardPage

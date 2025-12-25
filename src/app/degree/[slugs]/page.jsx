@@ -1,15 +1,15 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import Navbar from '../../components/Frontpage/Navbar'
-import Footer from '../../components/Frontpage/Footer'
-import Header from '../../components/Frontpage/Header'
+import Navbar from '../../../components/Frontpage/Navbar'
+import Footer from '../../../components/Frontpage/Footer'
+import Header from '../../../components/Frontpage/Header'
 import ImageSection from './components/upperSection'
 import Syllabus from './components/syllabus'
 import ApplyNow from './components/applyNow'
 import RelatedCourses from './components/RelatedCourses'
 import { getDegreeBySlug } from '../actions'
-import Loading from '../../components/Loading'
+import Loading from '../../../components/Loading'
 import CollegeTeach from './components/collegeTeach'
 
 const CourseDescription = ({ params }) => {

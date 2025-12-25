@@ -1,8 +1,8 @@
 'use client'
 import dynamic from 'next/dynamic'
 import React, { useState, useEffect, useMemo, useRef } from 'react'
-import Table from '../../../components/Table'
-import { Edit2, Trash2 } from 'lucide-react'
+import Table from '../../../../components/Table'
+import { Edit2, Trash2, Search } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { getEvents } from '@/app/action'
@@ -14,12 +14,15 @@ import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { fetchCategories } from '../category/action'
 import { X } from 'lucide-react'
-import useAdminPermission from '@/core/hooks/useAdminPermission'
+import useAdminPermission from '@/hooks/useAdminPermission'
+import { Modal } from '../../../../components/CreateUserModal'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
 
 export default function EventManager() {
+  const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
   const {
     register,
@@ -50,6 +53,7 @@ export default function EventManager() {
 
   const [events, setEvents] = useState([])
   const [editing, setEditing] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState({
     image: ''
@@ -67,6 +71,8 @@ export default function EventManager() {
   const [collegeSearch, setCollegeSearch] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [editorContent, setEditorContent] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchTimeout, setSearchTimeout] = useState(null)
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -79,8 +85,18 @@ export default function EventManager() {
   }, [])
 
   useEffect(() => {
+    setHeading('Events Management')
     loadEvents()
-  }, [])
+    return () => setHeading(null)
+  }, [setHeading])
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout)
+      }
+    }
+  }, [searchTimeout])
 
   const { requireAdmin } = useAdminPermission()
 
@@ -126,16 +142,6 @@ export default function EventManager() {
     setValue('college_id', updatedCollegeIds[0])
   }
 
-  const handleCancel = () => {
-    reset()
-    setEditing(false)
-    setEditingEventId(null)
-    setUploadedFiles({ image: '' })
-    setCollegeSearch('')
-    setSelectedColleges(null)
-    setEditorContent('')
-  }
-
   const handleSearch = async (query) => {
     if (!query) {
       loadEvents()
@@ -164,6 +170,23 @@ export default function EventManager() {
     } catch (error) {
       console.error('Error fetching event search results:', error.message)
       setEvents([])
+    }
+  }
+
+  const handleSearchInput = (value) => {
+    setSearchQuery(value)
+
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    if (value === '') {
+      handleSearch('')
+    } else {
+      const timeoutId = setTimeout(() => {
+        handleSearch(value)
+      }, 300)
+      setSearchTimeout(timeoutId)
     }
   }
   const initialContentRef = useRef(getValues('description'))
@@ -219,6 +242,8 @@ export default function EventManager() {
       // Reset form and state
       reset()
       setEditing(false)
+      setEditingEventId(null)
+      setIsOpen(false)
       setUploadedFiles({ image: '' })
       setCollegeSearch('')
       setSelectedColleges([])
@@ -236,6 +261,7 @@ export default function EventManager() {
     try {
       setEditing(true)
       setLoading(true)
+      setIsOpen(true)
       const response = await authFetch(
         `${process.env.baseUrl}${process.env.version}/event/${data.slugs}`,
         {
@@ -474,225 +500,339 @@ export default function EventManager() {
   )
 
   return (
-    <div className='p-4 w-4/5 mx-auto'>
-      <ToastContainer />
-      <h1 className='text-2xl font-bold mb-4'>Event Management</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className='mb-8'>
-        <div className='mb-4'>
-          <label htmlFor='title'>Event Title </label>
-
-          <input
-            {...register('title', { required: 'Title is required' })}
-            placeholder='Event Title'
-            className='w-full p-2 border rounded'
-          />
-          {errors.title && (
-            <span className='text-red-500'>{errors.title.message}</span>
-          )}
+    <>
+      <div className='p-4 w-full'>
+        <div className='flex justify-between items-center mb-4'>
+          {/* Search Bar */}
+          <div className='relative w-full max-w-md'>
+            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+              <Search className='w-4 h-4 text-gray-500' />
+            </div>
+            <input
+              type='text'
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              placeholder='Search events...'
+            />
+          </div>
+          {/* Button */}
+          <div className='flex gap-2'>
+            <button
+              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+              onClick={() => {
+                setIsOpen(true)
+                setEditing(false)
+                setEditingEventId(null)
+                reset()
+                setUploadedFiles({ image: '' })
+                setCollegeSearch('')
+                setSelectedColleges([])
+                setEditorContent('')
+              }}
+            >
+              Add Event
+            </button>
+          </div>
         </div>
+        <ToastContainer />
 
-        <div className='mb-4'>
-          <label htmlFor='category_id'>Categories *</label>
-          <select
-            {...register('category_id', { required: true })}
-            className='w-full p-2 border rounded'
-          >
-            <option value=''>Select Category</option>
-            {categories.map((category) => (
-              <option value={category.id} key={category.id}>
-                {category.title}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Modal
+          isOpen={isOpen}
+          onClose={() => {
+            setIsOpen(false)
+            setEditing(false)
+            setEditingEventId(null)
+            reset()
+            setUploadedFiles({ image: '' })
+            setCollegeSearch('')
+            setSelectedColleges([])
+            setEditorContent('')
+          }}
+          title={editing ? 'Edit Event' : 'Add Event'}
+          className='max-w-5xl'
+        >
+          <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className='flex flex-col flex-1 overflow-hidden'
+            >
+              <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+                {/* Basic Information */}
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <h2 className='text-xl font-semibold mb-4'>
+                    Event Information
+                  </h2>
+                  <div className='space-y-4'>
+                    <div>
+                      <label htmlFor='title' className='block mb-2'>
+                        Event Title *
+                      </label>
+                      <input
+                        {...register('title', {
+                          required: 'Title is required'
+                        })}
+                        placeholder='Event Title'
+                        className='w-full p-2 border rounded'
+                      />
+                      {errors.title && (
+                        <span className='text-red-500 text-sm'>
+                          {errors.title.message}
+                        </span>
+                      )}
+                    </div>
 
-        <div className='mb-4'>
-          <label className='block mb-2'>College</label>
-          <div className='flex flex-wrap gap-2 mb-2'>
-            {selectedColleges.map((college) => (
-              <div
-                key={college.id}
-                className='flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full'
-              >
-                <span>{college.name}</span>
+                    <div>
+                      <label htmlFor='category_id' className='block mb-2'>
+                        Categories *
+                      </label>
+                      <select
+                        {...register('category_id', { required: true })}
+                        className='w-full p-2 border rounded'
+                      >
+                        <option value=''>Select Category</option>
+                        {categories.map((category) => (
+                          <option value={category.id} key={category.id}>
+                            {category.title}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className='block mb-2'>College</label>
+                      <div className='flex flex-wrap gap-2 mb-2'>
+                        {selectedColleges.map((college) => (
+                          <div
+                            key={college.id}
+                            className='flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full'
+                          >
+                            <span>{college.name}</span>
+                            <button
+                              type='button'
+                              onClick={() => removeCollege(college.id)}
+                              className='text-blue-600 hover:text-blue-800'
+                            >
+                              <X className='w-4 h-4' />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className='relative'>
+                        <input
+                          type='text'
+                          disabled={selectedColleges.length > 0}
+                          value={collegeSearch}
+                          onChange={searchCollege}
+                          className='w-full p-2 border rounded'
+                          placeholder='Search college...'
+                        />
+
+                        {searchResults.length > 0 && (
+                          <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto'>
+                            {searchResults.map((college) => (
+                              <div
+                                key={college.id}
+                                onClick={() => addCollege(college)}
+                                className='p-2 hover:bg-gray-100 cursor-pointer'
+                              >
+                                {college.name}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Event Host Information */}
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <h2 className='text-xl font-semibold mb-4'>
+                    Event Host Information
+                  </h2>
+                  <div className='space-y-4'>
+                    <div>
+                      <label htmlFor='host' className='block mb-2'>
+                        Host *
+                      </label>
+                      <input
+                        {...register('event_host.host', {
+                          required: 'Host is required'
+                        })}
+                        placeholder='Event Host'
+                        className='w-full p-2 border rounded'
+                      />
+                      {errors.event_host?.host && (
+                        <span className='text-red-500 text-sm'>
+                          {errors.event_host.host.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                      <div>
+                        <label htmlFor='start_date' className='block mb-2'>
+                          Start Date *
+                        </label>
+                        <input
+                          type='date'
+                          {...register('event_host.start_date', {
+                            required: 'Start date is required'
+                          })}
+                          className='w-full p-2 border rounded'
+                        />
+                        {errors.event_host?.start_date && (
+                          <span className='text-red-500 text-sm'>
+                            {errors.event_host.start_date.message}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <label htmlFor='end_date' className='block mb-2'>
+                          End Date *
+                        </label>
+                        <input
+                          type='date'
+                          {...register('event_host.end_date', {
+                            required: 'End date is required'
+                          })}
+                          className='w-full p-2 border rounded'
+                        />
+                        {errors.event_host?.end_date && (
+                          <span className='text-red-500 text-sm'>
+                            {errors.event_host.end_date.message}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                      <div>
+                        <label htmlFor='time' className='block mb-2'>
+                          Time *
+                        </label>
+                        <input
+                          type='time'
+                          {...register('event_host.time', {
+                            required: 'Time is required'
+                          })}
+                          className='w-full p-2 border rounded'
+                          placeholder='Time'
+                        />
+                        {errors.event_host?.time && (
+                          <span className='text-red-500 text-sm'>
+                            {errors.event_host.time.message}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <label htmlFor='map_url' className='block mb-2'>
+                          Map Location
+                        </label>
+                        <input
+                          type='text'
+                          {...register('event_host.map_url')}
+                          placeholder='Map URL'
+                          className='w-full p-2 border rounded'
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description and Content */}
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <h2 className='text-xl font-semibold mb-4'>
+                    Description & Content
+                  </h2>
+                  <div className='space-y-4'>
+                    <div>
+                      <label htmlFor='description' className='block mb-2'>
+                        Description
+                      </label>
+                      <textarea
+                        {...register('description')}
+                        placeholder='Description'
+                        className='w-full p-2 border rounded'
+                        rows='5'
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor='content' className='block mb-2'>
+                        Content
+                      </label>
+                      <EditorMemo
+                        initialData={getValues('content')}
+                        onChange={(data) => setValue('content', data)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Media */}
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <h2 className='text-xl font-semibold mb-4'>Media</h2>
+                  <FileUpload
+                    label='Event Image'
+                    onUploadComplete={(url) => {
+                      setUploadedFiles((prev) => ({ ...prev, image: url }))
+                    }}
+                    defaultPreview={uploadedFiles.image}
+                  />
+                </div>
+
+                {/* Additional Settings */}
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <h2 className='text-xl font-semibold mb-4'>
+                    Additional Settings
+                  </h2>
+                  <div className='flex items-center'>
+                    <label className='flex items-center'>
+                      <input
+                        type='checkbox'
+                        {...register('is_featured')}
+                        className='mr-2'
+                      />
+                      Feature Event
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Button - Sticky Footer */}
+              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
                 <button
-                  type='button'
-                  onClick={() => removeCollege(college.id)}
-                  className='text-blue-600 hover:text-blue-800'
+                  type='submit'
+                  disabled={loading}
+                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
                 >
-                  <X className='w-4 h-4' />
+                  {loading
+                    ? 'Processing...'
+                    : editing
+                      ? 'Update Event'
+                      : 'Create Event'}
                 </button>
               </div>
-            ))}
+            </form>
           </div>
+        </Modal>
 
-          <div className='relative'>
-            <input
-              type='text'
-              disabled={selectedColleges.length > 0}
-              value={collegeSearch}
-              onChange={searchCollege}
-              className='w-full p-2 border rounded'
-              placeholder='Search college...'
-            />
-
-            {searchResults.length > 0 && (
-              <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto'>
-                {searchResults.map((college) => (
-                  <div
-                    key={college.id}
-                    onClick={() => addCollege(college)}
-                    className='p-2 hover:bg-gray-100 cursor-pointer'
-                  >
-                    {college.name}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className='mb-4'>
-          <label htmlFor='host'>Host</label>
-
-          <input
-            {...register('event_host.host', { required: 'Host is required' })}
-            placeholder='Event Host'
-            className='w-full p-2 border rounded'
-          />
-          {errors.event_host?.host && (
-            <span className='text-red-500'>
-              {errors.event_host.host.message}
-            </span>
-          )}
-        </div>
-
-        <div className='mb-4'>
-          <label htmlFor='description'>Description </label>
-          <textarea
-            {...register('description')}
-            placeholder='Description'
-            className='w-full p-2 border rounded'
-            rows='5'
+        {/* Table Section */}
+        <div className='mt-8'>
+          <Table
+            data={events}
+            columns={columns}
+            pagination={pagination}
+            onPageChange={(newPage) => loadEvents(newPage)}
+            onSearch={handleSearch}
+            showSearch={false}
           />
         </div>
+      </div>
 
-        <div className='mb-4'>
-          <label htmlFor='content'>Content</label>
-          <EditorMemo
-            initialData={getValues('content')}
-            onChange={(data) => setValue('content', data)}
-          />
-        </div>
-
-        <div className='flex mb-4'>
-          <div className='w-1/2 mr-4'>
-            <label htmlFor='start_date'>Start Date </label>
-
-            <input
-              type='date'
-              {...register('event_host.start_date', {
-                required: 'Start date is required'
-              })}
-              className='w-full p-2 border rounded'
-            />
-            {errors.event_host?.start_date && (
-              <span className='text-red-500'>
-                {errors.event_host.start_date.message}
-              </span>
-            )}
-          </div>
-          <div className='w-1/2'>
-            <label htmlFor='end_date'>End Date </label>
-
-            <input
-              type='date'
-              {...register('event_host.end_date', {
-                required: 'End date is required'
-              })}
-              className='w-full p-2 border rounded'
-            />
-            {errors.event_host?.end_date && (
-              <span className='text-red-500'>
-                {errors.event_host.end_date.message}
-              </span>
-            )}
-          </div>
-        </div>
-        <div className='bg-white p-6 rounded-lg shadow-md mb-6'>
-          <FileUpload
-            label={'Event Image'}
-            onUploadComplete={(url) => {
-              setUploadedFiles((prev) => ({ ...prev, image: url }))
-            }}
-            defaultPreview={uploadedFiles.image}
-          />
-        </div>
-
-        <div className='flex mb-4'>
-          <div className='w-1/2 mr-4'>
-            <label htmlFor='time'>Time</label>
-
-            <input
-              type='time'
-              {...register('event_host.time', { required: 'Time is required' })}
-              className='w-full p-2 border rounded'
-              placeholder='Time'
-            />
-            {errors.event_host?.time && (
-              <span className='text-red-500'>
-                {errors.event_host.time.message}
-              </span>
-            )}
-          </div>
-          <div className='w-1/2'>
-            <label htmlFor='end_date'>Map Location </label>
-
-            <input
-              type='text'
-              {...register('event_host.map_url')}
-              placeholder='Map URL'
-              className='w-full p-2 border rounded'
-            />
-          </div>
-        </div>
-
-        <div className='flex mb-4'>
-          <label className='flex items-center'>
-            <input
-              type='checkbox'
-              {...register('is_featured')}
-              className='mr-2'
-            />
-            Feature Event
-          </label>
-        </div>
-        <div className='flex gap-4'>
-          <button
-            type='submit'
-            className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
-          >
-            {editing ? 'Update Event' : 'Add Event'}
-          </button>
-          {editing && (
-            <button
-              type='button'
-              onClick={handleCancel}
-              className='bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600'
-            >
-              Cancel
-            </button>
-          )}
-        </div>
-      </form>
-
-      <Table
-        data={events}
-        columns={columns}
-        pagination={pagination}
-        onPageChange={(newPage) => loadEvents(newPage)}
-        onSearch={handleSearch}
-      />
       <ConfirmationDialog
         open={isDialogOpen}
         onClose={handleDialogClose}
@@ -700,6 +840,6 @@ export default function EventManager() {
         title='Confirm Deletion'
         message='Are you sure you want to delete this event? This action cannot be undone.'
       />
-    </div>
+    </>
   )
 }

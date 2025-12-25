@@ -2,7 +2,7 @@ import { Poppins } from 'next/font/google'
 import './globals.css'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
-import ReduxProvider from './components/ReduxProvider'
+import ReduxProvider from '../components/ReduxProvider'
 import ReactQueryContainer from '@/container/HOC/ReactQueryContainer'
 
 const poppins = Poppins({

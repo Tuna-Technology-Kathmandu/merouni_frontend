@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'
 import { getMaterials } from '../action'
 import Pagination from '../../blogs/components/Pagination'
-import Shimmer from '../../components/Shimmer'
+import Shimmer from '../../../components/Shimmer'
 import { MdOutlineRemoveRedEye } from 'react-icons/md'
 import Link from 'next/link'
 

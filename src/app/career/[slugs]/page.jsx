@@ -1,8 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
-import Footer from '../../components/Frontpage/Footer'
-import Header from '../../components/Frontpage/Header'
-import Navbar from '../../components/Frontpage/Navbar'
+import Footer from '../../../components/Frontpage/Footer'
+import Header from '../../../components/Frontpage/Header'
+import Navbar from '../../../components/Frontpage/Navbar'
 import { getCareer } from '../actions'
 
 const ShowCareer = ({ params }) => {

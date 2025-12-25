@@ -1,15 +1,15 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import Navbar from '@/app/components/Frontpage/Navbar'
-import Header from '@/app/components/Frontpage/Header'
-import Footer from '@/app/components/Frontpage/Footer'
+import Navbar from '../../../components/Frontpage/Navbar'
+import Header from '../../../components/Frontpage/Header'
+import Footer from '../../../components/Frontpage/Footer'
 import ImageSection from './components/upperSection'
 import CollegeOverview from './components/NewCollegeOverview'
 import { getCollegeBySlug } from '../actions'
 import ApplyNow from './components/applyNow'
 import RelatedColleges from './components/RelatedColleges'
-import Loading from '../../components/Loading'
+import Loading from '../../../components/Loading'
 
 const CollegeDetailPage = ({ params }) => {
   const [college, setCollege] = useState(null)

@@ -1,5 +1,5 @@
 import React from 'react'
-import Shimmer from '@/app/components/Shimmer'
+import Shimmer from '../../../components/Shimmer'
 const LatestBlogsShimmer = () => {
   return (
     <div className='relative rounded-xl w-85 min-w-[25rem] p-6 mb-8 overflow-hidden m-2'>

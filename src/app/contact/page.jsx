@@ -2,9 +2,9 @@
 
 import ContactHeroSection from './components/HeroSection'
 import ContactNewsletter from './components/ContactNewsLetter'
-import Header from '../components/Frontpage/Header'
-import Navbar from '../components/Frontpage/Navbar'
-import Footer from '../components/Frontpage/Footer'
+import Header from '../../components/Frontpage/Header'
+import Navbar from '../../components/Frontpage/Navbar'
+import Footer from '../../components/Frontpage/Footer'
 import ContactInfoCard from './components/ContactInfoCard'
 import ContactMap from './components/ContactMap'
 import ContactForm from './components/ContactForm'

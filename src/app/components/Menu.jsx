@@ -1,10 +1,12 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSelector, useDispatch } from 'react-redux'
 import { removeUser } from '@/app/utils/userSlice'
+import { destr } from 'destr'
+import ConfirmationDialog from '@/app/(dashboard)/dashboard/addCollege/ConfirmationDialog'
 
 // Icons
 import {
@@ -12,7 +14,8 @@ import {
   FaRegUserCircle,
   FaWpforms,
   FaBuilding,
-  FaBriefcase
+  FaBriefcase,
+  FaUniversity
 } from 'react-icons/fa'
 import { BsNewspaper, BsCalendarEvent } from 'react-icons/bs'
 import { HiOutlineUsers, HiOutlineAcademicCap } from 'react-icons/hi'
@@ -37,15 +40,9 @@ const menuItems = [
         visible: ['admin', 'superadmin', 'editor', 'teacher', 'student']
       },
       {
-        icon: <TbBrandGoogleAnalytics className='text-xl' />,
-        label: 'Insights',
-        href: '/dashboard/insights',
-        visible: ['admin', 'superadmin']
-      },
-      {
-        icon: <HiOutlineUsers className='text-xl' />,
-        label: 'Users',
-        href: '/dashboard/users',
+        icon: <VscReferences />,
+        label: 'Referrals',
+        href: '/dashboard/referrals',
         visible: ['admin', 'superadmin']
       },
       {
@@ -58,7 +55,7 @@ const menuItems = [
         icon: <RiUserSettingsLine className='text-xl' />,
         label: 'Agent Approve',
         href: '/dashboard/agentApprove',
-        visible: ['admin', 'superadmin']
+        visible: ['superadmin']
       },
       {
         icon: <FaBuilding className='text-xl' />,
@@ -79,6 +76,12 @@ const menuItems = [
         visible: ['admin', 'editor', 'superadmin']
       },
       {
+        icon: <FaUniversity className='text-xl' />,
+        label: 'University',
+        href: '/dashboard/university',
+        visible: ['admin', 'editor', 'superadmin']
+      },
+      {
         icon: <IoSchoolSharp className='text-xl' />,
         label: 'Colleges',
         href: '/dashboard/addCollege',
@@ -94,6 +97,12 @@ const menuItems = [
         icon: <BsCalendarEvent className='text-xl' />,
         label: 'Events',
         href: '/dashboard/events',
+        visible: ['admin', 'editor', 'superadmin']
+      },
+      {
+        icon: <FaBriefcase className='text-xl' />,
+        label: 'Vacancies',
+        href: '/dashboard/vacancy',
         visible: ['admin', 'editor', 'superadmin']
       },
 
@@ -116,9 +125,9 @@ const menuItems = [
         visible: ['agent']
       },
       {
-        icon: <VscReferences />,
-        label: 'Referrals',
-        href: '/dashboard/referrals',
+        icon: <HiOutlineUsers className='text-xl' />,
+        label: 'Users',
+        href: '/dashboard/users',
         visible: ['admin', 'superadmin']
       }
     ]
@@ -142,18 +151,25 @@ const menuItems = [
   }
 ]
 
-const Menu = () => {
+const Menu = ({ isCollapsed = false }) => {
   const pathname = usePathname()
   const router = useRouter()
   const dispatch = useDispatch()
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
 
   const role = useSelector((state) => {
     const roleData = state.user?.data?.role
-    return roleData ? JSON.parse(roleData) : {}
+    console.log(roleData, 'roleData')
+    const parsedRole = typeof roleData === 'string' ? destr(roleData) : roleData
+    if (!parsedRole || typeof parsedRole !== 'object') return {}
+
+    return Object.entries(parsedRole).reduce((acc, [key, value]) => {
+      acc[key] = value === true || value === 'true'
+      return acc
+    }, {})
   })
 
-  const handleLogout = async (e) => {
-    e.preventDefault()
+  const handleLogout = async () => {
     try {
       const response = await fetch(
         `${process.env.baseUrl}${process.env.version}/auth/logout`,
@@ -180,36 +196,49 @@ const Menu = () => {
       <div className='flex flex-col h-full space-y-6'>
         {menuItems.map((menu) => (
           <div key={menu.title} className='flex flex-col space-y-2'>
-            <h2 className='hidden lg:block text-xs font-semibold text-gray-400 px-4'>
-              {menu.title}
-            </h2>
+            {!isCollapsed && (
+              <h2 className='hidden lg:block text-xs font-semibold text-gray-400 px-4'>
+                {menu.title}
+              </h2>
+            )}
             <div className='flex flex-col space-y-1'>
               {menu.items.map((item) => {
-                const hasAccess = item.visible.some((r) => role[r] === true)
+                const hasAccess = item.visible.some((r) => role[r])
 
                 if (!hasAccess) return null
 
                 const isActive = pathname === item.href
+                const displayLabel =
+                  item.href === '/dashboard/referrals' &&
+                  role.student &&
+                  !role.admin &&
+                  !role['superadmin']
+                    ? 'Applied Colleges'
+                    : item.label
                 const itemClasses = `
                   flex items-center w-full p-2 text-gray-600 transition-colors rounded-lg
                   hover:bg-gray-100 hover:text-blue-600
                   ${isActive ? 'bg-blue-50 text-blue-600' : ''}
                   group
+                  ${isCollapsed ? 'justify-center' : ''}
                 `
 
                 if (item.href === '/dashboard/logout') {
                   return (
                     <button
                       key={item.label}
-                      onClick={handleLogout}
+                      onClick={() => setIsLogoutDialogOpen(true)}
                       className={itemClasses}
+                      title={isCollapsed ? item.label : ''}
                     >
                       <span className='flex items-center justify-center w-8 h-8 text-gray-500 group-hover:text-blue-600'>
                         {item.icon}
                       </span>
-                      <span className='hidden lg:block ml-3 text-sm font-medium'>
-                        {item.label}
-                      </span>
+                      {!isCollapsed && (
+                        <span className='hidden lg:block ml-3 text-sm font-medium'>
+                          {item.label}
+                        </span>
+                      )}
                     </button>
                   )
                 }
@@ -219,13 +248,16 @@ const Menu = () => {
                     key={item.label}
                     href={item.href}
                     className={itemClasses}
+                    title={isCollapsed ? item.label : ''}
                   >
                     <span className='flex items-center justify-center w-8 h-8 text-gray-500 group-hover:text-blue-600'>
                       {item.icon}
                     </span>
-                    <span className='hidden lg:block ml-3 text-sm font-medium'>
-                      {item.label}
-                    </span>
+                    {!isCollapsed && (
+                      <span className='hidden lg:block ml-3 text-sm font-medium'>
+                        {displayLabel}
+                      </span>
+                    )}
                   </Link>
                 )
               })}
@@ -233,6 +265,16 @@ const Menu = () => {
           </div>
         ))}
       </div>
+      <ConfirmationDialog
+        open={isLogoutDialogOpen}
+        onClose={() => setIsLogoutDialogOpen(false)}
+        onConfirm={async () => {
+          setIsLogoutDialogOpen(false)
+          await handleLogout()
+        }}
+        title='Confirm Logout'
+        message='Are you sure you want to logout?'
+      />
     </nav>
   )
 }

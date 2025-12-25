@@ -5,20 +5,23 @@ import { useForm } from 'react-hook-form'
 import { fetchNews, fetchTags } from './action'
 import { getCategories } from '@/app/action'
 import { authFetch } from '@/app/utils/authFetch'
-import Loader from '@/app/components/Loading'
-import Table from '../../../components/Table'
-import { Edit2, Trash2 } from 'lucide-react'
+import Loader from '../../../../components/Loading'
+import Table from '../../../../components/Table'
+import { Edit2, Trash2, Search } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import useAdminPermission from '@/core/hooks/useAdminPermission'
+import useAdminPermission from '@/hooks/useAdminPermission'
+import { Modal } from '../../../../components/CreateUserModal'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
 
 export default function NewsManager() {
+  const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
 
   const [news, setNews] = useState([])
@@ -26,6 +29,8 @@ export default function NewsManager() {
   const [authors, setAuthors] = useState([])
   const [loading, setLoading] = useState(false)
   const [editingId, setEditingId] = useState(null)
+  const [editing, setEditing] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState({
     featuredImage: ''
   })
@@ -43,6 +48,8 @@ export default function NewsManager() {
   const [tagsLoading, setTagsLoading] = useState(false)
   const searchTimeout = useRef(null)
   const [submitting, setSubmitting] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [newsSearchTimeout, setNewsSearchTimeout] = useState(null)
 
   const {
     register,
@@ -74,9 +81,43 @@ export default function NewsManager() {
       {
         header: 'Title',
         accessorKey: 'title',
-        cell: ({ getValue }) => (
-          <div className='max-w-xs overflow-hidden'>{getValue()}</div>
-        )
+        cell: ({ row }) => {
+          const { title, status, visibility } = row.original
+          const statusLabel = status || 'draft'
+          const visibilityLabel = visibility || 'private'
+
+          const statusClasses =
+            statusLabel === 'published'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-yellow-100 text-yellow-800'
+
+          const visibilityClasses =
+            visibilityLabel === 'public'
+              ? 'bg-blue-100 text-blue-800'
+              : 'bg-gray-100 text-gray-800'
+
+          return (
+            <div className='max-w-xs overflow-hidden'>
+              <div className='truncate'>{title}</div>
+              <div className='flex flex-wrap gap-2 mt-1'>
+                {status && (
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusClasses}`}
+                  >
+                    {statusLabel}
+                  </span>
+                )}
+                {visibility && (
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${visibilityClasses}`}
+                  >
+                    {visibilityLabel}
+                  </span>
+                )}
+              </div>
+            </div>
+          )
+        }
       },
       {
         header: 'Description',
@@ -86,46 +127,6 @@ export default function NewsManager() {
             {getValue()?.substring(0, 100)}
             {getValue()?.length > 100 ? '...' : ''}
           </div>
-        )
-      },
-      {
-        header: 'Content',
-        accessorKey: 'content',
-        cell: ({ getValue }) => (
-          <div className='max-w-xs overflow-hidden'>
-            {getValue()?.substring(0, 100)}
-            {getValue()?.length > 100 ? '...' : ''}
-          </div>
-        )
-      },
-      {
-        header: 'Status',
-        accessorKey: 'status',
-        cell: ({ getValue }) => (
-          <span
-            className={`px-2 py-1 rounded-full text-sm ${
-              getValue() === 'published'
-                ? 'bg-green-100 text-green-800'
-                : 'bg-yellow-100 text-yellow-800'
-            }`}
-          >
-            {getValue()}
-          </span>
-        )
-      },
-      {
-        header: 'Visibility',
-        accessorKey: 'visibility',
-        cell: ({ getValue }) => (
-          <span
-            className={`px-2 py-1 rounded-full text-sm ${
-              getValue() === 'public'
-                ? 'bg-blue-100 text-blue-800'
-                : 'bg-gray-100 text-gray-800'
-            }`}
-          >
-            {getValue()}
-          </span>
         )
       },
       {
@@ -235,8 +236,18 @@ export default function NewsManager() {
     }, 300)
   }
   useEffect(() => {
+    setHeading('News Management')
     loadData()
-  }, [])
+    return () => setHeading(null)
+  }, [setHeading])
+
+  useEffect(() => {
+    return () => {
+      if (newsSearchTimeout) {
+        clearTimeout(newsSearchTimeout)
+      }
+    }
+  }, [newsSearchTimeout])
 
   const { requireAdmin } = useAdminPermission()
 
@@ -334,6 +345,8 @@ export default function NewsManager() {
   const handleEdit = async (blog) => {
     hasSetContent.current = false
     setEditingId(blog.id)
+    setEditing(true)
+    setIsOpen(true)
 
     // Attempt to parse blog.tags if it's a string
     let blogTags = blog.tags
@@ -438,6 +451,23 @@ export default function NewsManager() {
     }
   }
 
+  const handleSearchInput = (value) => {
+    setSearchQuery(value)
+
+    if (newsSearchTimeout) {
+      clearTimeout(newsSearchTimeout)
+    }
+
+    if (value === '') {
+      handleSearch('')
+    } else {
+      const timeoutId = setTimeout(() => {
+        handleSearch(value)
+      }, 300)
+      setNewsSearchTimeout(timeoutId)
+    }
+  }
+
   const onSubmit = async (data) => {
     setSubmitting(true)
     try {
@@ -450,6 +480,8 @@ export default function NewsManager() {
       }
       reset()
       setEditingId(null)
+      setEditing(false)
+      setIsOpen(false)
       setSelectedTags([])
       setUploadedFiles({ featuredImage: '' })
       loadData()
@@ -463,13 +495,6 @@ export default function NewsManager() {
     } finally {
       setSubmitting(false)
     }
-  }
-
-  const handleCancel = () => {
-    reset()
-    setEditingId(null)
-    setSelectedTags([])
-    setUploadedFiles({ featuredImage: '' })
   }
 
   const handleDeleteClick = (id) => {
@@ -515,179 +540,268 @@ export default function NewsManager() {
     )
 
   return (
-    <div className='p-4 w-4/5 mx-auto'>
-      <ToastContainer />
-      <h1 className='text-2xl font-bold mb-4'>News Management</h1>
-
-      <form onSubmit={handleSubmit(onSubmit)} className='mb-8'>
-        <div className='mb-4'>
-          <input
-            type='text'
-            placeholder='News Title'
-            {...register('title', { required: 'Title is required' })}
-            className='w-full p-2 border rounded'
-          />
-          {errors.title && (
-            <span className='text-red-500 text-sm'>{errors.title.message}</span>
-          )}
-        </div>
-
-        <div className='flex mb-4'>
-          <div className='w-full'>
-            <select
-              {...register('category', { required: 'Category is required' })}
-              className='w-full p-2 border rounded'
-            >
-              <option value=''>Select Category</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.title}
-                </option>
-              ))}
-            </select>
-            {errors.category && (
-              <span className='text-red-500 text-sm'>
-                {errors.category.message}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Tags search input */}
-        <div className=' mb-4 relative'>
-          <input
-            type='text'
-            placeholder='Search for tags...'
-            value={tagsSearch}
-            onChange={handleTagsSearch}
-            className='w-full p-2 border rounded'
-          />
-
-          {/* Display search results in a dropdown */}
-          {searchResults.length > 0 && (
-            <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto'>
-              {searchResults.map((tag) => (
-                <div
-                  key={tag.id}
-                  className='p-2 hover:bg-gray-100 cursor-pointer'
-                  onClick={() => handleSelectTag(tag)}
-                >
-                  {tag.title}
-                </div>
-              ))}
+    <>
+      <div className='p-4 w-full'>
+        <div className='flex justify-between items-center mb-4'>
+          {/* Search Bar */}
+          <div className='relative w-full max-w-md'>
+            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+              <Search className='w-4 h-4 text-gray-500' />
             </div>
-          )}
-
-          {/* Display selected tags */}
-          <div className='mt-2 flex flex-wrap gap-2'>
-            {selectedTags.map((tag) => (
-              <span
-                key={tag.id}
-                className='bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center gap-1'
-              >
-                {tag.title}
-                <button
-                  type='button'
-                  onClick={() => {
-                    const newTags = selectedTags.filter((t) => t.id !== tag.id)
-                    setSelectedTags(newTags)
-                    setValue(
-                      'tags',
-                      newTags.map((t) => t.id)
-                    )
-                  }}
-                  className='text-blue-600 hover:text-blue-800 ml-1'
-                >
-                  ×
-                </button>
-              </span>
-            ))}
+            <input
+              type='text'
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              placeholder='Search news...'
+            />
           </div>
-        </div>
-
-        <div className='mb-4'>
-          <textarea
-            placeholder='Description'
-            {...register('description')}
-            className='w-full p-2 border rounded'
-          />
-        </div>
-
-        <div className='mb-4'>
-          <label htmlFor='content'>Content</label>
-
-          <CKBlogs
-            initialData={getValues('content')}
-            onChange={(data) => setValue('content', data)}
-            id='editor1'
-          />
-        </div>
-
-        <div className='bg-white p-6 rounded-lg shadow-md mb-6'>
-          <FileUpload
-            label={'News Image'}
-            onUploadComplete={(url) => {
-              setUploadedFiles((prev) => ({ ...prev, featuredImage: url }))
-            }}
-            defaultPreview={uploadedFiles.featuredImage}
-          />
-        </div>
-
-        <div className='flex mb-4'>
-          <div className='w-1/2 mr-4'>
-            <select
-              {...register('visibility')}
-              className='w-full p-2 border rounded'
-            >
-              <option value='private'>Private</option>
-              <option value='public'>Public</option>
-            </select>
-          </div>
-
-          <div className='w-1/2'>
-            <select
-              {...register('status')}
-              className='w-full p-2 border rounded'
-            >
-              <option value='draft'>Draft</option>
-              <option value='published'>Published</option>
-            </select>
-          </div>
-        </div>
-
-        <div className='flex gap-4'>
-          <button
-            type='submit'
-            className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
-            disabled={submitting}
-          >
-            {editingId
-              ? submitting
-                ? 'Updating...'
-                : 'Update News'
-              : submitting
-                ? 'Adding...'
-                : 'Add News'}
-          </button>
-          {editingId && (
+          {/* Button */}
+          <div className='flex gap-2'>
             <button
-              type='button'
-              onClick={handleCancel}
-              className='bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600'
+              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+              onClick={() => {
+                setIsOpen(true)
+                setEditing(false)
+                setEditingId(null)
+                reset()
+                setSelectedTags([])
+                setUploadedFiles({ featuredImage: '' })
+              }}
             >
-              Cancel
+              Add News
             </button>
-          )}
+          </div>
         </div>
-      </form>
+        <ToastContainer />
 
-      <Table
-        data={news}
-        columns={columns}
-        pagination={pagination}
-        onPageChange={(newPage) => loadData(newPage)}
-        onSearch={handleSearch}
-      />
+        <Modal
+          isOpen={isOpen}
+          onClose={() => {
+            setIsOpen(false)
+            setEditing(false)
+            setEditingId(null)
+            reset()
+            setSelectedTags([])
+            setUploadedFiles({ featuredImage: '' })
+          }}
+          title={editing ? 'Edit News' : 'Add News'}
+          className='max-w-5xl'
+        >
+          <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className='flex flex-col flex-1 overflow-hidden'
+            >
+              <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+                {/* Basic Information */}
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <h2 className='text-xl font-semibold mb-4'>
+                    News Information
+                  </h2>
+                  <div className='space-y-4'>
+                    <div>
+                      <label className='block mb-2'>News Title *</label>
+                      <input
+                        type='text'
+                        placeholder='News Title'
+                        {...register('title', {
+                          required: 'Title is required'
+                        })}
+                        className='w-full p-2 border rounded'
+                      />
+                      {errors.title && (
+                        <span className='text-red-500 text-sm'>
+                          {errors.title.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className='block mb-2'>Category *</label>
+                      <select
+                        {...register('category', {
+                          required: 'Category is required'
+                        })}
+                        className='w-full p-2 border rounded'
+                      >
+                        <option value=''>Select Category</option>
+                        {categories.map((cat) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.title}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.category && (
+                        <span className='text-red-500 text-sm'>
+                          {errors.category.message}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Tags search input */}
+                    <div className='relative'>
+                      <input
+                        type='text'
+                        placeholder='Search for tags...'
+                        value={tagsSearch}
+                        onChange={handleTagsSearch}
+                        className='w-full p-2 border rounded'
+                      />
+
+                      {/* Display search results in a dropdown */}
+                      {searchResults.length > 0 && (
+                        <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto'>
+                          {searchResults.map((tag) => (
+                            <div
+                              key={tag.id}
+                              className='p-2 hover:bg-gray-100 cursor-pointer'
+                              onClick={() => handleSelectTag(tag)}
+                            >
+                              {tag.title}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Display selected tags */}
+                      <div className='mt-2 flex flex-wrap gap-2'>
+                        {selectedTags.map((tag) => (
+                          <span
+                            key={tag.id}
+                            className='bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center gap-1'
+                          >
+                            {tag.title}
+                            <button
+                              type='button'
+                              onClick={() => {
+                                const newTags = selectedTags.filter(
+                                  (t) => t.id !== tag.id
+                                )
+                                setSelectedTags(newTags)
+                                setValue(
+                                  'tags',
+                                  newTags.map((t) => t.id)
+                                )
+                              }}
+                              className='text-blue-600 hover:text-blue-800 ml-1'
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description and Content */}
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <h2 className='text-xl font-semibold mb-4'>
+                    Description & Content
+                  </h2>
+                  <div className='space-y-4'>
+                    <div>
+                      <label className='block mb-2'>Description</label>
+                      <textarea
+                        placeholder='Description'
+                        {...register('description')}
+                        className='w-full p-2 border rounded'
+                        rows='4'
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor='content' className='block mb-2'>
+                        Content
+                      </label>
+                      <CKBlogs
+                        initialData={getValues('content')}
+                        onChange={(data) => setValue('content', data)}
+                        id='editor1'
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Media */}
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <h2 className='text-xl font-semibold mb-4'>Media</h2>
+                  <FileUpload
+                    label='News Image'
+                    onUploadComplete={(url) => {
+                      setUploadedFiles((prev) => ({
+                        ...prev,
+                        featuredImage: url
+                      }))
+                    }}
+                    defaultPreview={uploadedFiles.featuredImage}
+                  />
+                </div>
+
+                {/* Additional Settings */}
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <h2 className='text-xl font-semibold mb-4'>
+                    Additional Settings
+                  </h2>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div>
+                      <label className='block mb-2'>Visibility</label>
+                      <select
+                        {...register('visibility')}
+                        className='w-full p-2 border rounded'
+                      >
+                        <option value='private'>Private</option>
+                        <option value='public'>Public</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className='block mb-2'>Status</label>
+                      <select
+                        {...register('status')}
+                        className='w-full p-2 border rounded'
+                      >
+                        <option value='draft'>Draft</option>
+                        <option value='published'>Published</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Button - Sticky Footer */}
+              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
+                <button
+                  type='submit'
+                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
+                  disabled={submitting}
+                >
+                  {submitting
+                    ? editing
+                      ? 'Updating...'
+                      : 'Adding...'
+                    : editing
+                      ? 'Update News'
+                      : 'Create News'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </Modal>
+
+        {/* Table Section */}
+        <div className='mt-8'>
+          <Table
+            data={news}
+            columns={columns}
+            pagination={pagination}
+            onPageChange={(newPage) => loadData(newPage)}
+            onSearch={handleSearch}
+            showSearch={false}
+          />
+        </div>
+      </div>
 
       <ConfirmationDialog
         open={isDialogOpen}
@@ -696,6 +810,6 @@ export default function NewsManager() {
         title='Confirm Deletion'
         message='Are you sure you want to delete this news? This action cannot be undone.'
       />
-    </div>
+    </>
   )
 }

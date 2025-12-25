@@ -3,14 +3,14 @@ import dynamic from 'next/dynamic'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { getAllExams, createExam, updateExam, deleteExam } from './actions'
-import Loading from '../../../components/Loading'
-import Table from '../../../components/Table'
+import Loading from '../../../../components/Loading'
+import Table from '../../../../components/Table'
 import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import { useDebounce } from 'use-debounce'
 import { fetchUniversities, fetchLevel } from './actions'
-import useAdminPermission from '@/core/hooks/useAdminPermission'
+import useAdminPermission from '@/hooks/useAdminPermission'
 const CKExam = dynamic(() => import('../component/CKExam'), {
   ssr: false
 })

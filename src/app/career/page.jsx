@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react'
 import { getCareers } from './actions'
 import Link from 'next/link'
 import { Search } from 'lucide-react'
-import Footer from '../components/Frontpage/Footer'
-import Header from '../components/Frontpage/Header'
-import Navbar from '../components/Frontpage/Navbar'
+import Footer from '../../components/Frontpage/Footer'
+import Header from '../../components/Frontpage/Header'
+import Navbar from '../../components/Frontpage/Navbar'
 
 function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString('en-US', {

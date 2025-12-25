@@ -7,13 +7,15 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
-import Table from '@/app/components/Table'
-import { Edit2, Trash2 } from 'lucide-react'
+import Table from '../../../../components/Table'
+import { Edit2, Trash2, Search } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import useAdminPermission from '@/core/hooks/useAdminPermission'
+import useAdminPermission from '@/hooks/useAdminPermission'
 import dynamic from 'next/dynamic'
+import { Modal } from '../../../../components/CreateUserModal'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
 
 // Dynamically import CKEditor to avoid SSR issues
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
@@ -21,6 +23,7 @@ const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
 })
 
 export default function CareerForm() {
+  const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
   const [isOpen, setIsOpen] = useState(false)
   const [careers, setCareers] = useState([])
@@ -39,6 +42,8 @@ export default function CareerForm() {
     totalPages: 1,
     total: 0
   })
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchTimeout, setSearchTimeout] = useState(null)
   const {
     register,
     handleSubmit,
@@ -58,8 +63,18 @@ export default function CareerForm() {
   })
 
   useEffect(() => {
+    setHeading('Career Management')
     fetchCareers()
-  }, [])
+    return () => setHeading(null)
+  }, [setHeading])
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout)
+      }
+    }
+  }, [searchTimeout])
 
   const { requireAdmin } = useAdminPermission()
 
@@ -111,6 +126,23 @@ export default function CareerForm() {
     } catch (error) {
       console.error('Error fetching careers search results:', error.message)
       setCareers([])
+    }
+  }
+
+  const handleSearchInput = (value) => {
+    setSearchQuery(value)
+
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    if (value === '') {
+      handleSearch('')
+    } else {
+      const timeoutId = setTimeout(() => {
+        handleSearch(value)
+      }, 300)
+      setSearchTimeout(timeoutId)
     }
   }
 
@@ -257,102 +289,147 @@ export default function CareerForm() {
 
   return (
     <>
-      <div className='text-2xl mr-auto p-4 ml-14 font-bold'>
-        <ToastContainer />
-        <div className='text-center'>Career Management</div>
-        <div className='flex justify-left mt-2'>
-          <button
-            className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? 'Hide form' : 'Show form'}
-          </button>
+      <div className='p-4 w-full'>
+        <div className='flex justify-between items-center mb-4'>
+          {/* Search Bar */}
+          <div className='relative w-full max-w-md'>
+            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+              <Search className='w-4 h-4 text-gray-500' />
+            </div>
+            <input
+              type='text'
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              placeholder='Search careers...'
+            />
+          </div>
+          {/* Button */}
+          <div className='flex gap-2'>
+            <button
+              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+              onClick={() => {
+                setIsOpen(true)
+                setEditing(false)
+                setEditingId(null)
+                reset()
+                setUploadedFiles({ featured: '' })
+              }}
+            >
+              Add Career
+            </button>
+          </div>
         </div>
-      </div>
+        <ToastContainer />
 
-      {isOpen && (
-        <div className='container mx-auto p-4'>
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-            {/* Basic Information */}
-            <div className='bg-white p-6 rounded-lg shadow-md'>
-              <h2 className='text-xl font-semibold mb-4'>Career Information</h2>
-              <div className='grid grid-cols-1 gap-4'>
-                <div>
-                  <label className='block mb-2'>Job Title *</label>
-                  <input
-                    {...register('title', {
-                      required: 'Job title is required',
-                      minLength: {
-                        value: 3,
-                        message: 'Title must be at least 3 characters long'
-                      }
-                    })}
-                    className='w-full p-2 border rounded'
-                  />
-                  {errors.title && (
-                    <span className='text-red-500'>{errors.title.message}</span>
-                  )}
-                </div>
+        <Modal
+          isOpen={isOpen}
+          onClose={() => {
+            setIsOpen(false)
+            setEditing(false)
+            setEditingId(null)
+            reset()
+            setUploadedFiles({ featured: '' })
+          }}
+          title={editing ? 'Edit Career' : 'Add Career'}
+          className='max-w-5xl'
+        >
+          <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className='flex flex-col flex-1 overflow-hidden'
+            >
+              <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+                {/* Basic Information */}
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <h2 className='text-xl font-semibold mb-4'>
+                    Career Information
+                  </h2>
+                  <div className='grid grid-cols-1 gap-4'>
+                    <div>
+                      <label className='block mb-2'>Job Title *</label>
+                      <input
+                        {...register('title', {
+                          required: 'Job title is required',
+                          minLength: {
+                            value: 3,
+                            message: 'Title must be at least 3 characters long'
+                          }
+                        })}
+                        className='w-full p-2 border rounded'
+                      />
+                      {errors.title && (
+                        <span className='text-red-500'>
+                          {errors.title.message}
+                        </span>
+                      )}
+                    </div>
 
-                <div>
-                  <label className='block mb-2'>Description</label>
-                  <textarea
-                    {...register('description')}
-                    className='w-full p-2 border rounded'
-                    rows='3'
-                  />
-                </div>
+                    <div>
+                      <label className='block mb-2'>Description</label>
+                      <textarea
+                        {...register('description')}
+                        className='w-full p-2 border rounded'
+                        rows='3'
+                      />
+                    </div>
 
-                <div>
-                  <label className='block mb-2'>Content</label>
-                  <CKBlogs
-                    initialData={getValues('content')}
-                    onChange={(data) => setValue('content', data)}
-                    id='editor1'
-                  />
-                </div>
+                    <div>
+                      <label className='block mb-2'>Content</label>
+                      <CKBlogs
+                        initialData={getValues('content')}
+                        onChange={(data) => setValue('content', data)}
+                        id='editor1'
+                      />
+                    </div>
 
-                <div>
-                  <FileUpload
-                    label='Featured Image'
-                    onUploadComplete={(url) => {
-                      setUploadedFiles((prev) => ({ ...prev, featured: url }))
-                      setValue('featuredImage', url)
-                    }}
-                    defaultPreview={uploadedFiles.featured}
-                  />
+                    <div>
+                      <FileUpload
+                        label='Featured Image'
+                        onUploadComplete={(url) => {
+                          setUploadedFiles((prev) => ({
+                            ...prev,
+                            featured: url
+                          }))
+                          setValue('featuredImage', url)
+                        }}
+                        defaultPreview={uploadedFiles.featured}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Submit Button */}
-            <div className='flex justify-end'>
-              <button
-                type='submit'
-                disabled={loading}
-                className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
-              >
-                {loading
-                  ? 'Processing...'
-                  : editing
-                    ? 'Update Career'
-                    : 'Create Career'}
-              </button>
-            </div>
-          </form>
+              {/* Submit Button - Sticky Footer */}
+              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
+                <button
+                  type='submit'
+                  disabled={loading}
+                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
+                >
+                  {loading
+                    ? 'Processing...'
+                    : editing
+                      ? 'Update Career'
+                      : 'Create Career'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </Modal>
+
+        {/* Table Section */}
+        <div className='mt-8'>
+          <Table
+            loading={tableLoading}
+            data={careers}
+            columns={columns}
+            pagination={pagination}
+            onPageChange={(newPage) => fetchCareers(newPage)}
+            onSearch={handleSearch}
+            showSearch={false}
+          />
         </div>
-      )}
-
-      {/* Table Section */}
-      <div className='mt-8'>
-        <Table
-          loading={tableLoading}
-          data={careers}
-          columns={columns}
-          pagination={pagination}
-          onPageChange={(newPage) => fetchCareers(newPage)}
-          onSearch={handleSearch}
-        />
       </div>
 
       {/* Confirmation Dialog */}

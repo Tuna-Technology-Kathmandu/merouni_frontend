@@ -8,12 +8,12 @@ import {
 } from './action'
 // import dynamic from 'next/dynamic'
 import { useSelector } from 'react-redux'
-import Loader from '@/app/components/Loading'
-import Table from '../../../components/Table' // Adjust the import path as needed
+import Loader from '../../../../components/Loading'
+import Table from '../../../../components/Table' // Adjust the import path as needed
 import { Edit2, Trash2 } from 'lucide-react' // For action icons
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
-import useAdminPermission from '@/core/hooks/useAdminPermission'
+import useAdminPermission from '@/hooks/useAdminPermission'
 
 // const CKEditor4 = dynamic(() => import('../component/CKEditor4'), {
 //   ssr: false

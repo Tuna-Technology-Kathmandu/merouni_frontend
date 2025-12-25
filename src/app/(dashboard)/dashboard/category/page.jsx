@@ -3,16 +3,19 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { fetchCategories, deleteCategory } from './action'
-import Loader from '@/app/components/Loading'
-import Table from '../../../components/Table'
-import { Edit2, Trash2 } from 'lucide-react'
+import Loader from '../../../../components/Loading'
+import Table from '../../../../components/Table'
+import { Edit2, Trash2, Search } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import { Modal } from '../../../../components/CreateUserModal'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
 
 export default function CategoryManager() {
+  const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
 
   // Initialize react-hook-form
@@ -33,6 +36,8 @@ export default function CategoryManager() {
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState(null)
+  const [editing, setEditing] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [pagination, setPagination] = useState({
@@ -40,6 +45,8 @@ export default function CategoryManager() {
     totalPages: 1,
     total: 0
   })
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchTimeout, setSearchTimeout] = useState(null)
 
   const columns = useMemo(
     () => [
@@ -81,9 +88,19 @@ export default function CategoryManager() {
   )
 
   useEffect(() => {
+    setHeading('Category Management')
     loadCategories()
+    return () => setHeading(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [setHeading])
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout)
+      }
+    }
+  }, [searchTimeout])
 
   const loadCategories = async (page = 1) => {
     try {
@@ -161,6 +178,8 @@ export default function CategoryManager() {
       }
       reset() // Clear form
       setEditingId(null)
+      setEditing(false)
+      setIsOpen(false)
       loadCategories()
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Network error occurred'
@@ -173,13 +192,10 @@ export default function CategoryManager() {
 
   const handleEdit = (category) => {
     setEditingId(category.id)
+    setEditing(true)
+    setIsOpen(true)
     setValue('title', category.title)
     setValue('description', category.description || '')
-  }
-
-  const handleCancel = () => {
-    reset()
-    setEditingId(null)
   }
 
   const handleDeleteClick = (id) => {
@@ -248,6 +264,23 @@ export default function CategoryManager() {
     }
   }
 
+  const handleSearchInput = (value) => {
+    setSearchQuery(value)
+
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    if (value === '') {
+      handleSearch('')
+    } else {
+      const timeoutId = setTimeout(() => {
+        handleSearch(value)
+      }, 300)
+      setSearchTimeout(timeoutId)
+    }
+  }
+
   if (loading)
     return (
       <div className='mx-auto'>
@@ -256,57 +289,116 @@ export default function CategoryManager() {
     )
 
   return (
-    <div className='p-4 w-4/5 mx-auto'>
-      <ToastContainer />
-      <h1 className='text-2xl font-bold mb-4'>Category Management</h1>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className='mb-8'>
-        <div className='mb-4'>
-          <input
-            type='text'
-            placeholder='Category Title'
-            {...register('title', { required: 'Title is required' })}
-            className='w-full p-2 border rounded'
-          />
-          {errors.title && (
-            <span className='text-red-500'>{errors.title.message}</span>
-          )}
-        </div>
-        <div className='mb-4'>
-          <textarea
-            placeholder='Description'
-            {...register('description')}
-            className='w-full p-2 border rounded'
-          />
-        </div>
-        <div className='flex gap-4'>
-          <button
-            type='submit'
-            className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
-          >
-            {editingId ? 'Update Category' : 'Add Category'}
-          </button>
-          {editingId && (
+    <>
+      <div className='p-4 w-full'>
+        <div className='flex justify-between items-center mb-4'>
+          {/* Search Bar */}
+          <div className='relative w-full max-w-md'>
+            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+              <Search className='w-4 h-4 text-gray-500' />
+            </div>
+            <input
+              type='text'
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              placeholder='Search categories...'
+            />
+          </div>
+          {/* Button */}
+          <div className='flex gap-2'>
             <button
-              type='button'
-              onClick={handleCancel}
-              className='bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600'
+              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+              onClick={() => {
+                setIsOpen(true)
+                setEditing(false)
+                setEditingId(null)
+                reset()
+              }}
             >
-              Cancel
+              Add Category
             </button>
-          )}
+          </div>
         </div>
-      </form>
+        <ToastContainer />
 
-      {/* Table */}
-      <Table
-        data={categories}
-        columns={columns}
-        pagination={pagination}
-        onPageChange={(newPage) => loadCategories(newPage)}
-        onSearch={handleSearch}
-      />
+        <Modal
+          isOpen={isOpen}
+          onClose={() => {
+            setIsOpen(false)
+            setEditing(false)
+            setEditingId(null)
+            reset()
+          }}
+          title={editing ? 'Edit Category' : 'Add Category'}
+          className='max-w-2xl'
+        >
+          <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className='flex flex-col flex-1 overflow-hidden'
+            >
+              <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <h2 className='text-xl font-semibold mb-4'>
+                    Category Information
+                  </h2>
+                  <div className='space-y-4'>
+                    <div>
+                      <label className='block mb-2'>Category Title *</label>
+                      <input
+                        type='text'
+                        placeholder='Category Title'
+                        {...register('title', {
+                          required: 'Title is required'
+                        })}
+                        className='w-full p-2 border rounded'
+                      />
+                      {errors.title && (
+                        <span className='text-red-500 text-sm'>
+                          {errors.title.message}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <label className='block mb-2'>Description</label>
+                      <textarea
+                        placeholder='Description'
+                        {...register('description')}
+                        className='w-full p-2 border rounded'
+                        rows={4}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Button - Sticky Footer */}
+              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
+                <button
+                  type='submit'
+                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
+                >
+                  {editing ? 'Update Category' : 'Create Category'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </Modal>
+
+        {/* Table */}
+        <div className='mt-8'>
+          <Table
+            data={categories}
+            columns={columns}
+            pagination={pagination}
+            onPageChange={(newPage) => loadCategories(newPage)}
+            onSearch={handleSearch}
+            showSearch={false}
+          />
+        </div>
+      </div>
+
       <ConfirmationDialog
         open={isDialogOpen}
         onClose={handleDialogClose}
@@ -314,6 +406,6 @@ export default function CategoryManager() {
         title='Confirm Deletion'
         message='Are you sure you want to delete this category? This action cannot be undone.'
       />
-    </div>
+    </>
   )
 }

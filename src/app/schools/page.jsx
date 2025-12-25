@@ -1,11 +1,11 @@
 'use client'
 
-import Navbar from '../components/Frontpage/Navbar'
-import Footer from '../components/Frontpage/Footer'
-import Header from '../components/Frontpage/Header'
+import Navbar from '../../components/Frontpage/Navbar'
+import Footer from '../../components/Frontpage/Footer'
+import Header from '../../components/Frontpage/Header'
 import Featured from './components/Featured'
 import Body from './components/Body'
-import AdLayout from '../components/Frontpage/AdLayout'
+import AdLayout from '../../components/Frontpage/AdLayout'
 import { useEffect, useState } from 'react'
 import { getBanner } from '../[[...home]]/action'
 

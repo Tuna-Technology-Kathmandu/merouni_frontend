@@ -1,4 +1,4 @@
-import AcademiaCard from '@/app/components/AcademiaCard'
+import AcademiaCard from '../../../../components/AcademiaCard'
 import React from 'react'
 
 const page = () => {

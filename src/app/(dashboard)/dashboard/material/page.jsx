@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
-import Table from '@/app/components/Table'
+import Table from '../../../../components/Table'
 import { Edit2, Trash2 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { X } from 'lucide-react'
-import useAdminPermission from '@/core/hooks/useAdminPermission'
+import useAdminPermission from '@/hooks/useAdminPermission'
 
 export default function MaterialForm() {
   const author_id = useSelector((state) => state.user.data.id)

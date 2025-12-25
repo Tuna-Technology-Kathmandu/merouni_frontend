@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react'
 import { getCourseBySlug } from '../../actions'
 import he from 'he'
-import Loader from '@/app/components/Loading'
-import Navbar from '../../../components/Frontpage/Navbar'
-import Footer from '../../../components/Frontpage/Footer'
-import Header from '../../../components/Frontpage/Header'
+import Loader from '../../../../components/Loading'
+import Navbar from '../../../../components/Frontpage/Navbar'
+import Footer from '../../../../components/Frontpage/Footer'
+import Header from '../../../../components/Frontpage/Header'
 
 const SingleSubject = ({ slug }) => {
   const [course, setCourse] = useState(null)

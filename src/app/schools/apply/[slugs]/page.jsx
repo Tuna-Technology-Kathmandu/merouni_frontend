@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState, useEffect, use } from 'react'
-import Navbar from '@/app/components/Frontpage/Navbar'
-import Header from '@/app/components/Frontpage/Header'
-import Footer from '@/app/components/Frontpage/Footer'
+import Navbar from '../../../../components/Frontpage/Navbar'
+import Header from '../../../../components/Frontpage/Header'
+import Footer from '../../../../components/Frontpage/Footer'
 import ImageSection from './components/upperSection'
 import FormSection from './components/formSection'
 import { getCollegeBySlug } from '../../actions'

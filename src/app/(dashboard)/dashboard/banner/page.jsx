@@ -6,9 +6,11 @@ import { Eye, Trash2, Plus, X } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import useAdminPermission from '@/core/hooks/useAdminPermission'
+import useAdminPermission from '@/hooks/useAdminPermission'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
 
 export default function BannerForm() {
+  const { setHeading } = usePageHeading()
   const [maxPosition, setMaxPosition] = useState(1)
   const [activePosition, setActivePosition] = useState(1)
   const [isOpen, setIsOpen] = useState(false)
@@ -57,6 +59,7 @@ export default function BannerForm() {
   })
 
   useEffect(() => {
+    setHeading('Banner Management')
     fetchBannersByPosition()
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -64,8 +67,11 @@ export default function BannerForm() {
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    return () => {
+      setHeading(null)
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [setHeading])
 
   const fetchBannersByPosition = async () => {
     try {
@@ -315,9 +321,6 @@ export default function BannerForm() {
   return (
     <div className='container mx-auto p-4'>
       <ToastContainer />
-      <div className='text-2xl font-bold text-center mb-6'>
-        Banner Management
-      </div>
 
       <div className='flex flex-wrap gap-4 mb-6'>
         {allPositions.map((position) => (

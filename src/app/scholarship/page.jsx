@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react'
 import { Search } from 'lucide-react'
 
 import { fetchScholarships } from './actions'
-import Shimmer from '../components/Shimmer'
-import Navbar from '../components/Frontpage/Navbar'
-import Footer from '../components/Frontpage/Footer'
-import Header from '../components/Frontpage/Header'
+import Shimmer from '../../components/Shimmer'
+import Navbar from '../../components/Frontpage/Navbar'
+import Footer from '../../components/Frontpage/Footer'
+import Header from '../../components/Frontpage/Header'
 
 const ScholarshipPage = () => {
   const [scholarships, setScholarships] = useState([])
