@@ -3,12 +3,14 @@ import React, { useEffect, useState } from 'react'
 import { getFeaturedCollege } from '../../app/[[...home]]/action'
 import { toast } from 'react-toastify'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 const FeaturedAdmission = () => {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  const router = useRouter()
   useEffect(() => {
     fetchItems()
   }, [])
@@ -49,7 +51,10 @@ const FeaturedAdmission = () => {
               <SkeletonLoader key={index} />
             ))
           : data.map((item) => (
-              <Link href={`/colleges/${item.slugs}`} key={item.id}>
+              <div
+                onClick={() => router.push(`/colleges/${item.slugs}`)}
+                key={item.id}
+              >
                 <div
                   key={item.id}
                   className='bg-white rounded-lg shadow-lg overflow-hidden flex flex-col h-full'
@@ -65,20 +70,17 @@ const FeaturedAdmission = () => {
                     <h2 className='text-lg font-semibold text-gray-800 mb-2 line-clamp-2 min-h-[3.5rem]'>
                       {item.name}
                     </h2>
-                    <div className='mb-4 min-h-[3rem]'>
-                      <p className='text-gray-600 text-[15px] mb-1 truncate'>
-                        {item.address.city}, {item.address.country}
-                      </p>
-                      <p className='text-gray-400 text-[14px] truncate'>
-                        {item.university.fullname}
-                      </p>
-                    </div>
-                    <div className='flex justify-end mt-auto pt-2 h-10 flex-shrink-0'>
-                      <Link
-                        href={`/colleges/apply/${item.slugs}`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <button className='flex items-center bg-clientBtn text-white text-sm px-3 py-2 rounded-md hover:bg-blue-600 transition duration-300'>
+                    <div className=' sm:flex justify-between items-center'>
+                      <div>
+                        <p className='text-gray-600 text-[15px]'>
+                          {item.address.city}, {item.address.country}
+                        </p>
+                        <p className='text-gray-400 text-[14px]'>
+                          {item.university.fullname}
+                        </p>
+                      </div>
+                      <Link href={`/colleges/apply/${item.slugs}`}>
+                        <button className='flex items-center mt-3 sm:mt-0 bg-clientBtn text-white text-sm px-3 py-2 rounded-md hover:bg-blue-600 transition duration-300'>
                           Apply Now
                           <svg
                             xmlns='http://www.w3.org/2000/svg'
@@ -99,7 +101,7 @@ const FeaturedAdmission = () => {
                     </div>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
       </div>
     </>

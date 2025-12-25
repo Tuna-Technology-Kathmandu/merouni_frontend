@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation'
 const DegreeScroller = () => {
   const router = useRouter()
   const [allEvents, setAllEvents] = useState([])
+  const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
   const fieldsScrollerRef = useRef(null)
   useEffect(() => {
     loadEvents()

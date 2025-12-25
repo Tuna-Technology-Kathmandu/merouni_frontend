@@ -82,13 +82,18 @@ const MaterialCard = () => {
     <>
       <div className='flex flex-col max-w-[1600px] mx-auto px-8 mt-10'>
         {/* top section  */}
-        <div className='flex flex-row border-b-2 border-[#0A70A7] w-[45px] mb-10'>
-          <span className='text-2xl font-bold mr-2'>Our</span>
-          <span className='text-[#0A70A7] text-2xl font-bold'>Materials</span>
+        <div className='text-center mb-12'>
+          <h1 className='text-2xl md:text-3xl font-extrabold text-gray-800'>
+            Explore Our <span className='text-[#0A70A7]'>Materials</span>
+          </h1>
+          <p className='mt-3 text-gray-600 max-w-2xl mx-auto text-sm'>
+            Discover a materials to help you achieve your academic and career
+            goals.
+          </p>
         </div>
 
         {/* Search Bar */}
-        <div className='flex justify-end w-full'>
+        <div className='flex justify-center mb-10 md:mb-20 w-full'>
           <div className='relative w-full max-w-md mb-6'>
             <input
               type='text'
@@ -135,7 +140,7 @@ const MaterialCard = () => {
                 className='bg-white shadow-md rounded-2xl overflow-hidden transition-transform transform hover:scale-105'
               >
                 <img
-                  src='https://placehold.co/600x400'
+                  src={blog?.image}
                   alt={blog.title}
                   className='w-full h-48 object-cover'
                 />
@@ -144,11 +149,11 @@ const MaterialCard = () => {
                     <h1 className='text-lg font-semibold mb-2'>{blog.title}</h1>
                     <MdOutlineRemoveRedEye
                       className='w-6 h-6 cursor-pointer'
-                      onClick={() => window.open(blog.downloadUrl, '_blank')}
+                      onClick={() => window.open(blog?.file, '_blank')}
                     />
                   </div>
                   <a
-                    href={blog.downloadUrl} // The link to the PDF
+                    href={blog?.file} // The link to the PDF
                     download
                     className='w-full h-full'
                   >
