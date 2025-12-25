@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { Search } from 'lucide-react'
 import { fetchCourses } from './actions' // Make sure this points to the updated version of fetchCourses
-import { getAllFaculty } from '../(dashboard)/dashboard/faculty/action'
+import { getAllFaculty } from './actions'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
@@ -22,6 +22,18 @@ const CoursePage = () => {
     duration: { min: '', max: '' },
     faculty: ''
   })
+
+  const [draftFilters, setDraftFilters] = useState({
+    credits: { min: '', max: '' },
+    duration: { min: '', max: '' },
+    faculty: ''
+  })
+
+  const empty = {
+    credits: { min: '', max: '' },
+    duration: { min: '', max: '' },
+    faculty: ''
+  }
   const [storeFaculties, setStoreFaculties] = useState([])
   const [showFaculties, setShowFaculties] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -73,9 +85,10 @@ const CoursePage = () => {
   const fetchFaculties = async () => {
     try {
       const response = await getAllFaculty(1)
-      setStoreFaculties(response?.items)
+      console.log('API response:', response)
+      setStoreFaculties(response?.items ?? [])
     } catch (err) {
-      console.log('failed to fetch faculties')
+      console.error('Failed to fetch faculties:', err)
     }
   }
 
@@ -106,9 +119,9 @@ const CoursePage = () => {
   const handleFilterChange = (e) => {
     const { name, value } = e.target
     const [type, key] = name.split('.')
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [type]: { ...prevFilters[type], [key]: value }
+    setDraftFilters((prev) => ({
+      ...prev,
+      [type]: { ...prev[type], [key]: value }
     }))
   }
 
@@ -139,19 +152,20 @@ const CoursePage = () => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm)
     }, 500)
-
     return () => clearTimeout(handler)
   }, [searchTerm])
 
   // reset filters and search
   const reset = () => {
-    setFilters({
-      credits: { min: '', max: '' },
-      duration: { min: '', max: '' },
-      faculty: ''
-    })
+    setDraftFilters(empty)
+    setFilters(empty)
     setSearchTerm('')
     setDebouncedSearch('')
+  }
+
+  const applyFilters = () => {
+    setFilters(draftFilters)
+    setPagination((prev) => ({ ...prev, currentPage: 1 }))
   }
   return (
     <>
@@ -203,7 +217,9 @@ const CoursePage = () => {
                   onClick={() => setShowFaculties(!showFaculties)}
                 >
                   <h1 className='block text-sm font-medium text-gray-600'>
-                    {filters.faculty == '' ? 'Faculty' : filters.faculty}
+                    {draftFilters.faculty === ''
+                      ? 'Faculty'
+                      : draftFilters.faculty}
                   </h1>
                 </div>
 
@@ -214,7 +230,7 @@ const CoursePage = () => {
                         <div
                           key={index}
                           onClick={() => {
-                            setFilters((prev) => ({
+                            setDraftFilters((prev) => ({
                               ...prev,
                               faculty: item.title
                             }))
@@ -239,7 +255,7 @@ const CoursePage = () => {
                   <input
                     type='number'
                     name='credits.min'
-                    value={filters.credits.min}
+                    value={draftFilters.credits.min}
                     onChange={handleFilterChange}
                     placeholder='Min'
                     className='w-1/2 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
@@ -247,7 +263,7 @@ const CoursePage = () => {
                   <input
                     type='number'
                     name='credits.max'
-                    value={filters.credits.max}
+                    value={draftFilters.credits.max}
                     onChange={handleFilterChange}
                     placeholder='Max'
                     className='w-1/2 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
@@ -264,7 +280,7 @@ const CoursePage = () => {
                   <input
                     type='number'
                     name='duration.min'
-                    value={filters.duration.min}
+                    value={draftFilters.duration.min}
                     onChange={handleFilterChange}
                     placeholder='Min'
                     className='w-1/2 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
@@ -272,12 +288,21 @@ const CoursePage = () => {
                   <input
                     type='number'
                     name='duration.max'
-                    value={filters.duration.max}
+                    value={draftFilters.duration.max}
                     onChange={handleFilterChange}
                     placeholder='Max'
                     className='w-1/2 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
                   />
                 </div>
+              </div>
+
+              <div
+                className=' w-full flex justify-center mt-3'
+                onClick={applyFilters}
+              >
+                <button className='text-sm font-semibold px-4 py-2 bg-[#387CAE] hover:bg-[#29638c] text-white rounded-lg '>
+                  Apply Filters
+                </button>
               </div>
             </div>
           </div>

@@ -1,11 +1,25 @@
+import axios from 'axios'
+
 // services.js
-export const fetchDegrees = async (search = '', page = 1) => {
+export const fetchDegrees = async (
+  page = 1,
+  credits = '',
+  duration = '',
+  faculty = '',
+  debouncedSearch
+) => {
   try {
-    const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/program?q=${search}&page=${page}&limit=15`
+    const params = {}
+    if (credits) params.credits = credits
+    if (duration) params.duration = duration
+    if (faculty) params.faculty = faculty
+    if (page) params.page = page
+    if (debouncedSearch) params.q = debouncedSearch
+    const response = await axios.get(
+      `${process.env.baseUrl}${process.env.version}/program?&limit=15`,
+      { params }
     )
-    const data = await response.json()
-    return data
+    return response.data
   } catch (error) {
     console.error('Error fetching courses:', error)
     throw error

@@ -26,3 +26,16 @@ export const fetchCourses = async (
     throw error
   }
 }
+
+//for faculty
+
+export const getAllFaculty = async (page) => {
+  try {
+    const response = await axios.get(
+      `${process.env.baseUrl}${process.env.version}/faculty?page=${page}`
+    )
+    return response.data
+  } catch (error) {
+    throw new Error('Failed to fetch faculty data')
+  }
+}

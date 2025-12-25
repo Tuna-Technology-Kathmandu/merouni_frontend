@@ -122,7 +122,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
             'Content-Type': 'application/json',
             'device-id': getDeviceId()
           },
-          withCredentials: false
+          withCredentials: true
         }
       )
 
