@@ -4,7 +4,6 @@ import ProgramSection from '../../../colleges/[slugs]/components/sections/Progra
 import MemberSection from '../../../colleges/[slugs]/components/sections/MemberSection'
 import GoogleMap from '../../../colleges/[slugs]/components/GoogleMap'
 import GallerySection from '../../../colleges/[slugs]/components/sections/GallerySection'
-import BrochureSection from '../../../colleges/[slugs]/components/sections/BrochureSection'
 import FacilitySection from '../../../colleges/[slugs]/components/sections/FacilitySection'
 
 const CollegeOverview = ({ college }) => {
