@@ -3,13 +3,16 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import Table from '../../../../components/Table'
-import { Edit2, Trash2 } from 'lucide-react'
+import { Edit2, Trash2, Search } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
+import { Modal } from '../../../../components/CreateUserModal'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
 
 export default function LevelForm() {
+  const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
   const [isOpen, setIsOpen] = useState(false)
   const [levels, setLevels] = useState([])
@@ -20,6 +23,8 @@ export default function LevelForm() {
   const [editId, setEditingId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchTimeout, setSearchTimeout] = useState(null)
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -41,8 +46,18 @@ export default function LevelForm() {
   const { requireAdmin } = useAdminPermission()
 
   useEffect(() => {
+    setHeading('Level Management')
     fetchLevels()
-  }, [])
+    return () => setHeading(null)
+  }, [setHeading])
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout)
+      }
+    }
+  }, [searchTimeout])
 
   const fetchLevels = async (page = 1) => {
     setTableLoading(true)
@@ -100,6 +115,7 @@ export default function LevelForm() {
       reset()
       fetchLevels()
       setIsOpen(false)
+      setEditingId(null)
       setSubmitting(false)
     } catch (error) {
       toast.error(error.message || 'Failed to save level')
@@ -114,6 +130,30 @@ export default function LevelForm() {
     setEditingId(level.id)
     setValue('title', level.title)
     setValue('author', level.author)
+  }
+
+  const handleModalClose = () => {
+    setIsOpen(false)
+    setEditing(false)
+    setEditingId(null)
+    reset()
+  }
+
+  const handleSearchInput = (value) => {
+    setSearchQuery(value)
+
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    if (value === '') {
+      handleSearch('')
+    } else {
+      const timeoutId = setTimeout(() => {
+        handleSearch(value)
+      }, 300)
+      setSearchTimeout(timeoutId)
+    }
   }
 
   const handleDeleteClick = (id) => {
@@ -210,72 +250,104 @@ export default function LevelForm() {
       setLevels([])
     }
   }
+
   return (
     <>
-      <div className='text-2xl mr-auto p-4 ml-14 font-bold'>
-        <div className='text-center'>Level Management</div>
-        <div className='flex justify-left mt-2'>
-          <button
-            className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? 'Hide form' : 'Show form'}
-          </button>
+      <div className='p-4 w-full'>
+        <div className='flex justify-between items-center mb-4'>
+          {/* Search Bar */}
+          <div className='relative w-full max-w-md'>
+            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+              <Search className='w-4 h-4 text-gray-500' />
+            </div>
+            <input
+              type='text'
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              placeholder='Search levels...'
+            />
+          </div>
+          {/* Button */}
+          <div className='flex gap-2'>
+            <button
+              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+              onClick={() => {
+                setIsOpen(true)
+                setEditing(false)
+                setEditingId(null)
+                reset()
+              }}
+            >
+              Add Level
+            </button>
+          </div>
+        </div>
+        <ToastContainer />
+
+        {/* Table */}
+        <div className='mt-8'>
+          <Table
+            loading={tableLoading}
+            data={levels}
+            columns={columns}
+            pagination={pagination}
+            onPageChange={(newPage) => fetchLevels(newPage)}
+            onSearch={handleSearch}
+            showSearch={false}
+          />
         </div>
       </div>
 
-      {isOpen && (
-        <div className='container mx-auto p-4'>
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-            <div className='bg-white p-6 rounded-lg shadow-md'>
-              <h2 className='text-xl font-semibold mb-4'>Level Information</h2>
-              <div className='grid grid-cols-1 gap-4'>
-                <div>
-                  <label className='block mb-2'>Level Title *</label>
-                  <input
-                    {...register('title', {
-                      required: 'Level title is required',
-                      minLength: {
-                        value: 2,
-                        message: 'Title must be at least 2 characters long'
-                      }
-                    })}
-                    className='w-full p-2 border rounded'
-                  />
-                  {errors.title && (
-                    <span className='text-red-500'>{errors.title.message}</span>
-                  )}
-                </div>
-              </div>
+      {/* Form Modal */}
+      <Modal
+        isOpen={isOpen}
+        onClose={handleModalClose}
+        title={editing ? 'Edit Level' : 'Add Level'}
+        className='max-w-md'
+      >
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+          <div className='space-y-4'>
+            <div>
+              <label className='block mb-2'>Level Title *</label>
+              <input
+                {...register('title', {
+                  required: 'Level title is required',
+                  minLength: {
+                    value: 2,
+                    message: 'Title must be at least 2 characters long'
+                  }
+                })}
+                className='w-full p-2 border rounded'
+              />
+              {errors.title && (
+                <span className='text-red-500'>{errors.title.message}</span>
+              )}
             </div>
+          </div>
 
-            <div className='flex justify-end'>
-              <button
-                type='submit'
-                disabled={submitting}
-                className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
-              >
-                {submitting
-                  ? 'Processing...'
-                  : editing
-                    ? 'Update Level'
-                    : 'Create Level'}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      <div className='mt-8'>
-        <Table
-          loading={tableLoading}
-          data={levels}
-          columns={columns}
-          pagination={pagination}
-          onPageChange={(newPage) => fetchLevels(newPage)}
-          onSearch={handleSearch}
-        />
-      </div>
+          <div className='flex justify-end gap-2'>
+            <button
+              type='button'
+              onClick={handleModalClose}
+              className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors'
+            >
+              Cancel
+            </button>
+            <button
+              type='submit'
+              disabled={submitting}
+              className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
+            >
+              {submitting
+                ? 'Processing...'
+                : editing
+                  ? 'Update Level'
+                  : 'Create Level'}
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       <ConfirmationDialog
         open={isDialogOpen}

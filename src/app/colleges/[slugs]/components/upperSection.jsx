@@ -4,6 +4,7 @@ import { PiLineVerticalThin } from 'react-icons/pi'
 import { FaUniversity, FaPhoneAlt } from 'react-icons/fa'
 import { LiaUniversitySolid } from 'react-icons/lia'
 import { BsGlobe2 } from 'react-icons/bs'
+import { Eye } from 'lucide-react'
 
 const ImageSection = ({ college }) => {
   // Get current page URL to share
@@ -60,16 +61,16 @@ const ImageSection = ({ college }) => {
   // }
 
   return (
-    <div className='flex flex-col items-center relative gap-16 max-md:gap-12'>
+    <div className='flex flex-col items-center relative gap-8 md:gap-12 lg:gap-16'>
       {/* College image, name and location */}
       <div className='w-full'>
         <img
           src={college?.featured_img || '/images/degreeHero.webp'}
           alt='College Photo'
-          className='h-[25vh] w-full md:h-[400px] object-cover'
+          className='h-[15vh] w-full md:h-[200px] object-cover object-top'
         />
-        <div className='flex flex-row lg:h-[95px] bg-[#30AD8F] bg-opacity-5 items-center p-0 px-8 sm:px-14 md:px-24'>
-          <div className='flex items-center justify-center rounded-full bg-white -translate-y-8 overflow-hidden w-24 h-24 md:w-32 md:h-32'>
+        <div className='flex flex-row min-h-[60px] md:h-[70px] bg-[#30AD8F] bg-opacity-5 items-center p-2 px-4 sm:px-8 md:px-14 lg:px-24 gap-2 sm:gap-3'>
+          <div className='flex items-center justify-center rounded-full bg-white -translate-y-4 overflow-hidden w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 flex-shrink-0'>
             <img
               src={
                 college?.college_logo ||
@@ -79,57 +80,82 @@ const ImageSection = ({ college }) => {
               className='object-cover w-full h-full rounded-full aspect-square'
             />
           </div>
-          <div className='ml-4'>
-            <h2 className='font-bold text-lg lg:text-4xl lg:leading-[50px]'>
+          <div className='ml-2 sm:ml-3 flex-1 min-w-0'>
+            <h2 className='font-bold text-sm sm:text-base md:text-xl lg:text-2xl lg:leading-[30px] truncate'>
               {college?.name}
             </h2>
-            <div className='flex flex-row'>
-              <p className='font-semibold text-sm lg:text-lg'>
+            <div className='flex flex-row items-center gap-1'>
+              <p className='font-semibold text-xs sm:text-sm truncate'>
                 {college?.collegeAddress?.street},{' '}
                 {college?.collegeAddress?.city}
               </p>
-              <span>
-                <IoIosGlobe size={25} />
+              <span className='flex-shrink-0'>
+                <IoIosGlobe size={16} className='sm:w-5 sm:h-5' />
               </span>
             </div>
           </div>
+          {/* View Brochure Button */}
+          {college?.college_broucher && (
+            <div className='flex-shrink-0'>
+              <a
+                href={college.college_broucher}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='bg-[#0A6FA7] hover:bg-[#085e8a] text-white px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg flex items-center gap-1 sm:gap-2 transition-colors text-xs sm:text-sm font-semibold whitespace-nowrap'
+              >
+                <Eye className='w-3 h-3 sm:w-4 sm:h-4' />
+                <span className='hidden sm:inline'>View Brochure</span>
+                <span className='sm:hidden'>Brochure</span>
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
       {/* College details section */}
-      <div className='sm:px-24 px-12 w-full'>
-        <div className='bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex items-center justify-center md:flex-wrap flex-col md:flex-row  sm:justify-between md:justify-around md:gap-10 items-left w-full l:w-[80%] gap-6 lg:gap-6 p-7'>
+      <div className='px-4 sm:px-8 md:px-12 lg:px-24 w-full'>
+        <div className='bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex items-center flex-wrap flex-row justify-between md:justify-around gap-2 sm:gap-4 md:gap-6 lg:gap-10 p-3 sm:p-4 md:p-6 lg:p-7 overflow-x-auto'>
           {/* University */}
-          <div className='flex flex-col items-center gap-2 text-center'>
-            <FaUniversity size={30} />
-            <p className='md:max-w-36 sm:text-base text-xs font-semibold'>
+          <div className='flex flex-col items-center gap-1 sm:gap-2 text-center flex-shrink-0 min-w-[80px] sm:min-w-0'>
+            <FaUniversity
+              className='w-5 h-5 sm:w-6 sm:h-7 md:w-7 md:h-8'
+              size={30}
+            />
+            <p className='max-w-[100px] sm:max-w-36 text-[10px] sm:text-xs md:text-sm lg:text-base font-semibold line-clamp-2'>
               {college?.university?.fullname || 'N/A'}
             </p>
           </div>
 
-          <div className='items-center hidden xl:block'>
+          <div className='items-center hidden lg:block flex-shrink-0'>
             <PiLineVerticalThin size={60} />
           </div>
 
           {/* Institute Type */}
-          <div className='flex flex-col items-center gap-2 text-center'>
-            <LiaUniversitySolid size={30} />
-            <p className='whitespace-nowrap sm:text-base text-xs font-semibold'>
+          <div className='flex flex-col items-center gap-1 sm:gap-2 text-center flex-shrink-0 min-w-[60px] sm:min-w-0'>
+            <LiaUniversitySolid
+              className='w-5 h-5 sm:w-6 sm:h-7 md:w-7 md:h-8'
+              size={30}
+            />
+            <p className='whitespace-nowrap text-[10px] sm:text-xs md:text-sm lg:text-base font-semibold'>
               {college?.institute_type || 'N/A'}
             </p>
           </div>
 
-          <div className='items-center hidden xl:block'>
+          <div className='items-center hidden lg:block flex-shrink-0'>
             <PiLineVerticalThin size={60} />
           </div>
 
           {/* Institute Level */}
-          <div className='flex flex-col items-center gap-2 text-center'>
-            <img src='/images/level.png' alt='level' className='w-10' />
+          <div className='flex flex-col items-center gap-1 sm:gap-2 text-center flex-shrink-0 min-w-[60px] sm:min-w-0'>
+            <img
+              src='/images/level.png'
+              alt='level'
+              className='w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10'
+            />
             {JSON.parse(college?.institute_level || '[]').map(
               (level, index) => (
                 <div key={index}>
-                  <p className='max-w-36 sm:text-base text-xs font-semibold'>
+                  <p className='max-w-[80px] sm:max-w-36 text-[10px] sm:text-xs md:text-sm lg:text-base font-semibold line-clamp-2'>
                     {level}
                   </p>
                 </div>
@@ -137,101 +163,48 @@ const ImageSection = ({ college }) => {
             )}
           </div>
 
-          <div className='items-center hidden xl:block'>
+          <div className='items-center hidden lg:block flex-shrink-0'>
             <PiLineVerticalThin size={60} />
           </div>
 
           {/* Contact */}
-          <div className='flex flex-col items-center gap-2 text-center'>
-            <FaPhoneAlt size={25} />
-            {(college?.collegeContacts || []).map((contact, index) => (
-              <div key={index} className='flex flex-row'>
-                <p className='sm:text-base text-xs font-semibold'>
-                  {contact?.contact_number || ''}
-                </p>
-              </div>
-            ))}
+          <div className='flex flex-col items-center gap-1 sm:gap-2 text-center flex-shrink-0 min-w-[80px] sm:min-w-0'>
+            <FaPhoneAlt
+              className='w-4 h-4 sm:w-5 sm:h-6 md:w-6 md:h-7'
+              size={25}
+            />
+            {(college?.collegeContacts || [])
+              .slice(0, 2)
+              .map((contact, index) => (
+                <div key={index} className='flex flex-row'>
+                  <p className='text-[10px] sm:text-xs md:text-sm lg:text-base font-semibold line-clamp-1'>
+                    {contact?.contact_number || ''}
+                  </p>
+                </div>
+              ))}
           </div>
 
-          <div className='items-center hidden xl:block'>
+          <div className='items-center hidden lg:block flex-shrink-0'>
             <PiLineVerticalThin size={60} />
           </div>
 
           {/* Website */}
-          <div className='flex flex-col items-center gap-2 text-center'>
-            <BsGlobe2 size={25} />
+          <div className='flex flex-col items-center gap-1 sm:gap-2 text-center flex-shrink-0 min-w-[80px] sm:min-w-0'>
+            <BsGlobe2
+              className='w-4 h-4 sm:w-5 sm:h-6 md:w-6 md:h-7'
+              size={25}
+            />
             <a
               href={college.website_url}
               target='_blank'
               rel='noopener noreferrer'
+              className='max-w-[100px] sm:max-w-none'
             >
-              <p className='whitespace-nowrap hover:underline hover:text-blue-500 hover:cursor-pointer sm:text-base text-xs font-semibold'>
+              <p className='whitespace-nowrap hover:underline hover:text-blue-500 hover:cursor-pointer text-[10px] sm:text-xs md:text-sm lg:text-base font-semibold line-clamp-1'>
                 {college.website_url || 'www.check.com'}
               </p>
             </a>
           </div>
-        </div>
-      </div>
-
-      {/* Share buttons */}
-      <div className='fixed right-4 top-[30%] lg:block md:-translate-y-1 bg-white p-4 rounded-xl shadow-md z-50'>
-        <div className='text-black font-bold text-sm mb-3 text-center'>
-          Share
-        </div>
-        <div className='flex flex-col gap-4 items-center'>
-          {/* Facebook */}
-          <button
-            onClick={handleFacebookShare}
-            className='hover:opacity-80 transition-opacity hover:scale-110'
-            aria-label='Share on Facebook'
-          >
-            <img src='/images/fb.png' alt='Facebook' className='w-6' />
-          </button>
-
-          {/* Twitter/X */}
-          <button
-            onClick={handleTwitterShare}
-            className='hover:opacity-80 transition-opacity hover:scale-110'
-            aria-label='Share on Twitter'
-          >
-            <img src='/images/twitter.png' alt='Twitter' className='w-6' />
-          </button>
-
-          {/* LinkedIn */}
-          <button
-            onClick={handleLinkedInShare}
-            className='hover:opacity-80 transition-opacity hover:scale-110'
-            aria-label='Share on LinkedIn'
-          >
-            <img src='/images/linkedin.png' alt='LinkedIn' className='w-6' />
-          </button>
-
-          {/* WhatsApp */}
-          {/* <button
-            onClick={handleWhatsAppShare}
-            className='hover:opacity-80 transition-opacity hover:scale-110'
-            aria-label='Share on WhatsApp'
-          >
-            <img src='/images/whatsapp.png' alt='WhatsApp' className='w-6' />
-          </button> */}
-
-          {/* Instagram */}
-          <button
-            onClick={handleInstagramShare}
-            className='hover:opacity-80 transition-opacity hover:scale-110'
-            aria-label='Share on Instagram'
-          >
-            <img src='/images/insta.png' alt='Instagram' className='w-6' />
-          </button>
-
-          {/* Native Share */}
-          {/* <button
-            onClick={handleNativeShare}
-            className='hover:opacity-80 transition-opacity hover:scale-110'
-            aria-label='Share'
-          >
-            <img src='/images/share.png' alt='Share' className='w-6' />
-          </button> */}
         </div>
       </div>
     </div>

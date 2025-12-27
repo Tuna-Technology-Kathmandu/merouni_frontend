@@ -7,7 +7,7 @@ import { getCategories } from '@/app/action'
 import { authFetch } from '@/app/utils/authFetch'
 import Loader from '../../../../components/Loading'
 import Table from '../../../../components/Table'
-import { Edit2, Trash2, Search } from 'lucide-react'
+import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
@@ -50,6 +50,9 @@ export default function NewsManager() {
   const [submitting, setSubmitting] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [newsSearchTimeout, setNewsSearchTimeout] = useState(null)
+  const [viewModalOpen, setViewModalOpen] = useState(false)
+  const [viewNewsData, setViewNewsData] = useState(null)
+  const [loadingView, setLoadingView] = useState(false)
 
   const {
     register,
@@ -144,6 +147,13 @@ export default function NewsManager() {
         id: 'actions',
         cell: ({ row }) => (
           <div className='flex gap-2'>
+            <button
+              onClick={() => handleView(row.original.slug)}
+              className='p-1 text-purple-600 hover:text-purple-800'
+              title='View Details'
+            >
+              <Eye className='w-4 h-4' />
+            </button>
             <button
               onClick={() => handleEdit(row.original)}
               className='p-1 text-blue-600 hover:text-blue-800'
@@ -532,6 +542,32 @@ export default function NewsManager() {
     setDeleteId(null)
   }
 
+  const handleView = async (slug) => {
+    try {
+      setLoadingView(true)
+      setViewModalOpen(true)
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/blogs/${slug}`,
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+      if (!response.ok) {
+        throw new Error('Failed to fetch news details')
+      }
+      const data = await response.json()
+      setViewNewsData(data.blog)
+    } catch (err) {
+      toast.error(err.message || 'Failed to load news details')
+      setViewModalOpen(false)
+    } finally {
+      setLoadingView(false)
+    }
+  }
+
+  const handleCloseViewModal = () => {
+    setViewModalOpen(false)
+    setViewNewsData(null)
+  }
+
   if (loading)
     return (
       <div className='mx-auto'>
@@ -810,6 +846,135 @@ export default function NewsManager() {
         title='Confirm Deletion'
         message='Are you sure you want to delete this news? This action cannot be undone.'
       />
+
+      {/* View News Details Modal */}
+      <Modal
+        isOpen={viewModalOpen}
+        onClose={handleCloseViewModal}
+        title='News Details'
+        className='max-w-3xl'
+      >
+        {loadingView ? (
+          <div className='flex justify-center items-center h-48'>
+            Loading...
+          </div>
+        ) : viewNewsData ? (
+          <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
+            {viewNewsData.featuredImage && (
+              <div className='w-full h-64 rounded-lg overflow-hidden'>
+                <img
+                  src={viewNewsData.featuredImage}
+                  alt={viewNewsData.title}
+                  className='w-full h-full object-cover'
+                />
+              </div>
+            )}
+
+            <div>
+              <h2 className='text-2xl font-bold text-gray-800'>
+                {viewNewsData.title}
+              </h2>
+              <div className='flex gap-2 mt-2'>
+                {viewNewsData.status && (
+                  <span
+                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
+                      viewNewsData.status === 'published'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}
+                  >
+                    {viewNewsData.status}
+                  </span>
+                )}
+                {viewNewsData.visibility && (
+                  <span
+                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
+                      viewNewsData.visibility === 'public'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
+                    {viewNewsData.visibility}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {viewNewsData.newsCategory && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Category</h3>
+                <p className='text-gray-700'>
+                  {viewNewsData.newsCategory.title}
+                </p>
+              </div>
+            )}
+
+            {viewNewsData.newsAuthor && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Author</h3>
+                <p className='text-gray-700'>
+                  {viewNewsData.newsAuthor.firstName}{' '}
+                  {viewNewsData.newsAuthor.middleName}{' '}
+                  {viewNewsData.newsAuthor.lastName}
+                </p>
+              </div>
+            )}
+
+            {viewNewsData.tags &&
+              Array.isArray(viewNewsData.tags) &&
+              viewNewsData.tags.length > 0 && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Tags</h3>
+                  <div className='flex flex-wrap gap-2'>
+                    {viewNewsData.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className='px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm'
+                      >
+                        {typeof tag === 'object' ? tag.title || tag.name : tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            {viewNewsData.description && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Description</h3>
+                <div
+                  className='text-gray-700 prose max-w-none'
+                  dangerouslySetInnerHTML={{
+                    __html: viewNewsData.description
+                  }}
+                />
+              </div>
+            )}
+
+            {viewNewsData.content && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Content</h3>
+                <div
+                  className='text-gray-700 prose max-w-none'
+                  dangerouslySetInnerHTML={{
+                    __html: viewNewsData.content
+                  }}
+                />
+              </div>
+            )}
+
+            {viewNewsData.createdAt && (
+              <div className='pt-4 border-t'>
+                <p className='text-sm text-gray-500'>
+                  Created:{' '}
+                  {new Date(viewNewsData.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className='text-center text-gray-500'>No news data available.</p>
+        )}
+      </Modal>
     </>
   )
 }

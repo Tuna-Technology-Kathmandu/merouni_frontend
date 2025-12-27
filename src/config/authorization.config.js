@@ -2,9 +2,7 @@ export const APP_ROLES = {
   admin: 'admin',
   editor: 'editor',
   agent: 'agent',
-  teacher: 'teacher',
   student: 'student',
-  superadmin: 'superadmin',
   institution: 'institution'
 }
 
@@ -12,7 +10,6 @@ export const PERMISSIONS_VIA_ROLE = {
   [APP_ROLES.admin]: [
     '/dashboard',
     '/dashboard/insights',
-    '/dashboard/academia',
     '/dashboard/addCollege',
     '/dashboard/category',
     '/dashboard/events',
@@ -33,13 +30,17 @@ export const PERMISSIONS_VIA_ROLE = {
     '/dashboard/material',
     '/dashboard/consultancy',
     '/dashboard/career',
-    '/dashboard/vacancy'
+    '/dashboard/vacancy',
+    '/dashboard/college-rankings',
+    '/dashboard/college-orderings',
+    '/dashboard/level',
+    '/dashboard/tag'
   ],
   [APP_ROLES.editor]: [
     '/dashboard',
     '/dashboard/insights',
-    '/dashboard/academia',
     '/dashboard/addCollege',
+    '/dashboard/college-orderings',
     '/dashboard/courses',
     '/dashboard/exams',
     '/dashboard/banner',
@@ -60,10 +61,9 @@ export const PERMISSIONS_VIA_ROLE = {
     '/dashboard/tag',
     '/dashboard/material'
   ],
-  [APP_ROLES.agent]: ['/dashboard/referStudent', '/dashboard/profile'],
-  [APP_ROLES.teacher]: [
-    '/dashboard',
-    '/dashboard/material',
+  [APP_ROLES.agent]: [
+    '/dashboard/referStudent',
+    '/dashboard/referedStudents',
     '/dashboard/profile'
   ],
   [APP_ROLES.student]: ['/dashboard', '/dashboard/profile'],
@@ -72,6 +72,5 @@ export const PERMISSIONS_VIA_ROLE = {
     '/dashboard/profile',
     '/dashboard/applications',
     '/dashboard/edit-college'
-  ],
-  [APP_ROLES.superadmin]: ['*'] // Full access,
+  ]
 }

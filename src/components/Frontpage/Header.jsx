@@ -51,12 +51,24 @@ const Header = () => {
 
       {/* Sidebar */}
       <div
-        className={`absolute top-[80px] left-0 h-screen  w-full bg-white shadow-lg border-t-2 transform transition-transform duration-300 ease-in-out z-50 ${
+        className={`fixed top-[80px] left-0 h-[calc(100vh-80px)] w-full bg-white shadow-lg border-t-2 transform transition-transform duration-300 ease-in-out z-50 ${
           showSidebar ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
+        {/* Close Button */}
+        <div className='flex justify-between items-center px-4 py-4 border-b border-gray-200'>
+          <h2 className='text-xl font-bold text-gray-800'>Menu</h2>
+          <button
+            onClick={() => setShowSidebar(false)}
+            className='p-2 hover:bg-gray-100 rounded-full transition-colors'
+            aria-label='Close menu'
+          >
+            <IoClose size={28} className='text-gray-700' />
+          </button>
+        </div>
+
         {/* Menu Items */}
-        <nav className='px-4 h-[70%] overflow-auto'>
+        <nav className='px-4 h-[calc(100%-80px)] overflow-auto'>
           {menuItems.map((item, index) => (
             <Link
               key={index}
@@ -85,7 +97,7 @@ const Header = () => {
       {/* Sidebar Backdrop */}
       {showSidebar && (
         <div
-          className='fixed inset-0  z-40'
+          className='fixed inset-0 bg-black bg-opacity-50 z-40'
           onClick={() => setShowSidebar(false)}
         />
       )}

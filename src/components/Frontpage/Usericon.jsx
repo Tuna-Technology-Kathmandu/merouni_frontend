@@ -28,11 +28,12 @@ export default function UserDropdown() {
 
   if (isLoggedIn) {
     return (
-      <div className='flex items-center gap-2 mx-2'>
+      <div className='flex items-center gap-1 sm:gap-2 mx-1 sm:mx-2'>
         <Link href='/dashboard'>
-          <button className='flex items-center gap-2 px-4 py-2 bg-[#30ad8f] text-white rounded-lg font-semibold hover:bg-[#2a9d7f] transition-colors'>
-            Go to Dashboard
-            <FaArrowRight className='w-4 h-4' />
+          <button className='flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-[#30ad8f] text-white rounded-lg font-semibold hover:bg-[#2a9d7f] transition-colors text-xs sm:text-sm md:text-base'>
+            <span className='hidden sm:inline'>Go to Dashboard</span>
+            <span className='sm:hidden'>Dashboard</span>
+            <FaArrowRight className='w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0' />
           </button>
         </Link>
       </div>
@@ -45,14 +46,14 @@ export default function UserDropdown() {
   }
 
   return (
-    <div className='flex items-center gap-2 mx-2'>
+    <div className='flex items-center gap-1 sm:gap-2 mx-1 sm:mx-2'>
       <Link href='/sign-in'>
-        <button className='px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors'>
+        <button className='px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors text-xs sm:text-sm md:text-base'>
           Login
         </button>
       </Link>
       <Link href='/signup'>
-        <button className='px-4 py-2 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors'>
+        <button className='px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-xs sm:text-sm md:text-base'>
           Sign Up
         </button>
       </Link>

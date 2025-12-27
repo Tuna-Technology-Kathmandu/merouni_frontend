@@ -86,7 +86,7 @@ export const fetchLevel = async (searchQuery = '') => {
 export const fetchAllCourse = async () => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/program?limit=999999`
+      `${process.env.baseUrl}${process.env.version}/program?limit=100`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch courses')

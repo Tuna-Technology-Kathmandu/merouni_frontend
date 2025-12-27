@@ -2,7 +2,7 @@
 import dynamic from 'next/dynamic'
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import Table from '../../../../components/Table'
-import { Edit2, Trash2, Search } from 'lucide-react'
+import { Edit2, Trash2, Search, Eye, Globe } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { getEvents } from '@/app/action'
@@ -73,6 +73,9 @@ export default function EventManager() {
   const [editorContent, setEditorContent] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
+  const [viewModalOpen, setViewModalOpen] = useState(false)
+  const [viewEventData, setViewEventData] = useState(null)
+  const [loadingView, setLoadingView] = useState(false)
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -378,6 +381,32 @@ export default function EventManager() {
     setDeleteId(null)
   }
 
+  const handleView = async (slug) => {
+    try {
+      setLoadingView(true)
+      setViewModalOpen(true)
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/event/${slug}`,
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+      if (!response.ok) {
+        throw new Error('Failed to fetch event details')
+      }
+      const data = await response.json()
+      setViewEventData(data.item)
+    } catch (err) {
+      toast.error(err.message || 'Failed to load event details')
+      setViewModalOpen(false)
+    } finally {
+      setLoadingView(false)
+    }
+  }
+
+  const handleCloseViewModal = () => {
+    setViewModalOpen(false)
+    setViewEventData(null)
+  }
+
   const columns = useMemo(
     () => [
       {
@@ -480,6 +509,13 @@ export default function EventManager() {
         id: 'actions',
         cell: ({ row }) => (
           <div className='flex gap-2' key={row.original.id}>
+            <button
+              onClick={() => handleView(row.original.slugs)}
+              className='p-1 text-purple-600 hover:text-purple-800'
+              title='View Details'
+            >
+              <Eye className='w-4 h-4' />
+            </button>
             <button
               onClick={() => handleEdit(row.original)}
               className='p-1 text-blue-600 hover:text-blue-800'
@@ -840,6 +876,149 @@ export default function EventManager() {
         title='Confirm Deletion'
         message='Are you sure you want to delete this event? This action cannot be undone.'
       />
+
+      {/* View Event Details Modal */}
+      <Modal
+        isOpen={viewModalOpen}
+        onClose={handleCloseViewModal}
+        title='Event Details'
+        className='max-w-3xl'
+      >
+        {loadingView ? (
+          <div className='flex justify-center items-center h-48'>
+            Loading...
+          </div>
+        ) : viewEventData ? (
+          <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
+            {viewEventData.image && (
+              <div className='w-full h-64 rounded-lg overflow-hidden'>
+                <img
+                  src={viewEventData.image}
+                  alt={viewEventData.title}
+                  className='w-full h-full object-cover'
+                />
+              </div>
+            )}
+
+            <div>
+              <h2 className='text-2xl font-bold text-gray-800'>
+                {viewEventData.title}
+              </h2>
+              {viewEventData.is_featured === 1 && (
+                <span className='px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 mt-2 inline-block'>
+                  Featured
+                </span>
+              )}
+            </div>
+
+            {viewEventData.category && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Category</h3>
+                <p className='text-gray-700'>{viewEventData.category.title}</p>
+              </div>
+            )}
+
+            {viewEventData.college && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>College</h3>
+                <p className='text-gray-700'>{viewEventData.college.name}</p>
+              </div>
+            )}
+
+            {viewEventData.author && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Author</h3>
+                <p className='text-gray-700'>
+                  {viewEventData.author.firstName}{' '}
+                  {viewEventData.author.middleName}{' '}
+                  {viewEventData.author.lastName}
+                </p>
+              </div>
+            )}
+
+            {viewEventData.event_host && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Event Details</h3>
+                <div className='space-y-2'>
+                  {(() => {
+                    const eventHost =
+                      typeof viewEventData.event_host === 'string'
+                        ? JSON.parse(viewEventData.event_host)
+                        : viewEventData.event_host
+                    return (
+                      <>
+                        {eventHost.host && (
+                          <p className='text-gray-700'>
+                            <span className='font-medium'>Host:</span>{' '}
+                            {eventHost.host}
+                          </p>
+                        )}
+                        {eventHost.start_date && (
+                          <p className='text-gray-700'>
+                            <span className='font-medium'>Start Date:</span>{' '}
+                            {eventHost.start_date}
+                          </p>
+                        )}
+                        {eventHost.end_date && (
+                          <p className='text-gray-700'>
+                            <span className='font-medium'>End Date:</span>{' '}
+                            {eventHost.end_date}
+                          </p>
+                        )}
+                        {eventHost.time && (
+                          <p className='text-gray-700'>
+                            <span className='font-medium'>Time:</span>{' '}
+                            {eventHost.time}
+                          </p>
+                        )}
+                        {eventHost.map_url && (
+                          <p className='text-gray-700'>
+                            <span className='font-medium'>Location:</span>{' '}
+                            <a
+                              href={eventHost.map_url}
+                              target='_blank'
+                              rel='noopener noreferrer'
+                              className='text-blue-600 hover:underline inline-flex items-center gap-1'
+                            >
+                              <MapPin className='inline w-4 h-4' /> View Map
+                            </a>
+                          </p>
+                        )}
+                      </>
+                    )
+                  })()}
+                </div>
+              </div>
+            )}
+
+            {viewEventData.description && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Description</h3>
+                <div
+                  className='text-gray-700 prose max-w-none'
+                  dangerouslySetInnerHTML={{
+                    __html: viewEventData.description
+                  }}
+                />
+              </div>
+            )}
+
+            {viewEventData.content && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Content</h3>
+                <div
+                  className='text-gray-700 prose max-w-none'
+                  dangerouslySetInnerHTML={{
+                    __html: viewEventData.content
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className='text-center text-gray-500'>No event data available.</p>
+        )}
+      </Modal>
     </>
   )
 }

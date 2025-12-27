@@ -11,6 +11,100 @@ import ApplyNow from './components/applyNow'
 import RelatedColleges from './components/RelatedColleges'
 import Loading from '../../../components/Loading'
 
+// Share Section Component
+const ShareSection = ({ college }) => {
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
+  const shareTitle = `Check out ${college?.name} on our platform`
+
+  const handleFacebookShare = () => {
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}&quote=${encodeURIComponent(shareTitle)}`,
+      'facebook-share-dialog',
+      'width=626,height=436'
+    )
+  }
+
+  const handleTwitterShare = () => {
+    window.open(
+      `https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(shareTitle)}`,
+      'twitter-share-dialog',
+      'width=550,height=420'
+    )
+  }
+
+  const handleLinkedInShare = () => {
+    window.open(
+      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`,
+      'linkedin-share-dialog',
+      'width=550,height=420'
+    )
+  }
+
+  const handleInstagramShare = () => {
+    navigator.clipboard.writeText(`${shareTitle}\n${currentUrl}`)
+    alert('Link copied to clipboard! You can now paste it in Instagram')
+  }
+
+  return (
+    <div className='fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-lg z-50 py-3 sm:py-4'>
+      <div className='max-w-[1600px] mx-auto px-4'>
+        <div className='text-black font-bold text-xs sm:text-sm mb-3 text-center'>
+          Share
+        </div>
+        <div className='flex flex-row gap-3 sm:gap-4 items-center justify-center'>
+          {/* Facebook */}
+          <button
+            onClick={handleFacebookShare}
+            className='hover:opacity-80 transition-opacity hover:scale-110'
+            aria-label='Share on Facebook'
+          >
+            <img src='/images/fb.png' alt='Facebook' className='w-5 sm:w-6' />
+          </button>
+
+          {/* Twitter/X */}
+          <button
+            onClick={handleTwitterShare}
+            className='hover:opacity-80 transition-opacity hover:scale-110'
+            aria-label='Share on Twitter'
+          >
+            <img
+              src='/images/twitter.png'
+              alt='Twitter'
+              className='w-5 sm:w-6'
+            />
+          </button>
+
+          {/* LinkedIn */}
+          <button
+            onClick={handleLinkedInShare}
+            className='hover:opacity-80 transition-opacity hover:scale-110'
+            aria-label='Share on LinkedIn'
+          >
+            <img
+              src='/images/linkedin.png'
+              alt='LinkedIn'
+              className='w-5 sm:w-6'
+            />
+          </button>
+
+          {/* Instagram */}
+          <button
+            onClick={handleInstagramShare}
+            className='hover:opacity-80 transition-opacity hover:scale-110'
+            aria-label='Share on Instagram'
+          >
+            <img
+              src='/images/insta.png'
+              alt='Instagram'
+              className='w-5 sm:w-6'
+            />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const CollegeDetailPage = ({ params }) => {
   const [college, setCollege] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -70,6 +164,10 @@ const CollegeDetailPage = ({ params }) => {
       <CollegeOverview college={college} />
       <ApplyNow college={college} />
       <RelatedColleges college={college} />
+
+      {/* Share Section - Bottom Center */}
+      <ShareSection college={college} />
+
       <Footer />
     </div>
   )

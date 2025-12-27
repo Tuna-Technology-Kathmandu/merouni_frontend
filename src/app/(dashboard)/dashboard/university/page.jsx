@@ -6,7 +6,8 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
 import Table from '../../../../components/Table'
-import { Edit2, Trash2, Search } from 'lucide-react'
+import { Search, Globe, MapPin } from 'lucide-react'
+import { createColumns } from './columns'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
@@ -52,6 +53,9 @@ export default function UniversityForm() {
   })
   const [deleteId, setDeleteId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [viewModalOpen, setViewModalOpen] = useState(false)
+  const [viewUniversityData, setViewUniversityData] = useState(null)
+  const [loadingView, setLoadingView] = useState(false)
 
   const {
     register,
@@ -185,12 +189,14 @@ export default function UniversityForm() {
       data.assets.featured_image = uploadedFiles.featured
       data.gallery = uploadedFiles.gallery.filter((url) => url)
       data.levels = data.levels.map((l) => parseInt(l))
-      data.programs = Array.isArray(data.programs)
+
+      // Ensure programs is always an array
+      const programsArray = Array.isArray(data.programs)
         ? data.programs.map((program) => parseInt(program))
         : []
 
       // Filter out invalid program IDs and verify they exist in available courses
-      const validProgramIds = data.programs.filter(
+      const validProgramIds = programsArray.filter(
         (id) =>
           !isNaN(id) &&
           id !== null &&
@@ -198,18 +204,23 @@ export default function UniversityForm() {
           courses.some((course) => course.id === id)
       )
 
-      // Optional: Show error if no valid programs selected
-      if (validProgramIds.length === 0 && courses.length > 0) {
-        toast.error('Please select at least one valid program')
-        return
-      }
-
-      // Use only validated programs
+      // Always include programs array (even if empty) to ensure it's saved
       data.programs = validProgramIds
+
+      // Ensure contact object is always included
+      if (!data.contact) {
+        data.contact = {
+          faxes: '',
+          poboxes: '',
+          email: '',
+          phone_number: ''
+        }
+      }
 
       const url = `${process.env.baseUrl}${process.env.version}/university`
       const method = 'POST'
       console.log('before submitting uni', data)
+      console.log('contact data:', data.contact)
       const response = await authFetch(url, {
         method,
         headers: {
@@ -352,58 +363,42 @@ export default function UniversityForm() {
       setDeleteId(null) // Reset the delete ID
     }
   }
-  const columns = [
-    {
-      header: 'ID',
-      accessorKey: 'id'
-    },
-    {
-      header: 'Name',
-      accessorKey: 'fullname',
-      cell: ({ row }) => {
-        const name = row.original.fullname
-        const type = row.original.type_of_institute
-        return (
-          <div className='flex items-center gap-2'>
-            <span>{name}</span>
-            {type && (
-              <span className='px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800'>
-                {type}
-              </span>
-            )}
-          </div>
-        )
-      }
-    },
-    {
-      header: 'Location',
-      accessorKey: 'address',
-      cell: ({ row }) => {
-        const data = row.original
-        return `${data.city}, ${data.state}, ${data.country}`
-      }
-    },
-    {
-      header: 'Actions',
-      id: 'actions',
-      cell: ({ row }) => (
-        <div className='flex gap-2'>
-          <button
-            onClick={() => handleEdit(row.original.slugs)}
-            className='p-1 text-blue-600 hover:text-blue-800'
-          >
-            <Edit2 className='w-4 h-4' />
-          </button>
-          <button
-            onClick={() => handleDeleteClick(row.original.id)}
-            className='p-1 text-red-600 hover:text-red-800'
-          >
-            <Trash2 className='w-4 h-4' />
-          </button>
-        </div>
+
+  const handleView = async (slug) => {
+    try {
+      setLoadingView(true)
+      setViewModalOpen(true)
+
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/university/${slug}`,
+        { headers: { 'Content-Type': 'application/json' } }
       )
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch university details')
+      }
+
+      const data = await response.json()
+      setViewUniversityData(data)
+    } catch (err) {
+      toast.error(err.message || 'Failed to load university details')
+      setViewModalOpen(false)
+    } finally {
+      setLoadingView(false)
     }
-  ]
+  }
+
+  const handleCloseViewModal = () => {
+    setViewModalOpen(false)
+    setViewUniversityData(null)
+  }
+
+  // Create columns with handlers (must be after handlers are defined)
+  const columns = createColumns({
+    handleView,
+    handleEdit,
+    handleDeleteClick
+  })
 
   const handleSearch = async (query) => {
     if (!query) {
@@ -845,6 +840,157 @@ export default function UniversityForm() {
         title='Confirm Deletion'
         message='Are you sure you want to delete this university? This action cannot be undone.'
       />
+
+      {/* View University Details Modal */}
+      <Modal
+        isOpen={viewModalOpen}
+        onClose={handleCloseViewModal}
+        title='University Details'
+        className='max-w-4xl max-h-[90vh] overflow-y-auto'
+      >
+        {loadingView ? (
+          <div className='flex items-center justify-center py-8'>
+            <div className='text-gray-500'>Loading...</div>
+          </div>
+        ) : viewUniversityData ? (
+          <div className='space-y-6'>
+            {/* Logo and Basic Info */}
+            <div className='flex items-start gap-4 border-b pb-4'>
+              {viewUniversityData.featured_image && (
+                <img
+                  src={viewUniversityData.featured_image}
+                  alt={viewUniversityData.fullname}
+                  className='w-20 h-20 object-contain rounded-lg border'
+                />
+              )}
+              <div className='flex-1'>
+                <h2 className='text-2xl font-bold text-gray-800'>
+                  {viewUniversityData.fullname}
+                </h2>
+                {viewUniversityData.type_of_institute && (
+                  <span className='inline-block mt-2 px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800'>
+                    {viewUniversityData.type_of_institute}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Address */}
+            {(viewUniversityData.city ||
+              viewUniversityData.state ||
+              viewUniversityData.country) && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Address</h3>
+                <div className='text-gray-700 space-y-1'>
+                  {viewUniversityData.street && (
+                    <p>{viewUniversityData.street}</p>
+                  )}
+                  <p>
+                    {[
+                      viewUniversityData.city,
+                      viewUniversityData.state,
+                      viewUniversityData.country
+                    ]
+                      .filter(Boolean)
+                      .join(', ')}
+                  </p>
+                  {viewUniversityData.postal_code && (
+                    <p>Postal Code: {viewUniversityData.postal_code}</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Contact Information */}
+            {viewUniversityData.contact && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>
+                  Contact Information
+                </h3>
+                <div className='text-gray-700 space-y-1'>
+                  {viewUniversityData.contact.phone_number && (
+                    <p>Phone: {viewUniversityData.contact.phone_number}</p>
+                  )}
+                  {viewUniversityData.contact.email && (
+                    <p>Email: {viewUniversityData.contact.email}</p>
+                  )}
+                  {viewUniversityData.contact.faxes && (
+                    <p>Fax: {viewUniversityData.contact.faxes}</p>
+                  )}
+                  {viewUniversityData.contact.poboxes && (
+                    <p>P.O. Box: {viewUniversityData.contact.poboxes}</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Date of Establishment */}
+            {viewUniversityData.date_of_establish && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>
+                  Date of Establishment
+                </h3>
+                <p className='text-gray-700'>
+                  {new Date(
+                    viewUniversityData.date_of_establish
+                  ).toLocaleDateString()}
+                </p>
+              </div>
+            )}
+
+            {/* Programs */}
+            {viewUniversityData.programs &&
+              viewUniversityData.programs.length > 0 && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Programs</h3>
+                  <div className='flex flex-wrap gap-2'>
+                    {viewUniversityData.programs.map((program, index) => (
+                      <span
+                        key={index}
+                        className='px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm'
+                      >
+                        {typeof program === 'string'
+                          ? program
+                          : program.program?.title || 'N/A'}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            {/* Levels */}
+            {viewUniversityData.levels &&
+              viewUniversityData.levels.length > 0 && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Levels</h3>
+                  <div className='flex flex-wrap gap-2'>
+                    {viewUniversityData.levels.map((level, index) => (
+                      <span
+                        key={index}
+                        className='px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm'
+                      >
+                        {level}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            {/* Description */}
+            {viewUniversityData.description && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Description</h3>
+                <div
+                  className='text-gray-700 prose max-w-none'
+                  dangerouslySetInnerHTML={{
+                    __html: viewUniversityData.description
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        ) : null}
+      </Modal>
     </>
   )
 }

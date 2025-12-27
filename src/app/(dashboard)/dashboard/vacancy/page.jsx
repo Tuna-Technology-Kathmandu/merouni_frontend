@@ -12,7 +12,7 @@ import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { Modal } from '../../../../components/CreateUserModal'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Search } from 'lucide-react'
+import { Search, Eye } from 'lucide-react'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 
 const VacancyManager = () => {
@@ -54,6 +54,9 @@ const VacancyManager = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
+  const [viewModalOpen, setViewModalOpen] = useState(false)
+  const [viewVacancyData, setViewVacancyData] = useState(null)
+  const [loadingView, setLoadingView] = useState(false)
 
   const loadVacancies = async (page = 1) => {
     setTableLoading(true)
@@ -203,6 +206,32 @@ const VacancyManager = () => {
     setDeleteId(null)
   }
 
+  const handleView = async (slug) => {
+    try {
+      setLoadingView(true)
+      setViewModalOpen(true)
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/vacancy/${slug}`,
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+      if (!response.ok) {
+        throw new Error('Failed to fetch vacancy details')
+      }
+      const data = await response.json()
+      setViewVacancyData(data.item)
+    } catch (err) {
+      toast.error(err.message || 'Failed to load vacancy details')
+      setViewModalOpen(false)
+    } finally {
+      setLoadingView(false)
+    }
+  }
+
+  const handleCloseViewModal = () => {
+    setViewModalOpen(false)
+    setViewVacancyData(null)
+  }
+
   const handleSearch = async (query) => {
     if (!query) {
       loadVacancies()
@@ -270,6 +299,13 @@ const VacancyManager = () => {
       id: 'actions',
       cell: ({ row }) => (
         <div className='flex gap-2'>
+          <button
+            onClick={() => handleView(row.original.slugs)}
+            className='p-1 text-purple-600 hover:text-purple-800'
+            title='View Details'
+          >
+            <Eye className='w-4 h-4' />
+          </button>
           <button
             onClick={() => handleEdit(row.original.slugs)}
             className='p-1 text-blue-600 hover:text-blue-800'
@@ -462,6 +498,66 @@ const VacancyManager = () => {
         title='Confirm Deletion'
         message='Are you sure you want to delete this vacancy? This action cannot be undone.'
       />
+
+      {/* View Vacancy Details Modal */}
+      <Modal
+        isOpen={viewModalOpen}
+        onClose={handleCloseViewModal}
+        title='Vacancy Details'
+        className='max-w-3xl'
+      >
+        {loadingView ? (
+          <div className='flex justify-center items-center h-48'>
+            Loading...
+          </div>
+        ) : viewVacancyData ? (
+          <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
+            {viewVacancyData.featuredImage && (
+              <div className='w-full h-64 rounded-lg overflow-hidden'>
+                <img
+                  src={viewVacancyData.featuredImage}
+                  alt={viewVacancyData.title}
+                  className='w-full h-full object-cover'
+                />
+              </div>
+            )}
+
+            <div>
+              <h2 className='text-2xl font-bold text-gray-800'>
+                {viewVacancyData.title}
+              </h2>
+            </div>
+
+            {viewVacancyData.description && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Description</h3>
+                <div
+                  className='text-gray-700 prose max-w-none'
+                  dangerouslySetInnerHTML={{
+                    __html: viewVacancyData.description
+                  }}
+                />
+              </div>
+            )}
+
+            {viewVacancyData.content && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Content</h3>
+                <div
+                  className='text-gray-700 prose max-w-none'
+                  dangerouslySetInnerHTML={{
+                    __html: viewVacancyData.content
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className='text-center text-gray-500'>
+            No vacancy data available.
+          </p>
+        )}
+      </Modal>
     </>
   )
 }

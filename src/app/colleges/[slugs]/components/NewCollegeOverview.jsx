@@ -1,11 +1,11 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import OverviewSection from './sections/OverviewSection'
 import ProgramSection from './sections/ProgramSection'
 import MemberSection from './sections/MemberSection'
 import GoogleMap from './GoogleMap'
 import GallerySection from './sections/GallerySection'
-import BrochureSection from './sections/BrochureSection'
 import FacilitySection from './sections/FacilitySection'
+import InfoSection from './sections/InfoSection'
 
 const CollegeOverview = ({ college }) => {
   const overviewRef = useRef(null)
@@ -14,6 +14,8 @@ const CollegeOverview = ({ college }) => {
   const galleryRef = useRef(null)
   const bronchureRef = useRef(null)
   const facilityRef = useRef(null)
+  const infoRef = useRef(null)
+  const [activeSection, setActiveSection] = useState(0)
 
   const validMembers = (college.collegeMembers || []).filter(
     (member) =>
@@ -23,20 +25,20 @@ const CollegeOverview = ({ college }) => {
       member.description?.trim()
   )
 
+  const hasAddress =
+    college?.collegeAddress?.country ||
+    college?.collegeAddress?.state ||
+    college?.collegeAddress?.city ||
+    college?.collegeAddress?.street ||
+    college?.collegeAddress?.postal_code
+  const hasContact =
+    (college?.collegeContacts && college.collegeContacts.length > 0) ||
+    college?.website_url
+
   const allSections = [
     {
-      name: 'Bronchure',
-      visible: college?.college_broucher !== '',
-      ref: bronchureRef,
-      component: <BrochureSection college={college} />
-    },
-    {
       name: 'Overview',
-      visible: !!(
-        college?.description &&
-        college?.content &&
-        college?.institute_type !== ''
-      ),
+      visible: !!(college?.description || college?.content),
       ref: overviewRef,
       component: <OverviewSection college={college} />
     },
@@ -64,6 +66,12 @@ const CollegeOverview = ({ college }) => {
       visible: college?.collegeGallery?.length !== 0,
       ref: galleryRef,
       component: <GallerySection college={college} />
+    },
+    {
+      name: 'Contact & Address',
+      visible: !!(hasAddress || hasContact),
+      ref: infoRef,
+      component: <InfoSection college={college} />
     }
   ]
 
@@ -75,30 +83,65 @@ const CollegeOverview = ({ college }) => {
     const elementPosition = target.getBoundingClientRect().top + window.scrollY
     const offsetPosition = elementPosition - headerOffset
 
+    setActiveSection(index) // Update active section when clicked
     window.scrollTo({
       top: offsetPosition,
       behavior: 'smooth'
     })
   }
 
+  // Scroll spy effect to highlight active section
+  useEffect(() => {
+    const handleScrollSpy = () => {
+      const scrollPosition = window.scrollY + 200 // Offset for header and some padding
+
+      for (let i = visibleSections.length - 1; i >= 0; i--) {
+        const section = visibleSections[i]
+        const element = section.ref.current
+
+        if (element) {
+          const rect = element.getBoundingClientRect()
+          const elementTop = rect.top + window.scrollY
+          const elementBottom = elementTop + rect.height
+
+          if (scrollPosition >= elementTop && scrollPosition < elementBottom) {
+            setActiveSection(i)
+            break
+          }
+        }
+      }
+    }
+
+    window.addEventListener('scroll', handleScrollSpy)
+    handleScrollSpy() // Initial check
+
+    return () => {
+      window.removeEventListener('scroll', handleScrollSpy)
+    }
+  }, [visibleSections])
+
   return (
-    <section className='px-[75px] max-md:px-[30px] mb-20 max-md:mb-10 flex justify-between gap-16 max-md:gap-2 w-full max-md:flex-col-reverse max-md:items-between'>
+    <section className='px-4 sm:px-6 md:px-8 lg:px-[30px] xl:px-[75px] mb-10 sm:mb-16 md:mb-20 flex justify-between gap-4 sm:gap-8 md:gap-12 lg:gap-16 w-full flex-col md:flex-row md:items-start'>
       {/* Sidebar - Only shows visible sections */}
       {visibleSections.length > 0 && (
-        <aside className='sticky top-52 h-fit self-start max-md:static max-md:mx-auto'>
-          <div className='flex gap-1 max-md:gap-1 mt-20 max-md:mt-9'>
-            <div className='w-[4px] bg-[#0A6FA7] h-auto mr-2'></div>
-            <p className='font-semibold text-[20px] max-md:text-center tracking-[0.01em] text-black'>
+        <aside className='h-fit self-start md:sticky md:top-52 md:-ml-4 lg:-ml-8 w-full md:w-auto'>
+          <div className='flex gap-1 items-center justify-center md:justify-start mt-4 sm:mt-6 md:mt-9 lg:mt-20'>
+            <div className='w-[4px] bg-[#0A6FA7] h-auto '></div>
+            <p className='font-semibold text-base sm:text-lg md:text-[20px] text-center md:text-left tracking-[0.01em] text-black'>
               About
             </p>
           </div>
 
-          <ul className='mt-7 max-md:text-center'>
+          <ul className='mt-4 sm:mt-6 md:mt-7 flex flex-row md:flex-col gap-3 sm:gap-4 md:gap-0 flex-wrap md:flex-nowrap justify-center md:justify-start overflow-x-auto md:overflow-x-visible pb-2 md:pb-0'>
             {visibleSections.map((section, index) => (
               <li
                 key={index}
                 onClick={() => handleScroll(index)}
-                className='text-base max-[1120px]:text-sm font-medium mb-4 max-lg:mb-2 cursor-pointer hover:underline tracking-[0.01em]'
+                className={`text-xs sm:text-sm md:text-base lg:text-base font-medium mb-0 md:mb-2 lg:mb-4 cursor-pointer hover:underline tracking-[0.01em] whitespace-nowrap px-2 py-1 md:px-0 md:py-0 transition-colors ${
+                  activeSection === index
+                    ? 'text-[#30AD8F] font-bold'
+                    : 'text-gray-700'
+                }`}
               >
                 {section.name}
               </li>
@@ -108,7 +151,7 @@ const CollegeOverview = ({ college }) => {
       )}
 
       {/* Content Area - Only renders visible sections */}
-      <div className='flex flex-col justify-start w-2/3 max-lg:w-full gap-14 max-md:w-full mt-20'>
+      <div className='flex flex-col justify-start w-full md:w-2/3 gap-8 sm:gap-10 md:gap-12 lg:gap-14 mt-4 sm:mt-6 md:mt-12 lg:mt-20'>
         {visibleSections.map((section, index) => (
           <div key={index} className='min-h-[100px] w-full' ref={section.ref}>
             {section.component}

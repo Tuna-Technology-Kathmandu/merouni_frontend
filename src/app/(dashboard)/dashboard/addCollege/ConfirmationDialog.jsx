@@ -56,7 +56,15 @@ const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
   }
 }))
 
-const ConfirmationDialog = ({ open, onClose, onConfirm, title, message }) => {
+const ConfirmationDialog = ({
+  open,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = 'Confirm',
+  cancelText = 'Cancel'
+}) => {
   return (
     <StyledDialog
       open={open}
@@ -86,7 +94,7 @@ const ConfirmationDialog = ({ open, onClose, onConfirm, title, message }) => {
             }
           }}
         >
-          Cancel
+          {cancelText}
         </Button>
         <Button
           onClick={onConfirm}
@@ -98,7 +106,7 @@ const ConfirmationDialog = ({ open, onClose, onConfirm, title, message }) => {
             }
           }}
         >
-          Logout
+          {confirmText}
         </Button>
       </StyledDialogActions>
     </StyledDialog>

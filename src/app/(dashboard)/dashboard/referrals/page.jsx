@@ -1,6 +1,8 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
+import { useSelector } from 'react-redux'
+import { destr } from 'destr'
 import { fetchReferrals, updateReferralStatus, deleteReferral } from './action'
 import { FaTrashAlt, FaEdit } from 'react-icons/fa'
 import { Modal } from '../../../../components/CreateUserModal'
@@ -20,6 +22,15 @@ const ReferralsPage = () => {
     status: 'IN_PROGRESS',
     remarks: ''
   })
+
+  // Get user role from Redux
+  const rawRole = useSelector((state) => state.user?.data?.role)
+
+  // Check if user is an institution/college (has institution role but not admin/editor)
+  const isInstitution = useMemo(() => {
+    const role = typeof rawRole === 'string' ? destr(rawRole) : rawRole || {}
+    return !!(role?.institution && !role?.admin && !role?.editor)
+  }, [rawRole])
 
   useEffect(() => {
     setHeading('Referrals')
@@ -119,43 +130,53 @@ const ReferralsPage = () => {
         <table className='min-w-full bg-white border border-gray-200 shadow-md'>
           <thead>
             <tr className='bg-gray-100 border-b'>
+              <th className='px-4 py-2 border'>S.N.</th>
               <th className='px-4 py-2 border'>Student Name</th>
               <th className='px-4 py-2 border'>Applied College</th>
-              <th className='px-4 py-2 border'>Referred By</th>
+              {!isInstitution && (
+                <>
+                  <th className='px-4 py-2 border'>Referred By</th>
+                  <th className='px-4 py-2 border'>Application Type</th>
+                </>
+              )}
               <th className='px-4 py-2 border'>Student Email</th>
               <th className='px-4 py-2 border'>Student Phone</th>
-              <th className='px-4 py-2 border'>Application Type</th>
               <th className='px-4 py-2 border'>Status</th>
               <th className='px-4 py-2 border'>Remarks</th>
               <th className='px-4 py-2 border text-center'>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {referrals.map((referral) => (
+            {referrals.map((referral, index) => (
               <tr key={referral.id} className='border-b'>
+                <td className='px-4 py-2 border'>{index + 1}</td>
                 <td className='px-4 py-2 border'>
                   {referral.student_name || 'N/A'}
                 </td>
                 <td className='px-4 py-2 border'>
                   {referral.referralCollege?.name || 'N/A'}
                 </td>
-                <td className='px-4 py-2 border'>
-                  {referral.referralTeacher
-                    ? `${referral.referralTeacher.firstName} ${
-                        referral.referralTeacher.middleName || ''
-                      } ${referral.referralTeacher.lastName}`.trim()
-                    : referral.application_type === 'self'
-                      ? 'Self'
-                      : 'N/A'}
-                </td>
+                {!isInstitution && (
+                  <>
+                    <td className='px-4 py-2 border'>
+                      {referral.referralAgent
+                        ? `${referral.referralAgent.firstName} ${
+                            referral.referralAgent.middleName || ''
+                          } ${referral.referralAgent.lastName}`.trim()
+                        : referral.application_type === 'self'
+                          ? 'Self'
+                          : 'N/A'}
+                    </td>
+                    <td className='px-4 py-2 border'>
+                      {referral.application_type}
+                    </td>
+                  </>
+                )}
                 <td className='px-4 py-2 border'>
                   {referral.student_email || 'N/A'}
                 </td>
                 <td className='px-4 py-2 border'>
                   {referral.student_phone_no || 'N/A'}
-                </td>
-                <td className='px-4 py-2 border'>
-                  {referral.application_type}
                 </td>
                 <td className='px-4 py-2 border'>
                   <span

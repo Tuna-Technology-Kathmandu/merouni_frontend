@@ -110,12 +110,6 @@ const Navbar = () => {
                Courses
               </Link> */}
               <Link
-                href='/wishlist'
-                className='block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer'
-              >
-                Wishlist
-              </Link>
-              <Link
                 href='/contact'
                 className='block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer'
               >

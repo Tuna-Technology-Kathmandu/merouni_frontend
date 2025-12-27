@@ -19,7 +19,12 @@ import {
 } from 'react-icons/fa'
 import { BsNewspaper, BsCalendarEvent } from 'react-icons/bs'
 import { HiOutlineUsers, HiOutlineAcademicCap } from 'react-icons/hi'
-import { MdCategory, MdOutlinePermMedia } from 'react-icons/md'
+import {
+  MdCategory,
+  MdOutlinePermMedia,
+  MdOutlineDescription,
+  MdEmojiEvents
+} from 'react-icons/md'
 import { IoSchoolSharp } from 'react-icons/io5'
 import { RiUserSettingsLine } from 'react-icons/ri'
 import { BiLogOut } from 'react-icons/bi'
@@ -37,86 +42,92 @@ const menuItems = [
         icon: <FaHome className='text-xl' />,
         label: 'Home',
         href: '/dashboard',
-        visible: ['admin', 'superadmin', 'editor', 'teacher', 'student']
+        visible: ['admin', 'editor', 'student']
       },
       {
         icon: <VscReferences />,
         label: 'Referrals',
         href: '/dashboard/referrals',
-        visible: ['admin', 'superadmin']
+        visible: ['admin']
       },
       {
         icon: <HiOutlineAcademicCap className='text-xl' />,
         label: 'Academia',
         href: '/dashboard/academia',
-        visible: ['admin', 'editor', 'superadmin']
+        visible: ['admin', 'editor', 'admin']
       },
       {
         icon: <RiUserSettingsLine className='text-xl' />,
         label: 'Agent Approve',
         href: '/dashboard/agentApprove',
-        visible: ['superadmin']
+        visible: ['admin']
       },
       {
         icon: <FaBuilding className='text-xl' />,
         label: 'Banner',
         href: '/dashboard/banner',
-        visible: ['admin', 'superadmin', 'editor']
+        visible: ['admin', 'editor']
       },
       {
         icon: <FaBriefcase className='text-xl' />,
         label: 'Career',
         href: '/dashboard/career',
-        visible: ['admin', 'superadmin', 'editor']
+        visible: ['admin', 'editor']
       },
       {
         icon: <MdCategory className='text-xl' />,
         label: 'Category',
         href: '/dashboard/category',
-        visible: ['admin', 'editor', 'superadmin']
+        visible: ['admin', 'editor', 'admin']
       },
       {
         icon: <FaUniversity className='text-xl' />,
         label: 'University',
         href: '/dashboard/university',
-        visible: ['admin', 'editor', 'superadmin']
+        visible: ['admin', 'editor', 'admin']
       },
       {
         icon: <IoSchoolSharp className='text-xl' />,
         label: 'Colleges',
         href: '/dashboard/addCollege',
-        visible: ['admin', 'editor', 'superadmin']
+        visible: ['admin', 'editor', 'admin']
       },
       {
         icon: <FaHandshake className='text-xl' />,
         label: 'Consultancy',
         href: '/dashboard/consultancy',
-        visible: ['admin', 'superadmin', 'editor']
+        visible: ['admin', 'editor']
       },
       {
         icon: <BsCalendarEvent className='text-xl' />,
         label: 'Events',
         href: '/dashboard/events',
-        visible: ['admin', 'editor', 'superadmin']
+        visible: ['admin', 'editor', 'admin']
       },
       {
         icon: <FaBriefcase className='text-xl' />,
         label: 'Vacancies',
         href: '/dashboard/vacancy',
-        visible: ['admin', 'editor', 'superadmin']
+        visible: ['admin', 'editor', 'admin']
       },
 
       {
         icon: <MdOutlinePermMedia className='text-xl' />,
         label: 'Media',
         href: '/dashboard/media',
-        visible: ['admin', 'editor', 'superadmin']
+        visible: ['admin', 'editor', 'admin']
+      },
+      {
+        icon: <MdOutlineDescription className='text-xl' />,
+        label: 'Material',
+        href: '/dashboard/material',
+        visible: ['admin', 'editor', 'admin']
       },
       {
         icon: <BsNewspaper className='text-xl' />,
         label: 'News',
         href: '/dashboard/news',
-        visible: ['admin', 'editor', 'superadmin']
+        visible: ['admin', 'editor', 'admin']
       },
       {
         icon: <MdBackHand />,
@@ -128,7 +139,13 @@ const menuItems = [
         icon: <HiOutlineUsers className='text-xl' />,
         label: 'Users',
         href: '/dashboard/users',
-        visible: ['admin', 'superadmin']
+        visible: ['admin']
+      },
+      {
+        icon: <MdEmojiEvents className='text-xl' />,
+        label: 'College Rankings',
+        href: '/dashboard/college-rankings',
+        visible: ['admin']
       }
     ]
   },
@@ -139,13 +156,13 @@ const menuItems = [
         icon: <FaRegUserCircle className='text-xl' />,
         label: 'Update Profile',
         href: '/dashboard/profile',
-        visible: ['admin', 'editor', 'superadmin', 'agent', 'student']
+        visible: ['admin', 'editor', 'admin', 'agent', 'student']
       },
       {
         icon: <BiLogOut className='text-xl' />,
         label: 'Logout',
         href: '/dashboard/logout',
-        visible: ['admin', 'editor', 'superadmin', 'agent', 'student']
+        visible: ['admin', 'editor', 'admin', 'agent', 'student']
       }
     ]
   }
@@ -212,7 +229,7 @@ const Menu = ({ isCollapsed = false }) => {
                   item.href === '/dashboard/referrals' &&
                   role.student &&
                   !role.admin &&
-                  !role['superadmin']
+                  !role['admin']
                     ? 'Applied Colleges'
                     : item.label
                 const itemClasses = `

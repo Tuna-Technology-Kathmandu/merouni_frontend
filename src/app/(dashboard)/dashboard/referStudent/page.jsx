@@ -1,19 +1,23 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { Search, Plus, Trash2, X, UserPlus, Building2 } from 'lucide-react'
 
 const page = () => {
+  const { setHeading } = usePageHeading()
   const [formData, setFormData] = useState([])
-
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const [collegeSearch, setCollegeSearch] = useState('')
   const [searchResults, setSearchResults] = useState([])
-  const user = useSelector((state) => state.user.data)
 
-  const teacherId = user.id
+  useEffect(() => {
+    setHeading('Refer Student')
+    return () => setHeading(null)
+  }, [setHeading])
   const searchCollege = async (e) => {
     const query = e.target.value
     setCollegeSearch(query)
@@ -35,7 +39,6 @@ const page = () => {
       ...prev,
       {
         college_id: college.id,
-        teacher_id: teacherId,
         students: [],
         college_name: college.name
       }
@@ -165,35 +168,69 @@ const page = () => {
   }
 
   return (
-    <div className='max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg'>
-      <h2 className='text-2xl font-bold text-gray-800 mb-6'>
-        Student Application Form
-      </h2>
-      <form onSubmit={handleSubmit}>
-        {/* College Search */}
-        <div className='mb-6'>
-          <label className='block text-sm font-medium text-gray-700 mb-2'>
-            Search College
+    <div className='p-4 w-full'>
+      <form onSubmit={handleSubmit} className='space-y-6'>
+        {/* College Search Section */}
+        <div className='bg-white p-6 rounded-lg shadow-sm border border-gray-200'>
+          <label className='block text-sm font-semibold text-gray-700 mb-3'>
+            Search and Add College
           </label>
           <div className='relative'>
+            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+              <Search className='w-5 h-5 text-gray-400' />
+            </div>
             <input
               type='text'
               value={collegeSearch}
               onChange={searchCollege}
-              className='w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all'
+              className='w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all'
               placeholder='Type college name to search...'
             />
             {searchResults.length > 0 && (
-              <ul className='absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto'>
-                {searchResults.map((college) => (
-                  <li
-                    key={college.id}
-                    className='px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors border-b last:border-b-0'
-                    onClick={() => addCollege(college)}
-                  >
-                    {college.name}
-                  </li>
-                ))}
+              <ul className='absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto'>
+                {searchResults.map((college) => {
+                  const address = college.address || {}
+                  const location = [
+                    address.city,
+                    address.state,
+                    address.country
+                  ]
+                    .filter(Boolean)
+                    .join(', ')
+                  return (
+                    <li
+                      key={college.id}
+                      className='px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors border-b last:border-b-0 flex items-center gap-3'
+                      onClick={() => addCollege(college)}
+                    >
+                      {/* College Logo */}
+                      <div className='flex-shrink-0'>
+                        {college.college_logo ? (
+                          <img
+                            src={college.college_logo}
+                            alt={college.name}
+                            className='w-10 h-10 object-contain rounded'
+                          />
+                        ) : (
+                          <div className='w-10 h-10 bg-gray-100 rounded flex items-center justify-center'>
+                            <Building2 className='w-5 h-5 text-gray-400' />
+                          </div>
+                        )}
+                      </div>
+                      {/* College Name and Location */}
+                      <div className='flex-1 min-w-0'>
+                        <div className='text-gray-700 font-medium truncate'>
+                          {college.name}
+                        </div>
+                        {location && (
+                          <div className='text-sm text-gray-500 truncate'>
+                            {location}
+                          </div>
+                        )}
+                      </div>
+                    </li>
+                  )
+                })}
               </ul>
             )}
           </div>
@@ -203,189 +240,243 @@ const page = () => {
         {formData.map((college, collegeIndex) => (
           <div
             key={collegeIndex}
-            className='mb-8 bg-gray-50 p-6 rounded-lg border border-gray-200'
+            className='bg-white p-6 rounded-lg shadow-sm border border-gray-200'
           >
-            <div className='flex justify-between items-center mb-4 gap-4'>
-              <h3 className='text-lg font-semibold text-gray-800'>
-                College Name: {college.college_name}
-              </h3>
+            {/* College Header */}
+            <div className='flex justify-between items-center mb-6 pb-4 border-b border-gray-200'>
+              <div className='flex items-center gap-3'>
+                <Building2 className='w-5 h-5 text-blue-600' />
+                <h3 className='text-lg font-semibold text-gray-800'>
+                  {college.college_name}
+                </h3>
+              </div>
               <button
+                type='button'
                 onClick={() => deleteCollege(collegeIndex)}
-                className='px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors flex items-center gap-2'
+                className='px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium'
               >
-                <span>Delete</span>
-                <svg
-                  className='w-4 h-4'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'
-                  />
-                </svg>
+                <Trash2 className='w-4 h-4' />
+                <span>Remove College</span>
               </button>
             </div>
 
-            {college.students.map((student, studentIndex) => (
-              <div
-                key={studentIndex}
-                className='mb-4 bg-white p-4 rounded-lg shadow-sm'
-              >
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>
-                      Student Name
-                    </label>
-                    <input
-                      type='text'
-                      value={student.student_name}
-                      onChange={(e) =>
-                        handleStudentChange(
-                          collegeIndex,
-                          studentIndex,
-                          'student_name',
-                          e.target.value
-                        )
-                      }
-                      className='w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      placeholder='Enter student name'
-                    />
-                    {errors[`student_name_${collegeIndex}_${studentIndex}`] && (
-                      <p className='mt-1 text-sm text-red-600'>
-                        {errors[`student_name_${collegeIndex}_${studentIndex}`]}
-                      </p>
-                    )}
+            {/* Students List */}
+            <div className='space-y-4'>
+              {college.students.map((student, studentIndex) => (
+                <div
+                  key={studentIndex}
+                  className='p-5 bg-gray-50 rounded-lg border border-gray-200'
+                >
+                  <div className='flex justify-between items-center mb-4'>
+                    <h4 className='text-sm font-semibold text-gray-700 flex items-center gap-2'>
+                      <UserPlus className='w-4 h-4' />
+                      Student {studentIndex + 1}
+                    </h4>
+                    <button
+                      type='button'
+                      onClick={() => deleteStudent(collegeIndex, studentIndex)}
+                      className='p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors'
+                      title='Remove Student'
+                    >
+                      <X className='w-4 h-4' />
+                    </button>
                   </div>
 
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>
-                      Email Address
-                    </label>
-                    <input
-                      type='email'
-                      value={student.student_email}
-                      onChange={(e) =>
-                        handleStudentChange(
-                          collegeIndex,
-                          studentIndex,
-                          'student_email',
-                          e.target.value
-                        )
-                      }
-                      className='w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      placeholder='Enter email address'
-                    />
-                  </div>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div>
+                      <label className='block text-sm font-medium text-gray-700 mb-2'>
+                        Student Name <span className='text-red-500'>*</span>
+                      </label>
+                      <input
+                        type='text'
+                        value={student.student_name}
+                        onChange={(e) =>
+                          handleStudentChange(
+                            collegeIndex,
+                            studentIndex,
+                            'student_name',
+                            e.target.value
+                          )
+                        }
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                          errors[`student_name_${collegeIndex}_${studentIndex}`]
+                            ? 'border-red-300'
+                            : 'border-gray-300'
+                        }`}
+                        placeholder='Enter student name'
+                      />
+                      {errors[
+                        `student_name_${collegeIndex}_${studentIndex}`
+                      ] && (
+                        <p className='mt-1 text-sm text-red-600'>
+                          {
+                            errors[
+                              `student_name_${collegeIndex}_${studentIndex}`
+                            ]
+                          }
+                        </p>
+                      )}
+                    </div>
 
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>
-                      Phone Number
-                    </label>
-                    <input
-                      type='text'
-                      value={student.student_phone_no}
-                      onChange={(e) =>
-                        handleStudentChange(
-                          collegeIndex,
-                          studentIndex,
-                          'student_phone_no',
-                          e.target.value
-                        )
-                      }
-                      className='w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      placeholder='Enter phone number'
-                    />
-                  </div>
+                    <div>
+                      <label className='block text-sm font-medium text-gray-700 mb-2'>
+                        Email Address <span className='text-red-500'>*</span>
+                      </label>
+                      <input
+                        type='email'
+                        value={student.student_email}
+                        onChange={(e) =>
+                          handleStudentChange(
+                            collegeIndex,
+                            studentIndex,
+                            'student_email',
+                            e.target.value
+                          )
+                        }
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                          errors[
+                            `student_email_${collegeIndex}_${studentIndex}`
+                          ]
+                            ? 'border-red-300'
+                            : 'border-gray-300'
+                        }`}
+                        placeholder='student@example.com'
+                      />
+                      {errors[
+                        `student_email_${collegeIndex}_${studentIndex}`
+                      ] && (
+                        <p className='mt-1 text-sm text-red-600'>
+                          {
+                            errors[
+                              `student_email_${collegeIndex}_${studentIndex}`
+                            ]
+                          }
+                        </p>
+                      )}
+                    </div>
 
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-1'>
-                      Description
-                    </label>
-                    <input
-                      type='text'
-                      value={student.student_description}
-                      onChange={(e) =>
-                        handleStudentChange(
-                          collegeIndex,
-                          studentIndex,
-                          'student_description',
-                          e.target.value
-                        )
-                      }
-                      className='w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                      placeholder='Enter description'
-                    />
+                    <div>
+                      <label className='block text-sm font-medium text-gray-700 mb-2'>
+                        Phone Number <span className='text-red-500'>*</span>
+                      </label>
+                      <input
+                        type='text'
+                        value={student.student_phone_no}
+                        onChange={(e) =>
+                          handleStudentChange(
+                            collegeIndex,
+                            studentIndex,
+                            'student_phone_no',
+                            e.target.value
+                          )
+                        }
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                          errors[
+                            `student_phone_no_${collegeIndex}_${studentIndex}`
+                          ]
+                            ? 'border-red-300'
+                            : 'border-gray-300'
+                        }`}
+                        placeholder='10-digit phone number'
+                        maxLength={10}
+                      />
+                      {errors[
+                        `student_phone_no_${collegeIndex}_${studentIndex}`
+                      ] && (
+                        <p className='mt-1 text-sm text-red-600'>
+                          {
+                            errors[
+                              `student_phone_no_${collegeIndex}_${studentIndex}`
+                            ]
+                          }
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className='block text-sm font-medium text-gray-700 mb-2'>
+                        Description <span className='text-red-500'>*</span>
+                      </label>
+                      <textarea
+                        value={student.student_description}
+                        onChange={(e) =>
+                          handleStudentChange(
+                            collegeIndex,
+                            studentIndex,
+                            'student_description',
+                            e.target.value
+                          )
+                        }
+                        rows={3}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none ${
+                          errors[
+                            `student_description_${collegeIndex}_${studentIndex}`
+                          ]
+                            ? 'border-red-300'
+                            : 'border-gray-300'
+                        }`}
+                        placeholder='Enter student description or notes...'
+                      />
+                      {errors[
+                        `student_description_${collegeIndex}_${studentIndex}`
+                      ] && (
+                        <p className='mt-1 text-sm text-red-600'>
+                          {
+                            errors[
+                              `student_description_${collegeIndex}_${studentIndex}`
+                            ]
+                          }
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
-
-                <div className='mt-4 flex justify-end'>
-                  <button
-                    type='button'
-                    onClick={() => deleteStudent(collegeIndex, studentIndex)}
-                    className='px-3 py-1.5 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors text-sm'
-                  >
-                    Remove Student
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
 
             <button
               type='button'
-              className='mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors flex items-center gap-2'
+              className='mt-4 w-full md:w-auto px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors flex items-center justify-center gap-2 font-medium text-sm border border-blue-200'
               onClick={() => addStudent(collegeIndex)}
             >
-              <svg
-                className='w-4 h-4'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  d='M12 4v16m8-8H4'
-                />
-              </svg>
+              <Plus className='w-4 h-4' />
               <span>Add Student</span>
             </button>
           </div>
         ))}
 
-        <button
-          type='submit'
-          disabled={loading}
-          className='w-full md:w-auto px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
-        >
-          {loading ? (
-            <span className='flex items-center justify-center gap-2'>
-              <svg className='animate-spin h-5 w-5' viewBox='0 0 24 24'>
-                <circle
-                  className='opacity-25'
-                  cx='12'
-                  cy='12'
-                  r='10'
-                  stroke='currentColor'
-                  strokeWidth='4'
-                  fill='none'
-                />
-                <path
-                  className='opacity-75'
-                  fill='currentColor'
-                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                />
-              </svg>
-              Processing...
-            </span>
-          ) : (
-            'Submit Application'
-          )}
-        </button>
+        {/* Empty State */}
+        {formData.length === 0 && (
+          <div className='bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-12 text-center'>
+            <Building2 className='w-12 h-12 text-gray-400 mx-auto mb-4' />
+            <p className='text-gray-600 font-medium mb-2'>
+              No colleges added yet
+            </p>
+            <p className='text-sm text-gray-500'>
+              Search and add a college above to get started
+            </p>
+          </div>
+        )}
+
+        {/* Submit Button */}
+        {formData.length > 0 && (
+          <div className='bg-white p-6 rounded-lg shadow-sm border border-gray-200'>
+            <button
+              type='submit'
+              disabled={loading || formData.length === 0}
+              className='w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2'
+            >
+              {loading ? (
+                <>
+                  <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white'></div>
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <span>Submit Application</span>
+              )}
+            </button>
+          </div>
+        )}
       </form>
     </div>
   )

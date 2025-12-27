@@ -2,9 +2,11 @@
 import { useState, useEffect } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useSelector } from 'react-redux'
+import dynamic from 'next/dynamic'
 import FileUpload from '../addCollege/FileUpload'
 import Table from '../../../../components/Table'
-import { Edit2, Trash2, Search } from 'lucide-react'
+import { Search, Globe, MapPin } from 'lucide-react'
+import { createColumns } from './columns'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
@@ -12,6 +14,10 @@ import { X } from 'lucide-react'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Modal } from '../../../../components/CreateUserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+
+const CKEditor = dynamic(() => import('../component/CKStable'), {
+  ssr: false
+})
 
 export default function ConsultancyForm() {
   const { setHeading } = usePageHeading()
@@ -22,11 +28,15 @@ export default function ConsultancyForm() {
   const [loading, setLoading] = useState(false)
   const [editing, setEditing] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState({
-    featured: ''
+    featured: '',
+    logo: ''
   })
   const [deleteId, setDeleteId] = useState(null)
   const [editId, setEditingId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [viewModalOpen, setViewModalOpen] = useState(false)
+  const [viewConsultancyData, setViewConsultancyData] = useState(null)
+  const [loadingView, setLoadingView] = useState(false)
   const [selectedColleges, setSelectedColleges] = useState([])
   const [collegeSearch, setCollegeSearch] = useState('')
   const [searchResults, setSearchResults] = useState([])
@@ -43,6 +53,7 @@ export default function ConsultancyForm() {
     control,
     setValue,
     reset,
+    watch,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -54,9 +65,15 @@ export default function ConsultancyForm() {
         state: '',
         zip: ''
       },
+      description: '',
+      contact: ['', ''],
+      website_url: '',
+      google_map_url: '',
+      video_url: '',
       featured_image: '',
+      logo: '',
       pinned: 0,
-      courses: ''
+      courses: []
     }
   })
   const {
@@ -145,24 +162,57 @@ export default function ConsultancyForm() {
 
   const onSubmit = async (data) => {
     try {
-      data.featured_image = uploadedFiles.featured
-      data.destination = data.destination
-      data.address = data.address
-      data.pinned = Number(data.pinned)
+      // Build the payload with all fields - always include all fields explicitly
+      const payload = {
+        title: data.title?.trim() || '',
+        destination: data.destination || [],
+        address: data.address || {},
+        featured_image: uploadedFiles.featured || '',
+        logo:
+          uploadedFiles.logo && uploadedFiles.logo.trim() !== ''
+            ? uploadedFiles.logo.trim()
+            : null,
+        description:
+          data.description && data.description.trim() !== ''
+            ? data.description.trim()
+            : null,
+        contact: Array.isArray(data.contact)
+          ? data.contact.filter((c) => c && c.trim() !== '')
+          : [],
+        website_url:
+          data.website_url && data.website_url.trim() !== ''
+            ? data.website_url.trim()
+            : null,
+        google_map_url:
+          data.google_map_url && data.google_map_url.trim() !== ''
+            ? data.google_map_url.trim()
+            : null,
+        video_url:
+          data.video_url && data.video_url.trim() !== ''
+            ? data.video_url.trim()
+            : null,
+        pinned: data.pinned ? 1 : 0,
+        courses: Array.isArray(data.courses)
+          ? data.courses
+          : data.courses
+            ? [data.courses]
+            : []
+      }
+
       if (editId) {
-        data.id = editId
+        payload.id = editId
       }
 
       const url = `${process.env.baseUrl}${process.env.version}/consultancy`
       const method = 'POST'
-      console.log('consultancy data', data)
+      console.log('consultancy payload', payload)
 
       const response = await authFetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(payload)
       })
       await response.json()
 
@@ -174,7 +224,10 @@ export default function ConsultancyForm() {
       setEditing(false)
       reset()
       setSelectedColleges([])
-      setUploadedFiles({ featured: '' })
+      setUploadedFiles({ featured: '', logo: '' })
+      setEditingId(null)
+      setIsOpen(false)
+      fetchConsultancies()
       fetchConsultancies()
       setIsOpen(false)
     } catch (error) {
@@ -196,9 +249,24 @@ export default function ConsultancyForm() {
       console.log('while edititnc consul', consultancy)
       setEditingId(consultancy.id)
       setValue('title', consultancy.title)
+      setValue('description', consultancy.description || '')
+      setValue('website_url', consultancy.website_url || '')
+      setValue('google_map_url', consultancy.google_map_url || '')
+      setValue('video_url', consultancy.video_url || '')
       const parsedDestination = JSON.parse(consultancy.destination)
       setValue('destination', parsedDestination)
       setValue('address', JSON.parse(consultancy.address))
+      const parsedContact = consultancy.contact
+        ? typeof consultancy.contact === 'string'
+          ? JSON.parse(consultancy.contact)
+          : consultancy.contact
+        : ['', '']
+      setValue(
+        'contact',
+        parsedContact.length >= 2
+          ? parsedContact
+          : [...parsedContact, ...Array(2 - parsedContact.length).fill('')]
+      )
       setValue('pinned', consultancy.pinned)
       // setValue("courses", consultancy.courses);
       let consultId = consultancy.consultancyCourses.map((c) => c.id)
@@ -214,7 +282,8 @@ export default function ConsultancyForm() {
       )
 
       setUploadedFiles({
-        featured: consultancy.featured_image || ''
+        featured: consultancy.featured_image || '',
+        logo: consultancy.logo || ''
       })
     } catch (error) {
       toast.error('Failed to fetch consultancy details')
@@ -256,57 +325,41 @@ export default function ConsultancyForm() {
     }
   }
 
-  const columns = [
-    {
-      header: 'ID',
-      accessorKey: 'id'
-    },
-    {
-      header: 'Title',
-      accessorKey: 'title'
-    },
-    {
-      header: 'Destinations',
-      accessorKey: 'destination',
-      cell: ({ row }) => {
-        const destinations = JSON.parse(row.original.destination)
-        console.log('destinations', destinations)
-        return destinations.map((d) => `${d.city}, ${d.country}`).join('; ')
-      }
-    },
+  const handleView = async (slug) => {
+    try {
+      setLoadingView(true)
+      setViewModalOpen(true)
 
-    {
-      header: 'Courses',
-      accessorKey: 'consultancyCourses',
-      cell: ({ row }) => {
-        const consultancyCourses = row.original.consultancyCourses
-        console.log('Consultancy Courses', consultancyCourses)
-        // Return the titles of the consultancy courses, joined by a comma
-        return consultancyCourses.map((course) => course.title).join(', ')
-      }
-    },
-
-    {
-      header: 'Actions',
-      id: 'actions',
-      cell: ({ row }) => (
-        <div className='flex gap-2'>
-          <button
-            onClick={() => handleEdit(row.original)}
-            className='p-1 text-blue-600 hover:text-blue-800'
-          >
-            <Edit2 className='w-4 h-4' />
-          </button>
-          <button
-            onClick={() => handleDeleteClick(row.original.id)}
-            className='p-1 text-red-600 hover:text-red-800'
-          >
-            <Trash2 className='w-4 h-4' />
-          </button>
-        </div>
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/consultancy/${slug}`,
+        { headers: { 'Content-Type': 'application/json' } }
       )
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch consultancy details')
+      }
+
+      const data = await response.json()
+      setViewConsultancyData(data.consultancy)
+    } catch (err) {
+      toast.error(err.message || 'Failed to load consultancy details')
+      setViewModalOpen(false)
+    } finally {
+      setLoadingView(false)
     }
-  ]
+  }
+
+  const handleCloseViewModal = () => {
+    setViewModalOpen(false)
+    setViewConsultancyData(null)
+  }
+
+  // Create columns with handlers (must be after handlers are defined)
+  const columns = createColumns({
+    handleView,
+    handleEdit,
+    handleDeleteClick
+  })
 
   const handleSearch = async (query) => {
     if (!query) {
@@ -382,7 +435,7 @@ export default function ConsultancyForm() {
                 setEditingId(null)
                 reset()
                 setSelectedColleges([])
-                setUploadedFiles({ featured: '' })
+                setUploadedFiles({ featured: '', logo: '' })
               }}
             >
               Add Consultancy
@@ -399,7 +452,7 @@ export default function ConsultancyForm() {
             setEditingId(null)
             reset()
             setSelectedColleges([])
-            setUploadedFiles({ featured: '' })
+            setUploadedFiles({ featured: '', logo: '' })
           }}
           title={editing ? 'Edit Consultancy' : 'Add Consultancy'}
           className='max-w-5xl'
@@ -432,6 +485,15 @@ export default function ConsultancyForm() {
                           {errors.title.message}
                         </span>
                       )}
+                    </div>
+
+                    <div>
+                      <label className='block mb-2'>Description</label>
+                      <CKEditor
+                        value={watch('description') || ''}
+                        onChange={(data) => setValue('description', data)}
+                        id='consultancy-description-editor'
+                      />
                     </div>
 
                     <div className='bg-white p-6 rounded-lg shadow-md'>
@@ -555,6 +617,60 @@ export default function ConsultancyForm() {
                     </div>
 
                     <div>
+                      <label className='block mb-2'>Contact Information</label>
+                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                        {[0, 1].map((index) => (
+                          <div key={index}>
+                            <label className='block mb-2'>
+                              Contact {index + 1}
+                            </label>
+                            <input
+                              {...register(`contact.${index}`)}
+                              className='w-full p-2 border rounded'
+                              placeholder={`Contact ${index + 1}`}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className='block mb-2'>Website URL</label>
+                      <input
+                        {...register('website_url')}
+                        type='url'
+                        className='w-full p-2 border rounded'
+                        placeholder='https://example.com'
+                      />
+                    </div>
+
+                    <div>
+                      <label className='block mb-2'>Google Map URL</label>
+                      <textarea
+                        {...register('google_map_url')}
+                        className='w-full p-2 border rounded'
+                        placeholder='Paste Google Maps embed iframe code here'
+                        rows={4}
+                      />
+                      <p className='text-sm text-gray-500 mt-1'>
+                        Paste the iframe code from Google Maps embed
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className='block mb-2'>YouTube Video URL</label>
+                      <input
+                        {...register('video_url')}
+                        type='url'
+                        className='w-full p-2 border rounded'
+                        placeholder='https://www.youtube.com/watch?v=...'
+                      />
+                      <p className='text-sm text-gray-500 mt-1'>
+                        Enter a YouTube video URL
+                      </p>
+                    </div>
+
+                    <div>
                       <label className='block mb-2'>Pinned</label>
                       <input
                         type='checkbox'
@@ -563,18 +679,33 @@ export default function ConsultancyForm() {
                       />
                     </div>
 
-                    <div>
-                      <FileUpload
-                        label='Featured Image'
-                        onUploadComplete={(url) => {
-                          setUploadedFiles((prev) => ({
-                            ...prev,
-                            featured: url
-                          }))
-                          setValue('featured_image', url)
-                        }}
-                        defaultPreview={uploadedFiles.featured}
-                      />
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                      <div>
+                        <FileUpload
+                          label='Logo'
+                          onUploadComplete={(url) => {
+                            setUploadedFiles((prev) => ({
+                              ...prev,
+                              logo: url
+                            }))
+                            setValue('logo', url)
+                          }}
+                          defaultPreview={uploadedFiles.logo}
+                        />
+                      </div>
+                      <div>
+                        <FileUpload
+                          label='Featured Image'
+                          onUploadComplete={(url) => {
+                            setUploadedFiles((prev) => ({
+                              ...prev,
+                              featured: url
+                            }))
+                            setValue('featured_image', url)
+                          }}
+                          defaultPreview={uploadedFiles.featured}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -617,6 +748,187 @@ export default function ConsultancyForm() {
         title='Confirm Deletion'
         message='Are you sure you want to delete this consultancy? This action cannot be undone.'
       />
+
+      {/* View Consultancy Details Modal */}
+      <Modal
+        isOpen={viewModalOpen}
+        onClose={handleCloseViewModal}
+        title='Consultancy Details'
+        className='max-w-4xl max-h-[90vh] overflow-y-auto'
+      >
+        {loadingView ? (
+          <div className='flex items-center justify-center py-8'>
+            <div className='text-gray-500'>Loading...</div>
+          </div>
+        ) : viewConsultancyData ? (
+          <div className='space-y-6'>
+            {/* Logo and Basic Info */}
+            <div className='flex items-start gap-4 border-b pb-4'>
+              {viewConsultancyData.logo && (
+                <img
+                  src={viewConsultancyData.logo}
+                  alt={viewConsultancyData.title}
+                  className='w-20 h-20 object-contain rounded-lg border'
+                />
+              )}
+              <div className='flex-1'>
+                <h2 className='text-2xl font-bold text-gray-800'>
+                  {viewConsultancyData.title}
+                </h2>
+                {viewConsultancyData.website_url && (
+                  <div className='mt-2'>
+                    <a
+                      href={
+                        viewConsultancyData.website_url.startsWith('http')
+                          ? viewConsultancyData.website_url
+                          : `https://${viewConsultancyData.website_url}`
+                      }
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-blue-600 hover:underline inline-flex items-center gap-1'
+                    >
+                      <Globe className='w-4 h-4' />{' '}
+                      {viewConsultancyData.website_url}
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Address */}
+            {viewConsultancyData.address && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Address</h3>
+                <div className='text-gray-700 space-y-1'>
+                  {(() => {
+                    const address =
+                      typeof viewConsultancyData.address === 'string'
+                        ? JSON.parse(viewConsultancyData.address)
+                        : viewConsultancyData.address || {}
+                    return (
+                      <>
+                        {address.street && <p>{address.street}</p>}
+                        <p>
+                          {[address.city, address.state, address.zip]
+                            .filter(Boolean)
+                            .join(', ')}
+                        </p>
+                        {viewConsultancyData.google_map_url && (
+                          <a
+                            href={viewConsultancyData.google_map_url}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='text-blue-600 hover:underline inline-flex items-center gap-1 mt-2'
+                          >
+                            <MapPin className='w-4 h-4' /> View on Map
+                          </a>
+                        )}
+                      </>
+                    )
+                  })()}
+                </div>
+              </div>
+            )}
+
+            {/* Contact Information */}
+            {viewConsultancyData.contact && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>
+                  Contact Information
+                </h3>
+                <div className='space-y-1'>
+                  {(() => {
+                    const contacts =
+                      typeof viewConsultancyData.contact === 'string'
+                        ? JSON.parse(viewConsultancyData.contact)
+                        : Array.isArray(viewConsultancyData.contact)
+                          ? viewConsultancyData.contact
+                          : []
+                    return contacts.map(
+                      (contact, index) =>
+                        contact && (
+                          <p key={index} className='text-gray-700'>
+                            {contact}
+                          </p>
+                        )
+                    )
+                  })()}
+                </div>
+              </div>
+            )}
+
+            {/* Destinations */}
+            {viewConsultancyData.destination && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Destinations</h3>
+                <div className='flex flex-wrap gap-2'>
+                  {(() => {
+                    const destinations =
+                      typeof viewConsultancyData.destination === 'string'
+                        ? JSON.parse(viewConsultancyData.destination)
+                        : viewConsultancyData.destination || []
+                    return destinations.map((dest, index) => (
+                      <span
+                        key={index}
+                        className='px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm'
+                      >
+                        {dest.city && dest.country
+                          ? `${dest.city}, ${dest.country}`
+                          : dest.city || dest.country || 'N/A'}
+                      </span>
+                    ))
+                  })()}
+                </div>
+              </div>
+            )}
+
+            {/* Courses/Programs */}
+            {viewConsultancyData.consultancyCourses &&
+              viewConsultancyData.consultancyCourses.length > 0 && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Courses</h3>
+                  <div className='flex flex-wrap gap-2'>
+                    {viewConsultancyData.consultancyCourses.map(
+                      (course, index) => (
+                        <span
+                          key={index}
+                          className='px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm'
+                        >
+                          {course.title || 'N/A'}
+                        </span>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
+
+            {/* Description */}
+            {viewConsultancyData.description && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Description</h3>
+                <div
+                  className='text-gray-700 prose max-w-none'
+                  dangerouslySetInnerHTML={{
+                    __html: viewConsultancyData.description
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Status */}
+            <div className='flex gap-4 pt-4 border-t'>
+              <div>
+                <span className='text-sm font-medium text-gray-700'>
+                  Pinned:{' '}
+                </span>
+                <span className='text-sm text-gray-600'>
+                  {viewConsultancyData.pinned === 1 ? 'Yes' : 'No'}
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </Modal>
     </>
   )
 }

@@ -9,6 +9,7 @@ import FeaturedAdmission from '../../components/Frontpage/FeaturedAdmission'
 import FeaturedDegree from '../../components/Frontpage/FeaturedDegree'
 import FieldofStudy from '../../components/Frontpage/FieldofStudy'
 import Colleges from '../../components/Frontpage/Colleges'
+import CollegeRankings from '../../components/Frontpage/CollegeRankings'
 import Degree from '../../components/Frontpage/Degree'
 import ScrollToTop from '../../components/ScrollToTop'
 import SideBanner from '../../components/Frontpage/SideBanner'
@@ -68,7 +69,7 @@ const Page = () => {
 
       {/* degree section for home page */}
       <FeaturedDegree />
-      <Colleges />
+      <CollegeRankings />
       <FieldofStudy />
       <Footer />
       <ScrollToTop />

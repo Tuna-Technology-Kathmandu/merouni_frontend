@@ -10,24 +10,34 @@ import {
 import { useSelector } from 'react-redux'
 import Loader from '../../../../components/Loading'
 import Table from '../../../../components/Table' // Adjust the import path as needed
-import { Edit2, Trash2 } from 'lucide-react' // For action icons
+import { Edit2, Trash2, Search } from 'lucide-react' // For action icons
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import useAdminPermission from '@/hooks/useAdminPermission'
+import { Modal } from '../../../../components/CreateUserModal'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 
 // const CKEditor4 = dynamic(() => import('../component/CKEditor4'), {
 //   ssr: false
 // })
 
 export default function FacultyManager() {
+  const { setHeading } = usePageHeading()
   const [faculties, setFaculties] = useState([])
   const [loading, setLoading] = useState(true)
+  const [tableLoading, setTableLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
     description: ''
   })
   const [editingId, setEditingId] = useState(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchTimeout, setSearchTimeout] = useState(null)
   const author_id = useSelector((state) => state.user.data.id)
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -69,7 +79,7 @@ export default function FacultyManager() {
               <Edit2 className='w-4 h-4' />
             </button>
             <button
-              onClick={() => handleDelete(row.original.id)}
+              onClick={() => handleDeleteClick(row.original.id)}
               className='p-1 text-red-600 hover:text-red-800'
             >
               <Trash2 className='w-4 h-4' />
@@ -82,25 +92,36 @@ export default function FacultyManager() {
   )
 
   const { requireAdmin } = useAdminPermission()
-  useEffect(() => {
-    loadFaculties()
-  }, [])
 
-  const loadFaculties = async (page = 2) => {
+  useEffect(() => {
+    setHeading('Faculty Management')
+    loadFaculties()
+    return () => setHeading(null)
+  }, [setHeading])
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout)
+      }
+    }
+  }, [searchTimeout])
+
+  const loadFaculties = async (page = 1) => {
+    setTableLoading(true)
     try {
       const response = await getAllFaculty(page)
-      console.log
-      response.items
       setFaculties(response.items)
       setPagination({
         currentPage: response.pagination.currentPage,
         totalPages: response.pagination.totalPages,
         total: response.pagination.totalCount
       })
-      console.log(' resss', response.items)
     } catch (error) {
       console.error('Error loading faculties:', error)
+      toast.error('Failed to fetch faculties')
     } finally {
+      setTableLoading(false)
       setLoading(false)
     }
   }
@@ -113,18 +134,19 @@ export default function FacultyManager() {
 
       if (editingId) {
         await updateFaculty(editingId, requestData)
+        toast.success('Faculty updated successfully!')
       } else {
         await createFaculty(requestData)
+        toast.success('Faculty created successfully!')
       }
 
       setFormData({ title: '', description: '' })
       setEditingId(null)
+      setIsOpen(false)
       loadFaculties()
       setSubmitting(false)
-      toast.success('Successfully completed')
     } catch (error) {
-      toast.error(error.message || 'Failed to create college')
-    } finally {
+      toast.error(error.message || 'Failed to save faculty')
       setSubmitting(false)
     }
   }
@@ -135,19 +157,40 @@ export default function FacultyManager() {
       description: faculty.description
     })
     setEditingId(faculty.id)
+    setIsOpen(true)
   }
 
-  const handleDelete = async (id) => {
-    requireAdmin(async () => {
-      if (window.confirm('Are you sure you want to delete this faculty?')) {
-        try {
-          await deleteFaculty(id)
-          loadFaculties()
-        } catch (error) {
-          console.error('Error deleting faculty:', error)
-        }
-      }
-    }, 'You do not have permission to delete faculty.')
+  const handleModalClose = () => {
+    setIsOpen(false)
+    setEditingId(null)
+    setFormData({ title: '', description: '' })
+  }
+
+  const handleDeleteClick = (id) => {
+    requireAdmin(() => {
+      setDeleteId(id)
+      setIsDialogOpen(true)
+    })
+  }
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false)
+    setDeleteId(null)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteId) return
+
+    try {
+      await deleteFaculty(deleteId)
+      toast.success('Faculty deleted successfully!')
+      await loadFaculties()
+    } catch (err) {
+      toast.error(err.message || 'Failed to delete faculty')
+    } finally {
+      setIsDialogOpen(false)
+      setDeleteId(null)
+    }
   }
 
   const handleSearch = async (query) => {
@@ -180,15 +223,23 @@ export default function FacultyManager() {
     }
   }
 
-  // const MemoizedCKEditor4 = useMemo(() => (
-  //   <CKEditor4
-  //     id="editor-content"
-  //     initialData={formData.description}
-  //     onChange={(data) =>
-  //       setFormData((prevData) => ({ ...prevData, description: data }))
-  //     }
-  //   />
-  // ), [])
+  const handleSearchInput = (value) => {
+    setSearchQuery(value)
+
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    if (value === '') {
+      handleSearch('')
+    } else {
+      const timeoutId = setTimeout(() => {
+        handleSearch(value)
+      }, 300)
+      setSearchTimeout(timeoutId)
+    }
+  }
+
   if (loading)
     return (
       <div className='mx-auto'>
@@ -197,58 +248,118 @@ export default function FacultyManager() {
     )
 
   return (
-    <div className='p-4 w-4/5 mx-auto'>
-      <h1 className='text-2xl font-bold mb-4'>Faculty Management</h1>
+    <>
+      <div className='p-4 w-full'>
+        <div className='flex justify-between items-center mb-4'>
+          {/* Search Bar */}
+          <div className='relative w-full max-w-md'>
+            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+              <Search className='w-4 h-4 text-gray-500' />
+            </div>
+            <input
+              type='text'
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              placeholder='Search faculties...'
+            />
+          </div>
+          {/* Button */}
+          <div className='flex gap-2'>
+            <button
+              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+              onClick={() => {
+                setIsOpen(true)
+                setEditingId(null)
+                setFormData({ title: '', description: '' })
+              }}
+            >
+              Add Faculty
+            </button>
+          </div>
+        </div>
+        <ToastContainer />
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className='mb-8'>
-        <div className='mb-4'>
-          <input
-            type='text'
-            placeholder='Faculty Title'
-            value={formData.title}
-            onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
-            }
-            className='w-full p-2 border rounded'
-            required
+        {/* Table */}
+        <div className='mt-8'>
+          <Table
+            loading={tableLoading}
+            data={faculties}
+            columns={columns}
+            pagination={pagination}
+            onPageChange={(newPage) => loadFaculties(newPage)}
+            onSearch={handleSearch}
+            showSearch={false}
           />
         </div>
-        <div className='mb-4'>
-          {/* {MemoizedCKEditor4} */}
+      </div>
 
-          <textarea
-            placeholder='Faculty Description'
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-            className='w-full p-2 border rounded min-h-[150px]'
-            rows={6}
-          />
-        </div>
-        <button
-          type='submit'
-          className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
-        >
-          {submitting
-            ? editingId
-              ? 'Updating...'
-              : 'Adding...'
-            : editingId
-              ? 'Update'
-              : 'Add Faculty'}
-        </button>
-      </form>
+      {/* Form Modal */}
+      <Modal
+        isOpen={isOpen}
+        onClose={handleModalClose}
+        title={editingId ? 'Edit Faculty' : 'Add Faculty'}
+        className='max-w-md'
+      >
+        <form onSubmit={handleSubmit} className='space-y-6'>
+          <div className='space-y-4'>
+            <div>
+              <label className='block mb-2'>Faculty Title *</label>
+              <input
+                type='text'
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
+                className='w-full p-2 border rounded'
+                placeholder='Enter faculty title'
+                required
+              />
+            </div>
+            <div>
+              <label className='block mb-2'>Description</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                className='w-full p-2 border rounded min-h-[150px]'
+                rows={6}
+                placeholder='Enter faculty description'
+              />
+            </div>
+          </div>
 
-      {/* Table */}
-      <Table
-        data={faculties}
-        columns={columns}
-        pagination={pagination}
-        onPageChange={(newPage) => loadFaculties(newPage)}
-        onSearch={handleSearch}
+          <div className='flex justify-end gap-2'>
+            <button
+              type='button'
+              onClick={handleModalClose}
+              className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors'
+            >
+              Cancel
+            </button>
+            <button
+              type='submit'
+              disabled={submitting}
+              className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
+            >
+              {submitting
+                ? 'Processing...'
+                : editingId
+                  ? 'Update Faculty'
+                  : 'Create Faculty'}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      <ConfirmationDialog
+        open={isDialogOpen}
+        onClose={handleDialogClose}
+        onConfirm={handleDeleteConfirm}
+        title='Confirm Deletion'
+        message='Are you sure you want to delete this faculty? This action cannot be undone.'
       />
-    </div>
+    </>
   )
 }

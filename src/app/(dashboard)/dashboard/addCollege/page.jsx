@@ -39,6 +39,7 @@ import { useDebounce } from 'use-debounce'
 import GallerySection from './GallerySection'
 import VideoSection from './VideoSection'
 import useAdminPermission from '@/hooks/useAdminPermission'
+import { createColumns } from './columns'
 
 const FileUploadWithPreview = ({
   onUploadComplete,
@@ -183,8 +184,7 @@ export default function CollegeForm() {
 
   // for programs that is related to selected University
   const [uniSlug, setUniSlug] = useState('')
-  const [collectUni, setCollectUni] = useState([])
-  const [collectUniError, setCollectUniError] = useState('')
+  const [universityPrograms, setUniversityPrograms] = useState([])
 
   //show programs only fro selected University;
   const [loadingPrograms, setLoadingPrograms] = useState(false)
@@ -193,7 +193,6 @@ export default function CollegeForm() {
 
   //for allcourse
   const [courses, setCourses] = useState([])
-  const [courseSearch, setCourseSearch] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
   const [uploadedFiles, setUploadedFiles] = useState({
@@ -295,11 +294,6 @@ export default function CollegeForm() {
     remove: removeFacility
   } = useFieldArray({ control, name: 'facilities' })
   const onSubmit = async (data) => {
-    if (!data.courses || data.courses.length === 0) {
-      toast.error('Please select at least one program')
-      return
-    }
-
     try {
       setSubmitting(true)
 
@@ -316,7 +310,8 @@ export default function CollegeForm() {
       // Convert IDs to numbers
       data.university_id = parseInt(data.university_id)
 
-      data.courses = data.courses.map((course) => parseInt(course))
+      // Ensure courses is always an array, even if empty
+      data.courses = (data.courses || []).map((course) => parseInt(course))
 
       data.college_logo = uploadedFiles.logo
       data.featured_img = uploadedFiles.featured
@@ -364,7 +359,24 @@ export default function CollegeForm() {
       setIsOpen(false)
       loadColleges()
     } catch (error) {
-      toast.error(error.message || 'Failed to create college')
+      // Extract error message from different error formats
+
+      console.log('Error response', error['message'])
+      let errorMessage = 'Failed to create college'
+
+      if (error.message) {
+        // Standard error object (createCollege throws Error with message)
+        errorMessage = error.message
+      } else if (error.response?.data?.message) {
+        // API error response with message (for direct fetch calls)
+        errorMessage = error.response.data.message
+      } else if (typeof error === 'string') {
+        // String error
+        errorMessage = error
+      }
+
+      console.error('College submission error:', error)
+      toast.error(errorMessage)
     } finally {
       setSubmitting(false)
     }
@@ -391,10 +403,6 @@ export default function CollegeForm() {
     }
   }, [debouncedUni])
 
-  //search college
-  const filteredCourses = courses.filter((course) =>
-    course.title.toLowerCase().includes(courseSearch.toLowerCase())
-  )
   //for all fetching of college
   useEffect(() => {
     const getCourses = async () => {
@@ -455,125 +463,13 @@ export default function CollegeForm() {
     }
   }, [searchTimeout])
 
-  //columnes
-  const columns = [
-    {
-      header: 'ID',
-      accessorKey: 'id'
-    },
-    {
-      header: 'College Name',
-      accessorKey: 'name',
-      cell: ({ row }) => {
-        const name = row.original.name
-        const type = row.original.institute_type
-        return (
-          <div className='flex items-center gap-2'>
-            <span>{name}</span>
-            {type && (
-              <span className='px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800'>
-                {type}
-              </span>
-            )}
-          </div>
-        )
-      }
-    },
-    {
-      header: 'Location',
-      accessorKey: 'address',
-      cell: ({ row }) => {
-        const address = row.original.address || {}
-        const location = [address.city, address.state, address.country]
-          .filter(Boolean)
-          .join(', ')
-        const mapUrl = row.original.google_map_url
-
-        if (!location && !mapUrl) {
-          return 'N/A'
-        }
-
-        return (
-          <div className='flex flex-col'>
-            {location && <span>{location}</span>}
-            {mapUrl && (
-              <a
-                href={mapUrl}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-blue-600 hover:underline text-sm mt-1 inline-flex items-center gap-1'
-              >
-                <MapPin className='inline w-4 h-4' /> View Map
-              </a>
-            )}
-          </div>
-        )
-      }
-    },
-    {
-      header: 'Featured',
-      accessorKey: 'isFeatured',
-      cell: ({ getValue }) => (getValue() ? 'Yes' : 'No')
-    },
-    {
-      header: 'Pinned',
-      accessorKey: 'pinned',
-      cell: ({ getValue }) => (getValue() ? 'Yes' : 'No')
-    },
-    {
-      header: 'Website',
-      accessorKey: 'website_url',
-      cell: ({ getValue }) => {
-        const url = getValue()
-        return url ? (
-          <a
-            href={url}
-            target='_blank'
-            rel='noopener noreferrer'
-            className='text-blue-600 hover:underline'
-          >
-            <Globe className='inline w-4 h-4' /> Visit
-          </a>
-        ) : (
-          'N/A'
-        )
-      }
-    },
-    {
-      header: 'Actions',
-      id: 'actions',
-      cell: ({ row }) => (
-        <div className='flex gap-2'>
-          <button
-            onClick={() => handleEdit(row.original.slugs)}
-            className='p-1 text-blue-600 hover:text-blue-800'
-            title='Edit'
-          >
-            <Edit2 className='w-4 h-4' />
-          </button>
-          <button
-            onClick={() => handleOpenCredentialsModal(row.original)}
-            className='p-1 text-green-600 hover:text-green-800'
-            title='Create Credentials'
-          >
-            <UserPlus className='w-4 h-4' />
-          </button>
-          <button
-            onClick={() => handleDeleteClick(row.original.id)}
-            className='p-1 text-red-600 hover:text-red-800'
-            title='Delete'
-          >
-            <Trash2 className='w-4 h-4' />
-          </button>
-        </div>
-      )
-    }
-  ]
-
   const [deleteId, setDeleteId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [credentialsModalOpen, setCredentialsModalOpen] = useState(false)
   const [selectedCollege, setSelectedCollege] = useState(null)
+  const [viewModalOpen, setViewModalOpen] = useState(false)
+  const [viewCollegeData, setViewCollegeData] = useState(null)
+  const [loadingView, setLoadingView] = useState(false)
   const [credentialsForm, setCredentialsForm] = useState({
     firstName: '',
     lastName: '',
@@ -707,6 +603,27 @@ export default function CollegeForm() {
       const data = await response.json()
       toast.success(data.message || 'Credentials created successfully!')
       handleCloseCredentialsModal()
+
+      // Reload colleges to update has_account status
+      setTableLoading(true)
+      try {
+        const response2 = await getColleges(
+          null,
+          null,
+          10,
+          pagination.currentPage
+        )
+        setColleges(response2.items)
+        setPagination({
+          currentPage: response2.pagination.currentPage,
+          totalPages: response2.pagination.totalPages,
+          total: response2.pagination.totalCount
+        })
+      } catch (err) {
+        console.error('Error reloading colleges:', err)
+      } finally {
+        setTableLoading(false)
+      }
     } catch (err) {
       toast.error(err.message || 'Failed to create credentials')
     } finally {
@@ -963,24 +880,73 @@ export default function CollegeForm() {
   }, [formData])
 
   const fetchUniversityDetails = async (slugs) => {
+    if (!slugs) {
+      setUniversityPrograms([])
+      return
+    }
     try {
       setLoadingPrograms(true)
-      setCollectUniError('')
+      console.log('Fetching university programs for slug:', slugs)
       const universityData = await getUniversityBySlug(slugs)
-      setCollectUni(universityData.programs || [])
+      console.log('University data received:', universityData)
+      // Extract program IDs from university_programs array
+      const universityPrograms = universityData.university_programs || []
+
+      setUniversityPrograms(universityPrograms)
     } catch (error) {
-      setCollectUniError(error.message)
+      console.error('Error fetching university programs:', error)
+      setUniversityPrograms([])
     } finally {
       setLoadingPrograms(false)
     }
   }
+
   useEffect(() => {
-    fetchUniversityDetails(uniSlug)
+    if (uniSlug) {
+      fetchUniversityDetails(uniSlug)
+    } else {
+      setUniversityPrograms([])
+      setLoadingPrograms(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uniSlug])
 
-  const filteredPrograms = useMemo(() => {
-    return courses.filter((course) => collectUni.includes(course.title.trim()))
-  }, [courses, collectUni])
+  const handleView = async (slug) => {
+    try {
+      setLoadingView(true)
+      setViewModalOpen(true)
+
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/college/${slug}`,
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch college details')
+      }
+
+      const data = await response.json()
+      setViewCollegeData(data.item)
+    } catch (err) {
+      toast.error(err.message || 'Failed to load college details')
+      setViewModalOpen(false)
+    } finally {
+      setLoadingView(false)
+    }
+  }
+
+  const handleCloseViewModal = () => {
+    setViewModalOpen(false)
+    setViewCollegeData(null)
+  }
+
+  // Create columns with handlers (must be after handlers are defined)
+  const columns = createColumns({
+    handleView,
+    handleEdit,
+    handleOpenCredentialsModal,
+    handleDeleteClick
+  })
 
   return (
     <>
@@ -1157,83 +1123,86 @@ export default function CollegeForm() {
                 <div className='bg-white p-6 rounded-lg shadow-md'>
                   <div className='flex justify-between items-center mb-4'>
                     <h2 className='text-xl font-semibold'>Programs</h2>
-                    <div className='w-1/3'>
-                      <input
-                        type='text'
-                        placeholder='Search programs...'
-                        className='w-full p-2 border rounded'
-                        value={courseSearch}
-                        onChange={(e) => setCourseSearch(e.target.value)}
-                      />
-                    </div>
                   </div>
 
-                  {loadingPrograms ? (
+                  {!uniSlug ? (
+                    <p className='text-gray-500'>
+                      Please select a university first to see available programs
+                    </p>
+                  ) : loadingPrograms ? (
                     <p>Loading programs...</p>
-                  ) : collectUniError ? (
-                    <p className='text-red-500'>{collectUniError}</p>
                   ) : (
-                    <>
-                      <div className='text-sm text-gray-500 mb-2'>
-                        {getValues('courses')?.length || 0} programs selected
-                      </div>
-                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto'>
-                        {filteredPrograms
-                          .filter((program) =>
-                            program.title
-                              .toLowerCase()
-                              .includes(courseSearch.toLowerCase())
-                          )
-                          .map((course) => {
-                            const isChecked = getValues('courses')?.includes(
-                              course.id
-                            )
-                            return (
-                              <label
-                                key={course.id}
-                                className='flex items-center'
-                              >
-                                <input
-                                  type='checkbox'
-                                  value={course.id}
-                                  checked={isChecked}
-                                  onChange={(e) => {
-                                    const currentCourses =
-                                      getValues('courses') || []
-                                    if (e.target.checked) {
-                                      setValue('courses', [
-                                        ...currentCourses,
-                                        course.id
-                                      ])
-                                    } else {
-                                      setValue(
-                                        'courses',
-                                        currentCourses.filter(
-                                          (id) => id !== course.id
-                                        )
-                                      )
-                                    }
-                                  }}
-                                  className='mr-2'
-                                />
-                                {course.title}
-                              </label>
-                            )
-                          })}
-                        {filteredPrograms.length === 0 && (
-                          <p className='text-gray-500 col-span-full'>
-                            {collectUni.length > 0
-                              ? 'No matching programs found for the selected university'
-                              : 'No Programs Available'}
+                    <div>
+                      <label className='block mb-2'>
+                        Select Programs{' '}
+                        {universityPrograms.length > 0 && (
+                          <span className='text-gray-500 text-sm font-normal'>
+                            ({universityPrograms.length} programs available from
+                            selected university)
+                          </span>
+                        )}
+                      </label>
+                      <div className='border rounded p-4 max-h-96 overflow-y-auto'>
+                        {universityPrograms.length === 0 ? (
+                          <p className='text-gray-500'>
+                            {!uniSlug
+                              ? 'Please select a university first'
+                              : universityPrograms.length === 0
+                                ? 'No programs available for the selected university'
+                                : 'No programs available'}
                           </p>
+                        ) : (
+                          <div className='space-y-2'>
+                            {universityPrograms.map((course) => {
+                              const isChecked = (
+                                getValues('courses') || []
+                              ).includes(course.id)
+                              return (
+                                <div key={course.program_id}>
+                                  <input
+                                    type='checkbox'
+                                    checked={isChecked}
+                                    value={course.program_id}
+                                    onChange={(e) => {
+                                      const currentCourses =
+                                        getValues('courses') || []
+                                      if (e.target.checked) {
+                                        setValue(
+                                          'courses',
+                                          [...currentCourses, course.id],
+                                          {
+                                            shouldValidate: true,
+                                            shouldDirty: true
+                                          }
+                                        )
+                                      } else {
+                                        setValue(
+                                          'courses',
+                                          currentCourses.filter(
+                                            (id) => id !== course.id
+                                          ),
+                                          {
+                                            shouldValidate: true,
+                                            shouldDirty: true
+                                          }
+                                        )
+                                      }
+                                    }}
+                                    className='mr-3 h-4 w-4'
+                                  />
+                                  <span>{course.program?.title}</span>
+                                </div>
+                              )
+                            })}
+                          </div>
                         )}
                       </div>
-                    </>
+                    </div>
                   )}
                 </div>
 
-                {/*author section */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
+                {/*author section - Hidden */}
+                {/* <div className='bg-white p-6 rounded-lg shadow-md'>
                   <h2 className='text-xl font-semibold mb-4'>
                     Author Information
                   </h2>
@@ -1241,7 +1210,7 @@ export default function CollegeForm() {
                     <div>
                       <label className='block mb-2'>Author ID *</label>
                       <input
-                        {...register('author_id', { required: true })}
+                        {...register('author_id')}
                         className='w-full p-2 border rounded '
                         disabled
                       />
@@ -1252,7 +1221,7 @@ export default function CollegeForm() {
                       )}
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 <div className='bg-white p-6 rounded-lg shadow-md'>
                   <h2 className='text-xl font-semibold mb-4'>Media</h2>
@@ -1627,6 +1596,173 @@ export default function CollegeForm() {
           title='Confirm Deletion'
           message='Are you sure you want to delete this College? This action cannot be undone.'
         />
+
+        {/* View College Details Modal */}
+        <Modal
+          isOpen={viewModalOpen}
+          onClose={handleCloseViewModal}
+          title='College Details'
+          className='max-w-4xl max-h-[90vh] overflow-y-auto'
+        >
+          {loadingView ? (
+            <div className='flex items-center justify-center py-8'>
+              <div className='text-gray-500'>Loading...</div>
+            </div>
+          ) : viewCollegeData ? (
+            <div className='space-y-6'>
+              {/* Logo and Basic Info */}
+              <div className='flex items-start gap-4 border-b pb-4'>
+                {viewCollegeData.college_logo && (
+                  <img
+                    src={viewCollegeData.college_logo}
+                    alt={viewCollegeData.name}
+                    className='w-20 h-20 object-contain rounded-lg border'
+                  />
+                )}
+                <div className='flex-1'>
+                  <h2 className='text-2xl font-bold text-gray-800'>
+                    {viewCollegeData.name}
+                  </h2>
+                  {viewCollegeData.institute_type && (
+                    <span className='inline-block mt-2 px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800'>
+                      {viewCollegeData.institute_type}
+                    </span>
+                  )}
+                  {viewCollegeData.website_url && (
+                    <div className='mt-2'>
+                      <a
+                        href={
+                          viewCollegeData.website_url.startsWith('http')
+                            ? viewCollegeData.website_url
+                            : `https://${viewCollegeData.website_url}`
+                        }
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-blue-600 hover:underline inline-flex items-center gap-1'
+                      >
+                        <Globe className='w-4 h-4' />{' '}
+                        {viewCollegeData.website_url}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Address */}
+              {viewCollegeData.collegeAddress && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Address</h3>
+                  <div className='text-gray-700 space-y-1'>
+                    {viewCollegeData.collegeAddress.street && (
+                      <p>{viewCollegeData.collegeAddress.street}</p>
+                    )}
+                    <p>
+                      {[
+                        viewCollegeData.collegeAddress.city,
+                        viewCollegeData.collegeAddress.state,
+                        viewCollegeData.collegeAddress.country
+                      ]
+                        .filter(Boolean)
+                        .join(', ')}
+                    </p>
+                    {viewCollegeData.collegeAddress.postal_code && (
+                      <p>
+                        Postal Code:{' '}
+                        {viewCollegeData.collegeAddress.postal_code}
+                      </p>
+                    )}
+                    {viewCollegeData.google_map_url && (
+                      <a
+                        href={viewCollegeData.google_map_url}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-blue-600 hover:underline inline-flex items-center gap-1 mt-2'
+                      >
+                        <MapPin className='w-4 h-4' /> View on Map
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Contacts */}
+              {viewCollegeData.collegeContacts &&
+                viewCollegeData.collegeContacts.length > 0 && (
+                  <div>
+                    <h3 className='text-lg font-semibold mb-2'>
+                      Contact Numbers
+                    </h3>
+                    <div className='space-y-1'>
+                      {viewCollegeData.collegeContacts.map((contact, index) => (
+                        <p key={index} className='text-gray-700'>
+                          {contact.contact_number}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+              {/* University */}
+              {viewCollegeData.university && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>University</h3>
+                  <p className='text-gray-700'>
+                    {viewCollegeData.university.fullname}
+                  </p>
+                </div>
+              )}
+
+              {/* Programs */}
+              {viewCollegeData.collegeCourses &&
+                viewCollegeData.collegeCourses.length > 0 && (
+                  <div>
+                    <h3 className='text-lg font-semibold mb-2'>Programs</h3>
+                    <div className='flex flex-wrap gap-2'>
+                      {viewCollegeData.collegeCourses.map((course, index) => (
+                        <span
+                          key={index}
+                          className='px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm'
+                        >
+                          {course.program?.title || 'N/A'}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+              {/* Description */}
+              {viewCollegeData.description && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Description</h3>
+                  <p className='text-gray-700 whitespace-pre-wrap'>
+                    {viewCollegeData.description}
+                  </p>
+                </div>
+              )}
+
+              {/* Status Flags */}
+              <div className='flex gap-4 pt-4 border-t'>
+                <div>
+                  <span className='text-sm font-medium text-gray-700'>
+                    Featured:{' '}
+                  </span>
+                  <span className='text-sm text-gray-600'>
+                    {viewCollegeData.isFeatured === 1 ? 'Yes' : 'No'}
+                  </span>
+                </div>
+                <div>
+                  <span className='text-sm font-medium text-gray-700'>
+                    Pinned:{' '}
+                  </span>
+                  <span className='text-sm text-gray-600'>
+                    {viewCollegeData.pinned === 1 ? 'Yes' : 'No'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </Modal>
+
         {/*table*/}
         <Table
           loading={tableloading}

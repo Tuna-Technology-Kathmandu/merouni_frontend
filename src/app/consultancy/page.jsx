@@ -1,16 +1,17 @@
 'use client'
 import React, { useState, useEffect, useLayoutEffect } from 'react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { Search } from 'lucide-react'
 import { getConsultancies } from './actions'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Shimmer from '../../components/Shimmer'
-import SingleConsultancy from './components/SingleConsultancy'
 import Pagination from '../blogs/components/Pagination'
 
 export default function ConsultanciesPage() {
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [consultancyData, setConsultancyData] = useState([])
@@ -20,10 +21,6 @@ export default function ConsultanciesPage() {
     totalCount: 0
   })
   const [loading, setLoading] = useState(false)
-
-  // for single consultancy since backend donkey didn't provide endpoint
-  const [showSingle, setShowSingle] = useState(false)
-  const [singleConsultancy, setSingleConsultancy] = useState([])
 
   // Debouncing logic
   useEffect(() => {
@@ -67,9 +64,7 @@ export default function ConsultanciesPage() {
   }, [pagination.currentPage, debouncedSearch])
 
   const handleClick = (slugs) => {
-    const single = consultancyData.filter((items) => items.slugs === slugs)
-    setSingleConsultancy(single)
-    setShowSingle(true)
+    router.push(`/consultancy/${slugs}`)
   }
 
   const handlePageChange = (page) => {
@@ -83,147 +78,164 @@ export default function ConsultanciesPage() {
     <>
       <Header />
       <Navbar />
-      {!showSingle ? (
-        <div className='min-h-screen bg-gradient-to-b from-[#f7fbfc] to-[#e9f3f7] py-12 px-6'>
-          <div className='container mx-auto'>
-            <div className='text-center mb-12'>
-              <h1 className='text-2xl md:text-3xl font-extrabold text-gray-800'>
-                Explore <span className='text-[#0A70A7]'>Consultancies</span>
-              </h1>
-              <p className='mt-3 text-gray-600 max-w-2xl mx-auto text-sm'>
-                Discover trusted consultancies that guide you through
-                admissions, applications, and career opportunities abroad.
-              </p>
-            </div>
+      <div className='min-h-screen bg-gradient-to-b from-[#f7fbfc] to-[#e9f3f7] py-12 px-6'>
+        <div className='container mx-auto'>
+          <div className='text-center mb-12'>
+            <h1 className='text-2xl md:text-3xl font-extrabold text-gray-800'>
+              Explore <span className='text-[#0A70A7]'>Consultancies</span>
+            </h1>
+            <p className='mt-3 text-gray-600 max-w-2xl mx-auto text-sm'>
+              Discover trusted consultancies that guide you through admissions,
+              applications, and career opportunities abroad.
+            </p>
+          </div>
 
-            {/* Search Bar */}
-            <div className='flex justify-center mb-10 md:mb-20 w-full'>
-              <div className='relative w-full max-w-lg'>
-                <input
-                  type='text'
-                  placeholder='Search consultancy...'
-                  className='w-full px-5 py-3 pl-12 rounded-2xl border border-gray-300 shadow-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all'
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  value={searchTerm}
-                />
-                <Search className='absolute left-4 top-3.5 h-5 w-5 text-gray-400' />
-              </div>
+          {/* Search Bar */}
+          <div className='flex justify-center mb-10 md:mb-20 w-full'>
+            <div className='relative w-full max-w-lg'>
+              <input
+                type='text'
+                placeholder='Search consultancy...'
+                className='w-full px-5 py-3 pl-12 rounded-2xl border border-gray-300 shadow-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all'
+                onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchTerm}
+              />
+              <Search className='absolute left-4 top-3.5 h-5 w-5 text-gray-400' />
             </div>
+          </div>
 
-            {/* Grid */}
-            {loading ? (
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                {Array(6)
-                  .fill('')
-                  .map((_, index) => (
-                    <div
-                      key={index}
-                      className='bg-white rounded-xl p-6 border border-gray-200 shadow-lg'
-                    >
-                      <div className='flex flex-col gap-4'>
-                        <div className='w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center'>
-                          <Shimmer width='100%' height='100%' />
-                        </div>
-                        <Shimmer width='80%' height='20px' />
-                        <Shimmer width='60%' height='18px' />
-                        <Shimmer width='90%' height='15px' />
-                        <div className='flex gap-2'>
-                          <Shimmer width='40%' height='15px' />
-                          <Shimmer width='30%' height='15px' />
-                        </div>
+          {/* Grid */}
+          {loading ? (
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+              {Array(6)
+                .fill('')
+                .map((_, index) => (
+                  <div
+                    key={index}
+                    className='bg-white rounded-xl p-6 border border-gray-200 shadow-lg'
+                  >
+                    <div className='flex flex-col gap-4'>
+                      <div className='w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center'>
+                        <Shimmer width='100%' height='100%' />
+                      </div>
+                      <Shimmer width='80%' height='20px' />
+                      <Shimmer width='60%' height='18px' />
+                      <Shimmer width='90%' height='15px' />
+                      <div className='flex gap-2'>
+                        <Shimmer width='40%' height='15px' />
+                        <Shimmer width='30%' height='15px' />
                       </div>
                     </div>
-                  ))}
-              </div>
-            ) : (
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                {consultancyData.map((consultancy) => {
-                  const destinations = JSON.parse(consultancy.destination)
-                  const address = JSON.parse(consultancy.address)
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+              {consultancyData.map((consultancy) => {
+                const destinations = JSON.parse(consultancy.destination)
+                const address = JSON.parse(consultancy.address)
+                const description = consultancy?.description || ''
+                const logo = consultancy?.logo || ''
 
-                  return (
-                    <div
-                      key={consultancy.id}
-                      className='block group cursor-pointer'
-                      onClick={() => handleClick(consultancy.slugs)}
-                    >
-                      <div className='bg-white rounded-2xl custom-shadow overflow-hidden h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1'>
-                        {/* Banner */}
-                        <div className='relative h-48 w-full bg-green-100'>
-                          <Image
-                            src={
-                              consultancy?.featured_image ||
-                              'https://placehold.co/600x400'
-                            }
-                            alt={consultancy.title}
-                            fill
-                            className='object-cover group-hover:scale-105 transition-transform duration-300'
-                            priority
-                          />
+                return (
+                  <div
+                    key={consultancy.id}
+                    className='block group cursor-pointer'
+                    onClick={() => handleClick(consultancy.slugs)}
+                  >
+                    <div className='bg-white rounded-2xl custom-shadow overflow-hidden h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1'>
+                      {/* Banner */}
+                      <div className='relative h-48 w-full bg-green-100'>
+                        <Image
+                          src={
+                            consultancy?.featured_image ||
+                            'https://placehold.co/600x400'
+                          }
+                          alt={consultancy.title}
+                          fill
+                          className='object-cover group-hover:scale-105 transition-transform duration-300'
+                          priority
+                        />
 
-                          {consultancy.pinned === 1 && (
-                            <span className='absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md'>
-                              Featured
-                            </span>
+                        {consultancy.pinned === 1 && (
+                          <span className='absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md'>
+                            Featured
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className='p-6 flex flex-col'>
+                        {/* Logo and Title */}
+                        <div className='flex items-start gap-3 mb-3'>
+                          {logo && (
+                            <div className='relative w-12 h-12 flex-shrink-0'>
+                              <Image
+                                src={logo}
+                                alt={`${consultancy.title} Logo`}
+                                fill
+                                className='object-contain'
+                              />
+                            </div>
                           )}
-                        </div>
-
-                        {/* Content */}
-                        <div className='p-6 flex flex-col'>
-                          {/* Title */}
-                          <h2 className='text-lg md:text-xl font-bold text-gray-800 group-hover:text-[#0A70A7] transition-colors mb-3 line-clamp-2'>
+                          <h2 className='text-lg md:text-xl font-bold text-gray-800 group-hover:text-[#0A70A7] transition-colors line-clamp-2 flex-1'>
                             {consultancy.title}
                           </h2>
+                        </div>
 
-                          {/* Destinations */}
-                          <div className='mb-3'>
-                            <h3 className='text-sm font-semibold text-gray-700 mb-1'>
-                              Destinations
-                            </h3>
-                            <div className='flex flex-wrap gap-2'>
-                              {destinations.map((dest, index) => (
-                                <span
-                                  key={index}
-                                  className='bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium'
-                                >
-                                  {dest.city}, {dest.country}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
+                        {/* Description */}
+                        {description && (
+                          <p className='text-gray-600 text-sm mb-3 line-clamp-2'>
+                            {description}
+                          </p>
+                        )}
 
-                          {/* Address */}
-                          <div className='mb-3'>
-                            <h3 className='text-sm font-semibold text-gray-700 mb-1'>
-                              Address
-                            </h3>
-                            <p className='text-gray-600 text-sm leading-relaxed'>
-                              {address.street}, {address.city}, {address.state}{' '}
-                              {address.zip}
-                            </p>
+                        {/* Destinations */}
+                        <div className='mb-3'>
+                          <h3 className='text-sm font-semibold text-gray-700 mb-1'>
+                            Destinations
+                          </h3>
+                          <div className='flex flex-wrap gap-2'>
+                            {destinations.map((dest, index) => (
+                              <span
+                                key={index}
+                                className='bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium'
+                              >
+                                {dest.city}, {dest.country}
+                              </span>
+                            ))}
                           </div>
+                        </div>
+
+                        {/* Address */}
+                        <div className='mb-3'>
+                          <h3 className='text-sm font-semibold text-gray-700 mb-1'>
+                            Address
+                          </h3>
+                          <p className='text-gray-600 text-sm leading-relaxed'>
+                            {address.street}, {address.city}, {address.state}{' '}
+                            {address.zip}
+                          </p>
                         </div>
                       </div>
                     </div>
-                  )
-                })}
-              </div>
-            )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
 
-            {/* Pagination */}
-            {pagination.totalPages > 1 && (
-              <div className='mt-12 flex justify-center'>
-                <Pagination
-                  pagination={pagination}
-                  onPageChange={handlePageChange}
-                />
-              </div>
-            )}
-          </div>
+          {/* Pagination */}
+          {pagination.totalPages > 1 && (
+            <div className='mt-12 flex justify-center'>
+              <Pagination
+                pagination={pagination}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
         </div>
-      ) : (
-        <SingleConsultancy consultancy={singleConsultancy} />
-      )}
+      </div>
       <Footer />
     </>
   )

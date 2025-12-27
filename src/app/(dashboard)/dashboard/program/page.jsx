@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import Table from '../../../../components/Table'
-import { Edit2, Trash2 } from 'lucide-react'
+import { Edit2, Trash2, Search } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { X } from 'lucide-react'
 import {
@@ -19,11 +19,14 @@ import { useDebounce } from 'use-debounce'
 import CourseSearch from './CourseSearch'
 import Syllabus from './Syllabus'
 import useAdminPermission from '@/hooks/useAdminPermission'
+import { Modal } from '../../../../components/CreateUserModal'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
 const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
 })
 
 export default function ProgramForm() {
+  const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
   const [isOpen, setIsOpen] = useState(false)
   const [programs, setPrograms] = useState([])
@@ -32,6 +35,8 @@ export default function ProgramForm() {
   const [editing, setEditing] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchTimeout, setSearchTimeout] = useState(null)
 
   //new syllabus
   const [currentYear, setCurrentYear] = useState(1)
@@ -173,9 +178,19 @@ export default function ProgramForm() {
 
   // Fetch all necessary data on component mount
   useEffect(() => {
+    setHeading('Program Management')
     fetchPrograms()
     fetchColleges()
-  }, [])
+    return () => setHeading(null)
+  }, [setHeading])
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout)
+      }
+    }
+  }, [searchTimeout])
 
   const { requireAdmin } = useAdminPermission()
 
@@ -347,7 +362,10 @@ export default function ProgramForm() {
           : 'Program created successfully!'
       )
       setSubmitting(false)
+      setEditing(false)
       reset()
+      setSelectedColleges([])
+      setCollegeSearch('')
       fetchPrograms()
       setIsOpen(false)
 
@@ -501,6 +519,18 @@ export default function ProgramForm() {
     }
   }, [levelSearch, levels])
 
+  const handleDeleteClick = (id) => {
+    requireAdmin(() => {
+      setDeleteId(id)
+      setIsDialogOpen(true)
+    }, 'You do not have permission to delete this item.')
+  }
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false)
+    setDeleteId(null)
+  }
+
   const handleDeleteConfirm = async () => {
     if (!deleteId) return
 
@@ -519,6 +549,39 @@ export default function ProgramForm() {
     } finally {
       setIsDialogOpen(false)
       setDeleteId(null)
+    }
+  }
+
+  const handleModalClose = () => {
+    setIsOpen(false)
+    setEditing(false)
+    reset()
+    setSelectedColleges([])
+    setCollegeSearch('')
+    setFacSearch('')
+    setHasSelectedFac(false)
+    setScholarSearch('')
+    setHasSelectedScholar(false)
+    setExamSearch('')
+    setHasSelectedExam(false)
+    setLevelSearch('')
+    setHasSelectedLevel(false)
+  }
+
+  const handleSearchInput = (value) => {
+    setSearchQuery(value)
+
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    if (value === '') {
+      handleSearch('')
+    } else {
+      const timeoutId = setTimeout(() => {
+        handleSearch(value)
+      }, 300)
+      setSearchTimeout(timeoutId)
     }
   }
 
@@ -555,12 +618,7 @@ export default function ProgramForm() {
             <Edit2 className='w-4 h-4' />
           </button>
           <button
-            onClick={() => {
-              requireAdmin(() => {
-                setDeleteId(row.original.id)
-                setIsDialogOpen(true)
-              }, 'You do not have permission to delete this item.')
-            }}
+            onClick={() => handleDeleteClick(row.original.id)}
             className='p-1 text-red-600 hover:text-red-800'
           >
             <Trash2 className='w-4 h-4' />
@@ -639,21 +697,70 @@ export default function ProgramForm() {
 
   return (
     <>
-      <div className='text-2xl mr-auto p-4 ml-14 font-bold'>
-        <div className='text-center'>Program Management</div>
-        <div className='flex justify-left mt-2'>
-          <button
-            className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? 'Hide form' : 'Show form'}
-          </button>
+      <div className='p-4 w-full'>
+        <div className='flex justify-between items-center mb-4'>
+          {/* Search Bar */}
+          <div className='relative w-full max-w-md'>
+            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+              <Search className='w-4 h-4 text-gray-500' />
+            </div>
+            <input
+              type='text'
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              placeholder='Search programs...'
+            />
+          </div>
+          {/* Button */}
+          <div className='flex gap-2'>
+            <button
+              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+              onClick={() => {
+                setEditing(false)
+                reset()
+                setSelectedColleges([])
+                setCollegeSearch('')
+                setFacSearch('')
+                setHasSelectedFac(false)
+                setScholarSearch('')
+                setHasSelectedScholar(false)
+                setExamSearch('')
+                setHasSelectedExam(false)
+                setLevelSearch('')
+                setHasSelectedLevel(false)
+                setIsOpen(true)
+              }}
+            >
+              Add Program
+            </button>
+          </div>
+        </div>
+        <ToastContainer />
+
+        {/* Table Section */}
+        <div className='mt-8'>
+          <Table
+            loading={tableLoading}
+            data={programs}
+            columns={columns}
+            pagination={pagination}
+            onPageChange={(newPage) => fetchPrograms(newPage)}
+            onSearch={handleSearch}
+            showSearch={false}
+          />
         </div>
       </div>
 
-      {isOpen && (
-        <div className='container mx-auto p-4'>
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+      {/* Form Modal */}
+      <Modal
+        isOpen={isOpen}
+        onClose={handleModalClose}
+        title={editing ? 'Edit Program' : 'Add Program'}
+        className='max-w-6xl'
+      >
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+          <div className='max-h-[calc(100vh-200px)] overflow-y-auto pr-2'>
             {/* Basic Information */}
             <div className='bg-white p-6 rounded-lg shadow-md'>
               <h2 className='text-xl font-semibold mb-4'>Basic Information</h2>
@@ -1194,44 +1301,36 @@ export default function ProgramForm() {
                 )}
               </div>
             </div>
+          </div>
 
-            {/* Submit Button */}
-            <div className='flex justify-end'>
-              <button
-                type='submit'
-                disabled={loading}
-                className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
-              >
-                {submitting
-                  ? 'Processing...'
-                  : editing
-                    ? 'Update Program'
-                    : 'Create Program'}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Table Section */}
-      <div className='mt-8'>
-        <Table
-          loading={tableLoading}
-          data={programs}
-          columns={columns}
-          pagination={pagination}
-          onPageChange={(newPage) => fetchPrograms(newPage)}
-          onSearch={handleSearch}
-        />
-      </div>
+          {/* Submit Button */}
+          <div className='flex justify-end gap-2 pt-4 border-t'>
+            <button
+              type='button'
+              onClick={handleModalClose}
+              className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors'
+            >
+              Cancel
+            </button>
+            <button
+              type='submit'
+              disabled={submitting}
+              className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
+            >
+              {submitting
+                ? 'Processing...'
+                : editing
+                  ? 'Update Program'
+                  : 'Create Program'}
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Confirmation Dialog */}
       <ConfirmationDialog
         open={isDialogOpen}
-        onClose={() => {
-          setIsDialogOpen(false)
-          setDeleteId(null)
-        }}
+        onClose={handleDialogClose}
         onConfirm={handleDeleteConfirm}
         title='Confirm Deletion'
         message='Are you sure you want to delete this program? This action cannot be undone.'

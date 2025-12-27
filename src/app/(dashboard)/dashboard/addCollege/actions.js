@@ -14,6 +14,8 @@ export async function createCollege(data) {
 
   if (!response.ok) {
     const error = await response.json()
+    console.log('eeeeee', error)
+
     throw new Error(error.message || 'Failed to create college')
   }
 
@@ -56,7 +58,7 @@ export const fetchCourse = async (searchQuery = '') => {
 export const fetchAllCourse = async () => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/program?limit=999999`
+      `${process.env.baseUrl}${process.env.version}/program?limit=100`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch courses')
@@ -88,23 +90,21 @@ export const fetchAllUniversity = async () => {
 export const getUniversityBySlug = async (slug) => {
   try {
     console.log('Fetching university details for slug:', slug)
-    console.log(
-      `${process.env.baseUrl}${process.env.version}/university/${slug}`
-    )
-    const response = await fetch(
+    const response = await authFetch(
       `${process.env.baseUrl}${process.env.version}/university/${slug}`,
       {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
-        },
-        cache: 'no-store'
+        }
       }
     )
     if (!response.ok) {
-      throw new Error('Failed to fetch university description')
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.error || 'Failed to fetch university details')
     }
     const data = await response.json()
+    console.log('University data received:', data)
     return data
   } catch (error) {
     console.error('Error fetching university details:', error)

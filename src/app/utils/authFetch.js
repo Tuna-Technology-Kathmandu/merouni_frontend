@@ -67,6 +67,7 @@ export const authFetch = async (url, options = {}) => {
             }
             return newResponse // Return without throwing
           }
+
           throw new Error(`Request failed with status ${newResponse.status}`)
         }
         return newResponse
@@ -80,7 +81,10 @@ export const authFetch = async (url, options = {}) => {
     }
 
     if (!response.ok) {
-      throw new Error(`Request failed with status ${response.status}`)
+      const error = await response.json()
+      throw new Error(
+        error?.message || `Request failed with status ${response.status}`
+      )
     }
     return response
   } catch (error) {

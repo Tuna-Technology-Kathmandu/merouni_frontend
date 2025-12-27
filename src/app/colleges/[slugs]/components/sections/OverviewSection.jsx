@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import he from 'he'
 
 const OverviewSection = ({ college }) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+
   // Wrap tables in a scrollable container
   const processContent = (html) => {
     if (!html) return ''
@@ -11,21 +13,54 @@ const OverviewSection = ({ college }) => {
     )
   }
 
+  // Truncate description to first 30 words for mobile
+  const truncateDescription = (text, wordLimit = 30) => {
+    if (!text) return ''
+    const words = text.split(' ')
+    if (words.length <= wordLimit) return text
+    return words.slice(0, wordLimit).join(' ') + '...'
+  }
+
+  const fullDescription = college?.description || ''
+  const truncatedDescription = truncateDescription(fullDescription, 30)
+  const shouldTruncate = fullDescription.split(' ').length > 30
+
   return (
     <div>
       <h2 className='text-sm md:text-lg lg:text-xl font-bold'>Description</h2>
 
       {/* Plain description text */}
-      <p className='text-gray-800 mt-9 max-[1120px]:mt-5 leading-7 max-md:leading-5 text-justify text-xs md:text-sm lg:text-base'>
-        {college?.description}
-      </p>
+      {college?.description && (
+        <div>
+          {/* Mobile view - with truncation */}
+          <p className='md:hidden text-gray-800 mt-9 max-[1120px]:mt-5 leading-7 max-md:leading-5 text-justify text-xs'>
+            {isExpanded ? fullDescription : truncatedDescription}
+          </p>
+
+          {/* Desktop view - full description */}
+          <p className='hidden md:block text-gray-800 mt-9 max-[1120px]:mt-5 leading-7 text-justify text-sm lg:text-base'>
+            {fullDescription}
+          </p>
+
+          {/* Read more/less button - only on mobile */}
+          {shouldTruncate && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className='md:hidden mt-2 text-blue-600 hover:text-blue-800 font-semibold text-sm underline'
+            >
+              {isExpanded ? 'Read less' : 'Read more'}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Rich HTML content */}
-      <div
-        dangerouslySetInnerHTML={{
-          __html: he.decode(processContent(college?.content))
-        }}
-        className='text-gray-800 mt-4 leading-7 text-justify 
+      {college?.content && (
+        <div
+          dangerouslySetInnerHTML={{
+            __html: he.decode(processContent(college.content))
+          }}
+          className='text-gray-800 mt-4 leading-7 text-justify 
              text-xs md:text-sm lg:text-base
 
              [&>iframe]:w-full 
@@ -80,7 +115,8 @@ const OverviewSection = ({ college }) => {
              max-lg:[&_ul]:text-sm
              max-lg:[&_ol]:space-y-1
              max-lg:[&_ul]:space-y-1'
-      />
+        />
+      )}
     </div>
   )
 }

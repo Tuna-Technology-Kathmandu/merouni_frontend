@@ -56,14 +56,9 @@ export async function createUser(formData) {
       }
     )
 
-    if (!response.ok) {
-      throw new Error('Failed to create user')
-    }
-
     return await response.json()
   } catch (error) {
-    console.error('Error creating user:', error)
-    throw error
+    throw new Error(error.message || 'Failed to create user')
   }
 }
 

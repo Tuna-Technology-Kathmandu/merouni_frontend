@@ -4,18 +4,26 @@ import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
 import Table from '../../../../components/Table'
-import { Edit2, Trash2 } from 'lucide-react'
+import { Edit2, Trash2, Search } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { X } from 'lucide-react'
 import useAdminPermission from '@/hooks/useAdminPermission'
+import { Modal } from '../../../../components/CreateUserModal'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
 
 export default function MaterialForm() {
+  const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
   const [isOpen, setIsOpen] = useState(false)
   const [materials, setMaterials] = useState([])
   const [tags, setTags] = useState([])
+  const [categories, setCategories] = useState([])
+  const [showAddCategory, setShowAddCategory] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [newCategoryDescription, setNewCategoryDescription] = useState('')
+  const [addingCategory, setAddingCategory] = useState(false)
   const [tableLoading, setTableLoading] = useState(false)
   const [loading, setLoading] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -29,12 +37,12 @@ export default function MaterialForm() {
   const [collegeSearch, setCollegeSearch] = useState('')
   const [selectedColleges, setSelectedColleges] = useState([])
   const [searchResults, setSearchResults] = useState([])
+  const [searchQuery, setSearchQuery] = useState('')
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
     total: 0
   })
-  const statusOptions = ['draft', 'published', 'archived']
   const visibilityOptions = ['public', 'private']
 
   const searchCollege = async (e) => {
@@ -90,15 +98,19 @@ export default function MaterialForm() {
       tags: [],
       file: '',
       image: '',
-      status: 'draft',
-      visibility: 'public'
+      visibility: 'public',
+      category_id: ''
     }
   })
 
   useEffect(() => {
+    setHeading('Material Management')
     fetchMaterials()
     fetchTags()
-  }, [])
+    fetchCategories()
+    return () => setHeading(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setHeading])
 
   const { requireAdmin } = useAdminPermission()
 
@@ -111,6 +123,65 @@ export default function MaterialForm() {
       setTags(data.items)
     } catch (error) {
       toast.error('Failed to fetch tags')
+    }
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/material-category?limit=100`
+      )
+      const data = await response.json()
+      setCategories(data.items || [])
+    } catch (error) {
+      console.error('Failed to fetch material categories:', error)
+    }
+  }
+
+  const handleAddNewCategory = async () => {
+    if (!newCategoryName.trim()) {
+      toast.error('Category name is required')
+      return
+    }
+
+    setAddingCategory(true)
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/material-category`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: newCategoryName.trim(),
+            description: newCategoryDescription.trim() || null
+          })
+        }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Failed to create category')
+      }
+
+      const data = await response.json()
+      toast.success('Category created successfully!')
+
+      // Refresh categories list
+      await fetchCategories()
+
+      // Set the newly created category as selected
+      setValue('category_id', data.category.id)
+
+      // Reset form
+      setNewCategoryName('')
+      setNewCategoryDescription('')
+      setShowAddCategory(false)
+    } catch (error) {
+      toast.error(error.message || 'Failed to create category')
+    } finally {
+      setAddingCategory(false)
     }
   }
 
@@ -136,12 +207,34 @@ export default function MaterialForm() {
 
   const onSubmit = async (data) => {
     try {
-      data.file = uploadedFiles.file
-      data.image = uploadedFiles.image
+      // Validate file is provided
+      if (!uploadedFiles.file || !uploadedFiles.file.trim()) {
+        toast.error('Material file is required')
+        return
+      }
+
+      const payload = {
+        title: data.title?.trim() || '',
+        tags: data.tags || [],
+        visibility: data.visibility,
+        image: uploadedFiles.image || null,
+        file: uploadedFiles.file
+      }
+
+      // Handle category_id - convert empty string to null, or parse to integer
+      if (
+        data.category_id === '' ||
+        data.category_id === null ||
+        data.category_id === undefined
+      ) {
+        payload.category_id = null
+      } else {
+        payload.category_id = parseInt(data.category_id, 10)
+      }
 
       const url = `${process.env.baseUrl}${process.env.version}/material`
       const method = editing ? 'PUT' : 'POST'
-      console.log('before submit', data)
+      console.log('before submit', payload)
       if (editing) {
         const response = await authFetch(
           `${process.env.baseUrl}${process.env.version}/material?id=${editId}`,
@@ -150,7 +243,7 @@ export default function MaterialForm() {
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(payload)
           }
         )
         await response.json()
@@ -160,7 +253,7 @@ export default function MaterialForm() {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify(payload)
         })
         await response.json()
       }
@@ -175,8 +268,10 @@ export default function MaterialForm() {
       setUploadedFiles({ image: '', file: '' })
       setSelectedColleges([])
       setSearchResults([])
+      setValue('category_id', '')
       fetchMaterials()
       setIsOpen(false)
+      setEditingId(null)
     } catch (error) {
       toast.error(error.message || 'Failed to save material')
     }
@@ -214,8 +309,10 @@ export default function MaterialForm() {
       }
 
       // setValue("tags", JSON.parse(material.tags));
-      setValue('status', material.status)
       setValue('visibility', material.visibility)
+      // Extract category_id from material (could be direct field or from category association)
+      const categoryId = material.category_id || material.category?.id || ''
+      setValue('category_id', categoryId)
 
       setUploadedFiles({
         image: material.image || '',
@@ -263,16 +360,22 @@ export default function MaterialForm() {
 
   const columns = [
     {
-      header: 'ID',
-      accessorKey: 'id'
-    },
-    {
       header: 'Title',
       accessorKey: 'title'
     },
     {
-      header: 'Status',
-      accessorKey: 'status'
+      header: 'Category',
+      accessorKey: 'category',
+      cell: ({ row }) => {
+        const category = row.original.category
+        return category ? (
+          <span className='px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm'>
+            {category.name}
+          </span>
+        ) : (
+          <span className='text-gray-400 text-sm'>-</span>
+        )
+      }
     },
     {
       header: 'Visibility',
@@ -306,6 +409,7 @@ export default function MaterialForm() {
   ]
 
   const handleSearch = async (query) => {
+    setSearchQuery(query)
     if (!query) {
       fetchMaterials()
       return
@@ -336,30 +440,82 @@ export default function MaterialForm() {
     }
   }
 
+  const handleSearchInput = (value) => {
+    handleSearch(value)
+  }
+
+  const handleCloseModal = () => {
+    setIsOpen(false)
+    setEditing(false)
+    setEditingId(null)
+    reset()
+    setUploadedFiles({ image: '', file: '' })
+    setSelectedColleges([])
+    setSearchResults([])
+    setShowAddCategory(false)
+    setNewCategoryName('')
+    setNewCategoryDescription('')
+  }
+
+  const handleAddClick = () => {
+    setIsOpen(true)
+    setEditing(false)
+    setEditingId(null)
+    reset()
+    setUploadedFiles({ image: '', file: '' })
+    setSelectedColleges([])
+    setSearchResults([])
+  }
+
   return (
     <>
-      <div className='text-2xl mr-auto p-4 ml-14 font-bold'>
-        <div className='text-center'>Material Management</div>
-        <div className='flex justify-left mt-2'>
+      {/* Header Section */}
+      <div className='sticky top-0 z-30 bg-[#F7F8FA] flex items-center justify-between p-4'>
+        {/* Search Bar */}
+        <div className='relative w-full max-w-md'>
+          <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+            <Search className='w-4 h-4 text-gray-500' />
+          </div>
+          <input
+            type='text'
+            value={searchQuery}
+            onChange={(e) => handleSearchInput(e.target.value)}
+            className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+            placeholder='Search materials...'
+          />
+        </div>
+        {/* Button */}
+        <div className='flex items-center gap-4'>
           <button
-            className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600'
-            onClick={() => setIsOpen(!isOpen)}
+            className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+            onClick={handleAddClick}
           >
-            {isOpen ? 'Hide form' : 'Show form'}
+            Add Material
           </button>
         </div>
       </div>
 
-      {isOpen && (
-        <div className='container mx-auto p-4'>
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+      {/* Modal Dialog */}
+      <Modal
+        isOpen={isOpen}
+        onClose={handleCloseModal}
+        title={editing ? 'Edit Material' : 'Add Material'}
+        className='max-w-4xl max-h-[90vh] overflow-y-auto'
+      >
+        <div className='container mx-auto p-1 flex flex-col'>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className='flex flex-col space-y-6'
+          >
             <div className='bg-white p-6 rounded-lg shadow-md'>
               <h2 className='text-xl font-semibold mb-4'>
                 Material Information
               </h2>
               <div className='grid grid-cols-1 gap-4'>
                 <div>
-                  <label className='block mb-2'>Title *</label>
+                  <label className='block mb-2'>
+                    Title <span className='text-red-500'>*</span>
+                  </label>
                   <input
                     {...register('title', {
                       required: 'Title is required',
@@ -374,21 +530,6 @@ export default function MaterialForm() {
                     <span className='text-red-500'>{errors.title.message}</span>
                   )}
                 </div>
-
-                {/* <div>
-                  <label className="block mb-2">Tags</label>
-                  <select
-                    multiple
-                    {...register("tags")}
-                    className="w-full p-2 border rounded"
-                  >
-                    {tags.map((tag) => (
-                      <option key={tag.id} value={tag.id}>
-                        {tag.title}
-                      </option>
-                    ))}
-                  </select>
-                </div> */}
 
                 <div className='mb-4'>
                   <label className='block mb-2'>Tags</label>
@@ -435,17 +576,72 @@ export default function MaterialForm() {
                   </div>
                 </div>
                 <div>
-                  <label className='block mb-2'>Status</label>
-                  <select
-                    {...register('status')}
-                    className='w-full p-2 border rounded'
-                  >
-                    {statusOptions.map((status) => (
-                      <option key={status} value={status}>
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
-                      </option>
-                    ))}
-                  </select>
+                  <div className='flex items-center justify-between mb-2'>
+                    <label className='block'>Category</label>
+                    <button
+                      type='button'
+                      onClick={() => setShowAddCategory(!showAddCategory)}
+                      className='text-sm text-blue-600 hover:text-blue-800 font-medium'
+                    >
+                      {showAddCategory ? 'Cancel' : '+ Add New Category'}
+                    </button>
+                  </div>
+
+                  {showAddCategory ? (
+                    <div className='mb-4 p-4 border border-gray-300 rounded-lg bg-gray-50'>
+                      <div className='space-y-3'>
+                        <div>
+                          <label className='block mb-1 text-sm font-medium'>
+                            Category Name{' '}
+                            <span className='text-red-500'>*</span>
+                          </label>
+                          <input
+                            type='text'
+                            value={newCategoryName}
+                            onChange={(e) => setNewCategoryName(e.target.value)}
+                            className='w-full p-2 border rounded text-sm'
+                            placeholder='Enter category name'
+                            disabled={addingCategory}
+                          />
+                        </div>
+                        <div>
+                          <label className='block mb-1 text-sm font-medium'>
+                            Description
+                          </label>
+                          <textarea
+                            value={newCategoryDescription}
+                            onChange={(e) =>
+                              setNewCategoryDescription(e.target.value)
+                            }
+                            className='w-full p-2 border rounded text-sm'
+                            placeholder='Enter category description'
+                            rows={2}
+                            disabled={addingCategory}
+                          />
+                        </div>
+                        <button
+                          type='button'
+                          onClick={handleAddNewCategory}
+                          disabled={addingCategory || !newCategoryName.trim()}
+                          className='w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300 text-sm font-medium'
+                        >
+                          {addingCategory ? 'Creating...' : 'Create Category'}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <select
+                      {...register('category_id')}
+                      className='w-full p-2 border rounded'
+                    >
+                      <option value=''>No Category</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
 
                 <div>
@@ -465,18 +661,35 @@ export default function MaterialForm() {
 
                 <div>
                   <FileUpload
-                    label='Material File'
+                    label={
+                      <>
+                        Material File <span className='text-red-500'>*</span>
+                      </>
+                    }
+                    accept='application/pdf,image/*'
                     onUploadComplete={(url) => {
                       setUploadedFiles((prev) => ({ ...prev, file: url }))
                       setValue('file', url)
                     }}
                     defaultPreview={uploadedFiles.file}
                   />
+                  {!uploadedFiles.file && (
+                    <p className='text-red-500 text-sm mt-1'>
+                      Material file is required
+                    </p>
+                  )}
                 </div>
 
                 <div>
                   <FileUpload
-                    label='Material Image'
+                    label={
+                      <>
+                        Material Image{' '}
+                        <span className='text-gray-500 text-sm'>
+                          (Optional)
+                        </span>
+                      </>
+                    }
                     onUploadComplete={(url) => {
                       setUploadedFiles((prev) => ({ ...prev, image: url }))
                       setValue('image', url)
@@ -491,7 +704,7 @@ export default function MaterialForm() {
               <button
                 type='submit'
                 disabled={loading}
-                className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300'
+                className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
               >
                 {loading
                   ? 'Processing...'
@@ -502,9 +715,10 @@ export default function MaterialForm() {
             </div>
           </form>
         </div>
-      )}
+      </Modal>
 
-      <div className='mt-8'>
+      {/* Table */}
+      <div className='p-4'>
         <Table
           loading={tableLoading}
           data={materials}
@@ -512,6 +726,7 @@ export default function MaterialForm() {
           pagination={pagination}
           onPageChange={(newPage) => fetchMaterials(newPage)}
           onSearch={handleSearch}
+          showSearch={false}
         />
       </div>
 
@@ -521,6 +736,8 @@ export default function MaterialForm() {
         onConfirm={handleDeleteConfirm}
         title='Confirm Deletion'
         message='Are you sure you want to delete this material? This action cannot be undone.'
+        confirmText='Delete'
+        cancelText='Cancel'
       />
     </>
   )

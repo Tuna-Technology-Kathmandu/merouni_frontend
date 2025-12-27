@@ -13,6 +13,16 @@ function hasAccess(role, pathname) {
   })
 }
 
+function getFirstAllowedRoute(role) {
+  // Find the first route the user has access to
+  for (const [roleName, paths] of Object.entries(PERMISSIONS_VIA_ROLE)) {
+    if (role[roleName] && paths.length > 0) {
+      return paths[0] // Return the first allowed route
+    }
+  }
+  return DASHBOARD_ROUTE // Fallback to dashboard
+}
+
 export default function useAuthGuard() {
   /**
    * HOOKS
@@ -59,8 +69,9 @@ export default function useAuthGuard() {
         // Check if user has access to this route
         if (!hasAccess(role, pathname)) {
           console.log('No access to route:', pathname)
-          // Redirect to forbidden or dashboard home
-          router.replace(FORBIDDEN || DASHBOARD_ROUTE)
+          // Redirect to first allowed route for this user
+          const firstAllowedRoute = getFirstAllowedRoute(role)
+          router.replace(firstAllowedRoute)
           setIsBooted(true)
           return
         }
@@ -80,12 +91,14 @@ export default function useAuthGuard() {
       }
     } else {
       // Not a dashboard route, allow access
-      // If authenticated and on sign-in page, redirect to dashboard
+      // If authenticated and on sign-in page, redirect to their first allowed route
       if (pathname === SIGN_IN && token && refreshToken) {
         try {
           const user = decodeJwt(token)
-          // Token is valid, redirect to dashboard
-          router.replace(DASHBOARD_ROUTE)
+          const role = user?.data?.role ? destr(user?.data?.role) : {}
+          // Token is valid, redirect to first allowed route
+          const firstAllowedRoute = getFirstAllowedRoute(role)
+          router.replace(firstAllowedRoute)
           setIsBooted(true)
           return
         } catch (err) {

@@ -10,20 +10,26 @@ import {
 } from './actions'
 import Loading from '../../../../components/Loading'
 import Table from '../../../../components/Table'
-import { Edit2, Trash2 } from 'lucide-react'
+import { Edit2, Trash2, Search } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import useAdminPermission from '@/hooks/useAdminPermission'
+import { Modal } from '../../../../components/CreateUserModal'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 const CKEditor = dynamic(() => import('../component/CKStable'), {
   ssr: false
 })
 
 export default function ScholarshipManager() {
+  const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
   const [scholarships, setScholarships] = useState([])
   const [loading, setLoading] = useState(true)
+  const [tableLoading, setTableLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -34,7 +40,11 @@ export default function ScholarshipManager() {
     contactInfo: ''
   })
   const [editingId, setEditingId] = useState(null)
+  const [deleteId, setDeleteId] = useState(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [error, setError] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchTimeout, setSearchTimeout] = useState(null)
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -84,7 +94,7 @@ export default function ScholarshipManager() {
               <Edit2 className='w-4 h-4' />
             </button>
             <button
-              onClick={() => handleDelete(row.original.id)}
+              onClick={() => handleDeleteClick(row.original.id)}
               className='p-1 text-red-600 hover:text-red-800'
             >
               <Trash2 className='w-4 h-4' />
@@ -97,12 +107,23 @@ export default function ScholarshipManager() {
   )
 
   useEffect(() => {
+    setHeading('Scholarship Management')
     loadScholarships()
-  }, [])
+    return () => setHeading(null)
+  }, [setHeading])
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout)
+      }
+    }
+  }, [searchTimeout])
 
   const { requireAdmin } = useAdminPermission()
 
   const loadScholarships = async (page = 1) => {
+    setTableLoading(true)
     try {
       const res = await getAllScholarships((page = 1))
       const response = res.scholarships
@@ -132,7 +153,9 @@ export default function ScholarshipManager() {
     } catch (error) {
       setError('Failed to load scholarships')
       console.error('Error loading scholarships:', error)
+      toast.error('Failed to fetch scholarships')
     } finally {
+      setTableLoading(false)
       setLoading(false)
     }
   }
@@ -165,6 +188,7 @@ export default function ScholarshipManager() {
       })
       setEditingId(null)
       setError(null)
+      setIsOpen(false)
       loadScholarships()
       setIsSubmitting(false)
       toast.success(
@@ -191,22 +215,69 @@ export default function ScholarshipManager() {
     })
     setEditingId(scholarship.id)
     setError(null)
+    setIsOpen(true)
   }
 
-  const handleDelete = async (id) => {
-    requireAdmin(async () => {
-      console.log('ids0', id)
-      if (window.confirm('Are you sure you want to delete this scholarship?')) {
-        try {
-          await deleteScholarship(id)
-          loadScholarships()
-          setError(null)
-        } catch (error) {
-          setError('Failed to delete scholarship')
-          console.error('Error deleting scholarship:', error)
-        }
-      }
+  const handleModalClose = () => {
+    setIsOpen(false)
+    setEditingId(null)
+    setError(null)
+    setFormData({
+      name: '',
+      description: '',
+      eligibilityCriteria: '',
+      amount: '',
+      applicationDeadline: '',
+      renewalCriteria: '',
+      contactInfo: ''
+    })
+  }
+
+  const handleDeleteClick = (id) => {
+    requireAdmin(() => {
+      setDeleteId(id)
+      setIsDialogOpen(true)
     }, 'You do not have permission to delete scholarships.')
+  }
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false)
+    setDeleteId(null)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteId) return
+
+    try {
+      await deleteScholarship(deleteId)
+      toast.success('Scholarship deleted successfully!')
+      await loadScholarships()
+      setError(null)
+    } catch (error) {
+      toast.error('Failed to delete scholarship')
+      setError('Failed to delete scholarship')
+      console.error('Error deleting scholarship:', error)
+    } finally {
+      setIsDialogOpen(false)
+      setDeleteId(null)
+    }
+  }
+
+  const handleSearchInput = (value) => {
+    setSearchQuery(value)
+
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    if (value === '') {
+      handleSearch('')
+    } else {
+      const timeoutId = setTimeout(() => {
+        handleSearch(value)
+      }, 300)
+      setSearchTimeout(timeoutId)
+    }
   }
 
   const formatDate = (date) => {
@@ -263,118 +334,194 @@ export default function ScholarshipManager() {
     )
 
   return (
-    <div className='p-4 w-4/5 mx-auto'>
-      <ToastContainer />
-      <h1 className='text-2xl font-bold mb-4'>Scholarship Management</h1>
+    <>
+      <div className='p-4 w-full'>
+        <div className='flex justify-between items-center mb-4'>
+          {/* Search Bar */}
+          <div className='relative w-full max-w-md'>
+            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+              <Search className='w-4 h-4 text-gray-500' />
+            </div>
+            <input
+              type='text'
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              placeholder='Search scholarships...'
+            />
+          </div>
+          {/* Button */}
+          <div className='flex gap-2'>
+            <button
+              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+              onClick={() => {
+                setIsOpen(true)
+                setEditingId(null)
+                setError(null)
+                setFormData({
+                  name: '',
+                  description: '',
+                  eligibilityCriteria: '',
+                  amount: '',
+                  applicationDeadline: '',
+                  renewalCriteria: '',
+                  contactInfo: ''
+                })
+              }}
+            >
+              Add Scholarship
+            </button>
+          </div>
+        </div>
+        <ToastContainer />
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className='mb-8 space-y-4'>
-        <div>
-          <input
-            type='text'
-            placeholder='Scholarship Name'
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className='w-full p-2 border rounded'
-            required
+        {/* Table */}
+        <div className='mt-8'>
+          <Table
+            loading={tableLoading}
+            data={scholarships}
+            columns={columns}
+            pagination={pagination}
+            onPageChange={(newPage) => loadScholarships(newPage)}
+            onSearch={handleSearch}
+            showSearch={false}
           />
         </div>
+      </div>
 
-        <div>
-          <CKEditor
-            value={formData.description}
-            onChange={handleEditorChange}
-            id='scholarship-description-editor'
-          />
-        </div>
+      {/* Form Modal */}
+      <Modal
+        isOpen={isOpen}
+        onClose={handleModalClose}
+        title={editingId ? 'Edit Scholarship' : 'Add Scholarship'}
+        className='max-w-4xl'
+      >
+        <form onSubmit={handleSubmit} className='space-y-6'>
+          <div className='space-y-4'>
+            <div>
+              <input
+                type='text'
+                placeholder='Scholarship Name'
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                className='w-full p-2 border rounded'
+                required
+              />
+            </div>
 
-        <div>
-          <input
-            type='text'
-            placeholder='Eligibility Criteria'
-            value={formData.eligibilityCriteria}
-            onChange={(e) =>
-              setFormData({ ...formData, eligibilityCriteria: e.target.value })
-            }
-            className='w-full p-2 border rounded'
-            required
-          />
-        </div>
+            <div>
+              <CKEditor
+                value={formData.description}
+                onChange={handleEditorChange}
+                id='scholarship-description-editor'
+              />
+            </div>
 
-        <div>
-          <input
-            type='number'
-            placeholder='Amount'
-            value={formData.amount}
-            onChange={(e) =>
-              setFormData({ ...formData, amount: e.target.value })
-            }
-            className='w-full p-2 border rounded'
-            required
-          />
-        </div>
+            <div>
+              <input
+                type='text'
+                placeholder='Eligibility Criteria'
+                value={formData.eligibilityCriteria}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    eligibilityCriteria: e.target.value
+                  })
+                }
+                className='w-full p-2 border rounded'
+                required
+              />
+            </div>
 
-        <div>
-          <input
-            type='date'
-            value={formData.applicationDeadline}
-            onChange={(e) =>
-              setFormData({ ...formData, applicationDeadline: e.target.value })
-            }
-            className='w-full p-2 border rounded'
-            required
-          />
-        </div>
+            <div>
+              <input
+                type='number'
+                placeholder='Amount'
+                value={formData.amount}
+                onChange={(e) =>
+                  setFormData({ ...formData, amount: e.target.value })
+                }
+                className='w-full p-2 border rounded'
+                required
+              />
+            </div>
 
-        <div>
-          <input
-            type='text'
-            placeholder='Renewal Criteria'
-            value={formData.renewalCriteria}
-            onChange={(e) =>
-              setFormData({ ...formData, renewalCriteria: e.target.value })
-            }
-            className='w-full p-2 border rounded'
-            required
-          />
-        </div>
+            <div>
+              <input
+                type='date'
+                value={formData.applicationDeadline}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    applicationDeadline: e.target.value
+                  })
+                }
+                className='w-full p-2 border rounded'
+                required
+              />
+            </div>
 
-        <div>
-          <input
-            type='text'
-            placeholder='Contact Information'
-            value={formData.contactInfo}
-            onChange={(e) =>
-              setFormData({ ...formData, contactInfo: e.target.value })
-            }
-            className='w-full p-2 border rounded'
-            required
-          />
-        </div>
+            <div>
+              <input
+                type='text'
+                placeholder='Renewal Criteria'
+                value={formData.renewalCriteria}
+                onChange={(e) =>
+                  setFormData({ ...formData, renewalCriteria: e.target.value })
+                }
+                className='w-full p-2 border rounded'
+                required
+              />
+            </div>
 
-        {error && <div className='text-red-500'>{error}</div>}
+            <div>
+              <input
+                type='text'
+                placeholder='Contact Information'
+                value={formData.contactInfo}
+                onChange={(e) =>
+                  setFormData({ ...formData, contactInfo: e.target.value })
+                }
+                className='w-full p-2 border rounded'
+                required
+              />
+            </div>
 
-        <button
-          type='submit'
-          disabled={loading}
-          className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
-        >
-          {isSubmitting
-            ? 'Processing...'
-            : editingId
-              ? 'Update Scholarship'
-              : 'Add Scholarship'}
-        </button>
-      </form>
+            {error && <div className='text-red-500'>{error}</div>}
+          </div>
 
-      {/* Table */}
-      <Table
-        data={scholarships}
-        columns={columns}
-        pagination={pagination}
-        onPageChange={(newPage) => loadScholarships(newPage)}
-        onSearch={handleSearch}
+          <div className='flex justify-end gap-2 pt-4 border-t'>
+            <button
+              type='button'
+              onClick={handleModalClose}
+              className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors'
+            >
+              Cancel
+            </button>
+            <button
+              type='submit'
+              disabled={isSubmitting}
+              className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
+            >
+              {isSubmitting
+                ? 'Processing...'
+                : editingId
+                  ? 'Update Scholarship'
+                  : 'Create Scholarship'}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      <ConfirmationDialog
+        open={isDialogOpen}
+        onClose={handleDialogClose}
+        onConfirm={handleDeleteConfirm}
+        title='Confirm Deletion'
+        message='Are you sure you want to delete this scholarship? This action cannot be undone.'
       />
-    </div>
+    </>
   )
 }

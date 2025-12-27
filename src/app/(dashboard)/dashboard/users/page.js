@@ -10,18 +10,19 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa'
 
 import Loading from '../../../../components/Loading'
 import Table from '../../../../components/Table'
-import { Edit2, Trash2, Search } from 'lucide-react'
-// import { getToken } from '@/app/action'
-// import { jwtDecode } from 'jwt-decode'
+import { Search } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import ExportModal from './ExportModal'
 import { Modal } from '../../../../components/CreateUserModal'
 import { useSelector } from 'react-redux'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { toast } from 'react-toastify'
+import { createColumns } from './columns'
 
 export default function UsersManager() {
   const { setHeading } = usePageHeading()
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedUserType, setSelectedUserType] = useState('all')
   const [searchTimeout, setSearchTimeout] = useState(null)
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
@@ -31,12 +32,16 @@ export default function UsersManager() {
     firstName: '',
     lastName: '',
     email: '',
+    emailUsername: '',
+    emailDomain: '@merouni.com',
     password: '',
     phoneNo: '',
     roles: {
       student: false,
       editor: false,
-      admin: false
+      admin: false,
+      agent: false,
+      institution: false
     }
   })
   const [pagination, setPagination] = useState({
@@ -51,108 +56,49 @@ export default function UsersManager() {
   const [showPasswordValue, setShowPasswordValue] = useState(false)
 
   const userData = useSelector((state) => state.user.data)
-  const columns = useMemo(
-    () => [
-      {
-        header: 'First Name',
-        accessorKey: 'firstName'
-      },
-      {
-        header: 'Last Name',
-        accessorKey: 'lastName'
-      },
-      {
-        header: 'Email',
-        accessorKey: 'email'
-      },
-
-      {
-        header: 'Roles',
-        accessorKey: 'roles',
-        cell: ({ row }) => {
-          const roles = JSON.parse(row.original.roles || '{}') // Parse the string to an object
-          return (
-            <div className='flex gap-1'>
-              {Object.entries(roles)
-                .filter(([_, value]) => value) // keep only true roles
-                .map(([role]) => (
-                  <span
-                    key={role}
-                    className='px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800'
-                  >
-                    {role}
-                  </span>
-                ))}
-            </div>
-          )
-        }
-      },
-      {
-        header: 'Created At',
-        accessorKey: 'createdAt',
-        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString()
-      },
-      {
-        header: 'Actions',
-        id: 'actions',
-        cell: ({ row }) => (
-          <div className='flex gap-2'>
-            <button
-              onClick={() => handleEdit(row.original)}
-              className='p-1 text-blue-600 hover:text-blue-800'
-            >
-              <Edit2 className='w-4 h-4' />
-            </button>
-            <button
-              onClick={() => handleDelete(row.original.id)}
-              className='p-1 text-red-600 hover:text-red-800'
-            >
-              <Trash2 className='w-4 h-4' />
-            </button>
-          </div>
-        )
-      }
-    ],
-    []
-  )
 
   useEffect(() => {
     setHeading('User Management')
     loadUsers()
     return () => setHeading(null)
-  }, [setHeading])
+  }, [setHeading, selectedUserType])
 
   const loadUsers = async (page = 1) => {
     try {
       const token = localStorage.getItem('access_token')
-      // const tokenObj = await getToken()
-      // console.log('TOKEN OBJ:', tokenObj)
-      // const token = tokenObj
-      console.log('TOKEN:', token)
-      // const decodedToken = jwtDecode(tokenObj?.value)
-      // console.log('DECODED TOKEN:', decodedToken)
-      // const roleObject = JSON.parse(decodedToken?.data?.item?.role)
-      // console.log('ROLE OBJECT:', roleObject)
-      const refreshToken = localStorage.getItem('refreshToken')
-      console.log('refresh TOKEN:', refreshToken)
-      // Extract the role name based on the condition
-      // const roleName = Object.keys(roleObject).filter(
-      //   (key) => roleObject[key] === true
-      // )
-      // console.log('ROLE NAME:', roleName)
+
       if (!token) {
         throw new Error('Token not found')
       }
       setLoading(true)
-      const response = await getUsers(page, token)
-      console.log('Response of users:', response)
-      setUsers(response.items)
-      setPagination({
-        currentPage: response.pagination.currentPage,
-        totalPages: response.pagination.totalPages,
-        total: response.pagination.totalCount
+
+      // Build URL with role filter if not 'all'
+      let url = `${process.env.baseUrl}${process.env.version}/users?page=${page}`
+      if (selectedUserType !== 'all') {
+        url += `&role=${selectedUserType}`
+      }
+
+      const response = await authFetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       })
-      setError(null)
+
+      if (response.ok) {
+        const data = await response.json()
+        setUsers(data.items || [])
+
+        if (data.pagination) {
+          setPagination({
+            currentPage: data.pagination.currentPage,
+            totalPages: data.pagination.totalPages,
+            total: data.pagination.totalCount
+          })
+        }
+        setError(null)
+      } else {
+        throw new Error('Failed to fetch users')
+      }
     } catch (err) {
       setError('Failed to load users')
       console.error('Error loading users:', err)
@@ -175,14 +121,17 @@ export default function UsersManager() {
       const token = localStorage.getItem('access_token')
       console.log('Query:', query)
 
-      const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/users?q=${query}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+      // Build URL with search query and role filter
+      let url = `${process.env.baseUrl}${process.env.version}/users?q=${query}`
+      if (selectedUserType !== 'all') {
+        url += `&role=${selectedUserType}`
+      }
+
+      const response = await authFetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-      )
+      })
 
       if (response.ok) {
         const data = await response.json()
@@ -239,28 +188,73 @@ export default function UsersManager() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      if (editingId) {
-        const updatedData = { ...formData }
+      // Combine emailUsername and emailDomain to form full email
+      const fullEmail = formData.emailUsername
+        ? `${formData.emailUsername}${formData.emailDomain}`
+        : formData.email
 
-        // Only send password if it’s shown and not empty
-        if (!showPasswordField || !formData.password) {
+      // Convert roles object to string (find the first role that is true)
+      const rolesObject = formData.roles || {}
+      let rolesString = 'student' // default
+      const roleMap = {
+        admin: 'admin',
+        editor: 'editor',
+        agent: 'agent',
+        student: 'student',
+        institution: 'institution'
+      }
+
+      // Find the first role that is true
+      for (const [key, value] of Object.entries(rolesObject)) {
+        if (value === true && roleMap[key]) {
+          rolesString = roleMap[key]
+          break
+        }
+      }
+
+      const submitData = {
+        ...formData,
+        email: fullEmail,
+        roles: rolesString // Convert to string for registration
+      }
+
+      // Remove emailUsername and emailDomain from submit data
+      delete submitData.emailUsername
+      delete submitData.emailDomain
+
+      if (editingId) {
+        const updatedData = { ...submitData }
+        // For updates, send roles as object (based on updateUser validator)
+        updatedData.roles = formData.roles
+
+        // Only send password if it's provided (not empty)
+        if (!submitData.password || submitData.password.trim() === '') {
           delete updatedData.password
         }
         await updateUser(editingId, updatedData)
+        toast.success('User updated successfully')
       } else {
-        console.log('Form Data:', formData)
-        await createUser(formData)
+        // Add created_by_admin flag for new user creation
+        submitData.created_by_admin = 1
+        console.log('Form Data:', submitData)
+        await createUser(submitData)
+        toast.success('User created successfully')
       }
+
       setFormData({
         firstName: '',
         lastName: '',
         email: '',
+        emailUsername: '',
+        emailDomain: '@merouni.com',
         password: '',
         phoneNo: '',
         roles: {
           student: false,
-          teacher: false,
-          admin: false
+          editor: false,
+          admin: false,
+          agent: false,
+          institution: false
         }
       })
       setEditingId(null)
@@ -268,10 +262,21 @@ export default function UsersManager() {
       setShowPasswordValue(false)
       setError(null)
       setIsFormOpen(false)
-      loadUsers()
+
+      // Reload users in background, don't let errors prevent dialog from closing
+      try {
+        await loadUsers()
+      } catch (err) {
+        console.error('Error reloading users:', err)
+        // Error is already handled in loadUsers, just log it
+      }
     } catch (err) {
-      setError(`Failed to ${editingId ? 'update' : 'create'} user`)
-      console.error('Error saving user:', err)
+      setError(
+        err.message || `Failed to ${editingId ? 'update' : 'create'} user`
+      )
+      toast.error(
+        err.message || `Failed to ${editingId ? 'update' : 'create'} user`
+      )
     }
   }
 
@@ -284,10 +289,25 @@ export default function UsersManager() {
       console.error('Failed to parse roles:', e)
     }
 
+    // Extract username from email if it contains @merouni.com
+    let emailUsername = ''
+    let emailDomain = '@merouni.com'
+    if (user.email && user.email.includes('@merouni.com')) {
+      emailUsername = user.email.replace('@merouni.com', '')
+    } else if (user.email) {
+      // If email doesn't have @merouni.com, use full email as username
+      emailUsername = user.email.split('@')[0] || ''
+      emailDomain = user.email.includes('@')
+        ? `@${user.email.split('@')[1]}`
+        : '@merouni.com'
+    }
+
     setFormData({
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
+      emailUsername: emailUsername,
+      emailDomain: emailDomain,
       phoneNo: user.phoneNo,
       password: '',
       roles: parsedRoles || {}
@@ -323,6 +343,16 @@ export default function UsersManager() {
     })
   }
 
+  // Create columns with handlers (must be after handlers are defined)
+  const columns = useMemo(
+    () =>
+      createColumns({
+        handleEdit,
+        handleDelete
+      }),
+    [handleEdit, handleDelete]
+  )
+
   if (loading)
     return (
       <div className='mx-auto'>
@@ -332,19 +362,38 @@ export default function UsersManager() {
 
   return (
     <div className='p-4 w-full'>
-      <div className='flex justify-between items-center mb-4'>
-        {/* Search Bar */}
-        <div className='relative w-full max-w-md'>
-          <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-            <Search className='w-4 h-4 text-gray-500' />
+      <div className='flex justify-between items-center mb-4 gap-4'>
+        {/* Search Bar and Filter */}
+        <div className='flex gap-3 flex-1 max-w-2xl'>
+          <div className='relative flex-1 max-w-md'>
+            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+              <Search className='w-4 h-4 text-gray-500' />
+            </div>
+            <input
+              type='text'
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              placeholder='Search users...'
+            />
           </div>
-          <input
-            type='text'
-            value={searchQuery}
-            onChange={(e) => handleSearchInput(e.target.value)}
-            className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-            placeholder='Search users...'
-          />
+          {/* User Type Filter */}
+          <div className='min-w-[180px]'>
+            <select
+              value={selectedUserType}
+              onChange={(e) => {
+                setSelectedUserType(e.target.value)
+                setPagination((prev) => ({ ...prev, currentPage: 1 }))
+              }}
+              className='w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
+            >
+              <option value='all'>All Users</option>
+              <option value='student'>Student</option>
+              <option value='editor'>Editor</option>
+              <option value='admin'>Admin</option>
+              <option value='agent'>Partner (Agent)</option>
+            </select>
+          </div>
         </div>
         {/* Buttons */}
         <div className='flex gap-2'>
@@ -358,12 +407,16 @@ export default function UsersManager() {
                 firstName: '',
                 lastName: '',
                 email: '',
+                emailUsername: '',
+                emailDomain: '@merouni.com',
                 password: '',
                 phoneNo: '',
                 roles: {
                   student: false,
                   editor: false,
-                  admin: false
+                  admin: false,
+                  agent: false,
+                  institution: false
                 }
               })
             }}
@@ -391,52 +444,76 @@ export default function UsersManager() {
             firstName: '',
             lastName: '',
             email: '',
+            emailUsername: '',
+            emailDomain: '@merouni.com',
             phoneNo: '',
             password: '',
-            roles: { student: false, editor: false, admin: false }
+            roles: {
+              student: false,
+              editor: false,
+              admin: false,
+              agent: false,
+              institution: false
+            }
           })
         }}
         title={editingId ? 'Edit User' : 'Add User'}
         className='max-w-xl'
       >
         <form onSubmit={handleSubmit} className='space-y-4'>
-          <div>
-            <input
-              type='text'
-              placeholder='First Name'
-              value={formData.firstName}
-              onChange={(e) =>
-                setFormData({ ...formData, firstName: e.target.value })
-              }
-              className='w-full p-2 border rounded'
-              required
-            />
+          <div className='grid grid-cols-2 gap-4'>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-1'>
+                First Name <span className='text-red-500'>*</span>
+              </label>
+              <input
+                type='text'
+                placeholder='First Name'
+                value={formData.firstName}
+                onChange={(e) =>
+                  setFormData({ ...formData, firstName: e.target.value })
+                }
+                className='w-full p-2 border rounded'
+                required
+              />
+            </div>
+
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-1'>
+                Last Name <span className='text-red-500'>*</span>
+              </label>
+              <input
+                type='text'
+                placeholder='Last Name'
+                value={formData.lastName}
+                onChange={(e) =>
+                  setFormData({ ...formData, lastName: e.target.value })
+                }
+                className='w-full p-2 border rounded'
+                required
+              />
+            </div>
           </div>
 
           <div>
-            <input
-              type='text'
-              placeholder='Last Name'
-              value={formData.lastName}
-              onChange={(e) =>
-                setFormData({ ...formData, lastName: e.target.value })
-              }
-              className='w-full p-2 border rounded'
-              required
-            />
-          </div>
-
-          <div>
-            <input
-              type='email'
-              placeholder='Email'
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              className='w-full p-2 border rounded'
-              required
-            />
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
+              Email <span className='text-red-500'>*</span>
+            </label>
+            <div className='flex items-center gap-2'>
+              <input
+                type='text'
+                placeholder='username'
+                value={formData.emailUsername}
+                onChange={(e) =>
+                  setFormData({ ...formData, emailUsername: e.target.value })
+                }
+                className='flex-1 p-2 border rounded'
+                required
+              />
+              <span className='text-gray-600 px-2 py-2 border rounded bg-gray-50'>
+                @merouni.com
+              </span>
+            </div>
           </div>
 
           <div>
@@ -454,53 +531,49 @@ export default function UsersManager() {
             />
           </div>
 
-          <div>
-            <button
-              type='button'
-              className='text-sm text-blue-600 underline mb-1'
-              onClick={() => {
-                setShowPasswordField((prev) => !prev)
-                if (!showPasswordField) {
-                  setFormData((prev) => ({ ...prev, password: '' }))
-                }
-              }}
+          <div className='relative'>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
+              Password {!editingId && <span className='text-red-500'>*</span>}
+            </label>
+            <input
+              type={showPasswordValue ? 'text' : 'password'}
+              placeholder={
+                editingId ? 'Leave blank to keep current password' : 'Password'
+              }
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+              className='w-full p-2 border rounded pr-10'
+              required={!editingId}
+            />
+            <span
+              className='absolute right-3 top-9 cursor-pointer text-gray-500'
+              onClick={() => setShowPasswordValue((prev) => !prev)}
             >
-              {showPasswordField ? 'Hide Password Field' : 'Edit Password'}
-            </button>
-
-            {showPasswordField && (
-              <div className='relative'>
-                <input
-                  type={showPasswordValue ? 'text' : 'password'}
-                  placeholder='New Password'
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  className='w-full p-2 border rounded pr-10'
-                />
-                <span
-                  className='absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-600 cursor-pointer'
-                  onClick={() => setShowPasswordValue((prev) => !prev)}
-                >
-                  {showPasswordValue ? <FaEyeSlash /> : <FaEye />}
-                </span>
-              </div>
-            )}
+              {showPasswordValue ? <FaEyeSlash /> : <FaEye />}
+            </span>
           </div>
 
-          <div className='flex gap-4'>
-            {['student', 'editor', 'admin'].map((role) => (
-              <label key={role} className='flex items-center space-x-2'>
-                <input
-                  type='checkbox'
-                  checked={formData.roles[role]}
-                  onChange={() => handleRoleToggle(role)}
-                  className='rounded'
-                />
-                <span className='capitalize'>{role}</span>
-              </label>
-            ))}
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              Select Role <span className='text-red-500'>*</span>
+            </label>
+            <div className='flex gap-4'>
+              {['student', 'editor', 'admin', 'agent'].map((role) => (
+                <label key={role} className='flex items-center space-x-2'>
+                  <input
+                    type='checkbox'
+                    checked={formData.roles[role] || false}
+                    onChange={() => handleRoleToggle(role)}
+                    className='rounded'
+                  />
+                  <span className='capitalize'>
+                    {role === 'agent' ? 'Partner (Agent)' : role}
+                  </span>
+                </label>
+              ))}
+            </div>
           </div>
 
           {error && <div className='text-red-500'>{error}</div>}
@@ -517,9 +590,17 @@ export default function UsersManager() {
                   firstName: '',
                   lastName: '',
                   email: '',
+                  emailUsername: '',
+                  emailDomain: '@merouni.com',
                   phoneNo: '',
                   password: '',
-                  roles: { student: false, editor: false, admin: false }
+                  roles: {
+                    student: false,
+                    editor: false,
+                    admin: false,
+                    agent: false,
+                    institution: false
+                  }
                 })
               }}
               className='bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600'
