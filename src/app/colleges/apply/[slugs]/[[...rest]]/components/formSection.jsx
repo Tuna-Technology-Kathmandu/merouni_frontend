@@ -13,6 +13,7 @@ const FormSection = ({ id, college }) => {
   const parsedRole =
     typeof user?.role === 'string' ? destr(user.role) || {} : user?.role || {}
   const isStudent = !!parsedRole.student
+  const isAgent = !!parsedRole.agent
 
   // Check if user is logged in
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -160,6 +161,27 @@ const FormSection = ({ id, college }) => {
   }
 
   console.log(formData)
+
+  // If user is an agent, show message to visit dashboard
+  if (isLoggedIn && isAgent) {
+    return (
+      <div className='w-full max-w-3xl bg-white bg-opacity-95 backdrop-blur-sm shadow-lg rounded-lg p-8'>
+        <h2 className='text-center text-2xl font-bold mb-6'>
+          Apply For College
+        </h2>
+        <div className='text-center space-y-4'>
+          <p className='text-gray-700 text-lg'>Visit Dashboard to apply.</p>
+          <div className='flex items-center justify-center gap-4 pt-4'>
+            <Link href='/dashboard'>
+              <button className='px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors'>
+                Go to Dashboard
+              </button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // If not logged in, show login/signup buttons
   if (!isLoggedIn) {
