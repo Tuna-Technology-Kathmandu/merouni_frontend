@@ -73,7 +73,8 @@ export async function getBanner(page = 1, limit = 999) {
 export async function getEvents() {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/event?is_featured=true&limit=99999`,
+      `${process.env.baseUrl}${process.env.version}/event?is_featured=true&limit=999`,
+
       {
         method: 'GET',
         headers: {

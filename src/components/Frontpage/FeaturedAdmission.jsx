@@ -1,6 +1,5 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { getFeaturedCollege } from '../../app/[[...home]]/action'
 import { toast } from 'react-toastify'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -12,15 +11,53 @@ const FeaturedAdmission = () => {
 
   const router = useRouter()
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return
+
     fetchItems()
   }, [])
 
   const fetchItems = async () => {
     try {
-      let items = await getFeaturedCollege()
-      setData(items.items)
+      // Use direct fetch instead of server action to avoid SSR issues and ensure correct API URL
+      const apiUrl = `${process.env.baseUrl}${process.env.version}/college?pinned=true&page=1&limit=6`
+
+      // Debug: Log API URL in development (remove in production if needed)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Fetching featured colleges from:', apiUrl)
+      }
+
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        cache: 'no-store'
+      })
+
+      if (response.ok) {
+        const items = await response.json()
+        setData(items.items || [])
+      } else {
+        const errorText = await response.text()
+        console.error('Failed to fetch featured colleges:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText,
+          url: apiUrl
+        })
+        toast.error('Failed to load featured colleges')
+        setData([])
+      }
     } catch (error) {
+      console.error('Error fetching featured colleges:', {
+        message: error.message,
+        stack: error.stack,
+        baseUrl: process.env.baseUrl,
+        version: process.env.version
+      })
       toast.error('Something went wrong')
+      setData([])
     } finally {
       setLoading(false)
     }

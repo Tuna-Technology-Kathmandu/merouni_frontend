@@ -13,19 +13,39 @@ import CollegeRankings from '../../components/Frontpage/CollegeRankings'
 import Degree from '../../components/Frontpage/Degree'
 import ScrollToTop from '../../components/ScrollToTop'
 import SideBanner from '../../components/Frontpage/SideBanner'
-import { getBanner } from '../[[...home]]/action'
 
 const Page = () => {
   const [banners, setBanners] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return
+
     async function fetchData() {
       try {
-        const data = await getBanner(1, 999)
-        setBanners(data.items)
+        // Use direct fetch instead of server action to avoid SSR issues
+        const response = await fetch(
+          `${process.env.baseUrl}${process.env.version}/banner?page=1&limit=999`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            cache: 'no-store'
+          }
+        )
+
+        if (response.ok) {
+          const data = await response.json()
+          setBanners(data.items || [])
+        } else {
+          console.error('Failed to fetch banners:', response.statusText)
+          setBanners([])
+        }
       } catch (err) {
         console.error('Error loading banners', err)
+        setBanners([])
       } finally {
         setLoading(false)
       }

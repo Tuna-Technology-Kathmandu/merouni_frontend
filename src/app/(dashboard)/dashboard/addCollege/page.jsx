@@ -13,7 +13,6 @@ import axios from 'axios'
 import { useSelector } from 'react-redux'
 import FileUpload from './FileUpload'
 import Table from '../../../../components/Table'
-import { getColleges } from '@/app/action'
 import {
   Edit2,
   Trash2,
@@ -437,20 +436,40 @@ export default function CollegeForm() {
   }, [])
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return
+
     setHeading('College Management')
     const loadColleges = async () => {
       setLoading(true)
       setTableLoading(true)
       try {
-        const response = await getColleges()
-        setColleges(response.items)
-        setPagination({
-          currentPage: response.pagination.currentPage,
-          totalPages: response.pagination.totalPages,
-          total: response.pagination.totalCount
-        })
+        // Use authFetch directly instead of server action to avoid SSR issues
+        const response = await authFetch(
+          `${process.env.baseUrl}${process.env.version}/college?limit=10&page=1`
+        )
+        if (response.ok) {
+          const data = await response.json()
+          if (data && data.items) {
+            setColleges(data.items)
+            setPagination({
+              currentPage: data.pagination?.currentPage || 1,
+              totalPages: data.pagination?.totalPages || 1,
+              total: data.pagination?.totalCount || 0
+            })
+          }
+        } else {
+          throw new Error('Failed to fetch colleges')
+        }
       } catch (err) {
-        console.log(err)
+        console.error('Error loading colleges:', err)
+        // Set empty state on error instead of showing error
+        setColleges([])
+        setPagination({
+          currentPage: 1,
+          totalPages: 1,
+          total: 0
+        })
       } finally {
         setLoading(false)
         setTableLoading(false)
@@ -507,8 +526,21 @@ export default function CollegeForm() {
       )
       const res = await response.json()
       toast.success(res.message)
-      const updatedColleges = await getColleges()
-      setColleges(updatedColleges.items)
+      // Reload colleges using authFetch
+      const reloadResponse = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/college?limit=10&page=${pagination.currentPage}`
+      )
+      if (reloadResponse.ok) {
+        const reloadData = await reloadResponse.json()
+        setColleges(reloadData.items || [])
+        setPagination({
+          currentPage:
+            reloadData.pagination?.currentPage || pagination.currentPage,
+          totalPages:
+            reloadData.pagination?.totalPages || pagination.totalPages,
+          total: reloadData.pagination?.totalCount || pagination.total
+        })
+      }
       setEditing(false)
     } catch (err) {
       toast.error(err.message)
@@ -612,18 +644,18 @@ export default function CollegeForm() {
       // Reload colleges to update has_account status
       setTableLoading(true)
       try {
-        const response2 = await getColleges(
-          null,
-          null,
-          10,
-          pagination.currentPage
+        const response2 = await authFetch(
+          `${process.env.baseUrl}${process.env.version}/college?limit=10&page=${pagination.currentPage}`
         )
-        setColleges(response2.items)
-        setPagination({
-          currentPage: response2.pagination.currentPage,
-          totalPages: response2.pagination.totalPages,
-          total: response2.pagination.totalCount
-        })
+        if (response2.ok) {
+          const data = await response2.json()
+          setColleges(data.items || [])
+          setPagination({
+            currentPage: data.pagination?.currentPage || pagination.currentPage,
+            totalPages: data.pagination?.totalPages || pagination.totalPages,
+            total: data.pagination?.totalCount || pagination.total
+          })
+        }
       } catch (err) {
         console.error('Error reloading colleges:', err)
       } finally {
@@ -811,14 +843,22 @@ export default function CollegeForm() {
 
   const loadColleges = async (page = 1) => {
     try {
-      const response = await getColleges(null, null, 10, page)
+      // Use authFetch directly instead of server action to avoid SSR issues
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/college?limit=10&page=${page}`
+      )
 
-      setColleges(response.items)
-      setPagination({
-        currentPage: response.pagination.currentPage,
-        totalPages: response.pagination.totalPages,
-        total: response.pagination.totalCount
-      })
+      if (response.ok) {
+        const data = await response.json()
+        setColleges(data.items || [])
+        setPagination({
+          currentPage: data.pagination?.currentPage || page,
+          totalPages: data.pagination?.totalPages || 1,
+          total: data.pagination?.totalCount || 0
+        })
+      } else {
+        throw new Error('Failed to fetch colleges')
+      }
     } catch (err) {
       toast.error('Failed to load colleges')
       console.error('Error loading colleges:', err)
