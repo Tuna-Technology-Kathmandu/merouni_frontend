@@ -46,7 +46,7 @@ export async function getFeaturedCollege() {
   }
 }
 
-export async function getBanner(page = 1, limit = 99999999) {
+export async function getBanner(page = 1, limit = 999) {
   try {
     const response = await fetch(
       `${process.env.baseUrl}${process.env.version}/banner?page=${page}&limit=${limit}`,

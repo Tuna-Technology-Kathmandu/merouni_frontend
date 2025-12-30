@@ -162,7 +162,7 @@ export async function getColleges(
 export async function getFilteredPinFeatColleges(
   is_featured = null,
   pinned = null,
-  limit = 999999,
+  limit = 999,
   page = 1
 ) {
   const params = {

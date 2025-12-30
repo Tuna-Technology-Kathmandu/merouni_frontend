@@ -16,7 +16,7 @@ const page = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await getBanner(1, 99999999)
+        const data = await getBanner(1, 999)
         setBanners(data.items)
       } catch (err) {
         console.error('Error loading banners', err)
