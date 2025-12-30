@@ -31,7 +31,7 @@ const GallerySection = ({
         formData.append('authorId', '1')
 
         const response = await axios.post(
-          'https://uploads.merouni.com/api/v1/media/upload',
+          `${process.env.baseUrl}${process.env.version}/media/upload`,
           formData,
           { headers: { 'Content-Type': 'multipart/form-data' } }
         )

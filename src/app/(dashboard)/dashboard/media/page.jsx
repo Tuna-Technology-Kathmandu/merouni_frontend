@@ -148,7 +148,7 @@ export default function MediaPage() {
 
     try {
       const response = await authFetch(
-        'https://uploads.merouni.com/api/v1/media/upload',
+        `${process.env.baseUrl}${process.env.version}/media/upload`,
         {
           method: 'POST',
           body: formData
@@ -174,7 +174,7 @@ export default function MediaPage() {
   const handleDelete = async (id) => {
     try {
       const response = await authFetch(
-        `https://uploads.merouni.com/api/v1/media/${id}`,
+        `${process.env.baseUrl}${process.env.version}/media/${id}`,
         {
           method: 'DELETE'
         }

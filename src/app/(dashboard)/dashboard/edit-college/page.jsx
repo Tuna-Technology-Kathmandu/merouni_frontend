@@ -61,7 +61,7 @@ const FileUploadWithPreview = ({
 
     try {
       const response = await axios.post(
-        'https://uploads.merouni.com/api/v1/media/upload',
+        `${process.env.baseUrl}${process.env.version}/media/upload`,
         formData,
         {
           headers: {

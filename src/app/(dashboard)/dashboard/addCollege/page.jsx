@@ -82,7 +82,7 @@ const FileUploadWithPreview = ({
 
     try {
       const response = await axios.post(
-        'https://uploads.merouni.com/api/v1/media/upload',
+        `${process.env.baseUrl}${process.env.version}/media/upload`,
         formData,
         {
           headers: {
@@ -294,6 +294,11 @@ export default function CollegeForm() {
     remove: removeFacility
   } = useFieldArray({ control, name: 'facilities' })
   const onSubmit = async (data) => {
+    // Prevent auto-submission - only allow submission when modal is open
+    if (!isOpen) {
+      return
+    }
+
     try {
       setSubmitting(true)
 
