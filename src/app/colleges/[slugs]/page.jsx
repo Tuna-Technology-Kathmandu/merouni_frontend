@@ -6,7 +6,6 @@ import Header from '../../../components/Frontpage/Header'
 import Footer from '../../../components/Frontpage/Footer'
 import ImageSection from './components/upperSection'
 import CollegeOverview from './components/NewCollegeOverview'
-import { getCollegeBySlug } from '../actions'
 import ApplyNow from './components/applyNow'
 import RelatedColleges from './components/RelatedColleges'
 import Loading from '../../../components/Loading'
@@ -124,8 +123,30 @@ const CollegeDetailPage = ({ params }) => {
   }, [])
 
   const fetchCollegeDetails = async (slugs) => {
+    // Only run on client side
+    if (typeof window === 'undefined') return
+
     try {
-      const collegeData = await getCollegeBySlug(slugs)
+      // Use direct fetch instead of server action to avoid SSR issues
+      const response = await fetch(
+        `${process.env.baseUrl}${process.env.version}/college/${slugs}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          cache: 'no-store'
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch college details: ${response.statusText}`
+        )
+      }
+
+      const data = await response.json()
+      const collegeData = data.item
 
       if (collegeData) {
         setCollege(collegeData)
@@ -134,7 +155,7 @@ const CollegeDetailPage = ({ params }) => {
       }
     } catch (error) {
       console.error('Error fetching college details:', error)
-      setError(error.message)
+      setError(error.message || 'Failed to load college details')
     } finally {
       setLoading(false)
     }

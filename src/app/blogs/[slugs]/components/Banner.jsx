@@ -11,7 +11,7 @@ const Banner = () => {
       try {
         // Use direct fetch instead of server action to avoid SSR issues
         const response = await fetch(
-          `${process.env.baseUrl}${process.env.version}/banner?page=1&limit=9999`,
+          `${process.env.baseUrl}${process.env.version}/banner?page=1&limit=100`,
           {
             method: 'GET',
             headers: {

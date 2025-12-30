@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useState, useRef } from 'react'
-import { getColleges } from '../../actions'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -11,19 +10,53 @@ const RelatedColleges = ({ college }) => {
   const scrollContainerRef = useRef(null)
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return
     getRelatedColleges()
   }, [])
 
   const getRelatedColleges = async () => {
     setIsLoading(true)
     try {
-      const data = await getColleges()
-      const filteredColleges = data.colleges.filter(
-        (c) => c.collegeId !== college._id
+      // Use direct fetch instead of server action to avoid SSR issues
+      const response = await fetch(
+        `${process.env.baseUrl}${process.env.version}/college?page=1&limit=24`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          cache: 'no-store'
+        }
       )
-      setColleges(filteredColleges)
+
+      if (response.ok) {
+        const data = await response.json()
+        const collegesData =
+          data.items?.map((collegeItem) => ({
+            name: collegeItem.name,
+            location: `${collegeItem.address?.city || ''}, ${collegeItem.address?.state || ''}`,
+            description: collegeItem.description,
+            googleMapUrl: collegeItem.google_map_url,
+            instituteType: collegeItem.institute_type,
+            slug: collegeItem.slugs,
+            collegeId: collegeItem.id,
+            collegeImage: collegeItem.featured_img,
+            logo: collegeItem.college_logo
+          })) || []
+
+        // Filter out the current college
+        const filteredColleges = collegesData.filter(
+          (c) => c.collegeId !== college?.id && c.collegeId !== college?._id
+        )
+        setColleges(filteredColleges)
+      } else {
+        console.error('Failed to fetch colleges:', response.statusText)
+        setColleges([])
+      }
     } catch (error) {
       console.error('Error fetching colleges:', error)
+      setColleges([])
     } finally {
       setIsLoading(false)
     }

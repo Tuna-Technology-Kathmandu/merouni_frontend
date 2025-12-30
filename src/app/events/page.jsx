@@ -7,12 +7,6 @@ import Sponsors from './Sponsors'
 import EventCard from '../../components/Frontpage/EventCard'
 import { IoIosSearch } from 'react-icons/io'
 import Thisweek from './Thisweek'
-import {
-  getEvents,
-  getThisWeekEvents,
-  getNextWeekEvents,
-  searchEvent
-} from './action'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
@@ -21,6 +15,100 @@ import Loading from '../../components/Loading'
 import Pagination from '../blogs/components/Pagination'
 import { debounce } from 'lodash'
 import useMediaQuery from './MediaQuery'
+
+// Client-side fetch functions to replace server actions
+const fetchEvents = async (page = 1) => {
+  try {
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/event?page=${page}&limit=9`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        cache: 'no-store'
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch events: ${response.statusText}`)
+    }
+    return await response.json()
+  } catch (error) {
+    console.error('Error fetching events:', error)
+    throw error
+  }
+}
+
+const searchEvent = async (query) => {
+  try {
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/event?q=${encodeURIComponent(query)}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        cache: 'no-store'
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error(`Failed to search events: ${response.statusText}`)
+    }
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('Error searching events:', error)
+    throw error
+  }
+}
+
+const fetchThisWeekEvents = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/event/this-week`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        cache: 'no-store'
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch this week's events")
+    }
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching this week's events:", error)
+    throw error
+  }
+}
+
+const fetchNextWeekEvents = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/event/next-month`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        cache: 'no-store'
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch next week's events")
+    }
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching next week's events:", error)
+    throw error
+  }
+}
 
 const Events = () => {
   const [allEvents, setAllEvents] = useState([])
@@ -41,6 +129,9 @@ const Events = () => {
   const [allLoading, setAllLoading] = useState(false)
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return
+
     if (!searchQuery) {
       loadEvents(pagination.currentPage)
     }
@@ -49,19 +140,19 @@ const Events = () => {
   const loadEvents = async (page = 1) => {
     try {
       setAllLoading(true)
-      const response = await getEvents(page)
-      const events = response.items
+      const response = await fetchEvents(page)
+      const events = response.items || []
       setAllEvents(events)
       setPagination({
-        currentPage: response.pagination.currentPage,
-        totalPages: response.pagination.totalPages,
-        totalCount: response.pagination.totalCount
+        currentPage: response.pagination?.currentPage || page,
+        totalPages: response.pagination?.totalPages || 1,
+        totalCount: response.pagination?.totalCount || 0
       })
 
       // Filter events for different sections
-      const thisWeek = await getThisWeekEvents()
-      const nextWeek = await getNextWeekEvents()
-      const featured = thisWeek.events[0] // First event as featured
+      const thisWeek = await fetchThisWeekEvents()
+      const nextWeek = await fetchNextWeekEvents()
+      const featured = thisWeek.events?.[0] || null // First event as featured
 
       // Parse the event_host data for the featured event
       const eventHost = featured?.event_host
@@ -70,11 +161,15 @@ const Events = () => {
       //featured.eventHost = eventHost; // Attach the parsed eventHost to the featuredEvent
 
       setFeaturedEvent(featured)
-      setThisWeekEvents(thisWeek.events)
-      setNextWeekEvents(nextWeek.events)
+      setThisWeekEvents(thisWeek.events || [])
+      setNextWeekEvents(nextWeek.events || [])
     } catch (error) {
       setError('Failed to load Events')
-      console.error(error)
+      console.error('Error loading events:', error)
+      setAllEvents([])
+      setThisWeekEvents([])
+      setNextWeekEvents([])
+      setFeaturedEvent(null)
     } finally {
       setLoading(false)
       setAllLoading(false)
@@ -94,10 +189,27 @@ const Events = () => {
     debounce(async (query) => {
       if (query) {
         setIsSearching(true)
-        const results = await searchEvent(query)
-        setAllEvents(results.items)
-        setPagination(results.pagination)
-        setIsSearching(false)
+        try {
+          const results = await searchEvent(query)
+          setAllEvents(results.items || [])
+          setPagination(
+            results.pagination || {
+              currentPage: 1,
+              totalPages: 1,
+              totalCount: 0
+            }
+          )
+        } catch (error) {
+          console.error('Error searching events:', error)
+          setAllEvents([])
+          setPagination({
+            currentPage: 1,
+            totalPages: 1,
+            totalCount: 0
+          })
+        } finally {
+          setIsSearching(false)
+        }
       }
     }, 1000), // 1000ms delay
     []

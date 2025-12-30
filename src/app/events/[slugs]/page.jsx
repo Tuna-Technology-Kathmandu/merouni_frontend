@@ -1,6 +1,5 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { getEventBySlug, getRelatedEvents } from '../../events/action'
 import Navbar from '../../../components/Frontpage/Navbar'
 import Footer from '../../../components/Frontpage/Footer'
 import Header from '../../../components/Frontpage/Header'
@@ -10,6 +9,56 @@ import Cardlist from './components/Cardlist'
 import Loading from '../../../components/Loading'
 import Banner from '@/app/blogs/[slugs]/components/Banner'
 
+// Client-side fetch functions to replace server actions
+const fetchEventBySlug = async (slug) => {
+  try {
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/event/${slug}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        cache: 'no-store'
+      }
+    )
+    if (!response.ok) {
+      throw new Error(`Failed to fetch event details: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    return data.item
+  } catch (error) {
+    console.error('Error fetching event details:', error)
+    throw error
+  }
+}
+
+const fetchRelatedEvents = async () => {
+  try {
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/event`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        cache: 'no-store'
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch related events: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    return data.items || []
+  } catch (error) {
+    console.error('Error fetching related events:', error)
+    throw error
+  }
+}
+
 const EventDetailsPage = ({ params }) => {
   const [event, setEvent] = useState(null)
   const [relatedEvents, setRelatedEvents] = useState([])
@@ -17,25 +66,33 @@ const EventDetailsPage = ({ params }) => {
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return
+
     const fetchEventDetails = async () => {
       try {
-        const slugs = params.slugs // No need to await params.slugs
+        // Handle params which might be a promise in Next.js 15
+        const resolvedParams = await params
+        const slugs = resolvedParams.slugs
 
         const [eventData, allEvents] = await Promise.all([
-          getEventBySlug(slugs),
-          getRelatedEvents()
+          fetchEventBySlug(slugs),
+          fetchRelatedEvents()
         ])
-        setEvent(eventData || null) // Set eventData directly
-        setRelatedEvents(allEvents)
+        setEvent(eventData || null)
+        setRelatedEvents(allEvents || [])
       } catch (err) {
-        setError(err.message)
+        console.error('Error fetching event details:', err)
+        setError(err.message || 'Failed to load event details')
+        setEvent(null)
+        setRelatedEvents([])
       } finally {
         setLoading(false)
       }
     }
 
     fetchEventDetails()
-  }, [params.slugs]) // Add params.slugs to dependency array
+  }, [params]) // Add params to dependency array
 
   // useEffect(() => {
   //   console.log('Events:', event)

@@ -7,13 +7,200 @@ import { FaExpandAlt } from 'react-icons/fa'
 
 import UniversityCardShimmer from './UniversityShimmerCard'
 import Pagination from '@/app/blogs/components/Pagination'
-import {
-  getColleges,
-  searchColleges,
-  getPrograms,
-  getUniversity
-} from '../actions'
 import UniversityCard from './UniversityCard'
+
+// Client-side fetch functions to replace server actions
+const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
+  try {
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: '24'
+    })
+
+    if (filters.degree && filters.degree.length > 0) {
+      filters.degree.forEach((deg) => queryParams.append('degree', deg))
+    }
+    if (filters.state && filters.state.length > 0) {
+      filters.state.forEach((state) => queryParams.append('state', state))
+    }
+    if (filters.uni && filters.uni.length > 0) {
+      filters.uni.forEach((uni) => queryParams.append('university', uni))
+    }
+    if (filters.type && filters.type.length > 0) {
+      filters.type.forEach((type) => queryParams.append('type', type))
+    }
+
+    const url = `${process.env.baseUrl}${process.env.version}/college?${queryParams.toString()}`
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    return {
+      colleges:
+        data.items?.map((college) => ({
+          name: college.name,
+          location: `${college.address?.city || ''}, ${college.address?.state || ''}`,
+          description: college.description,
+          googleMapUrl: college.google_map_url,
+          instituteType: college.institute_type,
+          slug: college.slugs,
+          collegeId: college.id,
+          collegeImage: college.featured_img,
+          logo: college.college_logo
+        })) || [],
+      pagination: data.pagination || {
+        currentPage: 1,
+        totalPages: 1,
+        totalCount: data.items?.length || 0
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch colleges:', error)
+    return {
+      colleges: [],
+      pagination: {
+        currentPage: 1,
+        totalPages: 1,
+        totalCount: 0
+      }
+    }
+  }
+}
+
+const searchColleges = async (query) => {
+  try {
+    const response = await fetch(
+      `${process.env.baseUrl}${process.env.version}/college?q=${encodeURIComponent(query)}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        cache: 'no-store'
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (!data.items || data.items.length === 0) {
+      return {
+        colleges: [],
+        pagination: data.pagination || {
+          currentPage: 1,
+          totalPages: 0,
+          totalCount: 0
+        }
+      }
+    }
+
+    const colleges = data.items.map((clz) => ({
+      id: clz.id,
+      name: clz.name,
+      slug: clz.slugs,
+      collegeImage: clz.featured_img,
+      location: `${clz.address?.city || ''}, ${clz.address?.state || ''}`,
+      description: clz.description || 'No description available.',
+      logo: clz.college_logo || 'default_logo.png',
+      instituteType: clz.institute_type || 'Unknown',
+      instituteLevel: JSON.parse(clz.institute_level || '[]'),
+      programmes:
+        clz.collegeCourses?.map((course) => ({
+          id: course.id,
+          title: course.program?.title,
+          slug: course.program?.slugs
+        })) || []
+    }))
+
+    return {
+      colleges,
+      pagination: data.pagination || {
+        currentPage: 1,
+        totalPages: 0,
+        totalCount: 0
+      }
+    }
+  } catch (error) {
+    console.error('Failed to search colleges:', error)
+    return {
+      colleges: [],
+      pagination: {
+        currentPage: 1,
+        totalPages: 0,
+        totalCount: 0
+      }
+    }
+  }
+}
+
+const getPrograms = async (searchQuery = '') => {
+  try {
+    const queryParams = new URLSearchParams()
+    if (searchQuery) {
+      queryParams.append('q', searchQuery)
+    }
+
+    const url = `${process.env.baseUrl}${process.env.version}/program?${queryParams.toString()}`
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch Programs')
+    }
+
+    const data = await response.json()
+    return data.items || []
+  } catch (error) {
+    console.error('Error fetching programs:', error)
+    return []
+  }
+}
+
+const getUniversity = async (searchQuery = '') => {
+  try {
+    const queryParams = new URLSearchParams()
+    if (searchQuery) {
+      queryParams.append('q', searchQuery)
+    }
+
+    const url = `${process.env.baseUrl}${process.env.version}/university?${queryParams.toString()}`
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch universities')
+    }
+
+    const data = await response.json()
+    return data.items || []
+  } catch (error) {
+    console.error('Error fetching universities:', error)
+    return []
+  }
+}
 
 //all districts
 
@@ -340,36 +527,52 @@ const CollegeFinder = () => {
 
   // Initial fetch for disciplines and affiliations
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return
+
     const init = async () => {
-      const programs = await getPrograms()
-      setFilteredDisciplines(programs.map((p) => ({ name: p.title })))
-      setModalDisciplines(programs.map((p) => ({ name: p.title })))
-      const unis = await getUniversity()
-      setFilteredAffiliations(unis.map((u) => ({ name: u.fullname })))
-      setModalAffiliations(unis.map((u) => ({ name: u.fullname })))
+      try {
+        const programs = await getPrograms()
+        setFilteredDisciplines(programs.map((p) => ({ name: p.title })))
+        setModalDisciplines(programs.map((p) => ({ name: p.title })))
+        const unis = await getUniversity()
+        setFilteredAffiliations(unis.map((u) => ({ name: u.fullname })))
+        setModalAffiliations(unis.map((u) => ({ name: u.fullname })))
+      } catch (error) {
+        console.error('Error initializing filters:', error)
+      }
     }
     init()
   }, [])
 
   // Fetch colleges on mount and when filters change
-  const fetchColleges = useCallback(
+  const fetchCollegesData = useCallback(
     async (page = 1) => {
       setIsLoading(true)
       try {
-        const data = await getColleges(page, selectedFilters)
+        const data = await fetchCollegesFromAPI(page, selectedFilters)
         setUniversities(data.colleges)
         setPagination(data.pagination)
       } catch (err) {
-        console.error(err)
+        console.error('Error fetching colleges:', err)
+        setUniversities([])
+        setPagination({
+          totalPages: 1,
+          currentPage: 1,
+          totalCount: 0
+        })
+      } finally {
+        setIsLoading(false)
       }
-      setIsLoading(false)
     },
     [selectedFilters]
   )
 
   useEffect(() => {
-    fetchColleges(1)
-  }, [fetchColleges])
+    // Only run on client side
+    if (typeof window === 'undefined') return
+    fetchCollegesData(1)
+  }, [fetchCollegesData])
 
   // Handlers for sidebar filters
   const handleFilterInputChange = (field, value) => {
@@ -450,9 +653,9 @@ const CollegeFinder = () => {
       debouncedCollegeSearch(searchQuery)
       return () => debouncedCollegeSearch.cancel()
     } else {
-      fetchColleges(1)
+      fetchCollegesData(1)
     }
-  }, [searchQuery])
+  }, [searchQuery, fetchCollegesData])
 
   // Local filtering for district and institute type
   const filteredDistricts = useMemo(
@@ -510,7 +713,7 @@ const CollegeFinder = () => {
   const handlePageChange = (page) => {
     if (page > 0 && page <= pagination.totalPages) {
       setPagination((prev) => ({ ...prev, currentPage: page }))
-      fetchColleges(page)
+      fetchCollegesData(page)
     }
   }
 
