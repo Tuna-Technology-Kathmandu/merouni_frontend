@@ -1,14 +1,17 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Heart } from 'lucide-react'
+import { useSelector } from 'react-redux'
+import { authFetch } from '@/app/utils/authFetch'
 
 const FeaturedAdmission = () => {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
+  const [wishlistStatus, setWishlistStatus] = useState({})
+  const user = useSelector((state) => state.user.data)
   const router = useRouter()
   useEffect(() => {
     // Only run on client side
@@ -16,6 +19,93 @@ const FeaturedAdmission = () => {
 
     fetchItems()
   }, [])
+
+  useEffect(() => {
+    if (user?.id && data.length > 0) {
+      checkWishlistStatus()
+    }
+  }, [user, data])
+
+  const checkWishlistStatus = async () => {
+    if (!user?.id) return
+
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/wishlist?user_id=${user.id}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(`HTTP Error! Status: ${response.status}`)
+      }
+
+      const wishlistData = await response.json()
+      const statusMap = {}
+      wishlistData.items.forEach((item) => {
+        statusMap[item.college.id] = true
+      })
+      setWishlistStatus(statusMap)
+    } catch (error) {
+      console.error('Error checking wishlist status:', error)
+    }
+  }
+
+  const handleWishlistToggle = async (e, collegeId) => {
+    e.stopPropagation()
+
+    if (!user) {
+      toast.warning('Please sign in to manage your wishlist', {
+        position: 'top-right',
+        autoClose: 3000
+      })
+      return
+    }
+
+    try {
+      const isInWishlist = wishlistStatus[collegeId]
+      const method = isInWishlist ? 'DELETE' : 'POST'
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/wishlist`,
+        {
+          method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ college_id: collegeId, user_id: user.id })
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(`HTTP Error! Status: ${response.status}`)
+      }
+
+      setWishlistStatus((prev) => ({
+        ...prev,
+        [collegeId]: !isInWishlist
+      }))
+
+      toast.success(
+        method === 'DELETE'
+          ? 'Successfully removed from wishlist'
+          : 'Successfully added to wishlist',
+        {
+          position: 'top-right',
+          autoClose: 2000
+        }
+      )
+    } catch (error) {
+      console.error('Error updating wishlist:', error)
+      toast.error('Failed to update wishlist. Please try again.', {
+        position: 'top-right',
+        autoClose: 3000
+      })
+    }
+  }
 
   const fetchItems = async () => {
     try {
@@ -81,7 +171,10 @@ const FeaturedAdmission = () => {
 
   return (
     <>
-      <h1 className=' text-xl font-semibold text-gray-800 my-8'>Top Picks</h1>
+      <h1 className='text-xl font-semibold text-gray-800 my-8 pb-2 relative inline-block'>
+        Top Picks
+        <span className='absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#0870A8] to-[#31AD8F]'></span>
+      </h1>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr'>
         {loading
           ? Array.from({ length: 6 }).map((_, index) => (
@@ -91,51 +184,81 @@ const FeaturedAdmission = () => {
               <div
                 onClick={() => router.push(`/colleges/${item.slugs}`)}
                 key={item.id}
+                className='bg-white rounded-xl border border-gray-200 overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300 cursor-pointer flex flex-col'
               >
                 <div
-                  key={item.id}
-                  className='bg-white rounded-lg shadow-lg overflow-hidden flex flex-col h-full'
+                  className='flex justify-between items-start min-h-28 bg-slate-300 relative'
+                  style={{
+                    backgroundImage: `url("${item.featured_img || 'https://placehold.co/600x400'}")`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                  }}
                 >
-                  <div className='w-full h-32 sm:h-24 bg-gray-300 flex-shrink-0'>
-                    <img
-                      src={item.featured_img}
-                      alt={item.name}
-                      className='w-full h-32 sm:h-24 object-cover'
-                    />
-                  </div>
-                  <div className='p-4 flex flex-col flex-1 min-h-0'>
-                    <h2 className='text-lg font-semibold text-gray-800 mb-2 line-clamp-2 min-h-[3.5rem]'>
+                  {user && (
+                    <button
+                      className='p-2 hover:bg-gray-100 rounded-full m-2 z-10'
+                      onClick={(e) => handleWishlistToggle(e, item.id)}
+                    >
+                      <Heart
+                        className={`w-5 h-5 transition-colors duration-200 ${
+                          wishlistStatus[item.id]
+                            ? 'text-red-500 fill-red-500'
+                            : 'text-gray-600'
+                        }`}
+                      />
+                    </button>
+                  )}
+                </div>
+                <div className='p-4 flex flex-col h-full'>
+                  <div className='flex-grow'>
+                    <h3 className='font-semibold text-base mb-2 line-clamp-2 min-h-[2.5rem]'>
                       {item.name}
-                    </h2>
-                    <div className=' sm:flex justify-between items-center'>
-                      <div>
-                        <p className='text-gray-600 text-[15px]'>
-                          {item.address.city}, {item.address.country}
-                        </p>
-                        <p className='text-gray-400 text-[14px]'>
-                          {item.university.fullname}
-                        </p>
-                      </div>
-                      <Link href={`/colleges/apply/${item.slugs}`}>
-                        <button className='flex items-center mt-3 sm:mt-0 bg-clientBtn text-white text-sm px-3 py-2 rounded-md hover:bg-blue-600 transition duration-300'>
-                          Apply Now
-                          <svg
-                            xmlns='http://www.w3.org/2000/svg'
-                            className='h-4 w-4 ml-2'
-                            fill='none'
-                            viewBox='0 0 24 24'
-                            stroke='currentColor'
-                          >
-                            <path
-                              strokeLinecap='round'
-                              strokeLinejoin='round'
-                              strokeWidth={2}
-                              d='M14 5l7 7m0 0l-7 7m7-7H3'
-                            />
-                          </svg>
-                        </button>
-                      </Link>
-                    </div>
+                    </h3>
+                    {item.university?.fullname && (
+                      <p className='text-sm mb-1 text-gray-600 font-medium line-clamp-1'>
+                        {item.university.fullname}
+                      </p>
+                    )}
+                    <p className='text-sm mb-3 text-gray-400 line-clamp-1'>
+                      {item.address?.city || ''}, {item.address?.country || ''}
+                    </p>
+                  </div>
+                  <div className='flex gap-3 justify-between mt-auto'>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        router.push(`/colleges/apply/${item.slugs}`)
+                      }}
+                      className='flex-1 py-1.5 px-3 text-white rounded-2xl hover:opacity-90 text-[13px] font-medium text-center transition-opacity'
+                      style={{ backgroundColor: '#0870A8' }}
+                    >
+                      Apply Now
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        router.push(`/colleges/${item.slugs}`)
+                      }}
+                      className='flex-1 py-1.5 px-3 text-white rounded-2xl hover:opacity-90 text-[13px] font-medium text-center flex items-center justify-center gap-1 transition-opacity'
+                      style={{ backgroundColor: '#31AD8F' }}
+                    >
+                      Details
+                      <svg
+                        xmlns='http://www.w3.org/2000/svg'
+                        className='h-4 w-4'
+                        fill='none'
+                        viewBox='0 0 24 24'
+                        stroke='currentColor'
+                      >
+                        <path
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={2}
+                          d='M14 5l7 7m0 0l-7 7m7-7H3'
+                        />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>

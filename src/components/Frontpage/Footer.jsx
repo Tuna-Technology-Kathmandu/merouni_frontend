@@ -8,10 +8,8 @@ import { FaInstagram } from 'react-icons/fa6'
 import { TiSocialLinkedinCircular } from 'react-icons/ti'
 import { PiXLogoLight } from 'react-icons/pi'
 import { FaCopyright } from 'react-icons/fa'
-import { Section } from 'lucide-react'
-// import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
-import { RiArrowDropDownLine } from 'react-icons/ri'
-import { RiArrowDropUpLine } from 'react-icons/ri'
+import { RiArrowDropDownLine, RiArrowDropUpLine } from 'react-icons/ri'
+import { GraduationCap, School, BookOpen } from 'lucide-react'
 
 const Footer = () => {
   const [openSections, setOpenSections] = useState({})
@@ -26,6 +24,7 @@ const Footer = () => {
   const Sections = {
     Exams: {
       header: 'Top Exams',
+      icon: GraduationCap,
       list: [
         'MAT 2025',
         'IOE Entrance Exam 2025',
@@ -36,6 +35,7 @@ const Footer = () => {
     },
     Colleges: {
       header: 'Colleges',
+      icon: School,
       list: [
         'Colleges in Nepal',
         'College Reviews in Nepal',
@@ -46,6 +46,7 @@ const Footer = () => {
     },
     Resources: {
       header: 'Resources',
+      icon: BookOpen,
       list: [
         'B.Tech Companion Nepal',
         'MBBS Companion Nepal',
@@ -57,75 +58,19 @@ const Footer = () => {
   }
 
   return (
-    <>
-      <div className='hidden md:block'>
-        <header className='  bg-[#011E3F] bg-opacity-80 text-white'>
+    <div className='shadow-2xl relative z-50'>
+      <div className='hidden md:block shadow-md'>
+        <header className='bg-white text-[#0870A8] shadow-md'>
           <div className='container mx-auto px-4'>
             <div>
               <nav className='flex justify-between items-center py-4'>
-                <div className='flex items-center'>
-                  <Image
-                    src={'/images/logo.png'}
-                    width={256}
-                    height={86}
-                    alt='Mero UNI logo'
-                  />
-                </div>
-
-                <div className='hidden md:flex items-center space-x-8 '>
-                  <Link
-                    className='hover:text-[#30ad8f] transition-colors font-bold'
-                    href={'/'}
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    className='hover:text-[#30ad8f] transition-colors font-bold'
-                    href={'/events'}
-                  >
-                    Events
-                  </Link>
-                  <Link
-                    className='hover:text-[#30ad8f] transition-colors font-bold'
-                    href={'/blogs'}
-                  >
-                    Blogs
-                  </Link>
-                  <Link
-                    className='hover:text-[#30ad8f] transition-colors font-bold'
-                    href={'/contact'}
-                  >
-                    Contact
-                  </Link>
-                  <Link
-                    className='hover:text-[#30ad8f] transition-colors font-bold'
-                    href={'/about'}
-                  >
-                    About Us
-                  </Link>
-                </div>
-
-                <div className='hidden md:flex items-center space-x-4'>
-                  <a href='#'>
-                    <FaFacebook size={28} />
-                  </a>
-                  <a href='#'>
-                    <FaInstagram size={28} />
-                  </a>
-                  <a href='#'>
-                    <TiSocialLinkedinCircular size={30} />
-                  </a>
-                  <a href='#'>
-                    <PiXLogoLight size={28} />
-                  </a>
-                </div>
+                <div className='flex items-center'></div>
               </nav>
-              <div className=' h-[1px] bg-white'></div>
             </div>
           </div>
         </header>
 
-        <footer className=' bg-[#011E3F] bg-opacity-80 text-white py-10'>
+        <footer className='bg-white text-[#0870A8] py-10 shadow-lg'>
           <div className='container mx-auto px-4'>
             {/* <!-- Footer Content Section --> */}
             <div className='grid grid-cols-1 md:grid-cols-3 gap-8 mb-10'>
@@ -133,15 +78,18 @@ const Footer = () => {
 
               {Object.entries(Sections).map(([key, section], index) => (
                 <div key={index}>
-                  <h3 className='text-xl font-semibold mb-10'>
+                  <h3 className='text-xl font-semibold mb-10 text-[#31AD8F]'>
                     {section.header}
                   </h3>
                   <ul className='space-y-3'>
                     {section.list.map((item, itemIndex) => (
-                      <li key={itemIndex}>
+                      <li key={itemIndex} className='flex items-center gap-2'>
+                        {section.icon && (
+                          <section.icon size={18} className='text-[#31AD8F]' />
+                        )}
                         <Link
                           href={'#'}
-                          className='hover:text-[#30ad8f] transition-colors'
+                          className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
                         >
                           {item}
                         </Link>
@@ -152,26 +100,64 @@ const Footer = () => {
               ))}
             </div>
 
-            <div className='pt-8 border-t border-white flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 mb-10'>
-              <div className='space-x-8'>
-                <Link
-                  href={'#'}
-                  className='hover:text-[#30ad8f] transition-colors font-semibold'
-                >
-                  Disclaimer
-                </Link>
-                <Link
-                  href={'#'}
-                  className='hover:text-[#30ad8f] transition-colors font-semibold'
-                >
-                  Privacy Policy
-                </Link>
+            <div className='pt-8 border-t border-gray-300 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 mb-10'>
+              <div className='flex items-center gap-6'>
+                <div className='pr-6 border-r border-gray-300'>
+                  <Image
+                    src={'/images/logo.png'}
+                    width={200}
+                    height={70}
+                    alt='Mero UNI logo'
+                  />
+                </div>
+                <div className='hidden md:flex items-center space-x-4'>
+                  <a
+                    href='#'
+                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                  >
+                    <FaFacebook size={28} />
+                  </a>
+                  <a
+                    href='#'
+                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                  >
+                    <FaInstagram size={28} />
+                  </a>
+                  <a
+                    href='#'
+                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                  >
+                    <TiSocialLinkedinCircular size={30} />
+                  </a>
+                  <a
+                    href='#'
+                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                  >
+                    <PiXLogoLight size={28} />
+                  </a>
+                </div>
               </div>
-              <div className='flex flex-row items-center justify-center'>
-                <span className='font-semibold'>
-                  {' '}
-                  &copy; All rights reserved 2025
-                </span>
+              <div className='flex flex-col md:flex-row items-center gap-4 md:gap-8'>
+                <div className='space-x-8'>
+                  <Link
+                    href={'#'}
+                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors font-semibold'
+                  >
+                    Disclaimer
+                  </Link>
+                  <Link
+                    href={'#'}
+                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors font-semibold'
+                  >
+                    Privacy Policy
+                  </Link>
+                </div>
+                <div className='flex flex-row items-center justify-center'>
+                  <span className='font-semibold text-[#0870A8]'>
+                    {' '}
+                    &copy; All rights reserved 2025 - {new Date().getFullYear()}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -179,67 +165,29 @@ const Footer = () => {
       </div>
 
       <>
-        <div className='md:hidden flex flex-col justify-center items-center bg-[#011E3F] bg-opacity-95'>
-          <header className=' text-white'>
+        <div className='md:hidden flex flex-col justify-center items-center bg-white shadow-2xl relative z-50'>
+          <header className='text-[#0870A8]'>
             <div className='mx-auto px-4'>
-              <nav className='py-4'>
-                <div className='items-center flex justify-center'>
-                  <Image
-                    src={'/images/logo.png'}
-                    width={250}
-                    height={250}
-                    alt='Mero UNI logo'
-                  />
-                </div>
-                <div className='flex space-x-4 md:space-x-8'>
-                  <Link
-                    className='hover:text-[#30ad8f] transition-colors font-semibold'
-                    href={'/'}
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    className='hover:text-[#30ad8f] transition-colors font-semibold'
-                    href={'/events'}
-                  >
-                    Events
-                  </Link>
-                  <Link
-                    className='hover:text-[#30ad8f] transition-colors font-semibold'
-                    href={'/blogs'}
-                  >
-                    Blogs
-                  </Link>
-                  <Link
-                    className='hover:text-[#30ad8f] transition-colors font-semibold'
-                    href={'/contact'}
-                  >
-                    Contact
-                  </Link>
-                  <Link
-                    className='hover:text-[#30ad8f] transition-colors font-semibold'
-                    href={'/about'}
-                  >
-                    About Us
-                  </Link>
-                </div>
-              </nav>
+              <nav className='py-4'></nav>
             </div>
           </header>
 
-          <footer className='text-white w-full'>
+          <footer className='text-[#0870A8] w-full'>
             <div className='md:hidden space-y-4 w-full px-4'>
               {Object.entries(Sections).map(([key, section], index) => (
-                <div className='border-b border-white w-full mt-10' key={index}>
+                <div
+                  className='border-b border-gray-300 w-full mt-10'
+                  key={index}
+                >
                   <details
                     className='pb-4 w-full'
                     open={openSections[index]}
                     onToggle={() => toggleSection(index)}
                   >
-                    <summary className='w-full list-none flex justify-between items-center hover:cursor-pointer font-bold text-lg'>
+                    <summary className='w-full list-none flex justify-between items-center hover:cursor-pointer font-bold text-lg text-[#31AD8F]'>
                       {section.header}
                       <span>
-                        <button type='button' className='p-2'>
+                        <button type='button' className='p-2 text-[#0870A8]'>
                           {openSections[index] ? (
                             <RiArrowDropUpLine size={32} />
                           ) : (
@@ -249,12 +197,18 @@ const Footer = () => {
                         </button>
                       </span>
                     </summary>
-                    <ul>
+                    <ul className='space-y-2 pb-4'>
                       {section.list.map((item, itemIndex) => (
-                        <li key={itemIndex} className='mb-2'>
+                        <li key={itemIndex} className='flex items-center gap-2'>
+                          {section.icon && (
+                            <section.icon
+                              size={18}
+                              className='text-[#31AD8F]'
+                            />
+                          )}
                           <Link
                             href={'#'}
-                            className='hover:text-[#30ad8f] transition-colors'
+                            className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
                           >
                             {item}
                           </Link>
@@ -266,46 +220,68 @@ const Footer = () => {
               ))}
 
               <div className='flex flex-col items-center'>
-                <span className='font-semibold mt-20'>
+                <div className='mb-8 flex flex-col items-center gap-4 w-full'>
+                  <div className='pb-6 border-b border-gray-300 w-full flex justify-center'>
+                    <Image
+                      src={'/images/logo.png'}
+                      width={200}
+                      height={70}
+                      alt='Mero UNI logo'
+                    />
+                  </div>
+                  <div className='flex items-center space-x-4'>
+                    <a
+                      href='#'
+                      className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                    >
+                      <FaFacebook size={28} />
+                    </a>
+                    <a
+                      href='#'
+                      className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                    >
+                      <FaInstagram size={28} />
+                    </a>
+                    <a
+                      href='#'
+                      className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                    >
+                      <TiSocialLinkedinCircular size={30} />
+                    </a>
+                    <a
+                      href='#'
+                      className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                    >
+                      <PiXLogoLight size={28} />
+                    </a>
+                  </div>
+                </div>
+                <span className='font-semibold mt-4 text-[#0870A8]'>
                   {' '}
-                  &copy; Merouni All rights reserved 2025
+                  &copy; Merouni All rights reserved 2025 -{' '}
+                  {new Date().getFullYear()}
                 </span>
 
                 <div className='space-x-8 mt-8'>
                   <Link
                     href={'#'}
-                    className='hover:text-[#30ad8f] transition-colors font-semibold'
+                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors font-semibold'
                   >
                     Disclaimer
                   </Link>
                   <Link
                     href={'#'}
-                    className='hover:text-[#30ad8f] transition-colors font-semibold'
+                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors font-semibold'
                   >
                     Privacy Policy
                   </Link>
-                </div>
-
-                <div className='flex items-center justify-between gap-4 space-x-12 mt-16 mb-8'>
-                  <a href='#'>
-                    <FaFacebook size={28} />
-                  </a>
-                  <a href='#'>
-                    <FaInstagram size={28} />
-                  </a>
-                  <a href='#'>
-                    <TiSocialLinkedinCircular size={30} />
-                  </a>
-                  <a href='#'>
-                    <PiXLogoLight size={28} />
-                  </a>
                 </div>
               </div>
             </div>
           </footer>
         </div>
       </>
-    </>
+    </div>
   )
 }
 

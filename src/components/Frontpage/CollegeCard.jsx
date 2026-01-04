@@ -1,49 +1,170 @@
-const CollegeCard = ({ logo, name, address, gradient, featuredImg }) => {
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Heart } from 'lucide-react'
+import { toast } from 'react-toastify'
+import { useSelector } from 'react-redux'
+import { authFetch } from '@/app/utils/authFetch'
+import { useRouter } from 'next/navigation'
+
+const CollegeCard = ({
+  logo,
+  name,
+  address,
+  featuredImg,
+  collegeId,
+  slug,
+  universityName
+}) => {
+  const [isInWishlist, setIsInWishlist] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const user = useSelector((state) => state.user.data)
+  const router = useRouter()
+
+  useEffect(() => {
+    if (user?.id && collegeId) {
+      checkWishlistStatus()
+    }
+  }, [user, collegeId])
+
+  const checkWishlistStatus = async () => {
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/wishlist?user_id=${user.id}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(`HTTP Error! Status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      const isInList = data.items.some((item) => item.college.id === collegeId)
+
+      setIsInWishlist(isInList)
+    } catch (error) {
+      console.error('Error checking wishlist status:', error)
+    }
+  }
+
+  const handleWishlistToggle = async (e) => {
+    e.stopPropagation()
+
+    if (!user) {
+      toast.warning('Please sign in to manage your wishlist', {
+        position: 'top-right',
+        autoClose: 3000
+      })
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      const method = isInWishlist ? 'DELETE' : 'POST'
+      const response = await authFetch(
+        `${process.env.baseUrl}${process.env.version}/wishlist`,
+        {
+          method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ college_id: collegeId, user_id: user.id })
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(`HTTP Error! Status: ${response.status}`)
+      }
+      setIsInWishlist(!isInWishlist)
+
+      toast.success(
+        method === 'DELETE'
+          ? 'Successfully removed from wishlist'
+          : 'Successfully added to wishlist',
+        {
+          position: 'top-right',
+          autoClose: 2000
+        }
+      )
+    } catch (error) {
+      console.error('Error updating wishlist:', error)
+      toast.error('Failed to update wishlist. Please try again.', {
+        position: 'top-right',
+        autoClose: 3000
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div
-      className='min-w-[260px] md:min-w-[320px] lg:min-w-[360px] h-[320px] md:h-[360px] lg:h-[380px] mx-4 rounded-3xl p-[1px] transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl overflow-hidden'
-      style={{
-        background: gradient
+      onClick={() => {
+        if (slug) {
+          router.push(`/colleges/${slug}`)
+        }
       }}
+      className='min-w-[260px] md:min-w-[320px] lg:min-w-[360px] mx-4 bg-white rounded-xl border border-gray-200 overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300 cursor-pointer'
     >
-      <div className='h-full w-full rounded-3xl bg-white/95 backdrop-blur-sm flex flex-col overflow-hidden'>
-        {/* Featured Image - Full width, half height */}
-        <div className='w-full h-1/2 flex-shrink-0 overflow-hidden'>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={featuredImg || logo}
-            alt={`${name} featured image`}
-            className='w-full h-full object-cover'
-          />
-        </div>
+      <div
+        className='flex justify-between items-start min-h-28 bg-slate-300 relative'
+        style={{
+          backgroundImage: `url("${featuredImg || logo || 'https://placehold.co/600x400'}")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        {user && (
+          <button
+            className='p-2 hover:bg-gray-100 rounded-full m-2 z-10'
+            onClick={handleWishlistToggle}
+            disabled={isLoading}
+          >
+            <Heart
+              className={`w-5 h-5 transition-colors duration-200 ${
+                isInWishlist ? 'text-red-500 fill-red-500' : 'text-gray-600'
+              } ${isLoading ? 'opacity-50' : ''}`}
+            />
+          </button>
+        )}
+      </div>
+      <div className='p-4'>
+        <h3 className='font-semibold text-base mb-2'>{name}</h3>
+        {universityName && (
+          <p className='text-sm mb-1 text-gray-600 font-medium'>
+            {universityName}
+          </p>
+        )}
+        <p className='text-sm mb-3 text-gray-400'>{address}</p>
+        <div className='flex gap-3 justify-between'>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              if (slug) {
+                router.push(`/colleges/${slug}`)
+              }
+            }}
+            className='flex-1 py-1.5 px-3 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-50 text-[13px] font-medium text-center'
+          >
+            Details
+          </button>
 
-        {/* Content Section - Half height */}
-        <div className='h-1/2 flex flex-col items-center px-5 py-4 gap-3 flex-shrink-0'>
-          {/* Name & address */}
-          <div className='text-center space-y-2 flex-1 flex flex-col justify-center min-h-0 w-full'>
-            <h3 className='text-lg md:text-xl font-semibold text-gray-900 line-clamp-2 min-h-[3.5rem]'>
-              {name}
-            </h3>
-            <p className='text-sm text-gray-500 flex items-center justify-center gap-1'>
-              <span className='inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0'></span>
-              <span className='line-clamp-1'>{address}</span>
-            </p>
-          </div>
-
-          {/* CTA */}
-          <div className='w-full flex justify-center flex-shrink-0'>
-            <span className='inline-flex items-center gap-2 text-xs font-medium text-blue-700 bg-blue-50 rounded-full px-3 py-1'>
-              View details
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                className='h-3 w-3'
-                viewBox='0 0 20 20'
-                fill='currentColor'
-              >
-                <path d='M10.293 3.293a1 1 0 011.414 0l5 5a.997.997 0 01.083.094l.007.01a1.003 1.003 0 01-.09 1.32l-5 5a1 1 0 01-1.414-1.414L13.586 11H4a1 1 0 110-2h9.586l-3.293-3.293a1 1 0 010-1.414z' />
-              </svg>
-            </span>
-          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              if (slug) {
+                router.push(`/colleges/apply/${slug}`)
+              }
+            }}
+            className='flex-1 py-1.5 px-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 text-[13px] font-medium text-center'
+          >
+            Apply Now
+          </button>
         </div>
       </div>
     </div>

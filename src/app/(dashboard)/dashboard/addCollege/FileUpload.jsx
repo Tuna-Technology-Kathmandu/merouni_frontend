@@ -1,5 +1,5 @@
 import { Upload } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 
@@ -12,6 +12,7 @@ const FileUpload = ({
   const [isUploading, setIsUploading] = useState(false)
   const [preview, setPreview] = useState(defaultPreview)
   const [fileType, setFileType] = useState(null)
+  const fileInputRef = useRef(null)
 
   // Add useEffect to update preview when defaultPreview changes
   useEffect(() => {
@@ -53,7 +54,7 @@ const FileUpload = ({
 
     try {
       const response = await axios.post(
-        `${process.env.baseUrl}${process.env.version}/media/upload`,
+        `${process.env.mediaUrl}${process.env.version}/media/upload`,
         formData,
         {
           headers: {
@@ -67,6 +68,12 @@ const FileUpload = ({
 
       if (data.success === false) {
         toast.error(data.message || 'Upload failed.')
+        // Reset file input and preview on failure
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ''
+        }
+        setPreview(defaultPreview)
+        setFileType(null)
         return
       }
 
@@ -75,9 +82,15 @@ const FileUpload = ({
     } catch (error) {
       console.error('Upload failed:', error)
 
+      // Reset file input and preview on error
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+      setPreview(defaultPreview)
+      setFileType(null)
+
       if (error.response) {
         toast.error(error.response.data?.message || 'Upload failed.')
-        setPreview(defaultPreview)
       } else if (error.request) {
         toast.error('No response from server.')
       } else {
@@ -100,6 +113,7 @@ const FileUpload = ({
                 {preview ? 'Change file' : 'Click to upload'}
               </span>
               <input
+                ref={fileInputRef}
                 type='file'
                 className='hidden'
                 onChange={handleFileUpload}

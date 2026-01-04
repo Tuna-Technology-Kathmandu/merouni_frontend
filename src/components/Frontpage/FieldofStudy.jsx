@@ -38,10 +38,11 @@ const FieldofStudy = () => {
   }
 
   return (
-    <div className='bg-gray-100 py-8 relative'>
+    <div className='bg-gradient-to-br from-green-50 via-white to-blue-50 py-12 md:py-16 relative'>
       <div className='container mx-auto px-4'>
-        <h1 className=' text-xl font-semibold text-gray-800 my-8'>
+        <h1 className='text-xl font-semibold text-gray-800 my-8 pb-2 relative inline-block'>
           Field of Study
+          <span className='absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#0870A8] to-[#31AD8F]'></span>
         </h1>
         <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6'>
           {study.map((item, index) => (
@@ -60,8 +61,8 @@ const FieldofStudy = () => {
                   alt={item.title}
                   className='w-full h-48 object-cover transform transition-transform duration-300 group-hover:scale-105'
                 />
-                <div className='absolute inset-0 bg-black bg-opacity-25 flex items-end p-4'>
-                  <h2 className='text-xl font-semibold text-white'>
+                <div className='absolute bottom-0 left-0 right-0 bg-black p-4'>
+                  <h2 className='text-lg font-semibold text-white'>
                     {item.title}
                   </h2>
                 </div>

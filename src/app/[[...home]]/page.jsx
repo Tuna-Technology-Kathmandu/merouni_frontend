@@ -11,6 +11,7 @@ import FieldofStudy from '../../components/Frontpage/FieldofStudy'
 import Colleges from '../../components/Frontpage/Colleges'
 import CollegeRankings from '../../components/Frontpage/CollegeRankings'
 import Degree from '../../components/Frontpage/Degree'
+import Event from '../../components/Frontpage/Event'
 import ScrollToTop from '../../components/ScrollToTop'
 import SideBanner from '../../components/Frontpage/SideBanner'
 
@@ -80,16 +81,11 @@ const Page = () => {
         <SideBanner banners={banners} loading={loading} />
       </div>
 
-      {/* <Events /> */}
-      <Degree />
-
-      {/* the degree is the upcoming events section, not to be confused */}
-      {/* large banner */}
-      {/* <LargeBanner /> */}
-
-      {/* degree section for home page */}
-      <FeaturedDegree />
+      {/* Top Picks is already above in FeaturedAdmission */}
+      {/* Reordered sections: Top Picks, College Rankings, Events, Degree, Field of Study */}
       <CollegeRankings />
+      <Event />
+      <FeaturedDegree />
       <FieldofStudy />
       <Footer />
       <ScrollToTop />

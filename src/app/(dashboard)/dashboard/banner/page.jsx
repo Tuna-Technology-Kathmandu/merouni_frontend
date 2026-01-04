@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import FileUpload from '../addCollege/FileUpload'
-import { Eye, Trash2, Plus, X } from 'lucide-react'
+import { Edit, Trash2, Plus, X } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
@@ -155,11 +155,23 @@ export default function BannerForm() {
         website_url: data.website_url,
         date_of_expiry: data.date_of_expiry,
         display_position: activePosition,
-        bannerImage: data.bannerImages.map((image) => ({
-          title: image.title,
-          gallery: image.gallery,
-          is_featured: image.is_featured
-        }))
+        bannerImage: data.bannerImages.map((image) => {
+          // Use the same URL for all sizes if only small is provided
+          const imageUrl =
+            image.gallery.small ||
+            image.gallery.medium ||
+            image.gallery.large ||
+            ''
+          return {
+            title: image.title,
+            gallery: {
+              small: image.gallery.small || imageUrl,
+              medium: image.gallery.medium || imageUrl,
+              large: image.gallery.large || imageUrl
+            },
+            is_featured: image.is_featured
+          }
+        })
       }
 
       const url = `${process.env.baseUrl}${process.env.version}/banner`
@@ -263,8 +275,11 @@ export default function BannerForm() {
   }
 
   const addNewPosition = () => {
-    const newPosition = maxPosition + 1
-    setMaxPosition(newPosition)
+    // Find the next available position (highest existing + 1)
+    const existingPositions = Object.keys(bannersByPosition).map(Number)
+    const highestPosition =
+      existingPositions.length > 0 ? Math.max(...existingPositions) : 0
+    const newPosition = highestPosition + 1
     setActivePosition(newPosition)
     setIsOpen(true)
     resetFormForPosition(newPosition)
@@ -316,38 +331,16 @@ export default function BannerForm() {
     return null
   }
 
-  const allPositions = Array.from({ length: maxPosition }, (_, i) => i + 1)
+  // Only show positions that have banners (from backend)
+  const allPositions = Object.keys(bannersByPosition)
+    .map(Number)
+    .sort((a, b) => a - b)
 
   return (
     <div className='container mx-auto p-4'>
       <ToastContainer />
 
-      <div className='flex flex-wrap gap-4 mb-6'>
-        {allPositions.map((position) => (
-          <button
-            key={position}
-            onClick={() => {
-              setActivePosition(position)
-              setIsOpen(true)
-              const existingBanner = bannersByPosition[position]?.[0]
-              if (existingBanner) {
-                handleEdit(existingBanner)
-              } else {
-                resetFormForPosition(position)
-              }
-            }}
-            className={`px-4 py-2 rounded-lg ${
-              activePosition === position
-                ? 'bg-blue-500 text-white'
-                : bannersByPosition[position]
-                  ? 'bg-green-100 text-green-800 border border-green-300'
-                  : 'bg-gray-200 hover:bg-gray-300'
-            }`}
-          >
-            Position {position}
-            {bannersByPosition[position] && <span className='ml-2'>✓</span>}
-          </button>
-        ))}
+      <div className='flex justify-end mb-6'>
         <button
           onClick={addNewPosition}
           className='px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center gap-2'
@@ -392,12 +385,14 @@ export default function BannerForm() {
                       <button
                         onClick={() => handleEdit(banner)}
                         className='text-blue-600 hover:text-blue-800'
+                        title='Edit Banner'
                       >
-                        <Eye size={16} />
+                        <Edit size={16} />
                       </button>
                       <button
                         onClick={() => handleDeleteClick(banner.id)}
                         className='text-red-600 hover:text-red-800'
+                        title='Delete Banner'
                       >
                         <Trash2 size={16} />
                       </button>
@@ -439,187 +434,199 @@ export default function BannerForm() {
       </div>
 
       {isOpen && (
-        <div className='bg-white p-6 rounded-lg shadow-md mb-8'>
-          <h2 className='text-xl font-semibold mb-4'>
-            {editing ? 'See Banner' : 'Create Banner'} (Position{' '}
-            {activePosition})
-          </h2>
+        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
+          <div className='bg-white p-6 rounded-lg shadow-md max-w-4xl w-full max-h-[90vh] overflow-y-auto'>
+            <div className='flex justify-between items-center mb-4'>
+              <h2 className='text-xl font-semibold'>
+                {editing ? 'Edit Banner' : 'Create Banner'} (Position{' '}
+                {activePosition})
+              </h2>
+              <button
+                onClick={() => {
+                  setIsOpen(false)
+                  setEditing(false)
+                  setEditingId(null)
+                  resetFormForPosition(activePosition)
+                  setSelectedCollege(null)
+                }}
+                className='text-gray-500 hover:text-gray-700'
+              >
+                <X size={24} />
+              </button>
+            </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-            {!editing && (
-              <>
-                <div className='relative mb-6' ref={dropdownRef}>
-                  <label className='block mb-2'>Search College *</label>
+            <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+              {!editing && (
+                <>
+                  <div className='relative mb-6' ref={dropdownRef}>
+                    <label className='block mb-2'>Search College *</label>
+                    <input
+                      type='text'
+                      {...register('collegeSearch', {
+                        required: 'College selection is required'
+                      })}
+                      onChange={(e) => searchCollege(e.target.value)}
+                      className='w-full p-2 border rounded'
+                      placeholder='Search for a college...'
+                    />
+                    {errors.collegeSearch && (
+                      <span className='text-red-500'>
+                        {errors.collegeSearch.message}
+                      </span>
+                    )}
+
+                    {showDropdown && (
+                      <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto'>
+                        {searchLoading ? (
+                          <div className='p-2 text-center text-gray-500'>
+                            Loading...
+                          </div>
+                        ) : searchResults.length > 0 ? (
+                          searchResults.map((college) => (
+                            <div
+                              key={college.id}
+                              className='p-2 hover:bg-gray-100 cursor-pointer'
+                              onClick={() => handleCollegeSelect(college)}
+                            >
+                              {college.name}
+                            </div>
+                          ))
+                        ) : (
+                          <div className='p-2 text-center text-gray-500'>
+                            No colleges found
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
+              <div className='mb-4'>
+                <label className='block mb-2'>Website URL</label>
+                {!editing ? (
                   <input
                     type='text'
-                    {...register('collegeSearch', {
-                      required: 'College selection is required'
+                    {...register('website_url', {
+                      required: 'Website URL is required',
+                      pattern: {
+                        value:
+                          /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6}\.?)(\/[\w.-]*)*\/?$/,
+                        message: 'Enter a valid URL'
+                      }
                     })}
-                    onChange={(e) => searchCollege(e.target.value)}
                     className='w-full p-2 border rounded'
-                    placeholder='Search for a college...'
+                    placeholder='Enter website URL'
                   />
-                  {errors.collegeSearch && (
-                    <span className='text-red-500'>
-                      {errors.collegeSearch.message}
-                    </span>
-                  )}
-
-                  {showDropdown && (
-                    <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto'>
-                      {searchLoading ? (
-                        <div className='p-2 text-center text-gray-500'>
-                          Loading...
-                        </div>
-                      ) : searchResults.length > 0 ? (
-                        searchResults.map((college) => (
-                          <div
-                            key={college.id}
-                            className='p-2 hover:bg-gray-100 cursor-pointer'
-                            onClick={() => handleCollegeSelect(college)}
-                          >
-                            {college.name}
-                          </div>
-                        ))
-                      ) : (
-                        <div className='p-2 text-center text-gray-500'>
-                          No colleges found
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {selectedCollege && (
-                  <div className='p-2 bg-blue-50 rounded mb-6'>
-                    Selected College: {selectedCollege.name}
-                  </div>
+                ) : (
+                  <input
+                    type='text'
+                    disabled
+                    {...register('website_url', {
+                      required: 'Website URL is required',
+                      pattern: {
+                        value:
+                          /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6}\.?)(\/[\w.-]*)*\/?$/,
+                        message: 'Enter a valid URL'
+                      }
+                    })}
+                    className='w-full p-2 border rounded'
+                    placeholder='Enter website URL'
+                  />
                 )}
-              </>
-            )}
+                {errors.website_url && (
+                  <span className='text-red-500'>
+                    {errors.website_url.message}
+                  </span>
+                )}
+              </div>
 
-            <div className='mb-4'>
-              <label className='block mb-2'>Website URL</label>
-              {!editing ? (
-                <input
-                  type='text'
-                  {...register('website_url', {
-                    required: 'Website URL is required',
-                    pattern: {
-                      value:
-                        /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6}\.?)(\/[\w.-]*)*\/?$/,
-                      message: 'Enter a valid URL'
-                    }
-                  })}
-                  className='w-full p-2 border rounded'
-                  placeholder='Enter website URL'
-                />
-              ) : (
-                <input
-                  type='text'
-                  disabled
-                  {...register('website_url', {
-                    required: 'Website URL is required',
-                    pattern: {
-                      value:
-                        /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6}\.?)(\/[\w.-]*)*\/?$/,
-                      message: 'Enter a valid URL'
-                    }
-                  })}
-                  className='w-full p-2 border rounded'
-                  placeholder='Enter website URL'
-                />
-              )}
-              {errors.website_url && (
-                <span className='text-red-500'>
-                  {errors.website_url.message}
-                </span>
-              )}
-            </div>
+              <div className='mb-4'>
+                <label className='block mb-2'>Date of Expiry *</label>
+                {!editing ? (
+                  <input
+                    type='date'
+                    {...register('date_of_expiry', {
+                      required: 'Date of expiry is required',
+                      validate: (value) => {
+                        const selectedDate = new Date(value)
+                        const today = new Date()
+                        today.setHours(0, 0, 0, 0)
+                        return (
+                          selectedDate >= today || 'Date must be in the future'
+                        )
+                      }
+                    })}
+                    className='w-full p-2 border rounded'
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                ) : (
+                  <input
+                    type='date'
+                    disabled
+                    {...register('date_of_expiry', {
+                      required: 'Date of expiry is required',
+                      validate: (value) => {
+                        const selectedDate = new Date(value)
+                        const today = new Date()
+                        today.setHours(0, 0, 0, 0)
+                        return (
+                          selectedDate >= today || 'Date must be in the future'
+                        )
+                      }
+                    })}
+                    className='w-full p-2 border rounded'
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                )}
+                {errors.date_of_expiry && (
+                  <span className='text-red-500'>
+                    {errors.date_of_expiry.message}
+                  </span>
+                )}
+              </div>
 
-            <div className='mb-4'>
-              <label className='block mb-2'>Date of Expiry *</label>
-              {!editing ? (
-                <input
-                  type='date'
-                  {...register('date_of_expiry', {
-                    required: 'Date of expiry is required',
-                    validate: (value) => {
-                      const selectedDate = new Date(value)
-                      const today = new Date()
-                      today.setHours(0, 0, 0, 0)
-                      return (
-                        selectedDate >= today || 'Date must be in the future'
-                      )
-                    }
-                  })}
-                  className='w-full p-2 border rounded'
-                  min={new Date().toISOString().split('T')[0]}
-                />
-              ) : (
-                <input
-                  type='date'
-                  disabled
-                  {...register('date_of_expiry', {
-                    required: 'Date of expiry is required',
-                    validate: (value) => {
-                      const selectedDate = new Date(value)
-                      const today = new Date()
-                      today.setHours(0, 0, 0, 0)
-                      return (
-                        selectedDate >= today || 'Date must be in the future'
-                      )
-                    }
-                  })}
-                  className='w-full p-2 border rounded'
-                  min={new Date().toISOString().split('T')[0]}
-                />
-              )}
-              {errors.date_of_expiry && (
-                <span className='text-red-500'>
-                  {errors.date_of_expiry.message}
-                </span>
-              )}
-            </div>
+              <input
+                type='hidden'
+                {...register('display_position')}
+                value={activePosition}
+              />
 
-            <input
-              type='hidden'
-              {...register('display_position')}
-              value={activePosition}
-            />
+              <div className='space-y-6'>
+                {fields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    className='p-4 border rounded-lg relative'
+                  >
+                    {!editing && (
+                      <button
+                        type='button'
+                        onClick={() => remove(index)}
+                        className='absolute top-2 right-2 text-red-500 hover:text-red-700'
+                        disabled={fields.length === 1}
+                      >
+                        <X className='w-4 h-4' />
+                      </button>
+                    )}
 
-            <div className='space-y-6'>
-              {fields.map((field, index) => (
-                <div key={field.id} className='p-4 border rounded-lg relative'>
-                  {!editing && (
-                    <button
-                      type='button'
-                      onClick={() => remove(index)}
-                      className='absolute top-2 right-2 text-red-500 hover:text-red-700'
-                      disabled={fields.length === 1}
-                    >
-                      <X className='w-4 h-4' />
-                    </button>
-                  )}
+                    {!editing && (
+                      <div className='mb-4'>
+                        <label className='block mb-2'>Banner Title *</label>
+                        <input
+                          {...register(`bannerImages.${index}.title`, {
+                            required: 'Banner title is required'
+                          })}
+                          className='w-full p-2 border rounded'
+                        />
+                        {errors.bannerImages?.[index]?.title && (
+                          <span className='text-red-500'>
+                            {errors.bannerImages[index].title.message}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
-                  {!editing && (
-                    <div className='mb-4'>
-                      <label className='block mb-2'>Banner Title *</label>
-                      <input
-                        {...register(`bannerImages.${index}.title`, {
-                          required: 'Banner title is required'
-                        })}
-                        className='w-full p-2 border rounded'
-                      />
-                      {errors.bannerImages?.[index]?.title && (
-                        <span className='text-red-500'>
-                          {errors.bannerImages[index].title.message}
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* <div className="mb-4 flex items-center">
+                    {/* <div className="mb-4 flex items-center">
                     <input
                       type="checkbox"
                       {...register(`bannerImages.${index}.is_featured`)}
@@ -634,43 +641,46 @@ export default function BannerForm() {
                     <label className="ml-2">Is Featured?</label>
                   </div> */}
 
-                  <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                    <div>
-                      {!editing ? (
-                        <FileUpload
-                          label='Banner Image'
-                          onUploadComplete={(url) => {
-                            setValue(`bannerImages.${index}.gallery.small`, url)
-                          }}
-                          defaultPreview={watch(
-                            `bannerImages.${index}.gallery.small`
-                          )}
-                        />
-                      ) : (
-                        <div className='mt-4'>
-                          <label className='block mb-2'>
-                            Current Banner Image
-                          </label>
-                          {watch(`bannerImages.${index}.gallery.small`) ? (
-                            <div className='relative w-full h-48 border rounded overflow-hidden'>
-                              <Image
-                                src={watch(
-                                  `bannerImages.${index}.gallery.small`
-                                )}
-                                alt='Current banner'
-                                fill
-                                className='object-cover'
-                              />
-                            </div>
-                          ) : (
-                            <div className='bg-gray-100 text-gray-500 text-center py-8 rounded'>
-                              No image uploaded
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                    {/* <div>
+                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                      <div>
+                        {!editing ? (
+                          <FileUpload
+                            label='Banner Image'
+                            onUploadComplete={(url) => {
+                              setValue(
+                                `bannerImages.${index}.gallery.small`,
+                                url
+                              )
+                            }}
+                            defaultPreview={watch(
+                              `bannerImages.${index}.gallery.small`
+                            )}
+                          />
+                        ) : (
+                          <div className='mt-4'>
+                            <label className='block mb-2'>
+                              Current Banner Image
+                            </label>
+                            {watch(`bannerImages.${index}.gallery.small`) ? (
+                              <div className='relative w-full h-48 border rounded overflow-hidden'>
+                                <Image
+                                  src={watch(
+                                    `bannerImages.${index}.gallery.small`
+                                  )}
+                                  alt='Current banner'
+                                  fill
+                                  className='object-cover'
+                                />
+                              </div>
+                            ) : (
+                              <div className='bg-gray-100 text-gray-500 text-center py-8 rounded'>
+                                No image uploaded
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      {/* <div>
                       <FileUpload
                         label="Medium Banner Image"
                         onUploadComplete={(url) => {
@@ -684,7 +694,7 @@ export default function BannerForm() {
                         )}
                       />
                     </div> */}
-                    {/* <div>
+                      {/* <div>
                       <FileUpload
                         label="Large Banner Image"
                         onUploadComplete={(url) => {
@@ -695,11 +705,11 @@ export default function BannerForm() {
                         )}
                       />
                     </div> */}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
 
-              {/* <button
+                {/* <button
                 type="button"
                 onClick={() =>
                   append({
@@ -712,31 +722,28 @@ export default function BannerForm() {
               >
                 <Plus className="w-4 h-4" /> Add Another Banner Image
               </button> */}
-            </div>
-
-            {!editing && (
-              <div className='flex justify-end gap-4'>
-                <button
-                  type='button'
-                  onClick={() => setIsOpen(false)}
-                  className='px-6 py-2 border rounded hover:bg-gray-100'
-                >
-                  Cancel
-                </button>
-                <button
-                  type='submit'
-                  disabled={loading || !selectedCollege}
-                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300'
-                >
-                  {loading
-                    ? 'Processing...'
-                    : editing
-                      ? 'Update Banner'
-                      : 'Create Banner'}
-                </button>
               </div>
-            )}
-          </form>
+
+              {!editing && (
+                <div className='flex justify-end gap-4'>
+                  <button
+                    type='button'
+                    onClick={() => setIsOpen(false)}
+                    className='px-6 py-2 border rounded hover:bg-gray-100'
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type='submit'
+                    disabled={loading || (!editing && !selectedCollege)}
+                    className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300'
+                  >
+                    {loading ? 'Processing...' : 'Create Banner'}
+                  </button>
+                </div>
+              )}
+            </form>
+          </div>
         </div>
       )}
 

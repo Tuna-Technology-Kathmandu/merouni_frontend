@@ -55,18 +55,28 @@ const Colleges = () => {
             msOverflowStyle: 'none'
           }}
         >
-          {(featuredColleges ?? [])?.map((college, index) => (
-            <Link href={`/colleges/${college.slugs}`} key={index}>
+          {(featuredColleges ?? [])?.map((college, index) => {
+            // Get university name from various possible paths
+            const universityName =
+              college.university?.fullname ||
+              college.university?.name ||
+              college.University?.fullname ||
+              college.University?.name ||
+              null
+
+            return (
               <CollegeCard
                 logo={college.college_logo}
                 featuredImg={college.featured_img}
                 name={college.name}
-                address={`${college.address.city},${college.address.country}`}
-                key={index}
-                gradient={gradients[index % gradients.length]}
+                address={`${college.address?.city || ''},${college.address?.country || ''}`}
+                key={college.id || index}
+                collegeId={college.id}
+                slug={college.slugs}
+                universityName={universityName}
               />
-            </Link>
-          ))}
+            )
+          })}
         </div>
       )}
 

@@ -100,9 +100,10 @@ const CollegeRankings = () => {
 
   return (
     <div className='max-w-7xl mx-auto px-4 py-8 md:py-12'>
-      <h2 className='text-3xl font-bold text-gray-900 mb-8 text-center'>
+      <h1 className='text-xl font-semibold text-gray-800 my-8 text-left pb-2 relative inline-block'>
         Top College Rankings
-      </h2>
+        <span className='absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#0870A8] to-[#31AD8F]'></span>
+      </h1>
 
       <div className='relative'>
         {/* Left Arrow Button */}

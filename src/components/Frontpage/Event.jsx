@@ -59,7 +59,10 @@ const Event = () => {
       className='flex items-center max-w-[1800px] mx-auto justify-around'
     >
       <div className='flex flex-col items-center gap-4'>
-        <div className='font-extrabold text-4xl md:text-7xl'>Our Events</div>
+        <h1 className='text-xl font-semibold text-gray-800 my-8 text-left pb-2 relative inline-block'>
+          Our Events
+          <span className='absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#0870A8] to-[#31AD8F]'></span>
+        </h1>
 
         {loading && (
           <div className='flex justify-center items-center h-64'>
