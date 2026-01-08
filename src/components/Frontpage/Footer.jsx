@@ -8,8 +8,10 @@ import { FaInstagram } from 'react-icons/fa6'
 import { TiSocialLinkedinCircular } from 'react-icons/ti'
 import { PiXLogoLight } from 'react-icons/pi'
 import { FaCopyright } from 'react-icons/fa'
-import { RiArrowDropDownLine, RiArrowDropUpLine } from 'react-icons/ri'
-import { GraduationCap, School, BookOpen } from 'lucide-react'
+import { Section } from 'lucide-react'
+// import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
+import { RiArrowDropDownLine } from 'react-icons/ri'
+import { RiArrowDropUpLine } from 'react-icons/ri'
 
 const Footer = () => {
   const [openSections, setOpenSections] = useState({})
@@ -24,7 +26,6 @@ const Footer = () => {
   const Sections = {
     Exams: {
       header: 'Top Exams',
-      icon: GraduationCap,
       list: [
         'MAT 2025',
         'IOE Entrance Exam 2025',
@@ -35,7 +36,6 @@ const Footer = () => {
     },
     Colleges: {
       header: 'Colleges',
-      icon: School,
       list: [
         'Colleges in Nepal',
         'College Reviews in Nepal',
@@ -46,7 +46,6 @@ const Footer = () => {
     },
     Resources: {
       header: 'Resources',
-      icon: BookOpen,
       list: [
         'B.Tech Companion Nepal',
         'MBBS Companion Nepal',
@@ -58,7 +57,7 @@ const Footer = () => {
   }
 
   return (
-    <div className='shadow-2xl relative z-50'>
+    <div className='shadow-md'>
       <div className='hidden md:block shadow-md'>
         <header className='bg-white text-[#0870A8] shadow-md'>
           <div className='container mx-auto px-4'>
@@ -78,15 +77,12 @@ const Footer = () => {
 
               {Object.entries(Sections).map(([key, section], index) => (
                 <div key={index}>
-                  <h3 className='text-xl font-semibold mb-10 text-[#31AD8F]'>
+                  <h3 className='text-xl font-semibold mb-10 text-[#0870A8]'>
                     {section.header}
                   </h3>
                   <ul className='space-y-3'>
                     {section.list.map((item, itemIndex) => (
-                      <li key={itemIndex} className='flex items-center gap-2'>
-                        {section.icon && (
-                          <section.icon size={18} className='text-[#31AD8F]' />
-                        )}
+                      <li key={itemIndex}>
                         <Link
                           href={'#'}
                           className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
@@ -101,15 +97,13 @@ const Footer = () => {
             </div>
 
             <div className='pt-8 border-t border-gray-300 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 mb-10'>
-              <div className='flex items-center gap-6'>
-                <div className='pr-6 border-r border-gray-300'>
-                  <Image
-                    src={'/images/logo.png'}
-                    width={200}
-                    height={70}
-                    alt='Mero UNI logo'
-                  />
-                </div>
+              <div className='flex items-center gap-6 pr-6 border-r border-gray-300'>
+                <Image
+                  src={'/images/logo.png'}
+                  width={200}
+                  height={70}
+                  alt='Mero UNI logo'
+                />
                 <div className='hidden md:flex items-center space-x-4'>
                   <a
                     href='#'
@@ -165,7 +159,7 @@ const Footer = () => {
       </div>
 
       <>
-        <div className='md:hidden flex flex-col justify-center items-center bg-white shadow-2xl relative z-50'>
+        <div className='md:hidden flex flex-col justify-center items-center bg-white shadow-md'>
           <header className='text-[#0870A8]'>
             <div className='mx-auto px-4'>
               <nav className='py-4'></nav>
@@ -184,7 +178,7 @@ const Footer = () => {
                     open={openSections[index]}
                     onToggle={() => toggleSection(index)}
                   >
-                    <summary className='w-full list-none flex justify-between items-center hover:cursor-pointer font-bold text-lg text-[#31AD8F]'>
+                    <summary className='w-full list-none flex justify-between items-center hover:cursor-pointer font-bold text-lg text-[#0870A8]'>
                       {section.header}
                       <span>
                         <button type='button' className='p-2 text-[#0870A8]'>
@@ -197,15 +191,9 @@ const Footer = () => {
                         </button>
                       </span>
                     </summary>
-                    <ul className='space-y-2 pb-4'>
+                    <ul>
                       {section.list.map((item, itemIndex) => (
-                        <li key={itemIndex} className='flex items-center gap-2'>
-                          {section.icon && (
-                            <section.icon
-                              size={18}
-                              className='text-[#31AD8F]'
-                            />
-                          )}
+                        <li key={itemIndex} className='mb-2'>
                           <Link
                             href={'#'}
                             className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
@@ -220,15 +208,13 @@ const Footer = () => {
               ))}
 
               <div className='flex flex-col items-center'>
-                <div className='mb-8 flex flex-col items-center gap-4 w-full'>
-                  <div className='pb-6 border-b border-gray-300 w-full flex justify-center'>
-                    <Image
-                      src={'/images/logo.png'}
-                      width={200}
-                      height={70}
-                      alt='Mero UNI logo'
-                    />
-                  </div>
+                <div className='mb-8 flex flex-col items-center gap-4 pb-6 border-b border-gray-300 w-full'>
+                  <Image
+                    src={'/images/logo.png'}
+                    width={200}
+                    height={70}
+                    alt='Mero UNI logo'
+                  />
                   <div className='flex items-center space-x-4'>
                     <a
                       href='#'

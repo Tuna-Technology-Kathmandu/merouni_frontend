@@ -308,14 +308,37 @@ export default function CollegeForm() {
           return val !== null && val !== undefined
         })
       })
+
+      // Filter out empty members
+      const filteredMembers = (data.members || []).filter((member) => {
+        return Object.values(member).some((val) => {
+          if (typeof val === 'string') return val.trim() !== ''
+          return val !== null && val !== undefined
+        })
+      })
+
+      // Only include members in payload if there are non-empty members
+      if (filteredMembers.length > 0) {
+        data.members = filteredMembers
+      } else {
+        delete data.members
+      }
+
       // Convert boolean values to numbers
       data.is_featured = +data.is_featured
       data.pinned = +data.pinned
       // Convert IDs to numbers
       data.university_id = parseInt(data.university_id)
 
-      // Ensure courses is always an array, even if empty
-      data.courses = (data.courses || []).map((course) => parseInt(course))
+      // Only include courses in payload if there are courses
+      const coursesArray = (data.courses || [])
+        .map((course) => parseInt(course))
+        .filter((course) => !isNaN(course) && course > 0)
+      if (coursesArray.length > 0) {
+        data.courses = coursesArray
+      } else {
+        delete data.courses
+      }
 
       data.college_logo = uploadedFiles.logo
       data.featured_img = uploadedFiles.featured
@@ -719,14 +742,12 @@ export default function CollegeForm() {
         }
       }
 
-      // Set programs
+      // Set programs - use program_id from college course data
       const programIds =
         collegeData.collegeCourses
           ?.map((course) => {
-            const foundCourse = courses.find(
-              (c) => c.title === course.program.title
-            )
-            return foundCourse?.id
+            // Use program_id from the college course data
+            return course.program_id || course.program?.id
           })
           .filter((id) => id !== undefined) || []
 
@@ -1201,7 +1222,7 @@ export default function CollegeForm() {
                             {universityPrograms.map((course) => {
                               const isChecked = (
                                 getValues('courses') || []
-                              ).includes(course.id)
+                              ).includes(course.program_id)
                               return (
                                 <div key={course.program_id}>
                                   <input
@@ -1214,7 +1235,10 @@ export default function CollegeForm() {
                                       if (e.target.checked) {
                                         setValue(
                                           'courses',
-                                          [...currentCourses, course.id],
+                                          [
+                                            ...currentCourses,
+                                            course.program_id
+                                          ],
                                           {
                                             shouldValidate: true,
                                             shouldDirty: true
@@ -1224,7 +1248,7 @@ export default function CollegeForm() {
                                         setValue(
                                           'courses',
                                           currentCourses.filter(
-                                            (id) => id !== course.id
+                                            (id) => id !== course.program_id
                                           ),
                                           {
                                             shouldValidate: true,

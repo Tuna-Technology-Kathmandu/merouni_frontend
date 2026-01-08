@@ -56,8 +56,9 @@ export default function CollegeRankingsPage() {
 
   const fetchPrograms = async () => {
     try {
+      // Fetch all programs without limit
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/program?limit=100`
+        `${process.env.baseUrl}${process.env.version}/program?limit=1000`
       )
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

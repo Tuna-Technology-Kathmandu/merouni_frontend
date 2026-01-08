@@ -495,6 +495,21 @@ const EditCollegePage = () => {
         })
       })
 
+      // Filter out empty members
+      const filteredMembers = (data.members || []).filter((member) => {
+        return Object.values(member).some((val) => {
+          if (typeof val === 'string') return val.trim() !== ''
+          return val !== null && val !== undefined
+        })
+      })
+
+      // Only include members in payload if there are non-empty members
+      if (filteredMembers.length > 0) {
+        data.members = filteredMembers
+      } else {
+        delete data.members
+      }
+
       // Convert boolean values to numbers
       data.is_featured = +data.is_featured
       data.pinned = +data.pinned
@@ -504,10 +519,18 @@ const EditCollegePage = () => {
         data.university_id = parseInt(data.university_id)
       }
 
+      // Only include courses in payload if there are courses
       if (data.courses && data.courses.length > 0) {
-        data.courses = data.courses.map((course) => parseInt(course))
+        const coursesArray = data.courses
+          .map((course) => parseInt(course))
+          .filter((course) => !isNaN(course) && course > 0)
+        if (coursesArray.length > 0) {
+          data.courses = coursesArray
+        } else {
+          delete data.courses
+        }
       } else {
-        data.courses = []
+        delete data.courses
       }
 
       // Set file uploads

@@ -58,7 +58,17 @@ export default function ScholarshipManager() {
       },
       {
         header: 'Description',
-        accessorKey: 'description'
+        accessorKey: 'description',
+        cell: ({ getValue }) => {
+          const description = getValue()
+          if (!description) return ''
+          return (
+            <div
+              className='max-w-md line-clamp-3'
+              dangerouslySetInnerHTML={{ __html: description }}
+            />
+          )
+        }
       },
       {
         header: 'Eligibility',

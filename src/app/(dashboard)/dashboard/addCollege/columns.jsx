@@ -16,11 +16,11 @@ export const createColumns = ({
           <img
             src={logoUrl}
             alt='College Logo'
-            className='w-12 h-12 object-contain rounded'
+            className='w-20 h-20 object-contain rounded'
           />
         </div>
       ) : (
-        <div className='flex items-center justify-center w-12 h-12 bg-gray-100 rounded'>
+        <div className='flex items-center justify-center w-20 h-20 bg-gray-100 rounded'>
           <span className='text-gray-400 text-xs'>No Logo</span>
         </div>
       )
