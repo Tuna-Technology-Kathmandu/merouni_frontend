@@ -78,12 +78,12 @@ export async function updateEvent(eventId, data) {
     })
 
     if (!response.ok) {
-      throw new Error('Failed to update category')
+      throw new Error('Failed to update event')
     }
 
     return await response.json()
   } catch (error) {
-    console.error('Error updating category:', error)
+    console.error('Error updating event:', error)
     throw error
   }
 }
