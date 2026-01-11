@@ -8,6 +8,15 @@ import { FaTrashAlt, FaEdit } from 'react-icons/fa'
 import { Modal } from '../../../../components/CreateUserModal'
 import ShimmerEffect from '../../../../components/ShimmerEffect'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
 
 const ReferralsPage = () => {
   const { setHeading } = usePageHeading()
@@ -125,105 +134,124 @@ const ReferralsPage = () => {
     )
 
   return (
-    <div className='p-4'>
-      <div className='overflow-x-auto'>
-        <table className='min-w-full bg-white border border-gray-200 shadow-md'>
-          <thead>
-            <tr className='bg-gray-100 border-b'>
-              <th className='px-4 py-2 border'>S.N.</th>
-              <th className='px-4 py-2 border'>Student Name</th>
-              <th className='px-4 py-2 border'>Applied College</th>
+    <div className='p-4 bg-white min-h-screen'>
+      <div className='rounded-md border'>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className='w-[60px] text-gray-600'>S.N.</TableHead>
+              <TableHead className='text-gray-600'>Student Details</TableHead>
+              <TableHead className='text-gray-600'>Applied College</TableHead>
               {!isInstitution && (
                 <>
-                  <th className='px-4 py-2 border'>Referred By</th>
-                  <th className='px-4 py-2 border'>Application Type</th>
+                  <TableHead className='text-gray-600'>Referred By</TableHead>
+                  <TableHead className='text-gray-600'>
+                    Application Type
+                  </TableHead>
                 </>
               )}
-              <th className='px-4 py-2 border'>Student Email</th>
-              <th className='px-4 py-2 border'>Student Phone</th>
-              <th className='px-4 py-2 border'>Status</th>
-              <th className='px-4 py-2 border'>Remarks</th>
-              <th className='px-4 py-2 border text-center'>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {referrals.map((referral, index) => (
-              <tr key={referral.id} className='border-b'>
-                <td className='px-4 py-2 border'>{index + 1}</td>
-                <td className='px-4 py-2 border'>
-                  {referral.student_name || 'N/A'}
-                </td>
-                <td className='px-4 py-2 border'>
-                  {referral.referralCollege?.name || 'N/A'}
-                </td>
-                {!isInstitution && (
-                  <>
-                    <td className='px-4 py-2 border'>
-                      {referral.referralAgent
-                        ? `${referral.referralAgent.firstName} ${
-                            referral.referralAgent.middleName || ''
-                          } ${referral.referralAgent.lastName}`.trim()
-                        : referral.application_type === 'self'
-                          ? 'Self'
-                          : 'N/A'}
-                    </td>
-                    <td className='px-4 py-2 border'>
-                      {referral.application_type}
-                    </td>
-                  </>
-                )}
-                <td className='px-4 py-2 border'>
-                  {referral.student_email || 'N/A'}
-                </td>
-                <td className='px-4 py-2 border'>
-                  {referral.student_phone_no || 'N/A'}
-                </td>
-                <td className='px-4 py-2 border'>
-                  <span
-                    className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                      referral.status === 'ACCEPTED'
-                        ? 'bg-green-100 text-green-800'
-                        : referral.status === 'REJECTED'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                    }`}
-                  >
-                    {referral.status || 'IN_PROGRESS'}
-                  </span>
-                </td>
-                <td className='px-4 py-2 border'>
-                  <span className='text-sm text-gray-600'>
-                    {referral.remarks
-                      ? referral.remarks.length > 50
-                        ? `${referral.remarks.substring(0, 50)}...`
-                        : referral.remarks
-                      : 'N/A'}
-                  </span>
-                </td>
-                <td className='px-4 py-2 border text-center'>
-                  <div className='flex items-center justify-center gap-2'>
-                    <button
-                      onClick={() => handleOpenStatusModal(referral)}
-                      disabled={updatingId === referral.id}
-                      className='text-blue-600 hover:text-blue-800 disabled:opacity-50'
-                      title='Update Status'
+              <TableHead className='text-gray-600'>Status</TableHead>
+              <TableHead className='text-gray-600'>Remarks</TableHead>
+              <TableHead className='text-center text-gray-600'>
+                Actions
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {referrals.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={isInstitution ? 5 : 7}
+                  className='text-center py-8 text-muted-foreground'
+                >
+                  No referrals found
+                </TableCell>
+              </TableRow>
+            ) : (
+              referrals.map((referral, index) => (
+                <TableRow key={referral.id}>
+                  <TableCell className='font-medium'>{index + 1}</TableCell>
+                  <TableCell>
+                    <div className='flex flex-col space-y-1'>
+                      <div className='font-medium'>
+                        {referral.student_name || 'N/A'}
+                      </div>
+                      <div className='text-sm text-muted-foreground'>
+                        {referral.student_email || 'N/A'}
+                      </div>
+                      <div className='text-sm text-muted-foreground'>
+                        {referral.student_phone_no || 'N/A'}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {referral.referralCollege?.name || 'N/A'}
+                  </TableCell>
+                  {!isInstitution && (
+                    <>
+                      <TableCell>
+                        {referral.referralAgent
+                          ? `${referral.referralAgent.firstName} ${
+                              referral.referralAgent.middleName || ''
+                            } ${referral.referralAgent.lastName}`.trim()
+                          : referral.application_type === 'self'
+                            ? 'Self'
+                            : 'N/A'}
+                      </TableCell>
+                      <TableCell className='capitalize'>
+                        {referral.application_type}
+                      </TableCell>
+                    </>
+                  )}
+                  <TableCell>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                        referral.status === 'ACCEPTED'
+                          ? 'bg-green-100 text-green-800'
+                          : referral.status === 'REJECTED'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                      }`}
                     >
-                      <FaEdit className='inline w-4 h-4' />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(referral.id)}
-                      disabled={deletingId === referral.id}
-                      className='text-red-600 hover:text-red-800 disabled:opacity-50'
-                      title='Delete'
-                    >
-                      <FaTrashAlt className='inline w-4 h-4' />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                      {referral.status || 'IN_PROGRESS'}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className='text-sm text-muted-foreground'>
+                      {referral.remarks
+                        ? referral.remarks.length > 50
+                          ? `${referral.remarks.substring(0, 50)}...`
+                          : referral.remarks
+                        : 'N/A'}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className='flex items-center justify-center gap-2'>
+                      <Button
+                        variant='ghost'
+                        size='icon'
+                        onClick={() => handleOpenStatusModal(referral)}
+                        disabled={updatingId === referral.id}
+                        title='Update Status'
+                      >
+                        <FaEdit className='h-4 w-4 text-blue-600' />
+                      </Button>
+                      <Button
+                        variant='ghost'
+                        size='icon'
+                        onClick={() => handleDelete(referral.id)}
+                        disabled={deletingId === referral.id}
+                        title='Delete'
+                      >
+                        <FaTrashAlt className='h-4 w-4 text-red-600' />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
 
       {/* Update Status Modal */}
