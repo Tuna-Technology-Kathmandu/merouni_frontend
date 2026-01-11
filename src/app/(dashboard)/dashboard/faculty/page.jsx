@@ -53,19 +53,20 @@ export default function FacultyManager() {
       },
       {
         header: 'Description',
-        accessorKey: 'description'
+        accessorKey: 'description',
+        cell: ({ getValue }) => {
+          const description = getValue()
+          if (!description) return '-'
+          // Show only first 50 characters with ellipsis
+          return description.length > 50
+            ? `${description.substring(0, 50)}...`
+            : description
+        }
       },
       {
         header: 'Author',
         accessorFn: (row) =>
           `${row.authorDetails.firstName} ${row.authorDetails.lastName}`
-      },
-      {
-        header: 'Created At',
-        accessorKey: 'createdAt',
-        cell: ({ getValue }) => {
-          return new Date(getValue()).toLocaleDateString()
-        }
       },
       {
         header: 'Actions',

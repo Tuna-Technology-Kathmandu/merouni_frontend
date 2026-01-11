@@ -137,3 +137,27 @@ export async function getRelatedEvents() {
     throw error
   }
 }
+
+export async function getUnexpiredEvents() {
+  try {
+    const apiUrl = `${process.env.baseUrl}${process.env.version}/event/unexpired?limit=999`
+    
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch events')
+    }
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('Failed to fetch events:', error)
+    throw error
+  }
+}

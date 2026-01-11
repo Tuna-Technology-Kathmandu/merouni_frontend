@@ -17,6 +17,10 @@ import { X } from 'lucide-react'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Modal } from '../../../../components/CreateUserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
+import { useSearchParams, useRouter } from 'next/navigation'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
@@ -24,6 +28,8 @@ const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
 export default function EventManager() {
   const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const {
     register,
     handleSubmit,
@@ -35,7 +41,7 @@ export default function EventManager() {
     defaultValues: {
       title: '',
       category_id: '',
-      college_id: '',
+      college_id: null,
       author_id: author_id,
       description: '',
       content: '',
@@ -93,6 +99,23 @@ export default function EventManager() {
     return () => setHeading(null)
   }, [setHeading])
 
+  // Check for 'add' query parameter and open modal
+  useEffect(() => {
+    const addParam = searchParams.get('add')
+    if (addParam === 'true') {
+      setIsOpen(true)
+      setEditing(false)
+      setEditingEventId(null)
+      reset()
+      setUploadedFiles({ image: '' })
+      setCollegeSearch('')
+      setSelectedColleges([])
+      setEditorContent('')
+      // Remove query parameter from URL
+      router.replace('/dashboard/events', { scroll: false })
+    }
+  }, [searchParams, router, reset])
+
   useEffect(() => {
     return () => {
       if (searchTimeout) {
@@ -137,12 +160,14 @@ export default function EventManager() {
 
   // Add function to remove college
   const removeCollege = (collegeId) => {
-    setSelectedColleges((prev) => prev.filter((c) => c.id !== collegeId))
-    // Update form value
-    const updatedCollegeIds = selectedColleges
-      .filter((c) => c.id !== collegeId)
-      .map((c) => c.id)
-    setValue('college_id', updatedCollegeIds[0])
+    const updatedColleges = selectedColleges.filter((c) => c.id !== collegeId)
+    setSelectedColleges(updatedColleges)
+    // Update form value - set to null or undefined if no colleges left
+    if (updatedColleges.length > 0) {
+      setValue('college_id', updatedColleges[0].id)
+    } else {
+      setValue('college_id', null)
+    }
   }
 
   const handleSearch = async (query) => {
@@ -218,6 +243,16 @@ export default function EventManager() {
         is_featured: Number(data.is_featured),
         image: uploadedFiles.image
       }
+
+      // Remove college_id if it's empty, null, or undefined
+      if (
+        !formData.college_id ||
+        formData.college_id === '' ||
+        formData.college_id === null
+      ) {
+        delete formData.college_id
+      }
+
       // Include event ID for update operation
       if (editing) {
         formData.id = editingEventId // Add the event ID to the formData
@@ -311,7 +346,15 @@ export default function EventManager() {
             }
           ]
           setSelectedColleges(colgData)
+        } else {
+          // No college found, set to null
+          setValue('college_id', null)
+          setSelectedColleges([])
         }
+      } else {
+        // Event has no college, set to null
+        setValue('college_id', null)
+        setSelectedColleges([])
       }
 
       setValue('description', eventData.description)
@@ -596,20 +639,17 @@ export default function EventManager() {
               <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
                 {/* Basic Information */}
                 <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Event Information
-                  </h2>
                   <div className='space-y-4'>
                     <div>
-                      <label htmlFor='title' className='block mb-2'>
-                        Event Title *
-                      </label>
-                      <input
+                      <Label htmlFor='title' className='block mb-2'>
+                        Event Title <span className='text-red-500'>*</span>
+                      </Label>
+                      <Input
+                        id='title'
                         {...register('title', {
                           required: 'Title is required'
                         })}
                         placeholder='Event Title'
-                        className='w-full p-2 border rounded'
                       />
                       {errors.title && (
                         <span className='text-red-500 text-sm'>
@@ -619,12 +659,12 @@ export default function EventManager() {
                     </div>
 
                     <div>
-                      <label htmlFor='category_id' className='block mb-2'>
-                        Categories *
-                      </label>
-                      <select
+                      <Label htmlFor='category_id' className='block mb-2'>
+                        Categories <span className='text-red-500'>*</span>
+                      </Label>
+                      <Select
+                        id='category_id'
                         {...register('category_id', { required: true })}
-                        className='w-full p-2 border rounded'
                       >
                         <option value=''>Select Category</option>
                         {categories.map((category) => (
@@ -632,7 +672,7 @@ export default function EventManager() {
                             {category.title}
                           </option>
                         ))}
-                      </select>
+                      </Select>
                     </div>
 
                     <div>
@@ -656,12 +696,11 @@ export default function EventManager() {
                       </div>
 
                       <div className='relative'>
-                        <input
+                        <Input
                           type='text'
                           disabled={selectedColleges.length > 0}
                           value={collegeSearch}
                           onChange={searchCollege}
-                          className='w-full p-2 border rounded'
                           placeholder='Search college...'
                         />
 
@@ -690,15 +729,15 @@ export default function EventManager() {
                   </h2>
                   <div className='space-y-4'>
                     <div>
-                      <label htmlFor='host' className='block mb-2'>
-                        Host *
-                      </label>
-                      <input
+                      <Label htmlFor='host' className='block mb-2'>
+                        Host <span className='text-red-500'>*</span>
+                      </Label>
+                      <Input
+                        id='host'
                         {...register('event_host.host', {
                           required: 'Host is required'
                         })}
                         placeholder='Event Host'
-                        className='w-full p-2 border rounded'
                       />
                       {errors.event_host?.host && (
                         <span className='text-red-500 text-sm'>
@@ -709,15 +748,15 @@ export default function EventManager() {
 
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                       <div>
-                        <label htmlFor='start_date' className='block mb-2'>
-                          Start Date *
-                        </label>
-                        <input
+                        <Label htmlFor='start_date' className='block mb-2'>
+                          Start Date <span className='text-red-500'>*</span>
+                        </Label>
+                        <Input
+                          id='start_date'
                           type='date'
                           {...register('event_host.start_date', {
                             required: 'Start date is required'
                           })}
-                          className='w-full p-2 border rounded'
                         />
                         {errors.event_host?.start_date && (
                           <span className='text-red-500 text-sm'>
@@ -726,15 +765,15 @@ export default function EventManager() {
                         )}
                       </div>
                       <div>
-                        <label htmlFor='end_date' className='block mb-2'>
-                          End Date *
-                        </label>
-                        <input
+                        <Label htmlFor='end_date' className='block mb-2'>
+                          End Date <span className='text-red-500'>*</span>
+                        </Label>
+                        <Input
+                          id='end_date'
                           type='date'
                           {...register('event_host.end_date', {
                             required: 'End date is required'
                           })}
-                          className='w-full p-2 border rounded'
                         />
                         {errors.event_host?.end_date && (
                           <span className='text-red-500 text-sm'>
@@ -746,15 +785,15 @@ export default function EventManager() {
 
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                       <div>
-                        <label htmlFor='time' className='block mb-2'>
-                          Time *
-                        </label>
-                        <input
+                        <Label htmlFor='time' className='block mb-2'>
+                          Time <span className='text-red-500'>*</span>
+                        </Label>
+                        <Input
+                          id='time'
                           type='time'
                           {...register('event_host.time', {
                             required: 'Time is required'
                           })}
-                          className='w-full p-2 border rounded'
                           placeholder='Time'
                         />
                         {errors.event_host?.time && (
@@ -764,14 +803,14 @@ export default function EventManager() {
                         )}
                       </div>
                       <div>
-                        <label htmlFor='map_url' className='block mb-2'>
+                        <Label htmlFor='map_url' className='block mb-2'>
                           Map Location
-                        </label>
-                        <input
+                        </Label>
+                        <Input
+                          id='map_url'
                           type='text'
                           {...register('event_host.map_url')}
                           placeholder='Map URL'
-                          className='w-full p-2 border rounded'
                         />
                       </div>
                     </div>
@@ -785,10 +824,11 @@ export default function EventManager() {
                   </h2>
                   <div className='space-y-4'>
                     <div>
-                      <label htmlFor='description' className='block mb-2'>
+                      <Label htmlFor='description' className='block mb-2'>
                         Description
-                      </label>
+                      </Label>
                       <textarea
+                        id='description'
                         {...register('description')}
                         placeholder='Description'
                         className='w-full p-2 border rounded'
@@ -797,9 +837,9 @@ export default function EventManager() {
                     </div>
 
                     <div>
-                      <label htmlFor='content' className='block mb-2'>
+                      <Label htmlFor='content' className='block mb-2'>
                         Content
-                      </label>
+                      </Label>
                       <EditorMemo
                         initialData={getValues('content')}
                         onChange={(data) => setValue('content', data)}

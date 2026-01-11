@@ -9,7 +9,17 @@ import Piechart from '../../../components/Piechart'
 import { destr } from 'destr'
 import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { Phone, MapPin } from 'lucide-react'
+import {
+  Phone,
+  MapPin,
+  Plus,
+  Calendar,
+  Newspaper,
+  FileText,
+  School,
+  GraduationCap,
+  Book
+} from 'lucide-react'
 
 const AdminDashboard = () => {
   const { setHeading } = usePageHeading()
@@ -110,7 +120,7 @@ const AdminDashboard = () => {
     <div className='p-4 flex flex-col gap-8'>
       <div className='w-full flex flex-col gap-8'>
         {/* USER CARDS */}
-        <div className='flex gap-4 justify-between flex-wrap'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
           <UserCard
             type='Users'
             value={analytics?.totalUsers}
@@ -147,6 +157,87 @@ const AdminDashboard = () => {
             loading={loading}
           />
         </div>
+
+        {/* QUICK ACTIONS */}
+        <div className='bg-white rounded-lg shadow-md p-6'>
+          <h2 className='text-xl font-semibold text-gray-800 mb-4'>
+            Quick Actions
+          </h2>
+          <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
+            <Link
+              href='/dashboard/events?add=true'
+              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors group'
+            >
+              <div className='p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors'>
+                <Calendar className='w-5 h-5 text-blue-600' />
+              </div>
+              <span className='text-sm font-medium text-gray-700 group-hover:text-blue-600'>
+                Add Event
+              </span>
+            </Link>
+
+            <Link
+              href='/dashboard/news?add=true'
+              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-300 transition-colors group'
+            >
+              <div className='p-2 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors'>
+                <Newspaper className='w-5 h-5 text-green-600' />
+              </div>
+              <span className='text-sm font-medium text-gray-700 group-hover:text-green-600'>
+                Add News
+              </span>
+            </Link>
+
+            <Link
+              href='/dashboard/material?add=true'
+              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors group'
+            >
+              <div className='p-2 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors'>
+                <FileText className='w-5 h-5 text-purple-600' />
+              </div>
+              <span className='text-sm font-medium text-gray-700 group-hover:text-purple-600'>
+                Add Material
+              </span>
+            </Link>
+
+            <Link
+              href='/dashboard/addCollege'
+              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-orange-50 hover:border-orange-300 transition-colors group'
+            >
+              <div className='p-2 bg-orange-100 rounded-lg group-hover:bg-orange-200 transition-colors'>
+                <School className='w-5 h-5 text-orange-600' />
+              </div>
+              <span className='text-sm font-medium text-gray-700 group-hover:text-orange-600'>
+                Add College
+              </span>
+            </Link>
+
+            <Link
+              href='/dashboard/program'
+              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-indigo-50 hover:border-indigo-300 transition-colors group'
+            >
+              <div className='p-2 bg-indigo-100 rounded-lg group-hover:bg-indigo-200 transition-colors'>
+                <GraduationCap className='w-5 h-5 text-indigo-600' />
+              </div>
+              <span className='text-sm font-medium text-gray-700 group-hover:text-indigo-600'>
+                Add Program
+              </span>
+            </Link>
+
+            <Link
+              href='/dashboard/courses'
+              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-teal-50 hover:border-teal-300 transition-colors group'
+            >
+              <div className='p-2 bg-teal-100 rounded-lg group-hover:bg-teal-200 transition-colors'>
+                <Book className='w-5 h-5 text-teal-600' />
+              </div>
+              <span className='text-sm font-medium text-gray-700 group-hover:text-teal-600'>
+                Add Course
+              </span>
+            </Link>
+          </div>
+        </div>
+
         {/* MIDDLE CHARTS */}
         <div className='flex flex-col lg:flex-row gap-8'>
           <div className='w-full lg:w-1/2 h-[450px]'>

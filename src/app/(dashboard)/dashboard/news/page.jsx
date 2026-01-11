@@ -16,6 +16,7 @@ import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Modal } from '../../../../components/CreateUserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { useSearchParams, useRouter } from 'next/navigation'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
@@ -23,6 +24,8 @@ const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
 export default function NewsManager() {
   const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
+  const searchParams = useSearchParams()
+  const router = useRouter()
 
   const [news, setNews] = useState([])
   const [categories, setCategories] = useState([])
@@ -250,6 +253,21 @@ export default function NewsManager() {
     loadData()
     return () => setHeading(null)
   }, [setHeading])
+
+  // Check for 'add' query parameter and open modal
+  useEffect(() => {
+    const addParam = searchParams.get('add')
+    if (addParam === 'true') {
+      setIsOpen(true)
+      setEditing(false)
+      setEditingId(null)
+      reset()
+      setSelectedTags([])
+      setUploadedFiles({ featuredImage: '' })
+      // Remove query parameter from URL
+      router.replace('/dashboard/news', { scroll: false })
+    }
+  }, [searchParams, router, reset])
 
   useEffect(() => {
     return () => {

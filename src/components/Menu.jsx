@@ -56,21 +56,9 @@ const menuItems = [
         visible: ['admin', 'editor']
       },
       {
-        icon: <FaBook className='text-xl' />,
-        label: 'Courses',
-        href: '/dashboard/courses',
-        visible: ['admin', 'editor']
-      },
-      {
         icon: <MdQuiz className='text-xl' />,
         label: 'Exams',
         href: '/dashboard/exams',
-        visible: ['admin', 'editor']
-      },
-      {
-        icon: <FaGraduationCap className='text-xl' />,
-        label: 'Program',
-        href: '/dashboard/program',
         visible: ['admin', 'editor']
       },
       {
@@ -89,18 +77,6 @@ const menuItems = [
         icon: <FaBriefcase className='text-xl' />,
         label: 'Career',
         href: '/dashboard/career',
-        visible: ['admin', 'editor']
-      },
-      {
-        icon: <MdCategory className='text-xl' />,
-        label: 'Category',
-        href: '/dashboard/category',
-        visible: ['admin', 'editor']
-      },
-      {
-        icon: <FaUniversity className='text-xl' />,
-        label: 'University',
-        href: '/dashboard/university',
         visible: ['admin', 'editor']
       },
       {
@@ -208,6 +184,12 @@ const menuItems = [
         visible: ['admin', 'editor'],
         submenus: [
           {
+            icon: <MdCategory className='text-lg' />,
+            label: 'Category',
+            href: '/dashboard/category',
+            visible: ['admin', 'editor']
+          },
+          {
             icon: <BsLayers className='text-lg' />,
             label: 'Level',
             href: '/dashboard/level',
@@ -223,6 +205,24 @@ const menuItems = [
             icon: <FaTags className='text-lg' />,
             label: 'Tags',
             href: '/dashboard/tag',
+            visible: ['admin', 'editor']
+          },
+          {
+            icon: <FaBook className='text-lg' />,
+            label: 'Courses',
+            href: '/dashboard/courses',
+            visible: ['admin', 'editor']
+          },
+          {
+            icon: <FaGraduationCap className='text-lg' />,
+            label: 'Program',
+            href: '/dashboard/program',
+            visible: ['admin', 'editor']
+          },
+          {
+            icon: <FaUniversity className='text-lg' />,
+            label: 'University',
+            href: '/dashboard/university',
             visible: ['admin', 'editor']
           }
         ]

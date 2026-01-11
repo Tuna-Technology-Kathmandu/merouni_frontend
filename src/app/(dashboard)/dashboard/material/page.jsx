@@ -12,10 +12,13 @@ import { X } from 'lucide-react'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Modal } from '../../../../components/CreateUserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { useSearchParams, useRouter } from 'next/navigation'
 
 export default function MaterialForm() {
   const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [materials, setMaterials] = useState([])
   const [tags, setTags] = useState([])
@@ -111,6 +114,22 @@ export default function MaterialForm() {
     return () => setHeading(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setHeading])
+
+  // Check for 'add' query parameter and open modal
+  useEffect(() => {
+    const addParam = searchParams.get('add')
+    if (addParam === 'true') {
+      setIsOpen(true)
+      setEditing(false)
+      setEditingId(null)
+      reset()
+      setUploadedFiles({ image: '', file: '' })
+      setSelectedColleges([])
+      setSearchResults([])
+      // Remove query parameter from URL
+      router.replace('/dashboard/material', { scroll: false })
+    }
+  }, [searchParams, router, reset])
 
   const { requireAdmin } = useAdminPermission()
 

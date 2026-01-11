@@ -1,8 +1,9 @@
 'use client'
 import Image from 'next/image'
 import React, { useState, useEffect, useRef } from 'react'
-import { getEvents } from '@/app/action'
 import Link from 'next/link'
+import { getUnexpiredEvents } from '@/app/events/action'
+import { formatDate } from '@/utils/date.util'
 
 const Event = () => {
   const [events, setEvents] = useState([])
@@ -10,14 +11,36 @@ const Event = () => {
   const [loading, setLoading] = useState(false)
   const eventRef = useRef(null) // Reference for lazy loading
 
+  const getEventDate = (event) => {
+    // Try to get date from event_host
+    if (event.event_host) {
+      try {
+        const eventHost =
+          typeof event.event_host === 'string'
+            ? JSON.parse(event.event_host)
+            : event.event_host
+        if (eventHost?.start_date) {
+          return formatDate(eventHost.start_date)
+        }
+      } catch (error) {
+        // If parsing fails, continue to other options
+      }
+    }
+    // Fallback to createdAt if available
+    if (event.createdAt) {
+      return formatDate(event.createdAt)
+    }
+    return 'Date TBA'
+  }
+
   const fetchEvents = async () => {
     setLoading(true)
     try {
-      const response = await getEvents(1)
-      setEvents(response.items.slice(0, 3))
+      const data = await getUnexpiredEvents()
+      setEvents(data.items?.slice(0, 3) || [])
     } catch (error) {
       setError('Failed to fetch events')
-      console.error('Failed to fetch events')
+      console.error('Failed to fetch events:', error)
     } finally {
       setLoading(false)
     }
@@ -41,84 +64,59 @@ const Event = () => {
     return () => observer.disconnect()
   }, [])
 
-  const formatDate = (isoString) => {
-    const date = new Date(isoString)
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
-
-  useEffect(() => {}, [events])
-
   return (
     <div
       ref={eventRef}
-      className='flex items-center max-w-[1800px] mx-auto justify-around'
+      className='flex flex-col max-w-7xl mx-auto justify-start w-full px-4 py-8 md:py-12'
     >
-      <div className='flex flex-col items-center gap-4'>
-        <h1 className='text-xl font-semibold text-gray-800 my-8 text-left pb-2 relative inline-block'>
-          Our Events
-          <span className='absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#0870A8] to-[#31AD8F]'></span>
-        </h1>
+      <h1 className='text-xl font-semibold text-gray-800 my-8 text-left pb-2 relative inline-block'>
+        Our Events
+        <span className='absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#0870A8] to-[#31AD8F]'></span>
+      </h1>
 
-        {loading && (
-          <div className='flex justify-center items-center h-64'>
-            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500'></div>
-          </div>
-        )}
+      {loading && (
+        <div className='flex justify-center items-center h-64'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500'></div>
+        </div>
+      )}
 
-        {events.length > 0 && !loading && (
-          <>
-            <Link href={`/events/${events[0].slugs}`}>
-              <div className='w-[200px] h-[200px] md:w-[500px] md:h-[300px] relative'>
-                <Image
-                  src={'/images/upcoming.png' || events[0]?.image}
-                  layout='fill'
-                  objectFit='contain'
-                  alt={events[0].title || 'Event Image'}
-                  className='rounded-lg'
-                />
-              </div>
-              <div className='font-bold text-lg md:text-2xl'>
-                {events[0]?.title || 'Event Title'}
-              </div>
+      {events.length > 0 && !loading && (
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full'>
+          {events.map((event, index) => (
+            <Link
+              href={`/events/${event.slugs}`}
+              key={event.id || index}
+              className='group'
+            >
+              <div className='bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col'>
+                {/* Event Image */}
+                <div className='relative w-full h-48 md:h-56 overflow-hidden bg-gray-100'>
+                  <Image
+                    src={event.image || '/images/logo.png'}
+                    alt={event.title || 'Event Image'}
+                    fill
+                    className={
+                      event.image
+                        ? 'object-cover group-hover:scale-105 transition-transform duration-300'
+                        : 'object-contain p-4 group-hover:scale-105 transition-transform duration-300'
+                    }
+                  />
+                </div>
 
-              <div className='w-[300px] md:w-[400px]'>
-                {events[0]?.description || 'Event description....'}
-              </div>
-            </Link>
-          </>
-        )}
-      </div>
-
-      <div className='hidden tb:block'>
-        <div className='flex flex-col gap-8 my-4 '>
-          {events.slice(1).map((event, index) => (
-            <Link href={`/events/${event.slugs}`} key={index}>
-              <div className='flex gap-4 items-center' key={index}>
-                <Image
-                  src={'/images/upcoming.png' || event.image}
-                  width={200}
-                  height={200}
-                  alt={event.title || 'Event logo'}
-                  className='object-contain'
-                />
-                <div>
-                  <div className='font-bold text-2xl'>{event.title}</div>
-                  <div className='w-[250px] text-left'>{event.description}</div>
-                  <div className='mt-1 font-semibold'>
-                    {formatDate(event.eventMeta?.startDate) ||
-                      'No date provided'}
-                  </div>
+                {/* Event Content */}
+                <div className='p-4 flex flex-col flex-1'>
+                  <h3 className='font-bold text-lg md:text-xl mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors'>
+                    {event.title || 'Event Title'}
+                  </h3>
+                  <p className='text-sm text-gray-600 font-medium'>
+                    {getEventDate(event)}
+                  </p>
                 </div>
               </div>
             </Link>
           ))}
         </div>
-      </div>
+      )}
 
       {error && <div className='text-red-500'>{error}</div>}
     </div>
