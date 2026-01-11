@@ -106,7 +106,9 @@ const Footer = () => {
                 />
                 <div className='hidden md:flex items-center space-x-4'>
                   <a
-                    href='#'
+                    href='https://www.facebook.com/people/MeroUni/61570894206794/'
+                    target='_blank'
+                    rel='noopener noreferrer'
                     className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
                   >
                     <FaFacebook size={28} />
@@ -118,7 +120,9 @@ const Footer = () => {
                     <FaInstagram size={28} />
                   </a>
                   <a
-                    href='#'
+                    href='https://www.linkedin.com/company/merouni/?originalSubdomain=np'
+                    target='_blank'
+                    rel='noopener noreferrer'
                     className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
                   >
                     <TiSocialLinkedinCircular size={30} />
@@ -217,7 +221,9 @@ const Footer = () => {
                   />
                   <div className='flex items-center space-x-4'>
                     <a
-                      href='#'
+                      href='https://www.facebook.com/people/MeroUni/61570894206794/'
+                      target='_blank'
+                      rel='noopener noreferrer'
                       className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
                     >
                       <FaFacebook size={28} />
@@ -229,7 +235,9 @@ const Footer = () => {
                       <FaInstagram size={28} />
                     </a>
                     <a
-                      href='#'
+                      href='https://www.linkedin.com/company/merouni/?originalSubdomain=np'
+                      target='_blank'
+                      rel='noopener noreferrer'
                       className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
                     >
                       <TiSocialLinkedinCircular size={30} />
