@@ -4,11 +4,13 @@ import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { getUnexpiredEvents } from '@/app/events/action'
 import { formatDate } from '@/utils/date.util'
+import { Calendar } from 'lucide-react'
 
 const Event = () => {
   const [events, setEvents] = useState([])
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [hasFetched, setHasFetched] = useState(false)
   const eventRef = useRef(null) // Reference for lazy loading
 
   const getEventDate = (event) => {
@@ -35,6 +37,7 @@ const Event = () => {
 
   const fetchEvents = async () => {
     setLoading(true)
+    setError(null)
     try {
       const data = await getUnexpiredEvents()
       setEvents(data.items?.slice(0, 3) || [])
@@ -43,6 +46,7 @@ const Event = () => {
       console.error('Failed to fetch events:', error)
     } finally {
       setLoading(false)
+      setHasFetched(true)
     }
   }
 
@@ -118,7 +122,20 @@ const Event = () => {
         </div>
       )}
 
-      {error && <div className='text-red-500'>{error}</div>}
+      {!loading && hasFetched && events.length === 0 && !error && (
+        <div className='flex flex-col items-center justify-center py-12 md:py-16'>
+          <Calendar className='w-16 h-16 md:w-20 md:h-20 text-gray-400 mb-4' />
+          <p className='text-gray-500 text-lg md:text-xl font-medium'>
+            No events found
+          </p>
+        </div>
+      )}
+
+      {error && (
+        <div className='flex flex-col items-center justify-center py-12 md:py-16'>
+          <p className='text-red-500 text-lg md:text-xl font-medium'>{error}</p>
+        </div>
+      )}
     </div>
   )
 }
