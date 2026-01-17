@@ -71,7 +71,7 @@ const Event = () => {
   return (
     <div
       ref={eventRef}
-      className='flex flex-col max-w-7xl mx-auto justify-start w-full px-4 py-8 md:py-12'
+      className='flex flex-col max-w-7xl mx-auto justify-start w-full px-8 md:px-12 py-2 md:py-2'
     >
       <h1 className='text-xl font-semibold text-gray-800 my-8 text-left pb-2 relative inline-block'>
         Our Events

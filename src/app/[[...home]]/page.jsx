@@ -59,7 +59,7 @@ const Page = () => {
       <Header />
       <Navbar />
       <div className='py-4'>
-        <div className='container px-4 mx-auto'>
+        <div className='container px-8 md:px-12 mx-auto'>
           <BannerLayout banners={banners} loading={loading} />
           {/* Flex container for horizontal layout */}
           <div className='flex gap-6'>

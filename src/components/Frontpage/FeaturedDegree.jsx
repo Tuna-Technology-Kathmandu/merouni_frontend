@@ -38,7 +38,7 @@ const FeaturedDegree = () => {
   }
   return (
     <div className='bg-gradient-to-br from-blue-50 via-white to-green-50 py-12 md:py-16'>
-      <div className='container mx-auto px-4'>
+      <div className='container mx-auto px-8 md:px-12'>
         <h1 className='text-xl font-semibold text-gray-800 my-8 pb-2 relative inline-block'>
           Find the Right Degree and College for You
           <span className='absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#0870A8] to-[#31AD8F]'></span>

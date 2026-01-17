@@ -20,16 +20,22 @@ const Navbar = () => {
   return (
     <>
       <div
-        className={`bg-[#30ad8f] w-full h-12 pt-[10px] hidden md:block transition-all duration-300 ${
+        className={`bg-[#30ad8f] w-full h-12 md:h-11 lg:h-12 pt-[10px] md:pt-2 lg:pt-[10px] hidden md:block transition-all duration-300 ${
           isScrolled
             ? 'fixed top-[80px] left-0 shadow-lg z-50'
             : 'sticky top-[80px] z-30'
         }`}
       >
-        <div className='flex items-center mx-auto justify-center gap-8 md:gap-8 text-white'>
+        <div
+          className='flex items-center mx-auto justify-center gap-2 md:gap-2.5 lg:gap-4 xl:gap-6 2xl:gap-8 text-white px-2 md:px-3 lg:px-4 overflow-x-auto hide-scrollbar'
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none'
+          }}
+        >
           <Link
             href='/'
-            className={`hover:text-gray-200 cursor-pointer transition-colors ${
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
               pathname === '/' || pathname === ''
                 ? 'font-semibold border-b-2 pb-1'
                 : ''
@@ -45,7 +51,7 @@ const Navbar = () => {
 
           <Link
             href='/colleges'
-            className={`hover:text-gray-200 cursor-pointer transition-colors ${
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
               pathname?.startsWith('/colleges')
                 ? 'font-semibold border-b-2 pb-1'
                 : ''
@@ -63,7 +69,7 @@ const Navbar = () => {
           </Link> */}
           <Link
             href='/degree'
-            className={`hover:text-gray-200 cursor-pointer transition-colors ${
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
               pathname?.startsWith('/degree')
                 ? 'font-semibold border-b-2 pb-1'
                 : ''
@@ -78,7 +84,7 @@ const Navbar = () => {
           </Link>
           <Link
             href='/admission'
-            className={`hover:text-gray-200 cursor-pointer transition-colors ${
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
               pathname?.startsWith('/admission')
                 ? 'font-semibold border-b-2 pb-1'
                 : ''
@@ -93,7 +99,7 @@ const Navbar = () => {
           </Link>
           <Link
             href='/scholarship'
-            className={`hover:text-gray-200 cursor-pointer transition-colors ${
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
               pathname?.startsWith('/scholarship')
                 ? 'font-semibold border-b-2 pb-1'
                 : ''
@@ -108,7 +114,7 @@ const Navbar = () => {
           </Link>
           <Link
             href='/consultancy'
-            className={`hover:text-gray-200 cursor-pointer transition-colors ${
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
               pathname?.startsWith('/consultancy')
                 ? 'font-semibold border-b-2 pb-1'
                 : ''
@@ -123,7 +129,7 @@ const Navbar = () => {
           </Link>
           <Link
             href='/materials'
-            className={`hover:text-gray-200 cursor-pointer transition-colors ${
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
               pathname?.startsWith('/materials')
                 ? 'font-semibold border-b-2 pb-1'
                 : ''
@@ -138,7 +144,7 @@ const Navbar = () => {
           </Link>
           <Link
             href='/events'
-            className={`hover:text-gray-200 cursor-pointer transition-colors ${
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
               pathname?.startsWith('/events')
                 ? 'font-semibold border-b-2 pb-1'
                 : ''
@@ -153,7 +159,7 @@ const Navbar = () => {
           </Link>
           <Link
             href='/blogs'
-            className={`hover:text-gray-200 cursor-pointer transition-colors ${
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
               pathname?.startsWith('/blogs')
                 ? 'font-semibold border-b-2 pb-1'
                 : ''
@@ -167,9 +173,12 @@ const Navbar = () => {
             Blogs
           </Link>
           <div className='relative group'>
-            <button type='button' className='flex flex-row items-center'>
+            <button
+              type='button'
+              className='flex flex-row items-center text-xs md:text-sm lg:text-base whitespace-nowrap'
+            >
               <span>More</span>
-              <RiArrowDropDownLine size={20} />
+              <RiArrowDropDownLine className='w-4 h-4 md:w-5 md:h-5 lg:w-5 lg:h-5' />
             </button>
             <div
               className='absolute z-40 hidden pt-1 bg-[#30ad8f] group-hover:block'
