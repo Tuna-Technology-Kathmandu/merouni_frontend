@@ -6,7 +6,7 @@ const Fcollege = ({ name, description, image, slug }) => {
   return (
     <div
       onClick={() => router.push(`/colleges/${slug}`)}
-      className='flex gap-1 flex-col min-h-28  border border-gray-300 rounded-lg shadow-md w-[16em] md:w-80 lg:w-96 ml-10 overflow-hidden hover:shadow-lg transition-shadow duration-300 mb-8'
+      className='flex gap-1 flex-col min-h-28 border border-gray-300 rounded-lg shadow-md w-[16em] md:w-80 lg:w-96 flex-shrink-0 overflow-hidden hover:shadow-lg transition-shadow duration-300 mb-8'
     >
       <div className='w-full h-28'>
         <img

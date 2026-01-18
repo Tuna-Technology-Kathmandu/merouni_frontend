@@ -4,10 +4,12 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { debounce } from 'lodash'
 import { Search } from 'lucide-react'
 import { FaExpandAlt } from 'react-icons/fa'
+import { useSelector } from 'react-redux'
 
 import UniversityCardShimmer from './UniversityShimmerCard'
 import Pagination from '@/app/blogs/components/Pagination'
 import UniversityCard from './UniversityCard'
+import { authFetch } from '@/app/utils/authFetch'
 
 // Client-side fetch functions to replace server actions
 const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
@@ -479,6 +481,46 @@ const CollegeFinder = () => {
   const [isModalAffiliationLoading, setIsModalAffiliationLoading] =
     useState(false)
 
+  // Wishlist state - fetch once at parent level to avoid multiple API calls
+  const user = useSelector((state) => state.user.data)
+  const [wishlistCollegeIds, setWishlistCollegeIds] = useState(new Set())
+
+  // Fetch wishlist once when user is available
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      if (!user?.id) {
+        setWishlistCollegeIds(new Set())
+        return
+      }
+
+      try {
+        const response = await authFetch(
+          `${process.env.baseUrl}${process.env.version}/wishlist?user_id=${user.id}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+
+        if (response.ok) {
+          const data = await response.json()
+          const collegeIds = new Set(
+            (data.items || []).map((item) => item.college?.id).filter(Boolean)
+          )
+          setWishlistCollegeIds(collegeIds)
+        }
+      } catch (error) {
+        // Silently fail - user might not be logged in or wishlist might not be available
+        console.error('Error fetching wishlist:', error)
+        setWishlistCollegeIds(new Set())
+      }
+    }
+
+    fetchWishlist()
+  }, [user?.id])
+
   // Debounced functions for discipline and affiliation
   const debouncedFetchDisciplines = useMemo(
     () =>
@@ -846,7 +888,12 @@ const CollegeFinder = () => {
           ) : universities.length > 0 ? (
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
               {universities.map((u, idx) => (
-                <UniversityCard {...u} key={idx} />
+                <UniversityCard
+                  {...u}
+                  key={idx}
+                  wishlistCollegeIds={wishlistCollegeIds}
+                  onWishlistUpdate={setWishlistCollegeIds}
+                />
               ))}
             </div>
           ) : (

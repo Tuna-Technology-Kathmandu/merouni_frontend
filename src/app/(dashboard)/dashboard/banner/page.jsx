@@ -207,23 +207,62 @@ export default function BannerForm() {
       setEditingId(banner.id)
       setActivePosition(banner.display_position)
 
-      const bannerImages = banner.Banners?.map((b) => ({
-        title: b.title,
-        website_url: b.website_url,
-        gallery: {
-          small: b.banner_galleries.find((g) => g.size === 'small')?.url || '',
-          medium:
-            b.banner_galleries.find((g) => g.size === 'medium')?.url || '',
-          large: b.banner_galleries.find((g) => g.size === 'large')?.url || ''
-        },
-        is_featured: b.is_featured
-      })) || [
-        {
-          title: '',
-          gallery: { small: '', medium: '', large: '' },
-          is_featured: 0
-        }
-      ]
+      // Handle both banner structures: direct banner_galleries or nested Banners
+      let bannerImages = []
+
+      if (banner.Banners && banner.Banners.length > 0) {
+        // Nested structure: banner.Banners[0].banner_galleries
+        bannerImages = banner.Banners.map((b) => ({
+          title: b.title,
+          website_url: b.website_url,
+          gallery: {
+            small:
+              b.banner_galleries?.find((g) => g.size === 'small')?.url || '',
+            medium:
+              b.banner_galleries?.find((g) => g.size === 'medium')?.url || '',
+            large:
+              b.banner_galleries?.find((g) => g.size === 'large')?.url || ''
+          },
+          is_featured: b.is_featured
+        }))
+      } else if (
+        banner.banner_galleries &&
+        banner.banner_galleries.length > 0
+      ) {
+        // Direct structure: banner.banner_galleries
+        bannerImages = [
+          {
+            title: banner.title || '',
+            website_url: banner.website_url || '',
+            gallery: {
+              small:
+                banner.banner_galleries.find((g) => g.size === 'small')?.url ||
+                banner.banner_galleries[0]?.url ||
+                '',
+              medium:
+                banner.banner_galleries.find((g) => g.size === 'medium')?.url ||
+                banner.banner_galleries[0]?.url ||
+                '',
+              large:
+                banner.banner_galleries.find((g) => g.size === 'large')?.url ||
+                banner.banner_galleries[0]?.url ||
+                ''
+            },
+            is_featured: banner.is_featured || 1
+          }
+        ]
+      }
+
+      // Fallback if no images found
+      if (bannerImages.length === 0) {
+        bannerImages = [
+          {
+            title: banner.title || '',
+            gallery: { small: '', medium: '', large: '' },
+            is_featured: 0
+          }
+        ]
+      }
 
       reset({
         collegeSearch: banner.College?.name || '',
@@ -274,17 +313,6 @@ export default function BannerForm() {
     })
   }
 
-  const addNewPosition = () => {
-    // Find the next available position (highest existing + 1)
-    const existingPositions = Object.keys(bannersByPosition).map(Number)
-    const highestPosition =
-      existingPositions.length > 0 ? Math.max(...existingPositions) : 0
-    const newPosition = highestPosition + 1
-    setActivePosition(newPosition)
-    setIsOpen(true)
-    resetFormForPosition(newPosition)
-  }
-
   const resetFormForPosition = (position) => {
     reset({
       collegeSearch: '',
@@ -331,42 +359,83 @@ export default function BannerForm() {
     return null
   }
 
-  // Only show positions that have banners (from backend)
-  const allPositions = Object.keys(bannersByPosition)
-    .map(Number)
-    .sort((a, b) => a - b)
+  const handlePositionEdit = (position) => {
+    const banners = bannersByPosition[position] || []
+    if (banners.length > 0) {
+      // If there's a banner, edit the first one (or you can handle multiple)
+      handleEdit(banners[0])
+    } else {
+      // If no banner exists, allow creating one for this position
+      setActivePosition(position)
+      setIsOpen(true)
+      resetFormForPosition(position)
+      setEditing(false)
+      setEditingId(null)
+    }
+  }
 
   return (
     <div className='container mx-auto p-4'>
       <ToastContainer />
 
-      <div className='flex justify-end mb-6'>
-        <button
-          onClick={addNewPosition}
-          className='px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center gap-2'
-        >
-          <Plus size={16} /> Add Position
-        </button>
-      </div>
-
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8'>
-        {allPositions.map((position) => (
-          <div key={position} className='border rounded-lg p-4'>
-            <h3 className='text-lg font-semibold mb-4'>Position {position}</h3>
+        {[1, 2, 3, 4, 5, 6, 7].map((position) => {
+          const banners = bannersByPosition[position] || []
+          const hasBanner = banners.length > 0
+          const banner = hasBanner ? banners[0] : null
+          const status = banner
+            ? getExpirationStatus(banner.date_of_expiry)
+            : null
+          const showAlert = banner
+            ? isExpiredOrExpiringToday(banner.date_of_expiry)
+            : false
 
-            {bannersByPosition[position]?.map((banner) => {
-              const status = getExpirationStatus(banner.date_of_expiry)
-              const showAlert = isExpiredOrExpiringToday(banner.date_of_expiry)
-
-              return (
-                <div
-                  key={banner.id}
-                  className='bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200 relative'
+          return (
+            <div
+              key={position}
+              className='border-2 border-dashed border-gray-300 rounded-lg p-6 min-h-[200px] flex flex-col relative'
+            >
+              <div className='flex justify-between items-center mb-4'>
+                <h3 className='text-lg font-semibold'>Position {position}</h3>
+                <button
+                  onClick={() => handlePositionEdit(position)}
+                  className='px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2 text-sm'
+                  title={hasBanner ? 'Edit Banner' : 'Create Banner'}
                 >
+                  <Edit size={14} />
+                  Edit
+                </button>
+              </div>
+
+              {hasBanner && banner ? (
+                <div className='flex-1 flex flex-col'>
+                  {/* Banner Image */}
+                  <div className='mb-4 rounded-lg overflow-hidden border border-gray-200 bg-gray-50'>
+                    <img
+                      src={
+                        banner.banner_galleries?.find((g) => g.size === 'small')
+                          ?.url ||
+                        banner.Banners?.[0]?.banner_galleries?.find(
+                          (g) => g.size === 'small'
+                        )?.url ||
+                        banner.banner_galleries?.[0]?.url ||
+                        banner.Banners?.[0]?.banner_galleries?.[0]?.url ||
+                        '/images/meroUniLarge.gif'
+                      }
+                      onError={(e) => {
+                        e.target.src = '/images/meroUniLarge.gif'
+                      }}
+                      alt={
+                        banner.title || banner.Banners?.[0]?.title || 'Banner'
+                      }
+                      className='w-full h-32 object-cover'
+                    />
+                  </div>
+
                   {/* Status indicator (only if expired/expiring) */}
                   {showAlert && (
                     <span
-                      className={`absolute top-2 right-2 text-xs font-medium px-2 py-1 rounded-full ${
+                      className={`inline-block self-start text-xs font-medium px-2 py-1 rounded-full mb-3 ${
                         status === 'Expired!'
                           ? 'bg-red-100 text-red-800'
                           : 'bg-amber-100 text-amber-800'
@@ -377,60 +446,46 @@ export default function BannerForm() {
                   )}
 
                   {/* Banner content */}
-                  <div className='flex justify-between items-start mb-2'>
-                    <h4 className='font-medium'>
-                      {banner.title || 'Untitled Banner'}
+                  <div className='mb-2'>
+                    <h4 className='font-medium text-gray-800 mb-2'>
+                      {banner.title ||
+                        banner.Banners?.[0]?.title ||
+                        'Untitled Banner'}
                     </h4>
-                    <div className='flex gap-2'>
-                      <button
-                        onClick={() => handleEdit(banner)}
-                        className='text-blue-600 hover:text-blue-800'
-                        title='Edit Banner'
+
+                    {banner.website_url && (
+                      <a
+                        href={banner.website_url}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-blue-600 hover:underline text-sm block mb-2 truncate'
                       >
-                        <Edit size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(banner.id)}
-                        className='text-red-600 hover:text-red-800'
-                        title='Delete Banner'
+                        {banner.website_url}
+                      </a>
+                    )}
+
+                    {banner.date_of_expiry && (
+                      <p
+                        className={`text-sm ${
+                          showAlert ? 'text-red-600' : 'text-gray-600'
+                        }`}
                       >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
+                        Expires:{' '}
+                        {new Date(banner.date_of_expiry).toLocaleDateString()}
+                      </p>
+                    )}
                   </div>
-
-                  {banner.website_url && (
-                    <a
-                      href={banner.website_url}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='text-blue-600 hover:underline text-sm block mb-2'
-                    >
-                      {banner.website_url}
-                    </a>
-                  )}
-
-                  {banner.date_of_expiry && (
-                    <p
-                      className={`text-sm ${
-                        showAlert ? 'text-red-600' : 'text-gray-600'
-                      }`}
-                    >
-                      Expires:{' '}
-                      {new Date(banner.date_of_expiry).toLocaleDateString()}
-                    </p>
-                  )}
                 </div>
-              )
-            })}
-
-            {!bannersByPosition[position] && (
-              <p className='text-gray-500 text-center py-4'>
-                No banner for this position
-              </p>
-            )}
-          </div>
-        ))}
+              ) : (
+                <div className='flex-1 flex items-center justify-center'>
+                  <p className='text-gray-400 text-center'>
+                    No banner for this position
+                  </p>
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
 
       {isOpen && (
@@ -504,36 +559,19 @@ export default function BannerForm() {
 
               <div className='mb-4'>
                 <label className='block mb-2'>Website URL</label>
-                {!editing ? (
-                  <input
-                    type='text'
-                    {...register('website_url', {
-                      required: 'Website URL is required',
-                      pattern: {
-                        value:
-                          /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6}\.?)(\/[\w.-]*)*\/?$/,
-                        message: 'Enter a valid URL'
-                      }
-                    })}
-                    className='w-full p-2 border rounded'
-                    placeholder='Enter website URL'
-                  />
-                ) : (
-                  <input
-                    type='text'
-                    disabled
-                    {...register('website_url', {
-                      required: 'Website URL is required',
-                      pattern: {
-                        value:
-                          /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6}\.?)(\/[\w.-]*)*\/?$/,
-                        message: 'Enter a valid URL'
-                      }
-                    })}
-                    className='w-full p-2 border rounded'
-                    placeholder='Enter website URL'
-                  />
-                )}
+                <input
+                  type='text'
+                  {...register('website_url', {
+                    required: 'Website URL is required',
+                    pattern: {
+                      value:
+                        /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6}\.?)(\/[\w.-]*)*\/?$/,
+                      message: 'Enter a valid URL'
+                    }
+                  })}
+                  className='w-full p-2 border rounded'
+                  placeholder='Enter website URL'
+                />
                 {errors.website_url && (
                   <span className='text-red-500'>
                     {errors.website_url.message}
@@ -543,42 +581,22 @@ export default function BannerForm() {
 
               <div className='mb-4'>
                 <label className='block mb-2'>Date of Expiry *</label>
-                {!editing ? (
-                  <input
-                    type='date'
-                    {...register('date_of_expiry', {
-                      required: 'Date of expiry is required',
-                      validate: (value) => {
-                        const selectedDate = new Date(value)
-                        const today = new Date()
-                        today.setHours(0, 0, 0, 0)
-                        return (
-                          selectedDate >= today || 'Date must be in the future'
-                        )
-                      }
-                    })}
-                    className='w-full p-2 border rounded'
-                    min={new Date().toISOString().split('T')[0]}
-                  />
-                ) : (
-                  <input
-                    type='date'
-                    disabled
-                    {...register('date_of_expiry', {
-                      required: 'Date of expiry is required',
-                      validate: (value) => {
-                        const selectedDate = new Date(value)
-                        const today = new Date()
-                        today.setHours(0, 0, 0, 0)
-                        return (
-                          selectedDate >= today || 'Date must be in the future'
-                        )
-                      }
-                    })}
-                    className='w-full p-2 border rounded'
-                    min={new Date().toISOString().split('T')[0]}
-                  />
-                )}
+                <input
+                  type='date'
+                  {...register('date_of_expiry', {
+                    required: 'Date of expiry is required',
+                    validate: (value) => {
+                      const selectedDate = new Date(value)
+                      const today = new Date()
+                      today.setHours(0, 0, 0, 0)
+                      return (
+                        selectedDate >= today || 'Date must be in the future'
+                      )
+                    }
+                  })}
+                  className='w-full p-2 border rounded'
+                  min={new Date().toISOString().split('T')[0]}
+                />
                 {errors.date_of_expiry && (
                   <span className='text-red-500'>
                     {errors.date_of_expiry.message}
@@ -609,22 +627,21 @@ export default function BannerForm() {
                       </button>
                     )}
 
-                    {!editing && (
-                      <div className='mb-4'>
-                        <label className='block mb-2'>Banner Title *</label>
-                        <input
-                          {...register(`bannerImages.${index}.title`, {
-                            required: 'Banner title is required'
-                          })}
-                          className='w-full p-2 border rounded'
-                        />
-                        {errors.bannerImages?.[index]?.title && (
-                          <span className='text-red-500'>
-                            {errors.bannerImages[index].title.message}
-                          </span>
-                        )}
-                      </div>
-                    )}
+                    <div className='mb-4'>
+                      <label className='block mb-2'>Banner Title *</label>
+                      <input
+                        {...register(`bannerImages.${index}.title`, {
+                          required: 'Banner title is required'
+                        })}
+                        className='w-full p-2 border rounded'
+                        placeholder='Enter banner title'
+                      />
+                      {errors.bannerImages?.[index]?.title && (
+                        <span className='text-red-500'>
+                          {errors.bannerImages[index].title.message}
+                        </span>
+                      )}
+                    </div>
 
                     {/* <div className="mb-4 flex items-center">
                     <input
@@ -643,42 +660,19 @@ export default function BannerForm() {
 
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                       <div>
-                        {!editing ? (
-                          <FileUpload
-                            label='Banner Image'
-                            onUploadComplete={(url) => {
-                              setValue(
-                                `bannerImages.${index}.gallery.small`,
-                                url
-                              )
-                            }}
-                            defaultPreview={watch(
-                              `bannerImages.${index}.gallery.small`
-                            )}
-                          />
-                        ) : (
-                          <div className='mt-4'>
-                            <label className='block mb-2'>
-                              Current Banner Image
-                            </label>
-                            {watch(`bannerImages.${index}.gallery.small`) ? (
-                              <div className='relative w-full h-48 border rounded overflow-hidden'>
-                                <Image
-                                  src={watch(
-                                    `bannerImages.${index}.gallery.small`
-                                  )}
-                                  alt='Current banner'
-                                  fill
-                                  className='object-cover'
-                                />
-                              </div>
-                            ) : (
-                              <div className='bg-gray-100 text-gray-500 text-center py-8 rounded'>
-                                No image uploaded
-                              </div>
-                            )}
-                          </div>
-                        )}
+                        <FileUpload
+                          label={
+                            editing
+                              ? 'Banner Image (Change Image)'
+                              : 'Banner Image'
+                          }
+                          onUploadComplete={(url) => {
+                            setValue(`bannerImages.${index}.gallery.small`, url)
+                          }}
+                          defaultPreview={watch(
+                            `bannerImages.${index}.gallery.small`
+                          )}
+                        />
                       </div>
                       {/* <div>
                       <FileUpload
@@ -724,24 +718,32 @@ export default function BannerForm() {
               </button> */}
               </div>
 
-              {!editing && (
-                <div className='flex justify-end gap-4'>
-                  <button
-                    type='button'
-                    onClick={() => setIsOpen(false)}
-                    className='px-6 py-2 border rounded hover:bg-gray-100'
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type='submit'
-                    disabled={loading || (!editing && !selectedCollege)}
-                    className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300'
-                  >
-                    {loading ? 'Processing...' : 'Create Banner'}
-                  </button>
-                </div>
-              )}
+              <div className='flex justify-end gap-4 mt-6'>
+                <button
+                  type='button'
+                  onClick={() => {
+                    setIsOpen(false)
+                    setEditing(false)
+                    setEditingId(null)
+                    resetFormForPosition(activePosition)
+                    setSelectedCollege(null)
+                  }}
+                  className='px-6 py-2 border rounded hover:bg-gray-100'
+                >
+                  Cancel
+                </button>
+                <button
+                  type='submit'
+                  disabled={loading || (!editing && !selectedCollege)}
+                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300'
+                >
+                  {loading
+                    ? 'Processing...'
+                    : editing
+                      ? 'Update Banner'
+                      : 'Create Banner'}
+                </button>
+              </div>
             </form>
           </div>
         </div>

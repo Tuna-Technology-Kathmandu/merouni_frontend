@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Share, Heart } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
@@ -12,44 +12,22 @@ const UniversityCard = ({
   collegeId,
   isWishlistPage = false,
   slug,
-  collegeImage
+  collegeImage,
+  wishlistCollegeIds,
+  onWishlistUpdate
 }) => {
-  const [isInWishlist, setIsInWishlist] = useState(isWishlistPage)
-  const [isLoading, setIsLoading] = useState(false)
   const user = useSelector((state) => state.user.data)
-
   const router = useRouter()
 
-  useEffect(() => {
-    if (user?.id) {
-      checkWishlistStatus()
-    }
-  }, [user])
+  // Use wishlistCollegeIds prop if provided, otherwise fall back to isWishlistPage or check individually
+  const isInWishlist = wishlistCollegeIds
+    ? wishlistCollegeIds.has(collegeId)
+    : isWishlistPage
 
-  const checkWishlistStatus = async () => {
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/wishlist?user_id=${user.id}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      )
+  const [isLoading, setIsLoading] = useState(false)
 
-      if (!response.ok) {
-        throw new Error(`HTTP Error! Status: ${response.status}`)
-      }
-
-      const data = await response.json()
-      const isInList = data.items.some((item) => item.college.id === collegeId)
-
-      setIsInWishlist(isInList)
-    } catch (error) {
-      console.error('Error checking wishlist status:', error)
-    }
-  }
+  // Note: If wishlistCollegeIds prop is provided, we don't need to fetch individually
+  // The parent component (Body.jsx) fetches the wishlist once and passes it down
 
   const handleWishlistToggle = async () => {
     if (!user) {
@@ -77,7 +55,17 @@ const UniversityCard = ({
       if (!response.ok) {
         throw new Error(`HTTP Error! Status: ${response.status}`)
       }
-      setIsInWishlist(!isInWishlist)
+
+      // Update parent's wishlist state if callback is provided
+      if (onWishlistUpdate && wishlistCollegeIds) {
+        const newSet = new Set(wishlistCollegeIds)
+        if (method === 'DELETE') {
+          newSet.delete(collegeId)
+        } else {
+          newSet.add(collegeId)
+        }
+        onWishlistUpdate(newSet)
+      }
 
       toast.success(
         method === 'DELETE'
