@@ -184,6 +184,22 @@ export default function ProgramForm() {
     return () => setHeading(null)
   }, [setHeading])
 
+  // Handle query parameter to open add form
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    if (searchParams.get('add') === 'true') {
+      setIsOpen(true)
+      setEditing(false)
+      reset()
+      setFacSearch('')
+      setHasSelectedFac(false)
+      setLevelSearch('')
+      setHasSelectedLevel(false)
+      setSelectedColleges([])
+      setCollegeSearch('')
+    }
+  }, [reset])
+
   useEffect(() => {
     return () => {
       if (searchTimeout) {

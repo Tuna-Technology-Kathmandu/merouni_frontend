@@ -2,6 +2,7 @@
 import dynamic from 'next/dynamic'
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useSelector } from 'react-redux'
+import { useSearchParams, useRouter } from 'next/navigation'
 import {
   getAllScholarships,
   createScholarship,
@@ -10,12 +11,21 @@ import {
 } from './actions'
 import Loading from '../../../../components/Loading'
 import Table from '../../../../components/Table'
-import { Edit2, Trash2, Search } from 'lucide-react'
+import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import 'react-toastify/dist/ReactToastify.css'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../components/CreateUserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 const CKEditor = dynamic(() => import('../component/CKStable'), {
@@ -25,6 +35,8 @@ const CKEditor = dynamic(() => import('../component/CKStable'), {
 export default function ScholarshipManager() {
   const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const [scholarships, setScholarships] = useState([])
   const [loading, setLoading] = useState(true)
   const [tableLoading, setTableLoading] = useState(false)
@@ -42,6 +54,8 @@ export default function ScholarshipManager() {
   const [editingId, setEditingId] = useState(null)
   const [deleteId, setDeleteId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isViewOpen, setIsViewOpen] = useState(false)
+  const [viewData, setViewData] = useState(null)
   const [error, setError] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
@@ -55,20 +69,6 @@ export default function ScholarshipManager() {
       {
         header: 'Name',
         accessorKey: 'name'
-      },
-      {
-        header: 'Description',
-        accessorKey: 'description',
-        cell: ({ getValue }) => {
-          const description = getValue()
-          if (!description) return ''
-          return (
-            <div
-              className='max-w-md line-clamp-3'
-              dangerouslySetInnerHTML={{ __html: description }}
-            />
-          )
-        }
       },
       {
         header: 'Eligibility',
@@ -97,18 +97,33 @@ export default function ScholarshipManager() {
         id: 'actions',
         cell: ({ row }) => (
           <div className='flex gap-2'>
-            <button
+            <Button
+              variant='ghost'
+              size='sm'
+              onClick={() => {
+                setViewData(row.original)
+                setIsViewOpen(true)
+              }}
+              className='p-1 text-green-600 hover:text-green-800'
+            >
+              <Eye className='w-4 h-4' />
+            </Button>
+            <Button
+              variant='ghost'
+              size='sm'
               onClick={() => handleEdit(row.original)}
               className='p-1 text-blue-600 hover:text-blue-800'
             >
               <Edit2 className='w-4 h-4' />
-            </button>
-            <button
+            </Button>
+            <Button
+              variant='ghost'
+              size='sm'
               onClick={() => handleDeleteClick(row.original.id)}
               className='p-1 text-red-600 hover:text-red-800'
             >
               <Trash2 className='w-4 h-4' />
-            </button>
+            </Button>
           </div>
         )
       }
@@ -121,6 +136,27 @@ export default function ScholarshipManager() {
     loadScholarships()
     return () => setHeading(null)
   }, [setHeading])
+
+  // Check for 'add' query parameter and open modal
+  useEffect(() => {
+    const addParam = searchParams.get('add')
+    if (addParam === 'true') {
+      setIsOpen(true)
+      setEditingId(null)
+      setFormData({
+        name: '',
+        description: '',
+        eligibilityCriteria: '',
+        amount: '',
+        applicationDeadline: '',
+        renewalCriteria: '',
+        contactInfo: ''
+      })
+      setError(null)
+      // Remove query parameter from URL
+      router.replace('/dashboard/scholarship', { scroll: false })
+    }
+  }, [searchParams, router])
 
   useEffect(() => {
     return () => {
@@ -135,7 +171,7 @@ export default function ScholarshipManager() {
   const loadScholarships = async (page = 1) => {
     setTableLoading(true)
     try {
-      const res = await getAllScholarships((page = 1))
+      const res = await getAllScholarships(page)
       const response = res.scholarships
 
       const updatedScholarships = response.map((scholarship) => ({
@@ -362,7 +398,7 @@ export default function ScholarshipManager() {
           </div>
           {/* Button */}
           <div className='flex gap-2'>
-            <button
+            <Button
               className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
               onClick={() => {
                 setIsOpen(true)
@@ -380,7 +416,7 @@ export default function ScholarshipManager() {
               }}
             >
               Add Scholarship
-            </button>
+            </Button>
           </div>
         </div>
         <ToastContainer />
@@ -399,131 +435,141 @@ export default function ScholarshipManager() {
         </div>
       </div>
 
-      {/* Form Modal */}
-      <Modal
-        isOpen={isOpen}
-        onClose={handleModalClose}
-        title={editingId ? 'Edit Scholarship' : 'Add Scholarship'}
-        className='max-w-4xl'
-      >
-        <form onSubmit={handleSubmit} className='space-y-6'>
-          <div className='space-y-4'>
-            <div>
-              <input
-                type='text'
-                placeholder='Scholarship Name'
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                className='w-full p-2 border rounded'
-                required
-              />
+      {/* Form Dialog */}
+      <Dialog isOpen={isOpen} onClose={handleModalClose} className='max-w-4xl'>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingId ? 'Edit Scholarship' : 'Add Scholarship'}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className='space-y-6'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <div className='space-y-2 col-span-2'>
+                <Label htmlFor='name'>Scholarship Name</Label>
+                <Input
+                  id='name'
+                  placeholder='Scholarship Name'
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div className='space-y-2 col-span-2'>
+                <Label>Description</Label>
+                <CKEditor
+                  value={formData.description}
+                  onChange={handleEditorChange}
+                  id='scholarship-description-editor'
+                />
+              </div>
+
+              <div className='space-y-2'>
+                <Label htmlFor='eligibilityCriteria'>
+                  Eligibility Criteria
+                </Label>
+                <Input
+                  id='eligibilityCriteria'
+                  placeholder='Eligibility Criteria'
+                  value={formData.eligibilityCriteria}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      eligibilityCriteria: e.target.value
+                    })
+                  }
+                  required
+                />
+              </div>
+
+              <div className='space-y-2'>
+                <Label htmlFor='amount'>Amount (Rs.)</Label>
+                <Input
+                  id='amount'
+                  type='number'
+                  placeholder='Amount'
+                  value={formData.amount}
+                  onChange={(e) =>
+                    setFormData({ ...formData, amount: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div className='space-y-2'>
+                <Label htmlFor='applicationDeadline'>
+                  Application Deadline
+                </Label>
+                <Input
+                  id='applicationDeadline'
+                  type='date'
+                  value={formData.applicationDeadline}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      applicationDeadline: e.target.value
+                    })
+                  }
+                  required
+                />
+              </div>
+
+              <div className='space-y-2'>
+                <Label htmlFor='renewalCriteria'>Renewal Criteria</Label>
+                <Input
+                  id='renewalCriteria'
+                  placeholder='Renewal Criteria'
+                  value={formData.renewalCriteria}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      renewalCriteria: e.target.value
+                    })
+                  }
+                  required
+                />
+              </div>
+
+              <div className='space-y-2 col-span-2'>
+                <Label htmlFor='contactInfo'>Contact Information</Label>
+                <Input
+                  id='contactInfo'
+                  placeholder='Contact Information'
+                  value={formData.contactInfo}
+                  onChange={(e) =>
+                    setFormData({ ...formData, contactInfo: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              {error && (
+                <div className='text-red-500 text-sm col-span-2'>{error}</div>
+              )}
             </div>
 
-            <div>
-              <CKEditor
-                value={formData.description}
-                onChange={handleEditorChange}
-                id='scholarship-description-editor'
-              />
-            </div>
-
-            <div>
-              <input
-                type='text'
-                placeholder='Eligibility Criteria'
-                value={formData.eligibilityCriteria}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    eligibilityCriteria: e.target.value
-                  })
-                }
-                className='w-full p-2 border rounded'
-                required
-              />
-            </div>
-
-            <div>
-              <input
-                type='number'
-                placeholder='Amount'
-                value={formData.amount}
-                onChange={(e) =>
-                  setFormData({ ...formData, amount: e.target.value })
-                }
-                className='w-full p-2 border rounded'
-                required
-              />
-            </div>
-
-            <div>
-              <input
-                type='date'
-                value={formData.applicationDeadline}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    applicationDeadline: e.target.value
-                  })
-                }
-                className='w-full p-2 border rounded'
-                required
-              />
-            </div>
-
-            <div>
-              <input
-                type='text'
-                placeholder='Renewal Criteria'
-                value={formData.renewalCriteria}
-                onChange={(e) =>
-                  setFormData({ ...formData, renewalCriteria: e.target.value })
-                }
-                className='w-full p-2 border rounded'
-                required
-              />
-            </div>
-
-            <div>
-              <input
-                type='text'
-                placeholder='Contact Information'
-                value={formData.contactInfo}
-                onChange={(e) =>
-                  setFormData({ ...formData, contactInfo: e.target.value })
-                }
-                className='w-full p-2 border rounded'
-                required
-              />
-            </div>
-
-            {error && <div className='text-red-500'>{error}</div>}
-          </div>
-
-          <div className='flex justify-end gap-2 pt-4 border-t'>
-            <button
-              type='button'
-              onClick={handleModalClose}
-              className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors'
-            >
-              Cancel
-            </button>
-            <button
-              type='submit'
-              disabled={isSubmitting}
-              className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
-            >
-              {isSubmitting
-                ? 'Processing...'
-                : editingId
-                  ? 'Update Scholarship'
-                  : 'Create Scholarship'}
-            </button>
-          </div>
-        </form>
-      </Modal>
+            <DialogFooter className='gap-2 pt-4 border-t'>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={handleModalClose}
+              >
+                Cancel
+              </Button>
+              <Button type='submit' disabled={isSubmitting}>
+                {isSubmitting
+                  ? 'Processing...'
+                  : editingId
+                    ? 'Update Scholarship'
+                    : 'Create Scholarship'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <ConfirmationDialog
         open={isDialogOpen}
@@ -532,6 +578,81 @@ export default function ScholarshipManager() {
         title='Confirm Deletion'
         message='Are you sure you want to delete this scholarship? This action cannot be undone.'
       />
+
+      {/* View Scholarship Dialog */}
+      <Dialog
+        isOpen={isViewOpen}
+        onClose={() => setIsViewOpen(false)}
+        className='max-w-4xl'
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Scholarship Details</DialogTitle>
+          </DialogHeader>
+          {viewData && (
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6 py-4'>
+              <div className='space-y-1 col-span-2'>
+                <Label className='text-muted-foreground'>
+                  Scholarship Name
+                </Label>
+                <div className='text-lg font-medium'>{viewData.name}</div>
+              </div>
+
+              <div className='space-y-1 col-span-2'>
+                <Label className='text-muted-foreground'>Description</Label>
+                <div
+                  className='prose prose-sm max-w-none dark:prose-invert border rounded-md p-4 bg-muted/20'
+                  dangerouslySetInnerHTML={{ __html: viewData.description }}
+                />
+              </div>
+
+              <div className='space-y-1'>
+                <Label className='text-muted-foreground'>
+                  Eligibility Criteria
+                </Label>
+                <div className='font-medium'>
+                  {viewData.eligibilityCriteria}
+                </div>
+              </div>
+
+              <div className='space-y-1'>
+                <Label className='text-muted-foreground'>Amount (Rs.)</Label>
+                <div className='font-medium'>
+                  {viewData.amount.toLocaleString()}
+                </div>
+              </div>
+
+              <div className='space-y-1'>
+                <Label className='text-muted-foreground'>
+                  Application Deadline
+                </Label>
+                <div className='font-medium'>
+                  {new Date(viewData.applicationDeadline).toLocaleDateString()}
+                </div>
+              </div>
+
+              <div className='space-y-1'>
+                <Label className='text-muted-foreground'>
+                  Renewal Criteria
+                </Label>
+                <div className='font-medium'>{viewData.renewalCriteria}</div>
+              </div>
+
+              <div className='space-y-1 col-span-2'>
+                <Label className='text-muted-foreground'>
+                  Contact Information
+                </Label>
+                <div className='font-medium'>{viewData.contactInfo}</div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setIsViewOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

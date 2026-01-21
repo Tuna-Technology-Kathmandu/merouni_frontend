@@ -1,11 +1,16 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { createPortal } from 'react-dom'
 import { RiArrowDropDownLine } from 'react-icons/ri'
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isMoreOpen, setIsMoreOpen] = useState(false)
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
+  const moreButtonRef = useRef(null)
+  const closeTimeoutRef = useRef(null)
   const pathname = usePathname()
 
   useEffect(() => {
@@ -17,6 +22,70 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  useEffect(() => {
+    const updateDropdownPosition = () => {
+      if (moreButtonRef.current && isMoreOpen) {
+        const rect = moreButtonRef.current.getBoundingClientRect()
+        setDropdownPosition({
+          top: rect.bottom + window.scrollY + 8,
+          left: rect.left + window.scrollX
+        })
+      }
+    }
+
+    if (isMoreOpen) {
+      updateDropdownPosition()
+      window.addEventListener('scroll', updateDropdownPosition, true)
+      window.addEventListener('resize', updateDropdownPosition)
+    }
+
+    return () => {
+      window.removeEventListener('scroll', updateDropdownPosition, true)
+      window.removeEventListener('resize', updateDropdownPosition)
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current)
+      }
+    }
+  }, [isMoreOpen])
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const moreMenu = document.getElementById('more-menu-container')
+      const dropdown = document.getElementById('more-dropdown')
+      if (
+        isMoreOpen &&
+        moreMenu &&
+        !moreMenu.contains(event.target) &&
+        dropdown &&
+        !dropdown.contains(event.target)
+      ) {
+        setIsMoreOpen(false)
+      }
+    }
+
+    if (isMoreOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isMoreOpen])
+
+  const handleMouseEnter = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+      closeTimeoutRef.current = null
+    }
+    setIsMoreOpen(true)
+  }
+
+  const handleMouseLeave = () => {
+    closeTimeoutRef.current = setTimeout(() => {
+      setIsMoreOpen(false)
+    }, 200) // Small delay to allow moving to dropdown
+  }
+
   return (
     <>
       <div
@@ -25,12 +94,16 @@ const Navbar = () => {
             ? 'fixed top-[80px] left-0 shadow-lg z-50'
             : 'sticky top-[80px] z-30'
         }`}
+        style={{ overflow: 'visible' }}
       >
         <div
           className='flex items-center mx-auto justify-center gap-2 md:gap-2.5 lg:gap-4 xl:gap-6 2xl:gap-8 text-white px-2 md:px-3 lg:px-4 overflow-x-auto hide-scrollbar'
           style={{
             scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
+            msOverflowStyle: 'none',
+            overflowY: 'visible',
+            position: 'relative',
+            isolation: 'isolate'
           }}
         >
           <Link
@@ -172,93 +245,105 @@ const Navbar = () => {
           >
             Blogs
           </Link>
-          <div className='relative group'>
+          <div
+            id='more-menu-container'
+            className='relative'
+            style={{ position: 'relative', zIndex: 1000 }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
             <button
+              ref={moreButtonRef}
               type='button'
-              className='flex flex-row items-center text-xs md:text-sm lg:text-base whitespace-nowrap'
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsMoreOpen(!isMoreOpen)
+              }}
+              className='flex flex-row items-center text-xs md:text-sm lg:text-base whitespace-nowrap hover:text-gray-200 cursor-pointer transition-colors text-white'
             >
               <span>More</span>
-              <RiArrowDropDownLine className='w-4 h-4 md:w-5 md:h-5 lg:w-5 lg:h-5' />
+              <RiArrowDropDownLine
+                className={`w-4 h-4 md:w-5 md:h-5 lg:w-5 lg:h-5 transition-transform duration-200 ${isMoreOpen ? 'rotate-180' : ''}`}
+              />
             </button>
-            <div
-              className='absolute z-40 hidden pt-1 bg-[#30ad8f] group-hover:block'
-              style={{ minWidth: '180px' }}
-            >
-              <Link
-                href='/exams'
-                className={`block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer transition-colors ${
-                  pathname?.startsWith('/exams')
-                    ? 'font-semibold bg-opacity-30'
-                    : ''
-                }`}
-                style={
-                  pathname?.startsWith('/exams') ? { color: '#B5F1F8' } : {}
-                }
-              >
-                Exams
-              </Link>
-              <Link
-                href='/schools'
-                className={`block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer transition-colors ${
-                  pathname?.startsWith('/schools')
-                    ? 'font-semibold bg-opacity-30'
-                    : ''
-                }`}
-                style={
-                  pathname?.startsWith('/schools') ? { color: '#B5F1F8' } : {}
-                }
-              >
-                School
-              </Link>
-              <Link
-                href='/universities'
-                className={`block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer transition-colors ${
-                  pathname?.startsWith('/universities')
-                    ? 'font-semibold bg-opacity-30'
-                    : ''
-                }`}
-                style={
-                  pathname?.startsWith('/universities')
-                    ? { color: '#B5F1F8' }
-                    : {}
-                }
-              >
-                Universities
-              </Link>
-              <Link
-                href='/career'
-                className={`block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer transition-colors ${
-                  pathname?.startsWith('/career')
-                    ? 'font-semibold bg-opacity-30'
-                    : ''
-                }`}
-                style={
-                  pathname?.startsWith('/career') ? { color: '#B5F1F8' } : {}
-                }
-              >
-                Career
-              </Link>
-              {/* <Link
-                href='/courses'
-                className='block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer'
-              >
-               Courses
-              </Link> */}
-              <Link
-                href='/contact'
-                className={`block p-2 hover:text-gray-200 hover:bg-opacity-15 cursor-pointer transition-colors ${
-                  pathname?.startsWith('/contact')
-                    ? 'font-semibold bg-opacity-30'
-                    : ''
-                }`}
-                style={
-                  pathname?.startsWith('/contact') ? { color: '#B5F1F8' } : {}
-                }
-              >
-                Contact Us
-              </Link>
-            </div>
           </div>
+
+          {isMoreOpen &&
+            typeof window !== 'undefined' &&
+            createPortal(
+              <div
+                id='more-dropdown'
+                className='fixed bg-[#30ad8f] rounded-lg shadow-2xl border-2 border-teal-500 min-w-[180px] z-[10000]'
+                style={{
+                  top: `${dropdownPosition.top}px`,
+                  left: `${dropdownPosition.left}px`,
+                  display: 'block',
+                  visibility: 'visible',
+                  opacity: 1
+                }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                <div className='py-1'>
+                  <Link
+                    href='/exams'
+                    onClick={() => setIsMoreOpen(false)}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
+                      pathname?.startsWith('/exams')
+                        ? 'font-semibold bg-teal-600'
+                        : ''
+                    }`}
+                  >
+                    Exams
+                  </Link>
+                  <Link
+                    href='/schools'
+                    onClick={() => setIsMoreOpen(false)}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
+                      pathname?.startsWith('/schools')
+                        ? 'font-semibold bg-teal-600'
+                        : ''
+                    }`}
+                  >
+                    School
+                  </Link>
+                  <Link
+                    href='/universities'
+                    onClick={() => setIsMoreOpen(false)}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
+                      pathname?.startsWith('/universities')
+                        ? 'font-semibold bg-teal-600'
+                        : ''
+                    }`}
+                  >
+                    Universities
+                  </Link>
+                  <Link
+                    href='/career'
+                    onClick={() => setIsMoreOpen(false)}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
+                      pathname?.startsWith('/career')
+                        ? 'font-semibold bg-teal-600'
+                        : ''
+                    }`}
+                  >
+                    Career
+                  </Link>
+                  <Link
+                    href='/contact'
+                    onClick={() => setIsMoreOpen(false)}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
+                      pathname?.startsWith('/contact')
+                        ? 'font-semibold bg-teal-600'
+                        : ''
+                    }`}
+                  >
+                    Contact Us
+                  </Link>
+                </div>
+              </div>,
+              document.body
+            )}
         </div>
       </div>
     </>

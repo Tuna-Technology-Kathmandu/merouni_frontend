@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { useForm, useFieldArray } from 'react-hook-form'
 import {
@@ -30,6 +31,10 @@ import AdmissionItem from './AdmissionItem'
 import ConfirmationDialog from './ConfirmationDialog'
 import { Modal } from '../../../../components/CreateUserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { Button } from '../../../../components/ui/button'
+import { Input } from '../../../../components/ui/input'
+import { Label } from '../../../../components/ui/label'
+import { Select } from '../../../../components/ui/select'
 
 const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
@@ -157,13 +162,14 @@ const FileUploadWithPreview = ({
           </div>
         )}
         <div className='flex justify-end'>
-          <button
+          <Button
             type='button'
             onClick={handleClear}
-            className='bg-red-500 text-white p-2 rounded-md '
+            variant='destructive'
+            size='sm'
           >
             Clear
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -457,6 +463,24 @@ export default function CollegeForm() {
 
     getUniversities()
   }, [])
+
+  // Handle query parameter to open add form
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    if (searchParams.get('add') === 'true') {
+      setIsOpen(true)
+      setEditing(false)
+      reset()
+      setUniSearch('')
+      setHasSelectedUni(false)
+      setUploadedFiles({
+        logo: '',
+        featured: '',
+        images: [],
+        videos: []
+      })
+    }
+  }, [reset])
 
   useEffect(() => {
     // Only run on client side
@@ -1071,59 +1095,75 @@ export default function CollegeForm() {
                     Basic Information
                   </h2>
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <div>
-                      <label className='block mb-2'>College Name *</label>
-                      <input
+                    <div className='space-y-2'>
+                      <Label htmlFor='name'>
+                        College Name <span className='text-red-500'>*</span>
+                      </Label>
+                      <Input
+                        id='name'
+                        placeholder='Enter college name'
                         {...register('name', { required: true })}
-                        className='w-full p-2 border rounded'
+                        aria-invalid={errors.name ? 'true' : 'false'}
+                        className={errors.name ? 'border-destructive' : ''}
                       />
                       {errors.name && (
-                        <span className='text-red-500'>
+                        <span className='text-sm font-medium text-destructive'>
                           This field is required
                         </span>
                       )}
                     </div>
 
-                    <div>
-                      <label className='block mb-2'>Institute Type *</label>
-                      <select
+                    <div className='space-y-2'>
+                      <Label htmlFor='institute_type'>
+                        Institute Type <span className='text-red-500'>*</span>
+                      </Label>
+                      <Select
                         {...register('institute_type', { required: true })}
-                        className='w-full p-2 border rounded'
+                        id='institute_type'
+                        aria-invalid={errors.institute_type ? 'true' : 'false'}
+                        className={
+                          errors.institute_type ? 'border-destructive' : ''
+                        }
                       >
                         <option value='Private'>Private</option>
                         <option value='Public'>Public</option>
-                      </select>
+                      </Select>
                     </div>
 
-                    <div>
-                      <label className='block mb-2'>Institute Level</label>
+                    <div className='space-y-2'>
+                      <Label>Institute Level</Label>
                       <div className='space-y-2'>
                         {['School', 'College'].map((level) => (
-                          <label key={level} className='flex items-center'>
+                          <label
+                            key={level}
+                            className='flex items-center gap-2 cursor-pointer'
+                          >
                             <input
                               type='checkbox'
                               {...register('institute_level')}
                               value={level}
-                              className='mr-2'
+                              className='rounded border-input'
                             />
-                            {level}
+                            <span className='text-sm'>{level}</span>
                           </label>
                         ))}
                       </div>
                     </div>
 
-                    <div className='relative'>
-                      <label className='block mb-2'>University *</label>
+                    <div className='relative space-y-2'>
+                      <Label htmlFor='university-search'>
+                        University <span className='text-red-500'>*</span>
+                      </Label>
 
-                      <input
+                      <Input
+                        id='university-search'
                         type='text'
-                        className='w-full p-2 border rounded'
+                        placeholder='Search University'
                         value={uniSearch}
                         onChange={(e) => {
                           setUniSearch(e.target.value)
                           setHasSelectedUni(false)
                         }}
-                        placeholder='Search University'
                       />
 
                       {/* Hidden input for react-hook-form binding */}
@@ -1162,22 +1202,27 @@ export default function CollegeForm() {
                       ) : null}
                     </div>
 
-                    <div className='md:col-span-2'>
-                      <label className='block mb-2'>Description</label>
+                    <div className='md:col-span-2 space-y-2'>
+                      <Label htmlFor='description'>Description</Label>
                       <textarea
+                        id='description'
                         {...register('description')}
-                        className='w-full p-2 border rounded h-24'
+                        className='flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                        rows='4'
+                        placeholder='Enter college description'
                       />
                     </div>
 
-                    <div className='md:col-span-2'>
-                      <label className='block mb-2'>Content</label>
+                    <div className='md:col-span-2 space-y-2'>
+                      <Label htmlFor='content'>Content</Label>
 
-                      <CKUni
-                        id='editor-content'
-                        initialData={getValues('content')}
-                        onChange={(data) => setValue('content', data)}
-                      />
+                      <div className='border border-input rounded-md overflow-hidden'>
+                        <CKUni
+                          id='editor-content'
+                          initialData={getValues('content')}
+                          onChange={(data) => setValue('content', data)}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1358,7 +1403,7 @@ export default function CollegeForm() {
                 <div className='bg-white p-6 rounded-lg shadow-md'>
                   <div className='flex justify-between items-center mb-4'>
                     <h2 className='text-xl font-semibold'>Facilities</h2>
-                    <button
+                    <Button
                       type='button'
                       onClick={() =>
                         appendFacility({
@@ -1367,10 +1412,11 @@ export default function CollegeForm() {
                           icon: ''
                         })
                       }
-                      className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600'
+                      variant='default'
+                      size='sm'
                     >
                       Add Facility
-                    </button>
+                    </Button>
                   </div>
 
                   {facilityFields.map((field, index) => (
@@ -1378,25 +1424,40 @@ export default function CollegeForm() {
                       key={field.id}
                       className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border rounded'
                     >
-                      <div>
-                        <label className='block mb-2'>Title *</label>
-                        <input
+                      <div className='space-y-2'>
+                        <Label htmlFor={`facility-title-${index}`}>
+                          Title <span className='text-red-500'>*</span>
+                        </Label>
+                        <Input
+                          id={`facility-title-${index}`}
+                          placeholder='Facility Title'
                           {...register(`facilities.${index}.title`, {
                             required: true
                           })}
-                          className='w-full p-2 border rounded'
+                          aria-invalid={
+                            errors.facilities?.[index]?.title ? 'true' : 'false'
+                          }
+                          className={
+                            errors.facilities?.[index]?.title
+                              ? 'border-destructive'
+                              : ''
+                          }
                         />
                         {errors.facilities?.[index]?.title && (
-                          <span className='text-red-500'>
+                          <p className='text-sm font-medium text-destructive'>
                             This field is required
-                          </span>
+                          </p>
                         )}
                       </div>
-                      <div>
-                        <label className='block mb-2'>Description</label>
+                      <div className='space-y-2'>
+                        <Label htmlFor={`facility-description-${index}`}>
+                          Description
+                        </Label>
                         <textarea
+                          id={`facility-description-${index}`}
+                          placeholder='Facility Description'
                           {...register(`facilities.${index}.description`)}
-                          className='w-full p-2 border rounded'
+                          className='w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                         />
                       </div>
                       <div>
@@ -1409,7 +1470,7 @@ export default function CollegeForm() {
                         />
                       </div>
                       <div className='flex items-end'>
-                        <button
+                        <Button
                           type='button'
                           onClick={() => {
                             if (facilityFields.length > 1) {
@@ -1422,10 +1483,12 @@ export default function CollegeForm() {
                               })
                             }
                           }}
-                          className='bg-red-500 text-white px-4 h-[20%] w-full rounded hover:bg-red-600'
+                          variant='destructive'
+                          size='sm'
+                          className='w-full'
                         >
                           {facilityFields.length > 1 ? 'Remove' : 'Clear'}
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   ))}
@@ -1434,7 +1497,7 @@ export default function CollegeForm() {
                 <div className='bg-white p-6 rounded-lg shadow-md'>
                   <div className='flex justify-between items-center mb-4'>
                     <h2 className='text-xl font-semibold'>Members</h2>
-                    <button
+                    <Button
                       type='button'
                       onClick={() =>
                         appendMember({
@@ -1444,10 +1507,11 @@ export default function CollegeForm() {
                           description: ''
                         })
                       }
-                      className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600'
+                      variant='default'
+                      size='sm'
                     >
                       Add Member
-                    </button>
+                    </Button>
                   </div>
 
                   {memberFields.map((field, index) => (
@@ -1455,42 +1519,50 @@ export default function CollegeForm() {
                       key={field.id}
                       className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border rounded'
                     >
-                      <div>
-                        <label className='block mb-2'>Name</label>
-                        <input
+                      <div className='space-y-2'>
+                        <Label htmlFor={`member-name-${index}`}>Name</Label>
+                        <Input
+                          id={`member-name-${index}`}
+                          placeholder='Member Name'
                           {...register(`members.${index}.name`)}
-                          className='w-full p-2 border rounded'
                         />
                       </div>
-                      <div>
-                        <label className='block mb-2'>Role</label>
-                        <select
+                      <div className='space-y-2'>
+                        <Label htmlFor={`member-role-${index}`}>Role</Label>
+                        <Select
+                          id={`member-role-${index}`}
                           {...register(`members.${index}.role`)}
-                          className='w-full p-2 border rounded'
                         >
-                          <option value=''>Select Roles</option>
+                          <option value=''>Select Role</option>
                           <option value='Principal'>Principal</option>
                           <option value='Professor'>Professor</option>
                           <option value='Lecturer'>Lecturer</option>
                           <option value='Admin'>Admin</option>
                           <option value='Staff'>Staff</option>
-                        </select>
+                        </Select>
                       </div>
-                      <div>
-                        <label className='block mb-2'>Contact Number</label>
-                        <input
+                      <div className='space-y-2'>
+                        <Label htmlFor={`member-contact-${index}`}>
+                          Contact Number
+                        </Label>
+                        <Input
+                          id={`member-contact-${index}`}
+                          placeholder='Contact Number'
                           {...register(`members.${index}.contact_number`)}
-                          className='w-full p-2 border rounded'
                         />
                       </div>
-                      <div>
-                        <label className='block mb-2'>Description</label>
+                      <div className='space-y-2'>
+                        <Label htmlFor={`member-description-${index}`}>
+                          Description
+                        </Label>
                         <textarea
+                          id={`member-description-${index}`}
+                          placeholder='Member Description'
                           {...register(`members.${index}.description`)}
-                          className='w-full p-2 border rounded'
+                          className='w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                         />
                       </div>
-                      <button
+                      <Button
                         type='button'
                         onClick={() => {
                           if (memberFields.length > 1) {
@@ -1504,10 +1576,12 @@ export default function CollegeForm() {
                             })
                           }
                         }}
-                        className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600'
+                        variant='destructive'
+                        size='sm'
+                        className='w-full'
                       >
                         {memberFields.length > 1 ? 'Remove' : 'Clear'}
-                      </button>
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -1516,7 +1590,7 @@ export default function CollegeForm() {
                 <div className='bg-white p-6 rounded-lg shadow-md'>
                   <div className='flex justify-between items-center mb-4'>
                     <h2 className='text-xl font-semibold'>Admissions</h2>
-                    <button
+                    <Button
                       type='button'
                       onClick={() =>
                         appendAdmission({
@@ -1527,10 +1601,11 @@ export default function CollegeForm() {
                           description: ''
                         })
                       }
-                      className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600'
+                      variant='default'
+                      size='sm'
                     >
                       Add Admission
-                    </button>
+                    </Button>
                   </div>
 
                   {admissionFields.map((field, index) => {
@@ -1558,29 +1633,40 @@ export default function CollegeForm() {
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     {['country', 'state', 'city', 'street', 'postal_code'].map(
                       (field) => (
-                        <div key={field}>
-                          <label className='block mb-2 capitalize'>
+                        <div key={field} className='space-y-2'>
+                          <Label htmlFor={field} className='capitalize'>
                             {field !== 'state'
                               ? `${field.replace('_', ' ')} *`
                               : 'District'}
-                          </label>
-                          <input
+                          </Label>
+                          <Input
+                            id={field}
+                            placeholder={field.replace('_', ' ')}
                             {...register(`address.${field}`)}
-                            className='w-full p-2 border rounded'
+                            aria-invalid={
+                              errors.address?.[field] ? 'true' : 'false'
+                            }
+                            className={
+                              errors.address?.[field]
+                                ? 'border-destructive'
+                                : ''
+                            }
                           />
                           {errors.address?.[field] && (
-                            <span className='text-red-500'>
+                            <p className='text-sm font-medium text-destructive'>
                               This field is required
-                            </span>
+                            </p>
                           )}
                         </div>
                       )
                     )}
-                    <div>
-                      <label className='block mb-2'>Google Map URL</label>
-                      <input
+                    <div className='space-y-2'>
+                      <Label htmlFor='map-url'>Google Map URL</Label>
+                      <Input
+                        id='map-url'
+                        type='url'
+                        placeholder='https://maps.google.com/...'
                         {...register('google_map_url')}
-                        className='w-full p-2 border rounded'
                       />
                     </div>
                   </div>
@@ -1592,21 +1678,24 @@ export default function CollegeForm() {
                     Contact Information
                   </h2>
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <div>
-                      <label className='block mb-2'>Website URL</label>
-                      <input
+                    <div className='space-y-2'>
+                      <Label htmlFor='website-url'>Website URL</Label>
+                      <Input
+                        id='website-url'
+                        type='url'
+                        placeholder='https://example.com'
                         {...register('website_url')}
-                        className='w-full p-2 border rounded'
                       />
                     </div>
                     {[0, 1].map((index) => (
-                      <div key={index}>
-                        <label className='block mb-2'>
+                      <div key={index} className='space-y-2'>
+                        <Label htmlFor={`contact-${index}`}>
                           Contact {index + 1}
-                        </label>
-                        <input
-                          {...register(`contacts.${index}`)}
-                          className='w-full p-2 border rounded'
+                        </Label>
+                        <Input
+                          id={`contact-${index}`}
+                          placeholder='Phone or Email'
+                          {...register(`contact_info[${index}]`)}
                         />
                       </div>
                     ))}
@@ -1619,33 +1708,31 @@ export default function CollegeForm() {
                     Additional Settings
                   </h2>
                   <div className='space-y-4'>
-                    <label className='flex items-center'>
+                    <div className='flex items-center space-x-2'>
                       <input
+                        id='is-featured'
                         type='checkbox'
                         {...register('is_featured')}
-                        className='mr-2'
+                        className='w-4 h-4'
                       />
-                      Featured College
-                    </label>
-                    <label className='flex items-center'>
+                      <Label htmlFor='is-featured'>Featured College</Label>
+                    </div>
+                    <div className='flex items-center space-x-2'>
                       <input
+                        id='pinned'
                         type='checkbox'
                         {...register('pinned')}
-                        className='mr-2'
+                        className='w-4 h-4'
                       />
-                      Pinned
-                    </label>
+                      <Label htmlFor='pinned'>Pinned</Label>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Submit Button - Sticky Footer */}
               <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <button
-                  type='submit'
-                  disabled={submitting}
-                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
-                >
+                <Button type='submit' disabled={submitting} size='sm'>
                   {submitting
                     ? editing
                       ? 'Updating...'
@@ -1653,7 +1740,7 @@ export default function CollegeForm() {
                     : editing
                       ? 'Update College'
                       : 'Create College'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -1852,13 +1939,12 @@ export default function CollegeForm() {
         className='max-w-md'
       >
         <form onSubmit={handleCreateCredentials} className='space-y-4'>
-          <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              First Name
-            </label>
-            <input
+          <div className='space-y-2'>
+            <Label htmlFor='first-name'>First Name</Label>
+            <Input
+              id='first-name'
               type='text'
-              className='w-full p-2 border rounded'
+              placeholder='First Name'
               value={credentialsForm.firstName}
               onChange={(e) =>
                 setCredentialsForm({
@@ -1870,13 +1956,12 @@ export default function CollegeForm() {
             />
           </div>
 
-          <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Last Name
-            </label>
-            <input
+          <div className='space-y-2'>
+            <Label htmlFor='last-name'>Last Name</Label>
+            <Input
+              id='last-name'
               type='text'
-              className='w-full p-2 border rounded'
+              placeholder='Last Name'
               value={credentialsForm.lastName}
               onChange={(e) =>
                 setCredentialsForm({
@@ -1888,14 +1973,14 @@ export default function CollegeForm() {
             />
           </div>
 
-          <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Email
-            </label>
+          <div className='space-y-2'>
+            <Label htmlFor='email'>Email</Label>
             <div className='flex gap-2'>
-              <input
+              <Input
+                id='email'
                 type='text'
-                className='w-1/2 p-2 border rounded'
+                className='flex-1'
+                placeholder='username'
                 value={credentialsForm.emailName}
                 onChange={(e) =>
                   setCredentialsForm({
@@ -1903,23 +1988,21 @@ export default function CollegeForm() {
                     emailName: e.target.value
                   })
                 }
-                placeholder='username'
                 required
               />
-              <div className='w-1/2 p-2 border rounded bg-gray-50 flex items-center text-gray-600'>
+              <div className='flex-none px-3 py-2 border border-input rounded-md bg-muted flex items-center text-muted-foreground text-sm'>
                 @merouni.com
               </div>
             </div>
           </div>
 
-          <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Password
-            </label>
+          <div className='space-y-2'>
+            <Label htmlFor='password'>Password</Label>
             <div className='relative'>
-              <input
+              <Input
+                id='password'
                 type={showPassword ? 'text' : 'password'}
-                className='w-full p-2 border rounded pr-10'
+                placeholder='Password (min 6 characters)'
                 value={credentialsForm.password}
                 onChange={(e) =>
                   setCredentialsForm({
@@ -1929,28 +2012,28 @@ export default function CollegeForm() {
                 }
                 required
                 minLength={6}
+                className='pr-10'
               />
               <button
                 type='button'
                 onClick={() => setShowPassword(!showPassword)}
-                className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800'
+                className='absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'
               >
                 {showPassword ? (
-                  <EyeOff className='w-5 h-5' />
+                  <EyeOff className='w-4 h-4' />
                 ) : (
-                  <Eye className='w-5 h-5' />
+                  <Eye className='w-4 h-4' />
                 )}
               </button>
             </div>
           </div>
 
-          <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Phone Number
-            </label>
-            <input
+          <div className='space-y-2'>
+            <Label htmlFor='phone-number'>Phone Number</Label>
+            <Input
+              id='phone-number'
               type='tel'
-              className='w-full p-2 border rounded'
+              placeholder='Phone Number'
               value={credentialsForm.phoneNo}
               onChange={(e) =>
                 setCredentialsForm({
@@ -1962,21 +2045,18 @@ export default function CollegeForm() {
             />
           </div>
 
-          <div className='flex justify-end gap-2 pt-2'>
-            <button
+          <div className='flex justify-end gap-2 pt-4'>
+            <Button
               type='button'
               onClick={handleCloseCredentialsModal}
-              className='px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200'
+              variant='outline'
+              size='sm'
             >
               Cancel
-            </button>
-            <button
-              type='submit'
-              disabled={creatingCredentials}
-              className='px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50'
-            >
+            </Button>
+            <Button type='submit' disabled={creatingCredentials} size='sm'>
               {creatingCredentials ? 'Creating...' : 'Create'}
-            </button>
+            </Button>
           </div>
         </form>
       </Modal>

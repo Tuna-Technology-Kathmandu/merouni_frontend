@@ -18,7 +18,10 @@ import {
   FileText,
   School,
   GraduationCap,
-  Book
+  Book,
+  Trophy,
+  Pen,
+  Briefcase
 } from 'lucide-react'
 
 const AdminDashboard = () => {
@@ -201,7 +204,7 @@ const AdminDashboard = () => {
             </Link>
 
             <Link
-              href='/dashboard/addCollege'
+              href='/dashboard/addCollege?add=true'
               className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-orange-50 hover:border-orange-300 transition-colors group'
             >
               <div className='p-2 bg-orange-100 rounded-lg group-hover:bg-orange-200 transition-colors'>
@@ -213,7 +216,7 @@ const AdminDashboard = () => {
             </Link>
 
             <Link
-              href='/dashboard/program'
+              href='/dashboard/program?add=true'
               className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-indigo-50 hover:border-indigo-300 transition-colors group'
             >
               <div className='p-2 bg-indigo-100 rounded-lg group-hover:bg-indigo-200 transition-colors'>
@@ -225,7 +228,7 @@ const AdminDashboard = () => {
             </Link>
 
             <Link
-              href='/dashboard/courses'
+              href='/dashboard/courses?add=true'
               className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-teal-50 hover:border-teal-300 transition-colors group'
             >
               <div className='p-2 bg-teal-100 rounded-lg group-hover:bg-teal-200 transition-colors'>
@@ -233,6 +236,42 @@ const AdminDashboard = () => {
               </div>
               <span className='text-sm font-medium text-gray-700 group-hover:text-teal-600'>
                 Add Course
+              </span>
+            </Link>
+
+            <Link
+              href='/dashboard/scholarship?add=true'
+              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-yellow-50 hover:border-yellow-300 transition-colors group'
+            >
+              <div className='p-2 bg-yellow-100 rounded-lg group-hover:bg-yellow-200 transition-colors'>
+                <Trophy className='w-5 h-5 text-yellow-600' />
+              </div>
+              <span className='text-sm font-medium text-gray-700 group-hover:text-yellow-600'>
+                Add Scholarships
+              </span>
+            </Link>
+
+            <Link
+              href='/dashboard/exams?add=true'
+              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-pink-50 hover:border-pink-300 transition-colors group'
+            >
+              <div className='p-2 bg-pink-100 rounded-lg group-hover:bg-pink-200 transition-colors'>
+                <Pen className='w-5 h-5 text-pink-600' />
+              </div>
+              <span className='text-sm font-medium text-gray-700 group-hover:text-pink-600'>
+                Add Exams
+              </span>
+            </Link>
+
+            <Link
+              href='/dashboard/consultancy?add=true'
+              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors group'
+            >
+              <div className='p-2 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors'>
+                <Briefcase className='w-5 h-5 text-red-600' />
+              </div>
+              <span className='text-sm font-medium text-gray-700 group-hover:text-red-600'>
+                Add Consultancy
               </span>
             </Link>
           </div>

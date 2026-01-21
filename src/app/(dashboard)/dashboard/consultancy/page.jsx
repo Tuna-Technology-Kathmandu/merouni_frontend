@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useSelector } from 'react-redux'
+import { useSearchParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import FileUpload from '../addCollege/FileUpload'
 import Table from '../../../../components/Table'
@@ -22,6 +23,8 @@ const CKEditor = dynamic(() => import('../component/CKStable'), {
 export default function ConsultancyForm() {
   const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [consultancies, setConsultancies] = useState([])
   const [tableLoading, setTableLoading] = useState(false)
@@ -87,6 +90,41 @@ export default function ConsultancyForm() {
     fetchConsultancies()
     return () => setHeading(null)
   }, [setHeading])
+
+  // Check for 'add' query parameter and open modal
+  useEffect(() => {
+    const addParam = searchParams.get('add')
+    if (addParam === 'true') {
+      setIsOpen(true)
+      setEditing(false)
+      setEditingId(null)
+      reset({
+        title: '',
+        destination: [{ country: '', city: '' }],
+        address: {
+          street: '',
+          city: '',
+          state: '',
+          zip: ''
+        },
+        description: '',
+        contact: ['', ''],
+        website_url: '',
+        google_map_url: '',
+        video_url: '',
+        featured_image: '',
+        logo: '',
+        pinned: 0,
+        courses: []
+      })
+      setUploadedFiles({
+        featured: '',
+        logo: ''
+      })
+      // Remove query parameter from URL
+      router.replace('/dashboard/consultancy', { scroll: false })
+    }
+  }, [searchParams, router, reset])
 
   useEffect(() => {
     return () => {

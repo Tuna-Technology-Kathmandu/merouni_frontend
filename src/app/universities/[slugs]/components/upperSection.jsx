@@ -7,6 +7,7 @@ import { IoMdMail } from 'react-icons/io'
 import he from 'he'
 
 const ImageSection = ({ university }) => {
+  console.log('univeristy', university)
   return (
     <div className='flex flex-col items-center'>
       {/* Top Section (Already Styled) */}
@@ -158,15 +159,23 @@ const ImageSection = ({ university }) => {
 
       {/* Programs Section */}
       {Array.isArray(university?.programs) &&
-        university.programs.length > 0 && (
+        university?.programs?.program?.length > 0 && (
           <div className='bg-[#30AD8F] bg-opacity-10 rounded-xl p-8 w-full mb-12 px-[75px] max-md:px-[30px] overflow-hidden'>
             <h2 className='font-bold text-xl md:text-2xl mb-6'>
               Programs Offered
             </h2>
             <ul className='list-disc pl-5 space-y-2 text-gray-700'>
-              {university.programs.map((program, idx) => (
-                <li key={idx} className='text-sm md:text-base'>
-                  {program}
+              {university?.programs?.program?.map((programItem, idx) => (
+                <li
+                  key={programItem?.id || idx}
+                  className='text-sm md:text-base'
+                >
+                  {typeof programItem === 'string'
+                    ? programItem
+                    : programItem?.title ||
+                      programItem?.program ||
+                      programItem?.name ||
+                      'N/A'}
                 </li>
               ))}
             </ul>
