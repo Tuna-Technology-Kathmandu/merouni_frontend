@@ -129,7 +129,7 @@ const CollegeDetailPage = ({ params }) => {
     try {
       // Use direct fetch instead of server action to avoid SSR issues
       const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/college/${slugs}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/${slugs}`,
         {
           method: 'GET',
           headers: {

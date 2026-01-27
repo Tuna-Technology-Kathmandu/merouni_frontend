@@ -122,7 +122,7 @@ export default function CategoryManager() {
   const createCategory = async (data) => {
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/category`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/category`,
         {
           method: 'POST',
           headers: {
@@ -145,7 +145,7 @@ export default function CategoryManager() {
     try {
       console.log('Updating category with data:', data, 'and id:', id)
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/category?category_id=${id}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/category?category_id=${id}`,
         {
           method: 'PUT',
           headers: {
@@ -209,7 +209,7 @@ export default function CategoryManager() {
       console.log('Deleting id is :', deleteId)
 
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/category?category_id=${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/category?category_id=${deleteId}`,
         {
           method: 'DELETE',
           headers: {
@@ -241,7 +241,7 @@ export default function CategoryManager() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/category?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/category?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

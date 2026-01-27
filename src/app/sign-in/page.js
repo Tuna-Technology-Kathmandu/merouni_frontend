@@ -11,6 +11,7 @@ import { jwtDecode } from 'jwt-decode'
 import Link from 'next/link'
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
+import { DotenvConfig } from '../../config/env.config'
 
 const SignInPage = ({ defaultMode = 'login' }) => {
   const dispatch = useDispatch()
@@ -99,23 +100,23 @@ const SignInPage = ({ defaultMode = 'login' }) => {
    */
   const signInFormMutation = useMutation({
     mutationFn: async () => {
-      const endpoint = isLogin ? '/api/v1/auth/login' : '/api/v1/auth/register'
+      const endpoint = isLogin ? '/auth/login' : '/auth/register'
       const filteredData = isLogin
         ? {
-            email: formData.email,
-            password: formData.password,
-            deviceName: navigator.userAgent
-          }
+          email: formData.email,
+          password: formData.password,
+          deviceName: navigator.userAgent
+        }
         : {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            phoneNo: formData.phoneNo,
-            password: formData.password
-          }
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phoneNo: formData.phoneNo,
+          password: formData.password
+        }
 
       const response = await axios.post(
-        `${process.env.baseUrl}${endpoint}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}${endpoint}`,
         filteredData,
         {
           headers: {
@@ -209,9 +210,8 @@ const SignInPage = ({ defaultMode = 'login' }) => {
                   placeholder='First Name'
                   value={formData.firstName}
                   onChange={handleChange}
-                  className={`appearance-none rounded-lg w-full px-3 py-2 border ${
-                    errors.firstName ? 'border-red-500' : 'border-gray-300'
-                  } focus:outline-none focus:ring-blue-500`}
+                  className={`appearance-none rounded-lg w-full px-3 py-2 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'
+                    } focus:outline-none focus:ring-blue-500`}
                 />
                 {errors.firstName && (
                   <p className='text-red-500 text-xs mt-1'>
@@ -226,9 +226,8 @@ const SignInPage = ({ defaultMode = 'login' }) => {
                   placeholder='Last Name'
                   value={formData.lastName}
                   onChange={handleChange}
-                  className={`appearance-none rounded-lg w-full px-3 py-2 border ${
-                    errors.lastName ? 'border-red-500' : 'border-gray-300'
-                  } focus:outline-none focus:ring-blue-500`}
+                  className={`appearance-none rounded-lg w-full px-3 py-2 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'
+                    } focus:outline-none focus:ring-blue-500`}
                 />
                 {errors.lastName && (
                   <p className='text-red-500 text-xs mt-1'>{errors.lastName}</p>
@@ -243,9 +242,8 @@ const SignInPage = ({ defaultMode = 'login' }) => {
               placeholder='Email'
               value={formData.email}
               onChange={handleChange}
-              className={`appearance-none rounded-lg w-full px-3 py-2 border ${
-                errors.email ? 'border-red-500' : 'border-gray-300'
-              } focus:outline-none focus:ring-blue-500`}
+              className={`appearance-none rounded-lg w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'
+                } focus:outline-none focus:ring-blue-500`}
             />
             {errors.email && (
               <p className='text-red-500 text-xs mt-1'>{errors.email}</p>
@@ -259,9 +257,8 @@ const SignInPage = ({ defaultMode = 'login' }) => {
                 placeholder='Phone Number'
                 value={formData.phoneNo}
                 onChange={handleChange}
-                className={`appearance-none rounded-lg w-full px-3 py-2 border ${
-                  errors.phoneNo ? 'border-red-500' : 'border-gray-300'
-                } focus:outline-none focus:ring-blue-500`}
+                className={`appearance-none rounded-lg w-full px-3 py-2 border ${errors.phoneNo ? 'border-red-500' : 'border-gray-300'
+                  } focus:outline-none focus:ring-blue-500`}
                 maxLength={10}
               />
               {errors.phoneNo && (
@@ -277,9 +274,8 @@ const SignInPage = ({ defaultMode = 'login' }) => {
                 placeholder='Password'
                 value={formData.password}
                 onChange={handleChange}
-                className={`appearance-none rounded-lg w-full px-3 py-2 border ${
-                  errors.password ? 'border-red-500' : 'border-gray-300'
-                } focus:outline-none focus:ring-blue-500`}
+                className={`appearance-none rounded-lg w-full px-3 py-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'
+                  } focus:outline-none focus:ring-blue-500`}
               />
               <button
                 type='button'

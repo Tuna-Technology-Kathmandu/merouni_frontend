@@ -16,6 +16,7 @@ import useAdminPermission from '@/hooks/useAdminPermission'
 import dynamic from 'next/dynamic'
 import { Modal } from '../../../../components/CreateUserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { DotenvConfig } from '@/config/env.config'
 
 // Dynamically import CKEditor to avoid SSR issues
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
@@ -82,7 +83,7 @@ export default function CareerForm() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/career?page=${page}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/career?page=${page}`
       )
       const data = await response.json()
       setCareers(data.items)
@@ -106,7 +107,7 @@ export default function CareerForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/career?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/career?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -150,12 +151,12 @@ export default function CareerForm() {
     try {
       data.featuredImage = uploadedFiles.featured
 
-      const url = `${process.env.baseUrl}${process.env.version}/career`
+      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/career`
       const method = editing ? 'PUT' : 'POST'
 
       if (editing) {
         const response = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/career?id=${editId}`,
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/career?id=${editId}`,
           {
             method,
             headers: {
@@ -197,7 +198,7 @@ export default function CareerForm() {
       setLoading(true)
       setIsOpen(true)
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/career/${slug}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/career/${slug}`
       )
       const data = await response.json()
       const career = data.item
@@ -236,7 +237,7 @@ export default function CareerForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/career?id=${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/career?id=${deleteId}`,
         {
           method: 'DELETE'
         }

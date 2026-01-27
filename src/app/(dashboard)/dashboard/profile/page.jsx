@@ -53,7 +53,7 @@ const ProfileUpdate = () => {
     setIsLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/users/edit-profile?user_id=${userData.id}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/users/edit-profile?user_id=${userData.id}`,
         {
           method: 'PUT',
           body: JSON.stringify({
@@ -101,7 +101,7 @@ const ProfileUpdate = () => {
     setIsLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/users/edit-profile?user_id=${userData.id}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/users/edit-profile?user_id=${userData.id}`,
         {
           method: 'PUT',
           body: JSON.stringify({
@@ -138,9 +138,9 @@ const ProfileUpdate = () => {
   }
   const roles = userData?.role
     ? Object.entries(JSON.parse(userData.role))
-        .filter(([_, value]) => value)
-        .map(([key]) => key.toUpperCase())
-        .join(', ')
+      .filter(([_, value]) => value)
+      .map(([key]) => key.toUpperCase())
+      .join(', ')
     : 'No Role Assigned'
 
   return (

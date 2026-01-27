@@ -1,10 +1,11 @@
 // src/services/auth-api.service.js
-import { authFetch } from './auth-fetch'
+import { authFetch } from '../app/utils/authFetch'
+import { DotenvConfig } from '../config/env.config'
 
 class AuthApiService {
   constructor(endpoint) {
     this.endpoint = endpoint
-    this.baseUrl = `${process.env.NEXT_PUBLIC_BASE_URL || process.env.baseUrl}${process.env.NEXT_PUBLIC_API_VERSION || process.env.version}/${endpoint}`
+    this.baseUrl = `${DotenvConfig.NEXT_APP_API_BASE_URL}/${endpoint}`
   }
 
   buildUrl(url, params) {

@@ -99,7 +99,7 @@ export default function ProgramForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${query}`
       )
       const data = await response.json()
       setSearchResults(data.items || [])
@@ -310,7 +310,7 @@ export default function ProgramForm() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/program?page=${page}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?page=${page}`
       )
       const data = await response.json()
       setPrograms(data.items)
@@ -329,7 +329,7 @@ export default function ProgramForm() {
   const fetchColleges = async () => {
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college`
       )
       const data = await response.json()
       setColleges(data.items)
@@ -351,7 +351,7 @@ export default function ProgramForm() {
           is_elective: item.is_elective || false
         }))
       }
-      const url = `${process.env.baseUrl}${process.env.version}/program`
+      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/program`
       const method = 'POST'
       console.log('while submiting data is', cleanedData)
 
@@ -425,7 +425,7 @@ export default function ProgramForm() {
       setIsOpen(true)
 
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/program/${slug}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/program/${slug}`
       )
       const program = await response.json()
       // console.log('program', program)
@@ -552,7 +552,7 @@ export default function ProgramForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/program/${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/program/${deleteId}`,
         {
           method: 'DELETE'
         }
@@ -652,7 +652,7 @@ export default function ProgramForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/program?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -1181,11 +1181,10 @@ export default function ProgramForm() {
                             setCurrentYear(year)
                             setCurrentSemester(sem)
                           }}
-                          className={`w-full py-2 px-3 rounded text-sm ${
-                            currentYear === year && currentSemester === sem
+                          className={`w-full py-2 px-3 rounded text-sm ${currentYear === year && currentSemester === sem
                               ? 'bg-blue-500 text-white'
                               : 'bg-white border hover:bg-gray-100'
-                          }`}
+                            }`}
                         >
                           {sem !== 0
                             ? `
@@ -1258,8 +1257,8 @@ export default function ProgramForm() {
                           const title =
                             fieldIndex >= 0
                               ? watch(`syllabus.${fieldIndex}._title`) ||
-                                course.title ||
-                                'Unknown Course'
+                              course.title ||
+                              'Unknown Course'
                               : course.title || 'Unknown Course'
 
                           return (

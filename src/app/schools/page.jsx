@@ -1,4 +1,5 @@
 'use client'
+import { DotenvConfig } from '../../config/env.config'
 
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
@@ -20,7 +21,7 @@ const page = () => {
       try {
         // Use direct fetch instead of server action to avoid SSR issues
         const response = await fetch(
-          `${process.env.baseUrl}${process.env.version}/banner?page=1&limit=999`,
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/banner?page=1&limit=999`,
           {
             method: 'GET',
             headers: {

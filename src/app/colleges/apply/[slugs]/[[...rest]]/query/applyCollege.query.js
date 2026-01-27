@@ -1,6 +1,8 @@
+import { DotenvConfig } from '../../../../../../../config/env.config'
+
 export async function applyToCollege({ payload, isStudent }) {
   const response = await fetch(
-    `${process.env.baseUrl}${process.env.version}/referral/self-apply`,
+    `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/self-apply`,
     {
       method: 'POST',
       headers: {

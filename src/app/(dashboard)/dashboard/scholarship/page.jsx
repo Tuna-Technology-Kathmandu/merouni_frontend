@@ -28,6 +28,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import { DotenvConfig } from '@/config/env.config'
 const CKEditor = dynamic(() => import('../component/CKStable'), {
   ssr: false
 })
@@ -342,7 +343,7 @@ export default function ScholarshipManager() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/scholarship?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/scholarship?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

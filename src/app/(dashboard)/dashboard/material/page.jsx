@@ -12,6 +12,7 @@ import { X } from 'lucide-react'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Modal } from '../../../../components/CreateUserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { DotenvConfig } from '@/config/env.config'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 export default function MaterialForm() {
@@ -58,7 +59,7 @@ export default function MaterialForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/tag?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/tag?q=${query}`
       )
       const data = await response.json()
       setSearchResults(data.items || [])
@@ -136,7 +137,7 @@ export default function MaterialForm() {
   const fetchTags = async () => {
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/tag`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/tag`
       )
       const data = await response.json()
       setTags(data.items)
@@ -148,7 +149,7 @@ export default function MaterialForm() {
   const fetchCategories = async () => {
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/material-category?limit=100`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/material-category?limit=100`
       )
       const data = await response.json()
       setCategories(data.items || [])
@@ -166,7 +167,7 @@ export default function MaterialForm() {
     setAddingCategory(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/material-category`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/material-category`,
         {
           method: 'POST',
           headers: {
@@ -208,7 +209,7 @@ export default function MaterialForm() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/material?page=${page}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/material?page=${page}`
       )
       const data = await response.json()
       setPagination({
@@ -251,12 +252,12 @@ export default function MaterialForm() {
         payload.category_id = parseInt(data.category_id, 10)
       }
 
-      const url = `${process.env.baseUrl}${process.env.version}/material`
+      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/material`
       const method = editing ? 'PUT' : 'POST'
       console.log('before submit', payload)
       if (editing) {
         const response = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/material?id=${editId}`,
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/material?id=${editId}`,
           {
             method,
             headers: {
@@ -304,7 +305,7 @@ export default function MaterialForm() {
       setIsOpen(true)
       console.log('editdata', editdata)
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/material/${editdata.id}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/material/${editdata.id}`
       )
       const data = await response.json()
       const material = data.material
@@ -361,7 +362,7 @@ export default function MaterialForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/material?id=${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/material?id=${deleteId}`,
         {
           method: 'DELETE'
         }
@@ -436,7 +437,7 @@ export default function MaterialForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/material?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/material?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

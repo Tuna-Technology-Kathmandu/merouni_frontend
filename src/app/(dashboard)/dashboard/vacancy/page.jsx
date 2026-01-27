@@ -14,6 +14,7 @@ import { Modal } from '../../../../components/CreateUserModal'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Search, Eye } from 'lucide-react'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { DotenvConfig } from '@/config/env.config'
 
 const VacancyManager = () => {
   const { setHeading } = usePageHeading()
@@ -62,7 +63,7 @@ const VacancyManager = () => {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/vacancy?page=${page}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy?page=${page}`
       )
       const data = await response.json()
       setVacancies(data.items || [])
@@ -106,8 +107,8 @@ const VacancyManager = () => {
 
       const method = editing ? 'PUT' : 'POST'
       const url = editing
-        ? `${process.env.baseUrl}${process.env.version}/vacancy?id=${editingId}`
-        : `${process.env.baseUrl}${process.env.version}/vacancy`
+        ? `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy?id=${editingId}`
+        : `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy`
 
       const response = await authFetch(url, {
         method,
@@ -148,7 +149,7 @@ const VacancyManager = () => {
       setIsOpen(true)
 
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/vacancy/${slugs}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy/${slugs}`
       )
       const data = await response.json()
       const vacancy = data.item
@@ -179,7 +180,7 @@ const VacancyManager = () => {
     if (!deleteId) return
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/vacancy?id=${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy?id=${deleteId}`,
         {
           method: 'DELETE',
           headers: {
@@ -211,7 +212,7 @@ const VacancyManager = () => {
       setLoadingView(true)
       setViewModalOpen(true)
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/vacancy/${slug}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
       if (!response.ok) {
@@ -239,7 +240,7 @@ const VacancyManager = () => {
     }
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/vacancy?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

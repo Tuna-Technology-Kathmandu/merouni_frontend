@@ -73,7 +73,7 @@ export default function UsersManager() {
       setLoading(true)
 
       // Build URL with role filter if not 'all'
-      let url = `${process.env.baseUrl}${process.env.version}/users?page=${page}`
+      let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/users?page=${page}`
       if (selectedUserType !== 'all') {
         url += `&role=${selectedUserType}`
       }
@@ -122,7 +122,7 @@ export default function UsersManager() {
       console.log('Query:', query)
 
       // Build URL with search query and role filter
-      let url = `${process.env.baseUrl}${process.env.version}/users?q=${query}`
+      let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/users?q=${query}`
       if (selectedUserType !== 'all') {
         url += `&role=${selectedUserType}`
       }

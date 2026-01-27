@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { toast } from 'react-toastify' // Import toast
+import { DotenvConfig } from '@/config/env.config'
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -25,7 +26,7 @@ export default function ContactForm() {
     try {
       console.log(formData)
       const res = await fetch(
-        `${process.env.baseUrl}${process.env.version}/contact-us`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/contact-us`,
         {
           method: 'POST',
           headers: {

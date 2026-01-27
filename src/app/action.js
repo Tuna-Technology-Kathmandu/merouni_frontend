@@ -2,6 +2,7 @@
 
 import services from './apiService'
 import { cookies } from 'next/headers'
+import { DotenvConfig } from '../config/env.config'
 
 // const cookieStore = await
 
@@ -194,7 +195,7 @@ export async function getExams(limit, page) {
 export async function getBannerById(id) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/banner/${id}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/banner/${id}`,
       {
         method: 'GET',
         headers: {

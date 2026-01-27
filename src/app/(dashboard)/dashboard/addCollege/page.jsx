@@ -44,6 +44,7 @@ import GallerySection from './GallerySection'
 import VideoSection from './VideoSection'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { createColumns } from './columns'
+import { DotenvConfig } from '@/config/env.config'
 
 const FileUploadWithPreview = ({
   onUploadComplete,
@@ -86,7 +87,7 @@ const FileUploadWithPreview = ({
 
     try {
       const response = await axios.post(
-        `${process.env.baseUrl}${process.env.version}/media/upload`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/media/upload`,
         formData,
         {
           headers: {
@@ -493,7 +494,7 @@ export default function CollegeForm() {
       try {
         // Use authFetch directly instead of server action to avoid SSR issues
         const response = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/college?limit=10&page=1`
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?limit=10&page=1`
         )
         if (response.ok) {
           const data = await response.json()
@@ -563,7 +564,7 @@ export default function CollegeForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college/${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/${deleteId}`,
         {
           method: 'DELETE',
           headers: {
@@ -575,7 +576,7 @@ export default function CollegeForm() {
       toast.success(res.message)
       // Reload colleges using authFetch
       const reloadResponse = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college?limit=10&page=${pagination.currentPage}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?limit=10&page=${pagination.currentPage}`
       )
       if (reloadResponse.ok) {
         const reloadData = await reloadResponse.json()
@@ -669,7 +670,7 @@ export default function CollegeForm() {
       delete payload.emailName
 
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/users/college-credentials`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/users/college-credentials`,
         {
           method: 'POST',
           headers: {
@@ -692,7 +693,7 @@ export default function CollegeForm() {
       setTableLoading(true)
       try {
         const response2 = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/college?limit=10&page=${pagination.currentPage}`
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?limit=10&page=${pagination.currentPage}`
         )
         if (response2.ok) {
           const data = await response2.json()
@@ -724,7 +725,7 @@ export default function CollegeForm() {
       reset()
 
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college/${slug}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
 
@@ -824,13 +825,13 @@ export default function CollegeForm() {
       const memberData = collegeData.collegeMembers?.length
         ? collegeData.collegeMembers
         : [
-            {
-              name: '',
-              contact_number: '',
-              role: '',
-              description: ''
-            }
-          ]
+          {
+            name: '',
+            contact_number: '',
+            role: '',
+            description: ''
+          }
+        ]
       setValue('members', memberData)
 
       //college_broucher
@@ -841,42 +842,42 @@ export default function CollegeForm() {
       // Set facilities
       const facilityData = collegeData.collegeFacility?.length
         ? collegeData.collegeFacility.map((facility) => ({
-            title: facility.title || '',
-            description: facility.description || '',
-            icon: facility.icon || ''
-          }))
+          title: facility.title || '',
+          description: facility.description || '',
+          icon: facility.icon || ''
+        }))
         : [
-            {
-              title: '',
-              description: '',
-              icon: ''
-            }
-          ]
+          {
+            title: '',
+            description: '',
+            icon: ''
+          }
+        ]
       setValue('facilities', facilityData)
 
       // Admissions
       const admissionData = collegeData.collegeAdmissions?.length
         ? collegeData.collegeAdmissions.map((admission) => {
-            const courseId = courses.find(
-              (c) => c.title === admission.program.title
-            )?.id
-            return {
-              course_id: courseId || '',
-              eligibility_criteria: admission.eligibility_criteria || '',
-              admission_process: admission.admission_process || '',
-              fee_details: admission.fee_details || '',
-              description: admission.description || ''
-            }
-          })
+          const courseId = courses.find(
+            (c) => c.title === admission.program.title
+          )?.id
+          return {
+            course_id: courseId || '',
+            eligibility_criteria: admission.eligibility_criteria || '',
+            admission_process: admission.admission_process || '',
+            fee_details: admission.fee_details || '',
+            description: admission.description || ''
+          }
+        })
         : [
-            {
-              course_id: '',
-              eligibility_criteria: '',
-              admission_process: '',
-              fee_details: '',
-              description: ''
-            }
-          ]
+          {
+            course_id: '',
+            eligibility_criteria: '',
+            admission_process: '',
+            fee_details: '',
+            description: ''
+          }
+        ]
       setValue('admissions', admissionData)
     } catch (error) {
       console.error('Error fetching college data:', error)
@@ -890,7 +891,7 @@ export default function CollegeForm() {
     try {
       // Use authFetch directly instead of server action to avoid SSR issues
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college?limit=10&page=${page}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?limit=10&page=${page}`
       )
 
       if (response.ok) {
@@ -922,7 +923,7 @@ export default function CollegeForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -1007,7 +1008,7 @@ export default function CollegeForm() {
       setViewModalOpen(true)
 
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college/${slug}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
 

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { DotenvConfig } from '../../config/env.config'
 
 const CollegeRankings = () => {
   const [rankings, setRankings] = useState([])
@@ -40,7 +41,7 @@ const CollegeRankings = () => {
   const fetchRankings = async () => {
     try {
       const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/college-ranking?limit=100`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college-ranking?limit=100`,
         {
           method: 'GET',
           headers: {

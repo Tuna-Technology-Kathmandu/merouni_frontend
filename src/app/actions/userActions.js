@@ -1,6 +1,7 @@
 // app/actions/userActions.js
 
 import { authFetch } from '../utils/authFetch'
+import { DotenvConfig } from '../../config/env.config'
 
 export async function getUsers(page = 1, token) {
   if (!token) {
@@ -8,7 +9,7 @@ export async function getUsers(page = 1, token) {
   }
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/users?page=${page}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/users?page=${page}`,
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -46,7 +47,7 @@ export async function createUser(formData) {
     console.log('FORM Data:', formData)
 
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/auth/register`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/auth/register`,
       {
         method: 'POST',
         headers: {
@@ -67,7 +68,7 @@ export async function updateUser(userId, formData) {
     // const userData = Object.fromEntries(formData)
     console.log('formDatafromAPi', formData)
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/users/edit-profile?user_id=${userId}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/users/edit-profile?user_id=${userId}`,
       {
         method: 'PUT',
         headers: {
@@ -91,7 +92,7 @@ export async function updateUser(userId, formData) {
 export async function deleteUser(userId, userData) {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/users`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/users`,
       {
         method: 'DELETE',
         headers: {

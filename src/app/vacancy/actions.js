@@ -1,7 +1,9 @@
+import { DotenvConfig } from '../config/env.config'
+
 export async function getCareers(page = 1) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/blogs/?category_title=Vacancy`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs/?category_title=Vacancy`,
       {
         method: 'GET',
         headers: {

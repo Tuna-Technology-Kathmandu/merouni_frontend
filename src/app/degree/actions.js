@@ -1,8 +1,9 @@
 // services.js
+import { DotenvConfig } from '../config/env.config'
 export const fetchDegrees = async (search = '', page = 1) => {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/program?q=${search}&page=${page}&limit=15`
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?q=${search}&page=${page}&limit=15`
     )
     const data = await response.json()
     return data
@@ -15,7 +16,7 @@ export const fetchDegrees = async (search = '', page = 1) => {
 export const getDegreeBySlug = async (slug) => {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/program/${slug}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/program/${slug}`,
       {
         method: 'GET',
         headers: {
@@ -37,7 +38,7 @@ export const getDegreeBySlug = async (slug) => {
 export const getCourseBySlug = async (slug) => {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/course/${slug}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/course/${slug}`,
       {
         method: 'GET',
         headers: {

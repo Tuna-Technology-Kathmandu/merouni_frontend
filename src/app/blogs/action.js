@@ -1,9 +1,10 @@
 'use server'
+import { DotenvConfig } from '../config/env.config'
 
 export async function getNews() {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/blogs?random=true`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs?random=true`,
       {
         method: 'GET',
         headers: {
@@ -25,9 +26,9 @@ export async function getNews() {
 
 export async function getNewsBySlug(slug) {
   try {
-    console.log(`${process.env.baseUrl}${process.env.version}/blogs/${slug}`)
+    console.log(`${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs/${slug}`)
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/blogs/${slug}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs/${slug}`,
       {
         method: 'GET',
         headers: {
@@ -53,7 +54,7 @@ export async function getNewsBySlug(slug) {
 export async function getRelatedNews() {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/blogs`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs`,
       {
         method: 'GET',
         headers: {
@@ -78,7 +79,7 @@ export async function getRelatedNews() {
 export async function getBanner(page = 1, limit = 3) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/banner?page=${page}&limit=${limit}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/banner?page=${page}&limit=${limit}`,
       {
         method: 'GET',
         headers: {

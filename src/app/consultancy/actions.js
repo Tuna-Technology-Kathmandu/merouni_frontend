@@ -1,7 +1,7 @@
 export async function getConsultancies(page = 1, searchQuery = '') {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/consultancy?page=${page}&sort=desc&q=${searchQuery}&limit=15`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy?page=${page}&sort=desc&q=${searchQuery}&limit=15`,
       {
         method: 'GET',
         headers: {
@@ -24,7 +24,7 @@ export async function getConsultancies(page = 1, searchQuery = '') {
 export async function getConsultancyBySlug(slugs) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/consultancy/${slugs}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy/${slugs}`,
       {
         method: 'GET',
         headers: {

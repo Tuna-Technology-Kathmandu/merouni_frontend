@@ -1,9 +1,10 @@
 import { authFetch } from '@/app/utils/authFetch'
+import { DotenvConfig } from '@/config/env.config'
 
 export const fetchFaculties = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/faculty${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/faculty${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
 
     if (!response.ok) {
@@ -21,7 +22,7 @@ export const fetchFaculties = async (searchQuery = '') => {
 export const fetchLevel = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/level${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/level${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch level')
@@ -38,7 +39,7 @@ export const fetchLevel = async (searchQuery = '') => {
 export const fetchCourse = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/course${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/course${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
 
     if (!response.ok) {
@@ -56,7 +57,7 @@ export const fetchCourse = async (searchQuery = '') => {
 export const fetchScholarship = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/scholarship${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/scholarship${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
 
     if (!response.ok) {
@@ -75,7 +76,7 @@ export const fetchScholarship = async (searchQuery = '') => {
 export const fetchExam = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/exam${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/exam${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
 
     if (!response.ok) {

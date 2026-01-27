@@ -1,7 +1,8 @@
 // apiService.js
+import { DotenvConfig } from '../config/env.config'
 class ApiService {
   constructor(endpoint) {
-    this.baseUrl = `${process.env.baseUrl}${process.env.version}/${endpoint}`
+    this.baseUrl = `${DotenvConfig.NEXT_APP_API_BASE_URL}/${endpoint}`
   }
 
   buildUrl(baseUrl, params) {

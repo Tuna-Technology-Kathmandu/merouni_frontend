@@ -25,7 +25,7 @@ const page = () => {
 
     try {
       const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/college?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${query}`
       )
       const data = await response.json()
       setSearchResults(data.items || [])
@@ -141,7 +141,7 @@ const page = () => {
     console.log('Form to be submitted:', cleanedFormData)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/referral/agent-apply`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/agent-apply`,
         {
           method: 'POST',
           headers: {
@@ -298,24 +298,23 @@ const page = () => {
                             e.target.value
                           )
                         }
-                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
-                          errors[`student_name_${collegeIndex}_${studentIndex}`]
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${errors[`student_name_${collegeIndex}_${studentIndex}`]
                             ? 'border-red-300'
                             : 'border-gray-300'
-                        }`}
+                          }`}
                         placeholder='Enter student name'
                       />
                       {errors[
                         `student_name_${collegeIndex}_${studentIndex}`
                       ] && (
-                        <p className='mt-1 text-sm text-red-600'>
-                          {
-                            errors[
+                          <p className='mt-1 text-sm text-red-600'>
+                            {
+                              errors[
                               `student_name_${collegeIndex}_${studentIndex}`
-                            ]
-                          }
-                        </p>
-                      )}
+                              ]
+                            }
+                          </p>
+                        )}
                     </div>
 
                     <div>
@@ -333,26 +332,25 @@ const page = () => {
                             e.target.value
                           )
                         }
-                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
-                          errors[
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${errors[
                             `student_email_${collegeIndex}_${studentIndex}`
                           ]
                             ? 'border-red-300'
                             : 'border-gray-300'
-                        }`}
+                          }`}
                         placeholder='student@example.com'
                       />
                       {errors[
                         `student_email_${collegeIndex}_${studentIndex}`
                       ] && (
-                        <p className='mt-1 text-sm text-red-600'>
-                          {
-                            errors[
+                          <p className='mt-1 text-sm text-red-600'>
+                            {
+                              errors[
                               `student_email_${collegeIndex}_${studentIndex}`
-                            ]
-                          }
-                        </p>
-                      )}
+                              ]
+                            }
+                          </p>
+                        )}
                     </div>
 
                     <div>
@@ -370,27 +368,26 @@ const page = () => {
                             e.target.value
                           )
                         }
-                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
-                          errors[
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${errors[
                             `student_phone_no_${collegeIndex}_${studentIndex}`
                           ]
                             ? 'border-red-300'
                             : 'border-gray-300'
-                        }`}
+                          }`}
                         placeholder='10-digit phone number'
                         maxLength={10}
                       />
                       {errors[
                         `student_phone_no_${collegeIndex}_${studentIndex}`
                       ] && (
-                        <p className='mt-1 text-sm text-red-600'>
-                          {
-                            errors[
+                          <p className='mt-1 text-sm text-red-600'>
+                            {
+                              errors[
                               `student_phone_no_${collegeIndex}_${studentIndex}`
-                            ]
-                          }
-                        </p>
-                      )}
+                              ]
+                            }
+                          </p>
+                        )}
                     </div>
 
                     <div>
@@ -408,26 +405,25 @@ const page = () => {
                           )
                         }
                         rows={3}
-                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none ${
-                          errors[
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none ${errors[
                             `student_description_${collegeIndex}_${studentIndex}`
                           ]
                             ? 'border-red-300'
                             : 'border-gray-300'
-                        }`}
+                          }`}
                         placeholder='Enter student description or notes...'
                       />
                       {errors[
                         `student_description_${collegeIndex}_${studentIndex}`
                       ] && (
-                        <p className='mt-1 text-sm text-red-600'>
-                          {
-                            errors[
+                          <p className='mt-1 text-sm text-red-600'>
+                            {
+                              errors[
                               `student_description_${collegeIndex}_${studentIndex}`
-                            ]
-                          }
-                        </p>
-                      )}
+                              ]
+                            }
+                          </p>
+                        )}
                     </div>
                   </div>
                 </div>

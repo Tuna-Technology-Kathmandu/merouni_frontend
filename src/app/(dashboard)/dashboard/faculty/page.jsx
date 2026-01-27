@@ -16,6 +16,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Modal } from '../../../../components/CreateUserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { DotenvConfig } from '@/config/env.config'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 
 // const CKEditor4 = dynamic(() => import('../component/CKEditor4'), {
@@ -201,7 +202,7 @@ export default function FacultyManager() {
     }
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/faculty?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/faculty?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

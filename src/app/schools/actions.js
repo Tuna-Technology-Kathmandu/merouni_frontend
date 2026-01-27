@@ -1,9 +1,10 @@
 'use server'
+import { DotenvConfig } from '../../config/env.config'
 
 export async function getColleges(page = 1, sort = 'ASC') {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/college/list-school?page=${page}&sort=${sort}&limit=24`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/list-school?page=${page}&sort=${sort}&limit=24`,
       {
         cache: 'no-store'
       }
@@ -50,7 +51,7 @@ export async function getColleges(page = 1, sort = 'ASC') {
 export async function searchColleges(query, page = 1) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/college/search?q=${encodeURIComponent(query)}&page=${page}&limit=24`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/search?q=${encodeURIComponent(query)}&page=${page}&limit=24`,
       {
         cache: 'no-store'
       }
@@ -107,10 +108,10 @@ export async function searchColleges(query, page = 1) {
 export async function getCollegeBySlug(slug) {
   try {
     // console.log("Fetching college details for slug:", slug);
-    console.log(`${process.env.baseUrl}${process.env.version}/college/${slug}`)
+    console.log(`${DotenvConfig.NEXT_APP_API_BASE_URL}/college/${slug}`)
 
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/college/${slug}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/${slug}`,
       {
         method: 'GET',
         headers: {

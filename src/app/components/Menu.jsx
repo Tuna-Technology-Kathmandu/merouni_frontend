@@ -189,7 +189,7 @@ const Menu = ({ isCollapsed = false }) => {
   const handleLogout = async () => {
     try {
       const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/auth/logout`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/auth/logout`,
         {
           method: 'POST',
           credentials: 'include'
@@ -227,9 +227,9 @@ const Menu = ({ isCollapsed = false }) => {
                 const isActive = pathname === item.href
                 const displayLabel =
                   item.href === '/dashboard/referrals' &&
-                  role.student &&
-                  !role.admin &&
-                  !role['admin']
+                    role.student &&
+                    !role.admin &&
+                    !role['admin']
                     ? 'Applied Colleges'
                     : item.label
                 const itemClasses = `

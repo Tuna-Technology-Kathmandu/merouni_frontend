@@ -56,7 +56,7 @@ const FeaturedBlogs = () => {
     setLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/blogs?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs?q=${query}`
       )
 
       if (response.ok) {

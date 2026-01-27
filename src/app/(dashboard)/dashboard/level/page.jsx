@@ -10,6 +10,7 @@ import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Modal } from '../../../../components/CreateUserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { DotenvConfig } from '@/config/env.config'
 
 export default function LevelForm() {
   const { setHeading } = usePageHeading()
@@ -63,7 +64,7 @@ export default function LevelForm() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/level?page=${page}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/level?page=${page}`
       )
       const data = await response.json()
       setLevels(data.items)
@@ -82,12 +83,12 @@ export default function LevelForm() {
   const onSubmit = async (data) => {
     try {
       setSubmitting(true)
-      const url = `${process.env.baseUrl}${process.env.version}/level`
+      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/level`
       const method = editing ? 'PUT' : 'POST'
 
       if (editing) {
         const response = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/level?level_id=${editId}`,
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/level?level_id=${editId}`,
           {
             method,
             headers: {
@@ -173,7 +174,7 @@ export default function LevelForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/level?id=${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/level?id=${deleteId}`,
         {
           method: 'DELETE'
         }
@@ -224,7 +225,7 @@ export default function LevelForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/level?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/level?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

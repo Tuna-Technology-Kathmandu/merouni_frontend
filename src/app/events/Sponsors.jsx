@@ -13,7 +13,7 @@ const Sponsors = () => {
       try {
         // Use direct fetch instead of server action to avoid SSR issues
         const response = await fetch(
-          `${process.env.baseUrl}${process.env.version}/banner?page=1&limit=100`,
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/banner?page=1&limit=100`,
           {
             method: 'GET',
             headers: {

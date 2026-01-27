@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import ShimmerEffect from '@/components/ShimmerEffect'
+import { DotenvConfig } from '@/config/env.config'
 import {
   Building2,
   Mail,
@@ -32,7 +33,7 @@ const ReferedStudentsPage = () => {
         setLoading(true)
         setError(null)
         const response = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/referral/user/referrals`,
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/user/referrals`,
           { cache: 'no-store' }
         )
 
@@ -132,13 +133,12 @@ const ReferedStudentsPage = () => {
                     </div>
                     <div className='flex-shrink-0'>
                       <span
-                        className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                          referral.status === 'ACCEPTED'
+                        className={`px-3 py-1 text-xs font-semibold rounded-full ${referral.status === 'ACCEPTED'
                             ? 'bg-green-100 text-green-800'
                             : referral.status === 'REJECTED'
                               ? 'bg-red-100 text-red-800'
                               : 'bg-yellow-100 text-yellow-800'
-                        }`}
+                          }`}
                       >
                         {referral.status || 'IN_PROGRESS'}
                       </span>

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { FaLocationArrow } from 'react-icons/fa6'
 import { authFetch } from '@/app/utils/authFetch'
+import { DotenvConfig } from '../../config/env.config'
 
 const Newsletter = () => {
   const [email, setEmail] = useState('')
@@ -19,7 +20,7 @@ const Newsletter = () => {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/newsletter`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/newsletter`,
         {
           method: 'POST',
           headers: {

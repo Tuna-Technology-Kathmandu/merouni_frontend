@@ -303,7 +303,7 @@ export default function ExamManager() {
     }
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/exam?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/exam?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

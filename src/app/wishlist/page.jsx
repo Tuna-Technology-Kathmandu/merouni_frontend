@@ -21,7 +21,7 @@ const WishlistPage = () => {
       setLoading(true)
       try {
         const response = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/wishlist?user_id=${user.id}`
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist?user_id=${user.id}`
         )
         const data = await response.json()
         setWishlist(data.items || [])

@@ -2,13 +2,12 @@
 
 import { destr } from 'destr'
 
-import { React, useState } from 'react'
-import Image from 'next/image'
-import { CiPower } from 'react-icons/ci'
-import { toast } from 'react-toastify'
-import { useSelector } from 'react-redux'
+import { useState } from 'react'
 import { TfiAnnouncement } from 'react-icons/tfi'
+import { useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
 import { apiAuth } from '../app/utils/agentverify'
+import { DotenvConfig } from '../config/env.config'
 import { usePageHeading } from '../contexts/PageHeadingContext'
 
 const AdminNavbar = () => {
@@ -43,7 +42,7 @@ const AdminNavbar = () => {
     setLoading(true)
     try {
       const response = await apiAuth(
-        `${process.env.baseUrl}${process.env.version}/users/apply-agent`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/users/apply-agent`,
         {
           method: 'PUT',
           headers: {
@@ -69,7 +68,7 @@ const AdminNavbar = () => {
       console.error('Error during agent verification:', error)
       toast.error(
         error.message ||
-          'Failed to send verification request. Please try again.'
+        'Failed to send verification request. Please try again.'
       )
     } finally {
       setLoading(false)

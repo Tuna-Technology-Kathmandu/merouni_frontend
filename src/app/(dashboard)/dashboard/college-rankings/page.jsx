@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { DotenvConfig } from '@/config/env.config'
 import { Edit2, Trash2, Plus, GripVertical, X, ChevronDown } from 'lucide-react'
 import { Modal } from '../../../../components/CreateUserModal'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
@@ -31,7 +32,7 @@ export default function CollegeRankingsPage() {
     setLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college-ranking?limit=100`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college-ranking?limit=100`
       )
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -58,7 +59,7 @@ export default function CollegeRankingsPage() {
     try {
       // Fetch all programs without limit
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/program?limit=1000`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?limit=1000`
       )
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -80,7 +81,7 @@ export default function CollegeRankingsPage() {
       }
 
       // Build URL with program_id filter to only get colleges offering this program
-      const baseUrl = `${process.env.baseUrl}${process.env.version}/college`
+      const baseUrl = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college`
       const params = new URLSearchParams({
         program_id: selectedProgram.id.toString(),
         limit: '100'
@@ -113,7 +114,7 @@ export default function CollegeRankingsPage() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college-ranking/program?program_id=${deleteProgramId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college-ranking/program?program_id=${deleteProgramId}`,
         { method: 'DELETE' }
       )
       await response.json()
@@ -162,7 +163,7 @@ export default function CollegeRankingsPage() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college-ranking/order`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college-ranking/order`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -227,7 +228,7 @@ export default function CollegeRankingsPage() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college-ranking/program-order`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college-ranking/program-order`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -254,7 +255,7 @@ export default function CollegeRankingsPage() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college-ranking`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college-ranking`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -289,7 +290,7 @@ export default function CollegeRankingsPage() {
   const handleDeleteRanking = async (rankingId) => {
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college-ranking?ranking_id=${rankingId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college-ranking?ranking_id=${rankingId}`,
         { method: 'DELETE' }
       )
       await response.json()
@@ -528,9 +529,8 @@ export default function CollegeRankingsPage() {
               >
                 <ChevronDown
                   size={20}
-                  className={`transition-transform ${
-                    showProgramDropdown ? 'rotate-180' : ''
-                  }`}
+                  className={`transition-transform ${showProgramDropdown ? 'rotate-180' : ''
+                    }`}
                 />
               </button>
             </div>
@@ -645,9 +645,8 @@ export default function CollegeRankingsPage() {
                     <div
                       key={college.id}
                       onClick={() => setSelectedCollege(college)}
-                      className={`p-3 cursor-pointer hover:bg-gray-100 flex items-center gap-3 ${
-                        selectedCollege?.id === college.id ? 'bg-blue-50' : ''
-                      }`}
+                      className={`p-3 cursor-pointer hover:bg-gray-100 flex items-center gap-3 ${selectedCollege?.id === college.id ? 'bg-blue-50' : ''
+                        }`}
                     >
                       {college.college_logo && (
                         <div className='relative w-10 h-10 rounded-full overflow-hidden'>

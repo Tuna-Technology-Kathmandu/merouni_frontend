@@ -1,8 +1,9 @@
 // app/actions/scholarship.js
 
 import { authFetch } from '@/app/utils/authFetch'
+import { DotenvConfig } from '@/config/env.config'
 
-let url = `${process.env.baseUrl}${process.env.version}/exam`
+let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/exam`
 
 export async function getAllExams(page) {
   try {
@@ -50,7 +51,7 @@ export async function deleteExam(id) {
 export const fetchUniversities = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/university${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/university${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch universities')
@@ -67,7 +68,7 @@ export const fetchUniversities = async (searchQuery = '') => {
 export const fetchLevel = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/level${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/level${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch level')

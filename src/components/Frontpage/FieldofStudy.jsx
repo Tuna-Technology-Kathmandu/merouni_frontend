@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
+import { DotenvConfig } from '../../config/env.config'
 import { ImCross } from 'react-icons/im'
 
 const FieldofStudy = () => {
@@ -27,7 +28,7 @@ const FieldofStudy = () => {
   const getStudy = async () => {
     try {
       const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/faculty?limit=8`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/faculty?limit=8`
       )
       const data = await response.json()
       setStudy(data?.items)

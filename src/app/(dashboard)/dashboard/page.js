@@ -43,7 +43,7 @@ const AdminDashboard = () => {
       try {
         setLoading(true)
         const res = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/analytics/admin-overview`,
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/analytics/admin-overview`,
           { cache: 'no-store' }
         )
 
@@ -88,7 +88,7 @@ const AdminDashboard = () => {
         setLoading(true)
         // Build query string with years parameter
         const yearsParam = selectedYears.map((y) => `years=${y}`).join('&')
-        const url = `${process.env.baseUrl}${process.env.version}/analytics/admin-overview?${yearsParam}`
+        const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/analytics/admin-overview?${yearsParam}`
 
         const res = await authFetch(url, { cache: 'no-store' })
 
@@ -317,7 +317,7 @@ const StudentDashboard = () => {
         setLoading(true)
         setError(null)
         const res = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/referral/user/referrals`,
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/user/referrals`,
           { cache: 'no-store' }
         )
 
@@ -357,7 +357,7 @@ const StudentDashboard = () => {
         setWishlistLoading(true)
         setWishlistError(null)
         const res = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/wishlist?user_id=${user.id}`,
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist?user_id=${user.id}`,
           { cache: 'no-store' }
         )
 
@@ -458,13 +458,12 @@ const StudentDashboard = () => {
                               </p>
                               {app?.status && (
                                 <span
-                                  className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                                    app.status === 'ACCEPTED'
+                                  className={`px-2 py-1 text-xs font-semibold rounded-full ${app.status === 'ACCEPTED'
                                       ? 'bg-green-100 text-green-800'
                                       : app.status === 'REJECTED'
                                         ? 'bg-red-100 text-red-800'
                                         : 'bg-yellow-100 text-yellow-800'
-                                  }`}
+                                    }`}
                                 >
                                   {app.status}
                                 </span>
@@ -473,30 +472,30 @@ const StudentDashboard = () => {
                             {/* College Contact and Location in single row */}
                             {(app?.referralCollege?.contacts?.length > 0 ||
                               app?.referralCollege?.address) && (
-                              <div className='text-xs text-gray-500 mt-1 flex flex-wrap items-center gap-2'>
-                                {app?.referralCollege?.contacts?.length > 0 && (
-                                  <span className='flex items-center gap-1'>
-                                    <Phone className='w-3 h-3' />
-                                    {app.referralCollege.contacts
-                                      .map((contact) => contact.contact_number)
-                                      .join(', ')}
-                                  </span>
-                                )}
+                                <div className='text-xs text-gray-500 mt-1 flex flex-wrap items-center gap-2'>
+                                  {app?.referralCollege?.contacts?.length > 0 && (
+                                    <span className='flex items-center gap-1'>
+                                      <Phone className='w-3 h-3' />
+                                      {app.referralCollege.contacts
+                                        .map((contact) => contact.contact_number)
+                                        .join(', ')}
+                                    </span>
+                                  )}
 
-                                {app?.referralCollege?.address && (
-                                  <span className='flex items-center gap-1'>
-                                    <MapPin className='w-3 h-3' />
-                                    {[
-                                      app.referralCollege.address.city,
-                                      app.referralCollege.address.state,
-                                      app.referralCollege.address.country
-                                    ]
-                                      .filter(Boolean)
-                                      .join(', ')}
-                                  </span>
-                                )}
-                              </div>
-                            )}
+                                  {app?.referralCollege?.address && (
+                                    <span className='flex items-center gap-1'>
+                                      <MapPin className='w-3 h-3' />
+                                      {[
+                                        app.referralCollege.address.city,
+                                        app.referralCollege.address.state,
+                                        app.referralCollege.address.country
+                                      ]
+                                        .filter(Boolean)
+                                        .join(', ')}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
 
                             {/* Other Details */}
                             {app?.course && (
@@ -623,7 +622,7 @@ const InstitutionDashboard = () => {
         setLoading(true)
         setError(null)
         const res = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/referral/institution/applications`,
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/institution/applications`,
           { cache: 'no-store' }
         )
 

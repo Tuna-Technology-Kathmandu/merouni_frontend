@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { DotenvConfig } from '../../config/env.config'
 
 const FeaturedDegree = () => {
   const router = useRouter()
@@ -19,7 +20,7 @@ const FeaturedDegree = () => {
   const getdegree = async () => {
     try {
       const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/program?limit=6`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?limit=6`
       )
       const data = await response.json()
       setDegree(data?.items)

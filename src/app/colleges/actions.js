@@ -24,7 +24,7 @@ export async function getColleges(page = 1, filters = {}) {
     }
 
     // Log the final URL for debugging
-    const url = `${process.env.baseUrl}${process.env.version}/college?${queryParams.toString()}`
+    const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?${queryParams.toString()}`
 
     const response = await fetch(url, {
       cache: 'no-store'
@@ -70,7 +70,7 @@ export async function getColleges(page = 1, filters = {}) {
 export async function searchColleges(query) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/college?q=${query}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${query}`,
       {
         cache: 'no-store'
       }
@@ -129,7 +129,7 @@ export async function searchColleges(query) {
 export async function getCollegeBySlug(slug) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/college/${slug}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/${slug}`,
       {
         method: 'GET',
         headers: {
@@ -160,7 +160,7 @@ export async function getPrograms(searchQuery = '') {
       queryParams.append('q', searchQuery) // Assuming your API supports `q` for search
     }
 
-    const url = `${process.env.baseUrl}${process.env.version}/program?${queryParams.toString()}`
+    const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?${queryParams.toString()}`
 
     const response = await fetch(url, {
       method: 'GET',
@@ -191,7 +191,7 @@ export async function getUniversity(searchQuery = '') {
       queryParams.append('q', searchQuery) // or change 'q' to whatever your API expects
     }
 
-    const url = `${process.env.baseUrl}${process.env.version}/university?${queryParams.toString()}`
+    const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/university?${queryParams.toString()}`
 
     const response = await fetch(url, {
       method: 'GET',

@@ -180,7 +180,7 @@ export default function NewsManager() {
   const fetchTagById = async (tagId) => {
     console.log('I am here')
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/tag/${tagId}`
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/tag/${tagId}`
     )
     const data = await response.json()
     console.log('Data of tag id:', data)
@@ -238,7 +238,7 @@ export default function NewsManager() {
     searchTimeout.current = setTimeout(async () => {
       try {
         const response = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/tag?q=${query}`
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/tag?q=${query}`
         )
         const data = await response.json()
         setSearchResults(data.items || [])
@@ -322,7 +322,7 @@ export default function NewsManager() {
       }
 
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/blogs`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs`,
         {
           method: 'POST',
           headers: {
@@ -351,7 +351,7 @@ export default function NewsManager() {
         featuredImage: uploadedFiles.featuredImage
       }
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/blogs?id=${id}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs?id=${id}`,
         {
           method: 'PUT',
           headers: {
@@ -456,7 +456,7 @@ export default function NewsManager() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/blogs?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -536,7 +536,7 @@ export default function NewsManager() {
     if (!deleteId) return
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/blogs?id=${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs?id=${deleteId}`,
         {
           method: 'DELETE',
           headers: {
@@ -565,7 +565,7 @@ export default function NewsManager() {
       setLoadingView(true)
       setViewModalOpen(true)
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/blogs/${slug}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
       if (!response.ok) {
@@ -895,22 +895,20 @@ export default function NewsManager() {
               <div className='flex gap-2 mt-2'>
                 {viewNewsData.status && (
                   <span
-                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
-                      viewNewsData.status === 'published'
+                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${viewNewsData.status === 'published'
                         ? 'bg-green-100 text-green-800'
                         : 'bg-yellow-100 text-yellow-800'
-                    }`}
+                      }`}
                   >
                     {viewNewsData.status}
                   </span>
                 )}
                 {viewNewsData.visibility && (
                   <span
-                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
-                      viewNewsData.visibility === 'public'
+                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${viewNewsData.visibility === 'public'
                         ? 'bg-blue-100 text-blue-800'
                         : 'bg-gray-100 text-gray-800'
-                    }`}
+                      }`}
                   >
                     {viewNewsData.visibility}
                   </span>

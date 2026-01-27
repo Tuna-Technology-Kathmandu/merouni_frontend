@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Heart } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
+import { DotenvConfig } from '../../config/env.config'
 
 const FeaturedAdmission = () => {
   const [data, setData] = useState([])
@@ -31,7 +32,7 @@ const FeaturedAdmission = () => {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/wishlist?user_id=${user.id}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist?user_id=${user.id}`,
         {
           method: 'GET',
           headers: {
@@ -70,7 +71,7 @@ const FeaturedAdmission = () => {
       const isInWishlist = wishlistStatus[collegeId]
       const method = isInWishlist ? 'DELETE' : 'POST'
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/wishlist`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist`,
         {
           method,
           headers: {
@@ -110,7 +111,7 @@ const FeaturedAdmission = () => {
   const fetchItems = async () => {
     try {
       // Use direct fetch instead of server action to avoid SSR issues and ensure correct API URL
-      const apiUrl = `${process.env.baseUrl}${process.env.version}/college?pinned=true&page=1&limit=6`
+      const apiUrl = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?pinned=true&page=1&limit=6`
 
       // Debug: Log API URL in development (remove in production if needed)
       if (process.env.NODE_ENV === 'development') {
@@ -178,91 +179,90 @@ const FeaturedAdmission = () => {
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr'>
         {loading
           ? Array.from({ length: 6 }).map((_, index) => (
-              <SkeletonLoader key={index} />
-            ))
+            <SkeletonLoader key={index} />
+          ))
           : data.map((item) => (
+            <div
+              onClick={() => router.push(`/colleges/${item.slugs}`)}
+              key={item.id}
+              className='bg-white rounded-xl border border-gray-200 overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300 cursor-pointer flex flex-col'
+            >
               <div
-                onClick={() => router.push(`/colleges/${item.slugs}`)}
-                key={item.id}
-                className='bg-white rounded-xl border border-gray-200 overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300 cursor-pointer flex flex-col'
+                className='flex justify-between items-start min-h-28 bg-slate-300 relative'
+                style={{
+                  backgroundImage: `url("${item.featured_img || 'https://placehold.co/600x400'}")`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
               >
-                <div
-                  className='flex justify-between items-start min-h-28 bg-slate-300 relative'
-                  style={{
-                    backgroundImage: `url("${item.featured_img || 'https://placehold.co/600x400'}")`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                >
-                  {user && (
-                    <button
-                      className='p-2 hover:bg-gray-100 rounded-full m-2 z-10'
-                      onClick={(e) => handleWishlistToggle(e, item.id)}
-                    >
-                      <Heart
-                        className={`w-5 h-5 transition-colors duration-200 ${
-                          wishlistStatus[item.id]
-                            ? 'text-red-500 fill-red-500'
-                            : 'text-gray-600'
+                {user && (
+                  <button
+                    className='p-2 hover:bg-gray-100 rounded-full m-2 z-10'
+                    onClick={(e) => handleWishlistToggle(e, item.id)}
+                  >
+                    <Heart
+                      className={`w-5 h-5 transition-colors duration-200 ${wishlistStatus[item.id]
+                          ? 'text-red-500 fill-red-500'
+                          : 'text-gray-600'
                         }`}
-                      />
-                    </button>
-                  )}
-                </div>
-                <div className='p-4 flex flex-col h-full'>
-                  <div className='flex-grow'>
-                    <h3 className='font-semibold text-base mb-2 line-clamp-2 min-h-[2.5rem]'>
-                      {item.name}
-                    </h3>
-                    {item.university?.fullname && (
-                      <p className='text-sm mb-1 text-gray-600 font-medium line-clamp-1'>
-                        {item.university.fullname}
-                      </p>
-                    )}
-                    <p className='text-sm mb-3 text-gray-400 line-clamp-1'>
-                      {item.address?.city || ''}, {item.address?.country || ''}
+                    />
+                  </button>
+                )}
+              </div>
+              <div className='p-4 flex flex-col h-full'>
+                <div className='flex-grow'>
+                  <h3 className='font-semibold text-base mb-2 line-clamp-2 min-h-[2.5rem]'>
+                    {item.name}
+                  </h3>
+                  {item.university?.fullname && (
+                    <p className='text-sm mb-1 text-gray-600 font-medium line-clamp-1'>
+                      {item.university.fullname}
                     </p>
-                  </div>
-                  <div className='flex gap-3 justify-between mt-auto'>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        router.push(`/colleges/apply/${item.slugs}`)
-                      }}
-                      className='flex-1 py-1.5 px-3 text-white rounded-2xl hover:opacity-90 text-[13px] font-medium text-center transition-opacity'
-                      style={{ backgroundColor: '#0870A8' }}
-                    >
-                      Apply Now
-                    </button>
+                  )}
+                  <p className='text-sm mb-3 text-gray-400 line-clamp-1'>
+                    {item.address?.city || ''}, {item.address?.country || ''}
+                  </p>
+                </div>
+                <div className='flex gap-3 justify-between mt-auto'>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      router.push(`/colleges/apply/${item.slugs}`)
+                    }}
+                    className='flex-1 py-1.5 px-3 text-white rounded-2xl hover:opacity-90 text-[13px] font-medium text-center transition-opacity'
+                    style={{ backgroundColor: '#0870A8' }}
+                  >
+                    Apply Now
+                  </button>
 
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        router.push(`/colleges/${item.slugs}`)
-                      }}
-                      className='flex-1 py-1.5 px-3 text-white rounded-2xl hover:opacity-90 text-[13px] font-medium text-center flex items-center justify-center gap-1 transition-opacity'
-                      style={{ backgroundColor: '#31AD8F' }}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      router.push(`/colleges/${item.slugs}`)
+                    }}
+                    className='flex-1 py-1.5 px-3 text-white rounded-2xl hover:opacity-90 text-[13px] font-medium text-center flex items-center justify-center gap-1 transition-opacity'
+                    style={{ backgroundColor: '#31AD8F' }}
+                  >
+                    Details
+                    <svg
+                      xmlns='http://www.w3.org/2000/svg'
+                      className='h-4 w-4'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                      stroke='currentColor'
                     >
-                      Details
-                      <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        className='h-4 w-4'
-                        fill='none'
-                        viewBox='0 0 24 24'
-                        stroke='currentColor'
-                      >
-                        <path
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                          strokeWidth={2}
-                          d='M14 5l7 7m0 0l-7 7m7-7H3'
-                        />
-                      </svg>
-                    </button>
-                  </div>
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M14 5l7 7m0 0l-7 7m7-7H3'
+                      />
+                    </svg>
+                  </button>
                 </div>
               </div>
-            ))}
+            </div>
+          ))}
       </div>
     </>
   )

@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import { fetchMedia } from './action'
 import MediaCard from './components/MediaCard'
 import { authFetch } from '@/app/utils/authFetch'
+import { DotenvConfig } from '@/config/env.config'
 
 function Modal({ isOpen, onClose, onSave, isUploading }) {
   const [title, setTitle] = useState('')
@@ -148,7 +149,7 @@ export default function MediaPage() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/media/upload`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/media/upload`,
         {
           method: 'POST',
           body: formData
@@ -174,7 +175,7 @@ export default function MediaPage() {
   const handleDelete = async (id) => {
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/media/${id}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/media/${id}`,
         {
           method: 'DELETE'
         }

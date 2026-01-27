@@ -15,6 +15,7 @@ import { X } from 'lucide-react'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Modal } from '../../../../components/CreateUserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { DotenvConfig } from '@/config/env.config'
 
 const CKEditor = dynamic(() => import('../component/CKStable'), {
   ssr: false
@@ -140,7 +141,7 @@ export default function ConsultancyForm() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/consultancy?page=${page}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy?page=${page}`
       )
       const data = await response.json()
       setConsultancies(data.items)
@@ -166,7 +167,7 @@ export default function ConsultancyForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/course?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/course?q=${query}`
       )
       const data = await response.json()
       setSearchResults(data.items || [])
@@ -241,7 +242,7 @@ export default function ConsultancyForm() {
         payload.id = editId
       }
 
-      const url = `${process.env.baseUrl}${process.env.version}/consultancy`
+      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy`
       const method = 'POST'
       console.log('consultancy payload', payload)
 
@@ -279,7 +280,7 @@ export default function ConsultancyForm() {
       setLoading(true)
       setIsOpen(true)
       // const response = await authFetch(
-      //   `${process.env.baseUrl}${process.env.version}/consultancy/${slug}`
+      //   `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy/${slug}`
       // );
       // const data = await response.json();
       // console.log("editdata", editdata);
@@ -347,7 +348,7 @@ export default function ConsultancyForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/consultancy?id=${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy?id=${deleteId}`,
         {
           method: 'DELETE'
         }
@@ -369,7 +370,7 @@ export default function ConsultancyForm() {
       setViewModalOpen(true)
 
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/consultancy/${slug}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
 
@@ -407,7 +408,7 @@ export default function ConsultancyForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/consultancy?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

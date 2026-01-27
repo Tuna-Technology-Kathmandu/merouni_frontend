@@ -10,6 +10,7 @@ import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Modal } from '../../../../components/CreateUserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { DotenvConfig } from '@/config/env.config'
 
 export default function TagForm() {
   const { setHeading } = usePageHeading()
@@ -62,7 +63,7 @@ export default function TagForm() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/tag?page=${page}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/tag?page=${page}`
       )
       const data = await response.json()
       setTags(data.items)
@@ -81,12 +82,12 @@ export default function TagForm() {
   const onSubmit = async (data) => {
     try {
       setSubmitting(true)
-      const url = `${process.env.baseUrl}${process.env.version}/tag`
+      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/tag`
       const method = editing ? 'PUT' : 'POST'
 
       if (editing) {
         const response = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/tag?tag_id=${editId}`,
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/tag?tag_id=${editId}`,
           {
             method,
             headers: {
@@ -171,7 +172,7 @@ export default function TagForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/tag?id=${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/tag?id=${deleteId}`,
         {
           method: 'DELETE'
         }
@@ -222,7 +223,7 @@ export default function TagForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/tag?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/tag?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

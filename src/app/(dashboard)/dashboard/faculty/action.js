@@ -1,6 +1,7 @@
 import { authFetch } from '@/app/utils/authFetch'
+import { DotenvConfig } from '@/config/env.config'
 
-let url = `${process.env.baseUrl}${process.env.version}/faculty`
+let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/faculty`
 
 export async function getAllFaculty(page) {
   try {

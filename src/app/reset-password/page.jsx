@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { DotenvConfig } from '../../config/env.config'
 
 const ResetPassword = () => {
   const router = useRouter()
@@ -55,7 +56,7 @@ const ResetPassword = () => {
     setLoading(true)
     try {
       const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/auth/reset-password`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/auth/reset-password`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -22,6 +22,7 @@ import {
   DialogTitle
 } from '../../../../components/ui/dialog'
 import { Modal } from '../../../../components/CreateUserModal'
+import { DotenvConfig } from '@/config/env.config'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
@@ -134,7 +135,7 @@ export default function CourseForm() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/course?page=${page}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/course?page=${page}`
       )
       const data = await response.json()
       setCourses(data.items)
@@ -175,7 +176,7 @@ export default function CourseForm() {
   const onSubmit = async (data) => {
     setSubmitting(true)
     try {
-      const url = `${process.env.baseUrl}${process.env.version}/course`
+      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/course`
       const method = 'POST'
 
       // Convert syllabus to array if it's a string
@@ -218,7 +219,7 @@ export default function CourseForm() {
       setIsOpen(true)
 
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/course/${slug}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/course/${slug}`
       )
       const course = await response.json()
 
@@ -280,7 +281,7 @@ export default function CourseForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/course?id=${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/course?id=${deleteId}`,
         {
           method: 'DELETE'
         }
@@ -301,7 +302,7 @@ export default function CourseForm() {
       setLoadingView(true)
       setViewModalOpen(true)
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/course/${slug}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/course/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
       if (!response.ok) {
@@ -378,7 +379,7 @@ export default function CourseForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/course?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/course?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

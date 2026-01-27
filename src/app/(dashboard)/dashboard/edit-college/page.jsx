@@ -15,6 +15,7 @@ import {
   fetchAllUniversity,
   getUniversityBySlug
 } from '../addCollege/actions'
+import { DotenvConfig } from '@/config/env.config'
 import { Upload } from 'lucide-react'
 
 const CKUni = dynamic(() => import('../component/CKUni'), {
@@ -61,7 +62,7 @@ const FileUploadWithPreview = ({
 
     try {
       const response = await axios.post(
-        `${process.env.baseUrl}${process.env.version}/media/upload`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/media/upload`,
         formData,
         {
           headers: {
@@ -301,7 +302,7 @@ const EditCollegePage = () => {
     try {
       setLoading(true)
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college/institution/my-college`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/institution/my-college`,
         { headers: { 'Content-Type': 'application/json' } }
       )
 
@@ -401,54 +402,54 @@ const EditCollegePage = () => {
       const memberData = collegeData.collegeMembers?.length
         ? collegeData.collegeMembers
         : [
-            {
-              name: '',
-              contact_number: '',
-              role: '',
-              description: ''
-            }
-          ]
+          {
+            name: '',
+            contact_number: '',
+            role: '',
+            description: ''
+          }
+        ]
       setValue('members', memberData)
 
       // Facilities
       const facilityData = collegeData.collegeFacility?.length
         ? collegeData.collegeFacility.map((facility) => ({
-            title: facility.title || '',
-            description: facility.description || '',
-            icon: facility.icon || ''
-          }))
+          title: facility.title || '',
+          description: facility.description || '',
+          icon: facility.icon || ''
+        }))
         : [
-            {
-              title: '',
-              description: '',
-              icon: ''
-            }
-          ]
+          {
+            title: '',
+            description: '',
+            icon: ''
+          }
+        ]
       setValue('facilities', facilityData)
 
       // Admissions
       const admissionData = collegeData.collegeAdmissions?.length
         ? collegeData.collegeAdmissions.map((admission) => {
-            const courseId = courses.find(
-              (c) => c.title === admission.program.title
-            )?.id
-            return {
-              course_id: courseId || '',
-              eligibility_criteria: admission.eligibility_criteria || '',
-              admission_process: admission.admission_process || '',
-              fee_details: admission.fee_details || '',
-              description: admission.description || ''
-            }
-          })
+          const courseId = courses.find(
+            (c) => c.title === admission.program.title
+          )?.id
+          return {
+            course_id: courseId || '',
+            eligibility_criteria: admission.eligibility_criteria || '',
+            admission_process: admission.admission_process || '',
+            fee_details: admission.fee_details || '',
+            description: admission.description || ''
+          }
+        })
         : [
-            {
-              course_id: '',
-              eligibility_criteria: '',
-              admission_process: '',
-              fee_details: '',
-              description: ''
-            }
-          ]
+          {
+            course_id: '',
+            eligibility_criteria: '',
+            admission_process: '',
+            fee_details: '',
+            description: ''
+          }
+        ]
       setValue('admissions', admissionData)
 
       // College brochure
@@ -561,7 +562,7 @@ const EditCollegePage = () => {
       data.author_id = author_id
 
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college/institution/my-college`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/institution/my-college`,
         {
           method: 'PUT',
           headers: {

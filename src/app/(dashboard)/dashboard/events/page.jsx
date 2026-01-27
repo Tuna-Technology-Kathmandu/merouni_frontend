@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { DotenvConfig } from '@/config/env.config'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
@@ -88,7 +89,7 @@ export default function EventManager() {
       try {
         const categoriesList = await fetchCategories()
         setCategories(categoriesList.items)
-      } catch (error) {}
+      } catch (error) { }
     }
     loadCategories()
   }, [])
@@ -136,7 +137,7 @@ export default function EventManager() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/college?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${query}`
       )
       const data = await response.json()
       setSearchResults(data.items || [])
@@ -178,7 +179,7 @@ export default function EventManager() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/event?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/event?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -259,7 +260,7 @@ export default function EventManager() {
       }
       // Use the same endpoint for both create and update
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/event`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/event`,
         {
           method: 'POST',
           headers: {
@@ -301,7 +302,7 @@ export default function EventManager() {
       setLoading(true)
       setIsOpen(true)
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/event/${data.slugs}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/${data.slugs}`,
         {
           headers: {
             'Content-Type': 'application/json'
@@ -331,7 +332,7 @@ export default function EventManager() {
 
       if (eventData?.college) {
         const response = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/college?q=${eventData.college.slugs}`
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${eventData.college.slugs}`
         )
         const collegeData = await response.json()
         const collegeId = collegeData.items[0]?.id
@@ -396,7 +397,7 @@ export default function EventManager() {
     if (!deleteId) return
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/event?event_id=${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/event?event_id=${deleteId}`,
         {
           method: 'DELETE',
           headers: {
@@ -429,7 +430,7 @@ export default function EventManager() {
       setLoadingView(true)
       setViewModalOpen(true)
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/event/${slug}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
       if (!response.ok) {

@@ -22,6 +22,7 @@ import { fetchAllCourse } from './actions'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import GallerySection from './GallerySection'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { DotenvConfig } from '@/config/env.config'
 import { Button } from '../../../../components/ui/button'
 import { Input } from '../../../../components/ui/input'
 import { Label } from '../../../../components/ui/label'
@@ -169,7 +170,7 @@ export default function UniversityForm() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/university?page=${page}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/university?page=${page}`
       )
       const data = await response.json()
       setUniversities(data.items)
@@ -234,7 +235,7 @@ export default function UniversityForm() {
         }
       }
 
-      const url = `${process.env.baseUrl}${process.env.version}/university`
+      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/university`
       const method = 'POST'
       console.log('before submitting uni', data)
       console.log('contact data:', data.contact)
@@ -270,7 +271,7 @@ export default function UniversityForm() {
       setIsOpen(true)
 
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/university/${slugs}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/university/${slugs}`
       )
       const data = await response.json()
       const university = data
@@ -362,7 +363,7 @@ export default function UniversityForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/university?id=${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/university?id=${deleteId}`,
         {
           method: 'DELETE',
           headers: {
@@ -387,7 +388,7 @@ export default function UniversityForm() {
       setViewModalOpen(true)
 
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/university/${slug}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/university/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
 
@@ -425,7 +426,7 @@ export default function UniversityForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/university?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/university?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -962,27 +963,27 @@ export default function UniversityForm() {
               {(viewUniversityData.city ||
                 viewUniversityData.state ||
                 viewUniversityData.country) && (
-                <div>
-                  <h3 className='text-lg font-semibold mb-2'>Address</h3>
-                  <div className='text-gray-700 space-y-1'>
-                    {viewUniversityData.street && (
-                      <p>{viewUniversityData.street}</p>
-                    )}
-                    <p>
-                      {[
-                        viewUniversityData.city,
-                        viewUniversityData.state,
-                        viewUniversityData.country
-                      ]
-                        .filter(Boolean)
-                        .join(', ')}
-                    </p>
-                    {viewUniversityData.postal_code && (
-                      <p>Postal Code: {viewUniversityData.postal_code}</p>
-                    )}
+                  <div>
+                    <h3 className='text-lg font-semibold mb-2'>Address</h3>
+                    <div className='text-gray-700 space-y-1'>
+                      {viewUniversityData.street && (
+                        <p>{viewUniversityData.street}</p>
+                      )}
+                      <p>
+                        {[
+                          viewUniversityData.city,
+                          viewUniversityData.state,
+                          viewUniversityData.country
+                        ]
+                          .filter(Boolean)
+                          .join(', ')}
+                      </p>
+                      {viewUniversityData.postal_code && (
+                        <p>Postal Code: {viewUniversityData.postal_code}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {/* Contact Information */}
               {viewUniversityData.contact && (

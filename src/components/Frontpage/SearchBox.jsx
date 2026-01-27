@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { IoIosSearch } from 'react-icons/io'
 import { RxCross2 } from 'react-icons/rx'
 import Link from 'next/link'
+import { DotenvConfig } from '../../config/env.config'
 
 const SearchBox = ({ onClose }) => {
   const popularSearches = [
@@ -42,7 +43,7 @@ const SearchBox = ({ onClose }) => {
     setIsLoading(true)
     try {
       const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/search?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/search?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -141,11 +142,10 @@ const SearchBox = ({ onClose }) => {
 
   return (
     <div
-      className={`fixed flex flex-col top-0 left-0 w-full transition-all duration-300 z-50 ${
-        searchTag.trim()
+      className={`fixed flex flex-col top-0 left-0 w-full transition-all duration-300 z-50 ${searchTag.trim()
           ? 'h-screen bg-white overflow-auto'
           : 'h-[400px] md:h-[450px] bg-white shadow-md'
-      }`}
+        }`}
       onClick={(e) => e.stopPropagation()} // Prevents clicks from propagating
     >
       {/* 🔹 Search Input Container */}

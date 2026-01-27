@@ -1,7 +1,9 @@
+import { DotenvConfig } from '../config/env.config'
+
 export async function getCareers(page = 1, searchQuery = '') {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/career?page=${page}&q=${searchQuery}&limit=15`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/career?page=${page}&q=${searchQuery}&limit=15`,
       {
         method: 'GET',
         headers: {
@@ -25,7 +27,7 @@ export async function getCareers(page = 1, searchQuery = '') {
 export async function getCareer(slug) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/career/${slug}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/career/${slug}`,
       {
         method: 'GET',
         headers: {

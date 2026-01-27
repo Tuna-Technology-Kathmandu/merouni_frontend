@@ -1,9 +1,10 @@
 import { authFetch } from '@/app/utils/authFetch'
+import { DotenvConfig } from '@/config/env.config'
 
 export async function getUniversities(page = 1) {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/university`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/university`,
       {
         cache: 'no-store'
       }
@@ -19,7 +20,7 @@ export async function getUniversities(page = 1) {
 export async function createUniversity(data) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/university`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/university`,
       {
         method: 'POST',
         headers: {
@@ -37,7 +38,7 @@ export async function createUniversity(data) {
 export async function updateUniversity(id, data) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/university?university_id=${id}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/university?university_id=${id}`,
       {
         method: 'PUT',
         headers: {
@@ -55,7 +56,7 @@ export async function updateUniversity(id, data) {
 export async function deleteUniversity(id) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/university?university_id=${id}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/university?university_id=${id}`,
       {
         method: 'DELETE'
       }
@@ -70,7 +71,7 @@ export async function deleteUniversity(id) {
 export const fetchLevel = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/level${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/level${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch level')
@@ -86,7 +87,7 @@ export const fetchLevel = async (searchQuery = '') => {
 export const fetchAllCourse = async () => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/program?limit=100`
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?limit=100`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch courses')

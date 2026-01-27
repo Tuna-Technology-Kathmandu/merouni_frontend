@@ -1,7 +1,9 @@
+import { DotenvConfig } from '../config/env.config'
+
 export async function getAdmission(search = '', page = 1) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/college/admission?q=${search}&page=${page}&limit=15`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/admission?q=${search}&page=${page}&limit=15`,
       {
         method: 'GET',
         headers: {

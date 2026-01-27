@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/navigation'
+import { DotenvConfig } from '../../../config/env.config'
 
 const ForgotPasswordForm = ({ onSuccess }) => {
   const [email, setEmail] = useState('')
@@ -18,7 +19,7 @@ const ForgotPasswordForm = ({ onSuccess }) => {
     setLoading(true)
     try {
       const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/auth/forgot-password`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/auth/forgot-password`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

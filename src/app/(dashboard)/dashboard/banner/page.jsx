@@ -8,6 +8,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { DotenvConfig } from '@/config/env.config'
 
 export default function BannerForm() {
   const { setHeading } = usePageHeading()
@@ -76,7 +77,7 @@ export default function BannerForm() {
   const fetchBannersByPosition = async () => {
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/banner`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/banner`
       )
       const data = await response.json()
       const grouped = {}
@@ -124,7 +125,7 @@ export default function BannerForm() {
     searchTimeoutRef.current = setTimeout(async () => {
       try {
         const response = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/college?q=${query}`
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${query}`
         )
         const data = await response.json()
         setSearchResults(data.items || [])
@@ -174,7 +175,7 @@ export default function BannerForm() {
         })
       }
 
-      const url = `${process.env.baseUrl}${process.env.version}/banner`
+      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/banner`
       const method = editing ? 'PUT' : 'POST'
 
       await authFetch(editing ? `${url}/${editId}` : url, {
@@ -293,7 +294,7 @@ export default function BannerForm() {
 
     try {
       await authFetch(
-        `${process.env.baseUrl}${process.env.version}/banner/${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/banner/${deleteId}`,
         { method: 'DELETE' }
       )
       toast.success('Banner deleted successfully')
@@ -435,11 +436,10 @@ export default function BannerForm() {
                   {/* Status indicator (only if expired/expiring) */}
                   {showAlert && (
                     <span
-                      className={`inline-block self-start text-xs font-medium px-2 py-1 rounded-full mb-3 ${
-                        status === 'Expired!'
+                      className={`inline-block self-start text-xs font-medium px-2 py-1 rounded-full mb-3 ${status === 'Expired!'
                           ? 'bg-red-100 text-red-800'
                           : 'bg-amber-100 text-amber-800'
-                      }`}
+                        }`}
                     >
                       {status}
                     </span>
@@ -466,9 +466,8 @@ export default function BannerForm() {
 
                     {banner.date_of_expiry && (
                       <p
-                        className={`text-sm ${
-                          showAlert ? 'text-red-600' : 'text-gray-600'
-                        }`}
+                        className={`text-sm ${showAlert ? 'text-red-600' : 'text-gray-600'
+                          }`}
                       >
                         Expires:{' '}
                         {new Date(banner.date_of_expiry).toLocaleDateString()}

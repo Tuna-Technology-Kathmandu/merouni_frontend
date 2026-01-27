@@ -76,7 +76,7 @@ const FormSection = ({ id, college }) => {
     setLoading(true)
     try {
       const response = await fetch(
-        `${process.env.baseUrl}${process.env.version}/referral/self-apply`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/self-apply`,
         {
           method: 'POST',
           headers: {
@@ -218,9 +218,8 @@ const FormSection = ({ id, college }) => {
           <button
             type='submit'
             disabled={loading}
-            className={`w-full bg-[#011E3F] bg-opacity-80 text-white font-semibold py-2 rounded-lg transition duration-200 ${
-              loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#011E3F]'
-            }`}
+            className={`w-full bg-[#011E3F] bg-opacity-80 text-white font-semibold py-2 rounded-lg transition duration-200 ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#011E3F]'
+              }`}
           >
             {loading ? 'Submitting...' : 'Submit Application'}
           </button>

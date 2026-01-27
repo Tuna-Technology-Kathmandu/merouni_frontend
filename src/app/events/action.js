@@ -3,7 +3,7 @@
 export async function getEvents(page = 1) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/event?page=${page}&limit=9`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event?page=${page}&limit=9`,
       {
         method: 'GET',
         headers: {
@@ -26,7 +26,7 @@ export async function getEvents(page = 1) {
 export async function searchEvent(query) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/event?q=${query}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event?q=${query}`,
       {
         cache: 'no-store'
       }
@@ -46,7 +46,7 @@ export async function searchEvent(query) {
 export async function getThisWeekEvents() {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/event/this-week`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/this-week`,
       {
         method: 'GET',
         headers: {
@@ -69,7 +69,7 @@ export async function getThisWeekEvents() {
 export async function getNextWeekEvents() {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/event/next-month`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/next-month`,
       {
         method: 'GET',
         headers: {
@@ -92,7 +92,7 @@ export async function getNextWeekEvents() {
 export async function getEventBySlug(slug) {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/event/${slug}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/${slug}`,
       {
         method: 'GET',
         headers: {
@@ -116,7 +116,7 @@ export async function getEventBySlug(slug) {
 export async function getRelatedEvents() {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/event`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event`,
       {
         method: 'GET',
         headers: {
@@ -140,8 +140,8 @@ export async function getRelatedEvents() {
 
 export async function getUnexpiredEvents() {
   try {
-    const apiUrl = `${process.env.baseUrl}${process.env.version}/event/unexpired?limit=999`
-    
+    const apiUrl = `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/unexpired?limit=999`
+
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {

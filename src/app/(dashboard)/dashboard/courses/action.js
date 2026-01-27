@@ -1,9 +1,10 @@
 import { authFetch } from '@/app/utils/authFetch'
+import { DotenvConfig } from '@/config/env.config'
 
 export const fetchFaculties = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}${process.env.version}/faculty${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/faculty${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
 
     if (!response.ok) {

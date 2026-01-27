@@ -20,7 +20,7 @@ import useMediaQuery from './MediaQuery'
 const fetchEvents = async (page = 1) => {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/event?page=${page}&limit=9`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event?page=${page}&limit=9`,
       {
         method: 'GET',
         headers: {
@@ -43,7 +43,7 @@ const fetchEvents = async (page = 1) => {
 const searchEvent = async (query) => {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/event?q=${encodeURIComponent(query)}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event?q=${encodeURIComponent(query)}`,
       {
         method: 'GET',
         headers: {
@@ -67,7 +67,7 @@ const searchEvent = async (query) => {
 const fetchThisWeekEvents = async () => {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/event/this-week`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/this-week`,
       {
         method: 'GET',
         headers: {
@@ -90,7 +90,7 @@ const fetchThisWeekEvents = async () => {
 const fetchNextWeekEvents = async () => {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/event/next-month`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/next-month`,
       {
         method: 'GET',
         headers: {
@@ -266,7 +266,7 @@ const Events = () => {
                     <p className='whitespace-nowrap'>
                       {new Date(
                         JSON.parse(featuredEvent.event_host)?.start_date ??
-                          new Date()
+                        new Date()
                       ).toLocaleDateString()}
                     </p>
                   </div>
@@ -278,7 +278,7 @@ const Events = () => {
                     <p className='whitespace-nowrap'>
                       {new Date(
                         JSON.parse(featuredEvent.event_host)?.end_date ??
-                          new Date()
+                        new Date()
                       ).toLocaleDateString()}
                     </p>
                   </div>
@@ -293,12 +293,12 @@ const Events = () => {
                           const host = JSON.parse(featuredEvent.event_host) // parse the JSON string
                           return host?.time
                             ? new Date(
-                                `1970-01-01T${host.time}:00`
-                              ).toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: 'numeric',
-                                hour12: true
-                              })
+                              `1970-01-01T${host.time}:00`
+                            ).toLocaleTimeString('en-US', {
+                              hour: 'numeric',
+                              minute: 'numeric',
+                              hour12: true
+                            })
                             : 'No Time Available'
                         } catch (e) {
                           return 'Invalid Time Data'
@@ -383,22 +383,22 @@ const Events = () => {
                 <div className='grid grid-cols-1 sm:grid-cols-2 min-[1330px]:grid-cols-3 gap-4 md:gap-6'>
                   {allLoading
                     ? [...Array(6)].map((_, i) => (
-                        <div
-                          key={i}
-                          className='bg-gray-100 rounded-lg h-80 animate-pulse'
-                        ></div>
-                      ))
+                      <div
+                        key={i}
+                        className='bg-gray-100 rounded-lg h-80 animate-pulse'
+                      ></div>
+                    ))
                     : allEvents.map((event) => (
-                        <Link
-                          href={`/events/${event.slugs}`}
-                          key={event.id}
-                          passHref
-                        >
-                          <div className='transition-transform duration-300 hover:scale-[1.02]'>
-                            <EventCard event={event} />
-                          </div>
-                        </Link>
-                      ))}
+                      <Link
+                        href={`/events/${event.slugs}`}
+                        key={event.id}
+                        passHref
+                      >
+                        <div className='transition-transform duration-300 hover:scale-[1.02]'>
+                          <EventCard event={event} />
+                        </div>
+                      </Link>
+                    ))}
                 </div>
 
                 {/* Pagination - Centered with responsive margin */}

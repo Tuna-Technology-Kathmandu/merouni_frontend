@@ -1,8 +1,9 @@
 // app/actions/scholarship.js
 
 import { authFetch } from '@/app/utils/authFetch'
+import { DotenvConfig } from '@/config/env.config'
 
-let url = `${process.env.baseUrl}${process.env.version}/scholarship`
+let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/scholarship`
 
 export async function getAllScholarships(page) {
   try {

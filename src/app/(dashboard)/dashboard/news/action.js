@@ -1,5 +1,5 @@
 import { authFetch } from '@/app/utils/authFetch'
-let url = `${process.env.baseUrl}${process.env.version}/blogs`
+let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs`
 
 export async function fetchNews(page = 1, limit = 10) {
   try {
@@ -22,7 +22,7 @@ export async function fetchNews(page = 1, limit = 10) {
 export const fetchTags = async () => {
   try {
     // Log the full URL being called
-    const url = `${process.env.baseUrl}${process.env.version}/tag`
+    const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/tag`
     console.log('Fetching tags from URL:', url)
 
     const response = await authFetch(url)

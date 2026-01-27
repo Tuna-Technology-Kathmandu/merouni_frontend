@@ -13,7 +13,7 @@ import Banner from '@/app/blogs/[slugs]/components/Banner'
 const fetchEventBySlug = async (slug) => {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/event/${slug}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/${slug}`,
       {
         method: 'GET',
         headers: {
@@ -37,7 +37,7 @@ const fetchEventBySlug = async (slug) => {
 const fetchRelatedEvents = async () => {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/event`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event`,
       {
         method: 'GET',
         headers: {

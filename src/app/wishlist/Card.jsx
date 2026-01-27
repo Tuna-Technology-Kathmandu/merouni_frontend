@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import { getToken } from '../action'
 import { useSelector } from 'react-redux'
 import { authFetch } from '../utils/authFetch'
+import { DotenvConfig } from '@/config/env.config'
 
 const WishlistCollegeCard = ({
   name,
@@ -21,7 +22,7 @@ const WishlistCollegeCard = ({
 
     try {
       const res = await authFetch(
-        `${process.env.baseUrl}${process.env.version}/wishlist`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist`,
         {
           method: 'DELETE',
           headers: {
@@ -85,9 +86,8 @@ const WishlistCollegeCard = ({
             aria-label='Remove from wishlist'
           >
             <Heart
-              className={`w-5 h-5 text-red-500 fill-red-500 ${
-                isLoading ? 'opacity-50' : ''
-              }`}
+              className={`w-5 h-5 text-red-500 fill-red-500 ${isLoading ? 'opacity-50' : ''
+                }`}
             />
           </button>
         </div>

@@ -10,6 +10,7 @@ import UniversityCardShimmer from './UniversityShimmerCard'
 import Pagination from '@/app/blogs/components/Pagination'
 import UniversityCard from './UniversityCard'
 import { authFetch } from '@/app/utils/authFetch'
+import { DotenvConfig } from '@/config/env.config'
 
 // Client-side fetch functions to replace server actions
 const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
@@ -32,7 +33,7 @@ const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
       filters.type.forEach((type) => queryParams.append('type', type))
     }
 
-    const url = `${process.env.baseUrl}${process.env.version}/college?${queryParams.toString()}`
+    const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?${queryParams.toString()}`
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -82,7 +83,7 @@ const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
 const searchColleges = async (query) => {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}${process.env.version}/college?q=${encodeURIComponent(query)}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${encodeURIComponent(query)}`,
       {
         method: 'GET',
         headers: {
@@ -155,7 +156,7 @@ const getPrograms = async (searchQuery = '') => {
       queryParams.append('q', searchQuery)
     }
 
-    const url = `${process.env.baseUrl}${process.env.version}/program?${queryParams.toString()}`
+    const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?${queryParams.toString()}`
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -183,7 +184,7 @@ const getUniversity = async (searchQuery = '') => {
       queryParams.append('q', searchQuery)
     }
 
-    const url = `${process.env.baseUrl}${process.env.version}/university?${queryParams.toString()}`
+    const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/university?${queryParams.toString()}`
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -495,7 +496,7 @@ const CollegeFinder = () => {
 
       try {
         const response = await authFetch(
-          `${process.env.baseUrl}${process.env.version}/wishlist?user_id=${user.id}`,
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist?user_id=${user.id}`,
           {
             method: 'GET',
             headers: {
