@@ -6,7 +6,7 @@ const FCollegeShimmer = ({ count = 4 }) => {
       {[...Array(count)].map((_, index) => (
         <div
           key={index}
-          className='flex flex-col bg-white border border-gray-100 rounded-2xl shadow-sm w-80 flex-shrink-0 p-5'
+          className='flex flex-col bg-white border border-gray-100 rounded-xl shadow-sm w-80 flex-shrink-0 p-5'
         >
           <Skeleton className='w-full h-32 rounded-xl mb-4' />
           <Skeleton className='w-3/4 h-6 mb-3' />

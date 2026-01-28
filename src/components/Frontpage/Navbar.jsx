@@ -14,21 +14,33 @@ const Navbar = () => {
   const pathname = usePathname()
 
   useEffect(() => {
+    setIsMoreOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 150)
     }
-
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const dropdownRef = useRef(null)
+
   useEffect(() => {
     const updateDropdownPosition = () => {
-      if (moreButtonRef.current && isMoreOpen) {
+      if (moreButtonRef.current) {
         const rect = moreButtonRef.current.getBoundingClientRect()
+        const dropdownWidth = 180
+        let left = rect.left
+
+        if (typeof window !== 'undefined' && left + dropdownWidth > window.innerWidth) {
+          left = window.innerWidth - dropdownWidth - 12
+        }
+
         setDropdownPosition({
-          top: rect.bottom + window.scrollY + 8,
-          left: rect.left + window.scrollX
+          top: rect.bottom + 4,
+          left: left
         })
       }
     }
@@ -50,14 +62,12 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      const moreMenu = document.getElementById('more-menu-container')
-      const dropdown = document.getElementById('more-dropdown')
       if (
         isMoreOpen &&
-        moreMenu &&
-        !moreMenu.contains(event.target) &&
-        dropdown &&
-        !dropdown.contains(event.target)
+        moreButtonRef.current &&
+        !moreButtonRef.current.contains(event.target) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
       ) {
         setIsMoreOpen(false)
       }
@@ -89,11 +99,10 @@ const Navbar = () => {
   return (
     <>
       <div
-        className={`bg-[#30ad8f] w-full h-12 md:h-11 lg:h-12 pt-[10px] md:pt-2 lg:pt-[10px] hidden md:block transition-all duration-300 ${
-          isScrolled
-            ? 'fixed top-[80px] left-0 shadow-lg z-50'
-            : 'sticky top-[80px] z-30'
-        }`}
+        className={`bg-[#30ad8f] w-full h-12 md:h-11 lg:h-12 pt-[10px] md:pt-2 lg:pt-[10px] hidden md:block transition-all duration-300 ${isScrolled
+          ? 'fixed top-[80px] left-0 shadow-lg z-50'
+          : 'sticky top-[80px] z-30'
+          }`}
         style={{ overflow: 'visible' }}
       >
         <div
@@ -108,11 +117,10 @@ const Navbar = () => {
         >
           <Link
             href='/'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
-              pathname === '/' || pathname === ''
-                ? 'font-semibold border-b-2 pb-1'
-                : ''
-            }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname === '/' || pathname === ''
+              ? 'font-semibold border-b-2 pb-1'
+              : ''
+              }`}
             style={
               pathname === '/' || pathname === ''
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -124,11 +132,10 @@ const Navbar = () => {
 
           <Link
             href='/colleges'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
-              pathname?.startsWith('/colleges')
-                ? 'font-semibold border-b-2 pb-1'
-                : ''
-            }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/colleges')
+              ? 'font-semibold border-b-2 pb-1'
+              : ''
+              }`}
             style={
               pathname?.startsWith('/colleges')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -142,11 +149,10 @@ const Navbar = () => {
           </Link> */}
           <Link
             href='/degree'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
-              pathname?.startsWith('/degree')
-                ? 'font-semibold border-b-2 pb-1'
-                : ''
-            }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/degree')
+              ? 'font-semibold border-b-2 pb-1'
+              : ''
+              }`}
             style={
               pathname?.startsWith('/degree')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -157,11 +163,10 @@ const Navbar = () => {
           </Link>
           <Link
             href='/admission'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
-              pathname?.startsWith('/admission')
-                ? 'font-semibold border-b-2 pb-1'
-                : ''
-            }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/admission')
+              ? 'font-semibold border-b-2 pb-1'
+              : ''
+              }`}
             style={
               pathname?.startsWith('/admission')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -172,11 +177,10 @@ const Navbar = () => {
           </Link>
           <Link
             href='/scholarship'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
-              pathname?.startsWith('/scholarship')
-                ? 'font-semibold border-b-2 pb-1'
-                : ''
-            }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/scholarship')
+              ? 'font-semibold border-b-2 pb-1'
+              : ''
+              }`}
             style={
               pathname?.startsWith('/scholarship')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -187,11 +191,10 @@ const Navbar = () => {
           </Link>
           <Link
             href='/consultancy'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
-              pathname?.startsWith('/consultancy')
-                ? 'font-semibold border-b-2 pb-1'
-                : ''
-            }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/consultancy')
+              ? 'font-semibold border-b-2 pb-1'
+              : ''
+              }`}
             style={
               pathname?.startsWith('/consultancy')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -202,11 +205,10 @@ const Navbar = () => {
           </Link>
           <Link
             href='/materials'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
-              pathname?.startsWith('/materials')
-                ? 'font-semibold border-b-2 pb-1'
-                : ''
-            }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/materials')
+              ? 'font-semibold border-b-2 pb-1'
+              : ''
+              }`}
             style={
               pathname?.startsWith('/materials')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -217,11 +219,10 @@ const Navbar = () => {
           </Link>
           <Link
             href='/events'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
-              pathname?.startsWith('/events')
-                ? 'font-semibold border-b-2 pb-1'
-                : ''
-            }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/events')
+              ? 'font-semibold border-b-2 pb-1'
+              : ''
+              }`}
             style={
               pathname?.startsWith('/events')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -232,11 +233,10 @@ const Navbar = () => {
           </Link>
           <Link
             href='/blogs'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
-              pathname?.startsWith('/blogs')
-                ? 'font-semibold border-b-2 pb-1'
-                : ''
-            }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/blogs')
+              ? 'font-semibold border-b-2 pb-1'
+              : ''
+              }`}
             style={
               pathname?.startsWith('/blogs')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -272,7 +272,7 @@ const Navbar = () => {
             typeof window !== 'undefined' &&
             createPortal(
               <div
-                id='more-dropdown'
+                ref={dropdownRef}
                 className='fixed bg-[#30ad8f] rounded-lg shadow-2xl border-2 border-teal-500 min-w-[180px] z-[10000]'
                 style={{
                   top: `${dropdownPosition.top}px`,
@@ -288,55 +288,61 @@ const Navbar = () => {
                   <Link
                     href='/exams'
                     onClick={() => setIsMoreOpen(false)}
-                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
-                      pathname?.startsWith('/exams')
-                        ? 'font-semibold bg-teal-600'
-                        : ''
-                    }`}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/exams')
+                      ? 'font-semibold bg-teal-600'
+                      : ''
+                      }`}
                   >
                     Exams
                   </Link>
                   <Link
                     href='/schools'
                     onClick={() => setIsMoreOpen(false)}
-                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
-                      pathname?.startsWith('/schools')
-                        ? 'font-semibold bg-teal-600'
-                        : ''
-                    }`}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/schools')
+                      ? 'font-semibold bg-teal-600'
+                      : ''
+                      }`}
                   >
                     School
                   </Link>
                   <Link
+                    href='/news'
+                    onClick={() => setIsMoreOpen(false)}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/news')
+                      ? 'font-semibold bg-teal-600'
+                      : ''
+                      }`}
+                  >
+                    News
+                  </Link>
+
+                  <Link
                     href='/universities'
                     onClick={() => setIsMoreOpen(false)}
-                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
-                      pathname?.startsWith('/universities')
-                        ? 'font-semibold bg-teal-600'
-                        : ''
-                    }`}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/universities')
+                      ? 'font-semibold bg-teal-600'
+                      : ''
+                      }`}
                   >
                     Universities
                   </Link>
                   <Link
                     href='/career'
                     onClick={() => setIsMoreOpen(false)}
-                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
-                      pathname?.startsWith('/career')
-                        ? 'font-semibold bg-teal-600'
-                        : ''
-                    }`}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/career')
+                      ? 'font-semibold bg-teal-600'
+                      : ''
+                      }`}
                   >
                     Career
                   </Link>
                   <Link
                     href='/contact'
                     onClick={() => setIsMoreOpen(false)}
-                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
-                      pathname?.startsWith('/contact')
-                        ? 'font-semibold bg-teal-600'
-                        : ''
-                    }`}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/contact')
+                      ? 'font-semibold bg-teal-600'
+                      : ''
+                      }`}
                   >
                     Contact Us
                   </Link>

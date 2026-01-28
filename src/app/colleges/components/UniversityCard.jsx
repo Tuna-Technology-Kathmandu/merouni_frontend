@@ -89,62 +89,62 @@ const UniversityCard = ({
 
   return (
     <motion.div
-      whileHover={{ y: -8 }}
+      whileHover={{ y: -4 }}
       onClick={() => router.push(`/colleges/${slug}`)}
-      className='group bg-white rounded-[2rem] border border-gray-100 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer flex flex-col h-full'
+      className='group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col h-full'
     >
       <div className='relative h-52 overflow-hidden bg-gray-100'>
         <img
           src={collegeImage || 'https://placehold.co/600x400'}
-          className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-700'
+          className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500'
           alt={name}
         />
-        <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent'></div>
+        <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent'></div>
 
-        <div className='absolute top-4 left-4 flex gap-2'>
-          <div className='bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-[#387CAE] uppercase tracking-wider shadow-sm'>
+        <div className='absolute top-3 left-3 flex gap-2'>
+          <div className='bg-white px-2.5 py-1 rounded-lg text-[10px] font-bold text-[#0A70A7] uppercase tracking-wider shadow-sm'>
             {instituteType || 'College'}
           </div>
         </div>
 
-        <div className='absolute top-4 right-4'>
+        <div className='absolute top-3 right-3'>
           {user && (
             <button
               onClick={handleWishlistToggle}
               disabled={isLoading}
-              className='p-2.5 bg-white/20 backdrop-blur-md hover:bg-white/40 rounded-full transition-all group/heart'
+              className='p-2 bg-white/80 hover:bg-white rounded-full transition-all group/heart shadow-sm'
             >
               <Heart
-                className={`w-5 h-5 transition-all ${isInWishlist ? 'fill-red-500 text-red-500 scale-110' : 'text-white group-hover/heart:scale-110'
+                className={`w-4 h-4 transition-all ${isInWishlist ? 'fill-red-500 text-red-500 scale-110' : 'text-gray-600 group-hover/heart:scale-110'
                   }`}
               />
             </button>
           )}
         </div>
 
-        <div className='absolute bottom-4 left-5 right-5'>
-          <div className='flex items-center gap-1.5 text-white/90 text-sm font-medium'>
-            <MapPin className='w-3.5 h-3.5 text-blue-400' />
+        <div className='absolute bottom-3 left-4 right-4'>
+          <div className='flex items-center gap-1 text-white/90 text-xs font-medium'>
+            <MapPin className='w-3 h-3 text-blue-400' />
             <span className='line-clamp-1'>{location}</span>
           </div>
         </div>
       </div>
 
       <div className='p-6 flex flex-col flex-1'>
-        <h3 className='font-bold text-lg text-gray-900 mb-4 group-hover:text-[#387CAE] transition-colors leading-tight line-clamp-2 min-h-[3rem]'>
+        <h3 className='font-bold text-base text-gray-800 mb-4 group-hover:text-[#0A70A7] transition-colors leading-tight line-clamp-2 min-h-[2.5rem]'>
           {name}
         </h3>
 
-        <div className='mt-auto pt-5 flex items-center gap-3 border-t border-gray-50'>
+        <div className='mt-auto pt-5 flex items-center gap-3 border-t border-gray-100'>
           <button
             onClick={(e) => {
               e.stopPropagation()
               router.push(`/colleges/${slug}`)
             }}
-            className='flex-1 py-3 px-4 bg-gray-50 text-gray-700 rounded-2xl hover:bg-gray-100 transition-colors text-[11px] font-bold flex items-center justify-center gap-2'
+            className='flex-1 py-2.5 px-3 bg-gray-50 text-gray-700 rounded-xl hover:bg-gray-100 transition-colors text-[10px] font-bold flex items-center justify-center gap-1.5 uppercase tracking-wider'
           >
             <Info className='w-3.5 h-3.5' />
-            DETAILS
+            Details
           </button>
 
           <button
@@ -152,10 +152,10 @@ const UniversityCard = ({
               e.stopPropagation()
               router.push(`/colleges/apply/${slug}`)
             }}
-            className='flex-1 py-3 px-4 bg-[#387CAE] text-white rounded-2xl hover:bg-[#2d638c] transition-all text-[11px] font-bold shadow-lg shadow-blue-100 flex items-center justify-center gap-2'
+            className='flex-1 py-2.5 px-3 bg-[#0A70A7] text-white rounded-xl hover:bg-[#085a86] transition-all text-[10px] font-bold flex items-center justify-center gap-1.5 shadow-sm uppercase tracking-wider'
           >
             <GraduationCap className='w-3.5 h-3.5' />
-            APPLY NOW
+            Apply Now
           </button>
         </div>
       </div>

@@ -5,7 +5,8 @@ import FcollegeShimmer from './FCollegeShimmer'
 import Fcollege from './Fcollege'
 import { GoArrowLeft } from 'react-icons/go'
 import { GoArrowRight } from 'react-icons/go'
-import { getFilteredPinFeatColleges } from '@/app/action'
+import EmptyState from '@/components/ui/EmptyState'
+import { Sparkles } from 'lucide-react'
 
 const Featured = () => {
   const scrollRef = useRef(null)
@@ -80,12 +81,12 @@ const Featured = () => {
   }, [featuredColleges])
 
   return (
-    <div className='flex flex-col px-8 mt-12 mb-16'>
-      <div className='mb-10'>
-        <h2 className='text-3xl font-extrabold text-gray-900 tracking-tight'>
-          Featured <span className='text-[#0A70A7]'>Colleges</span>
+    <div className='flex flex-col px-8 mt-8 mb-12'>
+      <div className='mb-8'>
+        <h2 className='text-2xl font-bold text-gray-800 tracking-tight uppercase'>
+          Featured <span className='text-[#387CAE]'>Colleges</span>
         </h2>
-        <div className='w-16 h-1.5 bg-[#0A70A7] mt-3 rounded-full'></div>
+        <div className='w-12 h-1 bg-[#387CAE] mt-2 rounded-full'></div>
       </div>
       <div className='relative'>
         {/* Left Scroll Button - Only show if there are colleges and can scroll left */}
@@ -105,9 +106,12 @@ const Featured = () => {
         ) : error ? (
           <div className='w-full text-center py-10 text-red-500'>{error}</div>
         ) : featuredColleges.length === 0 ? (
-          <div className='w-full text-center py-10 text-gray-500'>
-            No featured colleges available at the moment.
-          </div>
+          <EmptyState
+            icon={Sparkles}
+            title="No Featured Colleges"
+            description="We haven't featured any colleges in this section yet. Please check back later for updates."
+            className="py-16"
+          />
         ) : (
           <div
             ref={scrollRef}

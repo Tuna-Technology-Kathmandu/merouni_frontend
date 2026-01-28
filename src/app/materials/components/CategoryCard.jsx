@@ -8,7 +8,7 @@ const CategoryCard = ({ category, onClick }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -8, scale: 1.02 }}
+      whileHover={{ y: -4 }}
       transition={{ duration: 0.3 }}
       onClick={onClick}
       className='group relative bg-white border border-gray-100 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden cursor-pointer p-6 flex flex-col items-center text-center transition-all'
