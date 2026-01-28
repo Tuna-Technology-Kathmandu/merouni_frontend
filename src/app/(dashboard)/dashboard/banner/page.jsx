@@ -404,7 +404,7 @@ export default function BannerForm() {
                   title={hasBanner ? 'Edit Banner' : 'Create Banner'}
                 >
                   <Edit size={14} />
-                  Edit
+                  {/* Edit */}
                 </button>
               </div>
 

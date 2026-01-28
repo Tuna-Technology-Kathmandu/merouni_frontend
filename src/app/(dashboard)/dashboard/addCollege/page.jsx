@@ -87,7 +87,7 @@ const FileUploadWithPreview = ({
 
     try {
       const response = await axios.post(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/media/upload`,
+        `${DotenvConfig.NEXT_APP_MEDIA_BASE_URL}/media/upload`,
         formData,
         {
           headers: {
@@ -1060,8 +1060,7 @@ export default function CollegeForm() {
           </div>
           {/* Button */}
           <div className='flex gap-2'>
-            <button
-              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+            <Button
               onClick={() => {
                 setIsOpen(true)
                 setEditing(false)
@@ -1075,7 +1074,7 @@ export default function CollegeForm() {
               }}
             >
               Add College
-            </button>
+            </Button>
           </div>
         </div>
         <ToastContainer />

@@ -15,6 +15,7 @@ import useAdminPermission from '@/hooks/useAdminPermission'
 import { Search, Eye } from 'lucide-react'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
+import { Button } from '@/components/ui/button'
 
 const VacancyManager = () => {
   const { setHeading } = usePageHeading()
@@ -364,8 +365,7 @@ const VacancyManager = () => {
           </div>
           {/* Button */}
           <div className='flex gap-2'>
-            <button
-              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+            <Button
               onClick={() => {
                 setIsOpen(true)
                 setEditing(false)
@@ -375,7 +375,7 @@ const VacancyManager = () => {
               }}
             >
               Add Vacancy
-            </button>
+            </Button>
           </div>
         </div>
         <ToastContainer />

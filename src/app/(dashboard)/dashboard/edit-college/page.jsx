@@ -62,7 +62,7 @@ const FileUploadWithPreview = ({
 
     try {
       const response = await axios.post(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/media/upload`,
+        `${DotenvConfig.NEXT_APP_MEDIA_BASE_URL}/media/upload`,
         formData,
         {
           headers: {

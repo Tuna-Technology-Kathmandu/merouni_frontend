@@ -8,6 +8,7 @@ import { Edit2, Trash2, Plus, GripVertical, X, ChevronDown } from 'lucide-react'
 import { Modal } from '../../../../components/UserModal'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import Image from 'next/image'
+import { Button } from '@/components/ui/button'
 
 export default function CollegeRankingsPage() {
   const { setHeading } = usePageHeading()
@@ -681,15 +682,14 @@ export default function CollegeRankingsPage() {
               }}
               className='px-4 py-2 border rounded hover:bg-gray-50'
             >
-              Done
+              Close
             </button>
-            <button
+            <Button
               onClick={handleAddRanking}
               disabled={!selectedProgram || !selectedCollege}
-              className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed'
             >
               Add College
-            </button>
+            </Button>
           </div>
         </div>
       </Modal>

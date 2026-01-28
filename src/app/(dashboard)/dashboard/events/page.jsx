@@ -22,6 +22,7 @@ import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { DotenvConfig } from '@/config/env.config'
+import { Button } from '@/components/ui/button'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
@@ -598,8 +599,7 @@ export default function EventManager() {
           </div>
           {/* Button */}
           <div className='flex gap-2'>
-            <button
-              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+            <Button
               onClick={() => {
                 setIsOpen(true)
                 setEditing(false)
@@ -612,7 +612,7 @@ export default function EventManager() {
               }}
             >
               Add Event
-            </button>
+            </Button>
           </div>
         </div>
         <ToastContainer />

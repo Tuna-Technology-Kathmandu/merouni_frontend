@@ -18,6 +18,7 @@ import { Modal } from '../../../../components/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import { Button } from '@/components/ui/button'
 
 // const CKEditor4 = dynamic(() => import('../component/CKEditor4'), {
 //   ssr: false

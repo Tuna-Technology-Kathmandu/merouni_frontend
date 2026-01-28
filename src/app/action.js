@@ -116,6 +116,26 @@ export async function getBlogs(page, category_title, search) {
   return services.blogs.getAll(params)
 }
 
+// Vacancies actions
+export async function getVacancies(page, category_title, search) {
+  const params = {
+    page,
+    category_title,
+    q: search
+  }
+  return services.vacancy.getAll(params)
+}
+
+// News actions
+export async function getNews(page, category_title, search) {
+  const params = {
+    page,
+    category_title,
+    q: search
+  }
+  return services.news.getAll(params)
+}
+
 // get ranking
 export async function getRankings(limit, page, category_title) {
   const params = {

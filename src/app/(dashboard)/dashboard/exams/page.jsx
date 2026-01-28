@@ -545,8 +545,7 @@ export default function ExamManager() {
           </div>
           {/* Button */}
           <div className='flex gap-2'>
-            <button
-              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+            <Button
               onClick={() => {
                 setIsOpen(true)
                 setEditingId(null)
@@ -583,7 +582,7 @@ export default function ExamManager() {
               }}
             >
               Add Exam
-            </button>
+            </Button>
           </div>
         </div>
         <ToastContainer />

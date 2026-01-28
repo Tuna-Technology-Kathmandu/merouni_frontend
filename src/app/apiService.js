@@ -109,6 +109,8 @@ const services = {
   faculty: new ApiService('faculty'),
   event: new ApiService('event'),
   blogs: new ApiService('blogs'),
+  vacancy: new ApiService('vacancy'),
+  news: new ApiService('news'),
   banner: new ApiService('banner'),
   exam: new ApiService('exam'),
   college: new ApiService('college'),
