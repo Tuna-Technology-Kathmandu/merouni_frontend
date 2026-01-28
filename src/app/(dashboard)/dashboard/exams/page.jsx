@@ -608,209 +608,258 @@ export default function ExamManager() {
         title={editingId ? 'Edit Exam' : 'Add Exam'}
         className='max-w-5xl'
       >
-        <form onSubmit={handleSubmit} className='space-y-6'>
-          <div className='max-h-[calc(100vh-200px)] overflow-y-auto pr-2'>
-            {/* Basic Information */}
-            <div className='space-y-4'>
-              <h2 className='text-xl font-semibold'>Basic Information</h2>
-              <div>
-                <RequiredLabel htmlFor='exam-title'>Exam Title</RequiredLabel>
-                <Input
-                  id='exam-title'
-                  type='text'
-                  placeholder='Enter exam title'
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      title: e.target.value
-                    }))
-                  }
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor='exam-description'>Description</Label>
-                <CKExam
-                  id='exam-description'
-                  initialData={formData.description}
-                  onChange={handleDescriptionChange}
-                />
-              </div>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                {/* level search box */}
+        <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
+          <form
+            onSubmit={handleSubmit}
+            className='flex flex-col flex-1 overflow-hidden'
+          >
+            <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+              {/* Basic Information */}
+              <div className='space-y-4'>
+                <h2 className='text-xl font-semibold'>Basic Information</h2>
                 <div>
-                  <RequiredLabel htmlFor='level-search'>Level</RequiredLabel>
-                  <div className='relative'>
-                    <Input
-                      id='level-search'
-                      type='text'
-                      value={levelSearch}
-                      onChange={(e) => {
-                        setLevelSearch(e.target.value)
-                        setHasSelectedLevel(false)
-                      }}
-                      placeholder='Search levels...'
-                    />
-                    {loadLevel ? (
-                      <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2 mt-1'>
-                        Loading...
-                      </div>
-                    ) : showLevelDrop ? (
-                      levels.length > 0 ? (
-                        <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md mt-1'>
-                          {levels.map((level) => (
-                            <li
-                              key={level.id}
-                              className='p-2 cursor-pointer hover:bg-gray-100'
-                              onClick={() => {
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  level_id: level.id
-                                }))
-
-                                setLevelSearch(level.title)
-                                setShowLevelDrop(false)
-                                setHasSelectedLevel(true)
-                              }}
-                            >
-                              {level.title}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 mt-1 text-gray-500'>
-                          No levels found.
-                        </div>
-                      )
-                    ) : null}
-                  </div>
-                </div>
-
-                {/* university search box */}
-                <div>
-                  <Label htmlFor='university-search'>
-                    University/Affiliation
-                  </Label>
-                  <div className='relative'>
-                    <Input
-                      id='university-search'
-                      type='text'
-                      value={uniSearch}
-                      onChange={(e) => {
-                        setUniSearch(e.target.value)
-                        setHasSelectedUni(false)
-                      }}
-                      placeholder='Search universities...'
-                    />
-                    {loadUni ? (
-                      <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2 mt-1'>
-                        Loading...
-                      </div>
-                    ) : showUniDrop ? (
-                      universities.length > 0 ? (
-                        <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md mt-1'>
-                          {universities.map((uni) => (
-                            <li
-                              key={uni.id}
-                              className='p-2 cursor-pointer hover:bg-gray-100'
-                              onClick={() => {
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  affiliation: uni.id
-                                }))
-                                setUniSearch(uni.fullname)
-                                setShowUniDrop(false)
-                                setHasSelectedUni(true)
-                              }}
-                            >
-                              {uni.fullname}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 mt-1 text-gray-500'>
-                          No universities found.
-                        </div>
-                      )
-                    ) : null}
-                  </div>
-                </div>
-              </div>
-              <div>
-                <RequiredLabel htmlFor='syllabus'>Syllabus</RequiredLabel>
-                <textarea
-                  id='syllabus'
-                  placeholder='Enter exam syllabus'
-                  value={formData.syllabus}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      syllabus: e.target.value
-                    }))
-                  }
-                  className='flex h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor='past-question'>Past Question URL</Label>
-                <Input
-                  id='past-question'
-                  type='text'
-                  placeholder='Enter past question URL'
-                  value={formData.pastQuestion}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      pastQuestion: e.target.value
-                    }))
-                  }
-                />
-              </div>
-            </div>
-
-            {/* Exam Details */}
-            <div className='space-y-4'>
-              <h2 className='text-xl font-semibold'>Exam Details</h2>
-              <div>
-                <RequiredLabel htmlFor='exam-type'>Exam Type</RequiredLabel>
-                <Select
-                  id='exam-type'
-                  value={formData.examDetails[0].exam_type}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      examDetails: [
-                        {
-                          ...prev.examDetails[0],
-                          exam_type: e.target.value
-                        }
-                      ]
-                    }))
-                  }
-                  required
-                >
-                  <option value='Written'>Written</option>
-                  <option value='Practical'>Practical</option>
-                  <option value='Oral'>Oral</option>
-                </Select>
-              </div>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div>
-                  <RequiredLabel htmlFor='full-marks'>Full Marks</RequiredLabel>
+                  <RequiredLabel htmlFor='exam-title'>Exam Title</RequiredLabel>
                   <Input
-                    id='full-marks'
-                    type='number'
-                    placeholder='e.g., 100'
-                    value={formData.examDetails[0].full_marks}
+                    id='exam-title'
+                    type='text'
+                    placeholder='Enter exam title'
+                    value={formData.title}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        title: e.target.value
+                      }))
+                    }
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor='exam-description'>Description</Label>
+                  <CKExam
+                    id='exam-description'
+                    initialData={formData.description}
+                    onChange={handleDescriptionChange}
+                  />
+                </div>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  {/* level search box */}
+                  <div>
+                    <RequiredLabel htmlFor='level-search'>Level</RequiredLabel>
+                    <div className='relative'>
+                      <Input
+                        id='level-search'
+                        type='text'
+                        value={levelSearch}
+                        onChange={(e) => {
+                          setLevelSearch(e.target.value)
+                          setHasSelectedLevel(false)
+                        }}
+                        placeholder='Search levels...'
+                      />
+                      {loadLevel ? (
+                        <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2 mt-1'>
+                          Loading...
+                        </div>
+                      ) : showLevelDrop ? (
+                        levels.length > 0 ? (
+                          <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md mt-1'>
+                            {levels.map((level) => (
+                              <li
+                                key={level.id}
+                                className='p-2 cursor-pointer hover:bg-gray-100'
+                                onClick={() => {
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    level_id: level.id
+                                  }))
+
+                                  setLevelSearch(level.title)
+                                  setShowLevelDrop(false)
+                                  setHasSelectedLevel(true)
+                                }}
+                              >
+                                {level.title}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 mt-1 text-gray-500'>
+                            No levels found.
+                          </div>
+                        )
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {/* university search box */}
+                  <div>
+                    <Label htmlFor='university-search'>
+                      University/Affiliation
+                    </Label>
+                    <div className='relative'>
+                      <Input
+                        id='university-search'
+                        type='text'
+                        value={uniSearch}
+                        onChange={(e) => {
+                          setUniSearch(e.target.value)
+                          setHasSelectedUni(false)
+                        }}
+                        placeholder='Search universities...'
+                      />
+                      {loadUni ? (
+                        <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2 mt-1'>
+                          Loading...
+                        </div>
+                      ) : showUniDrop ? (
+                        universities.length > 0 ? (
+                          <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md mt-1'>
+                            {universities.map((uni) => (
+                              <li
+                                key={uni.id}
+                                className='p-2 cursor-pointer hover:bg-gray-100'
+                                onClick={() => {
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    affiliation: uni.id
+                                  }))
+                                  setUniSearch(uni.fullname)
+                                  setShowUniDrop(false)
+                                  setHasSelectedUni(true)
+                                }}
+                              >
+                                {uni.fullname}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 mt-1 text-gray-500'>
+                            No universities found.
+                          </div>
+                        )
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <RequiredLabel htmlFor='syllabus'>Syllabus</RequiredLabel>
+                  <textarea
+                    id='syllabus'
+                    placeholder='Enter exam syllabus'
+                    value={formData.syllabus}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        syllabus: e.target.value
+                      }))
+                    }
+                    className='flex h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor='past-question'>Past Question URL</Label>
+                  <Input
+                    id='past-question'
+                    type='text'
+                    placeholder='Enter past question URL'
+                    value={formData.pastQuestion}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        pastQuestion: e.target.value
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+
+              {/* Exam Details */}
+              <div className='space-y-4'>
+                <h2 className='text-xl font-semibold'>Exam Details</h2>
+                <div>
+                  <RequiredLabel htmlFor='exam-type'>Exam Type</RequiredLabel>
+                  <Select
+                    id='exam-type'
+                    value={formData.examDetails[0].exam_type}
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
                         examDetails: [
                           {
                             ...prev.examDetails[0],
-                            full_marks: e.target.value
+                            exam_type: e.target.value
+                          }
+                        ]
+                      }))
+                    }
+                    required
+                  >
+                    <option value='Written'>Written</option>
+                    <option value='Practical'>Practical</option>
+                    <option value='Oral'>Oral</option>
+                  </Select>
+                </div>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div>
+                    <RequiredLabel htmlFor='full-marks'>Full Marks</RequiredLabel>
+                    <Input
+                      id='full-marks'
+                      type='number'
+                      placeholder='e.g., 100'
+                      value={formData.examDetails[0].full_marks}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          examDetails: [
+                            {
+                              ...prev.examDetails[0],
+                              full_marks: e.target.value
+                            }
+                          ]
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+                  <div>
+                    <RequiredLabel htmlFor='pass-marks'>Pass Marks</RequiredLabel>
+                    <Input
+                      id='pass-marks'
+                      type='number'
+                      placeholder='e.g., 40'
+                      value={formData.examDetails[0].pass_marks}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          examDetails: [
+                            {
+                              ...prev.examDetails[0],
+                              pass_marks: e.target.value
+                            }
+                          ]
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <RequiredLabel htmlFor='num-questions'>
+                    Number of Questions
+                  </RequiredLabel>
+                  <Input
+                    id='num-questions'
+                    type='number'
+                    placeholder='e.g., 50'
+                    value={formData.examDetails[0].number_of_question}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        examDetails: [
+                          {
+                            ...prev.examDetails[0],
+                            number_of_question: e.target.value
                           }
                         ]
                       }))
@@ -819,19 +868,44 @@ export default function ExamManager() {
                   />
                 </div>
                 <div>
-                  <RequiredLabel htmlFor='pass-marks'>Pass Marks</RequiredLabel>
-                  <Input
-                    id='pass-marks'
-                    type='number'
-                    placeholder='e.g., 40'
-                    value={formData.examDetails[0].pass_marks}
+                  <RequiredLabel htmlFor='question-type'>
+                    Question Type
+                  </RequiredLabel>
+                  <Select
+                    id='question-type'
+                    value={formData.examDetails[0].question_type}
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
                         examDetails: [
                           {
                             ...prev.examDetails[0],
-                            pass_marks: e.target.value
+                            question_type: e.target.value
+                          }
+                        ]
+                      }))
+                    }
+                    required
+                  >
+                    <option value='MCQ'>MCQ</option>
+                    <option value='Written'>Written</option>
+                    <option value='Mixed'>Mixed</option>
+                  </Select>
+                </div>
+                <div>
+                  <RequiredLabel htmlFor='duration'>Duration</RequiredLabel>
+                  <Input
+                    id='duration'
+                    type='text'
+                    placeholder='e.g., 2 hours'
+                    value={formData.examDetails[0].duration}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        examDetails: [
+                          {
+                            ...prev.examDetails[0],
+                            duration: e.target.value
                           }
                         ]
                       }))
@@ -840,203 +914,139 @@ export default function ExamManager() {
                   />
                 </div>
               </div>
-              <div>
-                <RequiredLabel htmlFor='num-questions'>
-                  Number of Questions
-                </RequiredLabel>
-                <Input
-                  id='num-questions'
-                  type='number'
-                  placeholder='e.g., 50'
-                  value={formData.examDetails[0].number_of_question}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      examDetails: [
-                        {
-                          ...prev.examDetails[0],
-                          number_of_question: e.target.value
-                        }
-                      ]
-                    }))
-                  }
-                  required
-                />
+
+              {/* Application Details */}
+              <div className='space-y-4'>
+                <h2 className='text-xl font-semibold'>Application Details</h2>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div>
+                    <RequiredLabel htmlFor='normal-fee'>Normal Fee</RequiredLabel>
+                    <Input
+                      id='normal-fee'
+                      type='text'
+                      placeholder='e.g., 2000'
+                      value={formData.applicationDetails.normal_fee}
+                      onChange={(e) =>
+                        setFormData((prevFormData) => ({
+                          ...prevFormData,
+                          applicationDetails: {
+                            ...prevFormData.applicationDetails,
+                            normal_fee: e.target.value
+                          }
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <RequiredLabel htmlFor='late-fee'>Late Fee</RequiredLabel>
+                    <Input
+                      id='late-fee'
+                      type='text'
+                      placeholder='e.g., 2500'
+                      value={formData.applicationDetails.late_fee}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          applicationDetails: {
+                            ...prev.applicationDetails,
+                            late_fee: e.target.value
+                          }
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+                </div>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                  <div>
+                    <RequiredLabel htmlFor='exam-date'>Exam Date</RequiredLabel>
+                    <Input
+                      id='exam-date'
+                      type='date'
+                      value={formData.applicationDetails.exam_date}
+                      min={formData.applicationDetails.closing_date || undefined}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          applicationDetails: {
+                            ...prev.applicationDetails,
+                            exam_date: e.target.value
+                          }
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+                  <div>
+                    <RequiredLabel htmlFor='opening-date'>
+                      Opening Date
+                    </RequiredLabel>
+                    <Input
+                      id='opening-date'
+                      type='date'
+                      value={formData.applicationDetails.opening_date}
+                      max={formData.applicationDetails.closing_date || undefined}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          applicationDetails: {
+                            ...prev.applicationDetails,
+                            opening_date: e.target.value
+                          }
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+                  <div>
+                    <RequiredLabel htmlFor='closing-date'>
+                      Closing Date
+                    </RequiredLabel>
+                    <Input
+                      id='closing-date'
+                      type='date'
+                      value={formData.applicationDetails.closing_date}
+                      // min={formData.applicationDetails.opening_date || undefined}
+                      // max={formData.applicationDetails.exam_date || undefined}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          applicationDetails: {
+                            ...prev.applicationDetails,
+                            closing_date: e.target.value
+                          }
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+                </div>
               </div>
-              <div>
-                <RequiredLabel htmlFor='question-type'>
-                  Question Type
-                </RequiredLabel>
-                <Select
-                  id='question-type'
-                  value={formData.examDetails[0].question_type}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      examDetails: [
-                        {
-                          ...prev.examDetails[0],
-                          question_type: e.target.value
-                        }
-                      ]
-                    }))
-                  }
-                  required
-                >
-                  <option value='MCQ'>MCQ</option>
-                  <option value='Written'>Written</option>
-                  <option value='Mixed'>Mixed</option>
-                </Select>
-              </div>
-              <div>
-                <RequiredLabel htmlFor='duration'>Duration</RequiredLabel>
-                <Input
-                  id='duration'
-                  type='text'
-                  placeholder='e.g., 2 hours'
-                  value={formData.examDetails[0].duration}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      examDetails: [
-                        {
-                          ...prev.examDetails[0],
-                          duration: e.target.value
-                        }
-                      ]
-                    }))
-                  }
-                  required
-                />
-              </div>
+
+              {error && <div className='text-red-500 text-sm'>{error}</div>}
             </div>
 
-            {/* Application Details */}
-            <div className='space-y-4'>
-              <h2 className='text-xl font-semibold'>Application Details</h2>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div>
-                  <RequiredLabel htmlFor='normal-fee'>Normal Fee</RequiredLabel>
-                  <Input
-                    id='normal-fee'
-                    type='text'
-                    placeholder='e.g., 2000'
-                    value={formData.applicationDetails.normal_fee}
-                    onChange={(e) =>
-                      setFormData((prevFormData) => ({
-                        ...prevFormData,
-                        applicationDetails: {
-                          ...prevFormData.applicationDetails,
-                          normal_fee: e.target.value
-                        }
-                      }))
-                    }
-                    required
-                  />
-                </div>
-
-                <div>
-                  <RequiredLabel htmlFor='late-fee'>Late Fee</RequiredLabel>
-                  <Input
-                    id='late-fee'
-                    type='text'
-                    placeholder='e.g., 2500'
-                    value={formData.applicationDetails.late_fee}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        applicationDetails: {
-                          ...prev.applicationDetails,
-                          late_fee: e.target.value
-                        }
-                      }))
-                    }
-                    required
-                  />
-                </div>
-              </div>
-              <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                <div>
-                  <RequiredLabel htmlFor='exam-date'>Exam Date</RequiredLabel>
-                  <Input
-                    id='exam-date'
-                    type='date'
-                    value={formData.applicationDetails.exam_date}
-                    min={formData.applicationDetails.closing_date || undefined}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        applicationDetails: {
-                          ...prev.applicationDetails,
-                          exam_date: e.target.value
-                        }
-                      }))
-                    }
-                    required
-                  />
-                </div>
-                <div>
-                  <RequiredLabel htmlFor='opening-date'>
-                    Opening Date
-                  </RequiredLabel>
-                  <Input
-                    id='opening-date'
-                    type='date'
-                    value={formData.applicationDetails.opening_date}
-                    max={formData.applicationDetails.closing_date || undefined}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        applicationDetails: {
-                          ...prev.applicationDetails,
-                          opening_date: e.target.value
-                        }
-                      }))
-                    }
-                    required
-                  />
-                </div>
-                <div>
-                  <RequiredLabel htmlFor='closing-date'>
-                    Closing Date
-                  </RequiredLabel>
-                  <Input
-                    id='closing-date'
-                    type='date'
-                    value={formData.applicationDetails.closing_date}
-                    min={formData.applicationDetails.opening_date || undefined}
-                    max={formData.applicationDetails.exam_date || undefined}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        applicationDetails: {
-                          ...prev.applicationDetails,
-                          closing_date: e.target.value
-                        }
-                      }))
-                    }
-                    required
-                  />
-                </div>
-              </div>
+            {/* Submit Button - Sticky Footer */}
+            <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
+              <Button
+                type='button'
+                onClick={handleModalClose}
+                variant='outline'
+              >
+                Cancel
+              </Button>
+              <Button type='submit' disabled={loading}>
+                {loading
+                  ? 'Processing...'
+                  : editingId
+                    ? 'Update Exam'
+                    : 'Create Exam'}
+              </Button>
             </div>
-
-            {error && <div className='text-red-500 text-sm'>{error}</div>}
-          </div>
-
-          <div className='flex justify-end gap-2 pt-4 border-t'>
-            <Button type='button' onClick={handleModalClose} variant='outline'>
-              Cancel
-            </Button>
-            <Button type='submit' disabled={loading}>
-              {loading
-                ? 'Processing...'
-                : editingId
-                  ? 'Update Exam'
-                  : 'Create Exam'}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </div>
       </Modal>
 
       <ConfirmationDialog

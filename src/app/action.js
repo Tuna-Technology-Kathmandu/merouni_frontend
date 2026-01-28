@@ -123,7 +123,9 @@ export async function getVacancies(page, category_title, search) {
     category_title,
     q: search
   }
-  return services.vacancy.getAll(params)
+  return await authFetch(
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy?limit=10&page=${page}`
+        )
 }
 
 // News actions
@@ -133,7 +135,10 @@ export async function getNews(page, category_title, search) {
     category_title,
     q: search
   }
-  return services.news.getAll(params)
+  
+  return await authFetch(
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/news?limit=10&page=${page}`
+        )
 }
 
 // get ranking

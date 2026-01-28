@@ -126,6 +126,43 @@ export default function ExamsPage() {
                   </div>
                 </div>
               </div>
+            ) : exams.length === 0 ? (
+              <div className='min-h-[400px] flex items-center justify-center'>
+                <div className='text-center'>
+                  <div className='mb-4'>
+                    <svg
+                      className='mx-auto h-24 w-24 text-gray-400'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                      stroke='currentColor'
+                      aria-hidden='true'
+                    >
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={2}
+                        d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+                      />
+                    </svg>
+                  </div>
+                  <h3 className='text-xl font-semibold text-gray-900 mb-2'>
+                    No Exams Found
+                  </h3>
+                  <p className='text-gray-600 mb-4'>
+                    {search
+                      ? `No exams match your search "${search}"`
+                      : 'No exams are currently available'}
+                  </p>
+                  {search && (
+                    <button
+                      onClick={() => setSearch('')}
+                      className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#0A70A7] hover:bg-[#085a8a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0A70A7]'
+                    >
+                      Clear Search
+                    </button>
+                  )}
+                </div>
+              </div>
             ) : (
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
                 {exams.map((exam) => (

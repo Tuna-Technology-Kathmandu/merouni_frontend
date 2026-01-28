@@ -41,7 +41,7 @@ const CourseDescription = ({ params }) => {
     try {
       const degreeData = await getDegreeBySlug(slugs)
 
-      if (degreeData) {
+      if (degreeData && degreeData.id) {
         setDegree(degreeData)
         setError(null)
       } else {
@@ -68,6 +68,21 @@ const CourseDescription = ({ params }) => {
         <Navbar />
         <div className='container mx-auto px-4 py-16 text-center'>
           <div className='max-w-md mx-auto'>
+            <div className='mb-6'>
+              <svg
+                className='mx-auto h-24 w-24 text-gray-400'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke='currentColor'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                />
+              </svg>
+            </div>
             <h1 className='text-4xl font-bold text-gray-800 mb-4'>
               {error === 'Degree not found' ? '404' : 'Error'}
             </h1>
@@ -92,6 +107,21 @@ const CourseDescription = ({ params }) => {
         <Navbar />
         <div className='container mx-auto px-4 py-16 text-center'>
           <div className='max-w-md mx-auto'>
+            <div className='mb-6'>
+              <svg
+                className='mx-auto h-24 w-24 text-gray-400'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke='currentColor'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                />
+              </svg>
+            </div>
             <h1 className='text-4xl font-bold text-gray-800 mb-4'>404</h1>
             <p className='text-xl text-gray-600 mb-8'>Degree not found</p>
             <a
@@ -112,11 +142,14 @@ const CourseDescription = ({ params }) => {
       <div>
         <Header />
         <Navbar />
-        <ImageSection degree={degree} />
-        <Syllabus degree={degree} />
-        <CollegeTeach degree={degree} />
-        {/* <ApplyNow degree={degree} /> */}
-        <RelatedCourses degree={degree} />
+        {degree && (
+          <>
+            <ImageSection degree={degree} />
+            <Syllabus degree={degree} />
+            <CollegeTeach degree={degree} />
+            <RelatedCourses degree={degree} />
+          </>
+        )}
         <Footer />
       </div>
     </>

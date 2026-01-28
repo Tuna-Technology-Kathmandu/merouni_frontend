@@ -44,6 +44,10 @@ const RelatedUniversities = ({ university }) => {
     )
   }
 
+  if (!universities.length){
+    return null
+  }
+
   return (
     <div className='flex flex-col w-full max-w-[1150px] mx-auto mb-20 px-4'>
       <h2 className='font-bold text-3xl leading-10 mb-4'>

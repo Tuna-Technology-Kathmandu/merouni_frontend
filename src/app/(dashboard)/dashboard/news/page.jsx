@@ -1,0 +1,416 @@
+'use client'
+
+import { useState, useEffect, useMemo } from 'react'
+import { useSelector } from 'react-redux'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { fetchNews, createNews, updateNews, deleteNews, getNewsBySlug } from './action'
+import { getCategories } from '@/app/action'
+import Table from '../../../../components/Table'
+import { Edit2, Trash2, Eye } from 'lucide-react'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import useAdminPermission from '@/hooks/useAdminPermission'
+import { Modal } from '../../../../components/UserModal'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { Button } from '../../../../components/ui/button'
+import NewsForm from './components/NewsForm'
+
+export default function NewsManager() {
+    const { setHeading } = usePageHeading()
+    const author_id = useSelector((state) => state.user.data.id)
+    const searchParams = useSearchParams()
+    const router = useRouter()
+
+    const [news, setNews] = useState([])
+    const [categories, setCategories] = useState([])
+    const [loading, setLoading] = useState(false)
+    const [editingId, setEditingId] = useState(null)
+    const [editing, setEditing] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
+    const [initialData, setInitialData] = useState(null)
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        total: 0
+    })
+    const [deleteId, setDeleteId] = useState(null)
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [viewModalOpen, setViewModalOpen] = useState(false)
+    const [viewNewsData, setViewNewsData] = useState(null)
+    const [loadingView, setLoadingView] = useState(false)
+
+    const columns = useMemo(
+        () => [
+            {
+                header: 'Title',
+                accessorKey: 'title',
+                cell: ({ row }) => {
+                    const { title, status, visibility } = row.original
+                    const statusLabel = status || 'draft'
+                    const visibilityLabel = visibility || 'private'
+
+                    const statusClasses =
+                        statusLabel === 'published'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-yellow-100 text-yellow-800'
+
+                    const visibilityClasses =
+                        visibilityLabel === 'public'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-gray-100 text-gray-800'
+
+                    return (
+                        <div className='max-w-xs overflow-hidden'>
+                            <div className='truncate'>{title}</div>
+                            <div className='flex flex-wrap gap-2 mt-1'>
+                                {status && (
+                                    <span
+                                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusClasses}`}
+                                    >
+                                        {statusLabel}
+                                    </span>
+                                )}
+                                {visibility && (
+                                    <span
+                                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${visibilityClasses}`}
+                                    >
+                                        {visibilityLabel}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    )
+                }
+            },
+            {
+                header: 'Description',
+                accessorKey: 'description',
+                cell: ({ getValue }) => (
+                    <div className='max-w-xs overflow-hidden'>
+                        {getValue()?.substring(0, 100)}
+                        {getValue()?.length > 100 ? '...' : ''}
+                    </div>
+                )
+            },
+            {
+                header: 'Created At',
+                accessorKey: 'createdAt',
+                cell: ({ getValue }) => {
+                    const date = new Date(getValue())
+                    return (
+                        <div className='whitespace-nowrap'>{date.toLocaleDateString()}</div>
+                    )
+                }
+            },
+            {
+                header: 'Actions',
+                id: 'actions',
+                cell: ({ row }) => (
+                    <div className='flex gap-2'>
+                        <button
+                            onClick={() => handleView(row.original.slug)}
+                            className='p-1 text-purple-600 hover:text-purple-800'
+                            title='View Details'
+                        >
+                            <Eye className='w-4 h-4' />
+                        </button>
+                        <button
+                            onClick={() => handleEdit(row.original)}
+                            className='p-1 text-blue-600 hover:text-blue-800'
+                        >
+                            <Edit2 className='w-4 h-4' />
+                        </button>
+                        <button
+                            onClick={() => handleDeleteClick(row.original.id)}
+                            className='p-1 text-red-600 hover:text-red-800'
+                        >
+                            <Trash2 className='w-4 h-4' />
+                        </button>
+                    </div>
+                )
+            }
+        ],
+        []
+    )
+
+    useEffect(() => {
+        setHeading('News Management')
+        loadData()
+        loadCategories()
+        return () => setHeading(null)
+    }, [setHeading])
+
+    // Check for 'add' query parameter
+    useEffect(() => {
+        const addParam = searchParams.get('add')
+        if (addParam === 'true') {
+            setIsOpen(true)
+            setEditing(false)
+            setInitialData(null)
+            router.replace('/dashboard/news')
+        }
+    }, [searchParams, router])
+
+    const { requireAdmin } = useAdminPermission()
+
+    const loadCategories = async () => {
+        try {
+            const response = await getCategories()
+            setCategories(response.items || [])
+        } catch (error) {
+            console.error('Error loading categories:', error)
+            toast.error('Failed to load categories')
+        }
+    }
+
+    const loadData = async (page = 1, search = '') => {
+        try {
+            setLoading(true)
+            const response = await fetchNews(page, search)
+
+            setNews(response.items || [])
+            setPagination({
+                currentPage: response.pagination?.currentPage || 1,
+                totalPages: response.pagination?.totalPages || 1,
+                total: response.pagination?.totalCount || 0
+            })
+        } catch (error) {
+            console.error('Error loading news:', error)
+            toast.error('Failed to fetch news')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleSearch = (query) => {
+        setSearchQuery(query)
+        loadData(1, query)
+    }
+
+    const handleSubmit = async (data) => {
+        try {
+            setSubmitting(true)
+
+            const newsData = {
+                title: data.title,
+                category_id: data.category,
+                description: data.description,
+                content: data.content,
+                featuredImage: data.featuredImage,
+                status: data.status,
+                visibility: data.visibility,
+                author: author_id
+            }
+
+            if (editing && editingId) {
+                await updateNews(editingId, newsData)
+                toast.success('News updated successfully')
+            } else {
+                await createNews(newsData)
+                toast.success('News created successfully')
+            }
+
+            setIsOpen(false)
+            setEditing(false)
+            setEditingId(null)
+            setInitialData(null)
+            loadData(pagination.currentPage, searchQuery)
+        } catch (error) {
+            console.error('Error saving news:', error)
+            toast.error(`Failed to ${editing ? 'update' : 'create'} news`)
+        } finally {
+            setSubmitting(false)
+        }
+    }
+
+    const handleEdit = (newsItem) => {
+        setInitialData(newsItem)
+        setEditingId(newsItem.id)
+        setEditing(true)
+        setIsOpen(true)
+    }
+
+    const handleView = async (slug) => {
+        try {
+            setLoadingView(true)
+            setViewModalOpen(true)
+            const newsData = await getNewsBySlug(slug)
+            setViewNewsData(newsData)
+        } catch (error) {
+            console.error('Error fetching news details:', error)
+            toast.error('Failed to load news details')
+            setViewModalOpen(false)
+        } finally {
+            setLoadingView(false)
+        }
+    }
+
+    const handleCloseViewModal = () => {
+        setViewModalOpen(false)
+        setViewNewsData(null)
+    }
+
+    const handleDeleteClick = (id) => {
+        requireAdmin(() => {
+            setDeleteId(id)
+            setIsDialogOpen(true)
+        }, 'You do not have permission to delete news.')
+    }
+
+    const handleDialogClose = () => {
+        setIsDialogOpen(false)
+        setDeleteId(null)
+    }
+
+    const handleDeleteConfirm = async () => {
+        if (!deleteId) return
+
+        try {
+            await deleteNews(deleteId)
+            toast.success('News deleted successfully')
+            loadData(pagination.currentPage, searchQuery)
+        } catch (error) {
+            console.error('Error deleting news:', error)
+            toast.error('Failed to delete news')
+        } finally {
+            handleDialogClose()
+        }
+    }
+
+    const handleModalClose = () => {
+        setIsOpen(false)
+        setEditing(false)
+        setEditingId(null)
+        setInitialData(null)
+    }
+
+    return (
+        <>
+            <div className='p-4 w-full'>
+                <ToastContainer position='top-right' />
+
+                {/* Header */}
+                <div className='flex justify-between items-center mb-6'>
+                    <div className='flex items-center gap-4'>
+                        <h1 className='text-2xl font-bold'>News</h1>
+                    </div>
+                    <Button
+                        onClick={() => {
+                            setIsOpen(true)
+                            setEditing(false)
+                            setInitialData(null)
+                        }}
+                    >
+                        Add News
+                    </Button>
+                </div>
+
+                {/* News Form Modal */}
+                <NewsForm
+                    isOpen={isOpen}
+                    onClose={handleModalClose}
+                    editing={editing}
+                    initialData={initialData}
+                    categories={categories}
+                    onSubmit={handleSubmit}
+                    submitting={submitting}
+                />
+
+                {/* Table Section */}
+                <div className='mt-8'>
+                    <Table
+                        data={news}
+                        columns={columns}
+                        pagination={pagination}
+                        onPageChange={(newPage) => loadData(newPage, searchQuery)}
+                        onSearch={handleSearch}
+                        showSearch={true}
+                    />
+                </div>
+            </div>
+
+            {/* Delete Confirmation Dialog */}
+            <ConfirmationDialog
+                open={isDialogOpen}
+                onClose={handleDialogClose}
+                onConfirm={handleDeleteConfirm}
+                title='Confirm Deletion'
+                message='Are you sure you want to delete this news? This action cannot be undone.'
+            />
+
+            {/* View News Details Modal */}
+            <Modal
+                isOpen={viewModalOpen}
+                onClose={handleCloseViewModal}
+                title='News Details'
+                className='max-w-3xl'
+            >
+                {loadingView ? (
+                    <div className='flex justify-center items-center h-48'>
+                        Loading...
+                    </div>
+                ) : viewNewsData ? (
+                    <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
+                        {viewNewsData.featuredImage && (
+                            <div className='w-full h-64 rounded-lg overflow-hidden'>
+                                <img
+                                    src={viewNewsData.featuredImage}
+                                    alt={viewNewsData.title}
+                                    className='w-full h-full object-cover'
+                                />
+                            </div>
+                        )}
+                        <div>
+                            <h2 className='text-2xl font-bold mb-2'>{viewNewsData.title}</h2>
+                            <div className='flex gap-2 mb-4'>
+                                <span
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${viewNewsData.status === 'published'
+                                        ? 'bg-green-100 text-green-800'
+                                        : 'bg-yellow-100 text-yellow-800'
+                                        }`}
+                                >
+                                    {viewNewsData.status}
+                                </span>
+                                <span
+                                    className={`px-2 py-1 rounded-full text-xs font-medium ${viewNewsData.visibility === 'public'
+                                        ? 'bg-blue-100 text-blue-800'
+                                        : 'bg-gray-100 text-gray-800'
+                                        }`}
+                                >
+                                    {viewNewsData.visibility}
+                                </span>
+                            </div>
+                        </div>
+                        {viewNewsData.description && (
+                            <div>
+                                <h3 className='font-semibold mb-2'>Description</h3>
+                                <p className='text-gray-700'>{viewNewsData.description}</p>
+                            </div>
+                        )}
+                        {viewNewsData.content && (
+                            <div>
+                                <h3 className='font-semibold mb-2'>Content</h3>
+                                <div
+                                    className='prose max-w-none'
+                                    dangerouslySetInnerHTML={{ __html: viewNewsData.content }}
+                                />
+                            </div>
+                        )}
+                        {viewNewsData.createdAt && (
+                            <div className='text-sm text-gray-500'>
+                                Created: {new Date(viewNewsData.createdAt).toLocaleString()}
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className='text-center py-8 text-gray-500'>
+                        No data available
+                    </div>
+                )}
+            </Modal>
+        </>
+    )
+}

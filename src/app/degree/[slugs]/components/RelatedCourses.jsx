@@ -37,6 +37,10 @@ const RelatedCourses = ({ degree }) => {
     return <div className='text-center py-10'>Loading...</div>
   }
 
+  if (!degrees || degrees.length === 0) {
+    return null // Don't show the section if there are no related degrees
+  }
+
   return (
     <div className='flex flex-col max-w-[1150px] mx-auto mb-20 px-4 my-16'>
       <h2 className='font-bold text-2xl md:text-3xl leading-10 mb-6 md:mb-9 text-center md:text-left'>

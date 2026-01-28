@@ -126,6 +126,12 @@ export const menuItems = [
         visible: ['admin', 'editor']
       },
       {
+        icon: <BsNewspaper className='text-xl' />,
+        label: 'News',
+        href: '/dashboard/news',
+        visible: ['admin', 'editor']
+      },
+      {
         icon: <MdBackHand />,
         label: 'Refer Student',
         href: '/dashboard/referStudent',

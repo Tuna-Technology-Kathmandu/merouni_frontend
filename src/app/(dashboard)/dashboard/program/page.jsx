@@ -20,6 +20,7 @@ import {
   fetchScholarship
 } from './actions'
 import CourseSearch from './CourseSearch'
+import { Button } from '@/components/ui/button'
 const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
 })
@@ -730,8 +731,7 @@ export default function ProgramForm() {
           </div>
           {/* Button */}
           <div className='flex gap-2'>
-            <button
-              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+            <Button
               onClick={() => {
                 setEditing(false)
                 reset()
@@ -749,7 +749,7 @@ export default function ProgramForm() {
               }}
             >
               Add Program
-            </button>
+            </Button>
           </div>
         </div>
         <ToastContainer />
@@ -1341,17 +1341,16 @@ export default function ProgramForm() {
             >
               Cancel
             </button>
-            <button
+            <Button
               type='submit'
               disabled={submitting}
-              className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
             >
               {submitting
                 ? 'Processing...'
                 : editing
                   ? 'Update Program'
                   : 'Create Program'}
-            </button>
+            </Button>
           </div>
         </form>
       </Modal>

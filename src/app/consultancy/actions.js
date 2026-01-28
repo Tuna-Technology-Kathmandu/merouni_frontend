@@ -1,3 +1,5 @@
+import { DotenvConfig } from "@/config/env.config"
+
 export async function getConsultancies(page = 1, searchQuery = '') {
   try {
     const response = await fetch(

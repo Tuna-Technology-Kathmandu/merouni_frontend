@@ -1,9 +1,11 @@
 import { authFetch } from '@/app/utils/authFetch'
+import { DotenvConfig } from '@/config/env.config'
 
-let url = `${process.env.mediaUrl}${process.env.version}/media`
+let url = `${DotenvConfig.NEXT_APP_MEDIA_BASE_URL}/media`
 
 export async function fetchMedia(page = 1, limit = 10) {
   try {
+    let url = `${DotenvConfig.NEXT_APP_MEDIA_BASE_URL}/media`
     const response = await authFetch(`${url}?limit=${limit}&page=${page}`, {
       cache: 'no-store'
     })

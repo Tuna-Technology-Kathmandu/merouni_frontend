@@ -26,7 +26,6 @@ const AdminNavbar = () => {
       const parsedRole =
         typeof userData.role === 'string' ? destr(userData.role) : userData.role
       userRoles = parsedRole && typeof parsedRole === 'object' ? parsedRole : {}
-      console.log(userRoles, 'userRoles')
     } catch (error) {
       console.error('Error parsing user role:', error)
       userRoles = {}

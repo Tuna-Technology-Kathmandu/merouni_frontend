@@ -2,9 +2,11 @@ import React from 'react'
 import Link from 'next/link'
 
 const CollegeTeach = ({ degree }) => {
-  if (degree?.colleges.length == 0) {
+  // Early return if no degree or no colleges
+  if (!degree || !degree.colleges || degree.colleges.length === 0) {
     return null
   }
+
   return (
     <>
       <div className='flex flex-col items-center  '>
@@ -13,9 +15,9 @@ const CollegeTeach = ({ degree }) => {
         </h2>
 
         <div className='w-[800px] max-[875px]:w-full max-h-[600px] overflow-y-auto mt-3 mb-2 border border-gray-300 rounded-lg'>
-          {degree?.colleges?.map((college, index) => {
+          {degree.colleges.map((college, index) => {
             // Find the matching address for each college
-            const collegeAddress = degree.collegesAddress.find(
+            const collegeAddress = degree.collegesAddress?.find(
               (address) =>
                 address.program_college.college_id ===
                 college.program_college.college_id

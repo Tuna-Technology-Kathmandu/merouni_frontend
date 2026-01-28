@@ -5,6 +5,7 @@ import { LiaUniversitySolid } from 'react-icons/lia'
 import { FaPhoneAlt, FaUniversity } from 'react-icons/fa'
 import { IoMdMail } from 'react-icons/io'
 import he from 'he'
+import { FormatDate } from '@/lib/date'
 
 const ImageSection = ({ university }) => {
   console.log('univeristy', university)
@@ -51,7 +52,7 @@ const ImageSection = ({ university }) => {
         <div className='flex flex-col items-center min-[1037px]:pr-14'>
           <MdDateRange size={30} className='text-[#30AD8F]' />
           <p className='whitespace-nowrap text-sm'>
-            {university?.date_of_establish || 'N/A'}
+            {FormatDate.formatDate(university?.date_of_establish) || 'N/A'}
           </p>
         </div>
 

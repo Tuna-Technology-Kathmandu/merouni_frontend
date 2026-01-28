@@ -49,9 +49,6 @@ const UniversityDetailPage = ({ params }) => {
     }
   }
 
-  // useEffect(() => {
-  //   console.log('University Data:', university)
-  // }, [university])
 
   if (loading) {
     return <Loading />

@@ -104,56 +104,87 @@ const AdmissionPage = () => {
                 <CardSkeleton key={index} />
               ))}
           </div>
+        ) : admission.length === 0 ? (
+          <div className='min-h-[400px] flex items-center justify-center'>
+            <div className='text-center'>
+              <div className='mb-4'>
+                <svg
+                  className='mx-auto h-24 w-24 text-gray-400'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
+                  aria-hidden='true'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'
+                  />
+                </svg>
+              </div>
+              <h3 className='text-xl font-semibold text-gray-900 mb-2'>
+                No Admissions Found
+              </h3>
+              <p className='text-gray-600 mb-4'>
+                {searchTerm
+                  ? `No admissions match your search "${searchTerm}"`
+                  : 'No admission details are currently available'}
+              </p>
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#0A70A7] hover:bg-[#085a8a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0A70A7]'
+                >
+                  Clear Search
+                </button>
+              )}
+            </div>
+          </div>
         ) : (
           <>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-              {admission.length === 0 ? (
-                <div className='text-center text-gray-500 mt-8 col-span-full'>
-                  No admission details available.
-                </div>
-              ) : (
-                admission.map((admis, index) => (
-                  <div
-                    key={index}
-                    className='border rounded-2xl p-6 bg-white hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 cursor-pointer'
+              {admission.map((admis, index) => (
+                <div
+                  key={index}
+                  className='border rounded-2xl p-6 bg-white hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 cursor-pointer'
+                >
+                  <Link
+                    href={`/degree/${admis?.program?.slugs}`}
+                    className='hover:underline hover:decoration-[#0A70A7]'
                   >
-                    <Link
-                      href={`/degree/${admis?.program?.slugs}`}
-                      className='hover:underline hover:decoration-[#0A70A7]'
-                    >
-                      <h2 className='text-lg font-bold text-gray-800 mb-3 min-h-[60px]'>
-                        {admis.program.title}
-                      </h2>
-                    </Link>
+                    <h2 className='text-lg font-bold text-gray-800 mb-3 min-h-[60px]'>
+                      {admis.program.title}
+                    </h2>
+                  </Link>
 
-                    <div className='space-y-2 text-sm'>
-                      <p className='text-gray-700'>
-                        <span className='font-semibold'>College:</span>{' '}
-                        <Link
-                          href={`/colleges/${admis?.collegeAdmissionCollege?.slugs}`}
-                          className='hover:underline hover:decoration-[#0A70A7]'
-                        >
-                          {admis.collegeAdmissionCollege.name}
-                        </Link>
-                      </p>
-                      <p className='text-gray-700'>
-                        <span className='font-semibold'>
-                          Admission Process:
-                        </span>{' '}
-                        {admis.admission_process}
-                      </p>
-                      <p className='text-gray-700'>
-                        <span className='font-semibold'>Eligibility:</span>{' '}
-                        {admis.eligibility_criteria}
-                      </p>
-                      <p className='text-gray-700'>
-                        <span className='font-semibold'>Fee Details:</span>{' '}
-                        {admis.fee_details}
-                      </p>
-                    </div>
+                  <div className='space-y-2 text-sm'>
+                    <p className='text-gray-700'>
+                      <span className='font-semibold'>College:</span>{' '}
+                      <Link
+                        href={`/colleges/${admis?.collegeAdmissionCollege?.slugs}`}
+                        className='hover:underline hover:decoration-[#0A70A7]'
+                      >
+                        {admis.collegeAdmissionCollege.name}
+                      </Link>
+                    </p>
+                    <p className='text-gray-700'>
+                      <span className='font-semibold'>
+                        Admission Process:
+                      </span>{' '}
+                      {admis.admission_process}
+                    </p>
+                    <p className='text-gray-700'>
+                      <span className='font-semibold'>Eligibility:</span>{' '}
+                      {admis.eligibility_criteria}
+                    </p>
+                    <p className='text-gray-700'>
+                      <span className='font-semibold'>Fee Details:</span>{' '}
+                      {admis.fee_details}
+                    </p>
                   </div>
-                ))
-              )}
+                </div>
+              ))}
             </div>
 
             {/* Pagination */}
