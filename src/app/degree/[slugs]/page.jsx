@@ -11,6 +11,8 @@ import RelatedCourses from './components/RelatedCourses'
 import Syllabus from './components/syllabus'
 import ImageSection from './components/upperSection'
 import { slugify } from '@/lib/slugify'
+import { BookOpen } from 'lucide-react'
+import EmptyState from '@/components/ui/EmptyState'
 
 const CourseDescription = ({ params }) => {
   const [degree, setDegree] = useState(null)
@@ -61,76 +63,21 @@ const CourseDescription = ({ params }) => {
     return <Loading />
   }
 
-  if (error) {
+  if (error || !degree) {
     return (
       <>
         <Header />
         <Navbar />
-        <div className='container mx-auto px-4 py-16 text-center'>
-          <div className='max-w-md mx-auto'>
-            <div className='mb-6'>
-              <svg
-                className='mx-auto h-24 w-24 text-gray-400'
-                fill='none'
-                viewBox='0 0 24 24'
-                stroke='currentColor'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-                />
-              </svg>
-            </div>
-            <h1 className='text-4xl font-bold text-gray-800 mb-4'>
-              {error === 'Degree not found' ? '404' : 'Error'}
-            </h1>
-            <p className='text-xl text-gray-600 mb-8'>{error}</p>
-            <a
-              href='/degree'
-              className='inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors'
-            >
-              Browse All Degrees
-            </a>
-          </div>
-        </div>
-        <Footer />
-      </>
-    )
-  }
-
-  if (!degree) {
-    return (
-      <>
-        <Header />
-        <Navbar />
-        <div className='container mx-auto px-4 py-16 text-center'>
-          <div className='max-w-md mx-auto'>
-            <div className='mb-6'>
-              <svg
-                className='mx-auto h-24 w-24 text-gray-400'
-                fill='none'
-                viewBox='0 0 24 24'
-                stroke='currentColor'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={2}
-                  d='M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-                />
-              </svg>
-            </div>
-            <h1 className='text-4xl font-bold text-gray-800 mb-4'>404</h1>
-            <p className='text-xl text-gray-600 mb-8'>Degree not found</p>
-            <a
-              href='/degree'
-              className='inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors'
-            >
-              Browse All Degrees
-            </a>
-          </div>
+        <div className='container mx-auto px-4 py-20'>
+          <EmptyState
+            icon={BookOpen}
+            title={error === 'Degree not found' || !degree ? 'Degree Not Found' : 'Something went wrong'}
+            description={error || "We couldn't find the degree you're looking for. It might have been moved or deleted."}
+            action={{
+              label: 'Browse All Degrees',
+              onClick: () => window.location.href = '/degree'
+            }}
+          />
         </div>
         <Footer />
       </>

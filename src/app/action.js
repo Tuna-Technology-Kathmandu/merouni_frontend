@@ -1,8 +1,7 @@
 'use server'
 
-import services from './apiService'
-import { cookies } from 'next/headers'
 import { DotenvConfig } from '../config/env.config'
+import services from './apiService'
 
 // const cookieStore = await
 

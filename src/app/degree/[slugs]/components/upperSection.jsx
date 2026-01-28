@@ -1,211 +1,167 @@
 import React from 'react'
-import { PiLineVerticalThin } from 'react-icons/pi'
+import { motion } from 'framer-motion'
+import { Calendar, Clock, GraduationCap, Globe, BookOpen } from 'lucide-react'
 
 const ImageSection = ({ degree }) => {
+  const infoItems = [
+    {
+      icon: Calendar,
+      label: 'Duration',
+      value: degree?.duration || 'TBD',
+      color: 'bg-emerald-50 text-emerald-600'
+    },
+    {
+      icon: GraduationCap,
+      label: 'Faculty',
+      value: degree?.programfaculty?.title || 'TBD',
+      color: 'bg-blue-50 text-blue-600'
+    },
+    {
+      icon: Clock,
+      label: 'Delivery Mode',
+      value: degree?.delivery_mode || 'TBD',
+      color: 'bg-orange-50 text-orange-600'
+    }
+  ]
+
   return (
-    <div className='flex flex-col items-center w-full'>
-      <div className='w-full'>
-        <div className='h-[25vh] w-full md:h-[400px] relative'>
+    <div className='flex flex-col items-center w-full bg-white'>
+      {/* Page Header / Hero Area */}
+      <div className='w-full bg-gray-50 border-b border-gray-100 py-16 md:py-24'>
+        <div className='container mx-auto px-4'>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className='max-w-4xl'
+          >
+            <div className='flex items-center space-x-3 mb-6'>
+              <span className='px-3 py-1 bg-[#30AD8F]/10 text-[#30AD8F] text-xs font-bold rounded-full border border-[#30AD8F]/20'>
+                {degree?.code}
+              </span>
+              {degree?.programlevel?.title && (
+                <span className='text-gray-400 text-xs font-bold uppercase tracking-widest'>
+                  • {degree.programlevel.title}
+                </span>
+              )}
+            </div>
+            <h1 className='text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight'>
+              {degree?.title}
+            </h1>
+            <p className='text-gray-500 text-lg max-w-2xl leading-relaxed'>
+              A comprehensive {degree?.duration} program delivered {degree?.delivery_mode} at the {degree?.programlevel?.title} level.
+            </p>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Hero Image Section */}
+      <div className='container mx-auto px-4 -mt-12 md:-mt-16 relative z-10'>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className='w-full h-[300px] md:h-[500px] rounded-[2rem] overflow-hidden shadow-2xl shadow-gray-200 border border-gray-100'
+        >
           <img
             src={'/images/degreeHero.webp'}
             alt={degree?.title || 'Degree Image'}
             className='object-cover w-full h-full'
           />
-          <div className='absolute w-full h-full inset-0 bg-black/25 z-10'></div>
-        </div>
+        </motion.div>
+      </div>
 
-        <div className='flex flex-row bg-[#30AD8F] bg-opacity-5 h-[110px] mb-20 items-center px-[75px] max-md:px-[30px]'>
-          <div className=''>
-            <h2 className='font-bold text-lg sm:text-2xl md:leading-10'>
-              {degree?.title || ''}
+      {/* Quick Info Grid */}
+      <div className='container mx-auto px-4 py-16'>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+          {infoItems.map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              className='flex flex-col p-8 bg-gray-50 rounded-3xl border border-gray-100'
+            >
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 shadow-sm ${item.color}`}>
+                <item.icon className='w-6 h-6' />
+              </div>
+              <p className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-2'>{item.label}</p>
+              <p className='text-gray-900 font-bold text-xl'>{item.value}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Content Section */}
+      <div className='container mx-auto px-4 pb-20'>
+        <div className='max-w-4xl'>
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <h2 className='text-3xl font-bold text-gray-900 mb-10 flex items-center'>
+              <span className='w-1.5 h-8 bg-[#30AD8F] rounded-full mr-4' />
+              Description
             </h2>
-            <p className='text-sm md:text-base text-gray-700 mt-2'>
-              {degree?.code || ''}
-            </p>
+            <div
+              className='prose prose-lg prose-gray max-w-none 
+              [&>iframe]:w-full 
+              [&>iframe]:aspect-video 
+              [&>iframe]:h-auto
+              [&>iframe]:rounded-3xl 
+              [&>iframe]:my-12
+              
+              [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mb-6
+              [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mb-4
+              [&_p]:text-gray-600 [&_p]:leading-relaxed [&_p]:mb-6
+              [&_ul]:list-none [&_ul]:pl-0
+              [&_li]:relative [&_li]:pl-8 [&_li]:mb-4
+              [&_li::before]:content-[""] [&_li::before]:absolute [&_li::before]:left-0 [&_li::before]:top-3 [&_li::before]:w-2 [&_li::before]:h-2 [&_li::before]:bg-[#30AD8F] [&_li::before]:rounded-full
+              '
+              dangerouslySetInnerHTML={{ __html: degree?.learning_outcomes || '' }}
+            />
+          </motion.div>
+
+          {/* Careers & Eligibility */}
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mt-16 pt-16 border-t border-gray-100'>
+            {degree?.careers && (
+              <div className='space-y-4'>
+                <h3 className='text-xl font-bold text-gray-900'>Career Opportunities</h3>
+                <p className='text-gray-600 leading-relaxed'>{degree.careers}</p>
+              </div>
+            )}
+
+            {degree?.eligibility_criteria && (
+              <div className='space-y-4'>
+                <h3 className='text-xl font-bold text-gray-900'>Eligibility Criteria</h3>
+                <p className='text-gray-600 leading-relaxed'>{degree.eligibility_criteria}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Details List */}
+          <div className='mt-20'>
+            <h3 className='text-xl font-bold text-gray-900 mb-8'>Quick Details</h3>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+              {[
+                { icon: Globe, label: 'Language', value: degree?.language },
+                { icon: BookOpen, label: 'Entrance Exam', value: degree?.programexam?.title },
+                { icon: GraduationCap, label: 'Scholarship', value: degree?.programscholarship?.name },
+                { icon: Clock, label: 'Delivery Type', value: degree?.delivery_type }
+              ].filter(i => i.value).map((item, idx) => (
+                <div key={idx} className='flex items-center p-5 bg-white border border-gray-100 rounded-2xl'>
+                  <item.icon className='w-5 h-5 text-[#30AD8F] mr-4' />
+                  <div>
+                    <p className='text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5'>{item.label}</p>
+                    <p className='text-gray-900 font-bold text-sm'>{item.value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className=' w-[1000px] max-[1096px]:w-full bg-[#30AD8F] bg-opacity-10 text-black rounded-md flex md:flex-row md:gap-0 gap-5  mb-8  items-center justify-center flex-col px-[75px] max-md:px-[30px] h-auto md:h-[150px] p-8'>
-        <div className=' flex flex-col items-center md:pr-14'>
-          {/* <p className="text-sm font-bold">Starts</p> */}
-          <img src='/images/course_year.png' alt='year' className='w-8' />
-          <p className='whitespace-nowrap'>{degree?.duration || ''}</p>
-        </div>
-        <div className='md:flex items-center pr-5 hidden'>
-          <PiLineVerticalThin size={60} />
-        </div>
-        <div className=' flex flex-col items-center md:pl-14 md:pr-14'>
-          {/* <p className="text-sm font-bold">Starts</p> */}
-          <img
-            src='/images/course_faculty.png'
-            alt='faculty'
-            className='w-10'
-          />
-          <p className=' whitespace-nowrap'>
-            {degree?.programfaculty?.title || ''}
-          </p>
-        </div>
-        <div className='md:flex hidden items-center pr-5'>
-          <PiLineVerticalThin size={60} />
-        </div>
-        <div className=' flex flex-col items-center md:pl-14'>
-          {/* <p className="text-sm font-bold">Ends</p> */}
-          <img src='/images/course_hour.png' alt='level' className='w-10' />
-
-          <p className='whitespace-nowrap'>{degree?.delivery_mode || ''}</p>
-        </div>
-      </div>
-
-      <div className=' bg-opacity-10 text-black rounded-md flex flex-col w-full  mb-8 pt-10 px-[75px] max-md:px-[30px]'>
-        <h2 className='font-bold text-2xl md:text-3xl leading-10 mb-6 text-center md:text-left'>
-          Description
-        </h2>
-        <p
-          className='pt-6 leading-7 text-justify
-        [&>iframe]:w-full 
-             [&>iframe]:max-w-[calc(100vw-40px)] 
-             [&>iframe]:aspect-video 
-             [&>iframe]:h-auto
-             [&>iframe]:rounded-lg 
-             [&>iframe]:mt-4
-             [&>iframe]:mx-auto
-             [&>iframe]:block
-
-             /* Table wrapper styles */
-             [&_.table-wrapper]:overflow-x-auto
-             [&_.table-wrapper]:my-4
-             [&_.table-wrapper]:w-full
-             [&_.table-wrapper]:[scrollbar-width:thin]
-             [&_.table-wrapper]:[scrollbar-color:gray-300_transparent]
-
-             /* Table styles */
-             [&_table]:min-w-full
-             [&_table]:border-collapse
-             [&_th]:bg-gray-100
-             [&_th]:p-2
-             [&_th]:text-left
-             [&_th]:border
-             [&_th]:border-gray-300
-             [&_td]:p-2
-             [&_td]:border
-             [&_td]:border-gray-300
-             [&_tr:nth-child(even)]:bg-gray-50
-
-             /* Other styles */
-             [&_h1]:text-2xl
-             [&_h1]:font-bold
-             [&_h1]:mt-8
-             [&_h1]:mb-4
-             [&_h2]:text-xl
-             [&_h2]:font-bold
-             [&_h2]:mt-6
-             [&_h2]:mb-3
-             text-xs md:text-sm lg:text-base
-             [&_ol]:pl-8 
-             [&_ol]:my-4
-             [&_ol]:space-y-2
-             [&_ul]:list-disc 
-             [&_ul]:pl-8 
-             [&_ul]:my-4
-             [&_ul]:space-y-2
-             [&_li]:pl-2
-             max-lg:[&_ol]:text-sm
-             max-lg:[&_ul]:text-sm
-             max-lg:[&_ol]:space-y-1
-             max-lg:[&_ul]:space-y-1
-        '
-          dangerouslySetInnerHTML={{ __html: degree?.learning_outcomes || '' }}
-        ></p>
-      </div>
-
-      {/* careers opportunities */}
-      {degree?.careers && (
-        <div className=' bg-opacity-10 text-black rounded-md flex flex-col w-full  mb-8 pt-8 px-[75px] max-md:px-[30px]'>
-          <h2 className='font-bold text-lg md:text-xl leading-10 mb-2 text-center md:text-left'>
-            Career Opportunities
-          </h2>
-          <p className='pt-2 leading-7 text-justify'>{degree?.careers || ''}</p>
-        </div>
-      )}
-
-      {/* eligibility criteria */}
-      {degree?.eligibility_criteria && (
-        <div className=' bg-opacity-10 text-black rounded-md flex flex-col w-full  mb-8 pt-8 px-[75px] max-md:px-[30px]'>
-          <h2 className='font-bold text-lg md:text-xl leading-10 mb-2 text-center md:text-left'>
-            Eligibility Criteria
-          </h2>
-          <p className='pt-2 leading-7 text-justify'>
-            {degree?.eligibility_criteria}
-          </p>
-        </div>
-      )}
-
-      {/* eligibility criteria */}
-      {degree?.curriculum && (
-        <div className=' bg-opacity-10 text-black rounded-md flex flex-col w-full  mb-8 pt-8 px-[75px] max-md:px-[30px]'>
-          <h2 className='font-bold text-lg md:text-xl leading-10 mb-2 text-center md:text-left'>
-            Curriculum
-          </h2>
-          <p className='pt-2 leading-7 text-justify'>{degree?.curriculum}</p>
-        </div>
-      )}
-
-      {/* additional informaiton */}
-      {/* additional information */}
-      <div className='bg-opacity-10 text-black rounded-md flex flex-col w-full mb-8 pt-8 px-[75px] max-md:px-[30px]'>
-        <h2 className='font-bold text-lg md:text-xl leading-10 mb-2 text-center md:text-left'>
-          Additional Information
-        </h2>
-
-        {degree?.credits && (
-          <div className='flex gap-3 items-center pt-2'>
-            <p className='font-medium'>Credits:</p>
-            <p>{degree.credits}</p>
-          </div>
-        )}
-
-        {degree?.programlevel?.title && (
-          <div className='flex gap-3 items-center pt-1'>
-            <p className='font-medium'>Level:</p>
-            <p>{degree.programlevel.title}</p>
-          </div>
-        )}
-
-        {degree?.language && (
-          <div className='flex gap-3 items-center pt-1'>
-            <p className='font-medium'>Language:</p>
-            <p>{degree.language}</p>
-          </div>
-        )}
-
-        {degree?.programexam?.title && (
-          <div className='flex gap-3 items-center pt-1'>
-            <p className='font-medium'>Entrance Exam:</p>
-            <p>{degree.programexam.title}</p>
-          </div>
-        )}
-
-        {degree?.fee && (
-          <div className='flex gap-3 items-center pt-1'>
-            <p className='font-medium'>Fee Structure:</p>
-            <p>{degree.fee}</p>
-          </div>
-        )}
-
-        {degree?.delivery_type && (
-          <div className='flex gap-3 items-center pt-1'>
-            <p className='font-medium'>Delivery Type:</p>
-            <p>{degree.delivery_type}</p>
-          </div>
-        )}
-
-        {degree?.programscholarship?.name && (
-          <div className='flex gap-3 items-center pt-1'>
-            <p className='font-medium'>Scholarship:</p>
-            <p>{degree.programscholarship.name}</p>
-          </div>
-        )}
       </div>
     </div>
   )
