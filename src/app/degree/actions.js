@@ -1,5 +1,6 @@
+import { DotenvConfig } from "@/config/env.config"
+
 // services.js
-import { DotenvConfig } from '../config/env.config'
 export const fetchDegrees = async (search = '', page = 1) => {
   try {
     const response = await fetch(

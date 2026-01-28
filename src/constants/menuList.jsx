@@ -36,7 +36,7 @@ export const menuItems = [
         icon: <VscReferences />,
         label: 'Referrals',
         href: '/dashboard/referrals',
-        visible: ['admin', 'editor']
+        visible: ['admin', 'editor', 'student']
       },
       {
         icon: <MdQuiz className='text-xl' />,

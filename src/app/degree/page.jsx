@@ -5,9 +5,9 @@ import { Search } from 'lucide-react'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
-import Shimmer from '../../components/Shimmer'
 import Link from 'next/link'
 import Pagination from '../blogs/components/Pagination'
+import { CardSkeleton } from '@/components/ui/CardSkeleton'
 
 const DegreePage = () => {
   const [courses, setCourses] = useState([])
@@ -112,25 +112,7 @@ const DegreePage = () => {
               {Array(6)
                 .fill('')
                 .map((_, index) => (
-                  <div
-                    key={index}
-                    className='bg-white rounded-2xl p-6 border border-gray-200 shadow-md'
-                  >
-                    <div className='flex items-start gap-4'>
-                      <div className='w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center'>
-                        <Shimmer width='30px' height='30px' />
-                      </div>
-                      <div className='flex flex-col gap-3 w-full'>
-                        <Shimmer width='80%' height='20px' />
-                        <Shimmer width='60%' height='18px' />
-                        <Shimmer width='90%' height='15px' />
-                        <div className='flex gap-2'>
-                          <Shimmer width='40%' height='15px' />
-                          <Shimmer width='40%' height='15px' />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <CardSkeleton key={index} />
                 ))}
             </div>
           ) : (

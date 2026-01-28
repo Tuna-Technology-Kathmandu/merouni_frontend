@@ -1,23 +1,19 @@
-import React from 'react'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const UniversityCardShimmer = () => {
   return (
-    <div className='bg-white rounded-xl border border-gray-200 overflow-hidden shadow-lg animate-pulse w-full'>
+    <div className='bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm w-full'>
       {/* Image Section */}
-      <div className='flex justify-between items-start min-h-28 bg-gray-300'>
-        <div className='flex gap-2 p-2'>
-          <div className='w-8 h-8 bg-gray-400 rounded-full'></div>
-        </div>
-      </div>
+      <Skeleton className='h-32 w-full rounded-none' />
 
       {/* Content Section */}
-      <div className='p-4'>
-        <div className='h-5 bg-gray-300 rounded w-3/4 mb-2'></div>
-        <div className='h-4 bg-gray-300 rounded w-1/2 mb-3'></div>
+      <div className='p-5'>
+        <Skeleton className='h-6 w-4/5 mb-3' />
+        <Skeleton className='h-4 w-3/5 mb-6' />
 
-        <div className='flex gap-3 justify-between'>
-          <div className='flex-1 py-2 bg-gray-300 rounded-2xl'></div>
-          <div className='flex-1 py-2 bg-gray-300 rounded-2xl'></div>
+        <div className='flex gap-4'>
+          <Skeleton className='h-10 flex-1 rounded-xl' />
+          <Skeleton className='h-10 flex-1 rounded-xl' />
         </div>
       </div>
     </div>

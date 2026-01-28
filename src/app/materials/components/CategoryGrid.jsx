@@ -1,10 +1,30 @@
 'use client'
 import React from 'react'
 import CategoryCard from './CategoryCard'
+import { FolderSearch, Plus } from 'lucide-react'
+import { GridSkeleton } from '@/components/ui/GridSkeleton'
 
-const CategoryGrid = ({ categories, onCategoryClick }) => {
+const CategoryGrid = ({ categories, onCategoryClick, loading }) => {
+  if (loading) {
+    return <GridSkeleton className='p-4 mb-10' />
+  }
+
+  if (!loading && categories.length === 0) {
+    return (
+      <div className='flex flex-col items-center justify-center py-20 px-4 text-center'>
+        <div className='w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6'>
+          <FolderSearch className='w-10 h-10 text-gray-300' />
+        </div>
+        <h3 className='text-xl font-bold text-gray-800 mb-2'>No Categories Found</h3>
+        <p className='text-gray-500 max-w-sm'>
+          We couldn't find any material categories at the moment. Please check back later or try a different section.
+        </p>
+      </div>
+    )
+  }
+
   return (
-    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4 mb-10'>
+    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 p-4 mb-16'>
       {categories.map((category) => (
         <CategoryCard
           key={category.id}
@@ -12,20 +32,21 @@ const CategoryGrid = ({ categories, onCategoryClick }) => {
           onClick={() => onCategoryClick(category)}
         />
       ))}
+
       {/* Unlisted/Others Card for materials without category */}
       <div
         onClick={() => onCategoryClick({ id: 'unlisted', name: 'Unlisted' })}
-        className='bg-white shadow-md rounded-2xl overflow-hidden transition-transform transform hover:scale-105 cursor-pointer border-2 border-dashed border-gray-300'
+        className='group relative bg-white border-2 border-dashed border-gray-200 hover:border-[#0A70A7] hover:bg-blue-50/30 rounded-2xl overflow-hidden transition-all p-6 flex flex-col items-center text-center cursor-pointer'
       >
-        <div className='p-8 text-center'>
-          <div className='w-20 h-20 mx-auto mb-4 bg-gray-400 rounded-full flex items-center justify-center'>
-            <span className='text-white text-2xl font-bold'>?</span>
-          </div>
-          <h2 className='text-xl font-semibold text-gray-800 mb-2'>Unlisted</h2>
-          <p className='text-sm text-gray-600 line-clamp-2'>
-            Materials without a category
-          </p>
+        <div className='w-20 h-20 mb-6 bg-gray-100 group-hover:bg-[#0A70A7] group-hover:rotate-6 rounded-3xl flex items-center justify-center transition-all duration-300'>
+          <Plus className='w-8 h-8 text-gray-400 group-hover:text-white' />
         </div>
+        <h2 className='text-xl font-bold text-gray-800 mb-2 group-hover:text-[#0A70A7]'>
+          Other Materials
+        </h2>
+        <p className='text-sm text-gray-500'>
+          Materials that aren't categorized yet
+        </p>
       </div>
     </div>
   )

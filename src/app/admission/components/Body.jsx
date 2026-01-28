@@ -4,11 +4,7 @@ import { Search } from 'lucide-react'
 import { getAdmission } from '../actions'
 import Link from 'next/link'
 import Pagination from '../../blogs/components/Pagination'
-
-// Simple shimmer loader
-const Shimmer = ({ width, height }) => (
-  <div className='shimmer bg-gray-200 rounded' style={{ width, height }}></div>
-)
+import { CardSkeleton } from '@/components/ui/CardSkeleton'
 
 const AdmissionPage = () => {
   const [admission, setAdmission] = useState([])
@@ -105,25 +101,7 @@ const AdmissionPage = () => {
             {Array(6)
               .fill('')
               .map((_, index) => (
-                <div
-                  key={index}
-                  className='bg-white rounded-2xl p-6 border border-gray-200 shadow-md'
-                >
-                  <div className='flex items-start gap-4'>
-                    <div className='w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center'>
-                      <Shimmer width='30px' height='30px' />
-                    </div>
-                    <div className='flex flex-col gap-3 w-full'>
-                      <Shimmer width='80%' height='20px' />
-                      <Shimmer width='60%' height='18px' />
-                      <Shimmer width='90%' height='15px' />
-                      <div className='flex gap-2'>
-                        <Shimmer width='40%' height='15px' />
-                        <Shimmer width='40%' height='15px' />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <CardSkeleton key={index} />
               ))}
           </div>
         ) : (

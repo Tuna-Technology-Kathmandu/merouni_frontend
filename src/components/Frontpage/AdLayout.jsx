@@ -1,5 +1,4 @@
-import Link from 'next/link'
-import React from 'react'
+import { Skeleton } from '../ui/Skeleton'
 
 const defaultImages = [
   '/images/UTCBanners/UTCLarge.gif',
@@ -33,13 +32,12 @@ const AdLayout = ({ banners = [], size = '', number = 1, loading = false }) => {
   if (loading) {
     return (
       <div className='mt-2 p-4'>
-        <div className='grid grid-cols-2 gap-3 sm:gap-5 sm:grid-cols-2 md:px-20 w-full'>
-          {[...Array(2)].map((_, index) => (
-            <div
+        <div className='flex gap-4 justify-center'>
+          {[...Array(3)].map((_, index) => (
+            <Skeleton
               key={index}
-              className={`rounded-lg animate-pulse bg-slate-300 h-[48px] md:h-[58px] lg:h-[70px] 
-                  }`}
-            ></div>
+              className='w-full sm:w-[350px] lg:w-[340px] xl:w-full h-[44px] md:h-[58px] lg:h-[70px]'
+            />
           ))}
         </div>
       </div>

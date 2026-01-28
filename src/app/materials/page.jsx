@@ -35,21 +35,21 @@ const Materials = () => {
     <>
       <Header />
       <Navbar />
-      <div className='flex flex-col max-w-[1600px] mx-auto px-8 mt-10'>
-        {!loading && (
-          <div className='text-center mb-12'>
-            <h1 className='text-2xl md:text-3xl font-extrabold text-gray-800'>
-              Explore Our <span className='text-[#0A70A7]'>Materials</span>
-            </h1>
-            <p className='mt-3 text-gray-600 max-w-2xl mx-auto text-sm'>
-              Discover a materials to help you achieve your academic and career
-              goals.
-            </p>
-          </div>
-        )}
+      <div className='flex flex-col max-w-[1600px] mx-auto px-8 mt-12'>
+        <div className='text-center mb-16'>
+          <h1 className='text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight'>
+            Academic <span className='text-[#0A70A7]'>Library</span>
+          </h1>
+          <div className='w-20 h-1.5 bg-[#0A70A7] mx-auto mt-4 rounded-full'></div>
+          <p className='mt-6 text-gray-600 max-w-2xl mx-auto text-base md:text-lg leading-relaxed'>
+            Access a comprehensive collection of curated study materials, guides, and resources designed to accelerate your learning journey.
+          </p>
+        </div>
+
         <CategoryGrid
           categories={categories}
           onCategoryClick={handleCategoryClick}
+          loading={loading}
         />
       </div>
       <Footer />

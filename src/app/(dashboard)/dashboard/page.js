@@ -23,6 +23,7 @@ import {
   Pen,
   Briefcase
 } from 'lucide-react'
+import { DotenvConfig } from '@/config/env.config'
 
 const AdminDashboard = () => {
   const { setHeading } = usePageHeading()
@@ -35,17 +36,21 @@ const AdminDashboard = () => {
     return () => setHeading(null)
   }, [setHeading])
 
-  // Initial load
+  // Load analytics data (Initial and when selectedYears change)
   useEffect(() => {
     let isMounted = true
 
     const loadAnalytics = async () => {
       try {
         setLoading(true)
-        const res = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/analytics/admin-overview`,
-          { cache: 'no-store' }
-        )
+        // Build query string with years parameter if selectedYears exist
+        const yearsParam =
+          selectedYears.length > 0
+            ? '?' + selectedYears.map((y) => `years=${y}`).join('&')
+            : ''
+        const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/analytics/admin-overview${yearsParam}`
+
+        const res = await authFetch(url, { cache: 'no-store' })
 
         if (!res.ok) {
           throw new Error('Failed to load analytics')
@@ -57,48 +62,10 @@ const AdminDashboard = () => {
         const data = json?.data || null
         setAnalytics(data)
 
-        // Initialize selected years from API response
-        if (data?.selectedYears) {
+        // Initialize selected years from API response if not already set
+        if (selectedYears.length === 0 && data?.selectedYears) {
           setSelectedYears(data.selectedYears)
         }
-      } catch (error) {
-        console.error('Error loading analytics:', error)
-      } finally {
-        if (isMounted) {
-          setLoading(false)
-        }
-      }
-    }
-
-    loadAnalytics()
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
-
-  // Reload when selected years change (only if years are already initialized)
-  useEffect(() => {
-    if (selectedYears.length === 0) return
-
-    let isMounted = true
-
-    const loadAnalytics = async () => {
-      try {
-        setLoading(true)
-        // Build query string with years parameter
-        const yearsParam = selectedYears.map((y) => `years=${y}`).join('&')
-        const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/analytics/admin-overview?${yearsParam}`
-
-        const res = await authFetch(url, { cache: 'no-store' })
-
-        if (!res.ok) {
-          throw new Error('Failed to load analytics')
-        }
-
-        const json = await res.json()
-        if (!isMounted) return
-        setAnalytics(json?.data || null)
       } catch (error) {
         console.error('Error loading analytics:', error)
       } finally {
@@ -459,10 +426,10 @@ const StudentDashboard = () => {
                               {app?.status && (
                                 <span
                                   className={`px-2 py-1 text-xs font-semibold rounded-full ${app.status === 'ACCEPTED'
-                                      ? 'bg-green-100 text-green-800'
-                                      : app.status === 'REJECTED'
-                                        ? 'bg-red-100 text-red-800'
-                                        : 'bg-yellow-100 text-yellow-800'
+                                    ? 'bg-green-100 text-green-800'
+                                    : app.status === 'REJECTED'
+                                      ? 'bg-red-100 text-red-800'
+                                      : 'bg-yellow-100 text-yellow-800'
                                     }`}
                                 >
                                   {app.status}

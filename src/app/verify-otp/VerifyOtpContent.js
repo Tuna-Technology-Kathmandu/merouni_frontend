@@ -56,7 +56,10 @@ const VerifyOtpContent = () => {
     inputRefs.current[focusIndex]?.focus()
   }
 
+
+
   const handleResendOtp = async () => {
+    console.log(`${DotenvConfig.NEXT_APP_API_BASE_URL}/auth/resend-otp`, "WOWdfO")
     try {
       const response = await fetch(
         `${DotenvConfig.NEXT_APP_API_BASE_URL}/auth/resend-otp`,

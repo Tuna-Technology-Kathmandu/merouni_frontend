@@ -1,5 +1,7 @@
 'use server'
 
+import { DotenvConfig } from "@/config/env.config"
+
 export async function getEvents(page = 1) {
   try {
     const response = await fetch(

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { DotenvConfig } from '../../config/env.config'
+import { toast } from 'react-toastify'
 
 const FeaturedDegree = () => {
   const router = useRouter()

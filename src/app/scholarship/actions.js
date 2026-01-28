@@ -1,5 +1,7 @@
 // actions.js
-import { DotenvConfig } from '../config/env.config'
+
+import { DotenvConfig } from "@/config/env.config"
+
 export const fetchScholarships = async (search = '') => {
   try {
     const response = await fetch(

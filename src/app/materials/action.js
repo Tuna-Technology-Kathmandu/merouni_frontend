@@ -1,5 +1,6 @@
 'use server'
-import { DotenvConfig } from '../config/env.config'
+
+import { DotenvConfig } from "@/config/env.config"
 
 export async function getMaterialsByCategory(
   page = 1,

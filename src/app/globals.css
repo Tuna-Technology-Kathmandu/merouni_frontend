@@ -227,3 +227,14 @@ body {
 .custom-shadow {
   box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.1);
 }
+
+/* Premium BProgress/NProgress Style */
+#nprogress .bar {
+  background: linear-gradient(to right, #387cae, #60a5fa) !important;
+  box-shadow: 0 0 12px rgba(56, 124, 174, 0.7), 0 0 5px rgba(56, 124, 174, 0.4) !important;
+  height: 4px !important;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 15px #387cae, 0 0 8px #387cae !important;
+}

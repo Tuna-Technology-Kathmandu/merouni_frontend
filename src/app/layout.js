@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
 import ReduxProvider from '../components/ReduxProvider'
 import ReactQueryContainer from '@/container/HOC/ReactQueryContainer'
+import BProgressProvider from '../components/BProgressProvider'
 
 const poppins = Poppins({
   variable: '--font-poppins',
@@ -22,7 +23,9 @@ export default function RootLayout({ children }) {
       <body className={`${poppins.variable} font-sans antialiased`}>
         <ReduxProvider>
           <ReactQueryContainer>
-            <main>{children}</main>
+            <BProgressProvider>
+              <main>{children}</main>
+            </BProgressProvider>
             <ToastContainer
               position='top-right'
               autoClose={3000}

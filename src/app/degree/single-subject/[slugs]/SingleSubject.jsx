@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getCourseBySlug } from '../../actions'
 import he from 'he'
-import Loader from '../../../../components/Loading'
+import { PageSkeleton } from '../../../../components/ui/PageSkeleton'
 import Navbar from '../../../../components/Frontpage/Navbar'
 import Footer from '../../../../components/Frontpage/Footer'
 import Header from '../../../../components/Frontpage/Header'
@@ -41,7 +41,15 @@ const SingleSubject = ({ slug }) => {
     : ''
   const syllabusArray = course?.syllabus ? JSON.parse(course.syllabus) : []
 
-  if (loading) return <Loader />
+  if (loading)
+    return (
+      <>
+        <Header />
+        <Navbar />
+        <PageSkeleton />
+        <Footer />
+      </>
+    )
   if (error) return <p className='text-center mt-10 text-red-600'>{error}</p>
 
   return (

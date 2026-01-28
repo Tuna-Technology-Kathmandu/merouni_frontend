@@ -80,10 +80,12 @@ const Featured = () => {
   }, [featuredColleges])
 
   return (
-    <div className='flex flex-col px-8 my-5'>
-      <div className='border-b-2 border-[#0A70A7] w-[45px] mt-8 mb-10 pl-2'>
-        <span className='text-2xl font-bold mr-2'>Featured</span>
-        <span className='text-[#0A70A7] text-2xl font-bold'>Colleges</span>
+    <div className='flex flex-col px-8 mt-12 mb-16'>
+      <div className='mb-10'>
+        <h2 className='text-3xl font-extrabold text-gray-900 tracking-tight'>
+          Featured <span className='text-[#0A70A7]'>Colleges</span>
+        </h2>
+        <div className='w-16 h-1.5 bg-[#0A70A7] mt-3 rounded-full'></div>
       </div>
       <div className='relative'>
         {/* Left Scroll Button - Only show if there are colleges and can scroll left */}
