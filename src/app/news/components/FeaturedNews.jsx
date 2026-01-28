@@ -5,7 +5,8 @@ import NewsCard from './NewsCard'
 import Pagination from './Pagination'
 import NewsShimmer from './NewsShimmer'
 import Link from 'next/link'
-import { IoSearch } from 'react-icons/io5'
+import { Newspaper } from 'lucide-react'
+import EmptyState from '@/components/ui/EmptyState'
 
 const FeaturedNews = ({ news, loading, pagination, onPageChange }) => {
     const truncateString = (str, maxLength) => {
@@ -47,15 +48,12 @@ const FeaturedNews = ({ news, loading, pagination, onPageChange }) => {
                     ))}
                 </div>
             ) : (
-                <div className='w-full py-20 text-center bg-gray-50 rounded-2xl border border-gray-100 mb-12'>
-                    <div className='bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm text-gray-400'>
-                        <IoSearch size={24} />
-                    </div>
-                    <h3 className='text-lg font-bold text-gray-800 mb-2'>No news found</h3>
-                    <p className='text-gray-500 max-w-sm mx-auto'>
-                        We couldn't find any news matching your criteria.
-                    </p>
-                </div>
+                <EmptyState
+                    icon={Newspaper}
+                    title='No News Found'
+                    description="We couldn't find any news matching your criteria. Please check back later or try a different category."
+                    className='mb-12'
+                />
             )}
 
             {pagination && pagination.totalCount > 0 && (

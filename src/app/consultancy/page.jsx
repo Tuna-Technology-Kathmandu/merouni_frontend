@@ -2,7 +2,8 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Search } from 'lucide-react'
+import { Search, Users } from 'lucide-react'
+import EmptyState from '@/components/ui/EmptyState'
 import { getConsultancies } from './actions'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
@@ -129,6 +130,26 @@ export default function ConsultanciesPage() {
                   </div>
                 ))}
             </div>
+          ) : consultancyData.length === 0 ? (
+            <EmptyState
+              icon={Users}
+              title='No Consultancies Found'
+              description={
+                searchTerm
+                  ? `No consultancies match your search "${searchTerm}"`
+                  : 'No consultancies are currently available'
+              }
+              action={
+                searchTerm
+                  ? {
+                    label: 'Clear Search',
+                    onClick: () => {
+                      setSearchTerm('')
+                    }
+                  }
+                  : null
+              }
+            />
           ) : (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
               {consultancyData.map((consultancy) => {

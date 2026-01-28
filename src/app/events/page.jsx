@@ -3,6 +3,8 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { PiLineVerticalThin } from 'react-icons/pi'
 import { IoIosArrowDroprightCircle } from 'react-icons/io'
 import { IoArrowUp } from 'react-icons/io5'
+import { Calendar } from 'lucide-react'
+import EmptyState from '@/components/ui/EmptyState'
 import Sponsors from './Sponsors'
 import EventCard from '../../components/Frontpage/EventCard'
 import { IoIosSearch } from 'react-icons/io'
@@ -15,6 +17,7 @@ import Loading from '../../components/Loading'
 import Pagination from '../blogs/components/Pagination'
 import { debounce } from 'lodash'
 import useMediaQuery from './MediaQuery'
+import { DotenvConfig } from '@/config/env.config'
 
 // Client-side fetch functions to replace server actions
 const fetchEvents = async (page = 1) => {
@@ -381,14 +384,38 @@ const Events = () => {
               <div className='w-full lg:w-3/4'>
                 {/* Responsive Grid */}
                 <div className='grid grid-cols-1 sm:grid-cols-2 min-[1330px]:grid-cols-3 gap-4 md:gap-6'>
-                  {allLoading
-                    ? [...Array(6)].map((_, i) => (
+                  {allLoading ? (
+                    [...Array(6)].map((_, i) => (
                       <div
                         key={i}
                         className='bg-gray-100 rounded-lg h-80 animate-pulse'
                       ></div>
                     ))
-                    : allEvents.map((event) => (
+                  ) : allEvents.length === 0 ? (
+                    <div className='col-span-full'>
+                      <EmptyState
+                        icon={Calendar}
+                        title='No Events Found'
+                        description={
+                          searchQuery
+                            ? `No events match your search "${searchQuery}"`
+                            : 'No events are currently scheduled'
+                        }
+                        action={
+                          searchQuery
+                            ? {
+                              label: 'Clear Search',
+                              onClick: () => {
+                                setSearchQuery('')
+                                loadEvents(1)
+                              }
+                            }
+                            : null
+                        }
+                      />
+                    </div>
+                  ) : (
+                    allEvents.map((event) => (
                       <Link
                         href={`/events/${event.slugs}`}
                         key={event.id}
@@ -398,7 +425,8 @@ const Events = () => {
                           <EventCard event={event} />
                         </div>
                       </Link>
-                    ))}
+                    ))
+                  )}
                 </div>
 
                 {/* Pagination - Centered with responsive margin */}

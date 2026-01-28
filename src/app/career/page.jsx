@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { getCareers } from './actions'
 import Link from 'next/link'
-import { Search } from 'lucide-react'
+import { Search, Briefcase } from 'lucide-react'
+import EmptyState from '@/components/ui/EmptyState'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
@@ -132,53 +133,65 @@ export default function CareersPage() {
 
           {/* No Results */}
           {!loading && !error && careersData.items?.length === 0 && (
-            <div className='text-center py-12'>
-              <h3 className='text-lg font-medium text-gray-900'>
-                No careers found
-              </h3>
-              <p className='mt-2 text-gray-600'>
-                Try adjusting your search query
-              </p>
-            </div>
+            <EmptyState
+              icon={Briefcase}
+              title='No Careers Found'
+              description={
+                debouncedSearch
+                  ? `No career opportunities match your search "${debouncedSearch}"`
+                  : 'No career opportunities are currently available'
+              }
+              action={
+                debouncedSearch
+                  ? {
+                    label: 'Clear Search',
+                    onClick: () => {
+                      setSearchTerm('')
+                      setDebouncedSearch('')
+                    }
+                  }
+                  : null
+              }
+            />
           )}
 
           {/* Cards Grid */}
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
             {loading
               ? // Show shimmer cards while loading
-                Array.from({ length: 6 }).map((_, index) => (
-                  <CareerCardShimmer key={`shimmer-${index}`} />
-                ))
+              Array.from({ length: 6 }).map((_, index) => (
+                <CareerCardShimmer key={`shimmer-${index}`} />
+              ))
               : // Show actual career cards when not loading
-                careersData.items?.map((career) => (
-                  <Link
-                    href={`/career/${career.slugs}`}
-                    key={career.id}
-                    className='block hover:shadow-xl transition-shadow duration-300'
-                  >
-                    <div className='bg-white rounded-lg shadow-md overflow-hidden h-full'>
-                      <div className='h-48 w-full'>
-                        <img
-                          src={career?.featuredImage || '/images/job.webp'}
-                          alt={career.title}
-                          fill
-                          className='object-cover w-full h-full '
-                        />
-                      </div>
-                      <div className='p-4'>
-                        <h2 className='text-xl max-md:text-lg font-semibold text-gray-900 mb-2 line-clamp-2'>
-                          {career.title}
-                        </h2>
-                        <p className='text-gray-600 mb-4 line-clamp-3 max-sm:text-sm max-sm:mb-2'>
-                          {career.description}
-                        </p>
-                        <div className='text-sm text-gray-500'>
-                          <p>Posted: {formatDate(career.createdAt)}</p>
-                        </div>
+              careersData.items?.map((career) => (
+                <Link
+                  href={`/career/${career.slugs}`}
+                  key={career.id}
+                  className='block hover:shadow-xl transition-shadow duration-300'
+                >
+                  <div className='bg-white rounded-lg shadow-md overflow-hidden h-full'>
+                    <div className='h-48 w-full'>
+                      <img
+                        src={career?.featuredImage || '/images/job.webp'}
+                        alt={career.title}
+                        fill
+                        className='object-cover w-full h-full '
+                      />
+                    </div>
+                    <div className='p-4'>
+                      <h2 className='text-xl max-md:text-lg font-semibold text-gray-900 mb-2 line-clamp-2'>
+                        {career.title}
+                      </h2>
+                      <p className='text-gray-600 mb-4 line-clamp-3 max-sm:text-sm max-sm:mb-2'>
+                        {career.description}
+                      </p>
+                      <div className='text-sm text-gray-500'>
+                        <p>Posted: {formatDate(career.createdAt)}</p>
                       </div>
                     </div>
-                  </Link>
-                ))}
+                  </div>
+                </Link>
+              ))}
           </div>
 
           {/* Pagination */}

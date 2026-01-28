@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { Search } from 'lucide-react'
+import { Search, Award } from 'lucide-react'
+import EmptyState from '@/components/ui/EmptyState'
 
 import { fetchScholarships } from './actions'
 import { CardSkeleton } from '@/components/ui/CardSkeleton'
@@ -144,58 +145,77 @@ const ScholarshipPage = () => {
                   <CardSkeleton key={index} />
                 ))}
             </div>
+          ) : scholarships.length === 0 ? (
+            <EmptyState
+              icon={Award}
+              title='No Scholarships Found'
+              description={
+                searchTerm || Object.values(filters).some((v) => v !== '' && v !== false)
+                  ? 'No scholarships match your search or filters'
+                  : 'No scholarships are currently available'
+              }
+              action={
+                searchTerm || Object.values(filters).some((v) => v !== '' && v !== false)
+                  ? {
+                    label: 'Clear Search & Filters',
+                    onClick: () => {
+                      setSearchTerm('')
+                      setFilters({
+                        minAmount: '',
+                        maxAmount: '',
+                        applicationDeadline: '',
+                        activeOnly: false
+                      })
+                    }
+                  }
+                  : null
+              }
+            />
           ) : (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-              {scholarships.length === 0 ? (
-                <div className='text-center text-gray-500 mt-8 col-span-full bg-white p-12 rounded-3xl border border-dashed border-gray-300'>
-                  <p className='text-lg font-medium'>No scholarships found</p>
-                  <p className='text-sm text-gray-400 mt-1'>Try adjusting your search or filters</p>
-                </div>
-              ) : (
-                scholarships.map((scholarship) => (
-                  <div
-                    key={scholarship.id}
-                    className='border rounded-2xl p-6 bg-white hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 cursor-pointer'
-                  >
-                    <h2 className='text-lg font-bold text-gray-800 mb-3 min-h-[60px]'>
-                      {scholarship.name}
-                    </h2>
-                    <div className='space-y-2 text-sm'>
-                      <div className='flex justify-between'>
-                        <span className='text-gray-600'>Amount:</span>
-                        <span className='font-medium text-green-600'>
-                          ${parseFloat(scholarship.amount).toLocaleString()}
-                        </span>
-                      </div>
-                      <div className='flex justify-between'>
-                        <span className='text-gray-600'>Deadline:</span>
-                        <span className='font-medium'>
-                          {new Date(
-                            scholarship.applicationDeadline
-                          ).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <div className='flex flex-col'>
-                        <span className='text-gray-600'>Eligibility:</span>
-                        <span className='text-sm'>
-                          {scholarship.eligibilityCriteria.replace(/"/g, '')}
-                        </span>
-                      </div>
-                      <div className='flex flex-col'>
-                        <span className='text-gray-600'>Renewal:</span>
-                        <span className='text-sm'>
-                          {scholarship.renewalCriteria.replace(/"/g, '')}
-                        </span>
-                      </div>
+              {scholarships.map((scholarship) => (
+                <div
+                  key={scholarship.id}
+                  className='border rounded-2xl p-6 bg-white hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 cursor-pointer'
+                >
+                  <h2 className='text-lg font-bold text-gray-800 mb-3 min-h-[60px]'>
+                    {scholarship.name}
+                  </h2>
+                  <div className='space-y-2 text-sm'>
+                    <div className='flex justify-between'>
+                      <span className='text-gray-600'>Amount:</span>
+                      <span className='font-medium text-green-600'>
+                        ${parseFloat(scholarship.amount).toLocaleString()}
+                      </span>
                     </div>
-                    <div className='mt-4'>
-                      <button className='w-full py-2 px-4 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-50 text-sm font-medium'>
-                        Apply Now
-                      </button>
+                    <div className='flex justify-between'>
+                      <span className='text-gray-600'>Deadline:</span>
+                      <span className='font-medium'>
+                        {new Date(
+                          scholarship.applicationDeadline
+                        ).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className='flex flex-col'>
+                      <span className='text-gray-600'>Eligibility:</span>
+                      <span className='text-sm'>
+                        {scholarship.eligibilityCriteria.replace(/"/g, '')}
+                      </span>
+                    </div>
+                    <div className='flex flex-col'>
+                      <span className='text-gray-600'>Renewal:</span>
+                      <span className='text-sm'>
+                        {scholarship.renewalCriteria.replace(/"/g, '')}
+                      </span>
                     </div>
                   </div>
-                ))
-              )}
+                  <div className='mt-4'>
+                    <button className='w-full py-2 px-4 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-50 text-sm font-medium'>
+                      Apply Now
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>

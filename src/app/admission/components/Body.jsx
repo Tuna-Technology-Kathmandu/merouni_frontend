@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react'
-import { Search } from 'lucide-react'
+import { Search, Clipboard } from 'lucide-react'
+import EmptyState from '@/components/ui/EmptyState'
 import { getAdmission } from '../actions'
 import Link from 'next/link'
 import Pagination from '../../blogs/components/Pagination'
@@ -105,42 +106,23 @@ const AdmissionPage = () => {
               ))}
           </div>
         ) : admission.length === 0 ? (
-          <div className='min-h-[400px] flex items-center justify-center'>
-            <div className='text-center'>
-              <div className='mb-4'>
-                <svg
-                  className='mx-auto h-24 w-24 text-gray-400'
-                  fill='none'
-                  viewBox='0 0 24 24'
-                  stroke='currentColor'
-                  aria-hidden='true'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'
-                  />
-                </svg>
-              </div>
-              <h3 className='text-xl font-semibold text-gray-900 mb-2'>
-                No Admissions Found
-              </h3>
-              <p className='text-gray-600 mb-4'>
-                {searchTerm
-                  ? `No admissions match your search "${searchTerm}"`
-                  : 'No admission details are currently available'}
-              </p>
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#0A70A7] hover:bg-[#085a8a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0A70A7]'
-                >
-                  Clear Search
-                </button>
-              )}
-            </div>
-          </div>
+          <EmptyState
+            icon={Clipboard}
+            title='No Admissions Found'
+            description={
+              searchTerm
+                ? `No admissions match your search "${searchTerm}"`
+                : 'No admission details are currently available'
+            }
+            action={
+              searchTerm
+                ? {
+                  label: 'Clear Search',
+                  onClick: () => setSearchTerm('')
+                }
+                : null
+            }
+          />
         ) : (
           <>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>

@@ -1,8 +1,9 @@
 'use client'
 import React from 'react'
 import CategoryCard from './CategoryCard'
-import { FolderSearch, Plus } from 'lucide-react'
+import { Folder, Plus } from 'lucide-react'
 import { GridSkeleton } from '@/components/ui/GridSkeleton'
+import EmptyState from '@/components/ui/EmptyState'
 
 const CategoryGrid = ({ categories, onCategoryClick, loading }) => {
   if (loading) {
@@ -11,15 +12,12 @@ const CategoryGrid = ({ categories, onCategoryClick, loading }) => {
 
   if (!loading && categories.length === 0) {
     return (
-      <div className='flex flex-col items-center justify-center py-20 px-4 text-center'>
-        <div className='w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6'>
-          <FolderSearch className='w-10 h-10 text-gray-300' />
-        </div>
-        <h3 className='text-xl font-bold text-gray-800 mb-2'>No Categories Found</h3>
-        <p className='text-gray-500 max-w-sm'>
-          We couldn't find any material categories at the moment. Please check back later or try a different section.
-        </p>
-      </div>
+      <EmptyState
+        icon={Folder}
+        title='No Categories Found'
+        description="We couldn't find any material categories at the moment. Please check back later or try a different section."
+        className='w-full'
+      />
     )
   }
 

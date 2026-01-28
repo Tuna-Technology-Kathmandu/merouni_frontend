@@ -1,5 +1,6 @@
 'use client'
-import { Search } from 'lucide-react'
+import { Search, School } from 'lucide-react'
+import EmptyState from '@/components/ui/EmptyState'
 import { FaExpandAlt } from 'react-icons/fa'
 import FilterSection from './FilterSection'
 import DegreeSection from './DegreeSection'
@@ -212,11 +213,10 @@ const CollegeFinder = () => {
       <button
         onClick={() => setCurrentPage((prev) => prev - 1)}
         disabled={!pagination.hasPreviousPage}
-        className={`px-4 py-2 rounded-lg ${
-          pagination.hasPreviousPage
-            ? 'bg-blue-500 text-white hover:bg-blue-600'
-            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-        }`}
+        className={`px-4 py-2 rounded-lg ${pagination.hasPreviousPage
+          ? 'bg-blue-500 text-white hover:bg-blue-600'
+          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }`}
       >
         Previous
       </button>
@@ -226,23 +226,37 @@ const CollegeFinder = () => {
       <button
         onClick={() => setCurrentPage((prev) => prev + 1)}
         disabled={!pagination.hasNextPage}
-        className={`px-4 py-2 rounded-lg ${
-          pagination.hasNextPage
-            ? 'bg-blue-500 text-white hover:bg-blue-600'
-            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-        }`}
+        className={`px-4 py-2 rounded-lg ${pagination.hasNextPage
+          ? 'bg-blue-500 text-white hover:bg-blue-600'
+          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }`}
       >
         Next
       </button>
     </div>
   )
   const NoResultsFound = () => (
-    <div className='flex flex-col items-center justify-center h-64'>
-      <Search className='w-16 h-16 text-gray-300 mb-4' />
-      <h3 className='text-xl font-semibold text-gray-600'>No Results Found</h3>
-      <p className='text-gray-500 mt-2'>
-        Try adjusting your search criteria or browse all colleges
-      </p>
+    <div className='col-span-full'>
+      <EmptyState
+        icon={School}
+        title='No Schools Found'
+        description={
+          searchQuery
+            ? `No schools match your search "${searchQuery}"`
+            : 'No schools are currently available'
+        }
+        action={
+          searchQuery
+            ? {
+              label: 'Clear Search',
+              onClick: () => {
+                setSearchQuery('')
+                fetchColleges(1)
+              }
+            }
+            : null
+        }
+      />
     </div>
   )
   return (

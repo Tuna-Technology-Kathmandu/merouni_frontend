@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { debounce } from 'lodash'
-import { Search } from 'lucide-react'
+import { Search, Building2, School } from 'lucide-react'
 import { FaExpandAlt } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -487,7 +487,7 @@ const CollegeFinder = () => {
             </div>
           ) : (
             <EmptyState
-              icon={Search}
+              icon={Building2}
               title="No Colleges Found"
               description="We couldn't find any colleges matching your current search or filter criteria. Try clearing some filters to see more results."
               action={{

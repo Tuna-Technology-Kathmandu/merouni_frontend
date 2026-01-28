@@ -1,7 +1,8 @@
 'use client'
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { fetchUniversities } from './actions'
-import { Search } from 'lucide-react'
+import { Search, GraduationCap } from 'lucide-react'
+import EmptyState from '@/components/ui/EmptyState'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
@@ -108,10 +109,27 @@ const UniversityPage = () => {
               <UniversityShimmer key={index} />
             ))}
           </div>
-        ) : universities.length === 0 ? ( // Check for empty universities array *after* loading
-          <div className='text-center text-gray-500 mt-8'>
-            No universities found.
-          </div>
+        ) : universities.length === 0 ? (
+          <EmptyState
+            icon={GraduationCap}
+            title='No Universities Found'
+            description={
+              searchTerm
+                ? `No universities match your search "${searchTerm}"`
+                : 'No universities are currently available'
+            }
+            action={
+              searchTerm
+                ? {
+                  label: 'Clear Search',
+                  onClick: () => {
+                    setSearchTerm('')
+                    loadUniversity(1)
+                  }
+                }
+                : null
+            }
+          />
         ) : (
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
             {universities
