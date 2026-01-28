@@ -486,7 +486,6 @@ export default function UniversityForm() {
           {/* Button */}
           <div className='flex gap-2'>
             <Button
-              className='bg-blue-500 text-white hover:bg-blue-600 text-sm'
               onClick={() => {
                 setIsOpen(true)
                 setEditing(false)

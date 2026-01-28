@@ -11,6 +11,7 @@ import useAdminPermission from '@/hooks/useAdminPermission'
 import { Modal } from '../../../../components/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
+import { Button } from '@/components/ui/button'
 
 export default function TagForm() {
   const { setHeading } = usePageHeading()
@@ -264,8 +265,7 @@ export default function TagForm() {
           </div>
           {/* Button */}
           <div className='flex gap-2'>
-            <button
-              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+            <Button
               onClick={() => {
                 setIsOpen(true)
                 setEditing(false)
@@ -274,7 +274,7 @@ export default function TagForm() {
               }}
             >
               Add Tag
-            </button>
+            </Button>
           </div>
         </div>
         <ToastContainer />
@@ -331,17 +331,16 @@ export default function TagForm() {
             >
               Cancel
             </button>
-            <button
+            <Button
               type='submit'
               disabled={submitting}
-              className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
             >
               {submitting
                 ? 'Processing...'
                 : editing
                   ? 'Update Tag'
                   : 'Create Tag'}
-            </button>
+            </Button>
           </div>
         </form>
       </Modal>

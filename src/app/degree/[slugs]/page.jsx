@@ -10,34 +10,32 @@ import CollegeTeach from './components/collegeTeach'
 import RelatedCourses from './components/RelatedCourses'
 import Syllabus from './components/syllabus'
 import ImageSection from './components/upperSection'
+import { slugify } from '@/lib/slugify'
 
 const CourseDescription = ({ params }) => {
   const [degree, setDegree] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(true)
-
-  function slugify(str) {
-    return str
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, '-') // spaces → -
-      .replace(/[^\w\-]+/g, '') // remove non-word chars
-      .replace(/\-\-+/g, '-') // collapse multiple -
-  }
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const fetchDegree = async () => {
       try {
+        setLoading(true)
+        setError(null)
+
         const resolvedParams = await params
         const slugs = decodeURIComponent(resolvedParams.slugs)
         const finalSlug = slugify(slugs)
-        fetchDegreeDetails(finalSlug)
+
+        await fetchDegreeDetails(finalSlug)
       } catch (error) {
         console.error('Error resolving params:', error)
+        setError('Failed to load degree information')
+        setLoading(false)
       }
     }
     fetchDegree()
-  }, [])
+  }, [params])
 
   const fetchDegreeDetails = async (slugs) => {
     try {
@@ -45,12 +43,15 @@ const CourseDescription = ({ params }) => {
 
       if (degreeData) {
         setDegree(degreeData)
+        setError(null)
       } else {
-        setError('No data found')
+        setError('Degree not found')
+        setDegree(null)
       }
     } catch (error) {
       console.error('Error fetching degree details:', error)
-      setError(error.message)
+      setError(error.message || 'Failed to fetch degree details')
+      setDegree(null)
     } finally {
       setLoading(false)
     }
@@ -58,6 +59,52 @@ const CourseDescription = ({ params }) => {
 
   if (loading) {
     return <Loading />
+  }
+
+  if (error) {
+    return (
+      <>
+        <Header />
+        <Navbar />
+        <div className='container mx-auto px-4 py-16 text-center'>
+          <div className='max-w-md mx-auto'>
+            <h1 className='text-4xl font-bold text-gray-800 mb-4'>
+              {error === 'Degree not found' ? '404' : 'Error'}
+            </h1>
+            <p className='text-xl text-gray-600 mb-8'>{error}</p>
+            <a
+              href='/degree'
+              className='inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors'
+            >
+              Browse All Degrees
+            </a>
+          </div>
+        </div>
+        <Footer />
+      </>
+    )
+  }
+
+  if (!degree) {
+    return (
+      <>
+        <Header />
+        <Navbar />
+        <div className='container mx-auto px-4 py-16 text-center'>
+          <div className='max-w-md mx-auto'>
+            <h1 className='text-4xl font-bold text-gray-800 mb-4'>404</h1>
+            <p className='text-xl text-gray-600 mb-8'>Degree not found</p>
+            <a
+              href='/degree'
+              className='inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors'
+            >
+              Browse All Degrees
+            </a>
+          </div>
+        </div>
+        <Footer />
+      </>
+    )
   }
 
   return (

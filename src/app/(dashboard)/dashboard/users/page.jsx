@@ -18,6 +18,7 @@ import Table from '../../../../components/Table'
 import { createColumns } from './columns'
 import ExportModal from './ExportModal'
 import { DotenvConfig } from '@/config/env.config'
+import { Button } from '@/components/ui/button'
 
 export default function UsersManager() {
   const { setHeading } = usePageHeading()
@@ -397,7 +398,7 @@ export default function UsersManager() {
         </div>
         {/* Buttons */}
         <div className='flex gap-2'>
-          <button
+          <Button
             onClick={() => {
               setIsFormOpen(true)
               setEditingId(null)
@@ -420,10 +421,9 @@ export default function UsersManager() {
                 }
               })
             }}
-            className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
           >
             Add User
-          </button>
+          </Button>
           <button
             onClick={() => setIsExportModalOpen(true)}
             className='bg-gray-100 text-gray-800 px-4 py-2 rounded hover:bg-gray-200 border'

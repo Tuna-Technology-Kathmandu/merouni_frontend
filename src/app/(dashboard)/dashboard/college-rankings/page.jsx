@@ -347,7 +347,7 @@ export default function CollegeRankingsPage() {
     <>
       <div className='p-4 w-full'>
         <div className='flex justify-end items-center mb-6'>
-          <button
+          <Button
             onClick={() => {
               setSelectedProgram(null)
               setSelectedCollege(null)
@@ -356,11 +356,10 @@ export default function CollegeRankingsPage() {
               setShowProgramDropdown(false)
               setIsEditModalOpen(true)
             }}
-            className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 flex items-center gap-2'
           >
             <Plus size={20} />
             Add Ranking
-          </button>
+          </Button>
         </div>
 
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>

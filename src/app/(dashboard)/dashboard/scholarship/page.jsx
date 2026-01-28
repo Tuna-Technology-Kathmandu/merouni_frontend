@@ -9,6 +9,7 @@ import {
   updateScholarship,
   deleteScholarship
 } from './actions'
+import { getCategories } from '@/app/action'
 import Loading from '../../../../components/Loading'
 import Table from '../../../../components/Table'
 import { Edit2, Trash2, Search, Eye } from 'lucide-react'
@@ -39,6 +40,7 @@ export default function ScholarshipManager() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [scholarships, setScholarships] = useState([])
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [tableLoading, setTableLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -50,7 +52,8 @@ export default function ScholarshipManager() {
     amount: '',
     applicationDeadline: '',
     renewalCriteria: '',
-    contactInfo: ''
+    contactInfo: '',
+    category_id: ''
   })
   const [editingId, setEditingId] = useState(null)
   const [deleteId, setDeleteId] = useState(null)
@@ -135,8 +138,19 @@ export default function ScholarshipManager() {
   useEffect(() => {
     setHeading('Scholarship Management')
     loadScholarships()
+    loadCategories()
     return () => setHeading(null)
   }, [setHeading])
+
+  const loadCategories = async () => {
+    try {
+      const response = await getCategories()
+      setCategories(response.items || [])
+    } catch (error) {
+      console.error('Error loading categories:', error)
+      toast.error('Failed to load categories')
+    }
+  }
 
   // Check for 'add' query parameter and open modal
   useEffect(() => {
@@ -225,7 +239,8 @@ export default function ScholarshipManager() {
         ...formData,
         amount: Number(formData.amount),
         applicationDeadline: formatDate(formData.applicationDeadline),
-        author: author_id
+        author: author_id,
+        category_id: formData.category_id || null
       }
       console.log('formatted data', formattedData)
       if (editingId) {
@@ -241,7 +256,8 @@ export default function ScholarshipManager() {
         amount: '',
         applicationDeadline: '',
         renewalCriteria: '',
-        contactInfo: ''
+        contactInfo: '',
+        category_id: ''
       })
       setEditingId(null)
       setError(null)
@@ -268,7 +284,8 @@ export default function ScholarshipManager() {
       amount: scholarship.amount,
       applicationDeadline: formatDateForInput(scholarship.applicationDeadline),
       renewalCriteria: scholarship.renewalCriteria,
-      contactInfo: scholarship.contactInfo
+      contactInfo: scholarship.contactInfo,
+      category_id: scholarship.category_id || ''
     })
     setEditingId(scholarship.id)
     setError(null)
@@ -286,7 +303,8 @@ export default function ScholarshipManager() {
       amount: '',
       applicationDeadline: '',
       renewalCriteria: '',
-      contactInfo: ''
+      contactInfo: '',
+      category_id: ''
     })
   }
 
@@ -477,6 +495,28 @@ export default function ScholarshipManager() {
                   onChange={handleEditorChange}
                   id='scholarship-description-editor'
                 />
+              </div>
+
+              <div className='space-y-2 col-span-2'>
+                <Label htmlFor='category_id'>
+                  Category <span className='text-red-500'>*</span>
+                </Label>
+                <select
+                  id='category_id'
+                  value={formData.category_id}
+                  onChange={(e) =>
+                    setFormData({ ...formData, category_id: e.target.value })
+                  }
+                  className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                  required
+                >
+                  <option value=''>Select Category</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.title}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className='space-y-2'>
