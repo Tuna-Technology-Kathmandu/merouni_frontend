@@ -1,3 +1,4 @@
+import { DotenvConfig } from '@/config/env.config'
 import { useState, useEffect } from 'react'
 import Marquee from 'react-fast-marquee'
 

@@ -10,6 +10,7 @@ import ExamShimmer from './components/ExamShimmer'
 import SingleExam from './components/SingleExam'
 import { useDebounce } from 'use-debounce'
 import Pagination from '../blogs/components/Pagination'
+import { FormatDate } from '@/lib/date'
 
 export default function ExamsPage() {
   const [exams, setExams] = useState([])
@@ -170,15 +171,15 @@ export default function ExamsPage() {
                         <div key={ad.id} className='text-sm text-gray-500 mb-3'>
                           <div>
                             <span className='font-medium'>Opening:</span>{' '}
-                            {ad.opening_date ?? 'TBD'}
+                            {FormatDate.formatDate(ad.opening_date) ?? 'TBD'}
                           </div>
                           <div>
                             <span className='font-medium'>Closing:</span>{' '}
-                            {ad.closing_date ?? 'TBD'}
+                            {FormatDate.formatDate(ad.closing_date) ?? 'TBD'}
                           </div>
                           <div>
                             <span className='font-medium'>Exam Date:</span>{' '}
-                            {ad.exam_date ?? 'TBD'}
+                            {FormatDate.formatDate(ad.exam_date) ?? 'TBD'}
                           </div>
                         </div>
                       ))}
