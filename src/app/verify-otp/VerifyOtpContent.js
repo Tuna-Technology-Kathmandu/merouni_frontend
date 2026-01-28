@@ -3,6 +3,8 @@ import { useState, useRef, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { DotenvConfig } from '../../config/env.config'
+import Link from 'next/link'
+import { FaArrowLeft } from 'react-icons/fa'
 
 const VerifyOtpContent = () => {
   const router = useRouter()
@@ -56,10 +58,7 @@ const VerifyOtpContent = () => {
     inputRefs.current[focusIndex]?.focus()
   }
 
-
-
   const handleResendOtp = async () => {
-    console.log(`${DotenvConfig.NEXT_APP_API_BASE_URL}/auth/resend-otp`, "WOWdfO")
     try {
       const response = await fetch(
         `${DotenvConfig.NEXT_APP_API_BASE_URL}/auth/resend-otp`,
@@ -108,7 +107,6 @@ const VerifyOtpContent = () => {
       )
 
       const data = await response.json()
-      console.log('API Response:', data)
 
       if (response.ok) {
         toast.success('Successfully verified!')
@@ -117,7 +115,6 @@ const VerifyOtpContent = () => {
         toast.error(data.message || 'OTP verification failed')
       }
     } catch (err) {
-      console.error('Error:', err)
       toast.error('Connection error. Please try again.')
     } finally {
       setLoading(false)
@@ -125,79 +122,65 @@ const VerifyOtpContent = () => {
   }
 
   return (
-    <div className='max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg'>
-      <div>
-        <h2 className='text-center text-3xl font-extrabold text-gray-900'>
-          Verify Your Email
-        </h2>
-        <p className='mt-2 text-center text-sm text-gray-600'>
-          We've sent a code to {email}
-        </p>
+    <div className='flex flex-col items-center justify-center w-full'>
+      <div className='w-full max-w-md mb-4 text-left font-medium'>
+        <Link
+          href='/sign-in'
+          className='inline-flex items-center gap-2 text-sm text-gray-400 hover:text-[#0A6FA7] transition-colors'
+        >
+          <FaArrowLeft className='w-3 h-3' />
+          <span>Back to Login</span>
+        </Link>
       </div>
 
-      <form onSubmit={handleSubmit} className='mt-8 space-y-6'>
-        <div className='flex gap-4 justify-center'>
-          {otp.map((digit, index) => (
-            <input
-              key={index}
-              ref={(el) => (inputRefs.current[index] = el)}
-              type='text'
-              maxLength={1}
-              value={digit}
-              onChange={(e) => handleChange(index, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(index, e)}
-              onPaste={handlePaste}
-              className='w-12 h-14 text-center text-xl font-semibold border-2 rounded-lg focus:border-blue-500 focus:ring-blue-500 focus:outline-none transition-colors'
-              required
-            />
-          ))}
+      <div className='max-w-md w-full bg-white p-10 rounded-2xl shadow-xl border border-gray-100'>
+        <div className='mb-8'>
+          <h2 className='text-3xl font-extrabold text-gray-900'>
+            Verify Email
+          </h2>
+          <p className='mt-2 text-sm text-gray-500 font-medium'>
+            We've sent a 6-digit code to {email}
+          </p>
         </div>
-        <div>
+
+        <form onSubmit={handleSubmit} className='space-y-8'>
+          <div className='flex gap-3 justify-center'>
+            {otp.map((digit, index) => (
+              <input
+                key={index}
+                ref={(el) => (inputRefs.current[index] = el)}
+                type='text'
+                maxLength={1}
+                value={digit}
+                onChange={(e) => handleChange(index, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(index, e)}
+                onPaste={handlePaste}
+                className='w-11 h-14 text-center text-xl font-bold border rounded-xl focus:border-[#0A6FA7] focus:ring-4 focus:ring-blue-50 focus:outline-none transition-all'
+                required
+              />
+            ))}
+          </div>
+
           <button
             type='submit'
             disabled={loading}
-            className='w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors'
+            className='w-full py-4 px-6 bg-[#0A6FA7] text-white rounded-xl font-bold hover:bg-[#085a86] transition-all shadow-md active:scale-[0.98] disabled:opacity-50 text-sm tracking-wide'
           >
-            {loading ? (
-              <span className='flex items-center'>
-                <svg
-                  className='animate-spin -ml-1 mr-3 h-5 w-5 text-white'
-                  xmlns='http://www.w3.org/2000/svg'
-                  fill='none'
-                  viewBox='0 0 24 24'
-                >
-                  <circle
-                    className='opacity-25'
-                    cx='12'
-                    cy='12'
-                    r='10'
-                    stroke='currentColor'
-                    strokeWidth='4'
-                  ></circle>
-                  <path
-                    className='opacity-75'
-                    fill='currentColor'
-                    d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                  ></path>
-                </svg>
-                Verifying...
-              </span>
-            ) : (
-              'Verify OTP'
-            )}
+            {loading ? 'Verifying...' : 'Verify Email'}
           </button>
+        </form>
+
+        <div className='mt-8 text-center'>
+          <p className='text-sm text-gray-500 font-medium'>
+            Didn't receive the code?{' '}
+            <button
+              onClick={handleResendOtp}
+              className='font-bold text-[#0A6FA7] hover:underline focus:outline-none'
+            >
+              Resend OTP
+            </button>
+          </p>
         </div>
-      </form>
-      <div className='text-center'>
-        <p className='text-sm text-gray-600'>
-          Didn't receive the code?{' '}
-          <button
-            onClick={handleResendOtp}
-            className='font-medium text-blue-600 hover:text-blue-500 focus:outline-none'
-          >
-            Resend OTP
-          </button>
-        </p>
       </div>
     </div>
   )

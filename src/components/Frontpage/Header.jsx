@@ -1,15 +1,11 @@
 'use client'
 import Image from 'next/image'
-import React, { useState } from 'react'
-import { IoSearchOutline } from 'react-icons/io5'
-import { FaUserCircle } from 'react-icons/fa'
-import SearchBox from './SearchBox'
 import Link from 'next/link'
-import { IoMenu } from 'react-icons/io5'
-import { IoClose } from 'react-icons/io5'
-import Usericon from './Usericon'
+import { useState } from 'react'
 import { FiChevronRight } from 'react-icons/fi'
-import { GoArrowUpRight } from 'react-icons/go'
+import { IoClose, IoMenu, IoSearchOutline } from 'react-icons/io5'
+import SearchBox from './SearchBox'
+import Usericon from './Usericon'
 
 const Header = () => {
   const [showSearch, setShowSearch] = useState(false)
@@ -51,9 +47,8 @@ const Header = () => {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-[80px] left-0 h-[calc(100vh-80px)] w-full bg-white shadow-lg border-t-2 transform transition-transform duration-300 ease-in-out z-50 ${
-          showSidebar ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed top-[80px] left-0 h-[calc(100vh-80px)] w-full bg-white shadow-lg border-t-2 transform transition-transform duration-300 ease-in-out z-50 ${showSidebar ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         {/* Close Button */}
         <div className='flex justify-between items-center px-4 py-4 border-b border-gray-200'>
