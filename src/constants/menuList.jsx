@@ -121,8 +121,8 @@ export const menuItems = [
       },
       {
         icon: <BsNewspaper className='text-xl' />,
-        label: 'News',
-        href: '/dashboard/news',
+        label: 'Blogs',
+        href: '/dashboard/blogs',
         visible: ['admin', 'editor']
       },
       {

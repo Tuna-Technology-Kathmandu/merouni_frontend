@@ -147,14 +147,14 @@ const AdminDashboard = () => {
             </Link>
 
             <Link
-              href='/dashboard/news?add=true'
+              href='/dashboard/blogs?add=true'
               className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-300 transition-colors group'
             >
               <div className='p-2 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors'>
                 <Newspaper className='w-5 h-5 text-green-600' />
               </div>
               <span className='text-sm font-medium text-gray-700 group-hover:text-green-600'>
-                Add News
+                Add Blog
               </span>
             </Link>
 

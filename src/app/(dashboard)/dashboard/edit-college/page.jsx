@@ -320,7 +320,9 @@ const EditCollegePage = () => {
       setValue('institute_type', collegeData.institute_type)
       setValue(
         'institute_level',
-        JSON.parse(collegeData.institute_level || '[]')
+        typeof collegeData.institute_level === 'string'
+          ? JSON.parse(collegeData.institute_level || '[]')
+          : collegeData.institute_level || []
       )
       setValue('description', collegeData.description)
       setValue('content', collegeData.content || '')

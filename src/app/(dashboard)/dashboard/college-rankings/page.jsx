@@ -5,7 +5,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
 import { Edit2, Trash2, Plus, GripVertical, X, ChevronDown } from 'lucide-react'
-import { Modal } from '../../../../components/CreateUserModal'
+import { Modal } from '../../../../components/UserModal'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import Image from 'next/image'
 

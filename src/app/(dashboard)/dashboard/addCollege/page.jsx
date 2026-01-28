@@ -29,7 +29,7 @@ import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import AdmissionItem from './AdmissionItem'
 import ConfirmationDialog from './ConfirmationDialog'
-import { Modal } from '../../../../components/CreateUserModal'
+import { Modal } from '../../../../components/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '../../../../components/ui/button'
 import { Input } from '../../../../components/ui/input'
@@ -740,7 +740,9 @@ export default function CollegeForm() {
       setValue('institute_type', collegeData.institute_type)
       setValue(
         'institute_level',
-        JSON.parse(collegeData.institute_level || '[]')
+        typeof collegeData.institute_level === 'string'
+          ? JSON.parse(collegeData.institute_level || '[]')
+          : collegeData.institute_level || []
       )
       setValue('description', collegeData.description)
       setValue('content', collegeData.content)

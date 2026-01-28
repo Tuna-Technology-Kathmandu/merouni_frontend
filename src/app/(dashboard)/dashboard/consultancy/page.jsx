@@ -13,9 +13,10 @@ import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { X } from 'lucide-react'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../components/CreateUserModal'
+import { Modal } from '../../../../components/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
+import { Button } from '@/components/ui/button'
 
 const CKEditor = dynamic(() => import('../component/CKStable'), {
   ssr: false
@@ -466,8 +467,7 @@ export default function ConsultancyForm() {
           </div>
           {/* Button */}
           <div className='flex gap-2'>
-            <button
-              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+            <Button
               onClick={() => {
                 setIsOpen(true)
                 setEditing(false)
@@ -478,7 +478,7 @@ export default function ConsultancyForm() {
               }}
             >
               Add Consultancy
-            </button>
+            </Button>
           </div>
         </div>
         <ToastContainer />
@@ -753,17 +753,16 @@ export default function ConsultancyForm() {
               </div>
 
               <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <button
+                <Button
                   type='submit'
                   disabled={loading}
-                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
                 >
                   {loading
                     ? 'Processing...'
                     : editing
                       ? 'Update Consultancy'
                       : 'Create Consultancy'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

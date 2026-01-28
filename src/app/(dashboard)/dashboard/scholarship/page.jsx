@@ -175,19 +175,29 @@ export default function ScholarshipManager() {
       const res = await getAllScholarships(page)
       const response = res.scholarships
 
-      const updatedScholarships = response.map((scholarship) => ({
-        ...scholarship,
-        eligibilityCriteria: JSON.parse(
-          scholarship.eligibilityCriteria || '""'
-        ),
-        renewalCriteria: JSON.parse(scholarship.renewalCriteria || '""'),
+      const updatedScholarships = response.map((scholarship) => {
+        // Safe JSON parse helper
+        const safeJsonParse = (value) => {
+          if (!value) return ''
+          if (typeof value === 'object') return value
+          try {
+            return JSON.parse(value)
+          } catch (e) {
+            console.warn('Failed to parse JSON:', value)
+            return ''
+          }
+        }
 
-        applicationDeadline: new Date(scholarship.applicationDeadline),
-
-        formattedDeadline: new Date(
-          scholarship.applicationDeadline
-        ).toLocaleDateString()
-      }))
+        return {
+          ...scholarship,
+          eligibilityCriteria: safeJsonParse(scholarship.eligibilityCriteria),
+          renewalCriteria: safeJsonParse(scholarship.renewalCriteria),
+          applicationDeadline: new Date(scholarship.applicationDeadline),
+          formattedDeadline: new Date(
+            scholarship.applicationDeadline
+          ).toLocaleDateString()
+        }
+      })
 
       setScholarships(updatedScholarships)
 
@@ -400,7 +410,6 @@ export default function ScholarshipManager() {
           {/* Button */}
           <div className='flex gap-2'>
             <Button
-              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
               onClick={() => {
                 setIsOpen(true)
                 setEditingId(null)

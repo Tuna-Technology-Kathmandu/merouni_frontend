@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { authFetch } from '@/app/utils/authFetch'
 import { FaEdit, FaTrashAlt } from 'react-icons/fa'
-import { Modal } from '../../../../components/CreateUserModal'
+import { Modal } from '../../../../components/UserModal'
 import ShimmerEffect from '../../../../components/ShimmerEffect'
 import { DotenvConfig } from '@/config/env.config'
 

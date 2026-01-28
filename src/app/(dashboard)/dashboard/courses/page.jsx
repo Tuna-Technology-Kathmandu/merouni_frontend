@@ -21,7 +21,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '../../../../components/ui/dialog'
-import { Modal } from '../../../../components/CreateUserModal'
+import { Modal } from '../../../../components/UserModal'
 import { DotenvConfig } from '@/config/env.config'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false

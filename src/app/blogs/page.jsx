@@ -7,7 +7,7 @@ import Footer from '../../components/Frontpage/Footer'
 import Latest from './components/Latest'
 import FeaturedBlogs from './components/FeaturedBlogs'
 import BlogFilters from './components/BlogFilters'
-import { getBlogs } from '@/app/action'
+import { getBlogs, getCategories } from '@/app/action'
 
 const Blogs = () => {
   // State
@@ -29,14 +29,10 @@ const Blogs = () => {
   const debounceRef = useRef(null)
 
   // Constants
-  const categories = [
-    { id: 'all', label: 'All' },
-    { id: 'Technology', label: 'Technology' },
-    { id: 'Education', label: 'Education' },
-    { id: 'Lifestyle', label: 'Lifestyle' },
-    { id: 'Career', label: 'Career' },
-    { id: 'Study Abroad', label: 'Study Abroad' }
-  ]
+
+  const [categories, setCategories] = useState([
+    { id: 'all', title: 'All' }
+  ])
 
   // Data Fetching
   const fetchBlogsData = async (page = 1, search = '', category = '') => {
@@ -66,6 +62,22 @@ const Blogs = () => {
       setLoading(false)
     }
   }
+
+
+  const fetchCategories = async () => {
+    try {
+      const response = await getCategories()
+      if (response && response.items) {
+        setCategories([{ id: 'all', title: 'All' }, ...response.items])
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
 
   // Effect: Debounced Search & Filter Change
   useEffect(() => {

@@ -10,10 +10,11 @@ import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { X } from 'lucide-react'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../components/CreateUserModal'
+import { Modal } from '../../../../components/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
 
 export default function MaterialForm() {
   const { setHeading } = usePageHeading()
@@ -506,12 +507,11 @@ export default function MaterialForm() {
         </div>
         {/* Button */}
         <div className='flex items-center gap-4'>
-          <button
-            className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+          <Button
             onClick={handleAddClick}
           >
             Add Material
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -721,7 +721,7 @@ export default function MaterialForm() {
             </div>
 
             <div className='flex justify-end'>
-              <button
+              <Button
                 type='submit'
                 disabled={loading}
                 className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
@@ -731,7 +731,7 @@ export default function MaterialForm() {
                   : editing
                     ? 'Update Material'
                     : 'Create Material'}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

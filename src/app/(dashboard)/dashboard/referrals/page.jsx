@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import { destr } from 'destr'
 import { fetchReferrals, updateReferralStatus, deleteReferral } from './action'
 import { FaTrashAlt, FaEdit } from 'react-icons/fa'
-import { Modal } from '../../../../components/CreateUserModal'
+import { Modal } from '../../../../components/UserModal'
 import ShimmerEffect from '../../../../components/ShimmerEffect'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import {
@@ -205,10 +205,10 @@ const ReferralsPage = () => {
                   <TableCell>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${referral.status === 'ACCEPTED'
-                          ? 'bg-green-100 text-green-800'
-                          : referral.status === 'REJECTED'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-green-100 text-green-800'
+                        : referral.status === 'REJECTED'
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-yellow-100 text-yellow-800'
                         }`}
                     >
                       {referral.status || 'IN_PROGRESS'}

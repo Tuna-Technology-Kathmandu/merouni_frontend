@@ -10,7 +10,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import { useDebounce } from 'use-debounce'
-import { Modal } from '../../../../components/CreateUserModal'
+import { Modal } from '../../../../components/UserModal'
 import Table from '../../../../components/Table'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import {
@@ -1093,7 +1093,7 @@ export default function ProgramForm() {
                   ) : showExamDrop ? (
                     exams.length > 0 ? (
                       <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
-                        
+
                         toot
                         {exams.map((item) => (
                           <li

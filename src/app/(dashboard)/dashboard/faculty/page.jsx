@@ -14,7 +14,7 @@ import { Edit2, Trash2, Search } from 'lucide-react' // For action icons
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../components/CreateUserModal'
+import { Modal } from '../../../../components/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
@@ -268,8 +268,7 @@ export default function FacultyManager() {
           </div>
           {/* Button */}
           <div className='flex gap-2'>
-            <button
-              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+            <Button
               onClick={() => {
                 setIsOpen(true)
                 setEditingId(null)
@@ -277,7 +276,7 @@ export default function FacultyManager() {
               }}
             >
               Add Faculty
-            </button>
+            </Button>
           </div>
         </div>
         <ToastContainer />

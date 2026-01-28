@@ -1,3 +1,5 @@
+import { DotenvConfig } from "@/config/env.config"
+
 export async function getExams(page = 1, search = '') {
   try {
     const baseUrl = `${DotenvConfig.NEXT_APP_API_BASE_URL}/exam`

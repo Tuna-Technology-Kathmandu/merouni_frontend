@@ -2,7 +2,7 @@
 import dynamic from 'next/dynamic'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
-import { fetchNews, fetchTags } from './action'
+import { fetchBlogs, fetchTags } from './action'
 import { getCategories } from '@/app/action'
 import { authFetch } from '@/app/utils/authFetch'
 import Loader from '../../../../components/Loading'
@@ -14,20 +14,32 @@ import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../components/CreateUserModal'
+import { Modal } from '../../../../components/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { Button } from '../../../../components/ui/button'
+import { Input } from '../../../../components/ui/input'
+import { Label } from '../../../../components/ui/label'
+import { DotenvConfig } from '@/config/env.config'
+
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
 
-export default function NewsManager() {
+// Helper component for required label
+const RequiredLabel = ({ children, htmlFor }) => (
+  <Label htmlFor={htmlFor}>
+    {children} <span className='text-red-500'>*</span>
+  </Label>
+)
+
+export default function BlogsManager() {
   const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  const [news, setNews] = useState([])
+  const [blogs, setBlogs] = useState([])
   const [categories, setCategories] = useState([])
   const [authors, setAuthors] = useState([])
   const [loading, setLoading] = useState(false)
@@ -249,7 +261,7 @@ export default function NewsManager() {
     }, 300)
   }
   useEffect(() => {
-    setHeading('News Management')
+    setHeading('Blogs Management')
     loadData()
     return () => setHeading(null)
   }, [setHeading])
@@ -265,7 +277,7 @@ export default function NewsManager() {
       setSelectedTags([])
       setUploadedFiles({ featuredImage: '' })
       // Remove query parameter from URL
-      router.replace('/dashboard/news', { scroll: false })
+      router.replace('/dashboard/blogs', { scroll: false })
     }
   }, [searchParams, router, reset])
 
@@ -296,8 +308,8 @@ export default function NewsManager() {
 
   const loadData = async (page = 1) => {
     try {
-      const response = await fetchNews(page)
-      setNews(response.items)
+      const response = await fetchBlogs(page)
+      setBlogs(response.items)
       setPagination({
         currentPage: response.pagination.currentPage,
         totalPages: response.pagination.totalPages,
@@ -311,7 +323,7 @@ export default function NewsManager() {
     }
   }
 
-  const createNews = async (data) => {
+  const createBlogs = async (data) => {
     try {
       // Send tags directly as an array of numbers
       const formattedData = {
@@ -341,7 +353,7 @@ export default function NewsManager() {
     }
   }
 
-  const updateNews = async (data, id) => {
+  const updateBlogs = async (data, id) => {
     try {
       // Send tags directly as an array of numbers
       const formattedData = {
@@ -460,7 +472,7 @@ export default function NewsManager() {
       )
       if (response.ok) {
         const data = await response.json()
-        setNews(data.items)
+        setBlogs(data.items)
 
         if (data.pagination) {
           setPagination({
@@ -471,11 +483,11 @@ export default function NewsManager() {
         }
       } else {
         console.error('Error fetching results:', response.statusText)
-        setNews([])
+        setBlogs([])
       }
     } catch (error) {
       console.error('Error fetching news search results:', error.message)
-      setNews([])
+      setBlogs([])
     }
   }
 
@@ -500,10 +512,10 @@ export default function NewsManager() {
     setSubmitting(true)
     try {
       if (editingId) {
-        await updateNews(data, editingId)
+        await updateBlogs(data, editingId)
         toast.success('News updated successfully')
       } else {
-        await createNews(data)
+        await createBlogs(data)
         toast.success('News created successfully')
       }
       reset()
@@ -606,14 +618,13 @@ export default function NewsManager() {
               type='text'
               value={searchQuery}
               onChange={(e) => handleSearchInput(e.target.value)}
-              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full pl-10 pr-4 py-2 text-sm border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring'
               placeholder='Search news...'
             />
           </div>
           {/* Button */}
           <div className='flex gap-2'>
-            <button
-              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+            <Button
               onClick={() => {
                 setIsOpen(true)
                 setEditing(false)
@@ -623,8 +634,8 @@ export default function NewsManager() {
                 setUploadedFiles({ featuredImage: '' })
               }}
             >
-              Add News
-            </button>
+              Add Blog
+            </Button>
           </div>
         </div>
         <ToastContainer />
@@ -639,7 +650,7 @@ export default function NewsManager() {
             setSelectedTags([])
             setUploadedFiles({ featuredImage: '' })
           }}
-          title={editing ? 'Edit News' : 'Add News'}
+          title={editing ? 'Edit Blog' : 'Add Blog'}
           className='max-w-5xl'
         >
           <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
@@ -651,37 +662,34 @@ export default function NewsManager() {
                 {/* Basic Information */}
                 <div className='bg-white p-6 rounded-lg shadow-md'>
                   <h2 className='text-xl font-semibold mb-4'>
-                    News Information
+                    Blog Information
                   </h2>
                   <div className='space-y-4'>
                     <div>
-                      <label className='block mb-2'>
-                        News Title <span className='text-red-500'>*</span>
-                      </label>
-                      <input
-                        type='text'
-                        placeholder='News Title'
+                      <RequiredLabel htmlFor='title'>Blog Title</RequiredLabel>
+                      <Input
+                        id='title'
+                        placeholder='Blog Title'
                         {...register('title', {
                           required: 'Title is required'
                         })}
-                        className='w-full p-2 border rounded'
+                        aria-invalid={errors.title ? 'true' : 'false'}
                       />
                       {errors.title && (
-                        <span className='text-red-500 text-sm'>
+                        <p className='text-sm font-medium text-destructive mt-1'>
                           {errors.title.message}
-                        </span>
+                        </p>
                       )}
                     </div>
 
                     <div>
-                      <label className='block mb-2'>
-                        Category <span className='text-red-500'>*</span>
-                      </label>
+                      <RequiredLabel htmlFor='category'>Category</RequiredLabel>
                       <select
+                        id='category'
                         {...register('category', {
                           required: 'Category is required'
                         })}
-                        className='w-full p-2 border rounded'
+                        className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                       >
                         <option value=''>Select Category</option>
                         {categories.map((cat) => (
@@ -691,20 +699,19 @@ export default function NewsManager() {
                         ))}
                       </select>
                       {errors.category && (
-                        <span className='text-red-500 text-sm'>
+                        <p className='text-sm font-medium text-destructive mt-1'>
                           {errors.category.message}
-                        </span>
+                        </p>
                       )}
                     </div>
 
                     {/* Tags search input */}
                     <div className='relative'>
-                      <input
+                      <Input
                         type='text'
                         placeholder='Search for tags...'
                         value={tagsSearch}
                         onChange={handleTagsSearch}
-                        className='w-full p-2 border rounded'
                       />
 
                       {/* Display search results in a dropdown */}
@@ -760,11 +767,12 @@ export default function NewsManager() {
                   </h2>
                   <div className='space-y-4'>
                     <div>
-                      <label className='block mb-2'>Description</label>
+                      <Label htmlFor='description'>Description</Label>
                       <textarea
+                        id='description'
                         placeholder='Description'
                         {...register('description')}
-                        className='w-full p-2 border rounded'
+                        className='flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                         rows='4'
                       />
                     </div>
@@ -784,9 +792,9 @@ export default function NewsManager() {
 
                 {/* Media */}
                 <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>Media</h2>
+                  <h2 className='text-xl font-semibold mb-4'>Featured Image </h2>
                   <FileUpload
-                    label='News Image'
+                    label='Blog Image'
                     onUploadComplete={(url) => {
                       setUploadedFiles((prev) => ({
                         ...prev,
@@ -804,10 +812,11 @@ export default function NewsManager() {
                   </h2>
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <div>
-                      <label className='block mb-2'>Visibility</label>
+                      <Label htmlFor='visibility'>Visibility</Label>
                       <select
+                        id='visibility'
                         {...register('visibility')}
-                        className='w-full p-2 border rounded'
+                        className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                       >
                         <option value='private'>Private</option>
                         <option value='public'>Public</option>
@@ -815,10 +824,11 @@ export default function NewsManager() {
                     </div>
 
                     <div>
-                      <label className='block mb-2'>Status</label>
+                      <Label htmlFor='status'>Status</Label>
                       <select
+                        id='status'
                         {...register('status')}
-                        className='w-full p-2 border rounded'
+                        className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                       >
                         <option value='draft'>Draft</option>
                         <option value='published'>Published</option>
@@ -830,9 +840,9 @@ export default function NewsManager() {
 
               {/* Submit Button - Sticky Footer */}
               <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <button
+                <Button
                   type='submit'
-                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
+                  className=' text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
                   disabled={submitting}
                 >
                   {submitting
@@ -840,9 +850,9 @@ export default function NewsManager() {
                       ? 'Updating...'
                       : 'Adding...'
                     : editing
-                      ? 'Update News'
-                      : 'Create News'}
-                </button>
+                      ? 'Update Blog'
+                      : 'Create Blog'}
+                </Button>
               </div>
             </form>
           </div>
@@ -851,7 +861,7 @@ export default function NewsManager() {
         {/* Table Section */}
         <div className='mt-8'>
           <Table
-            data={news}
+            data={blogs}
             columns={columns}
             pagination={pagination}
             onPageChange={(newPage) => loadData(newPage)}
@@ -866,14 +876,14 @@ export default function NewsManager() {
         onClose={handleDialogClose}
         onConfirm={handleDeleteConfirm}
         title='Confirm Deletion'
-        message='Are you sure you want to delete this news? This action cannot be undone.'
+        message='Are you sure you want to delete this blog? This action cannot be undone.'
       />
 
       {/* View News Details Modal */}
       <Modal
         isOpen={viewModalOpen}
         onClose={handleCloseViewModal}
-        title='News Details'
+        title='Blog Details'
         className='max-w-3xl'
       >
         {loadingView ? (
@@ -992,7 +1002,7 @@ export default function NewsManager() {
             )}
           </div>
         ) : (
-          <p className='text-center text-gray-500'>No news data available.</p>
+          <p className='text-center text-gray-500'>No blog data available.</p>
         )}
       </Modal>
     </>

@@ -137,7 +137,11 @@ const ProfileUpdate = () => {
     }
   }
   const roles = userData?.role
-    ? Object.entries(JSON.parse(userData.role))
+    ? Object.entries(
+      typeof userData.role === 'string'
+        ? JSON.parse(userData.role)
+        : userData.role
+    )
       .filter(([_, value]) => value)
       .map(([key]) => key.toUpperCase())
       .join(', ')

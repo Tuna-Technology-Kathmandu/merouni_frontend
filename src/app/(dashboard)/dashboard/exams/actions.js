@@ -1,5 +1,3 @@
-// app/actions/scholarship.js
-
 import { authFetch } from '@/app/utils/authFetch'
 import { DotenvConfig } from '@/config/env.config'
 

@@ -8,7 +8,15 @@ export const createColumns = ({ handleEdit, handleDelete }) => [
       const firstName = row.original.firstName || ''
       const lastName = row.original.lastName || ''
       const fullName = `${firstName} ${lastName}`.trim() || 'N/A'
-      const roles = JSON.parse(row.original.roles || '{}') // Parse the string to an object
+      let roles = row.original.roles || {}
+      if (typeof roles === 'string') {
+        try {
+          roles = JSON.parse(roles)
+        } catch (e) {
+          console.error('Failed to parse roles:', row.original.roles)
+          roles = {}
+        }
+      }
       const activeRoles = Object.entries(roles)
         .filter(([_, value]) => value) // keep only true roles
         .map(([role]) => role)

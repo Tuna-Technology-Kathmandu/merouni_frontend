@@ -3,7 +3,7 @@ import { DotenvConfig } from '@/config/env.config'
 
 let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs`
 
-export async function fetchNews(page = 1, limit = 10) {
+export async function fetchBlogs(page = 1, limit = 10) {
   try {
     const response = await fetch(`${url}?limit=${limit}&page=${page}`, {
       cache: 'no-store'
@@ -43,7 +43,7 @@ export const fetchTags = async () => {
   }
 }
 
-export async function createNews(data) {
+export async function createBlogs(data) {
   try {
     const response = await fetch(`${url}`, {
       method: 'POST',
@@ -64,7 +64,7 @@ export async function createNews(data) {
   }
 }
 
-export async function updateNews(eventId, data) {
+export async function updateBlogs(eventId, data) {
   try {
     const response = await fetch(`${url}?event_id=${eventId}`, {
       method: 'PUT',
@@ -85,7 +85,7 @@ export async function updateNews(eventId, data) {
   }
 }
 
-export async function deleteNews(eventId) {
+export async function deleteBlogs(eventId) {
   console.log('before deleteing')
   try {
     const response = await fetch(`${url}?event_id=${eventId}`, {

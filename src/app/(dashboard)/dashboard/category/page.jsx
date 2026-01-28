@@ -11,9 +11,10 @@ import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { Modal } from '../../../../components/CreateUserModal'
+import { Modal } from '../../../../components/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
+import { Button } from '@/components/ui/button'
 
 export default function CategoryManager() {
   const { setHeading } = usePageHeading()
@@ -308,8 +309,7 @@ export default function CategoryManager() {
           </div>
           {/* Button */}
           <div className='flex gap-2'>
-            <button
-              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+            <Button
               onClick={() => {
                 setIsOpen(true)
                 setEditing(false)
@@ -318,7 +318,7 @@ export default function CategoryManager() {
               }}
             >
               Add Category
-            </button>
+            </Button>
           </div>
         </div>
         <ToastContainer />
@@ -378,12 +378,11 @@ export default function CategoryManager() {
 
               {/* Submit Button - Sticky Footer */}
               <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <button
+                <Button
                   type='submit'
-                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
                 >
                   {editing ? 'Update Category' : 'Create Category'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

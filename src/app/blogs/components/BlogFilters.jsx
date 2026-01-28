@@ -41,11 +41,11 @@ const BlogFilters = ({
                         key={cat.id}
                         onClick={() => setSelectedCategory(cat.id)}
                         className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${selectedCategory === cat.id
-                                ? 'bg-[#0A70A7] text-white shadow-md shadow-blue-500/20'
-                                : 'bg-white text-gray-600 border border-gray-200 hover:border-[#0A70A7] hover:text-[#0A70A7]'
+                            ? 'bg-[#0A70A7] text-white shadow-md shadow-blue-500/20'
+                            : 'bg-white text-gray-600 border border-gray-200 hover:border-[#0A70A7] hover:text-[#0A70A7]'
                             }`}
                     >
-                        {cat.label}
+                        {cat.title}
                     </button>
                 ))}
             </div>

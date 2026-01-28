@@ -14,9 +14,10 @@ import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import dynamic from 'next/dynamic'
-import { Modal } from '../../../../components/CreateUserModal'
+import { Modal } from '../../../../components/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
+import { Button } from '@/components/ui/button'
 
 // Dynamically import CKEditor to avoid SSR issues
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
@@ -307,8 +308,7 @@ export default function CareerForm() {
           </div>
           {/* Button */}
           <div className='flex gap-2'>
-            <button
-              className='bg-blue-500 text-white text-sm px-6 py-2 rounded hover:bg-blue-600 transition-colors'
+            <Button
               onClick={() => {
                 setIsOpen(true)
                 setEditing(false)
@@ -318,7 +318,7 @@ export default function CareerForm() {
               }}
             >
               Add Career
-            </button>
+            </Button>
           </div>
         </div>
         <ToastContainer />
@@ -405,17 +405,16 @@ export default function CareerForm() {
 
               {/* Submit Button - Sticky Footer */}
               <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <button
+                <Button
                   type='submit'
                   disabled={loading}
-                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
                 >
                   {loading
                     ? 'Processing...'
                     : editing
                       ? 'Update Career'
                       : 'Create Career'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

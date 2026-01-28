@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Edit, Trash2, Plus } from 'lucide-react'
 import { Button } from './Button'
-import { Modal } from './CreateUserModal'
+import { Modal } from './UserModal'
 import { UserForm } from './UserForm'
 import { deleteUser } from '../app/actions/userActions'
 

@@ -113,7 +113,7 @@ export async function getBlogs(page, category_title, search) {
     category_title,
     q: search
   }
-  return services.news.getAll(params)
+  return services.blogs.getAll(params)
 }
 
 // get ranking
@@ -123,7 +123,7 @@ export async function getRankings(limit, page, category_title) {
     page,
     category_title
   }
-  return services.news.getAll(params)
+  return services.blogs.getAll(params)
 }
 export async function getToken() {
   // Check if localStorage is available (client-side)

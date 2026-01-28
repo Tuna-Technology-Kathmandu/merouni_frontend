@@ -25,6 +25,7 @@ class ApiService {
 
   async getAll(params = {}) {
     try {
+      console.log(this.baseUrl, "this.baseUrlthis.baseUrlthis.baseUrl")
       // const url = queryParams ? `${this.baseUrl}?${queryParams}` : this.baseUrl;
       const url = this.buildUrl(this.baseUrl, params)
       const response = await fetch(url, {
@@ -107,7 +108,7 @@ const services = {
   course: new ApiService('course'),
   faculty: new ApiService('faculty'),
   event: new ApiService('event'),
-  news: new ApiService('blogs'),
+  blogs: new ApiService('blogs'),
   banner: new ApiService('banner'),
   exam: new ApiService('exam'),
   college: new ApiService('college'),
