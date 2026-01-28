@@ -655,7 +655,9 @@ export default function NewsManager() {
                   </h2>
                   <div className='space-y-4'>
                     <div>
-                      <label className='block mb-2'>News Title *</label>
+                      <label className='block mb-2'>
+                        News Title <span className='text-red-500'>*</span>
+                      </label>
                       <input
                         type='text'
                         placeholder='News Title'
@@ -672,7 +674,9 @@ export default function NewsManager() {
                     </div>
 
                     <div>
-                      <label className='block mb-2'>Category *</label>
+                      <label className='block mb-2'>
+                        Category <span className='text-red-500'>*</span>
+                      </label>
                       <select
                         {...register('category', {
                           required: 'Category is required'
@@ -896,8 +900,8 @@ export default function NewsManager() {
                 {viewNewsData.status && (
                   <span
                     className={`px-2 py-0.5 text-xs font-semibold rounded-full ${viewNewsData.status === 'published'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-yellow-100 text-yellow-800'
                       }`}
                   >
                     {viewNewsData.status}
@@ -906,8 +910,8 @@ export default function NewsManager() {
                 {viewNewsData.visibility && (
                   <span
                     className={`px-2 py-0.5 text-xs font-semibold rounded-full ${viewNewsData.visibility === 'public'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-gray-100 text-gray-800'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-gray-100 text-gray-800'
                       }`}
                   >
                     {viewNewsData.visibility}

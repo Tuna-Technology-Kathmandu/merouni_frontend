@@ -203,7 +203,7 @@ const ProfileUpdate = () => {
                 <div className='space-y-3'>
                   <div>
                     <label className='block text-sm font-medium text-gray-700'>
-                      First Name
+                      First Name <span className='text-red-500'>*</span>
                     </label>
                     <input
                       type='text'
@@ -230,7 +230,7 @@ const ProfileUpdate = () => {
                   </div>
                   <div>
                     <label className='block text-sm font-medium text-gray-700'>
-                      Last Name
+                      Last Name <span className='text-red-500'>*</span>
                     </label>
                     <input
                       type='text'
@@ -244,7 +244,7 @@ const ProfileUpdate = () => {
                   </div>
                   <div>
                     <label className='block text-sm font-medium text-gray-700'>
-                      Email
+                      Email <span className='text-red-500'>*</span>
                     </label>
                     <input
                       type='text'
@@ -258,7 +258,7 @@ const ProfileUpdate = () => {
                   </div>
                   <div>
                     <label className='block text-sm font-medium text-gray-700'>
-                      Phone
+                      Phone <span className='text-red-500'>*</span>
                     </label>
                     <input
                       type='text'
@@ -300,7 +300,7 @@ const ProfileUpdate = () => {
                 <div className='space-y-3'>
                   <div>
                     <label className='block text-sm font-medium text-gray-700'>
-                      New Password
+                      New Password <span className='text-red-500'>*</span>
                     </label>
                     <div className='relative'>
                       <input
@@ -330,7 +330,7 @@ const ProfileUpdate = () => {
                   </div>
                   <div>
                     <label className='block text-sm font-medium text-gray-700'>
-                      Confirm New Password
+                      Confirm New Password <span className='text-red-500'>*</span>
                     </label>
                     <div className='relative'>
                       <input

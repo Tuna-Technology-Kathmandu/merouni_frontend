@@ -12,48 +12,37 @@ export default function UserDropdown() {
   const user = useSelector((state) => state.user?.data)
 
   useEffect(() => {
-    // Check if user is logged in by checking both Redux state and localStorage
-    const token =
-      typeof window !== 'undefined'
-        ? localStorage.getItem('access_token')
-        : null
+    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
     const hasUser = user !== null && user !== undefined
     setIsLoggedIn(!!(token || hasUser))
   }, [user])
 
-  // Check if we're on the apply page
-  const isApplyPage =
-    pathname?.includes('/colleges/apply') ||
-    pathname?.includes('/schools/apply')
+  const isApplyPage = pathname?.includes('/colleges/apply') || pathname?.includes('/schools/apply')
 
   if (isLoggedIn) {
     return (
-      <div className='flex items-center gap-1 sm:gap-2 mx-1 sm:mx-2'>
+      <div className='flex items-center gap-2 mx-2'>
         <Link href='/dashboard'>
-          <button className='flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-[#30ad8f] text-white rounded-lg font-semibold hover:bg-[#2a9d7f] transition-colors text-xs sm:text-sm md:text-base'>
-            <span className='hidden sm:inline'>Go to Dashboard</span>
-            <span className='sm:hidden'>Dashboard</span>
-            <FaArrowRight className='w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0' />
+          <button className='group flex items-center gap-2 px-5 py-2.5 bg-[#0A6FA7] text-white rounded-xl font-bold hover:bg-[#085a86] transition-all shadow-sm hover:shadow-lg active:scale-[0.98] text-xs sm:text-sm uppercase tracking-widest border border-white/10'>
+            <span>Dashboard</span>
+            <FaArrowRight className='w-3 h-3 transition-transform group-hover:translate-x-1' />
           </button>
         </Link>
       </div>
     )
   }
 
-  // Hide login/signup buttons on apply page when not logged in
-  if (isApplyPage) {
-    return null
-  }
+  if (isApplyPage) return null
 
   return (
-    <div className='flex items-center gap-1 sm:gap-2 mx-1 sm:mx-2'>
+    <div className='flex items-center gap-3 mx-2'>
       <Link href='/sign-in'>
-        <button className='px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors text-xs sm:text-sm md:text-base'>
+        <button className='px-6 py-2.5 bg-[#0A6FA7] text-white rounded-xl font-extrabold hover:bg-[#085a86] transition-all shadow-sm hover:shadow-lg active:scale-[0.98] text-xs sm:text-sm uppercase tracking-widest border border-white/10'>
           Login
         </button>
       </Link>
       <Link href='/signup'>
-        <button className='px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-xs sm:text-sm md:text-base'>
+        <button className='px-6 py-2.5 bg-white text-[#0A6FA7] border-2 border-[#0A6FA7] rounded-xl font-extrabold hover:bg-blue-50/50 transition-all text-xs sm:text-sm uppercase tracking-widest active:scale-[0.98]'>
           Sign Up
         </button>
       </Link>

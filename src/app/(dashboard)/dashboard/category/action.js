@@ -1,6 +1,7 @@
 'use server'
 
-import { DotenvConfig } from '@/config/env.config'
+import { DotenvConfig } from "@/config/env.config"
+
 
 let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/category`
 

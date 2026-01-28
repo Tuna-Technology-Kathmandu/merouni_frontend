@@ -491,7 +491,9 @@ export default function CollegeRankingsPage() {
         <div className='p-6 space-y-6'>
           {/* Program Selection */}
           <div className='relative' ref={programDropdownRef}>
-            <label className='block mb-2 font-medium'>Program *</label>
+            <label className='block mb-2 font-medium'>
+              Program <span className='text-red-500'>*</span>
+            </label>
             <div className='relative'>
               <input
                 type='text'
@@ -597,7 +599,7 @@ export default function CollegeRankingsPage() {
           {/* College Selection */}
           <div>
             <label className='block mb-2 font-medium'>
-              College *{' '}
+              College <span className='text-red-500'>*</span>{' '}
               {selectedProgram && (
                 <span className='text-gray-500 text-sm font-normal'>
                   (Select colleges to rank for this program)

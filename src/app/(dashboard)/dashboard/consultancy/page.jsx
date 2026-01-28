@@ -508,7 +508,9 @@ export default function ConsultancyForm() {
                   </h2>
                   <div className='grid grid-cols-1 gap-4'>
                     <div>
-                      <label className='block mb-2'>Title *</label>
+                      <label className='block mb-2'>
+                        Title <span className='text-red-500'>*</span>
+                      </label>
                       <input
                         {...register('title', {
                           required: 'Title is required',

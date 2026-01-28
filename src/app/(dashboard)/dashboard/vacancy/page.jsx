@@ -405,7 +405,9 @@ const VacancyManager = () => {
                   </h2>
                   <div className='space-y-4'>
                     <div>
-                      <label className='block mb-2'>Vacancy Title *</label>
+                      <label className='block mb-2'>
+                        Vacancy Title <span className='text-red-500'>*</span>
+                      </label>
                       <input
                         type='text'
                         placeholder='Vacancy Title'

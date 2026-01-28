@@ -348,7 +348,9 @@ export default function CareerForm() {
                   </h2>
                   <div className='grid grid-cols-1 gap-4'>
                     <div>
-                      <label className='block mb-2'>Job Title *</label>
+                      <label className='block mb-2'>
+                        Job Title <span className='text-red-500'>*</span>
+                      </label>
                       <input
                         {...register('title', {
                           required: 'Job title is required',

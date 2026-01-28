@@ -94,10 +94,10 @@ const ReferralsPage = () => {
         prev.map((ref) =>
           ref.id === selectedReferral.id
             ? {
-                ...ref,
-                status: statusForm.status,
-                remarks: statusForm.remarks || null
-              }
+              ...ref,
+              status: statusForm.status,
+              remarks: statusForm.remarks || null
+            }
             : ref
         )
       )
@@ -191,8 +191,7 @@ const ReferralsPage = () => {
                     <>
                       <TableCell>
                         {referral.referralAgent
-                          ? `${referral.referralAgent.firstName} ${
-                              referral.referralAgent.middleName || ''
+                          ? `${referral.referralAgent.firstName} ${referral.referralAgent.middleName || ''
                             } ${referral.referralAgent.lastName}`.trim()
                           : referral.application_type === 'self'
                             ? 'Self'
@@ -205,13 +204,12 @@ const ReferralsPage = () => {
                   )}
                   <TableCell>
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                        referral.status === 'ACCEPTED'
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${referral.status === 'ACCEPTED'
                           ? 'bg-green-100 text-green-800'
                           : referral.status === 'REJECTED'
                             ? 'bg-red-100 text-red-800'
                             : 'bg-yellow-100 text-yellow-800'
-                      }`}
+                        }`}
                     >
                       {referral.status || 'IN_PROGRESS'}
                     </span>
@@ -264,7 +262,7 @@ const ReferralsPage = () => {
         <form onSubmit={handleStatusSubmit} className='space-y-4'>
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Status
+              Status <span className='text-red-500'>*</span>
             </label>
             <select
               className='w-full p-2 border rounded'

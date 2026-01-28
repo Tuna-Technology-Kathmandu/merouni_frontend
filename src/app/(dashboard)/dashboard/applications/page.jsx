@@ -186,10 +186,10 @@ const ApplicationsPage = () => {
                   <td className='px-4 py-2 border'>
                     <span
                       className={`px-2 py-1 text-xs font-semibold rounded-full ${app.status === 'ACCEPTED'
-                          ? 'bg-green-100 text-green-800'
-                          : app.status === 'REJECTED'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-green-100 text-green-800'
+                        : app.status === 'REJECTED'
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-yellow-100 text-yellow-800'
                         }`}
                     >
                       {app.status || 'IN_PROGRESS'}
@@ -241,7 +241,7 @@ const ApplicationsPage = () => {
         <form onSubmit={handleStatusSubmit} className='space-y-4'>
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Status
+              Status <span className='text-red-500'>*</span>
             </label>
             <select
               className='w-full p-2 border rounded'

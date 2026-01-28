@@ -437,8 +437,8 @@ export default function BannerForm() {
                   {showAlert && (
                     <span
                       className={`inline-block self-start text-xs font-medium px-2 py-1 rounded-full mb-3 ${status === 'Expired!'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-amber-100 text-amber-800'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-amber-100 text-amber-800'
                         }`}
                     >
                       {status}
@@ -513,7 +513,9 @@ export default function BannerForm() {
               {!editing && (
                 <>
                   <div className='relative mb-6' ref={dropdownRef}>
-                    <label className='block mb-2'>Search College *</label>
+                    <label className='block mb-2'>
+                      Search College <span className='text-red-500'>*</span>
+                    </label>
                     <input
                       type='text'
                       {...register('collegeSearch', {
@@ -579,7 +581,9 @@ export default function BannerForm() {
               </div>
 
               <div className='mb-4'>
-                <label className='block mb-2'>Date of Expiry *</label>
+                <label className='block mb-2'>
+                  Date of Expiry <span className='text-red-500'>*</span>
+                </label>
                 <input
                   type='date'
                   {...register('date_of_expiry', {
@@ -627,7 +631,9 @@ export default function BannerForm() {
                     )}
 
                     <div className='mb-4'>
-                      <label className='block mb-2'>Banner Title *</label>
+                      <label className='block mb-2'>
+                        Banner Title <span className='text-red-500'>*</span>
+                      </label>
                       <input
                         {...register(`bannerImages.${index}.title`, {
                           required: 'Banner title is required'

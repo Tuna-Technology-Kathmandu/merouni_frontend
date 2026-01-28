@@ -78,12 +78,13 @@ const Header = () => {
         </nav>
 
         <div className='flex flex-row justify-between mt-12 ml-4 mr-4'>
-          <Link href='/sign-in'>
+          <Link href='/sign-in' className="w-full">
             <button
               type='button'
-              className=' bg-[#0A6FA7] w-[150px] p-2 rounded-lg'
+              className='w-full py-3 bg-[#0A6FA7] text-white rounded-xl font-bold hover:bg-[#085a86] transition-all shadow-md active:scale-[0.98] text-sm uppercase tracking-wide'
+              onClick={() => setShowSidebar(false)}
             >
-              <span className='text-white font-bold text-lg'>Login</span>
+              Login
             </button>
           </Link>
         </div>
@@ -123,7 +124,7 @@ const Header = () => {
 
           {/* Search Box for desktop */}
           <div
-            className='bg-white border-2 border-[#30ad8f] p-2 rounded-lg hidden md:block flex-1 max-w-[400px] mx-auto cursor-pointer'
+            className='bg-white border-2 border-[#0A6FA7] p-2 rounded-lg hidden md:block flex-1 max-w-[400px] mx-auto cursor-pointer'
             onClick={() => setShowSearch(true)}
           >
             <div className='flex items-center'>
@@ -155,9 +156,7 @@ const Header = () => {
           {/* User Icon */}
           <div className=''>
             <Usericon />
-            {/* <FaUserCircle
-            style={{ width: "40px", height: "40px", color: "#0a6fa7" }}
-          /> */}
+         
           </div>
 
           {/* Mobile Menu Icon (☰) */}

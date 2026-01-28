@@ -1316,28 +1316,6 @@ export default function CollegeForm() {
                   )}
                 </div>
 
-                {/*author section - Hidden */}
-                {/* <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Author Information
-                  </h2>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <div>
-                      <label className='block mb-2'>Author ID *</label>
-                      <input
-                        {...register('author_id')}
-                        className='w-full p-2 border rounded '
-                        disabled
-                      />
-                      {errors.author_id && (
-                        <span className='text-red-500'>
-                          This field is required
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div> */}
-
                 <div className='bg-white p-6 rounded-lg shadow-md'>
                   <h2 className='text-xl font-semibold mb-4'>Media</h2>
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -1636,9 +1614,14 @@ export default function CollegeForm() {
                       (field) => (
                         <div key={field} className='space-y-2'>
                           <Label htmlFor={field} className='capitalize'>
-                            {field !== 'state'
-                              ? `${field.replace('_', ' ')} *`
-                              : 'District'}
+                            {field !== 'state' ? (
+                              <>
+                                {field.replace('_', ' ')}{' '}
+                                <span className='text-red-500'>*</span>
+                              </>
+                            ) : (
+                              'District'
+                            )}
                           </Label>
                           <Input
                             id={field}

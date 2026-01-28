@@ -13,6 +13,7 @@ import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { Modal } from '../../../../components/CreateUserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { DotenvConfig } from '@/config/env.config'
 
 export default function CategoryManager() {
   const { setHeading } = usePageHeading()
@@ -345,7 +346,9 @@ export default function CategoryManager() {
                   </h2>
                   <div className='space-y-4'>
                     <div>
-                      <label className='block mb-2'>Category Title *</label>
+                      <label className='block mb-2'>
+                        Category Title <span className='text-red-500'>*</span>
+                      </label>
                       <input
                         type='text'
                         placeholder='Category Title'

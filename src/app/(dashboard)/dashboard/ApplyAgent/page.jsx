@@ -48,7 +48,7 @@ const AgentApplicationForm = () => {
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div>
                 <label className='block text-sm font-medium text-gray-700 mb-1'>
-                  First Name
+                  First Name <span className='text-red-500'>*</span>
                 </label>
                 <input
                   type='text'
@@ -63,7 +63,7 @@ const AgentApplicationForm = () => {
 
               <div>
                 <label className='block text-sm font-medium text-gray-700 mb-1'>
-                  Last Name
+                  Last Name <span className='text-red-500'>*</span>
                 </label>
                 <input
                   type='text'
@@ -79,7 +79,7 @@ const AgentApplicationForm = () => {
 
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1'>
-                Email Address
+                Email Address <span className='text-red-500'>*</span>
               </label>
               <input
                 type='email'
@@ -94,7 +94,7 @@ const AgentApplicationForm = () => {
 
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1'>
-                Phone Number
+                Phone Number <span className='text-red-500'>*</span>
               </label>
               <input
                 type='tel'
@@ -116,7 +116,7 @@ const AgentApplicationForm = () => {
 
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1'>
-                Years of Experience
+                Years of Experience <span className='text-red-500'>*</span>
               </label>
               <select
                 name='experience'
@@ -135,7 +135,7 @@ const AgentApplicationForm = () => {
 
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1'>
-                Area of Specialization
+                Area of Specialization <span className='text-red-500'>*</span>
               </label>
               <select
                 name='specialization'
@@ -154,7 +154,7 @@ const AgentApplicationForm = () => {
 
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1'>
-                License Number
+                License Number <span className='text-red-500'>*</span>
               </label>
               <input
                 type='text'
@@ -169,7 +169,7 @@ const AgentApplicationForm = () => {
 
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-1'>
-                About Yourself
+                About Yourself <span className='text-red-500'>*</span>
               </label>
               <textarea
                 name='about'

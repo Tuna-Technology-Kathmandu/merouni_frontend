@@ -8,6 +8,7 @@ import Pagination from './Pagination'
 import FeaturedBlogsShimmer from './FeaturedBlogShimmer'
 import Link from 'next/link'
 import { IoSearch } from 'react-icons/io5'
+import { DotenvConfig } from '@/config/env.config'
 
 const FeaturedBlogs = () => {
   const [pagination, setPagination] = useState({

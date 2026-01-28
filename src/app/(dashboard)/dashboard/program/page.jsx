@@ -782,7 +782,9 @@ export default function ProgramForm() {
               <h2 className='text-xl font-semibold mb-4'>Basic Information</h2>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div>
-                  <label className='block mb-2'>Program Title *</label>
+                  <label className='block mb-2'>
+                    Program Title <span className='text-red-500'>*</span>
+                  </label>
                   <input
                     {...register('title', { required: 'Title is required' })}
                     className='w-full p-2 border rounded'
@@ -801,7 +803,9 @@ export default function ProgramForm() {
                 </div>
 
                 <div className='relative'>
-                  <label className='block mb-2'>Faculty *</label>
+                  <label className='block mb-2'>
+                    Faculty <span className='text-red-500'>*</span>
+                  </label>
 
                   <input
                     type='text'
@@ -850,7 +854,9 @@ export default function ProgramForm() {
                 </div>
 
                 <div>
-                  <label className='block mb-2'>Duration *</label>
+                  <label className='block mb-2'>
+                    Duration <span className='text-red-500'>*</span>
+                  </label>
                   <input
                     {...register('duration', { required: true })}
                     className='w-full p-2 border rounded'
@@ -859,7 +865,9 @@ export default function ProgramForm() {
                 </div>
 
                 <div>
-                  <label className='block mb-2'>Credits *</label>
+                  <label className='block mb-2'>
+                    Credits <span className='text-red-500'>*</span>
+                  </label>
                   <input
                     type='number'
                     {...register('credits', {
@@ -873,7 +881,9 @@ export default function ProgramForm() {
 
                 {/* level search box */}
                 <div className='relative'>
-                  <label className='block mb-2'>Level *</label>
+                  <label className='block mb-2'>
+                    Level <span className='text-red-500'>*</span>
+                  </label>
                   <input
                     type='text'
                     className='w-full p-2 border rounded'
@@ -921,7 +931,9 @@ export default function ProgramForm() {
                 </div>
 
                 <div>
-                  <label className='block mb-2'>Language *</label>
+                  <label className='block mb-2'>
+                    Language <span className='text-red-500'>*</span>
+                  </label>
                   <input
                     {...register('language', { required: true })}
                     className='w-full p-2 border rounded'
@@ -1182,8 +1194,8 @@ export default function ProgramForm() {
                             setCurrentSemester(sem)
                           }}
                           className={`w-full py-2 px-3 rounded text-sm ${currentYear === year && currentSemester === sem
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-white border hover:bg-gray-100'
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-white border hover:bg-gray-100'
                             }`}
                         >
                           {sem !== 0

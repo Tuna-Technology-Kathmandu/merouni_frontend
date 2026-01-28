@@ -43,7 +43,7 @@ function Modal({ isOpen, onClose, onSave, isUploading }) {
         <form onSubmit={handleSubmit}>
           <div className='mb-4'>
             <label className='block'>
-              Title<span className=''>*</span>
+              Title <span className='text-red-500'>*</span>
             </label>
             <input
               type='text'
@@ -54,7 +54,7 @@ function Modal({ isOpen, onClose, onSave, isUploading }) {
           </div>
           <div className='mb-4'>
             <label className='block'>
-              Alt Text<span>*</span>
+              Alt Text <span className='text-red-500'>*</span>
             </label>
             <input
               type='text'
@@ -65,7 +65,7 @@ function Modal({ isOpen, onClose, onSave, isUploading }) {
           </div>
           <div className='mb-4'>
             <label className='block'>
-              Description<span>*</span>
+              Description <span className='text-red-500'>*</span>
             </label>
             <textarea
               value={description}
@@ -74,7 +74,9 @@ function Modal({ isOpen, onClose, onSave, isUploading }) {
             />
           </div>
           <div className='mb-4'>
-            <label className='block'>Upload File</label>
+            <label className='block'>
+              Upload File <span className='text-red-500'>*</span>
+            </label>
             <input
               type='file'
               onChange={handleFileChange}

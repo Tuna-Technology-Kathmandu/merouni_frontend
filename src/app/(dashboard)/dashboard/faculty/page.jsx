@@ -306,7 +306,9 @@ export default function FacultyManager() {
         <form onSubmit={handleSubmit} className='space-y-6'>
           <div className='space-y-4'>
             <div>
-              <label className='block mb-2'>Faculty Title *</label>
+              <label className='block mb-2'>
+                Faculty Title <span className='text-red-500'>*</span>
+              </label>
               <input
                 type='text'
                 value={formData.title}

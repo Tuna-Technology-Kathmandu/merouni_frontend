@@ -85,7 +85,7 @@ const Footer = () => {
                       <li key={itemIndex}>
                         <Link
                           href={'#'}
-                          className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                          className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors'
                         >
                           {item}
                         </Link>
@@ -109,13 +109,13 @@ const Footer = () => {
                     href='https://www.facebook.com/people/MeroUni/61570894206794/'
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                    className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors'
                   >
                     <FaFacebook size={28} />
                   </a>
                   <a
                     href='#'
-                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                    className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors'
                   >
                     <FaInstagram size={28} />
                   </a>
@@ -123,13 +123,13 @@ const Footer = () => {
                     href='https://www.linkedin.com/company/merouni/?originalSubdomain=np'
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                    className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors'
                   >
                     <TiSocialLinkedinCircular size={30} />
                   </a>
                   <a
                     href='#'
-                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                    className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors'
                   >
                     <PiXLogoLight size={28} />
                   </a>
@@ -139,13 +139,13 @@ const Footer = () => {
                 <div className='space-x-8'>
                   <Link
                     href={'#'}
-                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors font-semibold'
+                    className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors font-semibold'
                   >
                     Disclaimer
                   </Link>
                   <Link
                     href={'#'}
-                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors font-semibold'
+                    className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors font-semibold'
                   >
                     Privacy Policy
                   </Link>
@@ -200,7 +200,7 @@ const Footer = () => {
                         <li key={itemIndex} className='mb-2'>
                           <Link
                             href={'#'}
-                            className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                            className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors'
                           >
                             {item}
                           </Link>
@@ -224,13 +224,13 @@ const Footer = () => {
                       href='https://www.facebook.com/people/MeroUni/61570894206794/'
                       target='_blank'
                       rel='noopener noreferrer'
-                      className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                      className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors'
                     >
                       <FaFacebook size={28} />
                     </a>
                     <a
                       href='#'
-                      className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                      className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors'
                     >
                       <FaInstagram size={28} />
                     </a>
@@ -238,13 +238,13 @@ const Footer = () => {
                       href='https://www.linkedin.com/company/merouni/?originalSubdomain=np'
                       target='_blank'
                       rel='noopener noreferrer'
-                      className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                      className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors'
                     >
                       <TiSocialLinkedinCircular size={30} />
                     </a>
                     <a
                       href='#'
-                      className='text-[#0870A8] hover:text-[#31AD8F] transition-colors'
+                      className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors'
                     >
                       <PiXLogoLight size={28} />
                     </a>
@@ -259,13 +259,13 @@ const Footer = () => {
                 <div className='space-x-8 mt-8'>
                   <Link
                     href={'#'}
-                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors font-semibold'
+                    className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors font-semibold'
                   >
                     Disclaimer
                   </Link>
                   <Link
                     href={'#'}
-                    className='text-[#0870A8] hover:text-[#31AD8F] transition-colors font-semibold'
+                    className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors font-semibold'
                   >
                     Privacy Policy
                   </Link>

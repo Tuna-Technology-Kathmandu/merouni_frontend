@@ -447,7 +447,9 @@ export default function ScholarshipManager() {
           <form onSubmit={handleSubmit} className='space-y-6'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div className='space-y-2 col-span-2'>
-                <Label htmlFor='name'>Scholarship Name</Label>
+                <Label htmlFor='name'>
+                  Scholarship Name <span className='text-red-500'>*</span>
+                </Label>
                 <Input
                   id='name'
                   placeholder='Scholarship Name'
@@ -470,7 +472,7 @@ export default function ScholarshipManager() {
 
               <div className='space-y-2'>
                 <Label htmlFor='eligibilityCriteria'>
-                  Eligibility Criteria
+                  Eligibility Criteria <span className='text-red-500'>*</span>
                 </Label>
                 <Input
                   id='eligibilityCriteria'
@@ -487,7 +489,9 @@ export default function ScholarshipManager() {
               </div>
 
               <div className='space-y-2'>
-                <Label htmlFor='amount'>Amount (Rs.)</Label>
+                <Label htmlFor='amount'>
+                  Amount <span className='text-red-500'>(Rs.) *</span>
+                </Label>
                 <Input
                   id='amount'
                   type='number'
@@ -502,7 +506,7 @@ export default function ScholarshipManager() {
 
               <div className='space-y-2'>
                 <Label htmlFor='applicationDeadline'>
-                  Application Deadline
+                  Application Deadline <span className='text-red-500'>*</span>
                 </Label>
                 <Input
                   id='applicationDeadline'
@@ -519,7 +523,9 @@ export default function ScholarshipManager() {
               </div>
 
               <div className='space-y-2'>
-                <Label htmlFor='renewalCriteria'>Renewal Criteria</Label>
+                <Label htmlFor='renewalCriteria'>
+                  Renewal Criteria <span className='text-red-500'>*</span>
+                </Label>
                 <Input
                   id='renewalCriteria'
                   placeholder='Renewal Criteria'
@@ -535,7 +541,9 @@ export default function ScholarshipManager() {
               </div>
 
               <div className='space-y-2 col-span-2'>
-                <Label htmlFor='contactInfo'>Contact Information</Label>
+                <Label htmlFor='contactInfo'>
+                  Contact Information <span className='text-red-500'>*</span>
+                </Label>
                 <Input
                   id='contactInfo'
                   placeholder='Contact Information'

@@ -303,7 +303,9 @@ export default function TagForm() {
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
           <div className='space-y-4'>
             <div>
-              <label className='block mb-2'>Tag Title *</label>
+              <label className='block mb-2'>
+                Tag Title <span className='text-red-500'>*</span>
+              </label>
               <input
                 {...register('title', {
                   required: 'Tag title is required',

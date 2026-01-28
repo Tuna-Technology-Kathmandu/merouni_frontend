@@ -87,7 +87,9 @@ export default function CourseSearch({
 
   return (
     <div className='relative' ref={dropdownRef}>
-      <label className='block mb-2'>Course*</label>
+      <label className='block mb-2'>
+        Course <span className='text-red-500'>*</span>
+      </label>
       <input
         type='text'
         value={search}

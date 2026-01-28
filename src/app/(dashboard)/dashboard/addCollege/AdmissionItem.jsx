@@ -50,7 +50,9 @@ const AdmissionItem = ({
   return (
     <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border rounded'>
       <div className='relative'>
-        <label className='block mb-2'>Program*</label>
+        <label className='block mb-2'>
+          Program <span className='text-red-500'>*</span>
+        </label>
         <input
           type='text'
           className='w-full p-2 border rounded'

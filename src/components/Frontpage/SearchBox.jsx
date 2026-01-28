@@ -102,7 +102,7 @@ const SearchBox = ({ onClose }) => {
           <h2 className='text-base md:text-lg font-semibold'>{title}</h2>
           {items.length > slice && toggleView && (
             <p
-              className='text-sm text-[#30AD8F] border-b border-[#30AD8F] hover:text-[#248a72] transition cursor-pointer'
+              className='text-sm text-[#0A6FA7] border-b border-[#0A6FA7] hover:text-[#085a86] transition cursor-pointer'
               onClick={viewClick}
             >
               View All
@@ -110,7 +110,7 @@ const SearchBox = ({ onClose }) => {
           )}
           {!toggleView && (
             <p
-              className='text-sm text-[#30AD8F] border-b border-[#30AD8F] hover:text-[#248a72] transition cursor-pointer'
+              className='text-sm text-[#0A6FA7] border-b border-[#0A6FA7] hover:text-[#085a86] transition cursor-pointer'
               onClick={viewLess}
             >
               View Less
@@ -143,8 +143,8 @@ const SearchBox = ({ onClose }) => {
   return (
     <div
       className={`fixed flex flex-col top-0 left-0 w-full transition-all duration-300 z-50 ${searchTag.trim()
-          ? 'h-screen bg-white overflow-auto'
-          : 'h-[400px] md:h-[450px] bg-white shadow-md'
+        ? 'h-screen bg-white overflow-auto'
+        : 'h-[400px] md:h-[450px] bg-white shadow-md'
         }`}
       onClick={(e) => e.stopPropagation()} // Prevents clicks from propagating
     >
@@ -171,7 +171,7 @@ const SearchBox = ({ onClose }) => {
                   setSearchTag('')
                   setSearchResults({ blogs: [], events: [] })
                 }}
-                className='hover:bg-[#30AD8F] hover:rounded-lg p-1'
+                className='hover:bg-[#0A6FA7] hover:rounded-lg p-1'
               >
                 <RxCross2
                   size={20}
@@ -192,7 +192,7 @@ const SearchBox = ({ onClose }) => {
             {popularSearches.map((search, index) => (
               <li
                 key={index}
-                className='py-2  font-medium cursor-pointer hover:bg-gray-100 hover:text-[#30AD8F] rounded-md'
+                className='py-2  font-medium cursor-pointer hover:bg-gray-100 hover:text-[#0A6FA7] rounded-md'
                 onClick={() => handleItemClick(search)}
               >
                 {search}

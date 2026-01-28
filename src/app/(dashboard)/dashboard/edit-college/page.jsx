@@ -608,7 +608,9 @@ const EditCollegePage = () => {
             <h2 className='text-xl font-semibold mb-4'>Basic Information</h2>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div>
-                <label className='block mb-2'>College Name *</label>
+                <label className='block mb-2'>
+                  College Name <span className='text-red-500'>*</span>
+                </label>
                 <input
                   {...register('name', { required: true })}
                   className='w-full p-2 border rounded'
@@ -619,7 +621,9 @@ const EditCollegePage = () => {
               </div>
 
               <div>
-                <label className='block mb-2'>Institute Type *</label>
+                <label className='block mb-2'>
+                  Institute Type <span className='text-red-500'>*</span>
+                </label>
                 <select
                   {...register('institute_type', { required: true })}
                   className='w-full p-2 border rounded'
@@ -647,7 +651,9 @@ const EditCollegePage = () => {
               </div>
 
               <div>
-                <label className='block mb-2'>University *</label>
+                <label className='block mb-2'>
+                  University <span className='text-red-500'>*</span>
+                </label>
                 <select
                   {...register('university_id', { required: true })}
                   className='w-full p-2 border rounded'
@@ -860,7 +866,9 @@ const EditCollegePage = () => {
                 className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border rounded'
               >
                 <div>
-                  <label className='block mb-2'>Title *</label>
+                  <label className='block mb-2'>
+                    Title <span className='text-red-500'>*</span>
+                  </label>
                   <input
                     {...register(`facilities.${index}.title`, {
                       required: true
@@ -1040,9 +1048,14 @@ const EditCollegePage = () => {
                 (field) => (
                   <div key={field}>
                     <label className='block mb-2 capitalize'>
-                      {field !== 'state'
-                        ? `${field.replace('_', ' ')} *`
-                        : 'District'}
+                      {field !== 'state' ? (
+                        <>
+                          {field.replace('_', ' ')}{' '}
+                          <span className='text-red-500'>*</span>
+                        </>
+                      ) : (
+                        'District'
+                      )}
                     </label>
                     <input
                       {...register(`address.${field}`)}
