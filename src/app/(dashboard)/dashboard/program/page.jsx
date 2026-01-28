@@ -1,26 +1,25 @@
 'use client'
-import dynamic from 'next/dynamic'
-import { useState, useEffect } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
-import { useSelector } from 'react-redux'
-import Table from '../../../../components/Table'
-import { Edit2, Trash2, Search } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
+import { DotenvConfig } from '@/config/env.config'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+import useAdminPermission from '@/hooks/useAdminPermission'
+import { Edit2, Search, Trash2, X } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
+import { useDebounce } from 'use-debounce'
+import { Modal } from '../../../../components/CreateUserModal'
+import Table from '../../../../components/Table'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { X } from 'lucide-react'
 import {
+  fetchExam,
   fetchFaculties,
   fetchLevel,
-  fetchScholarship,
-  fetchExam
+  fetchScholarship
 } from './actions'
-import { useDebounce } from 'use-debounce'
 import CourseSearch from './CourseSearch'
-import Syllabus from './Syllabus'
-import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../components/CreateUserModal'
-import { usePageHeading } from '@/contexts/PageHeadingContext'
 const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
 })
@@ -320,6 +319,7 @@ export default function ProgramForm() {
         total: data.pagination.totalCount
       })
     } catch (error) {
+      console.log(error, "DONEDONE")
       toast.error('Failed to fetch programs')
     } finally {
       setTableLoading(false)
@@ -1093,6 +1093,8 @@ export default function ProgramForm() {
                   ) : showExamDrop ? (
                     exams.length > 0 ? (
                       <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
+                        
+                        toot
                         {exams.map((item) => (
                           <li
                             key={item.id}

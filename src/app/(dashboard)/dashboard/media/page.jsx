@@ -114,16 +114,14 @@ export default function MediaPage() {
   useEffect(() => {
     loadData()
   }, [])
-
+    
   const loadData = async () => {
     try {
       setLoading(true)
       const response = await fetchMedia()
       console.log('Response:', response)
       setNews(response.items)
-      toast.success('Images Loaded')
     } catch (err) {
-      toast.error('Failed to load data')
       console.error('Error loading data:', err)
     } finally {
       setLoading(false)

@@ -1,42 +1,46 @@
 import React from 'react'
 
 const LatestBlogs = ({ image, title, date, description }) => {
-  return (
-    <div
-      className='relative rounded-xl shadow-lg  min-w-[25rem] max-[1268px]:min-w-[20rem] max-[917px]:min-w-[16rem] h-[16rem]  
-    max-md:h-[14.7rem] p-6 mb-8 hover:shadow-2xl transition-shadow duration-300 overflow-hidden m-2 text-white'
-    >
-      {/* Background Image */}
-      <img
-        className='absolute inset-0 bg-cover bg-center w-full h-full rounded-xl'
-        src={image}
-        alt={title}
-      ></img>
-      <div className='absolute inset-0 bg-black bg-opacity-60 rounded-xl'></div>
+    return (
+        <div
+            className='relative rounded-2xl shadow-lg min-w-full h-full p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden text-white group cursor-pointer'
+        >
+            {/* Background Image */}
+            <img
+                className='absolute inset-0 bg-cover bg-center w-full h-full rounded-2xl transform group-hover:scale-110 transition-transform duration-700'
+                src={image}
+                alt={title}
+            />
 
-      {/* Content */}
-      <div className='relative z-10 text-left space-y-4 max-[1268px]:space-y-3'>
-        {/* Title */}
+            {/* Gradient Overlay */}
+            <div className='absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent rounded-2xl transition-opacity duration-300'></div>
 
-        <h3 className='text-xl font-bold max-[768px]:text-lg'>{title}</h3>
+            {/* Content */}
+            <div className='relative z-10 flex flex-col h-full justify-end text-left space-y-3 pb-2'>
+                {/* Date */}
+                <span className='inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium w-fit'>
+                    {date}
+                </span>
 
-        {/* Date */}
-        <p className='text-sm max-[768px]:text-xs '>{date}</p>
-        {/* Description */}
-        <p className=' text-sm line-clamp-3 max-md:text-[10px] max-md:leading-[16px]'>
-          {description}
-        </p>
+                {/* Title */}
+                <h3 className='text-white text-lg font-bold leading-tight group-hover:text-blue-200 transition-colors line-clamp-2'>
+                    {title}
+                </h3>
 
-        {/* Button */}
-        <button className='px-4 py-2  max-md:px-3 max-md:py-1 bg-[#387CAE] text-white rounded-md text-sm max-md:text-[13px] hover:bg-[#285c7f] transition'>
-          Learn More
-        </button>
-      </div>
+                {/* Description */}
+                <p className='text-sm text-gray-200 line-clamp-2 max-h-0 opacity-0 group-hover:max-h-20 group-hover:opacity-100 transition-all duration-500 ease-in-out'>
+                    {description}
+                </p>
 
-      {/* Decorative Border */}
-      <div className='absolute inset-0 rounded-lg border border-gray-300'></div>
-    </div>
-  )
+                {/* Button */}
+                <div className='pt-2'>
+                    <span className='text-sm font-semibold flex items-center gap-2 group-hover:gap-3 transition-all text-[#387CAE]'>
+                        Read Article <span className='text-lg'>→</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    )
 }
 
 export default LatestBlogs

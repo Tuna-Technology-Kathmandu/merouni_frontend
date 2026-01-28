@@ -1,4 +1,4 @@
-import { DotenvConfig } from '../config/env.config'
+import { DotenvConfig } from "@/config/env.config"
 
 export async function getCareers(page = 1, searchQuery = '') {
   try {

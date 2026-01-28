@@ -106,11 +106,12 @@ export async function getEvents(page) {
 }
 
 //Blogs actions
-export async function getBlogs(page, category_title) {
+export async function getBlogs(page, category_title, search) {
   // const q = `page=${queryParams}`;
   const params = {
     page,
-    category_title
+    category_title,
+    q: search
   }
   return services.news.getAll(params)
 }

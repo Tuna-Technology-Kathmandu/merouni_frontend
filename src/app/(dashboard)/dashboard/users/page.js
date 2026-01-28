@@ -1,23 +1,23 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
-import {
-  getUsers,
-  createUser,
-  updateUser,
-  deleteUser
-} from '../../../actions/userActions'
+import { useEffect, useMemo, useState } from 'react'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import {
+  createUser,
+  deleteUser,
+  updateUser
+} from '../../../actions/userActions'
 
+import { authFetch } from '@/app/utils/authFetch'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { Search } from 'lucide-react'
+import { useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
+import { Modal } from '../../../../components/CreateUserModal'
 import Loading from '../../../../components/Loading'
 import Table from '../../../../components/Table'
-import { Search } from 'lucide-react'
-import { authFetch } from '@/app/utils/authFetch'
-import ExportModal from './ExportModal'
-import { Modal } from '../../../../components/CreateUserModal'
-import { useSelector } from 'react-redux'
-import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { toast } from 'react-toastify'
 import { createColumns } from './columns'
+import ExportModal from './ExportModal'
+import { DotenvConfig } from '@/config/env.config'
 
 export default function UsersManager() {
   const { setHeading } = usePageHeading()

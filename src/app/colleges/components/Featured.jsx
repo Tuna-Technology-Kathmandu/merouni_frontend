@@ -5,8 +5,7 @@ import FcollegeShimmer from './FCollegeShimmer'
 import Fcollege from './Fcollege'
 import { GoArrowLeft } from 'react-icons/go'
 import { GoArrowRight } from 'react-icons/go'
-import EmptyState from '@/components/ui/EmptyState'
-import { Sparkles } from 'lucide-react'
+import { getFilteredPinFeatColleges } from '@/app/action'
 
 const Featured = () => {
   const scrollRef = useRef(null)
@@ -80,46 +79,57 @@ const Featured = () => {
     }
   }, [featuredColleges])
 
+  // Hide section completely if no data or error
+  if (!loading && (error || featuredColleges.length === 0)) {
+    return null
+  }
+
   return (
-    <div className='flex flex-col px-8 mt-8 mb-12'>
-      <div className='mb-8'>
-        <h2 className='text-2xl font-bold text-gray-800 tracking-tight uppercase'>
-          Featured <span className='text-[#387CAE]'>Colleges</span>
-        </h2>
-        <div className='w-12 h-1 bg-[#387CAE] mt-2 rounded-full'></div>
+    <div className='flex flex-col px-4 sm:px-8 mt-12 mb-16 max-w-[1600px] mx-auto w-full'>
+      <div className='flex items-center justify-between mb-8'>
+        <div className='relative'>
+          <h2 className='text-3xl font-extrabold text-gray-800'>
+            Featured <span className='text-[#0A70A7]'>Colleges</span>
+          </h2>
+          <div className='absolute -bottom-2 left-0 w-12 h-1 bg-[#0A70A7] rounded-full'></div>
+        </div>
+
+        <div className='flex gap-2 hidden sm:flex'>
+          <button
+            disabled={!canScrollLeft}
+            onClick={scrollLeft}
+            className={`p-2 rounded-full border transition-all ${canScrollLeft ? 'border-gray-300 text-gray-600 hover:bg-gray-50 cursor-pointer' : 'border-gray-100 text-gray-300 cursor-default'}`}
+          >
+            <GoArrowLeft size={20} />
+          </button>
+          <button
+            disabled={!canScrollRight}
+            onClick={scrollRight}
+            className={`p-2 rounded-full border transition-all ${canScrollRight ? 'border-gray-300 text-gray-600 hover:bg-gray-50 cursor-pointer' : 'border-gray-100 text-gray-300 cursor-default'}`}
+          >
+            <GoArrowRight size={20} />
+          </button>
+        </div>
       </div>
-      <div className='relative'>
-        {/* Left Scroll Button - Only show if there are colleges and can scroll left */}
-        {!loading && !error && featuredColleges.length > 0 && canScrollLeft && (
+
+      <div className='relative group'>
+        {/* Mobile Scroll Buttons (floated) */}
+        {canScrollLeft && (
           <button
             onClick={scrollLeft}
-            className='absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-200 hover:bg-gray-300 p-2 rounded-full shadow-md z-10'
-            aria-label='Scroll left'
+            className='absolute left-0 top-1/2 -translate-y-1/2 z-10 p-3 bg-white/80 backdrop-blur-md shadow-lg rounded-full text-gray-700 hover:text-[#0A70A7] transition-all opacity-0 group-hover:opacity-100 sm:hidden'
           >
-            <GoArrowLeft />
+            <GoArrowLeft size={20} />
           </button>
         )}
 
-        {/* Scrollable Container */}
         {loading ? (
           <FcollegeShimmer />
-        ) : error ? (
-          <div className='w-full text-center py-10 text-red-500'>{error}</div>
-        ) : featuredColleges.length === 0 ? (
-          <EmptyState
-            icon={Sparkles}
-            title="No Featured Colleges"
-            description="We haven't featured any colleges in this section yet. Please check back later for updates."
-            className="py-16"
-          />
         ) : (
           <div
             ref={scrollRef}
-            className='flex gap-4 w-full overflow-x-auto scroll-smooth hide-scrollbar'
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none'
-            }}
+            className='flex gap-6 w-full overflow-x-auto scroll-smooth hide-scrollbar pb-4 px-1'
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {featuredColleges.map((college, index) => (
               <Fcollege
@@ -133,19 +143,14 @@ const Featured = () => {
           </div>
         )}
 
-        {/* Right Scroll Button - Only show if there are colleges and can scroll right */}
-        {!loading &&
-          !error &&
-          featuredColleges.length > 0 &&
-          canScrollRight && (
-            <button
-              onClick={scrollRight}
-              className='absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-200 hover:bg-gray-300 p-2 rounded-full shadow-md z-10'
-              aria-label='Scroll right'
-            >
-              <GoArrowRight />
-            </button>
-          )}
+        {canScrollRight && (
+          <button
+            onClick={scrollRight}
+            className='absolute right-0 top-1/2 -translate-y-1/2 z-10 p-3 bg-white/80 backdrop-blur-md shadow-lg rounded-full text-gray-700 hover:text-[#0A70A7] transition-all opacity-0 group-hover:opacity-100 sm:hidden'
+          >
+            <GoArrowRight size={20} />
+          </button>
+        )}
       </div>
     </div>
   )

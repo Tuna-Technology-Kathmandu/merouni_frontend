@@ -13,6 +13,12 @@ const ScholarshipPage = () => {
   const [loading, setLoading] = useState(false)
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [filters, setFilters] = useState({
+    minAmount: '',
+    maxAmount: '',
+    applicationDeadline: '',
+    activeOnly: false
+  })
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -25,8 +31,11 @@ const ScholarshipPage = () => {
     const getScholarships = async () => {
       setLoading(true)
       try {
-        const response = await fetchScholarships()
-        setScholarships(response.scholarships)
+        const response = await fetchScholarships({
+          q: debouncedSearch,
+          ...filters
+        })
+        setScholarships(response.scholarships || [])
       } catch (error) {
         console.error('Error:', error)
       } finally {
@@ -34,11 +43,15 @@ const ScholarshipPage = () => {
       }
     }
     getScholarships()
-  }, [])
+  }, [debouncedSearch, filters])
 
-  const filteredScholarships = scholarships.filter((scholarship) =>
-    scholarship.name.toLowerCase().includes(debouncedSearch.toLowerCase())
-  )
+  const handleFilterChange = (e) => {
+    const { name, value, type, checked } = e.target
+    setFilters((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }))
+  }
 
   return (
     <>
@@ -58,17 +71,67 @@ const ScholarshipPage = () => {
             </p>
           </div>
 
-          {/* Search */}
-          <div className='flex justify-center mb-10 md:mb-20 '>
-            <div className='relative w-full max-w-lg'>
+          {/* Search and Filters */}
+          <div className='max-w-4xl mx-auto mb-12 space-y-6'>
+            <div className='relative w-full'>
               <input
                 type='text'
-                placeholder='Search scholarships...'
+                placeholder='Search scholarships by name...'
                 onChange={(e) => setSearchTerm(e.target.value)}
                 value={searchTerm}
                 className='w-full px-5 py-3 pl-12 rounded-2xl border border-gray-300 shadow-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all'
               />
               <Search className='absolute left-4 top-3.5 h-5 w-5 text-gray-400' />
+            </div>
+
+            <div className='grid grid-cols-1 md:grid-cols-4 gap-4 p-6 bg-white rounded-2xl border border-gray-200 shadow-sm'>
+              <div className='space-y-1'>
+                <label className='text-xs font-semibold text-gray-500 uppercase px-1'>Min Amount</label>
+                <input
+                  type='number'
+                  name='minAmount'
+                  placeholder='Min $'
+                  value={filters.minAmount}
+                  onChange={handleFilterChange}
+                  className='w-full px-3 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-[#0A70A7] text-sm'
+                />
+              </div>
+              <div className='space-y-1'>
+                <label className='text-xs font-semibold text-gray-500 uppercase px-1'>Max Amount</label>
+                <input
+                  type='number'
+                  name='maxAmount'
+                  placeholder='Max $'
+                  value={filters.maxAmount}
+                  onChange={handleFilterChange}
+                  className='w-full px-3 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-[#0A70A7] text-sm'
+                />
+              </div>
+              <div className='space-y-1'>
+                <label className='text-xs font-semibold text-gray-500 uppercase px-1'>Deadline After</label>
+                <input
+                  type='date'
+                  name='applicationDeadline'
+                  value={filters.applicationDeadline}
+                  onChange={handleFilterChange}
+                  className='w-full px-3 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-[#0A70A7] text-sm'
+                />
+              </div>
+              <div className='flex items-end pb-1'>
+                <label className='flex items-center gap-3 cursor-pointer group px-2 py-2 hover:bg-gray-50 rounded-xl transition-colors w-full border border-transparent'>
+                  <div className='relative'>
+                    <input
+                      type='checkbox'
+                      name='activeOnly'
+                      checked={filters.activeOnly}
+                      onChange={handleFilterChange}
+                      className='sr-only peer'
+                    />
+                    <div className="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-[#0A70A7] transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5"></div>
+                  </div>
+                  <span className='text-sm font-medium text-gray-600 group-hover:text-gray-900'>Active Only</span>
+                </label>
+              </div>
             </div>
           </div>
 
@@ -83,12 +146,13 @@ const ScholarshipPage = () => {
             </div>
           ) : (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-              {filteredScholarships.length === 0 ? (
-                <div className='text-center text-gray-500 mt-8 col-span-full'>
-                  No scholarships found matching your search.
+              {scholarships.length === 0 ? (
+                <div className='text-center text-gray-500 mt-8 col-span-full bg-white p-12 rounded-3xl border border-dashed border-gray-300'>
+                  <p className='text-lg font-medium'>No scholarships found</p>
+                  <p className='text-sm text-gray-400 mt-1'>Try adjusting your search or filters</p>
                 </div>
               ) : (
-                filteredScholarships.map((scholarship) => (
+                scholarships.map((scholarship) => (
                   <div
                     key={scholarship.id}
                     className='border rounded-2xl p-6 bg-white hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 cursor-pointer'

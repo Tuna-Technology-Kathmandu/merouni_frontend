@@ -5,7 +5,6 @@ import { getAdmission } from '../actions'
 import Link from 'next/link'
 import Pagination from '../../blogs/components/Pagination'
 import { CardSkeleton } from '@/components/ui/CardSkeleton'
-import EmptyState from '@/components/ui/EmptyState'
 
 const AdmissionPage = () => {
   const [admission, setAdmission] = useState([])
