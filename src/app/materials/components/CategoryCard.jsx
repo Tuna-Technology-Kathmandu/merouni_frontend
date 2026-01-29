@@ -1,16 +1,12 @@
 'use client'
 import React from 'react'
-import { motion } from 'framer-motion'
+import Link from 'next/link'
 import { ChevronRight, BookOpen } from 'lucide-react'
 
-const CategoryCard = ({ category, onClick }) => {
+const CategoryCard = ({ category }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.3 }}
-      onClick={onClick}
+    <Link
+      href={`/materials/category/${category.id}`}
       className='group relative bg-white border border-gray-100 shadow-sm hover:shadow-xl rounded-2xl overflow-hidden cursor-pointer p-6 flex flex-col items-center text-center transition-all'
     >
       <div className='absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity'>
@@ -44,7 +40,7 @@ const CategoryCard = ({ category, onClick }) => {
         <BookOpen className='w-4 h-4' />
         <span>BROWSE MATERIALS</span>
       </div>
-    </motion.div>
+    </Link>
   )
 }
 

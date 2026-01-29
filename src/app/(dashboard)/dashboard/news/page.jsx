@@ -280,7 +280,6 @@ export default function NewsManager() {
                 {/* Header */}
                 <div className='flex justify-between items-center mb-6'>
                     <div className='flex items-center gap-4'>
-                        <h1 className='text-2xl font-bold'>News</h1>
                     </div>
                     <Button
                         onClick={() => {

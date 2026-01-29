@@ -3,57 +3,73 @@
 import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { FaFacebook } from 'react-icons/fa6'
-import { FaInstagram } from 'react-icons/fa6'
+import { FaFacebook, FaInstagram } from 'react-icons/fa6'
 import { TiSocialLinkedinCircular } from 'react-icons/ti'
 import { PiXLogoLight } from 'react-icons/pi'
-import { FaCopyright } from 'react-icons/fa'
-import { Section } from 'lucide-react'
-// import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
-import { RiArrowDropDownLine } from 'react-icons/ri'
-import { RiArrowDropUpLine } from 'react-icons/ri'
+import { RiArrowDropDownLine, RiArrowDropUpLine } from 'react-icons/ri'
+import { getExams, getColleges, getBlogs } from '@/app/action.js'
 
 const Footer = () => {
   const [openSections, setOpenSections] = useState({})
+  const [sections, setSections] = useState({
+    Exams: {
+      header: 'Top Exams',
+      list: []
+    },
+    Colleges: {
+      header: 'Colleges',
+      list: []
+    },
+    Resources: {
+      header: 'Resources',
+      list: []
+    }
+  })
+
+  React.useEffect(() => {
+    const fetchFooterData = async () => {
+      try {
+        const [examsRes, collegesRes, resourcesRes] = await Promise.all([
+          getExams(5, 1),
+          getColleges(null, null, 5, 1),
+          getBlogs(1, '', '')
+        ])
+
+        setSections({
+          Exams: {
+            header: 'Top Exams',
+            list: (examsRes?.items || examsRes || []).slice(0, 5).map(item => ({
+              title: item.name || item.title,
+              href: `/exams/${item.slugs || item.id}`
+            }))
+          },
+          Colleges: {
+            header: 'Colleges',
+            list: (collegesRes?.items || collegesRes || []).slice(0, 5).map(item => ({
+              title: item.name || item.title,
+              href: `/college/${item.slugs || item.id}`
+            }))
+          },
+          Resources: {
+            header: 'Resources',
+            list: (resourcesRes?.items || resourcesRes || []).slice(0, 5).map(item => ({
+              title: item.name || item.title,
+              href: `/blogs/${item.slugs || item.id}`
+            }))
+          }
+        })
+      } catch (error) {
+        console.error('Error fetching footer data:', error)
+      }
+    }
+    fetchFooterData()
+  }, [])
 
   const toggleSection = (index) => {
     setOpenSections((prev) => ({
       ...prev,
       [index]: !prev[index]
     }))
-  }
-
-  const Sections = {
-    Exams: {
-      header: 'Top Exams',
-      list: [
-        'MAT 2025',
-        'IOE Entrance Exam 2025',
-        'NEB SEE 2025',
-        'NEB +2 Board Exam 2025',
-        'Lok Sewa Aayog Exams'
-      ]
-    },
-    Colleges: {
-      header: 'Colleges',
-      list: [
-        'Colleges in Nepal',
-        'College Reviews in Nepal',
-        'Top Colleges in Nepal',
-        'Top Colleges in Kathmandu',
-        'Top MBA Colleges in Nepal'
-      ]
-    },
-    Resources: {
-      header: 'Resources',
-      list: [
-        'B.Tech Companion Nepal',
-        'MBBS Companion Nepal',
-        'NEB (National Examination Board) Resources',
-        'Nepal Board Exam Calendar',
-        'MBA Salary in Nepal'
-      ]
-    }
   }
 
   return (
@@ -75,7 +91,7 @@ const Footer = () => {
             <div className='grid grid-cols-1 md:grid-cols-3 gap-8 mb-10'>
               {/* <!-- Top Exams --> */}
 
-              {Object.entries(Sections).map(([key, section], index) => (
+              {Object.entries(sections).map(([key, section], index) => (
                 <div key={index}>
                   <h3 className='text-xl font-semibold mb-10 text-[#0870A8]'>
                     {section.header}
@@ -84,10 +100,10 @@ const Footer = () => {
                     {section.list.map((item, itemIndex) => (
                       <li key={itemIndex}>
                         <Link
-                          href={'#'}
-                          className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors'
+                          href={item.href || '#'}
+                          className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors line-clamp-1'
                         >
-                          {item}
+                          {item.title}
                         </Link>
                       </li>
                     ))}
@@ -172,7 +188,7 @@ const Footer = () => {
 
           <footer className='text-[#0870A8] w-full'>
             <div className='md:hidden space-y-4 w-full px-4'>
-              {Object.entries(Sections).map(([key, section], index) => (
+              {Object.entries(sections).map(([key, section], index) => (
                 <div
                   className='border-b border-gray-300 w-full mt-10'
                   key={index}
@@ -199,10 +215,10 @@ const Footer = () => {
                       {section.list.map((item, itemIndex) => (
                         <li key={itemIndex} className='mb-2'>
                           <Link
-                            href={'#'}
+                            href={item.href || '#'}
                             className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors'
                           >
-                            {item}
+                            {item.title}
                           </Link>
                         </li>
                       ))}

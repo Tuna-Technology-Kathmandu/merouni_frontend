@@ -780,6 +780,7 @@ export default function ExamManager() {
                 <div>
                   <RequiredLabel htmlFor='exam-type'>Exam Type</RequiredLabel>
                   <Select
+                    className='w-full'
                     id='exam-type'
                     value={formData.examDetails[0].exam_type}
                     onChange={(e) =>

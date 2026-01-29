@@ -1,26 +1,40 @@
 'use client'
-import React, { useEffect, useState } from 'react'
-import { Search, Award } from 'lucide-react'
+import React, { useEffect, useState, useLayoutEffect } from 'react'
+import { Search, Award, Filter, X } from 'lucide-react'
+import { Select } from '@/components/ui/select'
 import EmptyState from '@/components/ui/EmptyState'
-
-import { fetchScholarships } from './actions'
+import { fetchScholarships, fetchCategories } from './actions'
 import { CardSkeleton } from '@/components/ui/CardSkeleton'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
+import Link from 'next/link'
 
 const ScholarshipPage = () => {
   const [scholarships, setScholarships] = useState([])
   const [loading, setLoading] = useState(false)
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [categories, setCategories] = useState([])
   const [filters, setFilters] = useState({
-    minAmount: '',
-    maxAmount: '',
-    applicationDeadline: '',
-    activeOnly: false
+    category: ''
   })
+  const [isScrolling, setIsScrolling] = useState(false)
 
+  // Fetch categories on mount
+  useEffect(() => {
+    const getCategories = async () => {
+      try {
+        const data = await fetchCategories()
+        setCategories(data || [])
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      }
+    }
+    getCategories()
+  }, [])
+
+  // Debounce search
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm)
@@ -28,6 +42,12 @@ const ScholarshipPage = () => {
     return () => clearTimeout(handler)
   }, [searchTerm])
 
+  // Reset page equivalent (if we had pagination)
+  useLayoutEffect(() => {
+    // If we add pagination later, reset it here
+  }, [debouncedSearch, filters])
+
+  // Fetch scholarships
   useEffect(() => {
     const getScholarships = async () => {
       setLoading(true)
@@ -46,12 +66,9 @@ const ScholarshipPage = () => {
     getScholarships()
   }, [debouncedSearch, filters])
 
-  const handleFilterChange = (e) => {
-    const { name, value, type, checked } = e.target
-    setFilters((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }))
+  const clearFilters = () => {
+    setSearchTerm('')
+    setFilters({ category: '' })
   }
 
   return (
@@ -59,159 +76,159 @@ const ScholarshipPage = () => {
       <Header />
       <Navbar />
 
-      <div className='min-h-screen bg-gradient-to-b from-[#f7fbfc] to-[#e9f3f7] py-12 px-6'>
-        <div className='container mx-auto'>
-          {/* Title */}
-          <div className='text-center mb-12'>
-            <h1 className='text-2xl md:text-3xl font-extrabold text-gray-800'>
-              Explore Our <span className='text-[#0A70A7]'>Scholarships</span>
-            </h1>
-            <p className='mt-3 text-gray-600 max-w-2xl mx-auto text-sm'>
-              Find scholarships designed to support your education and make your
-              learning journey more affordable.
-            </p>
-          </div>
-
-          {/* Search and Filters */}
-          <div className='max-w-4xl mx-auto mb-12 space-y-6'>
-            <div className='relative w-full'>
-              <input
-                type='text'
-                placeholder='Search scholarships by name...'
-                onChange={(e) => setSearchTerm(e.target.value)}
-                value={searchTerm}
-                className='w-full px-5 py-3 pl-12 rounded-2xl border border-gray-300 shadow-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all'
-              />
-              <Search className='absolute left-4 top-3.5 h-5 w-5 text-gray-400' />
+      <div className='min-h-screen bg-gray-50/50 py-12 px-6 font-sans'>
+        <div className='max-w-7xl mx-auto'>
+          {/* Header Section */}
+          <div className='flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12'>
+            <div>
+              <div className='relative inline-block mb-3'>
+                <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight'>
+                  Explore Our <span className='text-[#0A6FA7]'>Scholarships</span>
+                </h1>
+                <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
+              </div>
+              <p className='text-gray-500 max-w-xl font-medium text-lg mt-2'>
+                Find scholarships designed to support your education and make your learning journey more affordable.
+              </p>
             </div>
 
-            <div className='grid grid-cols-1 md:grid-cols-4 gap-4 p-6 bg-white rounded-2xl border border-gray-200 shadow-sm'>
-              <div className='space-y-1'>
-                <label className='text-xs font-semibold text-gray-500 uppercase px-1'>Min Amount</label>
-                <input
-                  type='number'
-                  name='minAmount'
-                  placeholder='Min $'
-                  value={filters.minAmount}
-                  onChange={handleFilterChange}
-                  className='w-full px-3 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-[#0A70A7] text-sm'
-                />
+            {/* Clear All Button */}
+            {(searchTerm || filters.category) && (
+              <button
+                onClick={clearFilters}
+                className='flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors'
+              >
+                <X className='w-4 h-4' />
+                Clear All Filters
+              </button>
+            )}
+          </div>
+
+          {/* Filters Bar */}
+          <div className='bg-white rounded-[32px] p-8 shadow-[0_2px_15px_rgba(0,0,0,0.02)] border border-gray-100 mb-12'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6'>
+              {/* Search */}
+              <div className='lg:col-span-8'>
+                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Search Scholarships</label>
+                <div className='relative group'>
+                  <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors' />
+                  <input
+                    type='text'
+                    placeholder='Search scholarships by name...'
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    value={searchTerm}
+                    className='w-full px-5 py-3.5 pl-12 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#0A6FA7]/10 focus:border-[#0A6FA7] focus:bg-white transition-all text-sm font-semibold text-gray-900 placeholder-gray-400'
+                  />
+                </div>
               </div>
-              <div className='space-y-1'>
-                <label className='text-xs font-semibold text-gray-500 uppercase px-1'>Max Amount</label>
-                <input
-                  type='number'
-                  name='maxAmount'
-                  placeholder='Max $'
-                  value={filters.maxAmount}
-                  onChange={handleFilterChange}
-                  className='w-full px-3 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-[#0A70A7] text-sm'
-                />
-              </div>
-              <div className='space-y-1'>
-                <label className='text-xs font-semibold text-gray-500 uppercase px-1'>Deadline After</label>
-                <input
-                  type='date'
-                  name='applicationDeadline'
-                  value={filters.applicationDeadline}
-                  onChange={handleFilterChange}
-                  className='w-full px-3 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-[#0A70A7] text-sm'
-                />
-              </div>
-              <div className='flex items-end pb-1'>
-                <label className='flex items-center gap-3 cursor-pointer group px-2 py-2 hover:bg-gray-50 rounded-xl transition-colors w-full border border-transparent'>
-                  <div className='relative'>
-                    <input
-                      type='checkbox'
-                      name='activeOnly'
-                      checked={filters.activeOnly}
-                      onChange={handleFilterChange}
-                      className='sr-only peer'
-                    />
-                    <div className="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:bg-[#0A70A7] transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5"></div>
-                  </div>
-                  <span className='text-sm font-medium text-gray-600 group-hover:text-gray-900'>Active Only</span>
+
+              <div className='lg:col-span-4'>
+                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                  Category
                 </label>
+                <div className='relative group'>
+                  <Select
+                    value={filters.category}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        category: e.target.value
+                      }))
+                    }
+                    className='w-full pl-6'
+                  >
+                    <option value=''>All Categories</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.title}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Scholarships */}
+          {/* Results Summary */}
+          {!loading && (
+            <div className='mb-8 px-2'>
+              <p className='text-sm text-gray-500 font-semibold'>
+                Showing <span className='text-gray-900'>{scholarships.length}</span> results
+              </p>
+            </div>
+          )}
+
+          {/* Scholarships Grid */}
           {loading ? (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-              {Array(6)
-                .fill('')
-                .map((_, index) => (
-                  <CardSkeleton key={index} />
-                ))}
+              {Array(6).fill('').map((_, index) => (
+                <CardSkeleton key={index} />
+              ))}
             </div>
           ) : scholarships.length === 0 ? (
-            <EmptyState
-              icon={Award}
-              title='No Scholarships Found'
-              description={
-                searchTerm || Object.values(filters).some((v) => v !== '' && v !== false)
-                  ? 'No scholarships match your search or filters'
-                  : 'No scholarships are currently available'
-              }
-              action={
-                searchTerm || Object.values(filters).some((v) => v !== '' && v !== false)
-                  ? {
-                    label: 'Clear Search & Filters',
-                    onClick: () => {
-                      setSearchTerm('')
-                      setFilters({
-                        minAmount: '',
-                        maxAmount: '',
-                        applicationDeadline: '',
-                        activeOnly: false
-                      })
+            <div className='bg-white rounded-[32px] border border-gray-100 border-dashed py-20'>
+              <EmptyState
+                icon={Award}
+                title='No Scholarships Found'
+                description={
+                  searchTerm || filters.category
+                    ? 'No scholarships match your search or filters'
+                    : 'No scholarships are currently available'
+                }
+                action={
+                  searchTerm || filters.category
+                    ? {
+                      label: 'Clear All Filters',
+                      onClick: clearFilters
                     }
-                  }
-                  : null
-              }
-            />
+                    : null
+                }
+              />
+            </div>
           ) : (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
               {scholarships.map((scholarship) => (
                 <div
                   key={scholarship.id}
-                  className='border rounded-2xl p-6 bg-white hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 cursor-pointer'
+                  className='group bg-white rounded-[32px] p-8 border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)] hover:border-[#0A6FA7]/20 transition-all duration-300 flex flex-col h-full cursor-pointer'
                 >
-                  <h2 className='text-lg font-bold text-gray-800 mb-3 min-h-[60px]'>
-                    {scholarship.name}
-                  </h2>
-                  <div className='space-y-2 text-sm'>
-                    <div className='flex justify-between'>
-                      <span className='text-gray-600'>Amount:</span>
-                      <span className='font-medium text-green-600'>
+                  <div className='flex items-start justify-between mb-6'>
+                    <div className='bg-[#0A6FA7]/10 p-3 rounded-2xl group-hover:bg-[#0A6FA7] transition-colors duration-500'>
+                      <Award className='w-6 h-6 text-[#0A6FA7] group-hover:text-white transition-colors duration-500' />
+                    </div>
+                    {scholarship.amount && (
+                      <span className='px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-bold border border-green-100 uppercase tracking-wider'>
                         ${parseFloat(scholarship.amount).toLocaleString()}
                       </span>
-                    </div>
-                    <div className='flex justify-between'>
-                      <span className='text-gray-600'>Deadline:</span>
-                      <span className='font-medium'>
-                        {new Date(
-                          scholarship.applicationDeadline
-                        ).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <div className='flex flex-col'>
-                      <span className='text-gray-600'>Eligibility:</span>
-                      <span className='text-sm'>
-                        {scholarship.eligibilityCriteria.replace(/"/g, '')}
-                      </span>
-                    </div>
-                    <div className='flex flex-col'>
-                      <span className='text-gray-600'>Renewal:</span>
-                      <span className='text-sm'>
-                        {scholarship.renewalCriteria.replace(/"/g, '')}
-                      </span>
+                    )}
+                  </div>
+
+                  <h2 className='text-xl font-bold text-gray-900 mb-4 group-hover:text-[#0A6FA7] transition-colors line-clamp-2 min-h-[3.5rem] tracking-tight'>
+                    {scholarship.name}
+                  </h2>
+
+                  <div className='mt-auto space-y-4 pt-6 border-t border-gray-50'>
+                    <div className='flex items-center justify-between'>
+                      <div className='flex flex-col'>
+                        <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>Deadline</span>
+                        <span className='text-sm font-bold text-gray-700'>
+                          {new Date(scholarship.applicationDeadline).toLocaleDateString()}
+                        </span>
+                      </div>
+                      {scholarship.eligibilityCriteria && (
+                        <div className='flex flex-col text-right'>
+                          <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>Eligibility</span>
+                          <span className='text-sm font-bold text-gray-700 truncate max-w-[120px]'>
+                            {scholarship.eligibilityCriteria.replace(/"/g, '')}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <div className='mt-4'>
-                    <button className='w-full py-2 px-4 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-50 text-sm font-medium'>
-                      Apply Now
+
+                  <div className='mt-6 pt-4'>
+                    <button className='w-full py-3 rounded-xl bg-gray-50 text-gray-700 font-bold text-sm group-hover:bg-[#0A6FA7] group-hover:text-white transition-all duration-300'>
+                      View Details
                     </button>
                   </div>
                 </div>

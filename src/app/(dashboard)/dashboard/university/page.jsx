@@ -547,6 +547,7 @@ export default function UniversityForm() {
                           Type of Institute
                         </RequiredLabel>
                         <Select
+                          className='w-full'
                           {...register('type_of_institute', { required: true })}
                         >
                           <option value='Public'>Public</option>

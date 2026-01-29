@@ -2,15 +2,15 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Search, Users } from 'lucide-react'
+import { Search, MapPin, Filter, X } from 'lucide-react'
+import { Select } from '@/components/ui/select'
 import EmptyState from '@/components/ui/EmptyState'
 import { getConsultancies, getCourses } from './actions'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
-import Shimmer from '../../components/Shimmer'
 import Pagination from '../blogs/components/Pagination'
-import { Select } from '@/components/ui/select'
+import { CardSkeleton } from '@/components/ui/CardSkeleton'
 
 export default function ConsultanciesPage() {
   const router = useRouter()
@@ -25,6 +25,7 @@ export default function ConsultanciesPage() {
   const [loading, setLoading] = useState(false)
   const [courses, setCourses] = useState([])
   const [selectedCourse, setSelectedCourse] = useState('')
+  const [isScrolling, setIsScrolling] = useState(false)
 
   // Fetch courses on mount
   useEffect(() => {
@@ -87,118 +88,140 @@ export default function ConsultanciesPage() {
 
   const handlePageChange = (page) => {
     if (page > 0 && page <= pagination.totalPages) {
+      setIsScrolling(true)
       setPagination((prev) => ({ ...prev, currentPage: page }))
       window.scrollTo({ top: 0, behavior: 'smooth' })
+      setTimeout(() => setIsScrolling(false), 500)
     }
+  }
+
+  const clearFilters = () => {
+    setSearchTerm('')
+    setSelectedCourse('')
   }
 
   return (
     <>
       <Header />
       <Navbar />
-      <div className='min-h-screen bg-gradient-to-b from-[#f7fbfc] to-[#e9f3f7] py-12 px-6'>
-        <div className='container mx-auto'>
-          <div className='text-center mb-12'>
-            <h1 className='text-2xl md:text-3xl font-extrabold text-gray-800'>
-              Explore <span className='text-[#0A70A7]'>Consultancies</span>
-            </h1>
-            <p className='mt-3 text-gray-600 max-w-2xl mx-auto text-sm'>
-              Discover trusted consultancies that guide you through admissions,
-              applications, and career opportunities abroad.
-            </p>
+      <div className='min-h-screen bg-gray-50/50 py-12 px-6 font-sans'>
+        <div className='max-w-7xl mx-auto'>
+          {/* Header Section */}
+          <div className='flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12'>
+            <div>
+              <div className='relative inline-block mb-3'>
+                <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight'>
+                  Explore <span className='text-[#0A6FA7]'>Consultancies</span>
+                </h1>
+                <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
+              </div>
+              <p className='text-gray-500 max-w-xl font-medium text-lg mt-2'>
+                Discover trusted consultancies that guide you through admissions, applications, and career opportunities abroad.
+              </p>
+            </div>
+
+            {/* Clear All Button */}
+            {(searchTerm || selectedCourse) && (
+              <button
+                onClick={clearFilters}
+                className='flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors'
+              >
+                <X className='w-4 h-4' />
+                Clear All Filters
+              </button>
+            )}
           </div>
 
           {/* Filters Bar */}
-          <div className='flex flex-col md:flex-row justify-center items-center gap-4 mb-10 md:mb-20 w-full max-w-4xl mx-auto'>
-            <div className='relative w-full md:w-2/3'>
-              <input
-                type='text'
-                placeholder='Search consultancy...'
-                className='w-full px-5 py-3 pl-12 rounded-2xl border border-gray-300 shadow-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all'
-                onChange={(e) => setSearchTerm(e.target.value)}
-                value={searchTerm}
-              />
-              <Search className='absolute left-4 top-3.5 h-5 w-5 text-gray-400' />
-            </div>
+          <div className='bg-white rounded-[32px] p-8 shadow-[0_2px_15px_rgba(0,0,0,0.02)] border border-gray-100 mb-12'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6'>
+              {/* Search */}
+              <div className='lg:col-span-8'>
+                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Search Consultancies</label>
+                <div className='relative group'>
+                  <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors' />
+                  <input
+                    type='text'
+                    placeholder='Search by consultancy name...'
+                    className='w-full px-5 py-3.5 pl-12 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#0A6FA7]/10 focus:border-[#0A6FA7] focus:bg-white transition-all text-sm font-semibold text-gray-900 placeholder-gray-400'
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    value={searchTerm}
+                  />
+                </div>
+              </div>
 
-            <div className='w-full md:w-1/3'>
-              <Select
-                value={selectedCourse}
-                onChange={(e) => setSelectedCourse(e.target.value)}
-                className='w-full px-5 py-3 h-[50px] rounded-2xl border-gray-300 focus:ring-[#0A70A7] focus:border-[#0A70A7] appearance-none cursor-pointer text-gray-700'
-              >
-                <option value=''>All Courses</option>
-                {courses.map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.title}
-                  </option>
-                ))}
-              </Select>
+              {/* Course Filter */}
+              <div className='lg:col-span-4'>
+                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Filter by Course</label>
+                <Select
+                  value={selectedCourse}
+                  onChange={(e) => setSelectedCourse(e.target.value)}
+                  className='w-full pl-6'
+                >
+                  <option value=''>All Courses</option>
+                  {courses.map((course) => (
+                    <option key={course.id} value={course.id}>
+                      {course.title}
+                    </option>
+                  ))}
+                </Select>
+              </div>
             </div>
           </div>
 
+          {/* Results Summary */}
+          {!loading && !isScrolling && (
+            <div className='mb-8 px-2'>
+              <p className='text-sm text-gray-500 font-semibold'>
+                Showing <span className='text-gray-900'>{consultancyData.length}</span> of <span className='text-gray-900'>{pagination.totalCount}</span> results
+              </p>
+            </div>
+          )}
+
           {/* Grid */}
-          {loading ? (
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-              {Array(6)
-                .fill('')
-                .map((_, index) => (
-                  <div
-                    key={index}
-                    className='bg-white rounded-xl p-6 border border-gray-200 shadow-lg'
-                  >
-                    <div className='flex flex-col gap-4'>
-                      <div className='w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center'>
-                        <Shimmer width='100%' height='100%' />
-                      </div>
-                      <Shimmer width='80%' height='20px' />
-                      <Shimmer width='60%' height='18px' />
-                      <Shimmer width='90%' height='15px' />
-                      <div className='flex gap-2'>
-                        <Shimmer width='40%' height='15px' />
-                        <Shimmer width='30%' height='15px' />
-                      </div>
-                    </div>
-                  </div>
-                ))}
+          {loading || isScrolling ? (
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+              {Array(6).fill('').map((_, index) => (
+                <CardSkeleton key={index} />
+              ))}
             </div>
           ) : consultancyData.length === 0 ? (
-            <EmptyState
-              icon={Users}
-              title='No Consultancies Found'
-              description={
-                searchTerm
-                  ? `No consultancies match your search "${searchTerm}"`
-                  : 'No consultancies are currently available'
-              }
-              action={
-                searchTerm
-                  ? {
-                    label: 'Clear Search',
-                    onClick: () => {
-                      setSearchTerm('')
+            <div className='bg-white rounded-[32px] border border-gray-100 border-dashed py-20'>
+              <EmptyState
+                icon={Search}
+                title='No Consultancies Found'
+                description={
+                  searchTerm
+                    ? `No consultancies match your search "${searchTerm}"`
+                    : 'No consultancies are currently available'
+                }
+                action={
+                  searchTerm || selectedCourse
+                    ? {
+                      label: 'Clear All Filters',
+                      onClick: clearFilters
                     }
-                  }
-                  : null
-              }
-            />
+                    : null
+                }
+              />
+            </div>
           ) : (
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
               {consultancyData.map((consultancy) => {
-                const destinations = JSON.parse(consultancy.destination)
-                const address = JSON.parse(consultancy.address)
+                const destinations = JSON.parse(consultancy.destination || '[]')
+                const address = JSON.parse(consultancy.address || '{}')
                 const description = consultancy?.description || ''
                 const logo = consultancy?.logo || ''
 
                 return (
                   <div
                     key={consultancy.id}
-                    className='block group cursor-pointer'
+                    className='group cursor-pointer h-full'
                     onClick={() => handleClick(consultancy.slugs)}
                   >
-                    <div className='bg-white rounded-2xl custom-shadow overflow-hidden h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1'>
+                    <div className='bg-white rounded-[32px] border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.02)] overflow-hidden h-full transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)] hover:border-[#0A6FA7]/20 flex flex-col'>
                       {/* Banner */}
-                      <div className='relative h-48 w-full bg-green-100'>
+                      <div className='relative h-48 w-full bg-gray-100'>
                         <Image
                           src={
                             consultancy?.featured_image ||
@@ -206,69 +229,80 @@ export default function ConsultanciesPage() {
                           }
                           alt={consultancy.title}
                           fill
-                          className='object-cover group-hover:scale-105 transition-transform duration-300'
+                          className='object-cover group-hover:scale-105 transition-transform duration-500'
                           priority
                         />
 
                         {consultancy.pinned === 1 && (
-                          <span className='absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md'>
+                          <span className='absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-[#0A6FA7] px-3 py-1 rounded-full text-[10px] font-bold shadow-sm border border-gray-100 uppercase tracking-wider'>
                             Featured
                           </span>
                         )}
                       </div>
 
                       {/* Content */}
-                      <div className='p-6 flex flex-col'>
+                      <div className='p-8 flex flex-col flex-grow'>
                         {/* Logo and Title */}
-                        <div className='flex items-start gap-3 mb-3'>
+                        <div className='flex items-start gap-4 mb-4'>
                           {logo && (
-                            <div className='relative w-12 h-12 flex-shrink-0'>
+                            <div className='relative w-12 h-12 flex-shrink-0 bg-white rounded-xl shadow-sm border border-gray-100 p-1'>
                               <Image
                                 src={logo}
                                 alt={`${consultancy.title} Logo`}
                                 fill
-                                className='object-contain'
+                                className='object-contain p-1'
                               />
                             </div>
                           )}
-                          <h2 className='text-lg md:text-xl font-bold text-gray-800 group-hover:text-[#0A70A7] transition-colors line-clamp-2 flex-1'>
+                          <h2 className='text-lg font-bold text-gray-900 group-hover:text-[#0A6FA7] transition-colors line-clamp-2 leading-tight'>
                             {consultancy.title}
                           </h2>
                         </div>
 
                         {/* Description */}
                         {description && (
-                          <p className='text-gray-600 text-sm mb-3 line-clamp-2'>
+                          <p className='text-gray-500 text-sm mb-6 line-clamp-2 font-medium leading-relaxed'>
                             {description}
                           </p>
                         )}
 
-                        {/* Destinations */}
-                        <div className='mb-3'>
-                          <h3 className='text-sm font-semibold text-gray-700 mb-1'>
-                            Destinations
-                          </h3>
-                          <div className='flex flex-wrap gap-2'>
-                            {destinations.map((dest, index) => (
-                              <span
-                                key={index}
-                                className='bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium'
-                              >
-                                {dest.city}, {dest.country}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
+                        <div className='mt-auto space-y-4 pt-6 border-t border-gray-50'>
+                          {/* Destinations */}
+                          {destinations.length > 0 && (
+                            <div>
+                              <h3 className='text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                                Destinations
+                              </h3>
+                              <div className='flex flex-wrap gap-2'>
+                                {destinations.slice(0, 3).map((dest, index) => (
+                                  <span
+                                    key={index}
+                                    className='bg-gray-50 text-gray-600 px-2.5 py-1 rounded-lg text-xs font-bold border border-gray-100'
+                                  >
+                                    {dest.country}
+                                  </span>
+                                ))}
+                                {destinations.length > 3 && (
+                                  <span className='text-xs font-bold text-gray-400 py-1'>+more</span>
+                                )}
+                              </div>
+                            </div>
+                          )}
 
-                        {/* Address */}
-                        <div className='mb-3'>
-                          <h3 className='text-sm font-semibold text-gray-700 mb-1'>
-                            Address
-                          </h3>
-                          <p className='text-gray-600 text-sm leading-relaxed'>
-                            {address.street}, {address.city}, {address.state}{' '}
-                            {address.zip}
-                          </p>
+                          {/* Address */}
+                          {(address.city || address.street) && (
+                            <div>
+                              <h3 className='text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1'>
+                                Location
+                              </h3>
+                              <div className='flex items-center gap-1.5 text-gray-600'>
+                                <MapPin className='w-3.5 h-3.5 text-[#0A6FA7]' />
+                                <span className='text-sm font-semibold truncate'>
+                                  {[address.street, address.city].filter(Boolean).join(', ')}
+                                </span>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -280,11 +314,13 @@ export default function ConsultanciesPage() {
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className='mt-12 flex justify-center'>
-              <Pagination
-                pagination={pagination}
-                onPageChange={handlePageChange}
-              />
+            <div className='mt-16 flex justify-center'>
+              <div className='bg-white px-8 py-4 rounded-[24px] shadow-[0_2px_15px_rgba(0,0,0,0.01)] border border-gray-100'>
+                <Pagination
+                  pagination={pagination}
+                  onPageChange={handlePageChange}
+                />
+              </div>
             </div>
           )}
         </div>

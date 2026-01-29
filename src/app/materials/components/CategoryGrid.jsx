@@ -27,7 +27,6 @@ const CategoryGrid = ({ categories, onCategoryClick, loading }) => {
         <CategoryCard
           key={category.id}
           category={category}
-          onClick={() => onCategoryClick(category)}
         />
       ))}
 

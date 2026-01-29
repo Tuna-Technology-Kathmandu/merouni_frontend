@@ -1120,6 +1120,7 @@ export default function CollegeForm() {
                         Institute Type <span className='text-red-500'>*</span>
                       </Label>
                       <Select
+                        className='w-full'
                         {...register('institute_type', { required: true })}
                         id='institute_type'
                         aria-invalid={errors.institute_type ? 'true' : 'false'}
@@ -1510,6 +1511,7 @@ export default function CollegeForm() {
                       <div className='space-y-2'>
                         <Label htmlFor={`member-role-${index}`}>Role</Label>
                         <Select
+                          className='w-full'
                           id={`member-role-${index}`}
                           {...register(`members.${index}.role`)}
                         >

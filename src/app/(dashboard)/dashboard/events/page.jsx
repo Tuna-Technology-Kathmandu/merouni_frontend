@@ -664,6 +664,7 @@ export default function EventManager() {
                         Categories <span className='text-red-500'>*</span>
                       </Label>
                       <Select
+                        className='w-full'
                         id='category_id'
                         {...register('category_id', { required: true })}
                       >
