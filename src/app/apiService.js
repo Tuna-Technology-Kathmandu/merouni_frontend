@@ -131,6 +131,7 @@ const services = {
   news: new ApiService('news'),
   banner: new ApiService('banner'),
   exam: new ApiService('exam'),
+  newsletter: new ApiService('newsletter'),
   college: new ApiService('college'),
   category: new ApiService('category')
 }

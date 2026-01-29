@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, Bell } from 'lucide-react'
+import services from '@/app/apiService'
+import { toast } from 'react-toastify'
 
 export default function ContactNewsletter() {
   const {
@@ -16,11 +18,17 @@ export default function ContactNewsletter() {
 
   const onSubmit = async (data) => {
     setIsSubmitting(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsSuccess(true)
-    setIsSubmitting(false)
-    reset()
-    setTimeout(() => setIsSuccess(false), 3000)
+    try {
+      await services.newsletter.create({ email: data.email })
+      setIsSuccess(true)
+      reset()
+      setTimeout(() => setIsSuccess(false), 5000)
+    } catch (error) {
+      console.error('Newsletter subscription failed:', error)
+      toast.error('Failed to subscribe. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (

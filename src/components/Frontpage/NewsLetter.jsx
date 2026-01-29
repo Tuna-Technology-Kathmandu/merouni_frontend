@@ -1,57 +1,29 @@
 'use client'
-
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { FaLocationArrow } from 'react-icons/fa6'
-import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '../../config/env.config'
+import services from '@/app/apiService'
+import { toast } from 'react-toastify'
 
 const Newsletter = () => {
   const [email, setEmail] = useState('')
-  const [message, setMessage] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setMessage('')
 
     if (!email) {
-      setMessage('Please enter a valid email.')
+      toast.warning('Please enter a valid email.')
       return
     }
 
     try {
-      const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/newsletter`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email })
-        }
-      )
-
-      const data = await response.json()
-      if (response.ok) {
-        setMessage('Subscribed successfully!')
-        setEmail('')
-      } else {
-        setMessage(data.message || 'Something went wrong.')
-      }
+      await services.newsletter.create({ email })
+      toast.success('Subscribed successfully!')
+      setEmail('')
     } catch (error) {
-      setMessage('Failed to subscribe. Please try again later.')
+      console.error('Newsletter error:', error)
+      toast.error('Failed to subscribe. Please try again later.')
     }
   }
-
-  useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => {
-        setMessage('')
-      }, 3000) // 3000ms = 3 seconds
-
-      // Cleanup timer on component unmount or if message changes
-      return () => clearTimeout(timer)
-    }
-  }, [message])
 
   return (
     <div className='relative bg-cover bg-center py-20 h-auto flex items-center px-4'>
@@ -94,12 +66,6 @@ const Newsletter = () => {
           </button>
         </form>
 
-        {/* Message Feedback */}
-        {message && (
-          <p className='text-center md:text-left mt-2 text-gray-700'>
-            {message}
-          </p>
-        )}
       </div>
     </div>
   )

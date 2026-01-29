@@ -247,7 +247,7 @@ const Footer = () => {
                       <FaFacebook size={28} />
                     </a>
                     <a
-                      href='#'
+                      href='/'
                       className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors'
                     >
                       <FaInstagram size={28} />
@@ -261,7 +261,7 @@ const Footer = () => {
                       <TiSocialLinkedinCircular size={30} />
                     </a>
                     <a
-                      href='#'
+                      href='/'
                       className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors'
                     >
                       <PiXLogoLight size={28} />
@@ -276,13 +276,13 @@ const Footer = () => {
 
                 <div className='space-x-8 mt-8'>
                   <Link
-                    href={'#'}
+                    href={'/disclaimer'}
                     className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors font-semibold'
                   >
                     Disclaimer
                   </Link>
                   <Link
-                    href={'#'}
+                    href={'/privacy-policy'}
                     className='text-[#0870A8] hover:text-[#0A6FA7] transition-colors font-semibold'
                   >
                     Privacy Policy

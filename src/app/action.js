@@ -106,7 +106,6 @@ export async function getEvents(page) {
 }
 
 //Blogs actions
-//Blogs actions
 export async function getBlogs(page, category_title = '', search = '') {
   const params = {
     page,
@@ -114,9 +113,13 @@ export async function getBlogs(page, category_title = '', search = '') {
     q: search
   }
   const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs?${new URLSearchParams(params).toString()}`
-  return fetch(url, {
+  const response = await fetch(url, {
     cache: 'no-store'
   })
+  if (!response.ok) {
+    return { items: [], pagination: { totalCount: 0 } }
+  }
+  return await response.json()
 }
 
 export async function getBlogBySlug(slug) {
@@ -135,22 +138,31 @@ export async function getVacancies(page, category_title, search) {
     category_title,
     q: search
   }
-  return await authFetch(
-    `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy?limit=10&page=${page}`
-  )
+  // This likely needs authFetch or similar fix if authFetch is missing
+  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy?limit=10&page=${page}`
+  const response = await fetch(url, { cache: 'no-store' })
+  if (!response.ok) {
+    return { items: [], pagination: { totalCount: 0 } }
+  }
+  return await response.json()
 }
 
 // News actions
 export async function getNews(page, category_title, search) {
-  const params = {
+  const queryParams = {
     page,
-    category_title,
-    q: search
+    limit: 10,
+    q: search,
+    category_title
   }
+  const queryString = buildQueryString(queryParams)
+  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/news?${queryString}`
 
-  return await authFetch(
-    `${DotenvConfig.NEXT_APP_API_BASE_URL}/news?limit=10&page=${page}`
-  )
+  const response = await fetch(url, { cache: 'no-store' })
+  if (!response.ok) {
+    return { items: [], pagination: { totalCount: 0 } }
+  }
+  return await response.json()
 }
 
 // get ranking
@@ -190,21 +202,24 @@ export async function getColleges(
   page = 1
 ) {
 
-    const query = buildQueryString({
+  const query = buildQueryString({
     limit,
     page,
     isFeatured,
     pinned,
   })
 
-  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college${
-    query ? `?${query}` : ''
-  }`
+  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college${query ? `?${query}` : ''
+    }`
 
 
-  return fetch(url, {
+  const response = await fetch(url, {
     cache: 'no-store'
   })
+  if (!response.ok) {
+    return { items: [], pagination: { totalCount: 0 } }
+  }
+  return await response.json()
 }
 
 export async function getFilteredPinFeatColleges(
@@ -226,21 +241,24 @@ export async function getFilteredPinFeatColleges(
     params.pinned = !!pinned
   }
 
-    const query = buildQueryString({
+  const query = buildQueryString({
     limit,
     page,
-    isFeatured,
+    isFeatured: is_featured,
     pinned,
   })
 
-  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college${
-    query ? `?${query}` : ''
-  }`
+  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college${query ? `?${query}` : ''
+    }`
 
 
-  return fetch(url, {
+  const response = await fetch(url, {
     cache: 'no-store'
   })
+  if (!response.ok) {
+    return { items: [], pagination: { totalCount: 0 } }
+  }
+  return await response.json()
 }
 
 // exams section
@@ -249,18 +267,19 @@ export async function getExams(limit, page) {
   const query = buildQueryString({
     limit,
     page,
-    isFeatured,
-    pinned,
   })
 
-  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/exam${
-    query ? `?${query}` : ''
-  }`
+  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/exam${query ? `?${query}` : ''
+    }`
 
 
-  return fetch(url, {
+  const response = await fetch(url, {
     cache: 'no-store'
   })
+  if (!response.ok) {
+    return { items: [], pagination: { totalCount: 0 } }
+  }
+  return await response.json()
 }
 
 export async function getBannerById(id) {
