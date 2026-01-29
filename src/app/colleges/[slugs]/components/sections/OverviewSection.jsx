@@ -26,19 +26,19 @@ const OverviewSection = ({ college }) => {
   const shouldTruncate = fullDescription.split(' ').length > 30
 
   return (
-    <div>
-      <h2 className='text-sm md:text-lg lg:text-xl font-bold'>Description</h2>
+    <div className='max-w-4xl'>
+      <h2 className='text-xl md:text-2xl font-bold mb-6 text-gray-900'>Description</h2>
 
       {/* Plain description text */}
       {college?.description && (
-        <div>
+        <div className='bg-white/50 rounded-3xl p-6 md:p-8 border border-gray-100/50 shadow-[0_2px_15px_rgba(0,0,0,0.01)]'>
           {/* Mobile view - with truncation */}
-          <p className='md:hidden text-gray-800 mt-9 max-[1120px]:mt-5 leading-7 max-md:leading-5 text-justify text-xs'>
+          <p className='md:hidden text-gray-600 leading-relaxed text-justify text-sm'>
             {isExpanded ? fullDescription : truncatedDescription}
           </p>
 
           {/* Desktop view - full description */}
-          <p className='hidden md:block text-gray-800 mt-9 max-[1120px]:mt-5 leading-7 text-justify text-sm lg:text-base'>
+          <p className='hidden md:block text-gray-600 leading-relaxed text-justify text-base lg:text-lg'>
             {fullDescription}
           </p>
 
@@ -46,9 +46,9 @@ const OverviewSection = ({ college }) => {
           {shouldTruncate && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className='md:hidden mt-2 text-blue-600 hover:text-blue-800 font-semibold text-sm underline'
+              className='md:hidden mt-4 text-[#0A6FA7] hover:text-[#085e8a] font-bold text-sm flex items-center gap-1'
             >
-              {isExpanded ? 'Read less' : 'Read more'}
+              {isExpanded ? 'Read less ↑' : 'Read more ↓'}
             </button>
           )}
         </div>
@@ -60,21 +60,22 @@ const OverviewSection = ({ college }) => {
           dangerouslySetInnerHTML={{
             __html: he.decode(processContent(college.content))
           }}
-          className='text-gray-800 mt-4 leading-7 text-justify 
-             text-xs md:text-sm lg:text-base
+          className='text-gray-600 mt-8 leading-relaxed text-justify 
+             text-sm md:text-base lg:text-lg
 
              [&>iframe]:w-full 
              [&>iframe]:max-w-[calc(100vw-40px)] 
              [&>iframe]:aspect-video 
              [&>iframe]:h-auto
-             [&>iframe]:rounded-lg 
-             [&>iframe]:mt-4
+             [&>iframe]:rounded-2xl 
+             [&>iframe]:mt-6
              [&>iframe]:mx-auto
              [&>iframe]:block
+             [&>iframe]:shadow-lg
 
              /* Table wrapper styles */
              [&_.table-wrapper]:overflow-x-auto
-             [&_.table-wrapper]:my-4
+             [&_.table-wrapper]:my-6
              [&_.table-wrapper]:w-full
              [&_.table-wrapper]:[scrollbar-width:thin]
              [&_.table-wrapper]:[scrollbar-color:gray-300_transparent]
@@ -82,39 +83,46 @@ const OverviewSection = ({ college }) => {
              /* Table styles */
              [&_table]:min-w-full
              [&_table]:border-collapse
-             [&_th]:bg-gray-100
-             [&_th]:p-2
+             [&_table]:rounded-xl
+             [&_table]:overflow-hidden
+             [&_table]:border
+             [&_table]:border-gray-100
+             [&_th]:bg-gray-50
+             [&_th]:p-3
              [&_th]:text-left
+             [&_th]:font-bold
+             [&_th]:text-gray-900
              [&_th]:border
-             [&_th]:border-gray-300
-             [&_td]:p-2
+             [&_th]:border-gray-200
+             [&_td]:p-3
              [&_td]:border
-             [&_td]:border-gray-300
-             [&_tr:nth-child(even)]:bg-gray-50
+             [&_td]:border-gray-100
+             [&_tr:nth-child(even)]:bg-gray-50/50
 
              /* Heading styles */
              [&_h1]:text-2xl
              [&_h1]:font-bold
-             [&_h1]:mt-8
-             [&_h1]:mb-4
+             [&_h1]:mt-10
+             [&_h1]:mb-6
+             [&_h1]:text-gray-900
              [&_h2]:text-xl
              [&_h2]:font-bold
-             [&_h2]:mt-6
-             [&_h2]:mb-3
+             [&_h2]:mt-8
+             [&_h2]:mb-4
+             [&_h2]:text-gray-900
 
              /* List styles */
              [&_ol]:pl-8 
-             [&_ol]:my-4
-             [&_ol]:space-y-2
+             [&_ol]:my-6
+             [&_ol]:space-y-3
+             [&_ol]:list-decimal
              [&_ul]:list-disc 
              [&_ul]:pl-8 
-             [&_ul]:my-4
-             [&_ul]:space-y-2
+             [&_ul]:my-6
+             [&_ul]:space-y-3
              [&_li]:pl-2
              max-lg:[&_ol]:text-sm
-             max-lg:[&_ul]:text-sm
-             max-lg:[&_ol]:space-y-1
-             max-lg:[&_ul]:space-y-1'
+             max-lg:[&_ul]:text-sm'
         />
       )}
     </div>

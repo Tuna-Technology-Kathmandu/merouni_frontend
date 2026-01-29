@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { fetchNews, createNews, updateNews, deleteNews, getNewsBySlug } from './action'
-import { getCategories } from '@/app/action'
 import Table from '../../../../components/Table'
 import { Edit2, Trash2, Eye } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
@@ -23,7 +22,6 @@ export default function NewsManager() {
     const router = useRouter()
 
     const [news, setNews] = useState([])
-    const [categories, setCategories] = useState([])
     const [loading, setLoading] = useState(false)
     const [editingId, setEditingId] = useState(null)
     const [editing, setEditing] = useState(false)
@@ -139,7 +137,6 @@ export default function NewsManager() {
     useEffect(() => {
         setHeading('News Management')
         loadData()
-        loadCategories()
         return () => setHeading(null)
     }, [setHeading])
 
@@ -155,16 +152,6 @@ export default function NewsManager() {
     }, [searchParams, router])
 
     const { requireAdmin } = useAdminPermission()
-
-    const loadCategories = async () => {
-        try {
-            const response = await getCategories()
-            setCategories(response.items || [])
-        } catch (error) {
-            console.error('Error loading categories:', error)
-            toast.error('Failed to load categories')
-        }
-    }
 
     const loadData = async (page = 1, search = '') => {
         try {
@@ -196,9 +183,7 @@ export default function NewsManager() {
 
             const newsData = {
                 title: data.title,
-                category_id: data.category,
                 description: data.description,
-                content: data.content,
                 featuredImage: data.featuredImage,
                 status: data.status,
                 visibility: data.visibility,
@@ -314,7 +299,6 @@ export default function NewsManager() {
                     onClose={handleModalClose}
                     editing={editing}
                     initialData={initialData}
-                    categories={categories}
                     onSubmit={handleSubmit}
                     submitting={submitting}
                 />
@@ -388,15 +372,6 @@ export default function NewsManager() {
                             <div>
                                 <h3 className='font-semibold mb-2'>Description</h3>
                                 <p className='text-gray-700'>{viewNewsData.description}</p>
-                            </div>
-                        )}
-                        {viewNewsData.content && (
-                            <div>
-                                <h3 className='font-semibold mb-2'>Content</h3>
-                                <div
-                                    className='prose max-w-none'
-                                    dangerouslySetInnerHTML={{ __html: viewNewsData.content }}
-                                />
                             </div>
                         )}
                         {viewNewsData.createdAt && (

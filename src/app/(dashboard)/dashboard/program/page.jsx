@@ -968,7 +968,7 @@ export default function ProgramForm() {
                   <input
                     {...register('fee')}
                     className='w-full p-2 border rounded'
-                    placeholder='e.g., 5000 USD per year'
+                    placeholder='e.g. 5000 USD per year'
                   />
                 </div>
 

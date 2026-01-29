@@ -9,6 +9,7 @@ import CollegeOverview from './components/NewCollegeOverview'
 import ApplyNow from './components/applyNow'
 import RelatedColleges from './components/RelatedColleges'
 import Loading from '../../../components/Loading'
+import { DotenvConfig } from '@/config/env.config'
 
 // Share Section Component
 const ShareSection = ({ college }) => {
@@ -45,60 +46,57 @@ const ShareSection = ({ college }) => {
   }
 
   return (
-    <div className='fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-lg z-50 py-3 sm:py-4'>
-      <div className='max-w-[1600px] mx-auto px-4'>
-        <div className='text-black font-bold text-xs sm:text-sm mb-3 text-center'>
-          Share
-        </div>
-        <div className='flex flex-row gap-3 sm:gap-4 items-center justify-center'>
-          {/* Facebook */}
-          <button
-            onClick={handleFacebookShare}
-            className='hover:opacity-80 transition-opacity hover:scale-110'
-            aria-label='Share on Facebook'
-          >
-            <img src='/images/fb.png' alt='Facebook' className='w-5 sm:w-6' />
-          </button>
+    <div className='fixed bottom-8 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md border border-gray-100 shadow-2xl z-50 py-3 px-6 rounded-2xl transition-all hover:scale-105'>
+      <div className='flex flex-row gap-5 items-center justify-center'>
+        <span className='text-gray-900 font-bold text-xs uppercase tracking-widest mr-2'>Share</span>
 
-          {/* Twitter/X */}
-          <button
-            onClick={handleTwitterShare}
-            className='hover:opacity-80 transition-opacity hover:scale-110'
-            aria-label='Share on Twitter'
-          >
-            <img
-              src='/images/twitter.png'
-              alt='Twitter'
-              className='w-5 sm:w-6'
-            />
-          </button>
+        {/* Facebook */}
+        <button
+          onClick={handleFacebookShare}
+          className='hover:opacity-80 transition-all hover:-translate-y-1'
+          aria-label='Share on Facebook'
+        >
+          <img src='/images/fb.png' alt='Facebook' className='w-5' />
+        </button>
 
-          {/* LinkedIn */}
-          <button
-            onClick={handleLinkedInShare}
-            className='hover:opacity-80 transition-opacity hover:scale-110'
-            aria-label='Share on LinkedIn'
-          >
-            <img
-              src='/images/linkedin.png'
-              alt='LinkedIn'
-              className='w-5 sm:w-6'
-            />
-          </button>
+        {/* Twitter/X */}
+        <button
+          onClick={handleTwitterShare}
+          className='hover:opacity-80 transition-all hover:-translate-y-1'
+          aria-label='Share on Twitter'
+        >
+          <img
+            src='/images/twitter.png'
+            alt='Twitter'
+            className='w-5'
+          />
+        </button>
 
-          {/* Instagram */}
-          <button
-            onClick={handleInstagramShare}
-            className='hover:opacity-80 transition-opacity hover:scale-110'
-            aria-label='Share on Instagram'
-          >
-            <img
-              src='/images/insta.png'
-              alt='Instagram'
-              className='w-5 sm:w-6'
-            />
-          </button>
-        </div>
+        {/* LinkedIn */}
+        <button
+          onClick={handleLinkedInShare}
+          className='hover:opacity-80 transition-all hover:-translate-y-1'
+          aria-label='Share on LinkedIn'
+        >
+          <img
+            src='/images/linkedin.png'
+            alt='LinkedIn'
+            className='w-5'
+          />
+        </button>
+
+        {/* Instagram */}
+        <button
+          onClick={handleInstagramShare}
+          className='hover:opacity-80 transition-all hover:-translate-y-1'
+          aria-label='Share on Instagram'
+        >
+          <img
+            src='/images/insta.png'
+            alt='Instagram'
+            className='w-5'
+          />
+        </button>
       </div>
     </div>
   )

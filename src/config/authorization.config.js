@@ -16,6 +16,7 @@ export const PERMISSIONS_VIA_ROLE = {
     '/dashboard/faculty',
     '/dashboard/media',
     '/dashboard/blogs',
+    '/dashboard/news',
     '/dashboard/profile',
     '/dashboard/program',
     '/dashboard/scholarship',
@@ -59,7 +60,10 @@ export const PERMISSIONS_VIA_ROLE = {
     '/dashboard/consultancy',
     '/dashboard/level',
     '/dashboard/tag',
-    '/dashboard/material'
+    '/dashboard/material',
+    '/dashboard/news',
+    '/dashboard/vacancy',
+    '/dashboard/referrals'
   ],
   [APP_ROLES.agent]: [
     '/dashboard/referStudent',

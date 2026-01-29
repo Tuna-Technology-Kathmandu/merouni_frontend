@@ -12,7 +12,6 @@ const CollegeOverview = ({ college }) => {
   const programsRef = useRef(null)
   const membersRef = useRef(null)
   const galleryRef = useRef(null)
-  const bronchureRef = useRef(null)
   const facilityRef = useRef(null)
   const infoRef = useRef(null)
   const [activeSection, setActiveSection] = useState(0)
@@ -25,15 +24,16 @@ const CollegeOverview = ({ college }) => {
       member.description?.trim()
   )
 
-  const hasAddress =
+  const hasAddress = !!(
     college?.collegeAddress?.country ||
     college?.collegeAddress?.state ||
     college?.collegeAddress?.city ||
     college?.collegeAddress?.street ||
     college?.collegeAddress?.postal_code
+  )
   const hasContact =
     (college?.collegeContacts && college.collegeContacts.length > 0) ||
-    college?.website_url
+    !!college?.website_url
 
   const allSections = [
     {
@@ -42,34 +42,33 @@ const CollegeOverview = ({ college }) => {
       ref: overviewRef,
       component: <OverviewSection college={college} />
     },
-
     {
       name: 'Programs',
-      visible: college?.collegeCourses?.length !== 0,
+      visible: college?.collegeCourses?.length > 0,
       ref: programsRef,
       component: <ProgramSection college={college} />
     },
     {
       name: 'Facility',
-      visible: college?.collegeFacility?.length !== 0,
+      visible: college?.collegeFacility?.length > 0,
       ref: facilityRef,
       component: <FacilitySection college={college} />
     },
     {
       name: 'Members',
-      visible: validMembers.length !== 0,
+      visible: validMembers.length > 0,
       ref: membersRef,
       component: <MemberSection validMembers={validMembers} />
     },
     {
       name: 'Gallery',
-      visible: college?.collegeGallery?.length !== 0,
+      visible: college?.collegeGallery?.length > 0,
       ref: galleryRef,
       component: <GallerySection college={college} />
     },
     {
       name: 'Contact & Address',
-      visible: !!(hasAddress || hasContact),
+      visible: hasAddress || hasContact,
       ref: infoRef,
       component: <InfoSection college={college} />
     }
@@ -79,21 +78,20 @@ const CollegeOverview = ({ college }) => {
 
   const handleScroll = (index) => {
     const target = visibleSections[index].ref.current
-    const headerOffset = 83
+    const headerOffset = 100
     const elementPosition = target.getBoundingClientRect().top + window.scrollY
     const offsetPosition = elementPosition - headerOffset
 
-    setActiveSection(index) // Update active section when clicked
+    setActiveSection(index)
     window.scrollTo({
       top: offsetPosition,
       behavior: 'smooth'
     })
   }
 
-  // Scroll spy effect to highlight active section
   useEffect(() => {
     const handleScrollSpy = () => {
-      const scrollPosition = window.scrollY + 200 // Offset for header and some padding
+      const scrollPosition = window.scrollY + 120
 
       for (let i = visibleSections.length - 1; i >= 0; i--) {
         const section = visibleSections[i]
@@ -113,7 +111,7 @@ const CollegeOverview = ({ college }) => {
     }
 
     window.addEventListener('scroll', handleScrollSpy)
-    handleScrollSpy() // Initial check
+    handleScrollSpy()
 
     return () => {
       window.removeEventListener('scroll', handleScrollSpy)
@@ -121,91 +119,98 @@ const CollegeOverview = ({ college }) => {
   }, [visibleSections])
 
   return (
-    <section className='px-4 sm:px-6 md:px-8 lg:px-[30px] xl:px-[75px] mb-10 sm:mb-16 md:mb-20 flex justify-between gap-4 sm:gap-8 md:gap-12 lg:gap-16 w-full flex-col md:flex-row md:items-start'>
-      {/* Sidebar - Only shows visible sections */}
+    <section className='px-4 sm:px-8 md:px-12 lg:px-24 mb-20 flex flex-col md:flex-row gap-8 lg:gap-16 w-full items-start'>
+      {/* Sidebar Navigation */}
       {visibleSections.length > 0 && (
-        <aside className='h-fit self-start md:sticky md:top-52 md:-ml-4 lg:-ml-8 w-full md:w-auto'>
-          <div className='flex gap-1 items-center justify-center md:justify-start mt-4 sm:mt-6 md:mt-9 lg:mt-20'>
-            <div className='w-[4px] bg-[#0A6FA7] h-auto '></div>
-            <p className='font-semibold text-base sm:text-lg md:text-[20px] text-center md:text-left tracking-[0.01em] text-black'>
-              About
-            </p>
+        <aside className='w-full md:w-48 lg:w-56 md:sticky md:top-32 flex-shrink-0'>
+          <div className='flex items-center gap-2 mb-6 hidden md:flex'>
+            <div className='w-1 h-6 bg-[#0A6FA7] rounded-full'></div>
+            <p className='font-bold text-lg text-gray-900'>Contents</p>
           </div>
 
-          <ul className='mt-4 sm:mt-6 md:mt-7 flex flex-row md:flex-col gap-3 sm:gap-4 md:gap-0 flex-wrap md:flex-nowrap justify-center md:justify-start overflow-x-auto md:overflow-x-visible pb-2 md:pb-0'>
+          <ul className='flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-y-auto no-scrollbar pb-4 md:pb-0 border-b md:border-b-0 border-gray-100'>
             {visibleSections.map((section, index) => (
               <li
                 key={index}
                 onClick={() => handleScroll(index)}
-                className={`text-xs sm:text-sm md:text-base lg:text-base font-medium mb-0 md:mb-2 lg:mb-4 cursor-pointer hover:underline tracking-[0.01em] whitespace-nowrap px-2 py-1 md:px-0 md:py-0 transition-colors ${
-                  activeSection === index
-                    ? 'text-[#30AD8F] font-bold'
-                    : 'text-gray-700'
-                }`}
+                className={`text-sm lg:text-base font-bold cursor-pointer whitespace-nowrap px-4 py-2 md:px-0 md:py-2.5 transition-all relative group ${activeSection === index
+                  ? 'text-[#0A6FA7]'
+                  : 'text-gray-400 hover:text-gray-700'
+                  }`}
               >
                 {section.name}
+                {activeSection === index && (
+                  <span className='absolute bottom-0 left-4 right-4 h-0.5 bg-[#0A6FA7] md:hidden'></span>
+                )}
+                {activeSection === index && (
+                  <span className='absolute left-[-12px] top-1/2 -translate-y-1/2 w-1 h-4 bg-[#0A6FA7] rounded-full hidden md:block'></span>
+                )}
               </li>
             ))}
           </ul>
         </aside>
       )}
 
-      {/* Content Area - Only renders visible sections */}
-      <div className='flex flex-col justify-start w-full md:w-2/3 gap-8 sm:gap-10 md:gap-12 lg:gap-14 mt-4 sm:mt-6 md:mt-12 lg:mt-20'>
+      {/* Main Content */}
+      <div className='flex-1 w-full space-y-16 md:space-y-24'>
         {visibleSections.map((section, index) => (
-          <div key={index} className='min-h-[100px] w-full' ref={section.ref}>
+          <div key={index} className='scroll-mt-32' ref={section.ref}>
             {section.component}
           </div>
         ))}
       </div>
 
-      {/* Right sidebar (location) - Unchanged */}
-      <aside className='sticky top-52 h-fit self-start max-lg:hidden'>
-        <div className='mt-20 max-[1144px]:w-[200px] max-[938px]:w-[150px]'>
-          {college?.google_map_url && (
-            <>
-              <p className='font-semibold text-[20px] max-md:text-center tracking-[0.01em] text-black'>
-                Location
-              </p>
-
-              <div className='mt-7 w-full h-52 tw:max-[938px]:h-40'>
-                <GoogleMap mapUrl={college.google_map_url} />
-              </div>
-            </>
-          )}
-
-          <div className='mt-7 w-full h-52 tw:max-[938px]:h-40'>
-            <div className='text-center shadow-lg h-auto p-2 border border-gray-300 rounded-md hover:scale-105 transition-all duration-300 ease-in-out'>
-              <p className='text-xs md:text-sm lg:text-base font-semibold'>
-                Address
-              </p>
-              <div className='text-xs md:text-[12px] font-medium lg:text-[14px] mt-2 w-full'>
-                {/* <span>{college?.collegeAddress?.country || ''},</span> */}
-                <span className='ml-1'>
-                  {college?.collegeAddress?.state || ''},
-                </span>
-                <span className='ml-1'>
-                  {college?.collegeAddress?.city || ''},
-                </span>
-                <br />
-                <span className='ml-1'>
-                  {college?.collegeAddress?.street || ''}
-                </span>
-              </div>
-            </div>
-            {college?.collegeAddress?.postal_code && (
-              <div className='text-center shadow-lg h-auto p-2 mt-4 border border-gray-300 rounded-md hover:scale-105 transition-all duration-300 ease-in-out'>
-                <p className='text-xs md:text-sm lg:text-base font-semibold'>
-                  Postcode
+      {/* Right Sidebar - Shortcuts/Location */}
+      {(college?.google_map_url || hasAddress) && (
+        <aside className='w-full md:w-64 lg:w-72 md:sticky md:top-32 flex-shrink-0 hidden xl:block'>
+          <div className='bg-gray-50/30 rounded-3xl p-6 border border-gray-100/50'>
+            {college?.google_map_url && (
+              <div className='mb-8'>
+                <p className='font-bold text-gray-900 mb-4 flex items-center gap-2'>
+                  <span className='w-1 h-4 bg-[#30AD8F] rounded-full'></span>
+                  Location Map
                 </p>
-                <div className='text-xs md:text-[12px] font-medium lg:text-[14px] mt-2 w-full'>
-                  <span>{college?.collegeAddress?.postal_code}</span>
+                <div className='w-full h-44 rounded-2xl overflow-hidden border border-white bg-white'>
+                  <GoogleMap mapUrl={college.google_map_url} />
+                </div>
+              </div>
+            )}
+
+            {hasAddress && (
+              <div>
+                <p className='font-bold text-gray-900 mb-4 flex items-center gap-2'>
+                  <span className='w-1 h-4 bg-[#0A6FA7] rounded-full'></span>
+                  Office Address
+                </p>
+                <div className='space-y-3'>
+                  <div className='bg-white/80 p-4 rounded-2xl border border-gray-100'>
+                    <p className='text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1'>Street & City</p>
+                    <p className='text-sm font-bold text-gray-700 leading-snug'>
+                      {college?.collegeAddress?.street ? `${college.collegeAddress.street}, ` : ''}
+                      {college?.collegeAddress?.city || ''}
+                    </p>
+                    {(college?.collegeAddress?.state || college?.collegeAddress?.country) && (
+                      <p className='text-[11px] font-medium text-gray-400 mt-1'>
+                        {college?.collegeAddress?.state ? `${college.collegeAddress.state}, ` : ''}
+                        {college?.collegeAddress?.country || ''}
+                      </p>
+                    )}
+                  </div>
+
+                  {college?.collegeAddress?.postal_code && (
+                    <div className='bg-white/80 p-4 rounded-2xl border border-gray-100'>
+                      <p className='text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1'>Postcode</p>
+                      <p className='text-sm font-bold text-gray-700'>
+                        {college?.collegeAddress?.postal_code}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
           </div>
-        </div>
-      </aside>
+        </aside>
+      )}
     </section>
   )
 }

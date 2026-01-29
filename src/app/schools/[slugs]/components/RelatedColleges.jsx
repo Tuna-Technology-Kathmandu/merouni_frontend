@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { getColleges } from '../../actions'
 import Link from 'next/link'
+import { MapPin } from 'lucide-react'
 
 const RelatedColleges = ({ college }) => {
   const [colleges, setColleges] = useState([])
@@ -16,14 +17,10 @@ const RelatedColleges = ({ college }) => {
     setIsLoading(true)
     try {
       const data = await getColleges()
-      console.log('RElated clz', data)
-
       const filteredColleges = data.colleges.filter(
         (c) => c.collegeId !== college._id
       )
-      console.log('Filtered Colleges:', filteredColleges)
-      // setColleges(data.colleges);
-      setColleges(filteredColleges)
+      setColleges(filteredColleges.slice(0, 3))
     } catch (error) {
       console.error('Error fetching colleges:', error)
     } finally {
@@ -31,38 +28,52 @@ const RelatedColleges = ({ college }) => {
     }
   }
 
+  if (isLoading) return null
+  if (colleges.length === 0) return null
+
   return (
-    <div className='flex flex-col max-w-[1600px] mx-auto mb-20 px-24'>
-      <h2 className='font-bold text-xl md:text-3xl leading-10 m-4 max-sm:text-center max-sm:leading-7'>
-        Schools you may like
-      </h2>
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-sm:gap-1'>
-        {colleges.map((college, index) => (
-          <Link href={`/schools/${college.slug}`} key={index}>
-            <div className='cursor-pointer p-4 max-w-sm mx-auto sm:mx-0 max-sm:p-2'>
-              <div className='flex justify-center border-2 rounded-3xl items-center overflow-hidden mb-2 p-4'>
+    <section className='px-4 sm:px-8 md:px-12 lg:px-24 mb-20'>
+      <div className='flex items-center gap-3 mb-8'>
+        <div className='w-1 h-6 bg-[#30AD8F] rounded-full'></div>
+        <h2 className='font-bold text-xl md:text-2xl text-gray-900'>
+          Schools you may like
+        </h2>
+      </div>
+
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+        {colleges.map((item, index) => (
+          <Link href={`/schools/${item.slug}`} key={index} className='group'>
+            <div className='bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)] transition-all duration-300 hover:border-[#30AD8F]/20 flex flex-col h-full'>
+              <div className='aspect-[4/3] relative overflow-hidden bg-gray-50 flex items-center justify-center p-8'>
                 <img
                   src={
-                    college?.logo ||
-                    `https://avatar.iran.liara.run/username?username=${college?.name}`
+                    item?.logo ||
+                    `https://avatar.iran.liara.run/username?username=${item?.name}`
                   }
-                  alt={college.name}
-                  className='w-48 h-48 max-[840px]:h-40 max-sm:h-36 object-cover'
+                  alt={item.name}
+                  className='max-w-[70%] max-h-[70%] object-contain transition-transform duration-500 group-hover:scale-110'
                 />
+                <div className='absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity'></div>
               </div>
-              <div className='px-4 pb-4 flex flex-col'>
-                <h3 className='text-lg font-bold text-center'>
-                  {college.name}
+
+              <div className='p-6 flex flex-col flex-1 gap-2'>
+                <h3 className='font-bold text-gray-900 line-clamp-1 group-hover:text-[#0A6FA7] transition-colors'>
+                  {item.name}
                 </h3>
-                <p className='text-xs text-gray-700 text-center'>
-                  {college.location}
-                </p>
+                {item.location && (
+                  <div className='flex items-center gap-1.5 text-gray-500'>
+                    <MapPin className='w-3.5 h-3.5 text-[#30AD8F]' />
+                    <p className='text-xs font-bold truncate'>
+                      {item.location}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </Link>
         ))}
       </div>
-    </div>
+    </section>
   )
 }
 

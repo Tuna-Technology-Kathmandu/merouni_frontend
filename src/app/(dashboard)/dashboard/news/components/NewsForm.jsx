@@ -2,16 +2,12 @@
 
 import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
-import dynamic from 'next/dynamic'
 import { Modal } from '../../../../../components/UserModal'
 import { Button } from '../../../../../components/ui/button'
 import { Input } from '../../../../../components/ui/input'
 import { Label } from '../../../../../components/ui/label'
 import FileUpload from '../../addCollege/FileUpload'
 
-const CKEditor = dynamic(() => import('../../component/CKBlogs'), {
-    ssr: false
-})
 
 // Helper component for required label
 const RequiredLabel = ({ children, htmlFor }) => (
@@ -25,7 +21,6 @@ export default function NewsForm({
     onClose,
     editing,
     initialData,
-    categories,
     onSubmit,
     submitting
 }) {
@@ -39,31 +34,24 @@ export default function NewsForm({
     } = useForm({
         defaultValues: {
             title: '',
-            category: '',
             description: '',
-            content: '',
             featuredImage: '',
             status: 'draft',
             visibility: 'private'
         }
     })
 
-    const editorRef = useRef(null)
-    const hasSetContent = useRef(false)
 
     // Reset form when modal closes
     useEffect(() => {
         if (!isOpen) {
             reset({
                 title: '',
-                category: '',
                 description: '',
-                content: '',
                 featuredImage: '',
                 status: 'draft',
                 visibility: 'private'
             })
-            hasSetContent.current = false
         }
     }, [isOpen, reset])
 
@@ -71,38 +59,13 @@ export default function NewsForm({
     useEffect(() => {
         if (editing && initialData && isOpen) {
             setValue('title', initialData.title || '')
-            setValue('category', initialData.category_id || '')
             setValue('description', initialData.description || '')
-            setValue('content', initialData.content || '')
             setValue('featuredImage', initialData.featuredImage || '')
             setValue('status', initialData.status || 'draft')
             setValue('visibility', initialData.visibility || 'private')
-            hasSetContent.current = false
         }
     }, [editing, initialData, isOpen, setValue])
 
-    // Set editor content after it's ready
-    useEffect(() => {
-        if (
-            editing &&
-            initialData?.content &&
-            editorRef.current &&
-            !hasSetContent.current &&
-            isOpen
-        ) {
-            const timer = setTimeout(() => {
-                if (editorRef.current?.setData) {
-                    editorRef.current.setData(initialData.content)
-                    hasSetContent.current = true
-                }
-            }, 500)
-            return () => clearTimeout(timer)
-        }
-    }, [editing, initialData, isOpen])
-
-    const handleEditorChange = (content) => {
-        setValue('content', content)
-    }
 
     const handleFormSubmit = (data) => {
         onSubmit(data)
@@ -143,29 +106,6 @@ export default function NewsForm({
                                     )}
                                 </div>
 
-                                {/* Category */}
-                                <div>
-                                    <RequiredLabel htmlFor='category'>Category</RequiredLabel>
-                                    <select
-                                        id='category'
-                                        {...register('category', {
-                                            required: 'Category is required'
-                                        })}
-                                        className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                                    >
-                                        <option value=''>Select Category</option>
-                                        {categories.map((cat) => (
-                                            <option key={cat.id} value={cat.id}>
-                                                {cat.title}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {errors.category && (
-                                        <p className='text-sm font-medium text-destructive mt-1'>
-                                            {errors.category.message}
-                                        </p>
-                                    )}
-                                </div>
 
                                 {/* Description */}
                                 <div>
@@ -190,26 +130,6 @@ export default function NewsForm({
                             </div>
                         </div>
 
-                        {/* Content */}
-                        <div className='bg-white p-6 rounded-lg shadow-md'>
-                            <h2 className='text-xl font-semibold mb-4'>Content</h2>
-                            <div>
-                                <RequiredLabel>News Content</RequiredLabel>
-                                <div className='mt-2'>
-                                    <CKEditor
-                                        value={watch('content')}
-                                        onChange={handleEditorChange}
-                                        editorRef={editorRef}
-                                        id='news-content-editor'
-                                    />
-                                </div>
-                                {errors.content && (
-                                    <p className='text-sm font-medium text-destructive mt-1'>
-                                        {errors.content.message}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
 
                         {/* Right Column - Featured Image & Settings */}
                         <div className='space-y-6'>
@@ -263,7 +183,6 @@ export default function NewsForm({
                     <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
                         <Button
                             type='submit'
-                            className='text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
                             disabled={submitting}
                         >
                             {submitting

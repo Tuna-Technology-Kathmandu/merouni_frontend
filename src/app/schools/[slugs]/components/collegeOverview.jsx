@@ -1,6 +1,5 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import OverviewSection from '../../../colleges/[slugs]/components/sections/OverviewSection'
-import ProgramSection from '../../../colleges/[slugs]/components/sections/ProgramSection'
 import MemberSection from '../../../colleges/[slugs]/components/sections/MemberSection'
 import GoogleMap from '../../../colleges/[slugs]/components/GoogleMap'
 import GallerySection from '../../../colleges/[slugs]/components/sections/GallerySection'
@@ -8,11 +7,11 @@ import FacilitySection from '../../../colleges/[slugs]/components/sections/Facil
 
 const CollegeOverview = ({ college }) => {
   const overviewRef = useRef(null)
-  const programsRef = useRef(null)
   const membersRef = useRef(null)
   const galleryRef = useRef(null)
-  const bronchureRef = useRef(null)
   const facilityRef = useRef(null)
+
+  const [activeSection, setActiveSection] = useState(0)
 
   const validMembers = (college.collegeMembers || []).filter(
     (member) =>
@@ -24,30 +23,13 @@ const CollegeOverview = ({ college }) => {
 
   const allSections = [
     {
-      name: 'Bronchure',
-      visible: college?.college_broucher !== '',
-      ref: bronchureRef,
-      component: <BrochureSection college={college} />
-    },
-    {
       name: 'Overview',
-      visible: !!(
-        college?.description &&
-        college?.content &&
-        college?.institute_type !== ''
-      ),
+      visible: !!(college?.description || college?.content),
       ref: overviewRef,
       component: <OverviewSection college={college} />
     },
-
-    // {
-    //   name: 'Programs',
-    //   visible: college?.collegeCourses?.length !== 0,
-    //   ref: programsRef,
-    //   component: <ProgramSection college={college} />
-    // },
     {
-      name: 'Facility',
+      name: 'Facilities',
       visible: college?.collegeFacility?.length !== 0,
       ref: facilityRef,
       component: <FacilitySection college={college} />
@@ -70,7 +52,7 @@ const CollegeOverview = ({ college }) => {
 
   const handleScroll = (index) => {
     const target = visibleSections[index].ref.current
-    const headerOffset = 83
+    const headerOffset = 120
     const elementPosition = target.getBoundingClientRect().top + window.scrollY
     const offsetPosition = elementPosition - headerOffset
 
@@ -80,90 +62,125 @@ const CollegeOverview = ({ college }) => {
     })
   }
 
-  console.log('visibleSections', college?.google_map_url)
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-150px 0px -50% 0px',
+      threshold: 0
+    }
+
+    const observerCallback = (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const index = visibleSections.findIndex((s) => s.ref.current === entry.target)
+          if (index !== -1) setActiveSection(index)
+        }
+      })
+    }
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions)
+    visibleSections.forEach((section) => {
+      if (section.ref.current) observer.observe(section.ref.current)
+    })
+
+    return () => observer.disconnect()
+  }, [visibleSections])
+
+  const hasAddress = college?.collegeAddress?.street || college?.collegeAddress?.city
 
   return (
-    <section className='px-[75px] max-md:px-[30px] mb-20 max-md:mb-10 flex justify-between gap-16 max-md:gap-2 w-full max-md:flex-col-reverse max-md:items-between'>
-      {/* Sidebar - Only shows visible sections */}
+    <section className='px-4 sm:px-8 md:px-12 lg:px-24 mb-20 flex flex-col md:flex-row gap-8 lg:gap-16 w-full items-start'>
+      {/* Sidebar Navigation */}
       {visibleSections.length > 0 && (
-        <aside className='sticky top-52 h-fit self-start max-md:static max-md:mx-auto'>
-          <div className='flex gap-1 max-md:gap-1 mt-20 max-md:mt-9'>
-            <div className='w-[4px] bg-[#0A6FA7] h-auto mr-2'></div>
-            <p className='font-semibold text-[20px] max-md:text-center tracking-[0.01em] text-black'>
-              About
-            </p>
+        <aside className='w-full md:w-48 lg:w-56 md:sticky md:top-32 flex-shrink-0'>
+          <div className='flex items-center gap-2 mb-6 hidden md:flex'>
+            <div className='w-1 h-6 bg-[#0A6FA7] rounded-full'></div>
+            <p className='font-bold text-lg text-gray-900'>Contents</p>
           </div>
 
-          <ul className='mt-7 max-md:text-center'>
+          <ul className='flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-y-auto no-scrollbar pb-4 md:pb-0 border-b md:border-b-0 border-gray-100'>
             {visibleSections.map((section, index) => (
               <li
                 key={index}
                 onClick={() => handleScroll(index)}
-                className='text-base max-[1120px]:text-sm font-medium mb-4 max-lg:mb-2 cursor-pointer hover:underline tracking-[0.01em]'
+                className={`text-sm lg:text-base font-bold cursor-pointer whitespace-nowrap px-4 py-2 md:px-0 md:py-2.5 transition-all relative group ${activeSection === index
+                  ? 'text-[#0A6FA7]'
+                  : 'text-gray-400 hover:text-gray-700'
+                  }`}
               >
                 {section.name}
+                {activeSection === index && (
+                  <span className='absolute bottom-0 left-4 right-4 h-0.5 bg-[#0A6FA7] md:hidden'></span>
+                )}
+                {activeSection === index && (
+                  <span className='absolute left-[-12px] top-1/2 -translate-y-1/2 w-1 h-4 bg-[#0A6FA7] rounded-full hidden md:block'></span>
+                )}
               </li>
             ))}
           </ul>
         </aside>
       )}
 
-      {/* Content Area - Only renders visible sections */}
-      <div className='flex flex-col justify-start w-2/3 max-lg:w-full gap-14 max-md:w-full mt-20'>
+      {/* Main Content */}
+      <div className='flex-1 w-full space-y-16 md:space-y-24'>
         {visibleSections.map((section, index) => (
-          <div key={index} className='min-h-[100px] w-full' ref={section.ref}>
+          <div key={index} className='scroll-mt-32' ref={section.ref}>
             {section.component}
           </div>
         ))}
       </div>
 
-      {/* Right sidebar (location) - Unchanged */}
-      <aside className='sticky top-52 h-fit self-start max-lg:hidden'>
-        <div className='mt-20 max-[1144px]:w-[200px] max-[938px]:w-[150px]'>
-          {college?.google_map_url && (
-            <>
-              <p className='font-semibold text-[20px] max-md:text-center tracking-[0.01em] text-black'>
-                Location
-              </p>
-
-              <div className='mt-7 w-full h-52 tw:max-[938px]:h-40'>
-                <GoogleMap mapUrl={college.google_map_url} />
-              </div>
-            </>
-          )}
-
-          <div className='mt-7 w-full h-52 tw:max-[938px]:h-40'>
-            <div className='text-center shadow-lg h-auto p-2 border border-gray-300 rounded-md hover:scale-105 transition-all duration-300 ease-in-out'>
-              <p className='text-xs md:text-sm lg:text-base font-semibold'>
-                Address
-              </p>
-              <div className='text-xs md:text-[12px] font-medium lg:text-[14px] mt-2 w-full'>
-                {/* <span>{college?.collegeAddress?.country || ''},</span> */}
-                <span className='ml-1'>
-                  {college?.collegeAddress?.state || ''},
-                </span>
-                <span className='ml-1'>
-                  {college?.collegeAddress?.city || ''},
-                </span>
-                <br />
-                <span className='ml-1'>
-                  {college?.collegeAddress?.street || ''}
-                </span>
-              </div>
-            </div>
-            {college?.collegeAddress?.postal_code && (
-              <div className='text-center shadow-lg h-auto p-2 mt-4 border border-gray-300 rounded-md hover:scale-105 transition-all duration-300 ease-in-out'>
-                <p className='text-xs md:text-sm lg:text-base font-semibold'>
-                  Postcode
+      {/* Right Sidebar - Shortcuts/Location */}
+      {(college?.google_map_url || hasAddress) && (
+        <aside className='w-full md:w-64 lg:w-72 md:sticky md:top-32 flex-shrink-0 hidden xl:block'>
+          <div className='bg-gray-50/30 rounded-3xl p-6 border border-gray-100/50'>
+            {college?.google_map_url && (
+              <div className='mb-8'>
+                <p className='font-bold text-gray-900 mb-4 flex items-center gap-2'>
+                  <span className='w-1 h-4 bg-[#30AD8F] rounded-full'></span>
+                  Location Map
                 </p>
-                <div className='text-xs md:text-[12px] font-medium lg:text-[14px] mt-2 w-full'>
-                  <span>{college?.collegeAddress?.postal_code}</span>
+                <div className='w-full h-44 rounded-2xl overflow-hidden border border-white bg-white'>
+                  <GoogleMap mapUrl={college.google_map_url} />
+                </div>
+              </div>
+            )}
+
+            {hasAddress && (
+              <div>
+                <p className='font-bold text-gray-900 mb-4 flex items-center gap-2'>
+                  <span className='w-1 h-4 bg-[#0A6FA7] rounded-full'></span>
+                  Office Address
+                </p>
+                <div className='space-y-4'>
+                  <div className='bg-white/80 p-4 rounded-2xl border border-gray-100'>
+                    <p className='text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1'>Street & City</p>
+                    <p className='text-sm font-bold text-gray-700 leading-snug'>
+                      {college?.collegeAddress?.street ? `${college.collegeAddress.street}, ` : ''}
+                      {college?.collegeAddress?.city || ''}
+                    </p>
+                    {(college?.collegeAddress?.state || college?.collegeAddress?.country) && (
+                      <p className='text-xs font-medium text-gray-500 mt-1'>
+                        {college?.collegeAddress?.state ? `${college.collegeAddress.state}, ` : ''}
+                        {college?.collegeAddress?.country || ''}
+                      </p>
+                    )}
+                  </div>
+
+                  {college?.collegeAddress?.postal_code && (
+                    <div className='bg-white/80 p-4 rounded-2xl border border-gray-100'>
+                      <p className='text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1'>Postcode</p>
+                      <p className='text-sm font-bold text-gray-700'>
+                        {college?.collegeAddress?.postal_code}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
           </div>
-        </div>
-      </aside>
+        </aside>
+      )}
     </section>
   )
 }
