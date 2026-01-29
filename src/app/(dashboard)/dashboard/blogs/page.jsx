@@ -276,7 +276,6 @@ export default function BlogsManager() {
       reset()
       setSelectedTags([])
       setUploadedFiles({ featuredImage: '' })
-      // Remove query parameter from URL
       router.replace('/dashboard/blogs', { scroll: false })
     }
   }, [searchParams, router, reset])
@@ -306,9 +305,11 @@ export default function BlogsManager() {
     setSearchResults([])
   }
 
-  const loadData = async (page = 1) => {
+  const [statusFilter, setStatusFilter] = useState('all')
+
+  const loadData = async (page = 1, status = statusFilter) => {
     try {
-      const response = await fetchBlogs(page)
+      const response = await fetchBlogs(page, 10, status)
       setBlogs(response.items)
       setPagination({
         currentPage: response.pagination.currentPage,
@@ -322,6 +323,12 @@ export default function BlogsManager() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    loadData(1, statusFilter)
+  }, [statusFilter])
+
+  // ... (existing code)
 
   const createBlogs = async (data) => {
     try {
@@ -467,9 +474,11 @@ export default function BlogsManager() {
     }
 
     try {
-      const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs?q=${query}`
-      )
+      let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs?q=${query}`
+      if (statusFilter && statusFilter !== 'all') {
+        url += `&status=${statusFilter}`
+      }
+      const response = await authFetch(url)
       if (response.ok) {
         const data = await response.json()
         setBlogs(data.items)
@@ -610,17 +619,28 @@ export default function BlogsManager() {
       <div className='p-4 w-full'>
         <div className='flex justify-between items-center mb-4'>
           {/* Search Bar */}
-          <div className='relative w-full max-w-md'>
-            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-              <Search className='w-4 h-4 text-gray-500' />
+          <div className='relative w-full max-w-md flex gap-2'>
+            <div className='relative flex-1'>
+              <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+                <Search className='w-4 h-4 text-gray-500' />
+              </div>
+              <input
+                type='text'
+                value={searchQuery}
+                onChange={(e) => handleSearchInput(e.target.value)}
+                className='w-full pl-10 pr-4 py-2 text-sm border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring'
+                placeholder='Search news...'
+              />
             </div>
-            <input
-              type='text'
-              value={searchQuery}
-              onChange={(e) => handleSearchInput(e.target.value)}
-              className='w-full pl-10 pr-4 py-2 text-sm border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring'
-              placeholder='Search news...'
-            />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className='w-40 px-3 py-2 text-sm border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-white'
+            >
+              <option value="all">All Status</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
           </div>
           {/* Button */}
           <div className='flex gap-2'>

@@ -36,9 +36,11 @@ const ScholarshipPage = () => {
 
   // Debounce search
   useEffect(() => {
+    
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm)
     }, 500)
+
     return () => clearTimeout(handler)
   }, [searchTerm])
 

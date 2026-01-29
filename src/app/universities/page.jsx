@@ -6,12 +6,12 @@ import EmptyState from '@/components/ui/EmptyState'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
-import Link from 'next/link'
 import UniversityShimmer from './components/UniversityShimmer'
 import Pagination from '../blogs/components/Pagination'
+import UniversityCard from './components/UniversityCard'
 
 const UniversityPage = () => {
-  const [universities, setUniversities] = useState([]) // Renamed for clarity
+  const [universities, setUniversities] = useState([])
   const [loading, setLoading] = useState(false)
   const [isScrolling, setIsScrolling] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -34,14 +34,20 @@ const UniversityPage = () => {
     setLoading(true)
     try {
       const response = await fetchUniversities(search, page)
-      setUniversities(response.items)
-      setPagination((prev) => ({
-        ...prev,
-        totalPages: response?.totalPages,
-        totalCount: response?.totalItems
-      }))
+      if (response && response.items) {
+        setUniversities(response.items)
+        setPagination((prev) => ({
+          ...prev,
+          totalPages: response.pagination ? response.pagination.totalPages : 1, // Handle potential missing pagination
+          totalCount: response.pagination ? response.pagination.totalCount : response.items.length
+        }))
+      } else {
+        setUniversities([])
+      }
+
     } catch (error) {
       console.error('Error:', error)
+      setUniversities([])
     } finally {
       setLoading(false)
     }
@@ -76,106 +82,79 @@ const UniversityPage = () => {
     <>
       <Header />
       <Navbar />
-      <div className='min-h-screen bg-gradient-to-b from-[#f7fbfc] to-[#e9f3f7] py-12 px-6'>
-        <div className='container mx-auto'>
-          <div className='text-center mb-12'>
-            <h1 className='text-2xl md:text-3xl font-extrabold text-gray-800'>
+      <div className='min-h-screen bg-white py-12 md:py-20 px-4 sm:px-6'>
+        <div className='max-w-[1600px] mx-auto'>
+          <div className='text-center mb-16'>
+            <h1 className='text-3xl md:text-4xl font-black text-gray-900 mb-4'>
               Available <span className='text-[#0A70A7]'>Universities</span>
             </h1>
-            <p className='mt-3 text-gray-600 max-w-2xl mx-auto text-sm'>
+            <p className='text-gray-500 max-w-2xl mx-auto text-lg leading-relaxed'>
               Discover a wide range of degree programs designed to help you
               achieve your academic and career goals.
             </p>
           </div>
 
           {/* Search Bar */}
-          <div className='flex justify-center mb-10 md:mb-20 '>
-            <div className='relative w-full max-w-lg'>
+          <div className='flex justify-center mb-16'>
+            <div className='relative w-full max-w-xl'>
               <input
                 type='text'
-                placeholder='Search university...'
-                className='w-full px-5 py-3 pl-12 rounded-2xl border border-gray-300 shadow-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all'
+                placeholder='Search universities...'
+                className='w-full px-6 py-4 pl-14 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:border-[#0A70A7] focus:ring-4 focus:ring-[#0A70A7]/10 outline-none transition-all duration-300 text-gray-800 placeholder:text-gray-400 font-medium'
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <Search className='absolute left-4 top-3.5 h-5 w-5 text-gray-400' />
+              <Search className='absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400' />
             </div>
           </div>
-        </div>
 
-        {/* Universities Grid */}
-        {loading ? (
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {[...Array(6)].map((_, index) => (
-              <UniversityShimmer key={index} />
-            ))}
-          </div>
-        ) : universities.length === 0 ? (
-          <EmptyState
-            icon={GraduationCap}
-            title='No Universities Found'
-            description={
-              searchTerm
-                ? `No universities match your search "${searchTerm}"`
-                : 'No universities are currently available'
-            }
-            action={
-              searchTerm
-                ? {
-                  label: 'Clear Search',
-                  onClick: () => {
-                    setSearchTerm('')
-                    loadUniversity(1)
-                  }
-                }
-                : null
-            }
-          />
-        ) : (
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {universities
-              .filter((uni) =>
-                uni.fullname.toLowerCase().includes(searchTerm.toLowerCase())
-              )
-              .map((uni, index) => (
-                <Link href={`/universities/${uni?.slugs}`} key={index}>
-                  <div className='border rounded-lg p-6 hover:shadow-lg transition-shadow bg-white'>
-                    <div className='mb-4 flex justify-between items-center'>
-                      <h2 className='text-xl font-semibold'>{uni.fullname}</h2>
-                      <img
-                        src={
-                          uni?.featured_image ||
-                          `https://avatar.iran.liara.run/username?username=${uni?.fullname}`
-                        } // Consider using a placeholder or actual university logo
-                        alt={uni.fullname + ' Logo'} // Add alt text for accessibility
-                        className='w-[65px] h-[65px] rounded-2xl'
-                        onError={(e) => {
-                          e.target.onerror = null
-                          e.target.src = 'https://placehold.co/600x400'
-                        }} // Placeholder on image error
-                      />
-                    </div>
-                    <div className='space-y-2'>
-                      <div className='flex justify-between'>
-                        <span>
-                          {uni.city}, {uni.state} {uni.country}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
+          {/* Universities Grid */}
+          {loading ? (
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+              {[...Array(8)].map((_, index) => (
+                <UniversityShimmer key={index} />
               ))}
-          </div>
-        )}
-
-        {/* Pagination */}
-        {pagination.totalPages > 1 && (
-          <div className='mt-12 flex justify-center'>
-            <Pagination
-              pagination={pagination}
-              onPageChange={handlePageChange}
+            </div>
+          ) : universities.length === 0 ? (
+            <EmptyState
+              icon={GraduationCap}
+              title='No Universities Found'
+              description={
+                searchTerm
+                  ? `No universities match "${searchTerm}"`
+                  : 'No universities are currently available'
+              }
+              action={
+                searchTerm
+                  ? {
+                    label: 'Clear Search',
+                    onClick: () => {
+                      setSearchTerm('')
+                      loadUniversity(1)
+                    }
+                  }
+                  : null
+              }
             />
-          </div>
-        )}
+          ) : (
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+              {universities
+                // Filter is handled by API usually, but keeping simplistic client-side check if needed, mostly redundant if API handles 'q'
+                .map((uni, index) => (
+                  <UniversityCard key={index} university={uni} />
+                ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {pagination.totalPages > 1 && (
+            <div className='mt-16 flex justify-center'>
+              <Pagination
+                pagination={pagination}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </div>
       </div>
       <Footer />
     </>

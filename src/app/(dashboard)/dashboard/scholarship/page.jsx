@@ -1,35 +1,34 @@
 'use client'
-import dynamic from 'next/dynamic'
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { useSelector } from 'react-redux'
-import { useSearchParams, useRouter } from 'next/navigation'
-import {
-  getAllScholarships,
-  createScholarship,
-  updateScholarship,
-  deleteScholarship
-} from './actions'
 import { getCategories } from '@/app/action'
-import Loading from '../../../../components/Loading'
-import Table from '../../../../components/Table'
-import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast, ToastContainer } from 'react-toastify'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
-  DialogTitle,
-  DialogFooter
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import 'react-toastify/dist/ReactToastify.css'
-import useAdminPermission from '@/hooks/useAdminPermission'
-import { usePageHeading } from '@/contexts/PageHeadingContext'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { DotenvConfig } from '@/config/env.config'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { Edit2, Eye, Search, Trash2 } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import Loading from '../../../../components/Loading'
+import Table from '../../../../components/Table'
+import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import {
+  createScholarship,
+  deleteScholarship,
+  getAllScholarships,
+  updateScholarship
+} from './actions'
 const CKEditor = dynamic(() => import('../component/CKStable'), {
   ssr: false
 })
@@ -53,7 +52,7 @@ export default function ScholarshipManager() {
     applicationDeadline: '',
     renewalCriteria: '',
     contactInfo: '',
-    category_id: ''
+    categoryId: '' 
   })
   const [editingId, setEditingId] = useState(null)
   const [deleteId, setDeleteId] = useState(null)
@@ -152,7 +151,6 @@ export default function ScholarshipManager() {
     }
   }
 
-  // Check for 'add' query parameter and open modal
   useEffect(() => {
     const addParam = searchParams.get('add')
     if (addParam === 'true') {
@@ -168,7 +166,6 @@ export default function ScholarshipManager() {
         contactInfo: ''
       })
       setError(null)
-      // Remove query parameter from URL
       router.replace('/dashboard/scholarship', { scroll: false })
     }
   }, [searchParams, router])
@@ -181,7 +178,6 @@ export default function ScholarshipManager() {
     }
   }, [searchTimeout])
 
-  const { requireAdmin } = useAdminPermission()
 
   const loadScholarships = async (page = 1) => {
     setTableLoading(true)
@@ -204,6 +200,7 @@ export default function ScholarshipManager() {
 
         return {
           ...scholarship,
+          categoryId: scholarship?.scholarshipCategory?.id,
           eligibilityCriteria: safeJsonParse(scholarship.eligibilityCriteria),
           renewalCriteria: safeJsonParse(scholarship.renewalCriteria),
           applicationDeadline: new Date(scholarship.applicationDeadline),
@@ -215,7 +212,6 @@ export default function ScholarshipManager() {
 
       setScholarships(updatedScholarships)
 
-      console.log('Updated scholarships:', updatedScholarships)
       setPagination({
         currentPage: res.pagination.currentPage,
         totalPages: res.pagination.totalPages,
@@ -240,7 +236,7 @@ export default function ScholarshipManager() {
         amount: Number(formData.amount),
         applicationDeadline: formatDate(formData.applicationDeadline),
         author: author_id,
-        category_id: formData.category_id || null
+        categoryId: formData.categoryId || null
       }
       console.log('formatted data', formattedData)
       if (editingId) {
@@ -257,7 +253,7 @@ export default function ScholarshipManager() {
         applicationDeadline: '',
         renewalCriteria: '',
         contactInfo: '',
-        category_id: ''
+        categoryId: ''
       })
       setEditingId(null)
       setError(null)
@@ -265,8 +261,9 @@ export default function ScholarshipManager() {
       loadScholarships()
       setIsSubmitting(false)
       toast.success(
-        `Successfully ${editingId ? 'updated' : 'created'} scholarship`
+        `Scholarship ${editingId ? 'updated' : 'created'} successfully`
       )
+
     } catch (error) {
       setError(`Failed to ${editingId ? 'update' : 'create'} scholarship`)
       toast.error('Error saving scholarship:', error)
@@ -285,7 +282,7 @@ export default function ScholarshipManager() {
       applicationDeadline: formatDateForInput(scholarship.applicationDeadline),
       renewalCriteria: scholarship.renewalCriteria,
       contactInfo: scholarship.contactInfo,
-      category_id: scholarship.category_id || ''
+      categoryId: scholarship.categoryId || null
     })
     setEditingId(scholarship.id)
     setError(null)
@@ -304,15 +301,15 @@ export default function ScholarshipManager() {
       applicationDeadline: '',
       renewalCriteria: '',
       contactInfo: '',
-      category_id: ''
+      categoryId: ''
     })
   }
 
   const handleDeleteClick = (id) => {
-    requireAdmin(() => {
-      setDeleteId(id)
-      setIsDialogOpen(true)
-    }, 'You do not have permission to delete scholarships.')
+    // requireAdmin(() => {
+    setDeleteId(id)
+    setIsDialogOpen(true)
+    // }, 'You do not have permission to delete scholarships.')
   }
 
   const handleDialogClose = () => {
@@ -421,7 +418,7 @@ export default function ScholarshipManager() {
               type='text'
               value={searchQuery}
               onChange={(e) => handleSearchInput(e.target.value)}
-              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-dark-500'
               placeholder='Search scholarships...'
             />
           </div>
@@ -498,14 +495,14 @@ export default function ScholarshipManager() {
               </div>
 
               <div className='space-y-2 col-span-2'>
-                <Label htmlFor='category_id'>
+                <Label htmlFor='categoryId'>
                   Category <span className='text-red-500'>*</span>
                 </Label>
                 <select
-                  id='category_id'
-                  value={formData.category_id}
+                  id='categoryId'
+                  value={formData.categoryId}
                   onChange={(e) =>
-                    setFormData({ ...formData, category_id: e.target.value })
+                    setFormData({ ...formData, categoryId: e.target.value })
                   }
                   className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                   required
@@ -654,6 +651,13 @@ export default function ScholarshipManager() {
                   Scholarship Name
                 </Label>
                 <div className='text-lg font-medium'>{viewData.name}</div>
+              </div>
+
+              <div className='space-y-1 col-span-2'>
+                <Label className='text-muted-foreground'>
+                  Category
+                </Label>
+                <div className='text-lg font-medium'>{viewData?.scholarshipCategory?.title}</div>
               </div>
 
               <div className='space-y-1 col-span-2'>

@@ -3,9 +3,13 @@ import { DotenvConfig } from '@/config/env.config'
 
 let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs`
 
-export async function fetchBlogs(page = 1, limit = 10) {
+export async function fetchBlogs(page = 1, limit = 10, status = '') {
   try {
-    const response = await fetch(`${url}?limit=${limit}&page=${page}`, {
+    let query = `${url}?limit=${limit}&page=${page}`
+    if (status && status !== 'all') {
+      query += `&status=${status}`
+    }
+    const response = await fetch(query, {
       cache: 'no-store'
     })
     console.log(`Response: ${response}`)
