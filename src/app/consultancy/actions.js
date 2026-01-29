@@ -1,9 +1,13 @@
 import { DotenvConfig } from "@/config/env.config"
 
-export async function getConsultancies(page = 1, searchQuery = '') {
+export async function getConsultancies(page = 1, searchQuery = '', courseId = '') {
   try {
+    let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy?page=${page}&sort=desc&q=${searchQuery}&limit=15`
+    if (courseId) {
+      url += `&courseId=${courseId}`
+    }
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy?page=${page}&sort=desc&q=${searchQuery}&limit=15`,
+      url,
       {
         method: 'GET',
         headers: {
@@ -43,6 +47,30 @@ export async function getConsultancyBySlug(slugs) {
     return data.consultancy || data
   } catch (error) {
     console.error('Error fetching consultancy:', error)
+    throw error
+  }
+}
+
+export async function getCourses() {
+  try {
+    const response = await fetch(
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?limit=100`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch courses')
+    }
+
+    const data = await response.json()
+    return data.items
+  } catch (error) {
+    console.error('Error fetching courses:', error)
     throw error
   }
 }

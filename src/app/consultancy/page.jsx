@@ -4,12 +4,13 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Search, Users } from 'lucide-react'
 import EmptyState from '@/components/ui/EmptyState'
-import { getConsultancies } from './actions'
+import { getConsultancies, getCourses } from './actions'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Shimmer from '../../components/Shimmer'
 import Pagination from '../blogs/components/Pagination'
+import { Select } from '@/components/ui/select'
 
 export default function ConsultanciesPage() {
   const router = useRouter()
@@ -22,6 +23,21 @@ export default function ConsultanciesPage() {
     totalCount: 0
   })
   const [loading, setLoading] = useState(false)
+  const [courses, setCourses] = useState([])
+  const [selectedCourse, setSelectedCourse] = useState('')
+
+  // Fetch courses on mount
+  useEffect(() => {
+    const fetchCoursesData = async () => {
+      try {
+        const data = await getCourses()
+        setCourses(data)
+      } catch (err) {
+        console.error('Failed to fetch courses:', err)
+      }
+    }
+    fetchCoursesData()
+  }, [])
 
   // Debouncing logic
   useEffect(() => {
@@ -31,12 +47,12 @@ export default function ConsultanciesPage() {
     return () => clearTimeout(handler)
   }, [searchTerm])
 
-  // Reset page on search change
+  // Reset page on search or filter change
   useLayoutEffect(() => {
     setPagination((prev) =>
       prev.currentPage !== 1 ? { ...prev, currentPage: 1 } : prev
     )
-  }, [debouncedSearch])
+  }, [debouncedSearch, selectedCourse])
 
   // Fetch consultancies
   useEffect(() => {
@@ -45,7 +61,8 @@ export default function ConsultanciesPage() {
       try {
         const data = await getConsultancies(
           pagination.currentPage,
-          debouncedSearch
+          debouncedSearch,
+          selectedCourse
         )
 
         setConsultancyData(data.items)
@@ -62,7 +79,7 @@ export default function ConsultanciesPage() {
       }
     }
     fetchData()
-  }, [pagination.currentPage, debouncedSearch])
+  }, [pagination.currentPage, debouncedSearch, selectedCourse])
 
   const handleClick = (slugs) => {
     router.push(`/consultancy/${slugs}`)
@@ -91,9 +108,9 @@ export default function ConsultanciesPage() {
             </p>
           </div>
 
-          {/* Search Bar */}
-          <div className='flex justify-center mb-10 md:mb-20 w-full'>
-            <div className='relative w-full max-w-lg'>
+          {/* Filters Bar */}
+          <div className='flex flex-col md:flex-row justify-center items-center gap-4 mb-10 md:mb-20 w-full max-w-4xl mx-auto'>
+            <div className='relative w-full md:w-2/3'>
               <input
                 type='text'
                 placeholder='Search consultancy...'
@@ -102,6 +119,21 @@ export default function ConsultanciesPage() {
                 value={searchTerm}
               />
               <Search className='absolute left-4 top-3.5 h-5 w-5 text-gray-400' />
+            </div>
+
+            <div className='w-full md:w-1/3'>
+              <Select
+                value={selectedCourse}
+                onChange={(e) => setSelectedCourse(e.target.value)}
+                className='w-full px-5 py-3 h-[50px] rounded-2xl border-gray-300 focus:ring-[#0A70A7] focus:border-[#0A70A7] appearance-none cursor-pointer text-gray-700'
+              >
+                <option value=''>All Courses</option>
+                {courses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.title}
+                  </option>
+                ))}
+              </Select>
             </div>
           </div>
 
