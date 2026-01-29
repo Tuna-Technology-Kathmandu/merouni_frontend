@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { getNewsBySlug, getRelatedNews } from '../action'
+import services from '@/app/apiService'
 import Navbar from '../../../components/Frontpage/Navbar'
 import Footer from '../../../components/Frontpage/Footer'
 import Header from '../../../components/Frontpage/Header'
@@ -22,7 +22,9 @@ const NewsDetailsPage = ({ params }) => {
       try {
         const resolvedParams = await params
         const slugs = resolvedParams.slugs
-        const newsData = await getNewsBySlug(slugs)
+        console.log('Fetching blog with slug:', slugs)
+        const newsData = await services.blogs.getBySlug(slugs)
+        console.log('Blog API response:', newsData)
 
         setNews(newsData.blog || null) // Set eventData directly
         // setRelatedNews(allNews);

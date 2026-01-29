@@ -1,3 +1,4 @@
+import { DotenvConfig } from '@/config/env.config'
 import { useEffect, useState } from 'react'
 
 const Banner = () => {

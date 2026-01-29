@@ -8,6 +8,7 @@ import Description from './components/Description'
 import Cardlist from './components/Cardlist'
 import Loading from '../../../components/Loading'
 import Banner from '@/app/blogs/[slugs]/components/Banner'
+import { DotenvConfig } from '@/config/env.config'
 
 // Client-side fetch functions to replace server actions
 const fetchEventBySlug = async (slug) => {
@@ -104,22 +105,25 @@ const EventDetailsPage = ({ params }) => {
   // if (!event) return <div>No event found</div>;
 
   return (
-    <div>
+    <div className='bg-white min-h-screen'>
       <Header />
       <Navbar />
       {loading ? (
-        <Loading />
+        <div className='min-h-[60vh] flex items-center justify-center'>
+          <Loading />
+        </div>
       ) : (
-        <>
+        <main className='animate-in fade-in duration-700'>
           <Hero event={event} />
-          <div className='px-16 max-sm:px-9 max-w-[1600px] pt-10 mx-auto'>
+
+          <div className='max-w-[1200px] mx-auto px-6 py-10'>
             <Banner />
           </div>
-          <div className=' px-16 max-sm:px-9 max-w-[1600px] mx-auto mt-12'>
-            <Description event={event} />
-          </div>
+
+          <Description event={event} />
+
           <Cardlist events={relatedEvents} />
-        </>
+        </main>
       )}
 
       <Footer />

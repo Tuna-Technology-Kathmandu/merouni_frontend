@@ -46,7 +46,9 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
       dispatch(removeUser())
       localStorage.removeItem('access_token')
       localStorage.removeItem('refreshToken')
-      router.replace('/sign-in')
+      localStorage.clear()
+      // router.replace('/sign-in')
+      window.location.href = '/sign-in'
     }
 
     try {

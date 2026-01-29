@@ -7,7 +7,7 @@ import Footer from '../../components/Frontpage/Footer'
 import Latest from './components/Latest'
 import FeaturedBlogs from './components/FeaturedBlogs'
 import BlogFilters from './components/BlogFilters'
-import { getBlogs, getCategories } from '@/app/action'
+import services from '@/app/apiService'
 
 const Blogs = () => {
   // State
@@ -40,7 +40,12 @@ const Blogs = () => {
     setError(null)
     try {
       const catParam = category === 'all' ? '' : category
-      const response = await getBlogs(page, catParam, search)
+      const params = {
+        page,
+        category_title: catParam,
+        q: search
+      }
+      const response = await services.blogs.getAll(params)
 
       if (response && response.items) {
         setBlogs(response.items)
@@ -66,7 +71,7 @@ const Blogs = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await getCategories()
+      const response = await services.category.getAll()
       if (response && response.items) {
         setCategories([{ id: 'all', title: 'All' }, ...response.items])
       }

@@ -58,6 +58,24 @@ class ApiService {
     }
   }
 
+  async getBySlug(slug, params = {}) {
+    try {
+      const url = this.buildUrl(`${this.baseUrl}/${slug}`, params)
+      const response = await fetch(url, {
+        cache: 'no-store'
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('API error:', error)
+      throw new Error(`Failed to fetch item with slug ${slug}`)
+    }
+  }
+
   async create(data) {
     try {
       const response = await fetch(this.baseUrl, {

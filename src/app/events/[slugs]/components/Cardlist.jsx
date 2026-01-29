@@ -1,31 +1,29 @@
 import React from 'react'
-import EventCard from './Cards' // Import the EventCard component
+import EventCard from '@/components/Frontpage/EventCard'
 import Link from 'next/link'
-const Cardlist = ({ events }) => {
-  return (
-    <div className=' px-16 max-sm:px-9 max-w-[1600px] mx-auto bg-[#E7E7E7] p-8 mt-20 rounded-md '>
-      <div className='max-w-full md:max-w-[1600px] md:mx-auto'>
-        <h1 className='text-2xl text-center font-bold mb-7'>
-          Other Events You make Like
-        </h1>
-        <div className='w-full grid grid-cols-4 gap-7 max-[1265px]:grid-cols-3 max-[795px]:grid-cols-2 max-[513px]:grid-cols-1 '>
-          {events.map((event) => {
-            const eventHost = JSON.parse(event.event_host)
-            const startDate = new Date(eventHost.start_date)
 
-            return (
-              <Link href={`/events/${event.slugs}`} key={event.id}>
-                <EventCard
-                  key={event.id}
-                  photo={event.image} // Use the event image or fallback
-                  month={startDate.toLocaleString('default', { month: 'long' })} // Get the month in text
-                  day={startDate.getDate()} // Get the day of the month
-                  title={event.title}
-                  description={event.description}
-                />
-              </Link>
-            )
-          })}
+const Cardlist = ({ events }) => {
+  if (!events || events.length === 0) return null
+
+  return (
+    <div className='bg-gray-50 border-t border-gray-100 mt-20'>
+      <div className='max-w-[1200px] mx-auto px-6 py-20'>
+        <div className='flex items-center justify-between mb-10'>
+          <h2 className='text-2xl font-black text-gray-900'>Related Events</h2>
+          <Link
+            href='/events'
+            className='text-sm font-bold text-[#0A6FA7] hover:underline'
+          >
+            View All Events
+          </Link>
+        </div>
+
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
+          {events.slice(0, 4).map((event) => (
+            <Link href={`/events/${event.slugs}`} key={event.id} className='h-full'>
+              <EventCard event={event} />
+            </Link>
+          ))}
         </div>
       </div>
     </div>

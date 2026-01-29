@@ -15,23 +15,29 @@ import Header from '../../components/Frontpage/Header'
 import Link from 'next/link'
 import Loading from '../../components/Loading'
 import Pagination from '../blogs/components/Pagination'
+import { Select } from '@/components/ui/select'
+import { getColleges } from '../action'
 import { debounce } from 'lodash'
 import useMediaQuery from './MediaQuery'
 import { DotenvConfig } from '@/config/env.config'
 
 // Client-side fetch functions to replace server actions
-const fetchEvents = async (page = 1) => {
+const fetchEvents = async (page = 1, collegeId = '') => {
   try {
-    const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event?page=${page}&limit=9`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        cache: 'no-store'
-      }
-    )
+    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event`)
+    url.searchParams.append('page', page)
+    url.searchParams.append('limit', 12)
+    if (collegeId) {
+      url.searchParams.append('college_id', collegeId)
+    }
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
 
     if (!response.ok) {
       throw new Error(`Failed to fetch events: ${response.statusText}`)
@@ -43,18 +49,21 @@ const fetchEvents = async (page = 1) => {
   }
 }
 
-const searchEvent = async (query) => {
+const searchEvent = async (query, collegeId = '') => {
   try {
-    const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event?q=${encodeURIComponent(query)}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        cache: 'no-store'
-      }
-    )
+    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event`)
+    url.searchParams.append('q', query)
+    if (collegeId) {
+      url.searchParams.append('college_id', collegeId)
+    }
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
 
     if (!response.ok) {
       throw new Error(`Failed to search events: ${response.statusText}`)
@@ -67,18 +76,18 @@ const searchEvent = async (query) => {
   }
 }
 
-const fetchThisWeekEvents = async () => {
+const fetchThisWeekEvents = async (collegeId = '') => {
   try {
-    const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/this-week`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        cache: 'no-store'
-      }
-    )
+    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event/this-week`)
+    if (collegeId) url.searchParams.append('college_id', collegeId)
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
 
     if (!response.ok) {
       throw new Error("Failed to fetch this week's events")
@@ -90,18 +99,18 @@ const fetchThisWeekEvents = async () => {
   }
 }
 
-const fetchNextWeekEvents = async () => {
+const fetchNextWeekEvents = async (collegeId = '') => {
   try {
-    const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/next-month`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        cache: 'no-store'
-      }
-    )
+    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event/next-month`)
+    if (collegeId) url.searchParams.append('college_id', collegeId)
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
 
     if (!response.ok) {
       throw new Error("Failed to fetch next week's events")
@@ -123,27 +132,41 @@ const Events = () => {
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
-    totalCount: 1
+    totalCount: 0
   })
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const isMobile = useMediaQuery('(max-width: 767px)')
 
   const [allLoading, setAllLoading] = useState(false)
+  const [colleges, setColleges] = useState([])
+  const [selectedCollege, setSelectedCollege] = useState('')
+
+  useEffect(() => {
+    const fetchCollegesData = async () => {
+      try {
+        const data = await getColleges(null, null, 999, 1)
+        setColleges(data.items || [])
+      } catch (err) {
+        console.error('Failed to fetch colleges:', err)
+      }
+    }
+    fetchCollegesData()
+  }, [])
 
   useEffect(() => {
     // Only run on client side
     if (typeof window === 'undefined') return
 
     if (!searchQuery) {
-      loadEvents(pagination.currentPage)
+      loadEvents(pagination.currentPage, selectedCollege)
     }
-  }, [pagination.currentPage, searchQuery])
+  }, [pagination.currentPage, searchQuery, selectedCollege])
 
-  const loadEvents = async (page = 1) => {
+  const loadEvents = async (page = 1, collegeId = '') => {
     try {
       setAllLoading(true)
-      const response = await fetchEvents(page)
+      const response = await fetchEvents(page, collegeId)
       const events = response.items || []
       setAllEvents(events)
       setPagination({
@@ -152,20 +175,17 @@ const Events = () => {
         totalCount: response.pagination?.totalCount || 0
       })
 
-      // Filter events for different sections
-      const thisWeek = await fetchThisWeekEvents()
-      const nextWeek = await fetchNextWeekEvents()
-      const featured = thisWeek.events?.[0] || null // First event as featured
+      // Fetch specific sections with college filtering
+      const thisWeek = await fetchThisWeekEvents(collegeId)
+      const nextWeek = await fetchNextWeekEvents(collegeId)
 
-      // Parse the event_host data for the featured event
-      const eventHost = featured?.event_host
-        ? JSON.parse(featured.event_host)
-        : null
-      //featured.eventHost = eventHost; // Attach the parsed eventHost to the featuredEvent
-
-      setFeaturedEvent(featured)
+      // Update states
       setThisWeekEvents(thisWeek.events || [])
       setNextWeekEvents(nextWeek.events || [])
+
+      const featured = thisWeek.events?.[0] || events[0] || null
+      setFeaturedEvent(featured)
+
     } catch (error) {
       setError('Failed to load Events')
       console.error('Error loading events:', error)
@@ -193,7 +213,7 @@ const Events = () => {
       if (query) {
         setIsSearching(true)
         try {
-          const results = await searchEvent(query)
+          const results = await searchEvent(query, selectedCollege)
           setAllEvents(results.items || [])
           setPagination(
             results.pagination || {
@@ -355,35 +375,80 @@ const Events = () => {
             <div className='flex flex-col min-[1330px]:flex-row gap-6 min-[1330px]:gap-12 items-center min-[1330px]:items-start max-sm:px-9'>
               {/* Left Section - Filters & Archive */}
               <div className='w-full lg:w-1/4 space-y-6 min-[1330px]:space-y-8'>
-                {/* Heading */}
-                <h1 className='text-2xl md:text-3xl font-bold text-[#0A6FA7] text-center min-[1330px]:text-left'>
-                  All Events
-                </h1>
+                <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
+                  <h2 className='text-xl font-bold text-gray-900 mb-6'>Filters</h2>
 
-                {/* Search Bar */}
-                <div className='relative'>
-                  <div className='relative flex items-center'>
-                    <input
-                      type='text'
-                      placeholder='Search Events...'
-                      className='w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] focus:border-transparent'
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                    />
-                    <IoIosSearch className='absolute right-3 text-gray-400 text-xl' />
-                  </div>
-                  {isSearching && (
-                    <div className='absolute right-3 top-3.5'>
-                      <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-[#0A6FA7]'></div>
+                  {/* Search Bar */}
+                  <div className='space-y-4'>
+                    <div className='group'>
+                      <label className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block'>Search</label>
+                      <div className='relative flex items-center'>
+                        <input
+                          type='text'
+                          placeholder='Search events...'
+                          className='w-full pl-4 pr-10 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] focus:border-transparent transition-all'
+                          value={searchQuery}
+                          onChange={handleSearchChange}
+                        />
+                        <IoIosSearch className='absolute right-3 text-gray-400 text-xl group-focus-within:text-[#0A6FA7] transition-colors' />
+                      </div>
                     </div>
-                  )}
+
+                    {/* College Filter */}
+                    <div className='group'>
+                      <label className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block'>Institution</label>
+                      <div className='relative'>
+                        <select
+                          value={selectedCollege}
+                          onChange={(e) => {
+                            setSelectedCollege(e.target.value)
+                            setPagination(prev => ({ ...prev, currentPage: 1 }))
+                          }}
+                          className='w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] focus:border-transparent transition-all appearance-none bg-white text-sm font-medium'
+                        >
+                          <option value=''>All Institutions</option>
+                          {colleges.map((college) => (
+                            <option key={college.id} value={college.id}>
+                              {college.name}
+                            </option>
+                          ))}
+                        </select>
+                        <div className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400'>
+                          <IoIosArrowDroprightCircle className='rotate-90' />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Reset Button */}
+                    {(selectedCollege || searchQuery) && (
+                      <button
+                        onClick={() => {
+                          setSelectedCollege('')
+                          setSearchQuery('')
+                          setPagination(prev => ({ ...prev, currentPage: 1 }))
+                        }}
+                        className='w-full py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 transition-colors'
+                      >
+                        Reset All Filters
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* Right Section - Events Grid */}
               <div className='w-full lg:w-3/4'>
+                <div className='flex items-center justify-between mb-8'>
+                  <h2 className='text-2xl font-bold text-gray-900'>
+                    {selectedCollege ? colleges.find(c => c.id === selectedCollege)?.name + ' Events' : 'All Events'}
+                  </h2>
+                  <div className='text-sm text-gray-500 font-medium'>
+                    Showing {allEvents.length} of {pagination.totalCount} events
+                  </div>
+                </div>
+
                 {/* Responsive Grid */}
-                <div className='grid grid-cols-1 sm:grid-cols-2 min-[1330px]:grid-cols-3 gap-4 md:gap-6'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 min-[1330px]:grid-cols-3 gap-6 md:gap-8'>
                   {allLoading ? (
                     [...Array(6)].map((_, i) => (
                       <div

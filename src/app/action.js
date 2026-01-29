@@ -1,5 +1,6 @@
 'use server'
 
+import { buildQueryString } from '@/lib/queryString'
 import { DotenvConfig } from '../config/env.config'
 import services from './apiService'
 
@@ -105,14 +106,26 @@ export async function getEvents(page) {
 }
 
 //Blogs actions
-export async function getBlogs(page, category_title, search) {
-  // const q = `page=${queryParams}`;
+//Blogs actions
+export async function getBlogs(page, category_title = '', search = '') {
   const params = {
     page,
     category_title,
     q: search
   }
-  return services.blogs.getAll(params)
+  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs?${new URLSearchParams(params).toString()}`
+  return fetch(url, {
+    cache: 'no-store'
+  })
+}
+
+export async function getBlogBySlug(slug) {
+  return services.blogs.getById(slug)
+}
+
+export async function getRelatedBlogs() {
+  // Assuming related blogs are just a list of blogs for now, similar to how it was implemented
+  return services.blogs.getAll({ limit: 4 })
 }
 
 // Vacancies actions
@@ -123,8 +136,8 @@ export async function getVacancies(page, category_title, search) {
     q: search
   }
   return await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy?limit=10&page=${page}`
-        )
+    `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy?limit=10&page=${page}`
+  )
 }
 
 // News actions
@@ -134,10 +147,10 @@ export async function getNews(page, category_title, search) {
     category_title,
     q: search
   }
-  
+
   return await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/news?limit=10&page=${page}`
-        )
+    `${DotenvConfig.NEXT_APP_API_BASE_URL}/news?limit=10&page=${page}`
+  )
 }
 
 // get ranking
@@ -176,13 +189,22 @@ export async function getColleges(
   limit = 10,
   page = 1
 ) {
-  const params = {
+
+    const query = buildQueryString({
     limit,
     page,
     isFeatured,
-    pinned
-  }
-  return services.college.getAll(params)
+    pinned,
+  })
+
+  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college${
+    query ? `?${query}` : ''
+  }`
+
+
+  return fetch(url, {
+    cache: 'no-store'
+  })
 }
 
 export async function getFilteredPinFeatColleges(
@@ -204,17 +226,41 @@ export async function getFilteredPinFeatColleges(
     params.pinned = !!pinned
   }
 
-  return services.college.getAll(params)
+    const query = buildQueryString({
+    limit,
+    page,
+    isFeatured,
+    pinned,
+  })
+
+  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college${
+    query ? `?${query}` : ''
+  }`
+
+
+  return fetch(url, {
+    cache: 'no-store'
+  })
 }
 
 // exams section
 
 export async function getExams(limit, page) {
-  const params = {
+  const query = buildQueryString({
     limit,
-    page
-  }
-  return services.exam.getAll(params)
+    page,
+    isFeatured,
+    pinned,
+  })
+
+  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/exam${
+    query ? `?${query}` : ''
+  }`
+
+
+  return fetch(url, {
+    cache: 'no-store'
+  })
 }
 
 export async function getBannerById(id) {

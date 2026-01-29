@@ -1,12 +1,10 @@
 import GoogleMap from '@/app/colleges/[slugs]/components/GoogleMap'
 import React from 'react'
-// import { FaRegFaceLaugh } from 'react-icons/fa6'
-// import { FaRegFaceAngry } from 'react-icons/fa6'
-// import { FaRegSadCry } from 'react-icons/fa'
-// import { AiOutlineLike } from 'react-icons/ai'
+import { FaUser, FaCalendarAlt, FaClock, FaMapMarkerAlt } from 'react-icons/fa'
 
 const Description = ({ event }) => {
-  // Function to wrap tables in a scrollable container
+  const hostData = event?.event_host ? (typeof event.event_host === 'string' ? JSON.parse(event.event_host) : event.event_host) : {}
+
   const processContent = (html) => {
     if (!html) return ''
     return html.replace(
@@ -15,153 +13,88 @@ const Description = ({ event }) => {
     )
   }
 
+  const MetaItem = ({ label, value }) => (
+    <div className='flex flex-col border-b border-gray-100 py-4 last:border-0'>
+      <span className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-1'>{label}</span>
+      <span className='text-base font-medium text-gray-900'>{value || 'N/A'}</span>
+    </div>
+  )
+
+  const formatTime = (time) => {
+    if (!time) return 'N/A'
+    try {
+      return new Date(`1970-01-01T${time}:00`).toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true
+      })
+    } catch (e) {
+      return time
+    }
+  }
+
   return (
-    <>
-      <div className='w-full'>
-        <div className='text-xl font-bold'>Description</div>
-        <div
-          className='text-[13px] mt-4 leading-7 max-md:leading-5 md:text-sm lg:text-base text-justify'
-          dangerouslySetInnerHTML={{ __html: event?.description }}
-        />
+    <div className='max-w-[1000px] mx-auto px-6 py-12'>
+      <div className='flex flex-col lg:flex-row gap-16'>
+        {/* Main Content */}
+        <div className='flex-1 space-y-12'>
+          <section>
+            <h2 className='text-2xl font-bold text-gray-900 mb-6'>About Event</h2>
+            <div
+              className='text-gray-600 leading-relaxed text-lg prose prose-gray max-w-none'
+              dangerouslySetInnerHTML={{ __html: event?.description }}
+            />
+          </section>
 
-        <div className='text-[13px] my-6 leading-7 max-md:leading-5 md:text-sm grid grid-cols-4 gap-7 max-[569px]:grid-cols-2 '>
-          <div className='flex justify-between items-center flex-col gap-1 p-3 bg-green-50 shadow-[0_0_10px_2px_rgba(0,0,0,0.1)] '>
-            <p className='font-medium'>Host</p>
-            <p>{event?.event_host?.host}</p>
-          </div>
-          <div className='flex justify-between items-center flex-col gap-1 p-3 bg-green-50 shadow-[0_0_10px_2px_rgba(0,0,0,0.1)]'>
-            <p className='font-medium'>Start Date</p>
-            <p>{event?.event_host?.start_date}</p>
-          </div>
-          <div className='flex justify-between items-center flex-col gap-1 p-3 bg-green-50 shadow-[0_0_10px_2px_rgba(0,0,0,0.1)]'>
-            <p className='font-medium'>End Date</p>
-            <p>{event?.event_host?.end_date}</p>
-          </div>
-          <div className='flex justify-between items-center flex-col gap-1 p-3 bg-green-50 shadow-[0_0_10px_2px_rgba(0,0,0,0.1)]'>
-            <p className='font-medium'>Time</p>
-            {new Date(
-              `1970-01-01T${event.event_host.time}:00`
-            ).toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: 'numeric',
-              hour12: true
-            })}
-          </div>
+          {event?.content && (
+            <section>
+              <div
+                className='text-gray-600 leading-relaxed prose prose-gray max-w-none 
+                [&_.table-wrapper]:overflow-x-auto
+                [&_.table-wrapper]:my-8
+                [&_table]:w-full
+                [&_table]:border-collapse
+                [&_th]:bg-gray-50
+                [&_th]:text-left
+                [&_th]:font-semibold
+                [&_th]:p-4
+                [&_th]:text-gray-900
+                [&_td]:p-4
+                [&_td]:border-t
+                [&_td]:border-gray-100'
+                dangerouslySetInnerHTML={{ __html: processContent(event?.content) }}
+              />
+            </section>
+          )}
         </div>
 
-        <div
-          className='text-[13px] md:text-sm text-justify lg:text-base mt-4 !leading-7 
-          [&_ul]:list-disc 
-          [&_ol]:list-decimal 
-          [&_li]:ml-10 
-          [&_li]:mb-1 
-          [&_li]:mt-1 
-          !max-w-none 
-          text-black
-          
-          /* Table wrapper styles */
-          [&_.table-wrapper]:overflow-x-auto
-          [&_.table-wrapper]:my-4
-          [&_.table-wrapper]:w-full
-          [&_.table-wrapper]:[scrollbar-width:thin]
-          [&_.table-wrapper]:[scrollbar-color:gray-300_transparent]
-          
-          /* Table styles */
-          [&_table]:min-w-full
-          [&_table]:border-collapse
-          [&_th]:bg-gray-100
-          [&_th]:p-2
-          [&_th]:text-left
-          [&_th]:border
-          [&_th]:border-gray-300
-          [&_td]:p-2
-          [&_td]:border
-          [&_td]:border-gray-300
-          [&_tr:nth-child(even)]:bg-gray-50'
-          dangerouslySetInnerHTML={{ __html: processContent(event?.content) }}
-        />
+        {/* Sidebar */}
+        <div className='lg:w-80 space-y-10'>
+          <div className='bg-gray-50 rounded-2xl p-8'>
+            <h3 className='text-sm font-bold text-gray-900 uppercase tracking-widest mb-6 border-b border-gray-200 pb-4'>Event Details</h3>
+            <div className='flex flex-col'>
+              <MetaItem label='Host' value={hostData?.host} />
+              <MetaItem label='Start Date' value={hostData?.start_date} />
+              <MetaItem label='End Date' value={hostData?.end_date} />
+              <MetaItem label='Time' value={formatTime(hostData?.time)} />
+            </div>
+          </div>
+
+          {hostData?.map_url && (
+            <div>
+              <h3 className='text-sm font-bold text-gray-900 uppercase tracking-widest mb-4 flex items-center gap-2'>
+                <FaMapMarkerAlt className='text-gray-400' />
+                Location
+              </h3>
+              <div className='w-full h-56 rounded-2xl overflow-hidden bg-gray-100'>
+                <GoogleMap mapUrl={hostData.map_url} />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-
-      {event?.event_host?.map_url && (
-        <div className='mt-7 w-full h-52 tw:max-[938px]:h-40 '>
-          <h1 className='text-xl font-bold mb-4'>Location</h1>
-          <GoogleMap mapUrl={event?.event_host?.map_url} />
-        </div>
-      )}
-    </>
+    </div>
   )
 }
 
 export default Description
-
-// import React from 'react'
-// import DOMPurify from 'dompurify'
-
-// const Description = ({ event }) => {
-//   // Function to wrap tables in a scrollable container
-//   const processContent = (html) => {
-//     if (!html) return ''
-//     const cleanHTML = DOMPurify.sanitize(html)
-//     return cleanHTML.replace(
-//       /<table([^>]*)>([\s\S]*?)<\/table>/g,
-//       '<div class="table-wrapper"><table$1>$2</table></div>'
-//     )
-//   }
-
-//   return (
-//     <div className='ml-4 mt-4 flex flex-col md:flex-row max-w-full md:max-w-[1600px] md:mx-auto items-start'>
-//       {/* Description Section */}
-//       <div className='mb-6 w-full md:w-1/2'>
-//         <h2 className='text-2xl font-bold'>Description</h2>
-//         <p className='text-base mt-2 leading-8'>{event?.description}</p>
-
-//         <div className='prose prose-sm sm:prose lg:prose-lg xl:prose-xl prose-slate max-w-full'>
-//           <div
-//             dangerouslySetInnerHTML={{ __html: processContent(event?.content) }}
-//             className='[&_.table-wrapper]:overflow-x-auto
-//                       [&_.table-wrapper]:my-4
-//                       [&_.table-wrapper]:w-full
-//                       [&_.table-wrapper]:[scrollbar-width:thin]
-//                       [&_.table-wrapper]:[scrollbar-color:gray-300_transparent]
-
-//                       [&_table]:min-w-full
-//                       [&_table]:border-collapse
-//                       [&_th]:bg-gray-100
-//                       [&_th]:p-2
-//                       [&_th]:text-left
-//                       [&_th]:border
-//                       [&_th]:border-gray-300
-//                       [&_td]:p-2
-//                       [&_td]:border
-//                       [&_td]:border-gray-300
-//                       [&_tr:nth-child(even)]:bg-gray-50'
-//           />
-//         </div>
-//       </div>
-
-//       {/* Event Location Section */}
-//       <div className='mb-6 w-full md:w-1/3 md:ml-auto md:mr-20 flex flex-col'>
-//         <h2 className='text-2xl font-bold my-6 md:my-0'>Event Location</h2>
-
-//         {/* Render map HTML if available */}
-//         {event?.event_host?.map_url && (
-//           <div
-//             className='mt-2 rounded-md w-full h-[300px] md:h-[350px]'
-//             style={{
-//               minWidth: '300px',
-//               maxWidth: '100%',
-//               overflow: 'hidden'
-//             }}
-//             dangerouslySetInnerHTML={{ __html: event.event_host.map_url }}
-//           />
-//         )}
-
-//         <p className='text-xl font-sm mt-4 text-center'>
-//           {event?.event_host?.host}
-//         </p>
-//       </div>
-//     </div>
-//   )
-// }
-
-// export default Description

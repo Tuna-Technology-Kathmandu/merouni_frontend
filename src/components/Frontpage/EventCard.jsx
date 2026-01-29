@@ -1,49 +1,54 @@
 import React from 'react'
 
 const EventCard = ({ event }) => {
-  let events = {
-    description:
-      'This is test. Explore diverse fields of study to find the best fit for your academic and career goals test test test test test test test test test test test'
-  }
-  // console.log("Month and day in event card:", event_host.start_date, day);
   let month = ''
   let day = ''
   try {
-    const { start_date } = JSON.parse(event.event_host)
-    const dateObj = new Date(start_date)
-    month = dateObj.toLocaleString('en-US', { month: 'short' }) // e.g., "Feb"
-    day = dateObj.getDate() // e.g., 15
+    const hostData = event.event_host ? (typeof event.event_host === 'string' ? JSON.parse(event.event_host) : event.event_host) : {}
+    const { start_date } = hostData
+    if (start_date) {
+      const dateObj = new Date(start_date)
+      month = dateObj.toLocaleString('en-US', { month: 'short' })
+      day = dateObj.getDate()
+    }
   } catch (error) {
     console.error('Error parsing event_host:', error)
   }
+
+  const collegeName = event.college?.name || event.institution_name || ''
+
   return (
-    <div className='sm:h-[350px] h-[320px] rounded-2xl  shadow-md border border-gray-300  '>
-      {/* <!-- Top Section: Image --> */}
-      {/* <div className="flex justify-center mb-4"> */}
-      <div className='h-[200px]'>
+    <div className='h-full flex flex-col rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 bg-white transition-all duration-300 overflow-hidden'>
+      {/* Top Section: Image */}
+      <div className='relative h-[180px] overflow-hidden'>
         <img
           src={event?.image || '/images/events.webp'}
-          alt={`${event.title} logo`}
-          className='w-full h-full object-cover rounded-t-2xl'
+          alt={event.title}
+          className='w-full h-full object-cover transition-transform duration-500 hover:scale-110'
         />
+        {collegeName && (
+          <div className='absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm'>
+            <p className='text-[10px] font-bold text-[#0A6FA7] uppercase tracking-wider'>{collegeName}</p>
+          </div>
+        )}
       </div>
 
-      <div className='flex items-start space-x-3 p-1'>
-        {/* Month and Day */}
-        <div className='flex flex-col items-center '>
-          <p className='text-blue-600 text-xl font-bold p-2'>{month}</p>
-          <p className='text-lg font-extrabold text-gray-700 p-2'>{day}</p>
+      <div className='flex items-start gap-4 p-5 flex-1'>
+        {/* Date Section */}
+        <div className='flex flex-col items-center justify-center min-w-[50px] h-[60px] bg-gray-50 rounded-xl border border-gray-100'>
+          <p className='text-[#0A6FA7] text-xs font-bold uppercase'>{month}</p>
+          <p className='text-xl font-black text-gray-800 leading-none'>{day}</p>
         </div>
 
-        {/* Title and Description */}
-        <div className='flex-1'>
-          <h3 className='text-lg font-bold text-gray-900 p-2'>
-            {event.title.slice(0, 15) + '...'}
+        {/* Info Section */}
+        <div className='flex-1 flex flex-col'>
+          <h3 className='text-base font-bold text-gray-900 line-clamp-2 leading-tight mb-2 hover:text-[#0A6FA7] transition-colors'>
+            {event.title}
           </h3>
-          <p
-            className='text-gray-700 text-sm p-2 '
+          <div
+            className='text-gray-500 text-xs line-clamp-3 leading-relaxed'
             dangerouslySetInnerHTML={{
-              __html: events?.description.slice(0, 80) + '...' || ''
+              __html: event.description || ''
             }}
           />
         </div>

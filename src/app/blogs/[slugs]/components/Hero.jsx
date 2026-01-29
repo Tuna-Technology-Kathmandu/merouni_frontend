@@ -55,8 +55,8 @@ const Hero = ({ news }) => {
           </p>
         </div>
         <div className='font-medium text-[12px] my-2 text-black/70'>
-          By {news.newsAuthor.firstName} {news.newsAuthor.middleName || ''}{' '}
-          {news.newsAuthor.lastName}
+          By {news?.newsAuthor?.firstName} {news?.newsAuthor?.middleName || ''}{' '}
+          {news?.newsAuthor?.lastName}
         </div>
 
         {news.featuredImage && (
