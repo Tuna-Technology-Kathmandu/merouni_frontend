@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 import { DotenvConfig } from '@/config/env.config'
-import { Label } from '@/components/ui/label'
+import { Label } from '@/ui/shadcn/label'
 import { cn } from '@/app/lib/utils'
 
 const FileUpload = ({
@@ -141,7 +141,9 @@ const FileUpload = ({
                     disabled={isUploading}
                   />
                 </label>
-                <span className='text-muted-foreground ml-1'>or drag and drop</span>
+                <span className='text-muted-foreground ml-1'>
+                  or drag and drop
+                </span>
               </div>
             </div>
           )}
@@ -149,7 +151,9 @@ const FileUpload = ({
           {isUploading && (
             <div className='flex flex-col items-center animate-in fade-in duration-300'>
               <Loader2 className='h-8 w-8 text-primary animate-spin mb-3' />
-              <span className='text-sm font-medium text-muted-foreground'>Uploading...</span>
+              <span className='text-sm font-medium text-muted-foreground'>
+                Uploading...
+              </span>
             </div>
           )}
 

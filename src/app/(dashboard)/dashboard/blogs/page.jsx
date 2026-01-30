@@ -5,8 +5,8 @@ import { useForm } from 'react-hook-form'
 import { fetchBlogs, fetchTags } from './action'
 import { getCategories } from '@/app/action'
 import { authFetch } from '@/app/utils/authFetch'
-import Loader from '../../../../components/Loading'
-import Table from '../../../../components/Table'
+import Loader from '../../../../ui/molecules/Loading'
+import Table from '../../../../ui/molecules/Table'
 import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -14,12 +14,12 @@ import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../components/UserModal'
+import { Modal } from '../../../../ui/molecules/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Button } from '../../../../components/ui/button'
-import { Input } from '../../../../components/ui/input'
-import { Label } from '../../../../components/ui/label'
+import { Button } from '../../../../ui/shadcn/button'
+import { Input } from '../../../../ui/shadcn/input'
+import { Label } from '../../../../ui/shadcn/label'
 import { DotenvConfig } from '@/config/env.config'
 
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
@@ -637,9 +637,9 @@ export default function BlogsManager() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className='w-40 px-3 py-2 text-sm border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-white'
             >
-              <option value="all">All Status</option>
-              <option value="published">Published</option>
-              <option value="draft">Draft</option>
+              <option value='all'>All Status</option>
+              <option value='published'>Published</option>
+              <option value='draft'>Draft</option>
             </select>
           </div>
           {/* Button */}
@@ -812,7 +812,9 @@ export default function BlogsManager() {
 
                 {/* Media */}
                 <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>Featured Image </h2>
+                  <h2 className='text-xl font-semibold mb-4'>
+                    Featured Image{' '}
+                  </h2>
                   <FileUpload
                     label='Blog Image'
                     onUploadComplete={(url) => {
@@ -929,20 +931,22 @@ export default function BlogsManager() {
               <div className='flex gap-2 mt-2'>
                 {viewNewsData.status && (
                   <span
-                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${viewNewsData.status === 'published'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-yellow-100 text-yellow-800'
-                      }`}
+                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
+                      viewNewsData.status === 'published'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}
                   >
                     {viewNewsData.status}
                   </span>
                 )}
                 {viewNewsData.visibility && (
                   <span
-                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${viewNewsData.visibility === 'public'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-gray-100 text-gray-800'
-                      }`}
+                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
+                      viewNewsData.visibility === 'public'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}
                   >
                     {viewNewsData.visibility}
                   </span>

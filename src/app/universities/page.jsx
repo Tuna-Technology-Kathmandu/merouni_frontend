@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { fetchUniversities } from './actions'
 import { Search, GraduationCap } from 'lucide-react'
-import EmptyState from '@/components/ui/EmptyState'
+import EmptyState from '@/ui/shadcn/EmptyState'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
@@ -39,12 +39,13 @@ const UniversityPage = () => {
         setPagination((prev) => ({
           ...prev,
           totalPages: response.pagination ? response.pagination.totalPages : 1, // Handle potential missing pagination
-          totalCount: response.pagination ? response.pagination.totalCount : response.items.length
+          totalCount: response.pagination
+            ? response.pagination.totalCount
+            : response.items.length
         }))
       } else {
         setUniversities([])
       }
-
     } catch (error) {
       console.error('Error:', error)
       setUniversities([])
@@ -126,12 +127,12 @@ const UniversityPage = () => {
               action={
                 searchTerm
                   ? {
-                    label: 'Clear Search',
-                    onClick: () => {
-                      setSearchTerm('')
-                      loadUniversity(1)
+                      label: 'Clear Search',
+                      onClick: () => {
+                        setSearchTerm('')
+                        loadUniversity(1)
+                      }
                     }
-                  }
                   : null
               }
             />

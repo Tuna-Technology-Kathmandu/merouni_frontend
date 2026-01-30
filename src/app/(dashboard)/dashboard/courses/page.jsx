@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic'
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
-import Table from '../../../../components/Table'
+import Table from '../../../../ui/molecules/Table'
 import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
@@ -13,15 +13,11 @@ import { fetchFaculties } from './action'
 import { useDebounce } from 'use-debounce'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { Button } from '../../../../components/ui/button'
-import { Input } from '../../../../components/ui/input'
-import { Label } from '../../../../components/ui/label'
-import {
-  Dialog,
-  DialogHeader,
-  DialogTitle
-} from '../../../../components/ui/dialog'
-import { Modal } from '../../../../components/UserModal'
+import { Button } from '../../../../ui/shadcn/button'
+import { Input } from '../../../../ui/shadcn/input'
+import { Label } from '../../../../ui/shadcn/label'
+import { Dialog, DialogHeader, DialogTitle } from '../../../../ui/shadcn/dialog'
+import { Modal } from '../../../../ui/molecules/UserModal'
 import { DotenvConfig } from '@/config/env.config'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false

@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import MaterialItem from './MaterialItem'
-import { CardSkeleton } from '@/components/ui/CardSkeleton'
+import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 
 const MaterialsGrid = ({ materials, loading }) => {
   if (loading) {

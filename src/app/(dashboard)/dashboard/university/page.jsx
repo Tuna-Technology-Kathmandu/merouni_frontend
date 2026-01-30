@@ -5,12 +5,12 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle
-} from '../../../../components/ui/dialog'
+} from '../../../../ui/shadcn/dialog'
 import { useState, useEffect } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
-import Table from '../../../../components/Table'
+import Table from '../../../../ui/molecules/Table'
 import { Search } from 'lucide-react'
 import { createColumns } from './columns'
 import { authFetch } from '@/app/utils/authFetch'
@@ -23,11 +23,11 @@ import useAdminPermission from '@/hooks/useAdminPermission'
 import GallerySection from './GallerySection'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
-import { Button } from '../../../../components/ui/button'
-import { Input } from '../../../../components/ui/input'
-import { Label } from '../../../../components/ui/label'
-import { Select } from '../../../../components/ui/select'
-import { Checkbox } from '../../../../components/ui/checkbox'
+import { Button } from '../../../../ui/shadcn/button'
+import { Input } from '../../../../ui/shadcn/input'
+import { Label } from '../../../../ui/shadcn/label'
+import { Select } from '../../../../ui/shadcn/select'
+import { Checkbox } from '../../../../ui/shadcn/checkbox'
 const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
 })
@@ -963,27 +963,27 @@ export default function UniversityForm() {
               {(viewUniversityData.city ||
                 viewUniversityData.state ||
                 viewUniversityData.country) && (
-                  <div>
-                    <h3 className='text-lg font-semibold mb-2'>Address</h3>
-                    <div className='text-gray-700 space-y-1'>
-                      {viewUniversityData.street && (
-                        <p>{viewUniversityData.street}</p>
-                      )}
-                      <p>
-                        {[
-                          viewUniversityData.city,
-                          viewUniversityData.state,
-                          viewUniversityData.country
-                        ]
-                          .filter(Boolean)
-                          .join(', ')}
-                      </p>
-                      {viewUniversityData.postal_code && (
-                        <p>Postal Code: {viewUniversityData.postal_code}</p>
-                      )}
-                    </div>
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Address</h3>
+                  <div className='text-gray-700 space-y-1'>
+                    {viewUniversityData.street && (
+                      <p>{viewUniversityData.street}</p>
+                    )}
+                    <p>
+                      {[
+                        viewUniversityData.city,
+                        viewUniversityData.state,
+                        viewUniversityData.country
+                      ]
+                        .filter(Boolean)
+                        .join(', ')}
+                    </p>
+                    {viewUniversityData.postal_code && (
+                      <p>Postal Code: {viewUniversityData.postal_code}</p>
+                    )}
                   </div>
-                )}
+                </div>
+              )}
 
               {/* Contact Information */}
               {viewUniversityData.contact && (

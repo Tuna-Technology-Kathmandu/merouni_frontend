@@ -6,7 +6,7 @@ import { getAllFaculty } from '../(dashboard)/dashboard/faculty/action'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
-import Shimmer from '../../components/Shimmer'
+import Shimmer from '../../ui/molecules/Shimmer'
 
 import { getBanners } from '../action'
 import AdLayout from '../../components/Frontpage/AdLayout'

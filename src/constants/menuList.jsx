@@ -1,9 +1,8 @@
-import { FaHome } from "react-icons/fa";
+import { FaHome } from 'react-icons/fa'
 
 // Icons
-import { SortAsc } from 'lucide-react';
-import { BiLogOut } from 'react-icons/bi';
-import { BsCalendarEvent, BsLayers, BsNewspaper } from 'react-icons/bs';
+import { SortAsc } from 'lucide-react'
+import { BsCalendarEvent, BsLayers, BsNewspaper } from 'react-icons/bs'
 import {
   FaBook,
   FaBriefcase,
@@ -11,16 +10,24 @@ import {
   FaChalkboardTeacher,
   FaGraduationCap,
   FaHandshake,
-  FaRegUserCircle,
   FaTags,
   FaUniversity
-} from 'react-icons/fa';
-import { HiOutlineUsers } from 'react-icons/hi';
-import { IoSchoolSharp } from 'react-icons/io5';
-import { MdBackHand, MdCategory, MdEmojiEvents, MdOutlineDescription, MdOutlinePermMedia, MdQuiz, MdSchool } from 'react-icons/md';
-import { RiSettingsLine } from 'react-icons/ri';
-import { VscReferences } from 'react-icons/vsc';
-
+} from 'react-icons/fa'
+import { HiOutlineUsers } from 'react-icons/hi'
+import { IoSchoolSharp } from 'react-icons/io5'
+import {
+  MdBackHand,
+  MdCategory,
+  MdEmojiEvents,
+  MdOutlineDescription,
+  MdOutlinePermMedia,
+  MdQuiz,
+  MdSchool
+} from 'react-icons/md'
+import { VscReferences } from 'react-icons/vsc'
+import { Book } from 'lucide-react'
+import { Rss } from 'lucide-react'
+import { HandCoins } from 'lucide-react'
 
 export const menuItems = [
   {
@@ -37,6 +44,12 @@ export const menuItems = [
         label: 'Referrals',
         href: '/dashboard/referrals',
         visible: ['admin', 'editor', 'student']
+      },
+      {
+        icon: <HandCoins className='text-xl' />,
+        label: 'Applied Scholarships',
+        href: '/dashboard/applied-scholarships',
+        visible: ['student']
       },
       {
         icon: <MdQuiz className='text-xl' />,
@@ -120,7 +133,7 @@ export const menuItems = [
         visible: ['admin', 'editor']
       },
       {
-        icon: <BsNewspaper className='text-xl' />,
+        icon: <Rss className='text-xl' />,
         label: 'Blogs',
         href: '/dashboard/blogs',
         visible: ['admin', 'editor']
@@ -164,69 +177,55 @@ export const menuItems = [
     ]
   },
   {
-    title: 'OTHER',
+    title: 'SETUP',
     items: [
       {
-        icon: <RiSettingsLine className='text-xl' />,
-        label: 'Setup',
-        href: null, // No direct href, has submenus
-        visible: ['admin', 'editor'],
-        submenus: [
-          {
-            icon: <MdCategory className='text-lg' />,
-            label: 'Category',
-            href: '/dashboard/category',
-            visible: ['admin', 'editor']
-          },
-          {
-            icon: <BsLayers className='text-lg' />,
-            label: 'Level',
-            href: '/dashboard/level',
-            visible: ['admin', 'editor']
-          },
-          {
-            icon: <FaChalkboardTeacher className='text-lg' />,
-            label: 'Faculty',
-            href: '/dashboard/faculty',
-            visible: ['admin', 'editor']
-          },
-          {
-            icon: <FaTags className='text-lg' />,
-            label: 'Tags',
-            href: '/dashboard/tag',
-            visible: ['admin', 'editor']
-          },
-          {
-            icon: <FaBook className='text-lg' />,
-            label: 'Courses',
-            href: '/dashboard/courses',
-            visible: ['admin', 'editor']
-          },
-          {
-            icon: <FaGraduationCap className='text-lg' />,
-            label: 'Program',
-            href: '/dashboard/program',
-            visible: ['admin', 'editor']
-          },
-          {
-            icon: <FaUniversity className='text-lg' />,
-            label: 'University',
-            href: '/dashboard/university',
-            visible: ['admin', 'editor']
-          }
-        ]
+        icon: <MdCategory className='text-xl' />,
+        label: 'Category',
+        href: '/dashboard/category',
+        visible: ['admin', 'editor']
       },
       {
-        icon: <FaRegUserCircle className='text-xl' />,
-        label: 'Update Profile',
-        href: '/dashboard/profile',
-        visible: ['admin', 'editor', 'agent', 'student', 'institution']
+        icon: <BsLayers className='text-xl' />,
+        label: 'Level',
+        href: '/dashboard/level',
+        visible: ['admin', 'editor']
       },
       {
-        icon: <BiLogOut className='text-xl' />,
-        label: 'Logout',
-        href: '/dashboard/logout',
-        visible: ['admin', 'editor', 'agent', 'student', 'institution']
+        icon: <FaChalkboardTeacher className='text-xl' />,
+        label: 'Faculty',
+        href: '/dashboard/faculty',
+        visible: ['admin', 'editor']
+      },
+      {
+        icon: <FaTags className='text-xl' />,
+        label: 'Tags',
+        href: '/dashboard/tag',
+        visible: ['admin', 'editor']
+      },
+      {
+        icon: <FaBook className='text-xl' />,
+        label: 'Courses',
+        href: '/dashboard/courses',
+        visible: ['admin', 'editor']
+      },
+      {
+        icon: <FaGraduationCap className='text-xl' />,
+        label: 'Program',
+        href: '/dashboard/program',
+        visible: ['admin', 'editor']
+      },
+      {
+        icon: <FaUniversity className='text-xl' />,
+        label: 'University',
+        href: '/dashboard/university',
+        visible: ['admin', 'editor']
+      },
+      {
+        icon: <HandCoins className='text-xl' />,
+        label: 'Set Referral Point',
+        href: '/dashboard/set-referral-point',
+        visible: ['admin']
       }
     ]
   }

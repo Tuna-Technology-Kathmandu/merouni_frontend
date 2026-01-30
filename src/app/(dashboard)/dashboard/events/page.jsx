@@ -1,10 +1,10 @@
 'use client'
 import { getEvents } from '@/app/action'
 import { authFetch } from '@/app/utils/authFetch'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
+import { Button } from '@/ui/shadcn/button'
+import { Input } from '@/ui/shadcn/input'
+import { Label } from '@/ui/shadcn/label'
+import { Select } from '@/ui/shadcn/select'
 import { DotenvConfig } from '@/config/env.config'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Edit2, Eye, MapPin, Search, Trash2, X } from 'lucide-react'
@@ -15,8 +15,8 @@ import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import Table from '../../../../components/Table'
-import { Modal } from '../../../../components/UserModal'
+import Table from '../../../../ui/molecules/Table'
+import { Modal } from '../../../../ui/molecules/UserModal'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import FileUpload from '../addCollege/FileUpload'
 import { fetchCategories } from '../category/action'
@@ -88,7 +88,7 @@ export default function EventManager() {
       try {
         const categoriesList = await fetchCategories()
         setCategories(categoriesList.items)
-      } catch (error) { }
+      } catch (error) {}
     }
     loadCategories()
   }, [])
@@ -123,7 +123,6 @@ export default function EventManager() {
       }
     }
   }, [searchTimeout])
-
 
   const searchCollege = async (e) => {
     const query = e.target.value
@@ -460,7 +459,6 @@ export default function EventManager() {
           const rawValue = row.original.event_host
           if (!rawValue) return ''
           try {
-
             const eventHost = rawValue
             return eventHost.host || ''
           } catch (error) {
@@ -878,10 +876,7 @@ export default function EventManager() {
 
               {/* Submit Button - Sticky Footer */}
               <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <Button
-                  type='submit'
-                  disabled={loading}
-                >
+                <Button type='submit' disabled={loading}>
                   {loading
                     ? 'Processing...'
                     : editing

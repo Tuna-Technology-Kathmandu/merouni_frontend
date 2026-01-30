@@ -35,7 +35,8 @@ export const PERMISSIONS_VIA_ROLE = {
     '/dashboard/college-rankings',
     '/dashboard/college-orderings',
     '/dashboard/level',
-    '/dashboard/tag'
+    '/dashboard/tag',
+    '/dashboard/set-referral-point'
   ],
   [APP_ROLES.editor]: [
     '/dashboard',
@@ -70,7 +71,12 @@ export const PERMISSIONS_VIA_ROLE = {
     '/dashboard/referedStudents',
     '/dashboard/profile'
   ],
-  [APP_ROLES.student]: ['/dashboard', '/dashboard/profile'],
+  [APP_ROLES.student]: [
+    '/dashboard',
+    '/dashboard/profile',
+    '/dashboard/referrals',
+    '/dashboard/applied-scholarships'
+  ],
   [APP_ROLES.institution]: [
     '/dashboard',
     '/dashboard/profile',

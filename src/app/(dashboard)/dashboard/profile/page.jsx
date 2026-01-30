@@ -1,15 +1,43 @@
 'use client'
+
 import { authFetch } from '@/app/utils/authFetch'
 import React, { useState } from 'react'
-// import axios from 'axios'
-import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
+import {
+  FaUser,
+  FaLock,
+  FaEye,
+  FaEyeSlash,
+  FaEnvelope,
+  FaPhone,
+  FaUserTag
+} from 'react-icons/fa'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
 import { DotenvConfig } from '@/config/env.config'
+import { Button } from '@/ui/shadcn/button'
+import { Input } from '@/ui/shadcn/input'
+import { Label } from '@/ui/shadcn/label'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogClose
+} from '@/ui/shadcn/dialog'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { useEffect } from 'react'
 
 const ProfileUpdate = () => {
+  const { setHeading } = usePageHeading()
   const userData = useSelector((state) => state.user.data)
+
+  useEffect(() => {
+    setHeading('Profile Settings')
+    return () => setHeading(null)
+  }, [setHeading])
 
   const [showNameModal, setShowNameModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -25,12 +53,23 @@ const ProfileUpdate = () => {
     phoneNo: userData?.phoneNo || ''
   })
 
-  console.log('userData', userData)
-
   const [passwordForm, setPasswordForm] = useState({
     newPassword: '',
     confirmPassword: ''
   })
+
+  // Update form when userData changes
+  useEffect(() => {
+    if (userData) {
+      setNameForm({
+        firstName: userData.firstName || '',
+        middleName: userData.middleName || '',
+        lastName: userData.lastName || '',
+        email: userData.email || '',
+        phoneNo: userData.phoneNo || ''
+      })
+    }
+  }, [userData])
 
   const validateName = (name) => {
     return name.length >= 2 && /^[a-zA-Z\s]*$/.test(name)
@@ -71,14 +110,14 @@ const ProfileUpdate = () => {
       )
 
       if (!response.ok) {
-        throw new Error('Failed to update name')
+        throw new Error('Failed to update profile')
       }
 
-      toast.success('Name updated successfully')
+      toast.success('Profile updated successfully')
       setShowNameModal(false)
     } catch (error) {
       console.error('Update error:', error)
-      toast.error(error.message || 'Failed to update name')
+      toast.error(error.message || 'Failed to update profile')
     } finally {
       setIsLoading(false)
     }
@@ -87,13 +126,11 @@ const ProfileUpdate = () => {
   const handlePasswordSubmit = async (e) => {
     e.preventDefault()
 
-    // Validate password requirements
     if (!validatePassword(passwordForm.newPassword)) {
       toast.error("Password doesn't meet requirements")
       return
     }
 
-    // Check password confirmation
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       toast.error("Passwords don't match")
       return
@@ -121,276 +158,348 @@ const ProfileUpdate = () => {
 
       toast.success('Password updated successfully')
       setShowPasswordModal(false)
-      // Clear password fields after successful update
       setPasswordForm({
-        newPassword: ''
+        newPassword: '',
+        confirmPassword: ''
       })
     } catch (error) {
       console.error('Password update error:', error)
       toast.error(error.message || 'Failed to update password')
-
-      // Handle specific error cases if needed
-      if (error.message.includes('current password')) {
-        toast.error('Incorrect current password')
-      }
     } finally {
       setIsLoading(false)
     }
   }
+
   const roles = userData?.role
     ? Object.entries(
-      typeof userData.role === 'string'
-        ? JSON.parse(userData.role)
-        : userData.role
-    )
-      .filter(([_, value]) => value)
-      .map(([key]) => key.toUpperCase())
-      .join(', ')
+        typeof userData.role === 'string'
+          ? JSON.parse(userData.role)
+          : userData.role
+      )
+        .filter(([_, value]) => value)
+        .map(([key]) => key.charAt(0).toUpperCase() + key.slice(1))
+        .join(', ')
     : 'No Role Assigned'
 
-  return (
-    <div className='min-h-screen bg-gray-100 p-4'>
-      <ToastContainer position='top-right' />
-      <div className='max-w-2xl mr-auto'>
-        <h1 className='text-2xl font-bold text-gray-800 mb-6'>
-          {userData?.firstName}'s Profile
-        </h1>
+  const getInitials = () => {
+    if (userData?.firstName && userData?.lastName) {
+      return `${userData.firstName.charAt(0)}${userData.lastName.charAt(0)}`.toUpperCase()
+    }
+    return 'U'
+  }
 
-        {/* User Info Display */}
-        <div className='bg-white rounded-lg shadow-sm p-4 mb-6'>
-          <h2 className='text-lg font-semibold mb-4'>User Information</h2>
-          <div className='grid grid-cols-2 gap-4'>
-            <div>
-              <p className='text-sm text-gray-600'>Name</p>
-              <p className='font-medium'>
-                {userData?.firstName} {userData?.middleName}{' '}
-                {userData?.lastName}
+  return (
+    <div className='p-6 max-w-4xl mx-auto'>
+      <ToastContainer position='top-right' />
+
+      {/* Profile Header Card */}
+      <div className='bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-6'>
+        <div className='flex items-center gap-6'>
+          <div className='w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg'>
+            {getInitials()}
+          </div>
+          <div className='flex-1'>
+            <h1 className='text-2xl font-bold text-gray-900 mb-1'>
+              {userData?.firstName && userData?.lastName
+                ? `${userData.firstName} ${userData.middleName || ''} ${userData.lastName}`.trim()
+                : 'User Profile'}
+            </h1>
+            <p className='text-sm text-gray-500'>{roles}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* User Information Card */}
+      <div className='bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6'>
+        <h2 className='text-lg font-semibold text-gray-900 mb-6'>
+          Personal Information
+        </h2>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          <div className='space-y-1'>
+            <Label className='text-xs font-medium text-gray-500 uppercase tracking-wider'>
+              Full Name
+            </Label>
+            <p className='text-sm font-medium text-gray-900'>
+              {userData?.firstName} {userData?.middleName || ''}{' '}
+              {userData?.lastName}
+            </p>
+          </div>
+          <div className='space-y-1'>
+            <Label className='text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center gap-2'>
+              <FaEnvelope className='w-3 h-3' />
+              Email Address
+            </Label>
+            <p className='text-sm font-medium text-gray-900'>
+              {userData?.email || 'Not provided'}
+            </p>
+          </div>
+          <div className='space-y-1'>
+            <Label className='text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center gap-2'>
+              <FaPhone className='w-3 h-3' />
+              Phone Number
+            </Label>
+            <p className='text-sm font-medium text-gray-900'>
+              {userData?.phoneNo || 'Not provided'}
+            </p>
+          </div>
+          <div className='space-y-1'>
+            <Label className='text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center gap-2'>
+              <FaUserTag className='w-3 h-3' />
+              Role
+            </Label>
+            <div className='flex flex-wrap gap-2'>
+              {roles.split(', ').map((role, idx) => (
+                <span
+                  key={idx}
+                  className='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800'
+                >
+                  {role}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Action Cards */}
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        <button
+          onClick={() => setShowNameModal(true)}
+          className='group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-indigo-200 transition-all duration-200 text-left'
+        >
+          <div className='flex items-start gap-4'>
+            <div className='w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors'>
+              <FaUser className='w-6 h-6 text-blue-600' />
+            </div>
+            <div className='flex-1'>
+              <h3 className='text-base font-semibold text-gray-900 mb-1'>
+                Update Profile
+              </h3>
+              <p className='text-sm text-gray-500'>
+                Edit your personal information and contact details
               </p>
             </div>
-            <div>
-              <p className='text-sm text-gray-600'>Email</p>
-              <p className='font-medium'>{userData?.email}</p>
+          </div>
+        </button>
+
+        <button
+          onClick={() => setShowPasswordModal(true)}
+          className='group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md hover:border-green-200 transition-all duration-200 text-left'
+        >
+          <div className='flex items-start gap-4'>
+            <div className='w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition-colors'>
+              <FaLock className='w-6 h-6 text-green-600' />
             </div>
-            <div>
-              <p className='text-sm text-gray-600'>Phone</p>
-              <p className='font-medium'>{userData?.phoneNo}</p>
-            </div>
-            <div>
-              <p className='text-sm text-gray-600'>Role</p>
-              <p className='font-medium'>{roles}</p>
+            <div className='flex-1'>
+              <h3 className='text-base font-semibold text-gray-900 mb-1'>
+                Change Password
+              </h3>
+              <p className='text-sm text-gray-500'>
+                Update your password to keep your account secure
+              </p>
             </div>
           </div>
-        </div>
-
-        <div className='grid grid-cols-2 gap-4'>
-          <button
-            onClick={() => setShowNameModal(true)}
-            className='p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all flex flex-col items-center'
-          >
-            <FaUser className='text-2xl text-blue-500 mb-2' />
-            <h2 className='text-sm font-semibold'>Update Information</h2>
-          </button>
-
-          <button
-            onClick={() => setShowPasswordModal(true)}
-            className='p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all flex flex-col items-center'
-          >
-            <FaLock className='text-2xl text-green-500 mb-2' />
-            <h2 className='text-sm font-semibold'>Update Password</h2>
-          </button>
-        </div>
-
-        {showNameModal && (
-          <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4'>
-            <div className='bg-white rounded-lg p-4 w-full max-w-md'>
-              <h2 className='text-xl font-bold mb-4'>Update Name</h2>
-              <form onSubmit={handleNameSubmit}>
-                <div className='space-y-3'>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700'>
-                      First Name <span className='text-red-500'>*</span>
-                    </label>
-                    <input
-                      type='text'
-                      value={nameForm.firstName}
-                      onChange={(e) =>
-                        setNameForm({ ...nameForm, firstName: e.target.value })
-                      }
-                      className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700'>
-                      Middle Name
-                    </label>
-                    <input
-                      type='text'
-                      value={nameForm.middleName}
-                      onChange={(e) =>
-                        setNameForm({ ...nameForm, middleName: e.target.value })
-                      }
-                      className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-                    />
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700'>
-                      Last Name <span className='text-red-500'>*</span>
-                    </label>
-                    <input
-                      type='text'
-                      value={nameForm.lastName}
-                      onChange={(e) =>
-                        setNameForm({ ...nameForm, lastName: e.target.value })
-                      }
-                      className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700'>
-                      Email <span className='text-red-500'>*</span>
-                    </label>
-                    <input
-                      type='text'
-                      value={nameForm.email}
-                      onChange={(e) =>
-                        setNameForm({ ...nameForm, email: e.target.value })
-                      }
-                      className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700'>
-                      Phone <span className='text-red-500'>*</span>
-                    </label>
-                    <input
-                      type='text'
-                      value={nameForm.phoneNo}
-                      onChange={(e) =>
-                        setNameForm({ ...nameForm, phoneNo: e.target.value })
-                      }
-                      className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'
-                      required
-                    />
-                  </div>
-                </div>
-                <div className='mt-4 flex justify-end space-x-3'>
-                  <button
-                    type='button'
-                    onClick={() => setShowNameModal(false)}
-                    className='px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200'
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type='submit'
-                    disabled={isLoading}
-                    className='px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50'
-                  >
-                    {isLoading ? 'Updating...' : 'Update Information'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {showPasswordModal && (
-          <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4'>
-            <div className='bg-white rounded-lg p-4 w-full max-w-md'>
-              <h2 className='text-xl font-bold mb-4'>Update Password</h2>
-              <form onSubmit={handlePasswordSubmit}>
-                <div className='space-y-3'>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700'>
-                      New Password <span className='text-red-500'>*</span>
-                    </label>
-                    <div className='relative'>
-                      <input
-                        type={showNewPassword ? 'text' : 'password'}
-                        value={passwordForm.newPassword}
-                        onChange={(e) =>
-                          setPasswordForm({
-                            ...passwordForm,
-                            newPassword: e.target.value.trim()
-                          })
-                        }
-                        className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pr-10'
-                        required
-                      />
-                      <button
-                        type='button'
-                        className='absolute inset-y-0 right-0 pr-3 flex items-center'
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                      >
-                        {showNewPassword ? (
-                          <FaEyeSlash className='h-5 w-5 text-gray-500' />
-                        ) : (
-                          <FaEye className='h-5 w-5 text-gray-500' />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700'>
-                      Confirm New Password <span className='text-red-500'>*</span>
-                    </label>
-                    <div className='relative'>
-                      <input
-                        type={showConfirmPassword ? 'text' : 'password'}
-                        value={passwordForm.confirmPassword}
-                        onChange={(e) =>
-                          setPasswordForm({
-                            ...passwordForm,
-                            confirmPassword: e.target.value.trim()
-                          })
-                        }
-                        className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pr-10'
-                        required
-                      />
-                      <button
-                        type='button'
-                        className='absolute inset-y-0 right-0 pr-3 flex items-center'
-                        onClick={() =>
-                          setShowConfirmPassword(!showConfirmPassword)
-                        }
-                      >
-                        {showConfirmPassword ? (
-                          <FaEyeSlash className='h-5 w-5 text-gray-500' />
-                        ) : (
-                          <FaEye className='h-5 w-5 text-gray-500' />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  <p className='text-xs text-gray-600'>
-                    Password must contain at least 8 characters, including
-                    uppercase, lowercase, number, and special character.
-                  </p>
-                </div>
-                <div className='mt-4 flex justify-end space-x-3'>
-                  <button
-                    type='button'
-                    onClick={() => setShowPasswordModal(false)}
-                    className='px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200'
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type='submit'
-                    disabled={isLoading}
-                    className='px-3 py-1.5 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50'
-                  >
-                    {isLoading ? 'Updating...' : 'Update Password'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        </button>
       </div>
+
+      {/* Update Profile Dialog */}
+      <Dialog isOpen={showNameModal} onClose={() => setShowNameModal(false)}>
+        <DialogContent className='max-w-md'>
+          <DialogClose onClick={() => setShowNameModal(false)} />
+          <DialogHeader>
+            <DialogTitle>Update Profile Information</DialogTitle>
+            <DialogDescription>
+              Make changes to your profile information here. Click save when
+              you're done.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleNameSubmit}>
+            <div className='space-y-4'>
+              <div className='space-y-2'>
+                <Label htmlFor='firstName'>
+                  First Name <span className='text-red-500'>*</span>
+                </Label>
+                <Input
+                  id='firstName'
+                  type='text'
+                  value={nameForm.firstName}
+                  onChange={(e) =>
+                    setNameForm({ ...nameForm, firstName: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className='space-y-2'>
+                <Label htmlFor='middleName'>Middle Name</Label>
+                <Input
+                  id='middleName'
+                  type='text'
+                  value={nameForm.middleName}
+                  onChange={(e) =>
+                    setNameForm({ ...nameForm, middleName: e.target.value })
+                  }
+                />
+              </div>
+              <div className='space-y-2'>
+                <Label htmlFor='lastName'>
+                  Last Name <span className='text-red-500'>*</span>
+                </Label>
+                <Input
+                  id='lastName'
+                  type='text'
+                  value={nameForm.lastName}
+                  onChange={(e) =>
+                    setNameForm({ ...nameForm, lastName: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className='space-y-2'>
+                <Label htmlFor='email'>
+                  Email <span className='text-red-500'>*</span>
+                </Label>
+                <Input
+                  id='email'
+                  type='email'
+                  value={nameForm.email}
+                  onChange={(e) =>
+                    setNameForm({ ...nameForm, email: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className='space-y-2'>
+                <Label htmlFor='phoneNo'>
+                  Phone Number <span className='text-red-500'>*</span>
+                </Label>
+                <Input
+                  id='phoneNo'
+                  type='tel'
+                  value={nameForm.phoneNo}
+                  onChange={(e) =>
+                    setNameForm({ ...nameForm, phoneNo: e.target.value })
+                  }
+                  required
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => setShowNameModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button type='submit' disabled={isLoading}>
+                {isLoading ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Update Password Dialog */}
+      <Dialog
+        isOpen={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+      >
+        <DialogContent className='max-w-md'>
+          <DialogClose onClick={() => setShowPasswordModal(false)} />
+          <DialogHeader>
+            <DialogTitle>Change Password</DialogTitle>
+            <DialogDescription>
+              Enter your new password. Make sure it meets the security
+              requirements.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handlePasswordSubmit}>
+            <div className='space-y-4'>
+              <div className='space-y-2'>
+                <Label htmlFor='newPassword'>
+                  New Password <span className='text-red-500'>*</span>
+                </Label>
+                <div className='relative'>
+                  <Input
+                    id='newPassword'
+                    type={showNewPassword ? 'text' : 'password'}
+                    value={passwordForm.newPassword}
+                    onChange={(e) =>
+                      setPasswordForm({
+                        ...passwordForm,
+                        newPassword: e.target.value.trim()
+                      })
+                    }
+                    className='pr-10'
+                    required
+                  />
+                  <button
+                    type='button'
+                    className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700'
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                  >
+                    {showNewPassword ? (
+                      <FaEyeSlash className='h-4 w-4' />
+                    ) : (
+                      <FaEye className='h-4 w-4' />
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div className='space-y-2'>
+                <Label htmlFor='confirmPassword'>
+                  Confirm Password <span className='text-red-500'>*</span>
+                </Label>
+                <div className='relative'>
+                  <Input
+                    id='confirmPassword'
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) =>
+                      setPasswordForm({
+                        ...passwordForm,
+                        confirmPassword: e.target.value.trim()
+                      })
+                    }
+                    className='pr-10'
+                    required
+                  />
+                  <button
+                    type='button'
+                    className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700'
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <FaEyeSlash className='h-4 w-4' />
+                    ) : (
+                      <FaEye className='h-4 w-4' />
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div className='rounded-lg bg-blue-50 border border-blue-200 p-3'>
+                <p className='text-xs text-blue-800'>
+                  <strong>Password Requirements:</strong> At least 8 characters,
+                  including uppercase, lowercase, number, and special character
+                  (@$!%*?&)
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => setShowPasswordModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button type='submit' disabled={isLoading} variant='default'>
+                {isLoading ? 'Updating...' : 'Update Password'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

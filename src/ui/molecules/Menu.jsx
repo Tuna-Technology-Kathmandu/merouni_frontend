@@ -88,14 +88,31 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
   // Check if user is admin
   const isAdmin = role.admin
 
-  // Filter menu items based on search query
-  const filterMenuItems = (items) => {
-    if (!searchQuery.trim()) return items
-
-    const query = searchQuery.toLowerCase()
+  // Filter menu items based on role access
+  const filterItemsByAccess = (items) => {
     return items.filter((item) => {
       const hasAccess = item.visible.some((r) => role[r])
       if (!hasAccess) return false
+      
+      // For items with submenus, check if any submenu is accessible
+      if (item.submenus && item.submenus.length > 0) {
+        return item.submenus.some((submenu) =>
+          submenu.visible.some((r) => role[r])
+        )
+      }
+      return true
+    })
+  }
+
+  // Filter menu items based on search query
+  const filterMenuItems = (items) => {
+    // First filter by access
+    const accessibleItems = filterItemsByAccess(items)
+    
+    if (!searchQuery.trim()) return accessibleItems
+
+    const query = searchQuery.toLowerCase()
+    return accessibleItems.filter((item) => {
       // Check main label
       if (item.label.toLowerCase().includes(query)) return true
       // Check submenu labels if they exist

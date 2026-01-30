@@ -5,10 +5,10 @@ import { toast, ToastContainer } from 'react-toastify'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
 import { Edit2, Trash2, Plus, GripVertical, X, ChevronDown } from 'lucide-react'
-import { Modal } from '../../../../components/UserModal'
+import { Modal } from '../../../../ui/molecules/UserModal'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/ui/shadcn/button'
 
 export default function CollegeRankingsPage() {
   const { setHeading } = usePageHeading()
@@ -531,8 +531,9 @@ export default function CollegeRankingsPage() {
               >
                 <ChevronDown
                   size={20}
-                  className={`transition-transform ${showProgramDropdown ? 'rotate-180' : ''
-                    }`}
+                  className={`transition-transform ${
+                    showProgramDropdown ? 'rotate-180' : ''
+                  }`}
                 />
               </button>
             </div>
@@ -647,8 +648,9 @@ export default function CollegeRankingsPage() {
                     <div
                       key={college.id}
                       onClick={() => setSelectedCollege(college)}
-                      className={`p-3 cursor-pointer hover:bg-gray-100 flex items-center gap-3 ${selectedCollege?.id === college.id ? 'bg-blue-50' : ''
-                        }`}
+                      className={`p-3 cursor-pointer hover:bg-gray-100 flex items-center gap-3 ${
+                        selectedCollege?.id === college.id ? 'bg-blue-50' : ''
+                      }`}
                     >
                       {college.college_logo && (
                         <div className='relative w-10 h-10 rounded-full overflow-hidden'>

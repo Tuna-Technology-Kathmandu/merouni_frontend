@@ -4,21 +4,21 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { getAllExams, createExam, updateExam, deleteExam } from './actions'
-import Loading from '../../../../components/Loading'
-import Table from '../../../../components/Table'
+import Loading from '../../../../ui/molecules/Loading'
+import Table from '../../../../ui/molecules/Table'
 import { Edit2, Trash2, Search } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import { useDebounce } from 'use-debounce'
 import { fetchUniversities, fetchLevel } from './actions'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../components/UserModal'
+import { Modal } from '../../../../ui/molecules/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { Button } from '../../../../components/ui/button'
-import { Input } from '../../../../components/ui/input'
-import { Label } from '../../../../components/ui/label'
-import { Select } from '../../../../components/ui/select'
+import { Button } from '../../../../ui/shadcn/button'
+import { Input } from '../../../../ui/shadcn/input'
+import { Label } from '../../../../ui/shadcn/label'
+import { Select } from '../../../../ui/shadcn/select'
 import { DotenvConfig } from '@/config/env.config'
 const CKExam = dynamic(() => import('../component/CKExam'), {
   ssr: false
@@ -410,15 +410,15 @@ export default function ExamManager() {
         exam.exam_details && exam.exam_details.length > 0
           ? exam.exam_details
           : [
-            {
-              exam_type: 'Written',
-              full_marks: '',
-              pass_marks: '',
-              number_of_question: '',
-              question_type: 'MCQ',
-              duration: ''
-            }
-          ],
+              {
+                exam_type: 'Written',
+                full_marks: '',
+                pass_marks: '',
+                number_of_question: '',
+                question_type: 'MCQ',
+                duration: ''
+              }
+            ],
       applicationDetails: exam.application_details[0] || {
         normal_fee: '',
         late_fee: '',
@@ -549,6 +549,8 @@ export default function ExamManager() {
           {/* Button */}
           <div className='flex gap-2'>
             <Button
+              type='button'
+              variant='default'
               onClick={() => {
                 setIsOpen(true)
                 setEditingId(null)
@@ -806,7 +808,9 @@ export default function ExamManager() {
                 </div>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div>
-                    <RequiredLabel htmlFor='full-marks'>Full Marks</RequiredLabel>
+                    <RequiredLabel htmlFor='full-marks'>
+                      Full Marks
+                    </RequiredLabel>
                     <Input
                       id='full-marks'
                       type='number'
@@ -827,7 +831,9 @@ export default function ExamManager() {
                     />
                   </div>
                   <div>
-                    <RequiredLabel htmlFor='pass-marks'>Pass Marks</RequiredLabel>
+                    <RequiredLabel htmlFor='pass-marks'>
+                      Pass Marks
+                    </RequiredLabel>
                     <Input
                       id='pass-marks'
                       type='number'
@@ -924,7 +930,9 @@ export default function ExamManager() {
                 <h2 className='text-xl font-semibold'>Application Details</h2>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div>
-                    <RequiredLabel htmlFor='normal-fee'>Normal Fee</RequiredLabel>
+                    <RequiredLabel htmlFor='normal-fee'>
+                      Normal Fee
+                    </RequiredLabel>
                     <Input
                       id='normal-fee'
                       type='text'
@@ -970,7 +978,9 @@ export default function ExamManager() {
                       id='exam-date'
                       type='date'
                       value={formData.applicationDetails.exam_date}
-                      min={formData.applicationDetails.closing_date || undefined}
+                      min={
+                        formData.applicationDetails.closing_date || undefined
+                      }
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
@@ -991,7 +1001,9 @@ export default function ExamManager() {
                       id='opening-date'
                       type='date'
                       value={formData.applicationDetails.opening_date}
-                      max={formData.applicationDetails.closing_date || undefined}
+                      max={
+                        formData.applicationDetails.closing_date || undefined
+                      }
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,

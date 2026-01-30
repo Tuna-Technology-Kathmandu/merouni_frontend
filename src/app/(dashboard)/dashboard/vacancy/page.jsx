@@ -1,28 +1,31 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-import Table from '../../../../components/Table'
+import Table from '../../../../ui/molecules/Table'
 import FileUpload from '../addCollege/FileUpload'
 import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { Modal } from '../../../../components/UserModal'
+import { Modal } from '../../../../ui/molecules/UserModal'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Search, Eye } from 'lucide-react'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { SearchableSelect } from '@/components/ui/SearchableSelect'
+import { Button } from '@/ui/shadcn/button'
+import { Input } from '@/ui/shadcn/input'
+import { Label } from '@/ui/shadcn/label'
+import { Textarea } from '@/ui/shadcn/textarea'
+import { SearchableSelect } from '@/ui/shadcn/SearchableSelect'
 
 const VacancyManager = () => {
   const { setHeading } = usePageHeading()
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const author_id = useSelector((state) => state.user.data.id)
   const { requireAdmin } = useAdminPermission()
 
@@ -116,6 +119,19 @@ const VacancyManager = () => {
     loadVacancies()
     return () => setHeading(null)
   }, [setHeading])
+
+  // Open add vacancy dialog when navigating from dashboard quick action (?add=true)
+  useEffect(() => {
+    if (searchParams.get('add') === 'true') {
+      setIsOpen(true)
+      setEditing(false)
+      setEditingId(null)
+      reset()
+      setUploadedFiles({ featuredImage: '' })
+      fetchAllColleges()
+      router.replace('/dashboard/vacancy', { scroll: false })
+    }
+  }, [searchParams])
 
   useEffect(() => {
     return () => {
@@ -446,7 +462,10 @@ const VacancyManager = () => {
                   </h2>
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <div className='space-y-2'>
-                      <Label htmlFor='title' className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                      <Label
+                        htmlFor='title'
+                        className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                      >
                         Vacancy Title
                       </Label>
                       <Input
@@ -521,10 +540,7 @@ const VacancyManager = () => {
 
               {/* Submit Button - Sticky Footer */}
               <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <Button
-                  type='submit'
-                  disabled={loading}
-                >
+                <Button type='submit' disabled={loading}>
                   {loading
                     ? 'Processing...'
                     : editing

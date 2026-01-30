@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components/ui/Skeleton'
+import { Skeleton } from '@/ui/shadcn/Skeleton'
 
 const FCollegeShimmer = ({ count = 4 }) => {
   return (

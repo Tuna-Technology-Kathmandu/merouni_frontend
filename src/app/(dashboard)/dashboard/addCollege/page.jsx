@@ -13,7 +13,7 @@ import {
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 import FileUpload from './FileUpload'
-import Table from '../../../../components/Table'
+import Table from '../../../../ui/molecules/Table'
 import {
   Edit2,
   Trash2,
@@ -29,14 +29,14 @@ import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import AdmissionItem from './AdmissionItem'
 import ConfirmationDialog from './ConfirmationDialog'
-import { Modal } from '../../../../components/UserModal'
+import { Modal } from '../../../../ui/molecules/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { Button } from '../../../../components/ui/button'
-import { Input } from '../../../../components/ui/input'
-import { Label } from '../../../../components/ui/label'
-import { Select } from '../../../../components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { SearchableSelect } from '@/components/ui/SearchableSelect'
+import { Button } from '../../../../ui/shadcn/button'
+import { Input } from '../../../../ui/shadcn/input'
+import { Label } from '../../../../ui/shadcn/label'
+import { Select } from '../../../../ui/shadcn/select'
+import { Textarea } from '@/ui/shadcn/textarea'
+import { SearchableSelect } from '@/ui/shadcn/SearchableSelect'
 
 const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
@@ -185,6 +185,7 @@ export default function CollegeForm() {
   const [debouncedUni] = useDebounce(uniSearch, 300)
   const [universities, setUniversities] = useState([])
   const [loadUni, setLoadUni] = useState(false)
+  const [showUniDrop, setShowUniDrop] = useState(false)
   const [hasSelectedUni, setHasSelectedUni] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
@@ -828,13 +829,13 @@ export default function CollegeForm() {
       const memberData = collegeData.collegeMembers?.length
         ? collegeData.collegeMembers
         : [
-          {
-            name: '',
-            contact_number: '',
-            role: '',
-            description: ''
-          }
-        ]
+            {
+              name: '',
+              contact_number: '',
+              role: '',
+              description: ''
+            }
+          ]
       setValue('members', memberData)
 
       //college_broucher
@@ -845,42 +846,42 @@ export default function CollegeForm() {
       // Set facilities
       const facilityData = collegeData.collegeFacility?.length
         ? collegeData.collegeFacility.map((facility) => ({
-          title: facility.title || '',
-          description: facility.description || '',
-          icon: facility.icon || ''
-        }))
+            title: facility.title || '',
+            description: facility.description || '',
+            icon: facility.icon || ''
+          }))
         : [
-          {
-            title: '',
-            description: '',
-            icon: ''
-          }
-        ]
+            {
+              title: '',
+              description: '',
+              icon: ''
+            }
+          ]
       setValue('facilities', facilityData)
 
       // Admissions
       const admissionData = collegeData.collegeAdmissions?.length
         ? collegeData.collegeAdmissions.map((admission) => {
-          const courseId = courses.find(
-            (c) => c.title === admission.program.title
-          )?.id
-          return {
-            course_id: courseId || '',
-            eligibility_criteria: admission.eligibility_criteria || '',
-            admission_process: admission.admission_process || '',
-            fee_details: admission.fee_details || '',
-            description: admission.description || ''
-          }
-        })
+            const courseId = courses.find(
+              (c) => c.title === admission.program.title
+            )?.id
+            return {
+              course_id: courseId || '',
+              eligibility_criteria: admission.eligibility_criteria || '',
+              admission_process: admission.admission_process || '',
+              fee_details: admission.fee_details || '',
+              description: admission.description || ''
+            }
+          })
         : [
-          {
-            course_id: '',
-            eligibility_criteria: '',
-            admission_process: '',
-            fee_details: '',
-            description: ''
-          }
-        ]
+            {
+              course_id: '',
+              eligibility_criteria: '',
+              admission_process: '',
+              fee_details: '',
+              description: ''
+            }
+          ]
       setValue('admissions', admissionData)
     } catch (error) {
       console.error('Error fetching college data:', error)
@@ -1179,7 +1180,9 @@ export default function CollegeForm() {
                       }}
                       onSearchChange={(val) => setUniSearch(val || '')}
                       placeholder='Search University'
-                      error={errors.university_id ? 'This field is required' : ''}
+                      error={
+                        errors.university_id ? 'This field is required' : ''
+                      }
                       required
                       loading={loadUni}
                     />

@@ -1,10 +1,10 @@
 import React from 'react'
-import StudentEnrollmentGrowthChart from '../../../../components/EnrollmentChart'
-import Announcements from '../../../../components/Announcements'
-import Calendar from '../../../../components/Calendar'
-import UserCard from '../../../../components/UserCard'
-import Piechart from '../../../../components/Piechart'
-import Barchart from '../../../../components/Barchart'
+import StudentEnrollmentGrowthChart from '../../../../ui/molecules/EnrollmentChart'
+import Announcements from '../../../../ui/molecules/Announcements'
+import Calendar from '../../../../ui/molecules/Calendar'
+import UserCard from '../../../../ui/molecules/UserCard'
+import Piechart from '../../../../ui/molecules/Piechart'
+import Barchart from '../../../../ui/molecules/Barchart'
 const page = () => {
   return (
     <div className='p-4 flex gap-4 flex-col md:flex-row'>

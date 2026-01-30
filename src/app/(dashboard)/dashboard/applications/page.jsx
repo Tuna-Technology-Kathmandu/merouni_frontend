@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react'
 import { authFetch } from '@/app/utils/authFetch'
 import { FaEdit, FaTrashAlt } from 'react-icons/fa'
-import { Modal } from '../../../../components/UserModal'
-import ShimmerEffect from '../../../../components/ShimmerEffect'
+import { Modal } from '../../../../ui/molecules/UserModal'
+import ShimmerEffect from '../../../../ui/molecules/ShimmerEffect'
 import { DotenvConfig } from '@/config/env.config'
 
 const ApplicationsPage = () => {
@@ -185,12 +185,13 @@ const ApplicationsPage = () => {
                   </td>
                   <td className='px-4 py-2 border'>
                     <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${app.status === 'ACCEPTED'
-                        ? 'bg-green-100 text-green-800'
-                        : app.status === 'REJECTED'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                        }`}
+                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        app.status === 'ACCEPTED'
+                          ? 'bg-green-100 text-green-800'
+                          : app.status === 'REJECTED'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                      }`}
                     >
                       {app.status || 'IN_PROGRESS'}
                     </span>

@@ -7,7 +7,7 @@ import Header from '../../../components/Frontpage/Header'
 import Hero from './components/Hero'
 import Description from './components/Description'
 import Cardlist from './components/Cardlist'
-import Loading from '../../../components/Loading'
+import Loading from '../../../ui/molecules/Loading'
 import SmallCardList from './components/SmallCardList'
 import Banner from './components/Banner'
 

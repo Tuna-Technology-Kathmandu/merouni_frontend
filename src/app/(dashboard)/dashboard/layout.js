@@ -1,6 +1,6 @@
 'use client'
-import AdminNavbar from '../../../components/AdminNavbar'
-import Menu from '../../../components/Menu'
+import AdminNavbar from '../../../ui/molecules/AdminNavbar'
+import Menu from '../../../ui/molecules/Menu'
 import Image from 'next/image'
 import Link from 'next/link'
 import useAuthGuard from '@/hooks/useAuthGuard'

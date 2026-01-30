@@ -10,8 +10,8 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import { useDebounce } from 'use-debounce'
-import { Modal } from '../../../../components/UserModal'
-import Table from '../../../../components/Table'
+import { Modal } from '../../../../ui/molecules/UserModal'
+import Table from '../../../../ui/molecules/Table'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import {
   fetchExam,
@@ -20,7 +20,7 @@ import {
   fetchScholarship
 } from './actions'
 import CourseSearch from './CourseSearch'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/ui/shadcn/button'
 const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
 })
@@ -320,7 +320,7 @@ export default function ProgramForm() {
         total: data.pagination.totalCount
       })
     } catch (error) {
-      console.log(error, "DONEDONE")
+      console.log(error, 'DONEDONE')
       toast.error('Failed to fetch programs')
     } finally {
       setTableLoading(false)
@@ -1093,7 +1093,6 @@ export default function ProgramForm() {
                   ) : showExamDrop ? (
                     exams.length > 0 ? (
                       <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
-
                         toot
                         {exams.map((item) => (
                           <li
@@ -1195,10 +1194,11 @@ export default function ProgramForm() {
                             setCurrentYear(year)
                             setCurrentSemester(sem)
                           }}
-                          className={`w-full py-2 px-3 rounded text-sm ${currentYear === year && currentSemester === sem
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-white border hover:bg-gray-100'
-                            }`}
+                          className={`w-full py-2 px-3 rounded text-sm ${
+                            currentYear === year && currentSemester === sem
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-white border hover:bg-gray-100'
+                          }`}
                         >
                           {sem !== 0
                             ? `
@@ -1271,8 +1271,8 @@ export default function ProgramForm() {
                           const title =
                             fieldIndex >= 0
                               ? watch(`syllabus.${fieldIndex}._title`) ||
-                              course.title ||
-                              'Unknown Course'
+                                course.title ||
+                                'Unknown Course'
                               : course.title || 'Unknown Course'
 
                           return (
@@ -1341,10 +1341,7 @@ export default function ProgramForm() {
             >
               Cancel
             </button>
-            <Button
-              type='submit'
-              disabled={submitting}
-            >
+            <Button type='submit' disabled={submitting}>
               {submitting
                 ? 'Processing...'
                 : editing

@@ -61,3 +61,22 @@ export async function deleteScholarship(id) {
     throw new Error(error)
   }
 }
+
+export async function getScholarshipApplications(scholarshipId, page = 1) {
+  try {
+    const response = await authFetch(
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/scholarship-application?scholarshipId=${scholarshipId}&page=${page}&limit=10`,
+      {
+        cache: 'no-store'
+      }
+    )
+    if (!response.ok) {
+      throw new Error('Failed to fetch applications')
+    }
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('Error fetching scholarship applications:', error)
+    throw error
+  }
+}

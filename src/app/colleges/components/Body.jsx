@@ -12,7 +12,7 @@ import Pagination from '@/app/blogs/components/Pagination'
 import UniversityCard from './UniversityCard'
 import { authFetch } from '@/app/utils/authFetch'
 import { DotenvConfig } from '@/config/env.config'
-import EmptyState from '@/components/ui/EmptyState'
+import EmptyState from '@/ui/shadcn/EmptyState'
 
 // Client-side fetch functions
 const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
@@ -47,17 +47,18 @@ const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
     const data = await response.json()
 
     return {
-      colleges: data.items?.map((college) => ({
-        name: college.name,
-        location: `${college.address?.city || ''}, ${college.address?.state || ''}`,
-        description: college.description,
-        googleMapUrl: college.google_map_url,
-        instituteType: college.institute_type,
-        slug: college.slugs,
-        collegeId: college.id,
-        collegeImage: college.featured_img,
-        logo: college.college_logo
-      })) || [],
+      colleges:
+        data.items?.map((college) => ({
+          name: college.name,
+          location: `${college.address?.city || ''}, ${college.address?.state || ''}`,
+          description: college.description,
+          googleMapUrl: college.google_map_url,
+          instituteType: college.institute_type,
+          slug: college.slugs,
+          collegeId: college.id,
+          collegeImage: college.featured_img,
+          logo: college.college_logo
+        })) || [],
       pagination: data.pagination || {
         currentPage: 1,
         totalPages: 1,
@@ -66,7 +67,10 @@ const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
     }
   } catch (error) {
     console.error('Failed to fetch colleges:', error)
-    return { colleges: [], pagination: { currentPage: 1, totalPages: 1, totalCount: 0 } }
+    return {
+      colleges: [],
+      pagination: { currentPage: 1, totalPages: 1, totalCount: 0 }
+    }
   }
 }
 
@@ -85,7 +89,10 @@ const searchColleges = async (query) => {
 
     const data = await response.json()
     if (!data.items || data.items.length === 0) {
-      return { colleges: [], pagination: { currentPage: 1, totalPages: 0, totalCount: 0 } }
+      return {
+        colleges: [],
+        pagination: { currentPage: 1, totalPages: 0, totalCount: 0 }
+      }
     }
 
     const colleges = data.items.map((clz) => ({
@@ -99,10 +106,20 @@ const searchColleges = async (query) => {
       instituteType: clz.institute_type || 'Unknown'
     }))
 
-    return { colleges, pagination: data.pagination || { currentPage: 1, totalPages: 0, totalCount: 0 } }
+    return {
+      colleges,
+      pagination: data.pagination || {
+        currentPage: 1,
+        totalPages: 0,
+        totalCount: 0
+      }
+    }
   } catch (error) {
     console.error('Failed to search colleges:', error)
-    return { colleges: [], pagination: { currentPage: 1, totalPages: 0, totalCount: 0 } }
+    return {
+      colleges: [],
+      pagination: { currentPage: 1, totalPages: 0, totalCount: 0 }
+    }
   }
 }
 
@@ -145,16 +162,83 @@ const getUniversity = async (searchQuery = '') => {
 }
 
 const districts = [
-  'Bhojpur', 'Dhankuta', 'Ilam', 'Jhapa', 'Khotang', 'Morang', 'Okhaladhunga', 'Panchthar',
-  'Sankhuwasabha', 'Solukhumbu', 'Sunsari', 'Taplejung', 'Terhathum', 'Udayapur', 'Bara',
-  'Dhanusha', 'Mahottari', 'Parsa', 'Rautahat', 'Saptari', 'Sarlahi', 'Siraha', 'Bhaktapur',
-  'Chitawan', 'Dhading', 'Dolakha', 'Kathmandu', 'Kavrepalanchok', 'Lalitpur', 'Makwanpur',
-  'Nuwakot', 'Ramechhap', 'Rasuwa', 'Sindhuli', 'Sindhupalchok', 'Baglung', 'Gorkha', 'Kaski',
-  'Lamjung', 'Manang', 'Mustang', 'Myagdi', 'Nawalpur', 'Parbat', 'Syangja', 'Tanahu',
-  'Arghakhanchi', 'Banke', 'Bardiya', 'Dang', 'Gulmi', 'Kapilbastu', 'Nawalparasi', 'Palpa',
-  'Pyuthan', 'Rolpa', 'Rukum Purba', 'Rupandehi', 'Dailekh', 'Dolpa', 'Humla', 'Jajarkot',
-  'Jumla', 'Kalikot', 'Mugu', 'Rukum Paschim', 'Salyan', 'Surkhet', 'Achham', 'Baitadi',
-  'Bajhang', 'Bajura', 'Dadeldhura', 'Darchula', 'Doti', 'Kailali', 'Kanchanpur'
+  'Bhojpur',
+  'Dhankuta',
+  'Ilam',
+  'Jhapa',
+  'Khotang',
+  'Morang',
+  'Okhaladhunga',
+  'Panchthar',
+  'Sankhuwasabha',
+  'Solukhumbu',
+  'Sunsari',
+  'Taplejung',
+  'Terhathum',
+  'Udayapur',
+  'Bara',
+  'Dhanusha',
+  'Mahottari',
+  'Parsa',
+  'Rautahat',
+  'Saptari',
+  'Sarlahi',
+  'Siraha',
+  'Bhaktapur',
+  'Chitawan',
+  'Dhading',
+  'Dolakha',
+  'Kathmandu',
+  'Kavrepalanchok',
+  'Lalitpur',
+  'Makwanpur',
+  'Nuwakot',
+  'Ramechhap',
+  'Rasuwa',
+  'Sindhuli',
+  'Sindhupalchok',
+  'Baglung',
+  'Gorkha',
+  'Kaski',
+  'Lamjung',
+  'Manang',
+  'Mustang',
+  'Myagdi',
+  'Nawalpur',
+  'Parbat',
+  'Syangja',
+  'Tanahu',
+  'Arghakhanchi',
+  'Banke',
+  'Bardiya',
+  'Dang',
+  'Gulmi',
+  'Kapilbastu',
+  'Nawalparasi',
+  'Palpa',
+  'Pyuthan',
+  'Rolpa',
+  'Rukum Purba',
+  'Rupandehi',
+  'Dailekh',
+  'Dolpa',
+  'Humla',
+  'Jajarkot',
+  'Jumla',
+  'Kalikot',
+  'Mugu',
+  'Rukum Paschim',
+  'Salyan',
+  'Surkhet',
+  'Achham',
+  'Baitadi',
+  'Bajhang',
+  'Bajura',
+  'Dadeldhura',
+  'Darchula',
+  'Doti',
+  'Kailali',
+  'Kanchanpur'
 ]
 
 // Memoized FilterSection with local state for performant typing
@@ -189,7 +273,9 @@ const FilterSection = React.memo(function FilterSection({
   return (
     <div className='bg-white rounded-2xl p-6 border border-gray-200 shadow-sm'>
       <div className='flex justify-between items-center mb-4'>
-        <h3 className='text-gray-800 font-bold text-xs md:text-sm uppercase tracking-wider'>{title}</h3>
+        <h3 className='text-gray-800 font-bold text-xs md:text-sm uppercase tracking-wider'>
+          {title}
+        </h3>
       </div>
       <div className='relative flex items-center mb-4'>
         <Search className='absolute left-3 w-4 h-4 text-gray-400' />
@@ -208,17 +294,24 @@ const FilterSection = React.memo(function FilterSection({
       </div>
       <div className='mt-2 space-y-2.5 overflow-y-auto h-36 pr-2 custom-scrollbar'>
         {options.length === 0 ? (
-          <div className='text-center py-6 text-xs text-gray-400 italic font-medium'>No matches found</div>
+          <div className='text-center py-6 text-xs text-gray-400 italic font-medium'>
+            No matches found
+          </div>
         ) : (
           options.map((opt, idx) => (
-            <label key={idx} className='flex items-center gap-3 group cursor-pointer'>
+            <label
+              key={idx}
+              className='flex items-center gap-3 group cursor-pointer'
+            >
               <input
                 type='checkbox'
                 checked={selectedValues.includes(opt.name)}
                 onChange={() => onCheckboxChange(opt.name)}
                 className='w-4 h-4 rounded border-gray-300 text-[#0A70A7] focus:ring-[#0A70A7] transition-all cursor-pointer'
               />
-              <span className='text-gray-600 group-hover:text-gray-900 text-sm font-medium transition-colors'>{opt.name}</span>
+              <span className='text-gray-600 group-hover:text-gray-900 text-sm font-medium transition-colors'>
+                {opt.name}
+              </span>
             </label>
           ))
         )}
@@ -250,27 +343,85 @@ const FilterModal = React.memo(function FilterModal({
         className='bg-white rounded-3xl p-6 md:p-10 w-full max-w-5xl h-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl space-y-8'
       >
         <div className='flex justify-between items-center shrink-0'>
-          <h2 className='text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight'>Advanced Filters</h2>
+          <h2 className='text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight'>
+            Advanced Filters
+          </h2>
           <button
             onClick={onClose}
             className='p-2.5 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-900'
           >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            <svg
+              className='w-6 h-6'
+              fill='none'
+              viewBox='0 0 24 24'
+              stroke='currentColor'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth='2'
+                d='M6 18L18 6M6 6l12 12'
+              />
+            </svg>
           </button>
         </div>
 
         <div className='flex-1 overflow-y-auto pr-3 custom-scrollbar'>
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pb-8'>
-            <FilterSection title='Discipline' inputField='discipline' options={modalDisciplines} selectedValues={modalSelectedFilters.degree} onCheckboxChange={(val) => handleModalFilterChange('degree', val)} defaultValue={modalFilterInputs.discipline} onSearchChange={handleModalFilterInputChange} isLoading={isModalDisciplineLoading} />
-            <FilterSection title='District' inputField='district' options={modalFilteredDistricts} selectedValues={modalSelectedFilters.state} onCheckboxChange={(val) => handleModalFilterChange('state', val)} defaultValue={modalFilterInputs.district} onSearchChange={handleModalFilterInputChange} />
-            <FilterSection title='Affiliation' inputField='affiliation' options={modalAffiliations} selectedValues={modalSelectedFilters.uni} onCheckboxChange={(val) => handleModalFilterChange('uni', val)} defaultValue={modalFilterInputs.affiliation} onSearchChange={handleModalFilterInputChange} isLoading={isModalAffiliationLoading} />
-            <FilterSection title='Institute type' inputField='instituteType' options={modalFilteredInstituteTypes} selectedValues={modalSelectedFilters.type} onCheckboxChange={(val) => handleModalFilterChange('type', val)} defaultValue={modalFilterInputs.instituteType} onSearchChange={handleModalFilterInputChange} />
+            <FilterSection
+              title='Discipline'
+              inputField='discipline'
+              options={modalDisciplines}
+              selectedValues={modalSelectedFilters.degree}
+              onCheckboxChange={(val) => handleModalFilterChange('degree', val)}
+              defaultValue={modalFilterInputs.discipline}
+              onSearchChange={handleModalFilterInputChange}
+              isLoading={isModalDisciplineLoading}
+            />
+            <FilterSection
+              title='District'
+              inputField='district'
+              options={modalFilteredDistricts}
+              selectedValues={modalSelectedFilters.state}
+              onCheckboxChange={(val) => handleModalFilterChange('state', val)}
+              defaultValue={modalFilterInputs.district}
+              onSearchChange={handleModalFilterInputChange}
+            />
+            <FilterSection
+              title='Affiliation'
+              inputField='affiliation'
+              options={modalAffiliations}
+              selectedValues={modalSelectedFilters.uni}
+              onCheckboxChange={(val) => handleModalFilterChange('uni', val)}
+              defaultValue={modalFilterInputs.affiliation}
+              onSearchChange={handleModalFilterInputChange}
+              isLoading={isModalAffiliationLoading}
+            />
+            <FilterSection
+              title='Institute type'
+              inputField='instituteType'
+              options={modalFilteredInstituteTypes}
+              selectedValues={modalSelectedFilters.type}
+              onCheckboxChange={(val) => handleModalFilterChange('type', val)}
+              defaultValue={modalFilterInputs.instituteType}
+              onSearchChange={handleModalFilterInputChange}
+            />
           </div>
         </div>
 
         <div className='flex justify-end gap-3 pt-6 shrink-0 border-t border-gray-100'>
-          <button onClick={onClose} className='px-8 py-3 rounded-2xl text-gray-500 font-bold hover:bg-gray-50 transition-colors text-sm uppercase tracking-widest'>Cancel</button>
-          <button onClick={onApply} className='bg-[#0A70A7] text-white px-10 py-3 rounded-2xl font-bold hover:bg-[#085a86] transition-all shadow-lg shadow-blue-100 text-sm uppercase tracking-widest'>Apply Filters</button>
+          <button
+            onClick={onClose}
+            className='px-8 py-3 rounded-2xl text-gray-500 font-bold hover:bg-gray-50 transition-colors text-sm uppercase tracking-widest'
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onApply}
+            className='bg-[#0A70A7] text-white px-10 py-3 rounded-2xl font-bold hover:bg-[#085a86] transition-all shadow-lg shadow-blue-100 text-sm uppercase tracking-widest'
+          >
+            Apply Filters
+          </button>
         </div>
       </motion.div>
     </div>
@@ -280,25 +431,42 @@ const FilterModal = React.memo(function FilterModal({
 const CollegeFinder = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [universities, setUniversities] = useState([])
-  const [pagination, setPagination] = useState({ totalPages: 1, currentPage: 1, totalCount: 0 })
+  const [pagination, setPagination] = useState({
+    totalPages: 1,
+    currentPage: 1,
+    totalCount: 0
+  })
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
 
-  const [filterInputs, setFilterInputs] = useState({ discipline: '', affiliation: '', district: '', instituteType: '' })
+  const [filterInputs, setFilterInputs] = useState({
+    discipline: '',
+    affiliation: '',
+    district: '',
+    instituteType: ''
+  })
   const [filteredDisciplines, setFilteredDisciplines] = useState([])
   const [filteredAffiliations, setFilteredAffiliations] = useState([])
-  const [selectedFilters, setSelectedFilters] = useState({ degree: [], uni: [], state: [], type: [] })
+  const [selectedFilters, setSelectedFilters] = useState({
+    degree: [],
+    uni: [],
+    state: [],
+    type: []
+  })
 
   const [modalFilterInputs, setModalFilterInputs] = useState(filterInputs)
-  const [modalSelectedFilters, setModalSelectedFilters] = useState(selectedFilters)
+  const [modalSelectedFilters, setModalSelectedFilters] =
+    useState(selectedFilters)
   const [modalDisciplines, setModalDisciplines] = useState([])
   const [modalAffiliations, setModalAffiliations] = useState([])
 
   const [isDisciplineLoading, setIsDisciplineLoading] = useState(false)
   const [isAffiliationLoading, setIsAffiliationLoading] = useState(false)
-  const [isModalDisciplineLoading, setIsModalDisciplineLoading] = useState(false)
-  const [isModalAffiliationLoading, setIsModalAffiliationLoading] = useState(false)
+  const [isModalDisciplineLoading, setIsModalDisciplineLoading] =
+    useState(false)
+  const [isModalAffiliationLoading, setIsModalAffiliationLoading] =
+    useState(false)
 
   const user = useSelector((state) => state.user.data)
   const [wishlistCollegeIds, setWishlistCollegeIds] = useState(new Set())
@@ -307,12 +475,20 @@ const CollegeFinder = () => {
     const fetchWishlist = async () => {
       if (!user?.id) return setWishlistCollegeIds(new Set())
       try {
-        const response = await authFetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist?user_id=${user.id}`)
+        const response = await authFetch(
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist?user_id=${user.id}`
+        )
         if (response.ok) {
           const data = await response.json()
-          setWishlistCollegeIds(new Set((data.items || []).map((item) => item.college?.id).filter(Boolean)))
+          setWishlistCollegeIds(
+            new Set(
+              (data.items || []).map((item) => item.college?.id).filter(Boolean)
+            )
+          )
         }
-      } catch (error) { setWishlistCollegeIds(new Set()) }
+      } catch (error) {
+        setWishlistCollegeIds(new Set())
+      }
     }
     fetchWishlist()
   }, [user?.id])
@@ -334,70 +510,142 @@ const CollegeFinder = () => {
   useEffect(() => {
     const init = async () => {
       const programs = await getPrograms()
-      const programOptions = programs.map(p => ({ name: p.title }))
+      const programOptions = programs.map((p) => ({ name: p.title }))
       setFilteredDisciplines(programOptions)
       setModalDisciplines(programOptions)
 
       const unis = await getUniversity()
-      const uniOptions = unis.map(u => ({ name: u.fullname }))
+      const uniOptions = unis.map((u) => ({ name: u.fullname }))
       setFilteredAffiliations(uniOptions)
       setModalAffiliations(uniOptions)
     }
     init()
   }, [])
 
-  const fetchCollegesData = useCallback(async (page = 1) => {
-    setIsLoading(true)
-    try {
-      const data = await fetchCollegesFromAPI(page, selectedFilters)
-      setUniversities(data.colleges); setPagination(data.pagination)
-    } catch (err) { setUniversities([]) } finally { setIsLoading(false) }
-  }, [selectedFilters])
+  const fetchCollegesData = useCallback(
+    async (page = 1) => {
+      setIsLoading(true)
+      try {
+        const data = await fetchCollegesFromAPI(page, selectedFilters)
+        setUniversities(data.colleges)
+        setPagination(data.pagination)
+      } catch (err) {
+        setUniversities([])
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [selectedFilters]
+  )
 
-  useEffect(() => { fetchCollegesData(1) }, [fetchCollegesData])
+  useEffect(() => {
+    fetchCollegesData(1)
+  }, [fetchCollegesData])
 
   const handleFilterSearchChange = (field, value) => {
     setFilterInputs((prev) => ({ ...prev, [field]: value }))
-    if (field === 'discipline') fetchDisciplines(value, setFilteredDisciplines, setIsDisciplineLoading)
-    if (field === 'affiliation') fetchAffiliations(value, setFilteredAffiliations, setIsAffiliationLoading)
+    if (field === 'discipline')
+      fetchDisciplines(value, setFilteredDisciplines, setIsDisciplineLoading)
+    if (field === 'affiliation')
+      fetchAffiliations(value, setFilteredAffiliations, setIsAffiliationLoading)
   }
 
   const handleModalFilterInputChange = (field, value) => {
     setModalFilterInputs((prev) => ({ ...prev, [field]: value }))
-    if (field === 'discipline') fetchDisciplines(value, setModalDisciplines, setIsModalDisciplineLoading)
-    if (field === 'affiliation') fetchAffiliations(value, setModalAffiliations, setIsModalAffiliationLoading)
+    if (field === 'discipline')
+      fetchDisciplines(value, setModalDisciplines, setIsModalDisciplineLoading)
+    if (field === 'affiliation')
+      fetchAffiliations(
+        value,
+        setModalAffiliations,
+        setIsModalAffiliationLoading
+      )
   }
 
   const handleFilterChange = (filterType, value) => {
     setSelectedFilters((prev) => {
       const arr = prev[filterType]
-      return { ...prev, [filterType]: arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value] }
+      return {
+        ...prev,
+        [filterType]: arr.includes(value)
+          ? arr.filter((v) => v !== value)
+          : [...arr, value]
+      }
     })
   }
 
   const handleModalFilterChange = (filterType, value) => {
     setModalSelectedFilters((prev) => {
       const arr = prev[filterType]
-      return { ...prev, [filterType]: arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value] }
+      return {
+        ...prev,
+        [filterType]: arr.includes(value)
+          ? arr.filter((v) => v !== value)
+          : [...arr, value]
+      }
     })
   }
 
-  const debouncedCollegeSearch = useMemo(() => debounce(async (query) => {
-    setIsSearching(true)
-    const results = await searchColleges(query)
-    setUniversities(results.colleges); setPagination(results.pagination); setIsSearching(false)
-  }, 500), [])
+  const debouncedCollegeSearch = useMemo(
+    () =>
+      debounce(async (query) => {
+        setIsSearching(true)
+        const results = await searchColleges(query)
+        setUniversities(results.colleges)
+        setPagination(results.pagination)
+        setIsSearching(false)
+      }, 500),
+    []
+  )
 
   useEffect(() => {
-    if (searchQuery) { debouncedCollegeSearch(searchQuery); return () => debouncedCollegeSearch.cancel() }
-    else { fetchCollegesData(1) }
+    if (searchQuery) {
+      debouncedCollegeSearch(searchQuery)
+      return () => debouncedCollegeSearch.cancel()
+    } else {
+      fetchCollegesData(1)
+    }
   }, [searchQuery, fetchCollegesData])
 
-  const filteredDistricts = useMemo(() => districts.filter(d => d.toLowerCase().includes(filterInputs.district.toLowerCase())).map(d => ({ name: d })), [filterInputs.district])
-  const filteredInstituteTypes = useMemo(() => ['private', 'public'].filter(t => t.toLowerCase().includes(filterInputs.instituteType.toLowerCase())).map(t => ({ name: t })), [filterInputs.instituteType])
+  const filteredDistricts = useMemo(
+    () =>
+      districts
+        .filter((d) =>
+          d.toLowerCase().includes(filterInputs.district.toLowerCase())
+        )
+        .map((d) => ({ name: d })),
+    [filterInputs.district]
+  )
+  const filteredInstituteTypes = useMemo(
+    () =>
+      ['private', 'public']
+        .filter((t) =>
+          t.toLowerCase().includes(filterInputs.instituteType.toLowerCase())
+        )
+        .map((t) => ({ name: t })),
+    [filterInputs.instituteType]
+  )
 
-  const modalFilteredDistricts = useMemo(() => districts.filter(d => d.toLowerCase().includes(modalFilterInputs.district.toLowerCase())).map(d => ({ name: d })), [modalFilterInputs.district])
-  const modalFilteredInstituteTypes = useMemo(() => ['private', 'public'].filter(t => t.toLowerCase().includes(modalFilterInputs.instituteType.toLowerCase())).map(t => ({ name: t })), [modalFilterInputs.instituteType])
+  const modalFilteredDistricts = useMemo(
+    () =>
+      districts
+        .filter((d) =>
+          d.toLowerCase().includes(modalFilterInputs.district.toLowerCase())
+        )
+        .map((d) => ({ name: d })),
+    [modalFilterInputs.district]
+  )
+  const modalFilteredInstituteTypes = useMemo(
+    () =>
+      ['private', 'public']
+        .filter((t) =>
+          t
+            .toLowerCase()
+            .includes(modalFilterInputs.instituteType.toLowerCase())
+        )
+        .map((t) => ({ name: t })),
+    [modalFilterInputs.instituteType]
+  )
 
   const handleApplyModalFilters = () => {
     setFilterInputs(modalFilterInputs)
@@ -407,7 +655,9 @@ const CollegeFinder = () => {
 
   const handlePageChange = (page) => {
     if (page > 0 && page <= pagination.totalPages) {
-      setPagination((prev) => ({ ...prev, currentPage: page })); fetchCollegesData(page); window.scrollTo({ top: 300, behavior: 'smooth' })
+      setPagination((prev) => ({ ...prev, currentPage: page }))
+      fetchCollegesData(page)
+      window.scrollTo({ top: 300, behavior: 'smooth' })
     }
   }
 
@@ -416,7 +666,9 @@ const CollegeFinder = () => {
       <div className='flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-8 border-b border-gray-100 pb-12'>
         <div className='flex-1 space-y-6 w-full'>
           <div className='flex items-center gap-4 mb-2'>
-            <h2 className='text-3xl font-extrabold text-gray-900 tracking-tight'>Colleges</h2>
+            <h2 className='text-3xl font-extrabold text-gray-900 tracking-tight'>
+              Colleges
+            </h2>
             <span className='bg-blue-50 text-[#0A70A7] px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider'>
               {pagination.totalCount || '0'} Results
             </span>
@@ -450,7 +702,7 @@ const CollegeFinder = () => {
             }}
             className='flex items-center gap-3 bg-white border border-gray-300 px-6 py-4 rounded-2xl text-gray-800 font-bold text-xs shadow-sm hover:bg-gray-50 transition-all whitespace-nowrap uppercase tracking-widest'
           >
-            <FaExpandAlt className="w-3.5 h-3.5" />
+            <FaExpandAlt className='w-3.5 h-3.5' />
             Advanced Filters
           </button>
           <button
@@ -458,7 +710,12 @@ const CollegeFinder = () => {
             onClick={() => {
               setSearchQuery('')
               setSelectedFilters({ state: [], degree: [], uni: [], type: [] })
-              setFilterInputs({ discipline: '', affiliation: '', district: '', instituteType: '' })
+              setFilterInputs({
+                discipline: '',
+                affiliation: '',
+                district: '',
+                instituteType: ''
+              })
             }}
           >
             Clear All
@@ -468,44 +725,100 @@ const CollegeFinder = () => {
 
       <div className='flex flex-col lg:flex-row gap-12'>
         <div className='lg:w-[320px] space-y-8 shrink-0 hidden lg:block'>
-          <FilterSection title='Discipline' inputField='discipline' options={filteredDisciplines} selectedValues={selectedFilters.degree} onCheckboxChange={(val) => handleFilterChange('degree', val)} defaultValue={filterInputs.discipline} onSearchChange={handleFilterSearchChange} isLoading={isDisciplineLoading} />
-          <FilterSection title='District' inputField='district' options={filteredDistricts} selectedValues={selectedFilters.state} onCheckboxChange={(val) => handleFilterChange('state', val)} defaultValue={filterInputs.district} onSearchChange={handleFilterSearchChange} />
-          <FilterSection title='Affiliation' inputField='affiliation' options={filteredAffiliations} selectedValues={selectedFilters.uni} onCheckboxChange={(val) => handleFilterChange('uni', val)} defaultValue={filterInputs.affiliation} onSearchChange={handleFilterSearchChange} isLoading={isAffiliationLoading} />
-          <FilterSection title='Institute type' inputField='instituteType' options={filteredInstituteTypes} selectedValues={selectedFilters.type} onCheckboxChange={(val) => handleFilterChange('type', val)} defaultValue={filterInputs.instituteType} onSearchChange={handleFilterSearchChange} />
+          <FilterSection
+            title='Discipline'
+            inputField='discipline'
+            options={filteredDisciplines}
+            selectedValues={selectedFilters.degree}
+            onCheckboxChange={(val) => handleFilterChange('degree', val)}
+            defaultValue={filterInputs.discipline}
+            onSearchChange={handleFilterSearchChange}
+            isLoading={isDisciplineLoading}
+          />
+          <FilterSection
+            title='District'
+            inputField='district'
+            options={filteredDistricts}
+            selectedValues={selectedFilters.state}
+            onCheckboxChange={(val) => handleFilterChange('state', val)}
+            defaultValue={filterInputs.district}
+            onSearchChange={handleFilterSearchChange}
+          />
+          <FilterSection
+            title='Affiliation'
+            inputField='affiliation'
+            options={filteredAffiliations}
+            selectedValues={selectedFilters.uni}
+            onCheckboxChange={(val) => handleFilterChange('uni', val)}
+            defaultValue={filterInputs.affiliation}
+            onSearchChange={handleFilterSearchChange}
+            isLoading={isAffiliationLoading}
+          />
+          <FilterSection
+            title='Institute type'
+            inputField='instituteType'
+            options={filteredInstituteTypes}
+            selectedValues={selectedFilters.type}
+            onCheckboxChange={(val) => handleFilterChange('type', val)}
+            defaultValue={filterInputs.instituteType}
+            onSearchChange={handleFilterSearchChange}
+          />
         </div>
 
         <div className='flex-1'>
           {isLoading ? (
             <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10'>
-              {Array.from({ length: 9 }).map((_, idx) => <UniversityCardShimmer key={idx} />)}
+              {Array.from({ length: 9 }).map((_, idx) => (
+                <UniversityCardShimmer key={idx} />
+              ))}
             </div>
           ) : universities.length > 0 ? (
             <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10'>
               {universities.map((u, idx) => (
-                <UniversityCard {...u} key={idx} wishlistCollegeIds={wishlistCollegeIds} onWishlistUpdate={setWishlistCollegeIds} />
+                <UniversityCard
+                  {...u}
+                  key={idx}
+                  wishlistCollegeIds={wishlistCollegeIds}
+                  onWishlistUpdate={setWishlistCollegeIds}
+                />
               ))}
             </div>
           ) : (
             <EmptyState
               icon={Building2}
-              title="No Colleges Found"
+              title='No Colleges Found'
               description="We couldn't find any colleges matching your current search or filter criteria. Try clearing some filters to see more results."
               action={{
-                label: "Clear All Filters",
+                label: 'Clear All Filters',
                 onClick: () => {
                   setSearchQuery('')
-                  setSelectedFilters({ state: [], degree: [], uni: [], type: [] })
-                  setFilterInputs({ discipline: '', affiliation: '', district: '', instituteType: '' })
+                  setSelectedFilters({
+                    state: [],
+                    degree: [],
+                    uni: [],
+                    type: []
+                  })
+                  setFilterInputs({
+                    discipline: '',
+                    affiliation: '',
+                    district: '',
+                    instituteType: ''
+                  })
                 }
               }}
             />
           )}
 
-          {!searchQuery && universities.length > 0 && pagination.totalPages > 1 && (
-            <div className="mt-16 flex justify-center">
-              <Pagination pagination={pagination} onPageChange={handlePageChange} />
-            </div>
-          )}
+          {!searchQuery &&
+            universities.length > 0 &&
+            pagination.totalPages > 1 && (
+              <div className='mt-16 flex justify-center'>
+                <Pagination
+                  pagination={pagination}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
         </div>
       </div>
 

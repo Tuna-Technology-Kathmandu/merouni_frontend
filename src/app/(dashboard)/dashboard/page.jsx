@@ -3,36 +3,27 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSelector } from 'react-redux'
-import StudentEnrollmentGrowthChart from '../../../components/EnrollmentChart'
-import UserCard from '../../../components/UserCard'
-import Piechart from '../../../components/Piechart'
 import { destr } from 'destr'
+import { Phone, MapPin } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import {
-  Phone,
-  MapPin,
-  Plus,
-  Calendar,
-  Newspaper,
-  FileText,
-  School,
-  GraduationCap,
-  Book,
-  Trophy,
-  Pen,
-  Briefcase
-} from 'lucide-react'
 import { DotenvConfig } from '@/config/env.config'
+import QuickActions from '@/ui/organisms/admin-dashboard/home/QuickActions'
+import AnalyticsCards from '@/ui/organisms/admin-dashboard/home/AnalyticsCards'
+import TopAgentsTable from '@/ui/organisms/admin-dashboard/home/TopAgentsTable'
+import DashboardCharts from '@/ui/organisms/admin-dashboard/home/DashboardCharts'
+import UserCard from '@/ui/molecules/UserCard'
 
 const AdminDashboard = () => {
   const { setHeading } = usePageHeading()
   const [analytics, setAnalytics] = useState(null)
   const [loading, setLoading] = useState(true)
   const [selectedYears, setSelectedYears] = useState([])
+  const [topAgents, setTopAgents] = useState([])
+  const [topAgentsLoading, setTopAgentsLoading] = useState(true)
 
   useEffect(() => {
-    setHeading('Welcome to Admin Dashboard')
+    setHeading('Admin Dashboard')
     return () => setHeading(null)
   }, [setHeading])
 
@@ -82,6 +73,42 @@ const AdminDashboard = () => {
     }
   }, [selectedYears])
 
+  // Load top agents
+  useEffect(() => {
+    let isMounted = true
+
+    const loadTopAgents = async () => {
+      try {
+        setTopAgentsLoading(true)
+        const res = await authFetch(
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/top-agents?limit=5`,
+          { cache: 'no-store' }
+        )
+
+        if (!res.ok) {
+          throw new Error('Failed to load top agents')
+        }
+
+        const json = await res.json()
+        if (!isMounted) return
+
+        setTopAgents(json.data?.topAgents || [])
+      } catch (error) {
+        console.error('Error loading top agents:', error)
+      } finally {
+        if (isMounted) {
+          setTopAgentsLoading(false)
+        }
+      }
+    }
+
+    loadTopAgents()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
   const handleYearsChange = (years) => {
     setSelectedYears(years)
   }
@@ -89,179 +116,21 @@ const AdminDashboard = () => {
   return (
     <div className='p-4 flex flex-col gap-8'>
       <div className='w-full flex flex-col gap-8'>
-        {/* USER CARDS */}
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
-          <UserCard
-            type='Users'
-            value={analytics?.totalUsers}
-            loading={loading}
-          />
-          <UserCard
-            type='College'
-            value={analytics?.totalColleges}
-            loading={loading}
-          />
-          <UserCard
-            type='University'
-            value={analytics?.totalUniversities}
-            loading={loading}
-          />
-          <UserCard
-            type='Consultancy'
-            value={analytics?.totalConsultancies}
-            loading={loading}
-          />
-          <UserCard
-            type='Agents'
-            value={analytics?.totalAgents}
-            loading={loading}
-          />
-          <UserCard
-            type='Events'
-            value={analytics?.totalEvents}
-            loading={loading}
-          />
-          <UserCard
-            type='Referrals'
-            value={analytics?.totalReferrals}
-            loading={loading}
-          />
-        </div>
+        {/* ANALYTICS CARDS */}
+        <AnalyticsCards analytics={analytics} loading={loading} />
 
         {/* QUICK ACTIONS */}
-        <div className='bg-white rounded-lg shadow-md p-6'>
-          <h2 className='text-xl font-semibold text-gray-800 mb-4'>
-            Quick Actions
-          </h2>
-          <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
-            <Link
-              href='/dashboard/events?add=true'
-              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors group'
-            >
-              <div className='p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors'>
-                <Calendar className='w-5 h-5 text-blue-600' />
-              </div>
-              <span className='text-sm font-medium text-gray-700 group-hover:text-blue-600'>
-                Add Event
-              </span>
-            </Link>
+        <QuickActions />
 
-            <Link
-              href='/dashboard/blogs?add=true'
-              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-300 transition-colors group'
-            >
-              <div className='p-2 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors'>
-                <Newspaper className='w-5 h-5 text-green-600' />
-              </div>
-              <span className='text-sm font-medium text-gray-700 group-hover:text-green-600'>
-                Add Blog
-              </span>
-            </Link>
+        {/* DASHBOARD CHARTS */}
+        <DashboardCharts
+          analytics={analytics}
+          selectedYears={selectedYears}
+          onYearsChange={handleYearsChange}
+        />
 
-            <Link
-              href='/dashboard/material?add=true'
-              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors group'
-            >
-              <div className='p-2 bg-purple-100 rounded-lg group-hover:bg-purple-200 transition-colors'>
-                <FileText className='w-5 h-5 text-purple-600' />
-              </div>
-              <span className='text-sm font-medium text-gray-700 group-hover:text-purple-600'>
-                Add Material
-              </span>
-            </Link>
-
-            <Link
-              href='/dashboard/addCollege?add=true'
-              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-orange-50 hover:border-orange-300 transition-colors group'
-            >
-              <div className='p-2 bg-orange-100 rounded-lg group-hover:bg-orange-200 transition-colors'>
-                <School className='w-5 h-5 text-orange-600' />
-              </div>
-              <span className='text-sm font-medium text-gray-700 group-hover:text-orange-600'>
-                Add College
-              </span>
-            </Link>
-
-            <Link
-              href='/dashboard/program?add=true'
-              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-indigo-50 hover:border-indigo-300 transition-colors group'
-            >
-              <div className='p-2 bg-indigo-100 rounded-lg group-hover:bg-indigo-200 transition-colors'>
-                <GraduationCap className='w-5 h-5 text-indigo-600' />
-              </div>
-              <span className='text-sm font-medium text-gray-700 group-hover:text-indigo-600'>
-                Add Program
-              </span>
-            </Link>
-
-            <Link
-              href='/dashboard/courses?add=true'
-              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-teal-50 hover:border-teal-300 transition-colors group'
-            >
-              <div className='p-2 bg-teal-100 rounded-lg group-hover:bg-teal-200 transition-colors'>
-                <Book className='w-5 h-5 text-teal-600' />
-              </div>
-              <span className='text-sm font-medium text-gray-700 group-hover:text-teal-600'>
-                Add Course
-              </span>
-            </Link>
-
-            <Link
-              href='/dashboard/scholarship?add=true'
-              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-yellow-50 hover:border-yellow-300 transition-colors group'
-            >
-              <div className='p-2 bg-yellow-100 rounded-lg group-hover:bg-yellow-200 transition-colors'>
-                <Trophy className='w-5 h-5 text-yellow-600' />
-              </div>
-              <span className='text-sm font-medium text-gray-700 group-hover:text-yellow-600'>
-                Add Scholarships
-              </span>
-            </Link>
-
-            <Link
-              href='/dashboard/exams?add=true'
-              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-pink-50 hover:border-pink-300 transition-colors group'
-            >
-              <div className='p-2 bg-pink-100 rounded-lg group-hover:bg-pink-200 transition-colors'>
-                <Pen className='w-5 h-5 text-pink-600' />
-              </div>
-              <span className='text-sm font-medium text-gray-700 group-hover:text-pink-600'>
-                Add Exams
-              </span>
-            </Link>
-
-            <Link
-              href='/dashboard/consultancy?add=true'
-              className='flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors group'
-            >
-              <div className='p-2 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors'>
-                <Briefcase className='w-5 h-5 text-red-600' />
-              </div>
-              <span className='text-sm font-medium text-gray-700 group-hover:text-red-600'>
-                Add Consultancy
-              </span>
-            </Link>
-          </div>
-        </div>
-
-        {/* MIDDLE CHARTS */}
-        <div className='flex flex-col lg:flex-row gap-8'>
-          <div className='w-full lg:w-1/2 h-[450px]'>
-            <Piechart data={analytics?.educationalInstitutions} />
-          </div>
-          <div className='w-full lg:w-1/2 h-[450px]'>
-            <StudentEnrollmentGrowthChart
-              data={analytics?.studentEnrollmentGrowth}
-              availableYears={analytics?.availableYears || []}
-              selectedYears={
-                selectedYears.length > 0
-                  ? selectedYears
-                  : analytics?.selectedYears || []
-              }
-              onYearsChange={handleYearsChange}
-            />
-          </div>
-        </div>
+        {/* TOP AGENTS TABLE */}
+        <TopAgentsTable topAgents={topAgents} loading={topAgentsLoading} />
       </div>
     </div>
   )
@@ -425,12 +294,13 @@ const StudentDashboard = () => {
                               </p>
                               {app?.status && (
                                 <span
-                                  className={`px-2 py-1 text-xs font-semibold rounded-full ${app.status === 'ACCEPTED'
-                                    ? 'bg-green-100 text-green-800'
-                                    : app.status === 'REJECTED'
-                                      ? 'bg-red-100 text-red-800'
-                                      : 'bg-yellow-100 text-yellow-800'
-                                    }`}
+                                  className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                                    app.status === 'ACCEPTED'
+                                      ? 'bg-green-100 text-green-800'
+                                      : app.status === 'REJECTED'
+                                        ? 'bg-red-100 text-red-800'
+                                        : 'bg-yellow-100 text-yellow-800'
+                                  }`}
                                 >
                                   {app.status}
                                 </span>
@@ -439,30 +309,30 @@ const StudentDashboard = () => {
                             {/* College Contact and Location in single row */}
                             {(app?.referralCollege?.contacts?.length > 0 ||
                               app?.referralCollege?.address) && (
-                                <div className='text-xs text-gray-500 mt-1 flex flex-wrap items-center gap-2'>
-                                  {app?.referralCollege?.contacts?.length > 0 && (
-                                    <span className='flex items-center gap-1'>
-                                      <Phone className='w-3 h-3' />
-                                      {app.referralCollege.contacts
-                                        .map((contact) => contact.contact_number)
-                                        .join(', ')}
-                                    </span>
-                                  )}
+                              <div className='text-xs text-gray-500 mt-1 flex flex-wrap items-center gap-2'>
+                                {app?.referralCollege?.contacts?.length > 0 && (
+                                  <span className='flex items-center gap-1'>
+                                    <Phone className='w-3 h-3' />
+                                    {app.referralCollege.contacts
+                                      .map((contact) => contact.contact_number)
+                                      .join(', ')}
+                                  </span>
+                                )}
 
-                                  {app?.referralCollege?.address && (
-                                    <span className='flex items-center gap-1'>
-                                      <MapPin className='w-3 h-3' />
-                                      {[
-                                        app.referralCollege.address.city,
-                                        app.referralCollege.address.state,
-                                        app.referralCollege.address.country
-                                      ]
-                                        .filter(Boolean)
-                                        .join(', ')}
-                                    </span>
-                                  )}
-                                </div>
-                              )}
+                                {app?.referralCollege?.address && (
+                                  <span className='flex items-center gap-1'>
+                                    <MapPin className='w-3 h-3' />
+                                    {[
+                                      app.referralCollege.address.city,
+                                      app.referralCollege.address.state,
+                                      app.referralCollege.address.country
+                                    ]
+                                      .filter(Boolean)
+                                      .join(', ')}
+                                  </span>
+                                )}
+                              </div>
+                            )}
 
                             {/* Other Details */}
                             {app?.course && (

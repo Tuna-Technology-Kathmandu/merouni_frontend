@@ -10,7 +10,7 @@ import { getUniversityBySlug } from '../actions'
 import Gallery from './components/Gallery'
 // import ApplyNow from "./components/applyNow";
 import RelatedUniversities from './components/RelatedUniversities'
-import Loading from '../../../components/Loading'
+import Loading from '../../../ui/molecules/Loading'
 
 const UniversityDetailPage = ({ params }) => {
   // const { slugs } = params; // Use `slugs` directly from `params`
@@ -48,7 +48,6 @@ const UniversityDetailPage = ({ params }) => {
       setLoading(false)
     }
   }
-
 
   if (loading) {
     return <Loading />

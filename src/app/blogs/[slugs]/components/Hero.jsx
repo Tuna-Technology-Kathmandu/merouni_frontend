@@ -59,12 +59,12 @@ const Hero = ({ news }) => {
           {news?.newsAuthor?.lastName}
         </div>
 
-        {news.featuredImage && (
-          <div className='w-full h-[456px] max-1xl:h-[380px] max-sm:h-[300px] overflow-hidden my-12 max-1xl:my-8 max-md:my-5'>
+        {news?.featuredImage && (
+          <div className='w-full my-12 max-1xl:my-8 max-md:my-5'>
             <img
-              src={news?.featuredImage}
-              alt={news?.title}
-              className='object-cover w-full h-full'
+              src={news.featuredImage}
+              alt={news?.title || 'Blog featured image'}
+              className='w-full h-auto max-h-[456px] max-1xl:max-h-[380px] max-sm:max-h-[300px] object-contain rounded-xl'
             />
           </div>
         )}

@@ -12,13 +12,13 @@ import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Search } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
-import { Modal } from '../../../../components/UserModal'
-import Loading from '../../../../components/Loading'
-import Table from '../../../../components/Table'
+import { Modal } from '../../../../ui/molecules/UserModal'
+import Loading from '../../../../ui/molecules/Loading'
+import Table from '../../../../ui/molecules/Table'
 import { createColumns } from './columns'
 import ExportModal from './ExportModal'
 import { DotenvConfig } from '@/config/env.config'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/ui/shadcn/button'
 
 export default function UsersManager() {
   const { setHeading } = usePageHeading()

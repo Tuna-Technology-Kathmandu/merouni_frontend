@@ -3,18 +3,18 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { fetchCategories, deleteCategory } from './action'
-import Loader from '../../../../components/Loading'
-import Table from '../../../../components/Table'
+import Loader from '../../../../ui/molecules/Loading'
+import Table from '../../../../ui/molecules/Table'
 import { Edit2, Trash2, Search } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { Modal } from '../../../../components/UserModal'
+import { Modal } from '../../../../ui/molecules/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/ui/shadcn/button'
 
 export default function CategoryManager() {
   const { setHeading } = usePageHeading()
@@ -378,9 +378,7 @@ export default function CategoryManager() {
 
               {/* Submit Button - Sticky Footer */}
               <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <Button
-                  type='submit'
-                >
+                <Button type='submit'>
                   {editing ? 'Update Category' : 'Create Category'}
                 </Button>
               </div>

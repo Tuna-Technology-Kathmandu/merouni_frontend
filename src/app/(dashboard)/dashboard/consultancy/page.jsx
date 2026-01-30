@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import { useSearchParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import FileUpload from '../addCollege/FileUpload'
-import Table from '../../../../components/Table'
+import Table from '../../../../ui/molecules/Table'
 import { Search, Globe, MapPin } from 'lucide-react'
 import { createColumns } from './columns'
 import { authFetch } from '@/app/utils/authFetch'
@@ -13,10 +13,10 @@ import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { X } from 'lucide-react'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../components/UserModal'
+import { Modal } from '../../../../ui/molecules/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/ui/shadcn/button'
 
 const CKEditor = dynamic(() => import('../component/CKStable'), {
   ssr: false
@@ -753,10 +753,7 @@ export default function ConsultancyForm() {
               </div>
 
               <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <Button
-                  type='submit'
-                  disabled={loading}
-                >
+                <Button type='submit' disabled={loading}>
                   {loading
                     ? 'Processing...'
                     : editing

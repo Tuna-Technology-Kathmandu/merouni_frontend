@@ -2,13 +2,13 @@
 import React, { useEffect, useState, useCallback, useLayoutEffect } from 'react'
 import { fetchDegrees, fetchFaculties, fetchLevels } from './actions'
 import { Search, BookOpen, Filter, X, GraduationCap } from 'lucide-react'
-import EmptyState from '@/components/ui/EmptyState'
+import EmptyState from '@/ui/shadcn/EmptyState'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
 import Link from 'next/link'
 import Pagination from '../blogs/components/Pagination'
-import { CardSkeleton } from '@/components/ui/CardSkeleton'
+import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 
 const DegreePage = () => {
   const [courses, setCourses] = useState([])
@@ -58,22 +58,25 @@ const DegreePage = () => {
   }, [searchTerm])
 
   // Load degrees
-  const loadDegrees = useCallback(async (page = 1, search = '', faculty = '', level = '') => {
-    setLoading(true)
-    try {
-      const response = await fetchDegrees(search, page, faculty, level)
-      setCourses(response.items)
-      setPagination((prev) => ({
-        ...prev,
-        totalPages: response.pagination.totalPages,
-        totalCount: response.pagination.totalCount
-      }))
-    } catch (error) {
-      console.error('Error:', error)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const loadDegrees = useCallback(
+    async (page = 1, search = '', faculty = '', level = '') => {
+      setLoading(true)
+      try {
+        const response = await fetchDegrees(search, page, faculty, level)
+        setCourses(response.items)
+        setPagination((prev) => ({
+          ...prev,
+          totalPages: response.pagination.totalPages,
+          totalCount: response.pagination.totalCount
+        }))
+      } catch (error) {
+        console.error('Error:', error)
+      } finally {
+        setLoading(false)
+      }
+    },
+    []
+  )
 
   // Reset to page 1 when search or filters change
   useLayoutEffect(() => {
@@ -82,8 +85,19 @@ const DegreePage = () => {
 
   // Fetch when page, search, or filters change
   useEffect(() => {
-    loadDegrees(pagination.currentPage, debouncedSearch, selectedFaculty, selectedLevel)
-  }, [debouncedSearch, pagination.currentPage, selectedFaculty, selectedLevel, loadDegrees])
+    loadDegrees(
+      pagination.currentPage,
+      debouncedSearch,
+      selectedFaculty,
+      selectedLevel
+    )
+  }, [
+    debouncedSearch,
+    pagination.currentPage,
+    selectedFaculty,
+    selectedLevel,
+    loadDegrees
+  ])
 
   // Handle page change
   const handlePageChange = (page) => {
@@ -117,7 +131,8 @@ const DegreePage = () => {
                 <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
               </div>
               <p className='text-gray-500 max-w-xl font-medium text-lg mt-2'>
-                Discover specialized degree programs tailored to your academic and professional aspirations.
+                Discover specialized degree programs tailored to your academic
+                and professional aspirations.
               </p>
             </div>
 
@@ -136,10 +151,11 @@ const DegreePage = () => {
           {/* Filters & Search Bar */}
           <div className='bg-white rounded-[32px] p-8 shadow-[0_2px_15px_rgba(0,0,0,0.02)] border border-gray-100 mb-12'>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6'>
-
               {/* Search */}
               <div className='lg:col-span-6'>
-                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Search Programs</label>
+                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                  Search Programs
+                </label>
                 <div className='relative group'>
                   <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors' />
                   <input
@@ -159,7 +175,9 @@ const DegreePage = () => {
 
               {/* Faculty Filter */}
               <div className='lg:col-span-3'>
-                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Faculty</label>
+                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                  Faculty
+                </label>
                 <div className='relative group'>
                   <Filter className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors z-10' />
                   <select
@@ -169,7 +187,9 @@ const DegreePage = () => {
                   >
                     <option value=''>All Faculties</option>
                     {faculties.map((fac) => (
-                      <option key={fac.id} value={fac.id}>{fac.title}</option>
+                      <option key={fac.id} value={fac.id}>
+                        {fac.title}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -177,7 +197,9 @@ const DegreePage = () => {
 
               {/* Level Filter */}
               <div className='lg:col-span-3'>
-                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Level</label>
+                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                  Level
+                </label>
                 <div className='relative group'>
                   <GraduationCap className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors z-10' />
                   <select
@@ -187,12 +209,13 @@ const DegreePage = () => {
                   >
                     <option value=''>All Levels</option>
                     {levels.map((lvl) => (
-                      <option key={lvl.id} value={lvl.id}>{lvl.title}</option>
+                      <option key={lvl.id} value={lvl.id}>
+                        {lvl.title}
+                      </option>
                     ))}
                   </select>
                 </div>
               </div>
-
             </div>
           </div>
 
@@ -200,7 +223,10 @@ const DegreePage = () => {
           {!loading && !isScrolling && (
             <div className='mb-8 px-2'>
               <p className='text-sm text-gray-500 font-semibold'>
-                Showing <span className='text-gray-900'>{courses.length}</span> of <span className='text-gray-900'>{pagination.totalCount}</span> results
+                Showing <span className='text-gray-900'>{courses.length}</span>{' '}
+                of{' '}
+                <span className='text-gray-900'>{pagination.totalCount}</span>{' '}
+                results
               </p>
             </div>
           )}
@@ -208,7 +234,11 @@ const DegreePage = () => {
           {/* Courses Grid */}
           {loading || isScrolling ? (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-              {Array(6).fill('').map((_, index) => <CardSkeleton key={index} />)}
+              {Array(6)
+                .fill('')
+                .map((_, index) => (
+                  <CardSkeleton key={index} />
+                ))}
             </div>
           ) : courses.length === 0 ? (
             <div className='bg-white rounded-[32px] border border-gray-100 border-dashed py-20'>
@@ -231,7 +261,11 @@ const DegreePage = () => {
             <>
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
                 {courses.map((degree, index) => (
-                  <Link href={`/degree/${degree.slugs}`} key={index} className='group'>
+                  <Link
+                    href={`/degree/${degree.slugs}`}
+                    key={index}
+                    className='group'
+                  >
                     <div className='h-full bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-[#0A6FA7]/5 hover:border-[#0A6FA7]/20 transition-all duration-500 flex flex-col'>
                       <div className='flex items-start justify-between mb-6'>
                         <div className='bg-[#0A6FA7]/10 p-3 rounded-2xl group-hover:bg-[#0A6FA7] transition-colors duration-500'>
@@ -258,23 +292,39 @@ const DegreePage = () => {
                       <div className='mt-auto space-y-4 pt-6 border-t border-gray-50'>
                         <div className='flex items-center justify-between'>
                           <div className='flex flex-col'>
-                            <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>Duration</span>
-                            <span className='text-sm font-bold text-gray-700'>{degree.duration || 'N/A'}</span>
+                            <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
+                              Duration
+                            </span>
+                            <span className='text-sm font-bold text-gray-700'>
+                              {degree.duration || 'N/A'}
+                            </span>
                           </div>
                           <div className='flex flex-col text-right'>
-                            <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>Credits</span>
-                            <span className='text-sm font-bold text-gray-700'>{degree.credits || 'N/A'}</span>
+                            <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
+                              Credits
+                            </span>
+                            <span className='text-sm font-bold text-gray-700'>
+                              {degree.credits || 'N/A'}
+                            </span>
                           </div>
                         </div>
 
                         <div className='flex items-center justify-between'>
                           <div className='flex flex-col'>
-                            <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>Delivery</span>
-                            <span className='text-sm font-bold text-gray-700'>{degree.delivery_mode || 'N/A'}</span>
+                            <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
+                              Delivery
+                            </span>
+                            <span className='text-sm font-bold text-gray-700'>
+                              {degree.delivery_mode || 'N/A'}
+                            </span>
                           </div>
                           <div className='flex flex-col text-right'>
-                            <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>Language</span>
-                            <span className='text-sm font-bold text-gray-700'>{degree.language || 'N/A'}</span>
+                            <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
+                              Language
+                            </span>
+                            <span className='text-sm font-bold text-gray-700'>
+                              {degree.language || 'N/A'}
+                            </span>
                           </div>
                         </div>
                       </div>

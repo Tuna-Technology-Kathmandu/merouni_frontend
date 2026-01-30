@@ -8,7 +8,7 @@ import ImageSection from './components/upperSection'
 import CollegeOverview from './components/NewCollegeOverview'
 import ApplyNow from './components/applyNow'
 import RelatedColleges from './components/RelatedColleges'
-import Loading from '../../../components/Loading'
+import Loading from '../../../ui/molecules/Loading'
 import { DotenvConfig } from '@/config/env.config'
 
 // Share Section Component
@@ -48,7 +48,9 @@ const ShareSection = ({ college }) => {
   return (
     <div className='fixed bottom-8 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md border border-gray-100 shadow-2xl z-50 py-3 px-6 rounded-2xl transition-all hover:scale-105'>
       <div className='flex flex-row gap-5 items-center justify-center'>
-        <span className='text-gray-900 font-bold text-xs uppercase tracking-widest mr-2'>Share</span>
+        <span className='text-gray-900 font-bold text-xs uppercase tracking-widest mr-2'>
+          Share
+        </span>
 
         {/* Facebook */}
         <button
@@ -65,11 +67,7 @@ const ShareSection = ({ college }) => {
           className='hover:opacity-80 transition-all hover:-translate-y-1'
           aria-label='Share on Twitter'
         >
-          <img
-            src='/images/twitter.png'
-            alt='Twitter'
-            className='w-5'
-          />
+          <img src='/images/twitter.png' alt='Twitter' className='w-5' />
         </button>
 
         {/* LinkedIn */}
@@ -78,11 +76,7 @@ const ShareSection = ({ college }) => {
           className='hover:opacity-80 transition-all hover:-translate-y-1'
           aria-label='Share on LinkedIn'
         >
-          <img
-            src='/images/linkedin.png'
-            alt='LinkedIn'
-            className='w-5'
-          />
+          <img src='/images/linkedin.png' alt='LinkedIn' className='w-5' />
         </button>
 
         {/* Instagram */}
@@ -91,11 +85,7 @@ const ShareSection = ({ college }) => {
           className='hover:opacity-80 transition-all hover:-translate-y-1'
           aria-label='Share on Instagram'
         >
-          <img
-            src='/images/insta.png'
-            alt='Instagram'
-            className='w-5'
-          />
+          <img src='/images/insta.png' alt='Instagram' className='w-5' />
         </button>
       </div>
     </div>

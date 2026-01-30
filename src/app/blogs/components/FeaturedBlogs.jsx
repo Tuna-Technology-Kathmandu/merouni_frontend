@@ -6,7 +6,7 @@ import Pagination from './Pagination'
 import FeaturedBlogsShimmer from './FeaturedBlogShimmer'
 import Link from 'next/link'
 import { Newspaper } from 'lucide-react'
-import EmptyState from '@/components/ui/EmptyState'
+import EmptyState from '@/ui/shadcn/EmptyState'
 
 const FeaturedBlogs = ({ blogs, loading, pagination, onPageChange }) => {
   const truncateString = (str, maxLength) => {
@@ -37,9 +37,7 @@ const FeaturedBlogs = ({ blogs, loading, pagination, onPageChange }) => {
                 <BlogCard
                   date={formatDate(blog.createdAt)}
                   description={truncateString(blog.description, 100)}
-                  image={
-                    blog.featuredImage || 'https://placehold.co/600x400'
-                  }
+                  image={blog.featuredImage || 'https://placehold.co/600x400'}
                   title={truncateString(blog.title, 60)}
                   slug={blog.slug}
                 />

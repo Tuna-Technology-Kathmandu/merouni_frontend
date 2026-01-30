@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { getCourseBySlug } from '../../actions'
 import he from 'he'
-import { PageSkeleton } from '../../../../components/ui/PageSkeleton'
+import { PageSkeleton } from '../../../../ui/shadcn/PageSkeleton'
 import Navbar from '../../../../components/Frontpage/Navbar'
 import Footer from '../../../../components/Frontpage/Footer'
 import Header from '../../../../components/Frontpage/Header'

@@ -10,7 +10,7 @@ import ConsultancyOverview from './components/ConsultancyOverview'
 import ContactNow from './components/ContactNow'
 import RelatedConsultancies from './components/RelatedConsultancies'
 import { getConsultancyBySlug } from '../actions'
-import Loading from '../../../components/Loading'
+import Loading from '../../../ui/molecules/Loading'
 
 // Share Section Component
 const ShareSection = ({ consultancy }) => {

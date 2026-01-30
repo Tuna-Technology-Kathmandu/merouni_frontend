@@ -1,11 +1,18 @@
 'use client'
 import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react'
-import { Search, Clipboard, Filter, X, ChevronRight, GraduationCap } from 'lucide-react'
-import EmptyState from '@/components/ui/EmptyState'
+import {
+  Search,
+  Clipboard,
+  Filter,
+  X,
+  ChevronRight,
+  GraduationCap
+} from 'lucide-react'
+import EmptyState from '@/ui/shadcn/EmptyState'
 import { getAdmission, fetchPrograms } from '../actions'
 import Link from 'next/link'
 import Pagination from '../../blogs/components/Pagination'
-import { CardSkeleton } from '@/components/ui/CardSkeleton'
+import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 
 const AdmissionPage = () => {
   const [admission, setAdmission] = useState([])
@@ -50,27 +57,35 @@ const AdmissionPage = () => {
   }, [debouncedSearch, selectedProgram])
 
   // Fetch admission data
-  const fetchAdmissionData = useCallback(async (page = 1, search = '', program = '') => {
-    setLoading(true)
-    try {
-      const response = await getAdmission(search, page, program)
-      setAdmission(response.items)
-      setPagination((prev) => ({
-        ...prev,
-        totalPages: response.pagination.totalPages,
-        totalCount: response.pagination.totalCount
-      }))
-    } catch (error) {
-      console.error('Error:', error)
-      setAdmission([])
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const fetchAdmissionData = useCallback(
+    async (page = 1, search = '', program = '') => {
+      setLoading(true)
+      try {
+        const response = await getAdmission(search, page, program)
+        setAdmission(response.items)
+        setPagination((prev) => ({
+          ...prev,
+          totalPages: response.pagination.totalPages,
+          totalCount: response.pagination.totalCount
+        }))
+      } catch (error) {
+        console.error('Error:', error)
+        setAdmission([])
+      } finally {
+        setLoading(false)
+      }
+    },
+    []
+  )
 
   useEffect(() => {
     fetchAdmissionData(pagination.currentPage, debouncedSearch, selectedProgram)
-  }, [debouncedSearch, selectedProgram, pagination.currentPage, fetchAdmissionData])
+  }, [
+    debouncedSearch,
+    selectedProgram,
+    pagination.currentPage,
+    fetchAdmissionData
+  ])
 
   const handlePageChange = (page) => {
     if (page > 0 && page <= pagination.totalPages) {
@@ -99,7 +114,8 @@ const AdmissionPage = () => {
               <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
             </div>
             <p className='mt-4 text-gray-500 max-w-2xl font-medium text-base md:text-lg'>
-              Find and apply to the best college programs in Nepal. Your future starts here.
+              Find and apply to the best college programs in Nepal. Your future
+              starts here.
             </p>
           </div>
 
@@ -120,7 +136,9 @@ const AdmissionPage = () => {
           <div className='grid grid-cols-1 md:grid-cols-12 gap-6'>
             {/* Search */}
             <div className='md:col-span-7'>
-              <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Search Admissions</label>
+              <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                Search Admissions
+              </label>
               <div className='relative group'>
                 <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors' />
                 <input
@@ -135,17 +153,21 @@ const AdmissionPage = () => {
 
             {/* Program Filter */}
             <div className='lg:col-span-3'>
-                              <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Program / Course</label>
+              <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                Program / Course
+              </label>
               <div className='relative group'>
-                  <Filter className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors z-10' />
+                <Filter className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors z-10' />
                 <select
                   value={selectedProgram}
                   onChange={(e) => setSelectedProgram(e.target.value)}
-                    className='w-full px-12 py-3.5 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#0A6FA7]/10 focus:border-[#0A6FA7] focus:bg-white transition-all text-sm font-semibold text-gray-900 appearance-none cursor-pointer'
+                  className='w-full px-12 py-3.5 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#0A6FA7]/10 focus:border-[#0A6FA7] focus:bg-white transition-all text-sm font-semibold text-gray-900 appearance-none cursor-pointer'
                 >
                   <option value=''>All Programs</option>
                   {programs.map((prog) => (
-                    <option key={prog.id} value={prog.slugs}>{prog.title}</option>
+                    <option key={prog.id} value={prog.slugs}>
+                      {prog.title}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -157,7 +179,9 @@ const AdmissionPage = () => {
         {!loading && !isScrolling && (
           <div className='flex items-center justify-between mb-8 px-2'>
             <p className='text-sm font-semibold text-gray-500'>
-              Showing <span className='text-gray-900'>{admission.length}</span> of <span className='text-gray-900'>{pagination.totalCount}</span> admissions
+              Showing <span className='text-gray-900'>{admission.length}</span>{' '}
+              of <span className='text-gray-900'>{pagination.totalCount}</span>{' '}
+              admissions
             </p>
           </div>
         )}
@@ -165,7 +189,11 @@ const AdmissionPage = () => {
         {/* Admissions Grid */}
         {loading || isScrolling ? (
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-            {Array(6).fill('').map((_, index) => <CardSkeleton key={index} />)}
+            {Array(6)
+              .fill('')
+              .map((_, index) => (
+                <CardSkeleton key={index} />
+              ))}
           </div>
         ) : admission.length === 0 ? (
           <div className='bg-white rounded-[40px] p-20 shadow-[0_2px_15px_rgba(0,0,0,0.01)] border border-gray-100'>
@@ -206,7 +234,9 @@ const AdmissionPage = () => {
 
                   <div className='space-y-4 pt-4 border-t border-gray-50'>
                     <div className='flex flex-col gap-1'>
-                      <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>College</span>
+                      <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
+                        College
+                      </span>
                       <Link
                         href={`/colleges/${admis?.collegeAdmissionCollege?.slugs}`}
                         className='text-sm font-semibold text-[#0A6FA7] hover:underline'
@@ -217,16 +247,24 @@ const AdmissionPage = () => {
 
                     <div className='grid grid-cols-1 gap-3 pt-2'>
                       <div className='flex flex-col gap-1'>
-                        <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>Process</span>
-                        <span className='text-sm font-medium text-gray-600 line-clamp-1'>{admis.admission_process}</span>
+                        <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
+                          Process
+                        </span>
+                        <span className='text-sm font-medium text-gray-600 line-clamp-1'>
+                          {admis.admission_process}
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <div className='mt-8 pt-6 border-t border-gray-50 flex items-center justify-between'>
                     <div className='flex flex-col'>
-                      <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>Fees</span>
-                      <span className='text-sm font-bold text-gray-900'>{admis.fee_details || 'Contact College'}</span>
+                      <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
+                        Fees
+                      </span>
+                      <span className='text-sm font-bold text-gray-900'>
+                        {admis.fee_details || 'Contact College'}
+                      </span>
                     </div>
                     <Link
                       href={`/degree/${admis?.program?.slugs}`}

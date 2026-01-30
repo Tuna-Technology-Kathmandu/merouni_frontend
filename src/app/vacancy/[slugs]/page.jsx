@@ -7,7 +7,7 @@ import Header from '../../../components/Frontpage/Header'
 import Hero from './components/Hero'
 import Description from './components/Description'
 import Cardlist from './components/Cardlist'
-import Loading from '../../../components/Loading'
+import Loading from '../../../ui/molecules/Loading'
 import SmallCardList from './components/SmallCardList'
 
 const NewsDetailsPage = ({ params }) => {
@@ -22,7 +22,7 @@ const NewsDetailsPage = ({ params }) => {
         const resolvedParams = await params
         const slugs = resolvedParams.slugs // No need to await params.slugs
         console.log('NEws slug:', slugs)
-      
+
         const newsData = await getNewsBySlug(slugs)
 
         setNews(newsData.blog || null) // Set eventData directly

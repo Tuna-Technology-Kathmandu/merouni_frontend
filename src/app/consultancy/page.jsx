@@ -3,14 +3,14 @@ import React, { useState, useEffect, useLayoutEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Search, MapPin, Filter, X } from 'lucide-react'
-import { Select } from '@/components/ui/select'
-import EmptyState from '@/components/ui/EmptyState'
+import { Select } from '@/ui/shadcn/select'
+import EmptyState from '@/ui/shadcn/EmptyState'
 import { getConsultancies, getCourses } from './actions'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Pagination from '../blogs/components/Pagination'
-import { CardSkeleton } from '@/components/ui/CardSkeleton'
+import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 
 export default function ConsultanciesPage() {
   const router = useRouter()
@@ -116,7 +116,8 @@ export default function ConsultanciesPage() {
                 <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
               </div>
               <p className='text-gray-500 max-w-xl font-medium text-lg mt-2'>
-                Discover trusted consultancies that guide you through admissions, applications, and career opportunities abroad.
+                Discover trusted consultancies that guide you through
+                admissions, applications, and career opportunities abroad.
               </p>
             </div>
 
@@ -137,7 +138,9 @@ export default function ConsultanciesPage() {
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6'>
               {/* Search */}
               <div className='lg:col-span-8'>
-                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Search Consultancies</label>
+                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                  Search Consultancies
+                </label>
                 <div className='relative group'>
                   <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors' />
                   <input
@@ -152,7 +155,9 @@ export default function ConsultanciesPage() {
 
               {/* Course Filter */}
               <div className='lg:col-span-4'>
-                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Filter by Course</label>
+                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                  Filter by Course
+                </label>
                 <Select
                   value={selectedCourse}
                   onChange={(e) => setSelectedCourse(e.target.value)}
@@ -173,7 +178,11 @@ export default function ConsultanciesPage() {
           {!loading && !isScrolling && (
             <div className='mb-8 px-2'>
               <p className='text-sm text-gray-500 font-semibold'>
-                Showing <span className='text-gray-900'>{consultancyData.length}</span> of <span className='text-gray-900'>{pagination.totalCount}</span> results
+                Showing{' '}
+                <span className='text-gray-900'>{consultancyData.length}</span>{' '}
+                of{' '}
+                <span className='text-gray-900'>{pagination.totalCount}</span>{' '}
+                results
               </p>
             </div>
           )}
@@ -181,9 +190,11 @@ export default function ConsultanciesPage() {
           {/* Grid */}
           {loading || isScrolling ? (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-              {Array(6).fill('').map((_, index) => (
-                <CardSkeleton key={index} />
-              ))}
+              {Array(6)
+                .fill('')
+                .map((_, index) => (
+                  <CardSkeleton key={index} />
+                ))}
             </div>
           ) : consultancyData.length === 0 ? (
             <div className='bg-white rounded-[32px] border border-gray-100 border-dashed py-20'>
@@ -198,9 +209,9 @@ export default function ConsultanciesPage() {
                 action={
                   searchTerm || selectedCourse
                     ? {
-                      label: 'Clear All Filters',
-                      onClick: clearFilters
-                    }
+                        label: 'Clear All Filters',
+                        onClick: clearFilters
+                      }
                     : null
                 }
               />
@@ -283,7 +294,9 @@ export default function ConsultanciesPage() {
                                   </span>
                                 ))}
                                 {destinations.length > 3 && (
-                                  <span className='text-xs font-bold text-gray-400 py-1'>+more</span>
+                                  <span className='text-xs font-bold text-gray-400 py-1'>
+                                    +more
+                                  </span>
                                 )}
                               </div>
                             </div>
@@ -298,7 +311,9 @@ export default function ConsultanciesPage() {
                               <div className='flex items-center gap-1.5 text-gray-600'>
                                 <MapPin className='w-3.5 h-3.5 text-[#0A6FA7]' />
                                 <span className='text-sm font-semibold truncate'>
-                                  {[address.street, address.city].filter(Boolean).join(', ')}
+                                  {[address.street, address.city]
+                                    .filter(Boolean)
+                                    .join(', ')}
                                 </span>
                               </div>
                             </div>

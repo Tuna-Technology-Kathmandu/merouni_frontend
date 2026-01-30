@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { SearchableSelect } from '@/components/ui/SearchableSelect'
+import { Button } from '@/ui/shadcn/button'
+import { Input } from '@/ui/shadcn/input'
+import { Label } from '@/ui/shadcn/label'
+import { SearchableSelect } from '@/ui/shadcn/SearchableSelect'
 import { useMutation } from '@tanstack/react-query'
 import { destr } from 'destr'
 import { GraduationCap } from 'lucide-react'
@@ -48,11 +48,11 @@ const FormSection = ({ id, college }) => {
       college_id: college?.id || 0,
       ...(isLoggedIn &&
         user && {
-        student_name:
-          `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim(),
-        student_email: user?.email || '',
-        student_phone_no: user?.phoneNo || ''
-      })
+          student_name:
+            `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim(),
+          student_email: user?.email || '',
+          student_phone_no: user?.phoneNo || ''
+        })
     }))
   }, [college?.id, isLoggedIn, user])
 
@@ -64,7 +64,9 @@ const FormSection = ({ id, college }) => {
       toast.success(data.message || 'College Applied Successfully')
       setFormData({
         college_id: college?.id || 0,
-        student_name: isLoggedIn ? `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() : '',
+        student_name: isLoggedIn
+          ? `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim()
+          : '',
         student_phone_no: isLoggedIn ? user?.phoneNo || '' : '',
         student_email: isLoggedIn ? user?.email || '' : '',
         student_description: '',
@@ -78,9 +80,12 @@ const FormSection = ({ id, college }) => {
 
   const validateForm = () => {
     const newErrors = {}
-    if (!formData.student_name && !isLoggedIn) newErrors.student_name = 'Name is required'
-    if (!formData.student_email && !isLoggedIn) newErrors.student_email = 'Email is required'
-    if (!formData.student_phone_no && !isLoggedIn) newErrors.student_phone_no = 'Phone number is required'
+    if (!formData.student_name && !isLoggedIn)
+      newErrors.student_name = 'Name is required'
+    if (!formData.student_email && !isLoggedIn)
+      newErrors.student_email = 'Email is required'
+    if (!formData.student_phone_no && !isLoggedIn)
+      newErrors.student_phone_no = 'Phone number is required'
     if (!formData.course) newErrors.course = 'Please select a course'
 
     setErrors(newErrors)
@@ -101,20 +106,20 @@ const FormSection = ({ id, college }) => {
 
     const payload = isStudent
       ? {
-        student_id: user?.id,
-        referral_type: 'self',
-        college_id: formData.college_id,
-        course_id: formData.course || null,
-        description: formData.student_description
-      }
+          student_id: user?.id,
+          referral_type: 'self',
+          college_id: formData.college_id,
+          course_id: formData.course || null,
+          description: formData.student_description
+        }
       : {
-        college_id: formData.college_id,
-        student_name: formData.student_name,
-        student_phone_no: formData.student_phone_no,
-        student_email: formData.student_email,
-        student_description: formData.student_description,
-        course: formData.course
-      }
+          college_id: formData.college_id,
+          student_name: formData.student_name,
+          student_phone_no: formData.student_phone_no,
+          student_email: formData.student_email,
+          student_description: formData.student_description,
+          course: formData.course
+        }
 
     applyMutation.mutate({ payload, isStudent })
   }
@@ -122,7 +127,9 @@ const FormSection = ({ id, college }) => {
   const courseOptions = useMemo(() => {
     if (!college?.collegeCourses) return []
     if (id) {
-      const option = college.collegeCourses.find((item) => String(item.id) === String(id))
+      const option = college.collegeCourses.find(
+        (item) => String(item.id) === String(id)
+      )
       if (option) {
         setFormData((prev) => ({ ...prev, course: option?.id }))
       }
@@ -139,16 +146,23 @@ const FormSection = ({ id, college }) => {
               <GraduationCap className='w-8 h-8' />
               <h2 className='text-3xl font-bold'>Apply For College</h2>
             </div>
-            <p className='text-teal-50/80'>Manage applications from your dashboard</p>
+            <p className='text-teal-50/80'>
+              Manage applications from your dashboard
+            </p>
           </div>
           <div className='absolute -right-8 -bottom-8 opacity-10'>
             <GraduationCap size={160} />
           </div>
         </div>
         <div className='p-8 pt-0'>
-          <p className='text-gray-600 mb-8'>As an agent, please visit your dashboard to manage student applications and tracking.</p>
+          <p className='text-gray-600 mb-8'>
+            As an agent, please visit your dashboard to manage student
+            applications and tracking.
+          </p>
           <Link href='/dashboard'>
-            <Button className='min-w-[200px] h-12 text-lg font-semibold bg-[#30ad8f] hover:bg-[#2c9a7f] transition-all'>Go to Dashboard</Button>
+            <Button className='min-w-[200px] h-12 text-lg font-semibold bg-[#30ad8f] hover:bg-[#2c9a7f] transition-all'>
+              Go to Dashboard
+            </Button>
           </Link>
         </div>
       </div>
@@ -171,13 +185,23 @@ const FormSection = ({ id, college }) => {
           </div>
         </div>
         <div className='p-8 pt-0'>
-          <p className='text-gray-600 mb-8'>Join our community to apply for top colleges and track your progress in real-time.</p>
+          <p className='text-gray-600 mb-8'>
+            Join our community to apply for top colleges and track your progress
+            in real-time.
+          </p>
           <div className='flex flex-col sm:flex-row items-center justify-center gap-4'>
             <Link href='/sign-in' className='w-full sm:w-auto'>
-              <Button className='w-full min-w-[160px] h-12 text-lg font-semibold bg-[#30ad8f] hover:bg-[#2c9a7f] transition-all'>Login Now</Button>
+              <Button className='w-full min-w-[160px] h-12 text-lg font-semibold bg-[#30ad8f] hover:bg-[#2c9a7f] transition-all'>
+                Login Now
+              </Button>
             </Link>
             <Link href='/signup' className='w-full sm:w-auto'>
-              <Button variant='outline' className='w-full min-w-[160px] h-12 text-lg font-semibold border-2 border-[#30ad8f] text-[#30ad8f] hover:bg-[#30ad8f]/10 transition-all'>Create Account</Button>
+              <Button
+                variant='outline'
+                className='w-full min-w-[160px] h-12 text-lg font-semibold border-2 border-[#30ad8f] text-[#30ad8f] hover:bg-[#30ad8f]/10 transition-all'
+              >
+                Create Account
+              </Button>
             </Link>
           </div>
         </div>
@@ -191,7 +215,9 @@ const FormSection = ({ id, college }) => {
         <div className='relative z-10 text-left'>
           <div className='flex items-center gap-3 mb-2'>
             <GraduationCap className='w-8 h-8' />
-            <h2 className='text-3xl font-bold font-poppins'>Apply For College</h2>
+            <h2 className='text-3xl font-bold font-poppins'>
+              Apply For College
+            </h2>
           </div>
           <p className='text-teal-50/80'>Begin your academic journey today</p>
         </div>
@@ -213,7 +239,9 @@ const FormSection = ({ id, college }) => {
               disabled={isLoggedIn}
               className={errors.student_name ? 'border-red-500' : ''}
             />
-            {errors.student_name && <p className='text-red-500 text-xs'>{errors.student_name}</p>}
+            {errors.student_name && (
+              <p className='text-red-500 text-xs'>{errors.student_name}</p>
+            )}
           </div>
 
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -229,7 +257,9 @@ const FormSection = ({ id, college }) => {
                 disabled={isLoggedIn}
                 className={errors.student_email ? 'border-red-500' : ''}
               />
-              {errors.student_email && <p className='text-red-500 text-xs'>{errors.student_email}</p>}
+              {errors.student_email && (
+                <p className='text-red-500 text-xs'>{errors.student_email}</p>
+              )}
             </div>
             <div className='space-y-2'>
               <Label htmlFor='student_phone_no'>Phone Number</Label>
@@ -243,7 +273,11 @@ const FormSection = ({ id, college }) => {
                 disabled={isLoggedIn}
                 className={errors.student_phone_no ? 'border-red-500' : ''}
               />
-              {errors.student_phone_no && <p className='text-red-500 text-xs'>{errors.student_phone_no}</p>}
+              {errors.student_phone_no && (
+                <p className='text-red-500 text-xs'>
+                  {errors.student_phone_no}
+                </p>
+              )}
             </div>
           </div>
 
@@ -255,8 +289,9 @@ const FormSection = ({ id, college }) => {
               displayKey={(opt) => opt?.program?.title || 'Unknown Program'}
               value={formData.course}
               onChange={(option) => {
-                setFormData(prev => ({ ...prev, course: option?.id || '' }))
-                if (errors.course) setErrors(prev => ({ ...prev, course: '' }))
+                setFormData((prev) => ({ ...prev, course: option?.id || '' }))
+                if (errors.course)
+                  setErrors((prev) => ({ ...prev, course: '' }))
               }}
               placeholder='Search and select a program'
               error={errors.course}

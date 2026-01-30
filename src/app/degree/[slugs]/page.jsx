@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Footer from '../../../components/Frontpage/Footer'
 import Header from '../../../components/Frontpage/Header'
 import Navbar from '../../../components/Frontpage/Navbar'
-import Loading from '../../../components/Loading'
+import Loading from '../../../ui/molecules/Loading'
 import { getDegreeBySlug } from '../actions'
 import CollegeTeach from './components/collegeTeach'
 import RelatedCourses from './components/RelatedCourses'
@@ -12,7 +12,7 @@ import Syllabus from './components/syllabus'
 import ImageSection from './components/upperSection'
 import { slugify } from '@/lib/slugify'
 import { BookOpen } from 'lucide-react'
-import EmptyState from '@/components/ui/EmptyState'
+import EmptyState from '@/ui/shadcn/EmptyState'
 
 const CourseDescription = ({ params }) => {
   const [degree, setDegree] = useState(null)
@@ -71,11 +71,18 @@ const CourseDescription = ({ params }) => {
         <div className='container mx-auto px-4 py-20'>
           <EmptyState
             icon={BookOpen}
-            title={error === 'Degree not found' || !degree ? 'Degree Not Found' : 'Something went wrong'}
-            description={error || "We couldn't find the degree you're looking for. It might have been moved or deleted."}
+            title={
+              error === 'Degree not found' || !degree
+                ? 'Degree Not Found'
+                : 'Something went wrong'
+            }
+            description={
+              error ||
+              "We couldn't find the degree you're looking for. It might have been moved or deleted."
+            }
             action={{
               label: 'Browse All Degrees',
-              onClick: () => window.location.href = '/degree'
+              onClick: () => (window.location.href = '/degree')
             }}
           />
         </div>

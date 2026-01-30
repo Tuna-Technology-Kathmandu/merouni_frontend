@@ -2,9 +2,9 @@ import { Poppins } from 'next/font/google'
 import './globals.css'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
-import ReduxProvider from '../components/ReduxProvider'
+import ReduxProvider from '../ui/molecules/ReduxProvider'
 import ReactQueryContainer from '@/container/HOC/ReactQueryContainer'
-import BProgressProvider from '../components/BProgressProvider'
+import BProgressProvider from '../ui/molecules/BProgressProvider'
 
 const poppins = Poppins({
   variable: '--font-poppins',

@@ -2,8 +2,8 @@
 import React from 'react'
 import CategoryCard from './CategoryCard'
 import { Folder, Plus } from 'lucide-react'
-import { GridSkeleton } from '@/components/ui/GridSkeleton'
-import EmptyState from '@/components/ui/EmptyState'
+import { GridSkeleton } from '@/ui/shadcn/GridSkeleton'
+import EmptyState from '@/ui/shadcn/EmptyState'
 
 const CategoryGrid = ({ categories, onCategoryClick, loading }) => {
   if (loading) {
@@ -24,10 +24,7 @@ const CategoryGrid = ({ categories, onCategoryClick, loading }) => {
   return (
     <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 p-4 mb-16'>
       {categories.map((category) => (
-        <CategoryCard
-          key={category.id}
-          category={category}
-        />
+        <CategoryCard key={category.id} category={category} />
       ))}
 
       {/* Unlisted/Others Card for materials without category */}

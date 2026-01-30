@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import ShimmerEffect from '@/components/ShimmerEffect'
+import ShimmerEffect from '@/ui/molecules/ShimmerEffect'
 import { DotenvConfig } from '@/config/env.config'
 import {
   Building2,
@@ -133,12 +133,13 @@ const ReferedStudentsPage = () => {
                     </div>
                     <div className='flex-shrink-0'>
                       <span
-                        className={`px-3 py-1 text-xs font-semibold rounded-full ${referral.status === 'ACCEPTED'
+                        className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                          referral.status === 'ACCEPTED'
                             ? 'bg-green-100 text-green-800'
                             : referral.status === 'REJECTED'
                               ? 'bg-red-100 text-red-800'
                               : 'bg-yellow-100 text-yellow-800'
-                          }`}
+                        }`}
                       >
                         {referral.status || 'IN_PROGRESS'}
                       </span>

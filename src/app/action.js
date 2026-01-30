@@ -98,11 +98,20 @@ export async function deleteFaculty(id) {
 }
 
 // Events actions
-export async function getEvents(page) {
+export async function getEvents(page, limit = 10) {
   const params = {
-    page
+    page,
+    limit
   }
-  return services.event.getAll(params)
+  const queryString = new URLSearchParams(params).toString()
+  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/event?${queryString}`
+  const response = await fetch(url, {
+    cache: 'no-store'
+  })
+  if (!response.ok) {
+    throw new Error(`Failed to fetch events: ${response.status}`)
+  }
+  return await response.json()
 }
 
 //Blogs actions
@@ -201,17 +210,16 @@ export async function getColleges(
   limit = 10,
   page = 1
 ) {
-
   const query = buildQueryString({
     limit,
     page,
     isFeatured,
-    pinned,
+    pinned
   })
 
-  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college${query ? `?${query}` : ''
-    }`
-
+  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college${
+    query ? `?${query}` : ''
+  }`
 
   const response = await fetch(url, {
     cache: 'no-store'
@@ -245,12 +253,12 @@ export async function getFilteredPinFeatColleges(
     limit,
     page,
     isFeatured: is_featured,
-    pinned,
+    pinned
   })
 
-  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college${query ? `?${query}` : ''
-    }`
-
+  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college${
+    query ? `?${query}` : ''
+  }`
 
   const response = await fetch(url, {
     cache: 'no-store'
@@ -266,12 +274,12 @@ export async function getFilteredPinFeatColleges(
 export async function getExams(limit, page) {
   const query = buildQueryString({
     limit,
-    page,
+    page
   })
 
-  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/exam${query ? `?${query}` : ''
-    }`
-
+  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/exam${
+    query ? `?${query}` : ''
+  }`
 
   const response = await fetch(url, {
     cache: 'no-store'
@@ -309,8 +317,16 @@ export async function getBannerById(id) {
 
 // category section
 
-export async function getCategories(queryParams) {
-  return services.category.getAll(queryParams)
+export async function getCategories(queryParams = {}) {
+  const queryString = new URLSearchParams(queryParams).toString()
+  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/category${queryString ? `?${queryString}` : ''}`
+  const response = await fetch(url, {
+    cache: 'no-store'
+  })
+  if (!response.ok) {
+    throw new Error(`Failed to fetch categories: ${response.status}`)
+  }
+  return await response.json()
 }
 
 export async function createCategory(data) {

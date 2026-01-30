@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
-import ShimmerEffect from '@/components/ShimmerEffect'
+import ShimmerEffect from '@/ui/molecules/ShimmerEffect'
 import { DotenvConfig } from '@/config/env.config'
 import {
   DndContext,

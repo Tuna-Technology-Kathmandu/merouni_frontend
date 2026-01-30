@@ -1,9 +1,6 @@
-import { Skeleton } from '../ui/Skeleton'
-
+import { Skeleton } from '../../ui/shadcn/Skeleton'
 
 const AdLayout = ({ banners = [], size = '', number = 1, loading = false }) => {
- 
-
   const displayBanners = [8, 9, 10].map((position) =>
     banners.find((banner) => banner.display_position === position)
   )

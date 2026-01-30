@@ -1,5 +1,5 @@
 'use client'
-import EmptyState from '@/components/ui/EmptyState'
+import EmptyState from '@/ui/shadcn/EmptyState'
 import { DotenvConfig } from '@/config/env.config'
 import { debounce } from 'lodash'
 import { Calendar } from 'lucide-react'
@@ -11,7 +11,7 @@ import EventCard from '../../components/Frontpage/EventCard'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
-import Loading from '../../components/Loading'
+import Loading from '../../ui/molecules/Loading'
 import { getColleges } from '../action'
 import Pagination from '../blogs/components/Pagination'
 import useMediaQuery from './MediaQuery'
@@ -98,7 +98,9 @@ const fetchThisWeekEvents = async (collegeId = '') => {
 
 const fetchNextWeekEvents = async (collegeId = '') => {
   try {
-    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event/next-month`)
+    const url = new URL(
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/next-month`
+    )
     if (collegeId) url.searchParams.append('college_id', collegeId)
 
     const response = await fetch(url.toString(), {
@@ -182,7 +184,6 @@ const Events = () => {
 
       const featured = thisWeek.events?.[0] || events[0] || null
       setFeaturedEvent(featured)
-
     } catch (error) {
       setError('Failed to load Events')
       console.error('Error loading events:', error)
@@ -286,7 +287,7 @@ const Events = () => {
                     <p className='whitespace-nowrap'>
                       {new Date(
                         JSON.parse(featuredEvent.event_host)?.start_date ??
-                        new Date()
+                          new Date()
                       ).toLocaleDateString()}
                     </p>
                   </div>
@@ -298,7 +299,7 @@ const Events = () => {
                     <p className='whitespace-nowrap'>
                       {new Date(
                         JSON.parse(featuredEvent.event_host)?.end_date ??
-                        new Date()
+                          new Date()
                       ).toLocaleDateString()}
                     </p>
                   </div>
@@ -313,12 +314,12 @@ const Events = () => {
                           const host = JSON.parse(featuredEvent.event_host) // parse the JSON string
                           return host?.time
                             ? new Date(
-                              `1970-01-01T${host.time}:00`
-                            ).toLocaleTimeString('en-US', {
-                              hour: 'numeric',
-                              minute: 'numeric',
-                              hour12: true
-                            })
+                                `1970-01-01T${host.time}:00`
+                              ).toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true
+                              })
                             : 'No Time Available'
                         } catch (e) {
                           return 'Invalid Time Data'
@@ -373,12 +374,16 @@ const Events = () => {
               {/* Left Section - Filters & Archive */}
               <div className='w-full lg:w-1/4 space-y-6 min-[1330px]:space-y-8'>
                 <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
-                  <h2 className='text-xl font-bold text-gray-900 mb-6'>Filters</h2>
+                  <h2 className='text-xl font-bold text-gray-900 mb-6'>
+                    Filters
+                  </h2>
 
                   {/* Search Bar */}
                   <div className='space-y-4'>
                     <div className='group'>
-                      <label className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block'>Search</label>
+                      <label className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block'>
+                        Search
+                      </label>
                       <div className='relative flex items-center'>
                         <input
                           type='text'
@@ -393,13 +398,18 @@ const Events = () => {
 
                     {/* College Filter */}
                     <div className='group'>
-                      <label className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block'>Institution</label>
+                      <label className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block'>
+                        Institution
+                      </label>
                       <div className='relative'>
                         <select
                           value={selectedCollege}
                           onChange={(e) => {
                             setSelectedCollege(e.target.value)
-                            setPagination(prev => ({ ...prev, currentPage: 1 }))
+                            setPagination((prev) => ({
+                              ...prev,
+                              currentPage: 1
+                            }))
                           }}
                           className='w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] focus:border-transparent transition-all appearance-none bg-white text-sm font-medium'
                         >
@@ -422,7 +432,7 @@ const Events = () => {
                         onClick={() => {
                           setSelectedCollege('')
                           setSearchQuery('')
-                          setPagination(prev => ({ ...prev, currentPage: 1 }))
+                          setPagination((prev) => ({ ...prev, currentPage: 1 }))
                         }}
                         className='w-full py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 transition-colors'
                       >
@@ -437,7 +447,10 @@ const Events = () => {
               <div className='w-full lg:w-3/4'>
                 <div className='flex items-center justify-between mb-8'>
                   <h2 className='text-2xl font-bold text-gray-900'>
-                    {selectedCollege ? colleges.find(c => c.id === selectedCollege)?.name + ' Events' : 'All Events'}
+                    {selectedCollege
+                      ? colleges.find((c) => c.id === selectedCollege)?.name +
+                        ' Events'
+                      : 'All Events'}
                   </h2>
                   <div className='text-sm text-gray-500 font-medium'>
                     Showing {allEvents.length} of {pagination.totalCount} events
@@ -466,12 +479,12 @@ const Events = () => {
                         action={
                           searchQuery
                             ? {
-                              label: 'Clear Search',
-                              onClick: () => {
-                                setSearchQuery('')
-                                loadEvents(1)
+                                label: 'Clear Search',
+                                onClick: () => {
+                                  setSearchQuery('')
+                                  loadEvents(1)
+                                }
                               }
-                            }
                             : null
                         }
                       />

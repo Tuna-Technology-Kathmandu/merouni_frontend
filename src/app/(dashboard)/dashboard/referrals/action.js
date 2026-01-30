@@ -1,16 +1,24 @@
 import { authFetch } from '@/app/utils/authFetch'
 import { DotenvConfig } from '@/config/env.config'
 
-export async function fetchReferrals(page = 1) {
+export async function fetchReferrals(page = 1, isStudent = false) {
   try {
+    // Use different endpoint for students vs admin
+    const endpoint = isStudent 
+      ? `/referral/user/referrals`
+      : `/referral?page=${page}`
+    
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral?page=${page}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}${endpoint}`,
       { cache: 'no-store' }
     )
     if (!response.ok) {
       throw new Error('Failed to fetch referrals')
     }
-    return await response.json()
+    const data = await response.json()
+    // For student endpoint, it returns an array directly, not paginated
+    // For admin endpoint, it returns paginated data
+    return isStudent ? data : data
   } catch (error) {
     console.error('Error fetching referrals:', error)
     throw error

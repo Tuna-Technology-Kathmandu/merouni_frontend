@@ -1,6 +1,6 @@
 'use client'
 import { Search, School } from 'lucide-react'
-import EmptyState from '@/components/ui/EmptyState'
+import EmptyState from '@/ui/shadcn/EmptyState'
 import { FaExpandAlt } from 'react-icons/fa'
 import FilterSection from './FilterSection'
 import UniversityCard from './UniversityCard'
@@ -94,25 +94,28 @@ const CollegeFinder = () => {
       const data = await response.json()
 
       if (data.items) {
-        setUniversities(data.items.map((college) => ({
-          name: college.name,
-          description: college.description,
-          googleMapUrl: college.google_map_url,
-          instituteType: college.institute_type,
-          slug: college.slugs,
-          collegeId: college.id,
-          logo: college.logo || college.image
-        })))
+        setUniversities(
+          data.items.map((college) => ({
+            name: college.name,
+            description: college.description,
+            googleMapUrl: college.google_map_url,
+            instituteType: college.institute_type,
+            slug: college.slugs,
+            collegeId: college.id,
+            logo: college.logo || college.image
+          }))
+        )
 
-        setPagination(data.pagination || {
-          currentPage: page,
-          totalPages: 1,
-          totalRecords: data.items.length
-        })
+        setPagination(
+          data.pagination || {
+            currentPage: page,
+            totalPages: 1,
+            totalRecords: data.items.length
+          }
+        )
       } else {
         setUniversities([])
       }
-
     } catch (error) {
       console.error('Error fetching colleges:', error)
       setUniversities([])
@@ -134,13 +137,12 @@ const CollegeFinder = () => {
     return () => debouncedFetch.cancel()
   }, [searchQuery, selectedFilters])
 
-
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value)
   }
 
   const handleFilterChange = (category, items) => {
-    setSelectedFilters(prev => ({ ...prev, [category]: items }))
+    setSelectedFilters((prev) => ({ ...prev, [category]: items }))
   }
 
   const handlePageChange = (page) => {
@@ -204,35 +206,37 @@ const CollegeFinder = () => {
         {/* Desktop Filters */}
         <div className='w-1/4 space-y-4 hidden lg:block'>
           <FilterSection
-            title="Grade"
+            title='Grade'
             options={filterOptions.grade}
             selectedItems={selectedFilters.grade}
             onSelectionChange={(items) => handleFilterChange('grade', items)}
           />
           <FilterSection
-            title="Affiliation"
+            title='Affiliation'
             options={filterOptions.affiliation}
             selectedItems={selectedFilters.affiliation}
-            onSelectionChange={(items) => handleFilterChange('affiliation', items)}
+            onSelectionChange={(items) =>
+              handleFilterChange('affiliation', items)
+            }
           />
           <FilterSection
-            title="Type"
+            title='Type'
             options={filterOptions.type}
             selectedItems={selectedFilters.type}
             onSelectionChange={(items) => handleFilterChange('type', items)}
           />
           <FilterSection
-            title="District"
+            title='District'
             options={filterOptions.district}
             selectedItems={selectedFilters.district}
-            placeholder="Search district"
+            placeholder='Search district'
             onSelectionChange={(items) => handleFilterChange('district', items)}
           />
           <FilterSection
-            title="Amenity"
+            title='Amenity'
             options={filterOptions.amenity}
             selectedItems={selectedFilters.amenity}
-            placeholder="Search amenity"
+            placeholder='Search amenity'
             onSelectionChange={(items) => handleFilterChange('amenity', items)}
           />
         </div>
@@ -257,7 +261,11 @@ const CollegeFinder = () => {
                 <EmptyState
                   icon={School}
                   title='No Schools Found'
-                  description={searchQuery ? `No schools match "${searchQuery}"` : 'Try adjusting your filters'}
+                  description={
+                    searchQuery
+                      ? `No schools match "${searchQuery}"`
+                      : 'Try adjusting your filters'
+                  }
                   action={{ label: 'Clear Filters', onClick: handleClearAll }}
                 />
               )}
@@ -279,46 +287,59 @@ const CollegeFinder = () => {
           <div className='bg-white w-[85%] max-w-md h-full overflow-y-auto p-6 animate-in slide-in-from-right duration-300'>
             <div className='flex justify-between items-center mb-6'>
               <h2 className='text-xl font-bold'>Filters</h2>
-              <button onClick={() => setIsModalOpen(false)} className='p-2 hover:bg-gray-100 rounded-full'>✕</button>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className='p-2 hover:bg-gray-100 rounded-full'
+              >
+                ✕
+              </button>
             </div>
             <div className='space-y-6'>
               <FilterSection
-                title="Grade"
+                title='Grade'
                 options={filterOptions.grade}
                 selectedItems={selectedFilters.grade}
-                onSelectionChange={(items) => handleFilterChange('grade', items)}
+                onSelectionChange={(items) =>
+                  handleFilterChange('grade', items)
+                }
               />
               <FilterSection
-                title="Affiliation"
+                title='Affiliation'
                 options={filterOptions.affiliation}
                 selectedItems={selectedFilters.affiliation}
-                onSelectionChange={(items) => handleFilterChange('affiliation', items)}
+                onSelectionChange={(items) =>
+                  handleFilterChange('affiliation', items)
+                }
               />
               <FilterSection
-                title="Type"
+                title='Type'
                 options={filterOptions.type}
                 selectedItems={selectedFilters.type}
                 onSelectionChange={(items) => handleFilterChange('type', items)}
               />
               <FilterSection
-                title="District"
+                title='District'
                 options={filterOptions.district}
                 selectedItems={selectedFilters.district}
-                placeholder="Search district"
-                onSelectionChange={(items) => handleFilterChange('district', items)}
+                placeholder='Search district'
+                onSelectionChange={(items) =>
+                  handleFilterChange('district', items)
+                }
               />
               <FilterSection
-                title="Amenity"
+                title='Amenity'
                 options={filterOptions.amenity}
                 selectedItems={selectedFilters.amenity}
-                placeholder="Search amenity"
-                onSelectionChange={(items) => handleFilterChange('amenity', items)}
+                placeholder='Search amenity'
+                onSelectionChange={(items) =>
+                  handleFilterChange('amenity', items)
+                }
               />
             </div>
-            <div className="mt-8 pt-4 border-t border-gray-100 sticky bottom-0 bg-white">
+            <div className='mt-8 pt-4 border-t border-gray-100 sticky bottom-0 bg-white'>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold"
+                className='w-full bg-blue-600 text-white py-3 rounded-xl font-bold'
               >
                 Show Results
               </button>

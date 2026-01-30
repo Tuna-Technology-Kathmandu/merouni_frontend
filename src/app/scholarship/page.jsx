@@ -1,16 +1,26 @@
 'use client'
 import React, { useEffect, useState, useLayoutEffect } from 'react'
 import { Search, Award, Filter, X } from 'lucide-react'
-import { Select } from '@/components/ui/select'
-import EmptyState from '@/components/ui/EmptyState'
-import { fetchScholarships, fetchCategories } from './actions'
-import { CardSkeleton } from '@/components/ui/CardSkeleton'
+import { Select } from '@/ui/shadcn/select'
+import EmptyState from '@/ui/shadcn/EmptyState'
+import {
+  fetchScholarships,
+  fetchCategories,
+  applyForScholarship
+} from './actions'
+import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useSelector } from 'react-redux'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const ScholarshipPage = () => {
+  const router = useRouter()
+  const user = useSelector((state) => state.user?.data)
   const [scholarships, setScholarships] = useState([])
   const [loading, setLoading] = useState(false)
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -20,6 +30,7 @@ const ScholarshipPage = () => {
     category: ''
   })
   const [isScrolling, setIsScrolling] = useState(false)
+  const [applyingIds, setApplyingIds] = useState(new Set())
 
   // Fetch categories on mount
   useEffect(() => {
@@ -36,7 +47,6 @@ const ScholarshipPage = () => {
 
   // Debounce search
   useEffect(() => {
-    
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm)
     }, 500)
@@ -73,6 +83,36 @@ const ScholarshipPage = () => {
     setFilters({ category: '' })
   }
 
+  const handleApply = async (scholarshipId) => {
+    // Check if user is logged in
+    if (!user || !user.id) {
+      toast.error('Please login to apply for scholarships')
+      router.push('/sign-in')
+      return
+    }
+
+    // Check if already applying
+    if (applyingIds.has(scholarshipId)) {
+      return
+    }
+
+    try {
+      setApplyingIds((prev) => new Set(prev).add(scholarshipId))
+      
+      await applyForScholarship(scholarshipId)
+      
+      toast.success('Application submitted successfully!')
+    } catch (error) {
+      toast.error(error.message || 'Failed to apply for scholarship')
+    } finally {
+      setApplyingIds((prev) => {
+        const newSet = new Set(prev)
+        newSet.delete(scholarshipId)
+        return newSet
+      })
+    }
+  }
+
   return (
     <>
       <Header />
@@ -85,12 +125,14 @@ const ScholarshipPage = () => {
             <div>
               <div className='relative inline-block mb-3'>
                 <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight'>
-                  Explore Our <span className='text-[#0A6FA7]'>Scholarships</span>
+                  Explore Our{' '}
+                  <span className='text-[#0A6FA7]'>Scholarships</span>
                 </h1>
                 <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
               </div>
               <p className='text-gray-500 max-w-xl font-medium text-lg mt-2'>
-                Find scholarships designed to support your education and make your learning journey more affordable.
+                Find scholarships designed to support your education and make
+                your learning journey more affordable.
               </p>
             </div>
 
@@ -111,7 +153,9 @@ const ScholarshipPage = () => {
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6'>
               {/* Search */}
               <div className='lg:col-span-8'>
-                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Search Scholarships</label>
+                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                  Search Scholarships
+                </label>
                 <div className='relative group'>
                   <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors' />
                   <input
@@ -155,7 +199,9 @@ const ScholarshipPage = () => {
           {!loading && (
             <div className='mb-8 px-2'>
               <p className='text-sm text-gray-500 font-semibold'>
-                Showing <span className='text-gray-900'>{scholarships.length}</span> results
+                Showing{' '}
+                <span className='text-gray-900'>{scholarships.length}</span>{' '}
+                results
               </p>
             </div>
           )}
@@ -163,9 +209,11 @@ const ScholarshipPage = () => {
           {/* Scholarships Grid */}
           {loading ? (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-              {Array(6).fill('').map((_, index) => (
-                <CardSkeleton key={index} />
-              ))}
+              {Array(6)
+                .fill('')
+                .map((_, index) => (
+                  <CardSkeleton key={index} />
+                ))}
             </div>
           ) : scholarships.length === 0 ? (
             <div className='bg-white rounded-[32px] border border-gray-100 border-dashed py-20'>
@@ -180,9 +228,9 @@ const ScholarshipPage = () => {
                 action={
                   searchTerm || filters.category
                     ? {
-                      label: 'Clear All Filters',
-                      onClick: clearFilters
-                    }
+                        label: 'Clear All Filters',
+                        onClick: clearFilters
+                      }
                     : null
                 }
               />
@@ -212,14 +260,20 @@ const ScholarshipPage = () => {
                   <div className='mt-auto space-y-4 pt-6 border-t border-gray-50'>
                     <div className='flex items-center justify-between'>
                       <div className='flex flex-col'>
-                        <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>Deadline</span>
+                        <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
+                          Deadline
+                        </span>
                         <span className='text-sm font-bold text-gray-700'>
-                          {new Date(scholarship.applicationDeadline).toLocaleDateString()}
+                          {new Date(
+                            scholarship.applicationDeadline
+                          ).toLocaleDateString()}
                         </span>
                       </div>
                       {scholarship.eligibilityCriteria && (
                         <div className='flex flex-col text-right'>
-                          <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>Eligibility</span>
+                          <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
+                            Eligibility
+                          </span>
                           <span className='text-sm font-bold text-gray-700 truncate max-w-[120px]'>
                             {scholarship.eligibilityCriteria.replace(/"/g, '')}
                           </span>
@@ -228,9 +282,24 @@ const ScholarshipPage = () => {
                     </div>
                   </div>
 
-                  <div className='mt-6 pt-4'>
-                    <button className='w-full py-3 rounded-xl bg-gray-50 text-gray-700 font-bold text-sm group-hover:bg-[#0A6FA7] group-hover:text-white transition-all duration-300'>
+                  <div className='mt-6 pt-4 flex gap-3'>
+                    <Link
+                      href={`/scholarship/${scholarship.slugs || scholarship.id}`}
+                      className='flex-1 py-3 rounded-xl bg-gray-50 text-gray-700 font-bold text-sm group-hover:bg-[#0A6FA7] group-hover:text-white transition-all duration-300 text-center'
+                    >
                       View Details
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleApply(scholarship.id)
+                      }}
+                      disabled={applyingIds.has(scholarship.id)}
+                      className='flex-1 py-3 rounded-xl bg-[#0A6FA7] text-white font-bold text-sm hover:bg-[#085a86] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'
+                    >
+                      {applyingIds.has(scholarship.id)
+                        ? 'Applying...'
+                        : 'Apply Now'}
                     </button>
                   </div>
                 </div>
@@ -241,6 +310,7 @@ const ScholarshipPage = () => {
       </div>
 
       <Footer />
+      <ToastContainer position='top-right' autoClose={3000} />
     </>
   )
 }

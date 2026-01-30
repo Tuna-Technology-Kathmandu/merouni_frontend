@@ -7,17 +7,17 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
-import Table from '../../../../components/Table'
+import Table from '../../../../ui/molecules/Table'
 import { Edit2, Trash2, Search } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import dynamic from 'next/dynamic'
-import { Modal } from '../../../../components/UserModal'
+import { Modal } from '../../../../ui/molecules/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/ui/shadcn/button'
 
 // Dynamically import CKEditor to avoid SSR issues
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
@@ -405,10 +405,7 @@ export default function CareerForm() {
 
               {/* Submit Button - Sticky Footer */}
               <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <Button
-                  type='submit'
-                  disabled={loading}
-                >
+                <Button type='submit' disabled={loading}>
                   {loading
                     ? 'Processing...'
                     : editing

@@ -2,16 +2,16 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
-import Table from '../../../../components/Table'
+import Table from '../../../../ui/molecules/Table'
 import { Edit2, Trash2, Search } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../components/UserModal'
+import { Modal } from '../../../../ui/molecules/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/ui/shadcn/button'
 
 export default function TagForm() {
   const { setHeading } = usePageHeading()
@@ -331,10 +331,7 @@ export default function TagForm() {
             >
               Cancel
             </button>
-            <Button
-              type='submit'
-              disabled={submitting}
-            >
+            <Button type='submit' disabled={submitting}>
               {submitting
                 ? 'Processing...'
                 : editing

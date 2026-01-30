@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { getCareers } from './actions'
 import Link from 'next/link'
 import { Search, Briefcase } from 'lucide-react'
-import EmptyState from '@/components/ui/EmptyState'
+import EmptyState from '@/ui/shadcn/EmptyState'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
@@ -144,12 +144,12 @@ export default function CareersPage() {
               action={
                 debouncedSearch
                   ? {
-                    label: 'Clear Search',
-                    onClick: () => {
-                      setSearchTerm('')
-                      setDebouncedSearch('')
+                      label: 'Clear Search',
+                      onClick: () => {
+                        setSearchTerm('')
+                        setDebouncedSearch('')
+                      }
                     }
-                  }
                   : null
               }
             />
@@ -159,39 +159,39 @@ export default function CareersPage() {
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
             {loading
               ? // Show shimmer cards while loading
-              Array.from({ length: 6 }).map((_, index) => (
-                <CareerCardShimmer key={`shimmer-${index}`} />
-              ))
+                Array.from({ length: 6 }).map((_, index) => (
+                  <CareerCardShimmer key={`shimmer-${index}`} />
+                ))
               : // Show actual career cards when not loading
-              careersData.items?.map((career) => (
-                <Link
-                  href={`/career/${career.slugs}`}
-                  key={career.id}
-                  className='block hover:shadow-xl transition-shadow duration-300'
-                >
-                  <div className='bg-white rounded-lg shadow-md overflow-hidden h-full'>
-                    <div className='h-48 w-full'>
-                      <img
-                        src={career?.featuredImage || '/images/job.webp'}
-                        alt={career.title}
-                        fill
-                        className='object-cover w-full h-full '
-                      />
-                    </div>
-                    <div className='p-4'>
-                      <h2 className='text-xl max-md:text-lg font-semibold text-gray-900 mb-2 line-clamp-2'>
-                        {career.title}
-                      </h2>
-                      <p className='text-gray-600 mb-4 line-clamp-3 max-sm:text-sm max-sm:mb-2'>
-                        {career.description}
-                      </p>
-                      <div className='text-sm text-gray-500'>
-                        <p>Posted: {formatDate(career.createdAt)}</p>
+                careersData.items?.map((career) => (
+                  <Link
+                    href={`/career/${career.slugs}`}
+                    key={career.id}
+                    className='block hover:shadow-xl transition-shadow duration-300'
+                  >
+                    <div className='bg-white rounded-lg shadow-md overflow-hidden h-full'>
+                      <div className='h-48 w-full'>
+                        <img
+                          src={career?.featuredImage || '/images/job.webp'}
+                          alt={career.title}
+                          fill
+                          className='object-cover w-full h-full '
+                        />
+                      </div>
+                      <div className='p-4'>
+                        <h2 className='text-xl max-md:text-lg font-semibold text-gray-900 mb-2 line-clamp-2'>
+                          {career.title}
+                        </h2>
+                        <p className='text-gray-600 mb-4 line-clamp-3 max-sm:text-sm max-sm:mb-2'>
+                          {career.description}
+                        </p>
+                        <div className='text-sm text-gray-500'>
+                          <p>Posted: {formatDate(career.createdAt)}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))}
           </div>
 
           {/* Pagination */}

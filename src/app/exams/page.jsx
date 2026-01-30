@@ -1,5 +1,5 @@
 'use client'
-import EmptyState from '@/components/ui/EmptyState'
+import EmptyState from '@/ui/shadcn/EmptyState'
 import { FormatDate } from '@/lib/date'
 import { Building2, ClipboardCheck, Search, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
@@ -8,7 +8,12 @@ import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
 import Pagination from '../blogs/components/Pagination'
-import { fetchFaculties, fetchLevels, fetchUniversities, getExams } from './actions'
+import {
+  fetchFaculties,
+  fetchLevels,
+  fetchUniversities,
+  getExams
+} from './actions'
 import ExamShimmer from './components/ExamShimmer'
 import SingleExam from './components/SingleExam'
 
@@ -83,7 +88,14 @@ export default function ExamsPage() {
     } finally {
       setLoading(false)
     }
-  }, [debouncedSearch, pagination.currentPage, selectedType, selectedLevel, selectedAffiliation, selectedFaculty])
+  }, [
+    debouncedSearch,
+    pagination.currentPage,
+    selectedType,
+    selectedLevel,
+    selectedAffiliation,
+    selectedFaculty
+  ])
 
   useEffect(() => {
     fetchExams()
@@ -92,7 +104,13 @@ export default function ExamsPage() {
   // Reset to page 1 whenever filters change
   useEffect(() => {
     setPagination((prev) => ({ ...prev, currentPage: 1 }))
-  }, [debouncedSearch, selectedType, selectedLevel, selectedAffiliation, selectedFaculty])
+  }, [
+    debouncedSearch,
+    selectedType,
+    selectedLevel,
+    selectedAffiliation,
+    selectedFaculty
+  ])
 
   const handleClick = (id) => {
     let single = exams.find((items) => items.id === id)
@@ -144,12 +162,17 @@ export default function ExamsPage() {
                   <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
                 </div>
                 <p className='text-gray-500 max-w-xl font-medium mt-2'>
-                  Find upcoming entrance and periodic exams tailored to your academic path.
+                  Find upcoming entrance and periodic exams tailored to your
+                  academic path.
                 </p>
               </div>
 
               {/* Clear All Button */}
-              {(search || selectedType || selectedLevel || selectedAffiliation || selectedFaculty) && (
+              {(search ||
+                selectedType ||
+                selectedLevel ||
+                selectedAffiliation ||
+                selectedFaculty) && (
                 <button
                   onClick={clearFilters}
                   className='flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors'
@@ -163,10 +186,11 @@ export default function ExamsPage() {
             {/* Filter Bar */}
             <div className='bg-white rounded-[32px] p-8 shadow-[0_2px_15px_rgba(0,0,0,0.02)] border border-gray-100 mb-12'>
               <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6'>
-
                 {/* Search */}
                 <div className='lg:col-span-4'>
-                  <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Search</label>
+                  <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                    Search
+                  </label>
                   <div className='relative group'>
                     <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors' />
                     <input
@@ -181,7 +205,9 @@ export default function ExamsPage() {
 
                 {/* Exam Type */}
                 <div className='lg:col-span-2'>
-                  <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Type</label>
+                  <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                    Type
+                  </label>
                   <select
                     value={selectedType}
                     onChange={(e) => setSelectedType(e.target.value)}
@@ -196,49 +222,60 @@ export default function ExamsPage() {
 
                 {/* Study Level */}
                 <div className='lg:col-span-2'>
-                  <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Level</label>
+                  <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                    Level
+                  </label>
                   <select
                     value={selectedLevel}
                     onChange={(e) => setSelectedLevel(e.target.value)}
                     className='w-full px-4 py-3.5 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#0A6FA7]/10 focus:border-[#0A6FA7] focus:bg-white transition-all text-sm font-bold appearance-none cursor-pointer'
                   >
                     <option value=''>All Levels</option>
-                    {levels.map(lvl => (
-                      <option key={lvl.id} value={lvl.id}>{lvl.title}</option>
+                    {levels.map((lvl) => (
+                      <option key={lvl.id} value={lvl.id}>
+                        {lvl.title}
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 {/* Affiliation */}
                 <div className='lg:col-span-2'>
-                  <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Affiliation</label>
+                  <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                    Affiliation
+                  </label>
                   <select
                     value={selectedAffiliation}
                     onChange={(e) => setSelectedAffiliation(e.target.value)}
                     className='w-full px-4 py-3.5 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#0A6FA7]/10 focus:border-[#0A6FA7] focus:bg-white transition-all text-sm font-bold appearance-none cursor-pointer'
                   >
                     <option value=''>All Universities</option>
-                    {universities.map(uni => (
-                      <option key={uni.id} value={uni.id}>{uni.fullname}</option>
+                    {universities.map((uni) => (
+                      <option key={uni.id} value={uni.id}>
+                        {uni.fullname}
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 {/* Discipline */}
                 <div className='lg:col-span-2'>
-                  <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Discipline</label>
+                  <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                    Discipline
+                  </label>
                   <select
                     value={selectedFaculty}
                     onChange={(e) => setSelectedFaculty(e.target.value)}
                     className='w-full px-4 py-3.5 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#0A6FA7]/10 focus:border-[#0A6FA7] focus:bg-white transition-all text-sm font-bold appearance-none cursor-pointer'
                   >
                     <option value=''>All Disciplines</option>
-                    {faculties.map(fac => (
-                      <option key={fac.id} value={fac.id}>{fac.title}</option>
+                    {faculties.map((fac) => (
+                      <option key={fac.id} value={fac.id}>
+                        {fac.title}
+                      </option>
                     ))}
                   </select>
                 </div>
-
               </div>
             </div>
 
@@ -255,16 +292,24 @@ export default function ExamsPage() {
                   icon={ClipboardCheck}
                   title='No Exams Found'
                   description={
-                    search || selectedType || selectedLevel || selectedAffiliation || selectedFaculty
+                    search ||
+                    selectedType ||
+                    selectedLevel ||
+                    selectedAffiliation ||
+                    selectedFaculty
                       ? 'No exams match your current filter criteria. Try adjusting your selections.'
                       : 'No exams are currently available at the moment.'
                   }
                   action={
-                    search || selectedType || selectedLevel || selectedAffiliation || selectedFaculty
+                    search ||
+                    selectedType ||
+                    selectedLevel ||
+                    selectedAffiliation ||
+                    selectedFaculty
                       ? {
-                        label: 'Clear All Filters',
-                        onClick: clearFilters
-                      }
+                          label: 'Clear All Filters',
+                          onClick: clearFilters
+                        }
                       : null
                   }
                 />
@@ -310,20 +355,30 @@ export default function ExamsPage() {
                         {exam.application_details?.length > 0 ? (
                           <div className='grid grid-cols-2 gap-4'>
                             <div className='flex flex-col'>
-                              <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>Closing Date</span>
+                              <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
+                                Closing Date
+                              </span>
                               <span className='text-sm font-bold text-gray-700'>
-                                {FormatDate.formatDate(exam.application_details[0].closing_date) ?? 'TBD'}
+                                {FormatDate.formatDate(
+                                  exam.application_details[0].closing_date
+                                ) ?? 'TBD'}
                               </span>
                             </div>
                             <div className='flex flex-col text-right'>
-                              <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>Exam Date</span>
+                              <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
+                                Exam Date
+                              </span>
                               <span className='text-sm font-bold text-[#0A6FA7]'>
-                                {FormatDate.formatDate(exam.application_details[0].exam_date) ?? 'TBD'}
+                                {FormatDate.formatDate(
+                                  exam.application_details[0].exam_date
+                                ) ?? 'TBD'}
                               </span>
                             </div>
                           </div>
                         ) : (
-                          <p className='text-xs font-bold text-gray-400 text-center py-2 bg-gray-50 rounded-xl'>Dates to be announced</p>
+                          <p className='text-xs font-bold text-gray-400 text-center py-2 bg-gray-50 rounded-xl'>
+                            Dates to be announced
+                          </p>
                         )}
 
                         <button

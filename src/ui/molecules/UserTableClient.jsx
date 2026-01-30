@@ -5,7 +5,7 @@ import { Edit, Trash2, Plus } from 'lucide-react'
 import { Button } from './Button'
 import { Modal } from './UserModal'
 import { UserForm } from './UserForm'
-import { deleteUser } from '../app/actions/userActions'
+import { deleteUser } from '../../app/actions/userActions'
 
 export function UserTableClient({ users }) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)

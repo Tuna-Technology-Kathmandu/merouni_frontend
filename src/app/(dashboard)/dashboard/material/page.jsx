@@ -3,18 +3,18 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
-import Table from '../../../../components/Table'
+import Table from '../../../../ui/molecules/Table'
 import { Edit2, Trash2, Search } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { X } from 'lucide-react'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../components/UserModal'
+import { Modal } from '../../../../ui/molecules/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/ui/shadcn/button'
 
 export default function MaterialForm() {
   const { setHeading } = usePageHeading()
@@ -507,11 +507,7 @@ export default function MaterialForm() {
         </div>
         {/* Button */}
         <div className='flex items-center gap-4'>
-          <Button
-            onClick={handleAddClick}
-          >
-            Add Material
-          </Button>
+          <Button onClick={handleAddClick}>Add Material</Button>
         </div>
       </div>
 
