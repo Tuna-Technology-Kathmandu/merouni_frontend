@@ -131,9 +131,8 @@ export default function NewsForm({
                       shouldDirty: true
                     })
                   }}
-                  placeholder='Search and select category'
+                  placeholder='Search and select category (optional)'
                   error={errors.category_id?.message}
-                  required
                   loading={loadingCategories}
                 />
               </div>

@@ -5,7 +5,7 @@ import { Button } from '@/ui/shadcn/button'
 import { DotenvConfig } from '@/config/env.config'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Edit2, Eye, Trash2 } from 'lucide-react'
+import { Edit2, Eye, Trash2, Search } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -338,9 +338,18 @@ export default function NewsManager() {
       <div className='p-4 w-full'>
         <ToastContainer position='top-right' />
 
-        {/* Header */}
-        <div className='flex justify-between items-center mb-6'>
-          <div className='flex items-center gap-4'></div>
+        {/* Header: search and Add News in same row */}
+        <div className='flex justify-between items-center gap-4 mb-6'>
+          <div className='relative w-full max-w-md'>
+            <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none' />
+            <input
+              type='text'
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder='Search news...'
+              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+            />
+          </div>
           <Button
             onClick={() => {
               setIsOpen(true)
@@ -376,7 +385,7 @@ export default function NewsManager() {
             pagination={pagination}
             onPageChange={(newPage) => loadData(newPage, searchQuery)}
             onSearch={handleSearch}
-            showSearch={true}
+            showSearch={false}
           />
         </div>
       </div>

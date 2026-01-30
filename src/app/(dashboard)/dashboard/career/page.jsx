@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
 import Table from '../../../../ui/molecules/Table'
-import { Edit2, Trash2, Search } from 'lucide-react'
+import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
@@ -39,6 +39,9 @@ export default function CareerForm() {
   const [editId, setEditingId] = useState(null)
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [viewModalOpen, setViewModalOpen] = useState(false)
+  const [viewCareerData, setViewCareerData] = useState(null)
+  const [loadingView, setLoadingView] = useState(false)
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -235,6 +238,30 @@ export default function CareerForm() {
     setDeleteId(null)
   }
 
+  const handleView = async (slug) => {
+    try {
+      setLoadingView(true)
+      setViewModalOpen(true)
+      const response = await authFetch(
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/career/${slug}`,
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+      if (!response.ok) throw new Error('Failed to fetch career details')
+      const data = await response.json()
+      setViewCareerData(data.item ?? data)
+    } catch (err) {
+      toast.error(err.message ?? 'Failed to load career details')
+      setViewModalOpen(false)
+    } finally {
+      setLoadingView(false)
+    }
+  }
+
+  const handleCloseViewModal = () => {
+    setViewModalOpen(false)
+    setViewCareerData(null)
+  }
+
   const handleDeleteConfirm = async () => {
     if (!deleteId) return
 
@@ -295,14 +322,23 @@ export default function CareerForm() {
       cell: ({ row }) => (
         <div className='flex gap-2'>
           <button
+            onClick={() => handleView(row.original.slugs)}
+            className='p-1 text-purple-600 hover:text-purple-800'
+            title='View Details'
+          >
+            <Eye className='w-4 h-4' />
+          </button>
+          <button
             onClick={() => handleEdit(row.original.slugs)}
             className='p-1 text-blue-600 hover:text-blue-800'
+            title='Edit'
           >
             <Edit2 className='w-4 h-4' />
           </button>
           <button
             onClick={() => handleDeleteClick(row.original.id)}
             className='p-1 text-red-600 hover:text-red-800'
+            title='Delete'
           >
             <Trash2 className='w-4 h-4' />
           </button>
@@ -469,6 +505,70 @@ export default function CareerForm() {
         title='Confirm Deletion'
         message='Are you sure you want to delete this career? This action cannot be undone.'
       />
+
+      {/* View Career Details Modal */}
+      <Modal
+        isOpen={viewModalOpen}
+        onClose={handleCloseViewModal}
+        title='Career Details'
+        className='max-w-3xl'
+      >
+        {loadingView ? (
+          <div className='flex justify-center items-center h-48'>
+            Loading...
+          </div>
+        ) : viewCareerData ? (
+          <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
+            {viewCareerData.featuredImage && (
+              <div className='w-full h-64 rounded-lg overflow-hidden'>
+                <img
+                  src={viewCareerData.featuredImage}
+                  alt={viewCareerData.title}
+                  className='w-full h-full object-cover'
+                />
+              </div>
+            )}
+
+            <div>
+              <h2 className='text-2xl font-bold text-gray-800'>
+                {viewCareerData.title}
+              </h2>
+              {viewCareerData.status && (
+                <span
+                  className={`inline-flex mt-2 px-2 py-1 text-xs font-semibold rounded-full ${
+                    viewCareerData.status === 'active'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}
+                >
+                  {viewCareerData.status === 'active' ? 'Active' : 'Inactive'}
+                </span>
+              )}
+            </div>
+
+            {viewCareerData.description && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Description</h3>
+                <p className='text-gray-700 whitespace-pre-wrap'>
+                  {viewCareerData.description}
+                </p>
+              </div>
+            )}
+
+            {viewCareerData.content && (
+              <div>
+                <h3 className='text-lg font-semibold mb-2'>Content</h3>
+                <div
+                  className='text-gray-700 prose max-w-none'
+                  dangerouslySetInnerHTML={{ __html: viewCareerData.content }}
+                />
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className='text-center text-gray-500'>No career data available.</p>
+        )}
+      </Modal>
     </>
   )
 }
