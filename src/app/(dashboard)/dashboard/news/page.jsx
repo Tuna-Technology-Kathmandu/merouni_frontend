@@ -1,21 +1,21 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { useSelector } from 'react-redux'
-import { useSearchParams, useRouter } from 'next/navigation'
-import { fetchNews, createNews, updateNews, deleteNews, getNewsBySlug } from './action'
-import { fetchCategories } from '../category/action.js'
 import { authFetch } from '@/app/utils/authFetch'
+import { Button } from '@/components/ui/button'
 import { DotenvConfig } from '@/config/env.config'
-import Table from '../../../../components/Table'
-import { Edit2, Trash2, Eye } from 'lucide-react'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+import useAdminPermission from '@/hooks/useAdminPermission'
+import { Edit2, Eye, Trash2 } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import useAdminPermission from '@/hooks/useAdminPermission'
+import Table from '../../../../components/Table'
 import { Modal } from '../../../../components/UserModal'
-import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { Button } from '@/components/ui/button'
+import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import { fetchCategories } from '../category/action.js'
+import { createNews, deleteNews, fetchNews, getNewsById, updateNews } from './action'
 import NewsForm from './components/NewsForm'
 
 export default function NewsManager() {
@@ -112,7 +112,7 @@ export default function NewsManager() {
             },
             {
                 header: 'Associated College',
-                accessorKey: 'cnewsCollegeollege.name',
+                accessorKey: 'newsCollege.name',
                 cell: ({ row }) => row.original.newsCollege?.name || 'N/A'
             },
             {
@@ -126,7 +126,7 @@ export default function NewsManager() {
                 cell: ({ row }) => (
                     <div className='flex gap-2'>
                         <button
-                            onClick={() => handleView(row.original.slug)}
+                            onClick={() => handleView(row.original.id)}
                             className='p-1 text-purple-600 hover:text-purple-800'
                             title='View Details'
                         >
@@ -270,11 +270,11 @@ export default function NewsManager() {
         fetchAllCategories()
     }
 
-    const handleView = async (slug) => {
+    const handleView = async (id) => {
         try {
             setLoadingView(true)
             setViewModalOpen(true)
-            const newsData = await getNewsBySlug(slug)
+            const newsData = await getNewsById(id)
             setViewNewsData(newsData)
         } catch (error) {
             console.error('Error fetching news details:', error)
@@ -431,6 +431,16 @@ export default function NewsManager() {
                                 <p className='text-gray-700'>{viewNewsData.description}</p>
                             </div>
                         )}
+                        <div className='grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg'>
+                            <div>
+                                <h3 className='text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1'>Associated College</h3>
+                                <p className='text-sm font-medium'>{viewNewsData.newsCollege?.name || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <h3 className='text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1'>Category</h3>
+                                <p className='text-sm font-medium'>{viewNewsData.newsCategory?.title || 'N/A'}</p>
+                            </div>
+                        </div>
                         {viewNewsData.createdAt && (
                             <div className='text-sm text-gray-500'>
                                 Created: {new Date(viewNewsData.createdAt).toLocaleString()}

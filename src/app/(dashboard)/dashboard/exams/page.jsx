@@ -337,11 +337,11 @@ export default function ExamManager() {
         author: author_id,
         examDetails: [
           {
-            ...formData.examDetails[0],
-            full_marks: Number(formData.examDetails[0].full_marks),
-            pass_marks: Number(formData.examDetails[0].pass_marks),
+            ...(formData.examDetails?.[0] || {}),
+            full_marks: Number(formData.examDetails?.[0]?.full_marks || 0),
+            pass_marks: Number(formData.examDetails?.[0]?.pass_marks || 0),
             number_of_question: Number(
-              formData.examDetails[0].number_of_question
+              formData.examDetails?.[0]?.number_of_question || 0
             )
           }
         ],
@@ -406,16 +406,19 @@ export default function ExamManager() {
       affiliation: exam.affiliation,
       syllabus: exam.syllabus,
       pastQuestion: exam.pastQuestion,
-      examDetails: exam.exam_details || [
-        {
-          exam_type: 'Written',
-          full_marks: '',
-          pass_marks: '',
-          number_of_question: '',
-          question_type: 'MCQ',
-          duration: ''
-        }
-      ],
+      examDetails:
+        exam.exam_details && exam.exam_details.length > 0
+          ? exam.exam_details
+          : [
+            {
+              exam_type: 'Written',
+              full_marks: '',
+              pass_marks: '',
+              number_of_question: '',
+              question_type: 'MCQ',
+              duration: ''
+            }
+          ],
       applicationDetails: exam.application_details[0] || {
         normal_fee: '',
         late_fee: '',
@@ -782,13 +785,13 @@ export default function ExamManager() {
                   <Select
                     className='w-full'
                     id='exam-type'
-                    value={formData.examDetails[0].exam_type}
+                    value={formData.examDetails?.[0]?.exam_type || 'Written'}
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
                         examDetails: [
                           {
-                            ...prev.examDetails[0],
+                            ...(prev.examDetails?.[0] || {}),
                             exam_type: e.target.value
                           }
                         ]
@@ -808,13 +811,13 @@ export default function ExamManager() {
                       id='full-marks'
                       type='number'
                       placeholder='e.g., 100'
-                      value={formData.examDetails[0].full_marks}
+                      value={formData.examDetails?.[0]?.full_marks || ''}
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
                           examDetails: [
                             {
-                              ...prev.examDetails[0],
+                              ...(prev.examDetails?.[0] || {}),
                               full_marks: e.target.value
                             }
                           ]
@@ -829,13 +832,13 @@ export default function ExamManager() {
                       id='pass-marks'
                       type='number'
                       placeholder='e.g., 40'
-                      value={formData.examDetails[0].pass_marks}
+                      value={formData.examDetails?.[0]?.pass_marks || ''}
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
                           examDetails: [
                             {
-                              ...prev.examDetails[0],
+                              ...(prev.examDetails?.[0] || {}),
                               pass_marks: e.target.value
                             }
                           ]
@@ -853,13 +856,13 @@ export default function ExamManager() {
                     id='num-questions'
                     type='number'
                     placeholder='e.g., 50'
-                    value={formData.examDetails[0].number_of_question}
+                    value={formData.examDetails?.[0]?.number_of_question || ''}
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
                         examDetails: [
                           {
-                            ...prev.examDetails[0],
+                            ...(prev.examDetails?.[0] || {}),
                             number_of_question: e.target.value
                           }
                         ]
@@ -874,13 +877,13 @@ export default function ExamManager() {
                   </RequiredLabel>
                   <Select
                     id='question-type'
-                    value={formData.examDetails[0].question_type}
+                    value={formData.examDetails?.[0]?.question_type || 'MCQ'}
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
                         examDetails: [
                           {
-                            ...prev.examDetails[0],
+                            ...(prev.examDetails?.[0] || {}),
                             question_type: e.target.value
                           }
                         ]
@@ -899,13 +902,13 @@ export default function ExamManager() {
                     id='duration'
                     type='text'
                     placeholder='e.g., 2 hours'
-                    value={formData.examDetails[0].duration}
+                    value={formData.examDetails?.[0]?.duration || ''}
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
                         examDetails: [
                           {
-                            ...prev.examDetails[0],
+                            ...(prev.examDetails?.[0] || {}),
                             duration: e.target.value
                           }
                         ]

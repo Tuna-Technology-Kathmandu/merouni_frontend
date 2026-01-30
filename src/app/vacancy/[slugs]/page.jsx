@@ -22,10 +22,7 @@ const NewsDetailsPage = ({ params }) => {
         const resolvedParams = await params
         const slugs = resolvedParams.slugs // No need to await params.slugs
         console.log('NEws slug:', slugs)
-        // const [newsData, allNews] = await Promise.all([
-        //   getNewsBySlug(slugs),
-        //   getRelatedNews(),
-        // ]);
+      
         const newsData = await getNewsBySlug(slugs)
 
         setNews(newsData.blog || null) // Set eventData directly

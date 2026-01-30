@@ -86,16 +86,31 @@ export async function deleteNews(id) {
     }
 }
 
-export async function getNewsBySlug(slug) {
+export async function getNewsById(id) {
     try {
-        const response = await authFetch(`${url}/slug/${slug}`)
-
+        const response = await authFetch(`${url}/id/${id}`)
         if (!response.ok) {
             throw new Error('Failed to fetch news details')
         }
 
         const data = await response.json()
-        return data.item || data
+        return data.news || data.item || data
+    } catch (error) {
+        console.error('Error fetching news by slug:', error)
+        throw error
+    }
+}
+
+
+export async function getNewsBySlug(slug) {
+    try {
+        const response = await authFetch(`${url}/${slug}`)
+        if (!response.ok) {
+            throw new Error('Failed to fetch news details')
+        }
+
+        const data = await response.json()
+        return data.news || data.item || data
     } catch (error) {
         console.error('Error fetching news by slug:', error)
         throw error
