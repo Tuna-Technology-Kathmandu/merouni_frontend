@@ -1,8 +1,10 @@
-import { Upload } from 'lucide-react'
+import { Upload, X, FileText, Loader2 } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 import { DotenvConfig } from '@/config/env.config'
+import { Label } from '@/components/ui/label'
+import { cn } from '@/app/lib/utils'
 
 const FileUpload = ({
   onUploadComplete,
@@ -102,74 +104,103 @@ const FileUpload = ({
     }
   }
 
+  const handleRemove = (e) => {
+    e.stopPropagation()
+    setPreview(null)
+    setFileType(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+    onUploadComplete('')
+  }
+
   return (
-    <div className='space-y-4'>
-      <label className='block mb-2'>{label}</label>
-      <div className='border-2 border-dashed border-gray-300 rounded-lg p-6'>
-        <div className='flex flex-col items-center'>
-          {!preview && <Upload className='h-12 w-12 text-gray-400' />}
-          <div className='mt-4 text-center'>
-            <label className='cursor-pointer'>
-              <span className='text-blue-500 hover:text-blue-600'>
-                {preview ? 'Change file' : 'Click to upload'}
-              </span>
-              <input
-                ref={fileInputRef}
-                type='file'
-                className='hidden'
-                onChange={handleFileUpload}
-                accept={accept}
-                disabled={isUploading}
-              />
-            </label>
-          </div>
-        </div>
-        {isUploading && (
-          <div className='mt-4 text-center text-sm text-gray-500'>
-            Uploading...
-          </div>
+    <div className='space-y-2'>
+      {label && <Label>{label}</Label>}
+      <div
+        className={cn(
+          'relative border-2 border-dashed rounded-lg p-4 transition-all duration-200',
+          'border-input bg-background/50 hover:bg-muted/30 hover:border-ring/40',
+          isUploading && 'opacity-60 cursor-not-allowed',
+          preview ? 'border-primary/20 bg-primary/[0.02]' : 'border-input'
         )}
-        {preview && fileType === 'image' && (
-          <div className='mt-4'>
-            <img
-              src={preview}
-              alt='Preview'
-              className='mx-auto max-h-40 rounded-lg'
-            />
-          </div>
-        )}
-        {preview && fileType === 'pdf' && (
-          <div className='mt-4 text-center'>
-            <div className='inline-flex items-center gap-2 px-4 py-2 bg-red-50 border border-red-200 rounded-lg'>
-              <span className='text-red-600 font-medium'>📄 {preview}</span>
-              {defaultPreview && (
-                <a
-                  href={defaultPreview}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='text-blue-600 hover:text-blue-800 text-sm underline'
+      >
+        <div className='flex flex-col items-center justify-center min-h-[120px]'>
+          {!preview && !isUploading && (
+            <div className='flex flex-col items-center animate-in fade-in zoom-in duration-300'>
+              <Upload className='h-8 w-8 text-muted-foreground mb-3 opacity-60' />
+              <div className='text-sm text-center'>
+                <label className='cursor-pointer text-primary hover:underline font-medium'>
+                  Click to upload
+                  <input
+                    ref={fileInputRef}
+                    type='file'
+                    className='hidden'
+                    onChange={handleFileUpload}
+                    accept={accept}
+                    disabled={isUploading}
+                  />
+                </label>
+                <span className='text-muted-foreground ml-1'>or drag and drop</span>
+              </div>
+            </div>
+          )}
+
+          {isUploading && (
+            <div className='flex flex-col items-center animate-in fade-in duration-300'>
+              <Loader2 className='h-8 w-8 text-primary animate-spin mb-3' />
+              <span className='text-sm font-medium text-muted-foreground'>Uploading...</span>
+            </div>
+          )}
+
+          {preview && !isUploading && (
+            <div className='w-full animate-in fade-in slide-in-from-bottom-2 duration-300'>
+              <div className='flex items-center justify-between mb-3 px-1'>
+                <span className='text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70'>
+                  {fileType === 'pdf' ? 'PDF Document' : 'Image Preview'}
+                </span>
+                <button
+                  onClick={handleRemove}
+                  className='p-1 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors'
+                  title='Remove file'
                 >
-                  View PDF
-                </a>
+                  <X className='h-4 w-4' />
+                </button>
+              </div>
+
+              {fileType === 'image' ? (
+                <div className='relative mx-auto rounded-md overflow-hidden border shadow-sm bg-muted/20'>
+                  <img
+                    src={preview}
+                    alt='Preview'
+                    className='max-h-48 w-auto mx-auto object-contain'
+                  />
+                </div>
+              ) : (
+                <div className='flex items-center gap-3 p-3 bg-card border rounded-md shadow-sm mx-auto max-w-[340px]'>
+                  <div className='p-2 bg-muted rounded text-muted-foreground'>
+                    <FileText className='h-5 w-5' />
+                  </div>
+                  <div className='flex-1 min-w-0'>
+                    <p className='text-sm font-medium text-foreground truncate'>
+                      {preview}
+                    </p>
+                    {defaultPreview && (
+                      <a
+                        href={defaultPreview}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-[11px] text-muted-foreground hover:text-primary transition-colors'
+                      >
+                        Open External File
+                      </a>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
-          </div>
-        )}
-        {defaultPreview && !preview && defaultPreview.includes('.pdf') && (
-          <div className='mt-4 text-center'>
-            <div className='inline-flex items-center gap-2 px-4 py-2 bg-red-50 border border-red-200 rounded-lg'>
-              <span className='text-red-600 font-medium'>PDF File</span>
-              <a
-                href={defaultPreview}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-blue-600 hover:text-blue-800 text-sm underline'
-              >
-                View PDF
-              </a>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

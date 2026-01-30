@@ -9,21 +9,19 @@ export function Modal({ isOpen, onClose, title, children, className }) {
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black opacity-30"
-        onClick={onClose}
       />
 
       {/* Modal */}
       <div
-        className={`relative w-full rounded-lg bg-white p-6 shadow-lg ${
-          className || 'max-w-md'
-        }`}
+        className={`relative w-full rounded-lg bg-white p-6 shadow-lg ${className || 'max-w-md'
+          }`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold">{title}</h3>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="rounded-full p-1 text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600"
           >
             <X className="h-5 w-5" />
           </button>

@@ -35,6 +35,8 @@ import { Button } from '../../../../components/ui/button'
 import { Input } from '../../../../components/ui/input'
 import { Label } from '../../../../components/ui/label'
 import { Select } from '../../../../components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { SearchableSelect } from '@/components/ui/SearchableSelect'
 
 const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
@@ -183,7 +185,6 @@ export default function CollegeForm() {
   const [debouncedUni] = useDebounce(uniSearch, 300)
   const [universities, setUniversities] = useState([])
   const [loadUni, setLoadUni] = useState(false)
-  const [showUniDrop, setShowUniDrop] = useState(false)
   const [hasSelectedUni, setHasSelectedUni] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
@@ -1105,7 +1106,6 @@ export default function CollegeForm() {
                         id='name'
                         placeholder='Enter college name'
                         {...register('name', { required: true })}
-                        aria-invalid={errors.name ? 'true' : 'false'}
                         className={errors.name ? 'border-destructive' : ''}
                       />
                       {errors.name && (
@@ -1128,6 +1128,11 @@ export default function CollegeForm() {
                         <option value='Private'>Private</option>
                         <option value='Public'>Public</option>
                       </Select>
+                      {errors.institute_type && (
+                        <span className='text-sm font-medium text-destructive'>
+                          This field is required
+                        </span>
+                      )}
                     </div>
 
                     <div className='space-y-2'>
@@ -1150,66 +1155,42 @@ export default function CollegeForm() {
                       </div>
                     </div>
 
-                    <div className='relative space-y-2'>
-                      <Label htmlFor='university-search'>
-                        University <span className='text-red-500'>*</span>
-                      </Label>
-
-                      <Input
-                        id='university-search'
-                        type='text'
-                        placeholder='Search University'
-                        value={uniSearch}
-                        onChange={(e) => {
-                          setUniSearch(e.target.value)
+                    <SearchableSelect
+                      id='university_id'
+                      label='University'
+                      options={universities}
+                      value={watch('university_id')}
+                      displayKey='fullname'
+                      onChange={(option) => {
+                        if (option) {
+                          setValue('university_id', Number(option.id), {
+                            shouldValidate: true,
+                            shouldDirty: true
+                          })
+                          setHasSelectedUni(true)
+                          setUniSlug(option.slugs)
+                        } else {
+                          setValue('university_id', '', {
+                            shouldValidate: true
+                          })
                           setHasSelectedUni(false)
-                        }}
-                      />
-
-                      {/* Hidden input for react-hook-form binding */}
-                      <input
-                        type='hidden'
-                        {...register('university_id', { required: true })}
-                      />
-                      {loadUni ? (
-                        <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
-                          Loading...
-                        </div>
-                      ) : showUniDrop ? (
-                        universities.length > 0 ? (
-                          <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
-                            {universities.map((uni) => (
-                              <li
-                                key={uni.id}
-                                className='p-2 cursor-pointer hover:bg-gray-100'
-                                onClick={() => {
-                                  setValue('university_id', Number(uni.id))
-                                  setUniSearch(uni.fullname)
-                                  setShowUniDrop(false)
-                                  setHasSelectedUni(true)
-                                  setUniSlug(uni.slugs)
-                                }}
-                              >
-                                {uni.fullname}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
-                            No universities found.
-                          </div>
-                        )
-                      ) : null}
-                    </div>
+                          setUniSlug('')
+                        }
+                      }}
+                      onSearchChange={(val) => setUniSearch(val || '')}
+                      placeholder='Search University'
+                      error={errors.university_id ? 'This field is required' : ''}
+                      required
+                      loading={loadUni}
+                    />
 
                     <div className='md:col-span-2 space-y-2'>
                       <Label htmlFor='description'>Description</Label>
-                      <textarea
+                      <Textarea
                         id='description'
-                        {...register('description')}
-                        className='flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                        rows='4'
                         placeholder='Enter college description'
+                        {...register('description')}
+                        className='min-h-[100px]'
                       />
                     </div>
 
@@ -1422,20 +1403,20 @@ export default function CollegeForm() {
                           }
                         />
                         {errors.facilities?.[index]?.title && (
-                          <p className='text-sm font-medium text-destructive'>
+                          <span className='text-sm font-medium text-destructive'>
                             This field is required
-                          </p>
+                          </span>
                         )}
                       </div>
                       <div className='space-y-2'>
                         <Label htmlFor={`facility-description-${index}`}>
                           Description
                         </Label>
-                        <textarea
+                        <Textarea
                           id={`facility-description-${index}`}
                           placeholder='Facility Description'
                           {...register(`facilities.${index}.description`)}
-                          className='w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                          className='min-h-[80px]'
                         />
                       </div>
                       <div>

@@ -3,18 +3,15 @@
 import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { Modal } from '../../../../../components/UserModal'
-import { Button } from '../../../../../components/ui/button'
-import { Input } from '../../../../../components/ui/input'
-import { Label } from '../../../../../components/ui/label'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { SearchableSelect } from '@/components/ui/SearchableSelect'
 import FileUpload from '../../addCollege/FileUpload'
 
 
-// Helper component for required label
-const RequiredLabel = ({ children, htmlFor }) => (
-    <Label htmlFor={htmlFor}>
-        {children} <span className='text-red-500'>*</span>
-    </Label>
-)
 
 export default function NewsForm({
     isOpen,
@@ -22,7 +19,11 @@ export default function NewsForm({
     editing,
     initialData,
     onSubmit,
-    submitting
+    submitting,
+    colleges = [],
+    categories = [],
+    loadingColleges = false,
+    loadingCategories = false
 }) {
     const {
         register,
@@ -37,7 +38,9 @@ export default function NewsForm({
             description: '',
             featuredImage: '',
             status: 'draft',
-            visibility: 'private'
+            visibility: 'private',
+            college_id: '',
+            category_id: ''
         }
     })
 
@@ -50,7 +53,9 @@ export default function NewsForm({
                 description: '',
                 featuredImage: '',
                 status: 'draft',
-                visibility: 'private'
+                visibility: 'private',
+                college_id: '',
+                category_id: ''
             })
         }
     }, [isOpen, reset])
@@ -63,6 +68,8 @@ export default function NewsForm({
             setValue('featuredImage', initialData.featuredImage || '')
             setValue('status', initialData.status || 'draft')
             setValue('visibility', initialData.visibility || 'private')
+            setValue('college_id', initialData.college_id || initialData.vacancyCollege?.id || '')
+            setValue('category_id', initialData.category_id || initialData.category?.id || '')
         }
     }, [editing, initialData, isOpen, setValue])
 
@@ -87,46 +94,80 @@ export default function NewsForm({
                         {/* Basic Information */}
                         <div className='bg-white p-6 rounded-lg shadow-md'>
                             <h2 className='text-xl font-semibold mb-4'>News Information</h2>
-                            <div className='space-y-4'>
-                                {/* Title */}
-                                <div>
-                                    <RequiredLabel htmlFor='title'>News Title</RequiredLabel>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                                <div className='space-y-2'>
+                                    <Label htmlFor='title' className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                                        News Title
+                                    </Label>
                                     <Input
                                         id='title'
-                                        placeholder='News Title'
+                                        placeholder='Enter news title'
                                         {...register('title', {
                                             required: 'Title is required'
                                         })}
-                                        aria-invalid={errors.title ? 'true' : 'false'}
+                                        className={errors.title ? 'border-destructive' : ''}
                                     />
                                     {errors.title && (
-                                        <p className='text-sm font-medium text-destructive mt-1'>
+                                        <span className='text-sm font-medium text-destructive'>
                                             {errors.title.message}
-                                        </p>
+                                        </span>
                                     )}
                                 </div>
 
+                                <SearchableSelect
+                                    id='category_id'
+                                    label='Category'
+                                    options={categories}
+                                    displayKey='title'
+                                    value={watch('category_id')}
+                                    onChange={(option) => {
+                                        setValue('category_id', option?.id || '', {
+                                            shouldValidate: true,
+                                            shouldDirty: true
+                                        })
+                                    }}  
+                                    placeholder='Search and select category'
+                                    error={errors.category_id?.message}
+                                    required
+                                    loading={loadingCategories}
+                                />
+                            </div>
 
-                                {/* Description */}
-                                <div>
-                                    <RequiredLabel htmlFor='description'>
-                                        Description
-                                    </RequiredLabel>
-                                    <textarea
-                                        id='description'
-                                        {...register('description', {
-                                            required: 'Description is required'
-                                        })}
-                                        placeholder='Brief description of the news...'
-                                        rows={3}
-                                        className='flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                                    />
-                                    {errors.description && (
-                                        <p className='text-sm font-medium text-destructive mt-1'>
-                                            {errors.description.message}
-                                        </p>
-                                    )}
-                                </div>
+                            <div className='mt-4'>
+                                <SearchableSelect
+                                    id='college_id'
+                                    label='Associated College'
+                                    options={colleges}
+                                    value={watch('college_id')}
+                                    onChange={(option) => {
+                                        setValue('college_id', option?.id || '', {
+                                            shouldValidate: true,
+                                            shouldDirty: true
+                                        })
+                                    }}
+                                    placeholder='Search and select college (optional)'
+                                    error={errors.college_id?.message}
+                                    loading={loadingColleges}
+                                />
+                            </div>
+
+                            <div className='space-y-2 mt-4'>
+                                <Label htmlFor='description' className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                                    Description
+                                </Label>
+                                <Textarea
+                                    id='description'
+                                    {...register('description', {
+                                        required: 'Description is required'
+                                    })}
+                                    placeholder='Brief description of the news...'
+                                    className='min-h-[100px]'
+                                />
+                                {errors.description && (
+                                    <span className='text-sm font-medium text-destructive'>
+                                        {errors.description.message}
+                                    </span>
+                                )}
                             </div>
                         </div>
 
@@ -151,28 +192,28 @@ export default function NewsForm({
                                     Additional Settings
                                 </h2>
                                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                                    <div>
+                                    <div className='space-y-2'>
                                         <Label htmlFor='visibility'>Visibility</Label>
-                                        <select
+                                        <Select
                                             id='visibility'
                                             {...register('visibility')}
-                                            className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                                            className='w-full'
                                         >
                                             <option value='private'>Private</option>
                                             <option value='public'>Public</option>
-                                        </select>
+                                        </Select>
                                     </div>
 
-                                    <div>
+                                    <div className='space-y-2'>
                                         <Label htmlFor='status'>Status</Label>
-                                        <select
+                                        <Select
                                             id='status'
                                             {...register('status')}
-                                            className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                                            className='w-full'
                                         >
                                             <option value='draft'>Draft</option>
                                             <option value='published'>Published</option>
-                                        </select>
+                                        </Select>
                                     </div>
                                 </div>
                             </div>

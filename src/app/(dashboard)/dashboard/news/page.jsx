@@ -4,6 +4,9 @@ import { useState, useEffect, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { fetchNews, createNews, updateNews, deleteNews, getNewsBySlug } from './action'
+import { fetchCategories } from '../category/action.js'
+import { authFetch } from '@/app/utils/authFetch'
+import { DotenvConfig } from '@/config/env.config'
 import Table from '../../../../components/Table'
 import { Edit2, Trash2, Eye } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
@@ -12,7 +15,7 @@ import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Modal } from '../../../../components/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { Button } from '../../../../components/ui/button'
+import { Button } from '@/components/ui/button'
 import NewsForm from './components/NewsForm'
 
 export default function NewsManager() {
@@ -39,6 +42,10 @@ export default function NewsManager() {
     const [viewModalOpen, setViewModalOpen] = useState(false)
     const [viewNewsData, setViewNewsData] = useState(null)
     const [loadingView, setLoadingView] = useState(false)
+    const [colleges, setColleges] = useState([])
+    const [categories, setCategories] = useState([])
+    const [loadingColleges, setLoadingColleges] = useState(false)
+    const [loadingCategories, setLoadingCategories] = useState(false)
 
     const columns = useMemo(
         () => [
@@ -104,6 +111,16 @@ export default function NewsManager() {
                 }
             },
             {
+                header: 'Associated College',
+                accessorKey: 'cnewsCollegeollege.name',
+                cell: ({ row }) => row.original.newsCollege?.name || 'N/A'
+            },
+            {
+                header: 'Category',
+                accessorKey: 'newsCategory.name',
+                cell: ({ row }) => row.original.newsCategory?.title || 'N/A'
+            },
+            {
                 header: 'Actions',
                 id: 'actions',
                 cell: ({ row }) => (
@@ -147,11 +164,42 @@ export default function NewsManager() {
             setIsOpen(true)
             setEditing(false)
             setInitialData(null)
+            fetchAllColleges()
+            fetchAllCategories()
             router.replace('/dashboard/news')
         }
     }, [searchParams, router])
 
     const { requireAdmin } = useAdminPermission()
+
+    const fetchAllColleges = async (force = false) => {
+        if (colleges.length > 0 && !force) return
+        try {
+            setLoadingColleges(true)
+            const response = await authFetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/college?limit=1000`)
+            if (response.ok) {
+                const data = await response.json()
+                setColleges(data.items || [])
+            }
+        } catch (err) {
+            console.error('Error loading colleges:', err)
+        } finally {
+            setLoadingColleges(false)
+        }
+    }
+
+    const fetchAllCategories = async (force = false) => {
+        if (categories.length > 0 && !force) return
+        try {
+            setLoadingCategories(true)
+            const response = await fetchCategories(1, 1000)
+            setCategories(response.items || [])
+        } catch (err) {
+            console.error('Error loading categories:', err)
+        } finally {
+            setLoadingCategories(false)
+        }
+    }
 
     const loadData = async (page = 1, search = '') => {
         try {
@@ -186,8 +234,10 @@ export default function NewsManager() {
                 description: data.description,
                 featuredImage: data.featuredImage,
                 status: data.status,
-                visibility: data.visibility,
-                author: author_id
+                visibility: data.visibility || 'private',
+                author: author_id,
+                college_id: data.college_id || null,
+                category_id: data.category_id || null
             }
 
             if (editing && editingId) {
@@ -216,6 +266,8 @@ export default function NewsManager() {
         setEditingId(newsItem.id)
         setEditing(true)
         setIsOpen(true)
+        fetchAllColleges()
+        fetchAllCategories()
     }
 
     const handleView = async (slug) => {
@@ -286,6 +338,8 @@ export default function NewsManager() {
                             setIsOpen(true)
                             setEditing(false)
                             setInitialData(null)
+                            fetchAllColleges()
+                            fetchAllCategories()
                         }}
                     >
                         Add News
@@ -300,6 +354,10 @@ export default function NewsManager() {
                     initialData={initialData}
                     onSubmit={handleSubmit}
                     submitting={submitting}
+                    colleges={colleges}
+                    categories={categories}
+                    loadingColleges={loadingColleges}
+                    loadingCategories={loadingCategories}
                 />
 
                 {/* Table Section */}

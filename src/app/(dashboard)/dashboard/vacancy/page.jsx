@@ -16,6 +16,10 @@ import { Search, Eye } from 'lucide-react'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { SearchableSelect } from '@/components/ui/SearchableSelect'
 
 const VacancyManager = () => {
   const { setHeading } = usePageHeading()
@@ -27,6 +31,7 @@ const VacancyManager = () => {
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -34,6 +39,7 @@ const VacancyManager = () => {
       description: '',
       content: '',
       featuredImage: '',
+      college_id: '',
       author_id
     }
   })
@@ -59,6 +65,8 @@ const VacancyManager = () => {
   const [viewModalOpen, setViewModalOpen] = useState(false)
   const [viewVacancyData, setViewVacancyData] = useState(null)
   const [loadingView, setLoadingView] = useState(false)
+  const [colleges, setColleges] = useState([])
+  const [loadCollegesList, setLoadCollegesList] = useState(false)
 
   const loadVacancies = async (page = 1) => {
     setTableLoading(true)
@@ -80,6 +88,26 @@ const VacancyManager = () => {
       console.error('Error loading vacancies:', err)
     } finally {
       setTableLoading(false)
+    }
+  }
+
+  const fetchAllColleges = async (force = false) => {
+    // Avoid redundant fetches if we already have colleges
+    if (colleges.length > 0 && !force) return
+
+    try {
+      setLoadCollegesList(true)
+      const response = await authFetch(
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?limit=1000`
+      )
+      if (response.ok) {
+        const data = await response.json()
+        setColleges(data.items || [])
+      }
+    } catch (err) {
+      console.error('Error loading colleges:', err)
+    } finally {
+      setLoadCollegesList(false)
     }
   }
 
@@ -145,6 +173,7 @@ const VacancyManager = () => {
 
   const handleEdit = async (slugs) => {
     try {
+      fetchAllColleges()
       setEditing(true)
       setLoading(true)
       setIsOpen(true)
@@ -163,6 +192,12 @@ const VacancyManager = () => {
       setUploadedFiles({
         featuredImage: vacancy.featuredImage || ''
       })
+
+      if (vacancy.college_id) {
+        setValue('college_id', vacancy.college_id)
+      } else {
+        setValue('college_id', '')
+      }
     } catch (error) {
       toast.error('Failed to fetch vacancy details')
     } finally {
@@ -289,6 +324,11 @@ const VacancyManager = () => {
       accessorKey: 'title'
     },
     {
+      header: 'Associated College',
+      accessorKey: 'college.name',
+      cell: ({ row }) => row.original.vacancyCollege?.name || 'N/A'
+    },
+    {
       header: 'Description',
       accessorKey: 'description',
       cell: ({ getValue }) => {
@@ -372,6 +412,7 @@ const VacancyManager = () => {
                 setEditingId(null)
                 reset()
                 setUploadedFiles({ featuredImage: '' })
+                fetchAllColleges()
               }}
             >
               Add Vacancy
@@ -403,45 +444,61 @@ const VacancyManager = () => {
                   <h2 className='text-xl font-semibold mb-4'>
                     Vacancy Information
                   </h2>
-                  <div className='space-y-4'>
-                    <div>
-                      <label className='block mb-2'>
-                        Vacancy Title <span className='text-red-500'>*</span>
-                      </label>
-                      <input
-                        type='text'
-                        placeholder='Vacancy Title'
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div className='space-y-2'>
+                      <Label htmlFor='title' className="after:content-['*'] after:ml-0.5 after:text-red-500">
+                        Vacancy Title
+                      </Label>
+                      <Input
+                        id='title'
+                        placeholder='Enter vacancy title'
                         {...register('title', {
                           required: 'Title is required'
                         })}
-                        className='w-full p-2 border rounded'
+                        className={errors.title ? 'border-destructive' : ''}
                       />
                       {errors.title && (
-                        <span className='text-red-500 text-sm'>
+                        <span className='text-sm font-medium text-destructive'>
                           {errors.title.message}
                         </span>
                       )}
                     </div>
 
-                    <div>
-                      <label className='block mb-2'>Short Description</label>
-                      <textarea
-                        placeholder='Short description'
-                        {...register('description')}
-                        className='w-full p-2 border rounded'
-                        rows={3}
-                      />
-                    </div>
+                    <SearchableSelect
+                      id='college_id'
+                      label='Associated College'
+                      options={colleges}
+                      value={watch('college_id')}
+                      onChange={(option) => {
+                        setValue('college_id', option?.id || '', {
+                          shouldValidate: true,
+                          shouldDirty: true
+                        })
+                      }}
+                      placeholder='Search and select college'
+                      error={errors.college_id?.message}
+                      loading={loadCollegesList}
+                    />
+                  </div>
 
-                    <div>
-                      <label className='block mb-2'>Content</label>
-                      <textarea
-                        placeholder='Detailed content'
-                        {...register('content')}
-                        className='w-full p-2 border rounded'
-                        rows={6}
-                      />
-                    </div>
+                  <div className='space-y-2 mt-4'>
+                    <Label htmlFor='description'>Short Description</Label>
+                    <Textarea
+                      id='description'
+                      placeholder='Enter short description'
+                      {...register('description')}
+                      className='min-h-[100px]'
+                    />
+                  </div>
+
+                  <div className='space-y-2 mt-4'>
+                    <Label htmlFor='content'>Content</Label>
+                    <Textarea
+                      id='content'
+                      placeholder='Enter detailed content'
+                      {...register('content')}
+                      className='min-h-[200px]'
+                    />
                   </div>
                 </div>
 
@@ -464,17 +521,16 @@ const VacancyManager = () => {
 
               {/* Submit Button - Sticky Footer */}
               <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <button
+                <Button
                   type='submit'
                   disabled={loading}
-                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
                 >
                   {loading
                     ? 'Processing...'
                     : editing
                       ? 'Update Vacancy'
                       : 'Create Vacancy'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
