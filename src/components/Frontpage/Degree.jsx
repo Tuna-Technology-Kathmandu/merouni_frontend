@@ -79,10 +79,6 @@ const DegreeScroller = () => {
                 ></div>
               </div>
 
-              {/* Arrow Icon */}
-              {/* <div className='self-end z-20'>
-                <FaArrowCircleRight className='w-8 h-8 md:w-10 md:h-10 text-white hover:text-purple-300 transition-colors' />
-              </div> */}
             </div>
           ))}
         </div>

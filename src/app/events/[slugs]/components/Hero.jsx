@@ -1,6 +1,7 @@
 import React from 'react'
 import { FaArrowLeft, FaFacebook, FaTwitter, FaLinkedin, FaLink } from 'react-icons/fa'
 import Link from 'next/link'
+import { formatDate } from '@/utils/date.util'
 
 const Hero = ({ event }) => {
   const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
@@ -23,14 +24,7 @@ const Hero = ({ event }) => {
     alert('Link copied to clipboard!')
   }
 
-  const formatDate = (dateString) => {
-    if (!dateString) return ''
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
+ 
 
   return (
     <div className='max-w-[1000px] mx-auto px-6 pt-12 lg:pt-16'>

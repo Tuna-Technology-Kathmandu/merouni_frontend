@@ -57,11 +57,10 @@ const DegreePage = () => {
     return () => clearTimeout(handler)
   }, [searchTerm])
 
-  // Load degrees
-  const loadDegrees = useCallback(async (page = 1, search = '', faculty = '', level = '') => {
+  const loadDegrees = useCallback(async (page = 1, search = '', facultyId = '', level = '') => {
     setLoading(true)
     try {
-      const response = await fetchDegrees(search, page, faculty, level)
+      const response = await fetchDegrees(search, page, facultyId, level)
       setCourses(response.items)
       setPagination((prev) => ({
         ...prev,
@@ -83,7 +82,7 @@ const DegreePage = () => {
   // Fetch when page, search, or filters change
   useEffect(() => {
     loadDegrees(pagination.currentPage, debouncedSearch, selectedFaculty, selectedLevel)
-  }, [debouncedSearch, pagination.currentPage, selectedFaculty, selectedLevel, loadDegrees])
+  }, [debouncedSearch, pagination.currentPage, selectedFaculty, selectedLevel])
 
   // Handle page change
   const handlePageChange = (page) => {
