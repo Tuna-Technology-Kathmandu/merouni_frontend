@@ -17,107 +17,10 @@ import Pagination from '../blogs/components/Pagination'
 import useMediaQuery from './MediaQuery'
 import Sponsors from './Sponsors'
 import Thisweek from './Thisweek'
+import { fetchEvents, fetchNextWeekEvents, fetchThisWeekEvents, searchEvent } from './action'
+import { formatDate } from '@/utils/date.util'
 
-// Client-side fetch functions to replace server actions
-const fetchEvents = async (page = 1, collegeId = '') => {
-  try {
-    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event`)
-    url.searchParams.append('page', page)
-    url.searchParams.append('limit', 12)
-    if (collegeId) {
-      url.searchParams.append('college_id', collegeId)
-    }
 
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      cache: 'no-store'
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch events: ${response.statusText}`)
-    }
-    return await response.json()
-  } catch (error) {
-    console.error('Error fetching events:', error)
-    throw error
-  }
-}
-
-const searchEvent = async (query, collegeId = '') => {
-  try {
-    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event`)
-    url.searchParams.append('q', query)
-    if (collegeId) {
-      url.searchParams.append('college_id', collegeId)
-    }
-
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      cache: 'no-store'
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to search events: ${response.statusText}`)
-    }
-    const data = await response.json()
-    return data
-  } catch (error) {
-    console.error('Error searching events:', error)
-    throw error
-  }
-}
-
-const fetchThisWeekEvents = async (collegeId = '') => {
-  try {
-    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event/this-week`)
-    if (collegeId) url.searchParams.append('college_id', collegeId)
-
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      cache: 'no-store'
-    })
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch this week's events")
-    }
-    return await response.json()
-  } catch (error) {
-    console.error("Error fetching this week's events:", error)
-    throw error
-  }
-}
-
-const fetchNextWeekEvents = async (collegeId = '') => {
-  try {
-    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event/next-month`)
-    if (collegeId) url.searchParams.append('college_id', collegeId)
-
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      cache: 'no-store'
-    })
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch next week's events")
-    }
-    return await response.json()
-  } catch (error) {
-    console.error("Error fetching next week's events:", error)
-    throw error
-  }
-}
 
 const Events = () => {
   const [allEvents, setAllEvents] = useState([])
@@ -155,7 +58,9 @@ const Events = () => {
     // Only run on client side
     if (typeof window === 'undefined') return
 
-    if (!searchQuery) {
+    if (searchQuery) {
+      debouncedSearch(searchQuery, selectedCollege)
+    } else {
       loadEvents(pagination.currentPage, selectedCollege)
     }
   }, [pagination.currentPage, searchQuery, selectedCollege])
@@ -206,11 +111,11 @@ const Events = () => {
   }
 
   const debouncedSearch = useCallback(
-    debounce(async (query) => {
+    debounce(async (query, collegeId) => {
       if (query) {
         setIsSearching(true)
         try {
-          const results = await searchEvent(query, selectedCollege)
+          const results = await searchEvent(query, collegeId)
           setAllEvents(results.items || [])
           setPagination(
             results.pagination || {
@@ -231,14 +136,13 @@ const Events = () => {
           setIsSearching(false)
         }
       }
-    }, 1000), // 1000ms delay
+    }, 1000),
     []
   )
 
   const handleSearchChange = (e) => {
     const query = e.target.value
     setSearchQuery(query)
-    debouncedSearch(query)
   }
 
   if (error) return <div>Error: {error}</div>
@@ -284,10 +188,7 @@ const Events = () => {
                   <div className='flex flex-col items-center'>
                     <p className='text-sm font-bold'>Starts</p>
                     <p className='whitespace-nowrap'>
-                      {new Date(
-                        JSON.parse(featuredEvent.event_host)?.start_date ??
-                        new Date()
-                      ).toLocaleDateString()}
+                      {formatDate(featuredEvent.event_host?.start_date)}
                     </p>
                   </div>
                   <div className='flex items-center'>
@@ -296,10 +197,7 @@ const Events = () => {
                   <div className='flex flex-col items-center'>
                     <p className='text-sm font-bold'>Ends</p>
                     <p className='whitespace-nowrap'>
-                      {new Date(
-                        JSON.parse(featuredEvent.event_host)?.end_date ??
-                        new Date()
-                      ).toLocaleDateString()}
+                      {formatDate(featuredEvent.event_host?.end_date)}
                     </p>
                   </div>
                   <div className='flex items-center'>
@@ -310,7 +208,7 @@ const Events = () => {
                     <p className='whitespace-nowrap'>
                       {(() => {
                         try {
-                          const host = JSON.parse(featuredEvent.event_host) // parse the JSON string
+                          const host = featuredEvent.event_host 
                           return host?.time
                             ? new Date(
                               `1970-01-01T${host.time}:00`
@@ -511,4 +409,3 @@ const Events = () => {
 
 export default Events
 
-// this week events
