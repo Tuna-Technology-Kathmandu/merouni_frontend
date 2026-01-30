@@ -60,7 +60,8 @@ export default function CareerForm() {
       author_id: author_id,
       description: '',
       content: '',
-      featuredImage: ''
+      featuredImage: '',
+      status: 'active'
     }
   })
 
@@ -209,6 +210,7 @@ export default function CareerForm() {
       setValue('title', career.title)
       setValue('description', career.description)
       setValue('content', career.content)
+      setValue('status', career.status || 'active')
 
       // Set featured image
       setUploadedFiles({
@@ -256,12 +258,32 @@ export default function CareerForm() {
 
   const columns = [
     {
-      header: 'ID',
-      accessorKey: 'id'
+      header: 'S.N',
+      id: 'sn',
+      cell: ({ row }) =>
+        (pagination.currentPage - 1) * (pagination.limit ?? 10) + row.index + 1
     },
     {
       header: 'Title',
       accessorKey: 'title'
+    },
+    {
+      header: 'Status',
+      accessorKey: 'status',
+      cell: ({ row }) => {
+        const status = row.original.status || 'active'
+        return (
+          <span
+            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+              status === 'active'
+                ? 'bg-green-100 text-green-800'
+                : 'bg-gray-100 text-gray-800'
+            }`}
+          >
+            {status === 'active' ? 'Active' : 'Inactive'}
+          </span>
+        )
+      }
     },
     {
       header: 'Description',
@@ -343,9 +365,6 @@ export default function CareerForm() {
               <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
                 {/* Basic Information */}
                 <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Career Information
-                  </h2>
                   <div className='grid grid-cols-1 gap-4'>
                     <div>
                       <label className='block mb-2'>
@@ -366,6 +385,17 @@ export default function CareerForm() {
                           {errors.title.message}
                         </span>
                       )}
+                    </div>
+
+                    <div>
+                      <label className='block mb-2'>Status</label>
+                      <select
+                        {...register('status')}
+                        className='w-full p-2 border rounded bg-white'
+                      >
+                        <option value='active'>Active</option>
+                        <option value='inactive'>Inactive</option>
+                      </select>
                     </div>
 
                     <div>

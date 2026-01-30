@@ -17,6 +17,12 @@ import { Modal } from '../../../../ui/molecules/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/ui/shadcn/button'
+import { Input } from '@/ui/shadcn/input'
+import { Label } from '@/ui/shadcn/label'
+import { Textarea } from '@/ui/shadcn/textarea'
+import { Checkbox } from '@/ui/shadcn/checkbox'
+import { Controller } from 'react-hook-form'
+import { Plus, Trash2 } from 'lucide-react'
 
 const CKEditor = dynamic(() => import('../component/CKStable'), {
   ssr: false
@@ -63,7 +69,7 @@ export default function ConsultancyForm() {
   } = useForm({
     defaultValues: {
       title: '',
-      destination: [{ country: '', city: '' }],
+      destination: [],
       address: {
         street: '',
         city: '',
@@ -102,7 +108,7 @@ export default function ConsultancyForm() {
       setEditingId(null)
       reset({
         title: '',
-        destination: [{ country: '', city: '' }],
+        destination: [],
         address: {
           street: '',
           city: '',
@@ -205,7 +211,11 @@ export default function ConsultancyForm() {
       // Build the payload with all fields - always include all fields explicitly
       const payload = {
         title: data.title?.trim() || '',
-        destination: data.destination || [],
+        destination: Array.isArray(data.destination)
+          ? data.destination
+              .map((d) => (typeof d === 'string' ? d : (d?.country ?? '')))
+              .filter(Boolean)
+          : [],
         address: data.address || {},
         featured_image: uploadedFiles.featured || '',
         logo:
@@ -293,8 +303,26 @@ export default function ConsultancyForm() {
       setValue('website_url', consultancy.website_url || '')
       setValue('google_map_url', consultancy.google_map_url || '')
       setValue('video_url', consultancy.video_url || '')
-      const parsedDestination = JSON.parse(consultancy.destination)
-      setValue('destination', parsedDestination)
+      const parsedDestination = Array.isArray(consultancy.destination)
+        ? consultancy.destination
+        : typeof consultancy.destination === 'string'
+          ? (() => {
+              try {
+                return JSON.parse(consultancy.destination)
+              } catch {
+                return []
+              }
+            })()
+          : []
+      const destinationForForm = (
+        Array.isArray(parsedDestination) ? parsedDestination : []
+      ).map((d) =>
+        typeof d === 'string' ? { country: d } : { country: d?.country ?? '' }
+      )
+      setValue(
+        'destination',
+        destinationForForm.length ? destinationForForm : []
+      )
       setValue('address', JSON.parse(consultancy.address))
       const parsedContact = consultancy.contact
         ? typeof consultancy.contact === 'string'
@@ -501,258 +529,313 @@ export default function ConsultancyForm() {
               onSubmit={handleSubmit(onSubmit)}
               className='flex flex-col flex-1 overflow-hidden'
             >
-              <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Consultancy Information
-                  </h2>
-                  <div className='grid grid-cols-1 gap-4'>
-                    <div>
-                      <label className='block mb-2'>
-                        Title <span className='text-red-500'>*</span>
-                      </label>
-                      <input
-                        {...register('title', {
-                          required: 'Title is required',
-                          minLength: {
-                            value: 3,
-                            message: 'Title must be at least 3 characters long'
-                          }
-                        })}
-                        className='w-full p-2 border rounded'
-                      />
-                      {errors.title && (
-                        <span className='text-red-500'>
-                          {errors.title.message}
-                        </span>
-                      )}
-                    </div>
+              <div className='flex-1 overflow-y-auto space-y-8 pr-2'>
+                {/* Basic info */}
+                <div className='space-y-4'>
+                  <h3 className='text-sm font-semibold text-gray-900 border-b pb-2'>
+                    Basic Information
+                  </h3>
+                  <div className='space-y-2'>
+                    <Label
+                      htmlFor='title'
+                      className='after:content-["*"] after:ml-0.5 after:text-destructive'
+                    >
+                      Title
+                    </Label>
+                    <Input
+                      id='title'
+                      placeholder='Consultancy name'
+                      {...register('title', {
+                        required: 'Title is required',
+                        minLength: {
+                          value: 3,
+                          message: 'Title must be at least 3 characters'
+                        }
+                      })}
+                      className={errors.title ? 'border-destructive' : ''}
+                    />
+                    {errors.title && (
+                      <p className='text-sm text-destructive'>
+                        {errors.title.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className='space-y-2'>
+                    <Label htmlFor='description'>Description</Label>
+                    <CKEditor
+                      value={watch('description') || ''}
+                      onChange={(data) => setValue('description', data)}
+                      id='consultancy-description-editor'
+                    />
+                  </div>
+                </div>
 
-                    <div>
-                      <label className='block mb-2'>Description</label>
-                      <CKEditor
-                        value={watch('description') || ''}
-                        onChange={(data) => setValue('description', data)}
-                        id='consultancy-description-editor'
-                      />
-                    </div>
-
-                    <div className='bg-white p-6 rounded-lg shadow-md'>
-                      <div className='flex justify-between items-center mb-4'>
-                        <h2 className='text-xl font-semibold'>Destination</h2>
-                        <button
-                          type='button'
-                          onClick={() =>
-                            appendDestination({ country: '', city: '' })
-                          }
-                          className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600'
-                        >
-                          Add Destination
-                        </button>
-                      </div>
-                      {destinationFeilds.map((field, index) => (
-                        <div
-                          key={field.id}
-                          className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 border rounded'
-                        >
-                          <div>
-                            <label className='block mb-2'>Country</label>
-                            <input
-                              type='text'
-                              {...register(`destination.${index}.country`)}
-                              className='w-full p-2 border rounded'
-                            />
-                          </div>
-
-                          <div>
-                            <label className='block mb-2'>City</label>
-                            <input
-                              type='text'
-                              {...register(`destination.${index}.city`)}
-                              className='w-full p-2 border rounded'
-                            />
-                          </div>
-
-                          {index > 0 && (
-                            <button
-                              type='button'
-                              onClick={() => removeDestination(index)}
-                              className='bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600'
-                            >
-                              Remove
-                            </button>
-                          )}
+                {/* Destinations */}
+                <div className='space-y-4'>
+                  <div className='flex justify-between items-center'>
+                    <h3 className='text-sm font-semibold text-gray-900 border-b pb-2 flex-1'>
+                      Destinations (Countries)
+                    </h3>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      onClick={() => appendDestination({ country: '' })}
+                      className='shrink-0 ml-4'
+                    >
+                      <Plus className='w-4 h-4 mr-1' />
+                      Add Country
+                    </Button>
+                  </div>
+                  <div className='space-y-3'>
+                    {destinationFeilds.map((field, index) => (
+                      <div key={field.id} className='flex gap-3 items-end'>
+                        <div className='flex-1 space-y-2'>
+                          <Label htmlFor={`destination-${index}`}>
+                            Country
+                          </Label>
+                          <Input
+                            id={`destination-${index}`}
+                            {...register(`destination.${index}.country`)}
+                            placeholder=''
+                          />
                         </div>
-                      ))}
-                    </div>
-
-                    <div>
-                      <label className='block mb-2'>Address</label>
-                      <div className='grid grid-cols-2 gap-2'>
-                        <input
-                          {...register('address.street')}
-                          placeholder='Street'
-                          className='w-full p-2 border rounded'
-                        />
-                        <input
-                          {...register('address.city')}
-                          placeholder='City'
-                          className='w-full p-2 border rounded'
-                        />
-                        <input
-                          {...register('address.state')}
-                          placeholder='State'
-                          className='w-full p-2 border rounded'
-                        />
-                        <input
-                          {...register('address.zip')}
-                          placeholder='ZIP'
-                          className='w-full p-2 border rounded'
-                        />
-                      </div>
-                    </div>
-
-                    <div className='mb-4'>
-                      <label className='block mb-2'>Courses</label>
-                      <div className='flex flex-wrap gap-2 mb-2'>
-                        {selectedColleges.map((college) => (
-                          <div
-                            key={college.id}
-                            className='flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full'
+                        {index > 0 && (
+                          <Button
+                            type='button'
+                            variant='outline'
+                            size='icon'
+                            onClick={() => removeDestination(index)}
+                            className='shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10'
                           >
-                            <span>{college.title}</span>
-                            <button
-                              type='button'
-                              onClick={() => removeCollege(college.id)}
-                              className='text-blue-600 hover:text-blue-800'
-                            >
-                              <X className='w-4 h-4' />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className='relative'>
-                        <input
-                          type='text'
-                          value={collegeSearch}
-                          onChange={searchCollege}
-                          className='w-full p-2 border rounded'
-                          placeholder='Search courses...'
-                        />
-
-                        {searchResults.length > 0 && (
-                          <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto'>
-                            {searchResults.map((college) => (
-                              <div
-                                key={college.id}
-                                onClick={() => addCollege(college)}
-                                className='p-2 hover:bg-gray-100 cursor-pointer'
-                              >
-                                {college.title}
-                              </div>
-                            ))}
-                          </div>
+                            <Trash2 className='w-4 h-4' />
+                          </Button>
                         )}
                       </div>
-                    </div>
+                    ))}
+                  </div>
+                </div>
 
-                    <div>
-                      <label className='block mb-2'>Contact Information</label>
-                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                        {[0, 1].map((index) => (
-                          <div key={index}>
-                            <label className='block mb-2'>
-                              Contact {index + 1}
-                            </label>
-                            <input
-                              {...register(`contact.${index}`)}
-                              className='w-full p-2 border rounded'
-                              placeholder={`Contact ${index + 1}`}
-                            />
-                          </div>
+                {/* Address */}
+                <div className='space-y-4'>
+                  <h3 className='text-sm font-semibold text-gray-900 border-b pb-2'>
+                    Address
+                  </h3>
+                  <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                    <div className='space-y-2'>
+                      <Label htmlFor='address.street'>Street</Label>
+                      <Input
+                        id='address.street'
+                        {...register('address.street')}
+                        placeholder='Street'
+                      />
+                    </div>
+                    <div className='space-y-2'>
+                      <Label htmlFor='address.city'>City</Label>
+                      <Input
+                        id='address.city'
+                        {...register('address.city')}
+                        placeholder='City'
+                      />
+                    </div>
+                    <div className='space-y-2'>
+                      <Label htmlFor='address.state'>State</Label>
+                      <Input
+                        id='address.state'
+                        {...register('address.state')}
+                        placeholder='State'
+                      />
+                    </div>
+                    <div className='space-y-2'>
+                      <Label htmlFor='address.zip'>ZIP</Label>
+                      <Input
+                        id='address.zip'
+                        {...register('address.zip')}
+                        placeholder='ZIP'
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Courses */}
+                <div className='space-y-4'>
+                  <h3 className='text-sm font-semibold text-gray-900 border-b pb-2'>
+                    Courses
+                  </h3>
+                  <div className='flex flex-wrap gap-2 mb-3'>
+                    {selectedColleges.map((college) => (
+                      <span
+                        key={college.id}
+                        className='inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary'
+                      >
+                        {college.title}
+                        <button
+                          type='button'
+                          onClick={() => removeCollege(college.id)}
+                          className='rounded-full hover:bg-primary/20 p-0.5'
+                          aria-label='Remove'
+                        >
+                          <X className='w-3.5 h-3.5' />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <div className='relative space-y-2'>
+                    <Label htmlFor='course-search'>Search courses</Label>
+                    <Input
+                      id='course-search'
+                      type='text'
+                      value={collegeSearch}
+                      onChange={searchCollege}
+                      placeholder='Type to search and add courses...'
+                    />
+                    {searchResults.length > 0 && (
+                      <ul className='absolute z-10 w-full mt-1 rounded-md border bg-popover shadow-md max-h-60 overflow-auto py-1'>
+                        {searchResults.map((college) => (
+                          <li key={college.id}>
+                            <button
+                              type='button'
+                              onClick={() => addCollege(college)}
+                              className='w-full px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground'
+                            >
+                              {college.title}
+                            </button>
+                          </li>
                         ))}
-                      </div>
-                    </div>
+                      </ul>
+                    )}
+                  </div>
+                </div>
 
-                    <div>
-                      <label className='block mb-2'>Website URL</label>
-                      <input
-                        {...register('website_url')}
-                        type='url'
-                        className='w-full p-2 border rounded'
-                        placeholder='https://example.com'
+                {/* Contact & URLs */}
+                <div className='space-y-4'>
+                  <h3 className='text-sm font-semibold text-gray-900 border-b pb-2'>
+                    Contact & Links
+                  </h3>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div className='space-y-2'>
+                      <Label htmlFor='contact.0'>Contact 1</Label>
+                      <Input
+                        id='contact.0'
+                        {...register('contact.0')}
+                        placeholder='Phone or email'
                       />
                     </div>
-
-                    <div>
-                      <label className='block mb-2'>Google Map URL</label>
-                      <textarea
-                        {...register('google_map_url')}
-                        className='w-full p-2 border rounded'
-                        placeholder='Paste Google Maps embed iframe code here'
-                        rows={4}
-                      />
-                      <p className='text-sm text-gray-500 mt-1'>
-                        Paste the iframe code from Google Maps embed
-                      </p>
-                    </div>
-
-                    <div>
-                      <label className='block mb-2'>YouTube Video URL</label>
-                      <input
-                        {...register('video_url')}
-                        type='url'
-                        className='w-full p-2 border rounded'
-                        placeholder='https://www.youtube.com/watch?v=...'
-                      />
-                      <p className='text-sm text-gray-500 mt-1'>
-                        Enter a YouTube video URL
-                      </p>
-                    </div>
-
-                    <div>
-                      <label className='block mb-2'>Pinned</label>
-                      <input
-                        type='checkbox'
-                        {...register('pinned')}
-                        className='w-4 h-4'
+                    <div className='space-y-2'>
+                      <Label htmlFor='contact.1'>Contact 2</Label>
+                      <Input
+                        id='contact.1'
+                        {...register('contact.1')}
+                        placeholder='Phone or email'
                       />
                     </div>
+                  </div>
+                  <div className='space-y-2'>
+                    <Label htmlFor='website_url'>Website URL</Label>
+                    <Input
+                      id='website_url'
+                      type='url'
+                      {...register('website_url')}
+                      placeholder='https://example.com'
+                    />
+                  </div>
+                  <div className='space-y-2'>
+                    <Label htmlFor='google_map_url'>Google Map URL</Label>
+                    <Textarea
+                      id='google_map_url'
+                      {...register('google_map_url')}
+                      placeholder='Paste Google Maps embed iframe code'
+                      rows={3}
+                      className='resize-none'
+                    />
+                    <p className='text-xs text-muted-foreground'>
+                      Paste the iframe code from Google Maps embed
+                    </p>
+                  </div>
+                  <div className='space-y-2'>
+                    <Label htmlFor='video_url'>YouTube Video URL</Label>
+                    <Input
+                      id='video_url'
+                      type='url'
+                      {...register('video_url')}
+                      placeholder='https://www.youtube.com/watch?v=...'
+                    />
+                    <p className='text-xs text-muted-foreground'>
+                      Enter a YouTube video URL
+                    </p>
+                  </div>
+                </div>
 
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                      <div>
-                        <FileUpload
-                          label='Logo'
-                          onUploadComplete={(url) => {
-                            setUploadedFiles((prev) => ({
-                              ...prev,
-                              logo: url
-                            }))
-                            setValue('logo', url)
-                          }}
-                          defaultPreview={uploadedFiles.logo}
+                {/* Pinned & Media */}
+                <div className='space-y-4'>
+                  <h3 className='text-sm font-semibold text-gray-900 border-b pb-2'>
+                    Options & Media
+                  </h3>
+                  <div className='flex items-center space-x-2'>
+                    <Controller
+                      name='pinned'
+                      control={control}
+                      render={({ field }) => (
+                        <Checkbox
+                          id='pinned'
+                          checked={!!field.value}
+                          onCheckedChange={(v) => field.onChange(v ? 1 : 0)}
                         />
-                      </div>
-                      <div>
-                        <FileUpload
-                          label='Featured Image'
-                          onUploadComplete={(url) => {
-                            setUploadedFiles((prev) => ({
-                              ...prev,
-                              featured: url
-                            }))
-                            setValue('featured_image', url)
-                          }}
-                          defaultPreview={uploadedFiles.featured}
-                        />
-                      </div>
+                      )}
+                    />
+                    <Label
+                      htmlFor='pinned'
+                      className='font-normal cursor-pointer'
+                    >
+                      Pin this consultancy
+                    </Label>
+                  </div>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                    <div className='space-y-2'>
+                      <Label>Logo</Label>
+                      <FileUpload
+                        label=''
+                        onUploadComplete={(url) => {
+                          setUploadedFiles((prev) => ({ ...prev, logo: url }))
+                          setValue('logo', url)
+                        }}
+                        defaultPreview={uploadedFiles.logo}
+                      />
+                    </div>
+                    <div className='space-y-2'>
+                      <Label className='after:content-["*"] after:ml-0.5 after:text-destructive'>
+                        Featured Image
+                      </Label>
+                      <FileUpload
+                        label=''
+                        onUploadComplete={(url) => {
+                          setUploadedFiles((prev) => ({
+                            ...prev,
+                            featured: url
+                          }))
+                          setValue('featured_image', url)
+                        }}
+                        defaultPreview={uploadedFiles.featured}
+                      />
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
+              <div className='sticky bottom-0 bg-background border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  onClick={() => {
+                    setIsOpen(false)
+                    setEditing(false)
+                    setEditingId(null)
+                    reset()
+                    setUploadedFiles({ featured: '', logo: '' })
+                  }}
+                >
+                  Cancel
+                </Button>
                 <Button type='submit' disabled={loading}>
                   {loading
                     ? 'Processing...'
@@ -909,9 +992,9 @@ export default function ConsultancyForm() {
                         key={index}
                         className='px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm'
                       >
-                        {dest.city && dest.country
-                          ? `${dest.city}, ${dest.country}`
-                          : dest.city || dest.country || 'N/A'}
+                        {typeof dest === 'string'
+                          ? dest
+                          : dest?.country || 'N/A'}
                       </span>
                     ))
                   })()}

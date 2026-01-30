@@ -90,14 +90,13 @@ const ShowCareer = ({ params }) => {
       <Header />
       <Navbar />
       <main className=''>
-        <div className='w-full h-[25vh] md:h-[400px] relative'>
+        <div className='w-full relative'>
           <img
             src={data.featuredImage || '/images/job.webp'}
-            alt={data.title || 'data'}
-            className='w-full h-full object-cover'
+            alt={data.title || 'Career'}
+            className='w-full h-auto max-h-[456px] max-xl:max-h-[380px] max-sm:max-h-[300px] object-contain block'
           />
-
-          <div className='absolute bg-black/50 w-full h-full inset-0 '></div>
+          <div className='absolute inset-0 bg-black/50  pointer-events-none' />
         </div>
         <div className='p-12 px-18 max-lg:py-8 w-full max-[868px]:gap-0 max-[868px]:pb-0'>
           <div className=' w-[15rem] min-[433px]:w-[20rem] sm:w-[30rem] lg:w-[50rem] md:w-[40rem] font-bold'>

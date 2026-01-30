@@ -250,7 +250,9 @@ const ScholarshipDetailsPage = ({ params }) => {
                       Amount
                     </span>
                     <span className='text-2xl font-bold text-green-700'>
-                      ${parseFloat(scholarship.amount).toLocaleString()}
+                      {Number.isNaN(parseFloat(scholarship.amount))
+                        ? scholarship.amount
+                        : `Rs. ${parseFloat(scholarship.amount).toLocaleString()}`}
                     </span>
                   </div>
                 )}

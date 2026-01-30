@@ -50,7 +50,10 @@ const ScholarshipFormDialog = ({
         name: editingScholarship.name || '',
         description: editingScholarship.description || '',
         eligibilityCriteria: editingScholarship.eligibilityCriteria || '',
-        amount: editingScholarship.amount || '',
+        amount:
+          editingScholarship.amount != null
+            ? String(editingScholarship.amount)
+            : '',
         applicationDeadline:
           formatDateForInput(editingScholarship.applicationDeadline) || '',
         renewalCriteria: editingScholarship.renewalCriteria || '',
@@ -95,7 +98,7 @@ const ScholarshipFormDialog = ({
       setError(null)
       const formattedData = {
         ...formData,
-        amount: Number(formData.amount),
+        amount: String(formData.amount ?? '').trim(),
         applicationDeadline: formatDate(formData.applicationDeadline),
         author: authorId,
         categoryId: formData.categoryId || null
@@ -207,12 +210,12 @@ const ScholarshipFormDialog = ({
 
               <div className='space-y-2'>
                 <Label htmlFor='amount'>
-                  Amount <span className='text-red-500'>(Rs.) *</span>
+                  Amount <span className='text-red-500'> *</span>
                 </Label>
                 <Input
                   id='amount'
-                  type='number'
-                  placeholder='Amount'
+                  type='text'
+                  placeholder='e.g. 50,000 or Full tuition'
                   value={formData.amount}
                   onChange={(e) =>
                     setFormData({ ...formData, amount: e.target.value })

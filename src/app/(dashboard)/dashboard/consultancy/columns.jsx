@@ -33,9 +33,21 @@ export const createColumns = ({
     header: 'Destinations',
     accessorKey: 'destination',
     cell: ({ row }) => {
-      const destinations = JSON.parse(row.original.destination)
-      console.log('destinations', destinations)
-      return destinations.map((d) => `${d.city}, ${d.country}`).join('; ')
+      let destinations = row.original.destination
+      if (typeof destinations === 'string') {
+        try {
+          destinations = JSON.parse(destinations)
+        } catch {
+          return 'N/A'
+        }
+      }
+      if (!Array.isArray(destinations)) return 'N/A'
+      return (
+        destinations
+          .map((d) => (typeof d === 'string' ? d : d?.country))
+          .filter(Boolean)
+          .join('; ') || 'N/A'
+      )
     }
   },
   {

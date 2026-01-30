@@ -6,8 +6,8 @@ import EmptyState from '@/ui/shadcn/EmptyState'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
-import Link from 'next/link'
 import Pagination from '../blogs/components/Pagination'
+import DegreeCard from '@/ui/molecules/cards/DegreeCard'
 import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 
 const DegreePage = () => {
@@ -57,13 +57,11 @@ const DegreePage = () => {
     return () => clearTimeout(handler)
   }, [searchTerm])
 
-<<<<<<< HEAD
-  // Load degrees
   const loadDegrees = useCallback(
-    async (page = 1, search = '', faculty = '', level = '') => {
+    async (page = 1, search = '', facultyId = '', level = '') => {
       setLoading(true)
       try {
-        const response = await fetchDegrees(search, page, faculty, level)
+        const response = await fetchDegrees(search, page, facultyId, level)
         setCourses(response.items)
         setPagination((prev) => ({
           ...prev,
@@ -78,24 +76,6 @@ const DegreePage = () => {
     },
     []
   )
-=======
-  const loadDegrees = useCallback(async (page = 1, search = '', facultyId = '', level = '') => {
-    setLoading(true)
-    try {
-      const response = await fetchDegrees(search, page, facultyId, level)
-      setCourses(response.items)
-      setPagination((prev) => ({
-        ...prev,
-        totalPages: response.pagination.totalPages,
-        totalCount: response.pagination.totalCount
-      }))
-    } catch (error) {
-      console.error('Error:', error)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
->>>>>>> a01b8f31c52222f3dfa4c2f7e49e896c890131d5
 
   // Reset to page 1 when search or filters change
   useLayoutEffect(() => {
@@ -104,24 +84,13 @@ const DegreePage = () => {
 
   // Fetch when page, search, or filters change
   useEffect(() => {
-<<<<<<< HEAD
     loadDegrees(
       pagination.currentPage,
       debouncedSearch,
       selectedFaculty,
       selectedLevel
     )
-  }, [
-    debouncedSearch,
-    pagination.currentPage,
-    selectedFaculty,
-    selectedLevel,
-    loadDegrees
-  ])
-=======
-    loadDegrees(pagination.currentPage, debouncedSearch, selectedFaculty, selectedLevel)
   }, [debouncedSearch, pagination.currentPage, selectedFaculty, selectedLevel])
->>>>>>> a01b8f31c52222f3dfa4c2f7e49e896c890131d5
 
   // Handle page change
   const handlePageChange = (page) => {
@@ -150,14 +119,10 @@ const DegreePage = () => {
             <div>
               <div className='relative inline-block mb-3'>
                 <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight'>
-                  Explore Our <span className='text-[#0A6FA7]'>Degrees</span>
+                  Explore <span className='text-[#0A6FA7]'>Degrees</span>
                 </h1>
                 <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
               </div>
-              <p className='text-gray-500 max-w-xl font-medium text-lg mt-2'>
-                Discover specialized degree programs tailored to your academic
-                and professional aspirations.
-              </p>
             </div>
 
             {/* Clear All Button */}
@@ -257,7 +222,7 @@ const DegreePage = () => {
 
           {/* Courses Grid */}
           {loading || isScrolling ? (
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
               {Array(6)
                 .fill('')
                 .map((_, index) => (
@@ -283,77 +248,9 @@ const DegreePage = () => {
             </div>
           ) : (
             <>
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-                {courses.map((degree, index) => (
-                  <Link
-                    href={`/degree/${degree.slugs}`}
-                    key={index}
-                    className='group'
-                  >
-                    <div className='h-full bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-[#0A6FA7]/5 hover:border-[#0A6FA7]/20 transition-all duration-500 flex flex-col'>
-                      <div className='flex items-start justify-between mb-6'>
-                        <div className='bg-[#0A6FA7]/10 p-3 rounded-2xl group-hover:bg-[#0A6FA7] transition-colors duration-500'>
-                          <BookOpen className='w-6 h-6 text-[#0A6FA7] group-hover:text-white transition-colors duration-500' />
-                        </div>
-                        {degree.programlevel?.title && (
-                          <span className='px-3 py-1 bg-gray-50 rounded-full text-[10px] font-bold text-gray-500 uppercase tracking-wider border border-gray-100'>
-                            {degree.programlevel.title}
-                          </span>
-                        )}
-                      </div>
-
-                      <h2 className='text-xl font-bold text-gray-900 mb-4 group-hover:text-[#0A6FA7] transition-colors line-clamp-2 min-h-[3.5rem] tracking-tight'>
-                        {degree.title}
-                      </h2>
-
-                      {degree.programfaculty?.title && (
-                        <p className='text-sm text-[#30AD8F] font-bold mb-6 flex items-center gap-2'>
-                          <span className='w-1.5 h-1.5 rounded-full bg-[#30AD8F]'></span>
-                          {degree.programfaculty.title}
-                        </p>
-                      )}
-
-                      <div className='mt-auto space-y-4 pt-6 border-t border-gray-50'>
-                        <div className='flex items-center justify-between'>
-                          <div className='flex flex-col'>
-                            <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
-                              Duration
-                            </span>
-                            <span className='text-sm font-bold text-gray-700'>
-                              {degree.duration || 'N/A'}
-                            </span>
-                          </div>
-                          <div className='flex flex-col text-right'>
-                            <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
-                              Credits
-                            </span>
-                            <span className='text-sm font-bold text-gray-700'>
-                              {degree.credits || 'N/A'}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className='flex items-center justify-between'>
-                          <div className='flex flex-col'>
-                            <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
-                              Delivery
-                            </span>
-                            <span className='text-sm font-bold text-gray-700'>
-                              {degree.delivery_mode || 'N/A'}
-                            </span>
-                          </div>
-                          <div className='flex flex-col text-right'>
-                            <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
-                              Language
-                            </span>
-                            <span className='text-sm font-bold text-gray-700'>
-                              {degree.language || 'N/A'}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
+              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                {courses.map((degree) => (
+                  <DegreeCard key={degree.id ?? degree.slugs} degree={degree} />
                 ))}
               </div>
 

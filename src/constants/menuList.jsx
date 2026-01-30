@@ -69,12 +69,7 @@ export const menuItems = [
         href: '/dashboard/banner',
         visible: ['admin', 'editor']
       },
-      {
-        icon: <FaBriefcase className='text-xl' />,
-        label: 'Career',
-        href: '/dashboard/career',
-        visible: ['admin', 'editor']
-      },
+
       {
         icon: <IoSchoolSharp className='text-xl' />,
         label: 'Colleges',
@@ -173,6 +168,12 @@ export const menuItems = [
         label: 'Users',
         href: '/dashboard/users',
         visible: ['admin']
+      },
+      {
+        icon: <FaBriefcase className='text-xl' />,
+        label: 'MeroUni Careers',
+        href: '/dashboard/career',
+        visible: ['admin', 'editor']
       }
     ]
   },

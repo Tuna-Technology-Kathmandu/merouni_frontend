@@ -48,14 +48,13 @@ const ImageSection = ({ consultancy }) => {
     <div className='flex flex-col items-center relative gap-16 max-md:gap-12'>
       {/* Consultancy image, name and location */}
       <div className='w-full'>
-        <div className='h-[25vh] w-full md:h-[400px] relative'>
-          <Image
+        <div className='w-full relative'>
+          <img
             src={consultancy?.featured_image || '/images/degreeHero.webp'}
             alt='Consultancy Photo'
-            fill
-            className='object-cover'
-            priority
+            className='w-full h-auto max-h-[456px] max-xl:max-h-[380px] max-sm:max-h-[300px] object-contain rounded-xl block'
           />
+          <div className='absolute inset-0 bg-gradient-to-t from-black/40 to-transparent rounded-xl pointer-events-none' />
         </div>
         <div className='flex flex-row lg:h-[95px] bg-[#30AD8F] bg-opacity-5 items-center p-0 px-8 sm:px-14 md:px-24'>
           <div className='flex items-center justify-center rounded-full bg-white -translate-y-8 overflow-hidden w-24 h-24 md:w-32 md:h-32 relative'>

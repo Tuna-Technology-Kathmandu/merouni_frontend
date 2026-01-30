@@ -34,7 +34,10 @@ const Navbar = () => {
         const dropdownWidth = 180
         let left = rect.left
 
-        if (typeof window !== 'undefined' && left + dropdownWidth > window.innerWidth) {
+        if (
+          typeof window !== 'undefined' &&
+          left + dropdownWidth > window.innerWidth
+        ) {
           left = window.innerWidth - dropdownWidth - 12
         }
 
@@ -99,10 +102,11 @@ const Navbar = () => {
   return (
     <>
       <div
-        className={`bg-[#30ad8f] w-full h-12 md:h-11 lg:h-12 pt-[10px] md:pt-2 lg:pt-[10px] hidden md:block transition-all duration-300 ${isScrolled
-          ? 'fixed top-[80px] left-0 shadow-lg z-50'
-          : 'sticky top-[80px] z-30'
-          }`}
+        className={`bg-[#30ad8f] w-full h-12 md:h-11 lg:h-12 pt-[10px] md:pt-2 lg:pt-[10px] hidden md:block transition-all duration-300 ${
+          isScrolled
+            ? 'fixed top-[80px] left-0 shadow-lg z-50'
+            : 'sticky top-[80px] z-30'
+        }`}
         style={{ overflow: 'visible' }}
       >
         <div
@@ -117,10 +121,11 @@ const Navbar = () => {
         >
           <Link
             href='/'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname === '/' || pathname === ''
-              ? 'font-semibold border-b-2 pb-1'
-              : ''
-              }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
+              pathname === '/' || pathname === ''
+                ? 'font-semibold border-b-2 pb-1'
+                : ''
+            }`}
             style={
               pathname === '/' || pathname === ''
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -132,10 +137,11 @@ const Navbar = () => {
 
           <Link
             href='/colleges'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/colleges')
-              ? 'font-semibold border-b-2 pb-1'
-              : ''
-              }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
+              pathname?.startsWith('/colleges')
+                ? 'font-semibold border-b-2 pb-1'
+                : ''
+            }`}
             style={
               pathname?.startsWith('/colleges')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -149,10 +155,11 @@ const Navbar = () => {
           </Link> */}
           <Link
             href='/degree'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/degree')
-              ? 'font-semibold border-b-2 pb-1'
-              : ''
-              }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
+              pathname?.startsWith('/degree')
+                ? 'font-semibold border-b-2 pb-1'
+                : ''
+            }`}
             style={
               pathname?.startsWith('/degree')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -163,10 +170,11 @@ const Navbar = () => {
           </Link>
           <Link
             href='/admission'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/admission')
-              ? 'font-semibold border-b-2 pb-1'
-              : ''
-              }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
+              pathname?.startsWith('/admission')
+                ? 'font-semibold border-b-2 pb-1'
+                : ''
+            }`}
             style={
               pathname?.startsWith('/admission')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -177,10 +185,11 @@ const Navbar = () => {
           </Link>
           <Link
             href='/scholarship'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/scholarship')
-              ? 'font-semibold border-b-2 pb-1'
-              : ''
-              }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
+              pathname?.startsWith('/scholarship')
+                ? 'font-semibold border-b-2 pb-1'
+                : ''
+            }`}
             style={
               pathname?.startsWith('/scholarship')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -191,10 +200,11 @@ const Navbar = () => {
           </Link>
           <Link
             href='/consultancy'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/consultancy')
-              ? 'font-semibold border-b-2 pb-1'
-              : ''
-              }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
+              pathname?.startsWith('/consultancy')
+                ? 'font-semibold border-b-2 pb-1'
+                : ''
+            }`}
             style={
               pathname?.startsWith('/consultancy')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -205,10 +215,11 @@ const Navbar = () => {
           </Link>
           <Link
             href='/materials'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/materials')
-              ? 'font-semibold border-b-2 pb-1'
-              : ''
-              }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
+              pathname?.startsWith('/materials')
+                ? 'font-semibold border-b-2 pb-1'
+                : ''
+            }`}
             style={
               pathname?.startsWith('/materials')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -219,10 +230,11 @@ const Navbar = () => {
           </Link>
           <Link
             href='/events'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/events')
-              ? 'font-semibold border-b-2 pb-1'
-              : ''
-              }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
+              pathname?.startsWith('/events')
+                ? 'font-semibold border-b-2 pb-1'
+                : ''
+            }`}
             style={
               pathname?.startsWith('/events')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -233,10 +245,11 @@ const Navbar = () => {
           </Link>
           <Link
             href='/blogs'
-            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${pathname?.startsWith('/blogs')
-              ? 'font-semibold border-b-2 pb-1'
-              : ''
-              }`}
+            className={`hover:text-gray-200 cursor-pointer transition-colors text-xs md:text-sm lg:text-base whitespace-nowrap ${
+              pathname?.startsWith('/blogs')
+                ? 'font-semibold border-b-2 pb-1'
+                : ''
+            }`}
             style={
               pathname?.startsWith('/blogs')
                 ? { color: '#B5F1F8', borderColor: '#B5F1F8' }
@@ -288,30 +301,44 @@ const Navbar = () => {
                   <Link
                     href='/exams'
                     onClick={() => setIsMoreOpen(false)}
-                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/exams')
-                      ? 'font-semibold bg-teal-600'
-                      : ''
-                      }`}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
+                      pathname?.startsWith('/exams')
+                        ? 'font-semibold bg-teal-600'
+                        : ''
+                    }`}
                   >
                     Exams
                   </Link>
                   <Link
+                    href='/vacancies'
+                    onClick={() => setIsMoreOpen(false)}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
+                      pathname?.startsWith('/vacancies')
+                        ? 'font-semibold bg-teal-600'
+                        : ''
+                    }`}
+                  >
+                    Vacancies
+                  </Link>
+                  <Link
                     href='/schools'
                     onClick={() => setIsMoreOpen(false)}
-                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/schools')
-                      ? 'font-semibold bg-teal-600'
-                      : ''
-                      }`}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
+                      pathname?.startsWith('/schools')
+                        ? 'font-semibold bg-teal-600'
+                        : ''
+                    }`}
                   >
                     School
                   </Link>
                   <Link
                     href='/news'
                     onClick={() => setIsMoreOpen(false)}
-                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/news')
-                      ? 'font-semibold bg-teal-600'
-                      : ''
-                      }`}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
+                      pathname?.startsWith('/news')
+                        ? 'font-semibold bg-teal-600'
+                        : ''
+                    }`}
                   >
                     News
                   </Link>
@@ -319,40 +346,34 @@ const Navbar = () => {
                   <Link
                     href='/universities'
                     onClick={() => setIsMoreOpen(false)}
-                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/universities')
-                      ? 'font-semibold bg-teal-600'
-                      : ''
-                      }`}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
+                      pathname?.startsWith('/universities')
+                        ? 'font-semibold bg-teal-600'
+                        : ''
+                    }`}
                   >
                     Universities
                   </Link>
                   <Link
                     href='/career'
                     onClick={() => setIsMoreOpen(false)}
-                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/career')
-                      ? 'font-semibold bg-teal-600'
-                      : ''
-                      }`}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
+                      pathname?.startsWith('/career')
+                        ? 'font-semibold bg-teal-600'
+                        : ''
+                    }`}
                   >
-                    Career
+                    Careers at MeroUni
                   </Link>
-                  <Link
-                    href='/vacancies'
-                    onClick={() => setIsMoreOpen(false)}
-                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/vacancies')
-                      ? 'font-semibold bg-teal-600'
-                      : ''
-                      }`}
-                  >
-                    Vacancies
-                  </Link>
+
                   <Link
                     href='/contact'
                     onClick={() => setIsMoreOpen(false)}
-                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/contact')
-                      ? 'font-semibold bg-teal-600'
-                      : ''
-                      }`}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${
+                      pathname?.startsWith('/contact')
+                        ? 'font-semibold bg-teal-600'
+                        : ''
+                    }`}
                   >
                     Contact Us
                   </Link>

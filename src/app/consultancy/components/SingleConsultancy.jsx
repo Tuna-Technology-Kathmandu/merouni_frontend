@@ -241,7 +241,7 @@ const SingleConsultancy = ({ consultancy }) => {
             <ul className='list-disc list-inside text-gray-700'>
               {destinations.map((d, i) => (
                 <li key={i}>
-                  {d.city}, {d.country}
+                  {typeof d === 'string' ? d : d?.country ?? '—'}
                 </li>
               ))}
             </ul>

@@ -1,4 +1,4 @@
-import AcademiaCard from '../../../../ui/molecules/AcademiaCard'
+import AcademiaCard from '../../../../ui/molecules/cards/AcademiaCard'
 import React from 'react'
 
 const page = () => {

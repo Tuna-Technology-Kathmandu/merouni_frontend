@@ -12,8 +12,8 @@ import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import ScholarshipCard from '@/ui/molecules/cards/ScholarshipCard'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -98,9 +98,9 @@ const ScholarshipPage = () => {
 
     try {
       setApplyingIds((prev) => new Set(prev).add(scholarshipId))
-      
+
       await applyForScholarship(scholarshipId)
-      
+
       toast.success('Application submitted successfully!')
     } catch (error) {
       toast.error(error.message || 'Failed to apply for scholarship')
@@ -125,15 +125,11 @@ const ScholarshipPage = () => {
             <div>
               <div className='relative inline-block mb-3'>
                 <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight'>
-                  Explore Our{' '}
+                  Explore &nbsp;
                   <span className='text-[#0A6FA7]'>Scholarships</span>
                 </h1>
                 <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
               </div>
-              <p className='text-gray-500 max-w-xl font-medium text-lg mt-2'>
-                Find scholarships designed to support your education and make
-                your learning journey more affordable.
-              </p>
             </div>
 
             {/* Clear All Button */}
@@ -236,73 +232,14 @@ const ScholarshipPage = () => {
               />
             </div>
           ) : (
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
               {scholarships.map((scholarship) => (
-                <div
+                <ScholarshipCard
                   key={scholarship.id}
-                  className='group bg-white rounded-[32px] p-8 border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)] hover:border-[#0A6FA7]/20 transition-all duration-300 flex flex-col h-full cursor-pointer'
-                >
-                  <div className='flex items-start justify-between mb-6'>
-                    <div className='bg-[#0A6FA7]/10 p-3 rounded-2xl group-hover:bg-[#0A6FA7] transition-colors duration-500'>
-                      <Award className='w-6 h-6 text-[#0A6FA7] group-hover:text-white transition-colors duration-500' />
-                    </div>
-                    {scholarship.amount && (
-                      <span className='px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-bold border border-green-100 uppercase tracking-wider'>
-                        ${parseFloat(scholarship.amount).toLocaleString()}
-                      </span>
-                    )}
-                  </div>
-
-                  <h2 className='text-xl font-bold text-gray-900 mb-4 group-hover:text-[#0A6FA7] transition-colors line-clamp-2 min-h-[3.5rem] tracking-tight'>
-                    {scholarship.name}
-                  </h2>
-
-                  <div className='mt-auto space-y-4 pt-6 border-t border-gray-50'>
-                    <div className='flex items-center justify-between'>
-                      <div className='flex flex-col'>
-                        <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
-                          Deadline
-                        </span>
-                        <span className='text-sm font-bold text-gray-700'>
-                          {new Date(
-                            scholarship.applicationDeadline
-                          ).toLocaleDateString()}
-                        </span>
-                      </div>
-                      {scholarship.eligibilityCriteria && (
-                        <div className='flex flex-col text-right'>
-                          <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
-                            Eligibility
-                          </span>
-                          <span className='text-sm font-bold text-gray-700 truncate max-w-[120px]'>
-                            {scholarship.eligibilityCriteria.replace(/"/g, '')}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className='mt-6 pt-4 flex gap-3'>
-                    <Link
-                      href={`/scholarship/${scholarship.slugs || scholarship.id}`}
-                      className='flex-1 py-3 rounded-xl bg-gray-50 text-gray-700 font-bold text-sm group-hover:bg-[#0A6FA7] group-hover:text-white transition-all duration-300 text-center'
-                    >
-                      View Details
-                    </Link>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleApply(scholarship.id)
-                      }}
-                      disabled={applyingIds.has(scholarship.id)}
-                      className='flex-1 py-3 rounded-xl bg-[#0A6FA7] text-white font-bold text-sm hover:bg-[#085a86] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'
-                    >
-                      {applyingIds.has(scholarship.id)
-                        ? 'Applying...'
-                        : 'Apply Now'}
-                    </button>
-                  </div>
-                </div>
+                  scholarship={scholarship}
+                  onApply={handleApply}
+                  isApplying={applyingIds.has(scholarship.id)}
+                />
               ))}
             </div>
           )}

@@ -12,7 +12,7 @@ import QuickActions from '@/ui/organisms/admin-dashboard/home/QuickActions'
 import AnalyticsCards from '@/ui/organisms/admin-dashboard/home/AnalyticsCards'
 import TopAgentsTable from '@/ui/organisms/admin-dashboard/home/TopAgentsTable'
 import DashboardCharts from '@/ui/organisms/admin-dashboard/home/DashboardCharts'
-import UserCard from '@/ui/molecules/UserCard'
+import UserCard from '@/ui/molecules/cards/UserCard'
 
 const AdminDashboard = () => {
   const { setHeading } = usePageHeading()

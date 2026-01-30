@@ -20,7 +20,6 @@ import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { Textarea } from '@/ui/shadcn/textarea'
-import { SearchableSelect } from '@/ui/shadcn/SearchableSelect'
 
 const VacancyManager = () => {
   const { setHeading } = usePageHeading()
@@ -34,7 +33,6 @@ const VacancyManager = () => {
     handleSubmit,
     reset,
     setValue,
-    watch,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -42,7 +40,7 @@ const VacancyManager = () => {
       description: '',
       content: '',
       featuredImage: '',
-      college_id: '',
+      associated_organization_name: '',
       author_id
     }
   })
@@ -68,8 +66,6 @@ const VacancyManager = () => {
   const [viewModalOpen, setViewModalOpen] = useState(false)
   const [viewVacancyData, setViewVacancyData] = useState(null)
   const [loadingView, setLoadingView] = useState(false)
-  const [colleges, setColleges] = useState([])
-  const [loadCollegesList, setLoadCollegesList] = useState(false)
 
   const loadVacancies = async (page = 1) => {
     setTableLoading(true)
@@ -94,26 +90,6 @@ const VacancyManager = () => {
     }
   }
 
-  const fetchAllColleges = async (force = false) => {
-    // Avoid redundant fetches if we already have colleges
-    if (colleges.length > 0 && !force) return
-
-    try {
-      setLoadCollegesList(true)
-      const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?limit=1000`
-      )
-      if (response.ok) {
-        const data = await response.json()
-        setColleges(data.items || [])
-      }
-    } catch (err) {
-      console.error('Error loading colleges:', err)
-    } finally {
-      setLoadCollegesList(false)
-    }
-  }
-
   useEffect(() => {
     setHeading('Vacancy Management')
     loadVacancies()
@@ -128,7 +104,6 @@ const VacancyManager = () => {
       setEditingId(null)
       reset()
       setUploadedFiles({ featuredImage: '' })
-      fetchAllColleges()
       router.replace('/dashboard/vacancy', { scroll: false })
     }
   }, [searchParams])
@@ -189,7 +164,6 @@ const VacancyManager = () => {
 
   const handleEdit = async (slugs) => {
     try {
-      fetchAllColleges()
       setEditing(true)
       setLoading(true)
       setIsOpen(true)
@@ -205,15 +179,13 @@ const VacancyManager = () => {
       setValue('description', vacancy.description || '')
       setValue('content', vacancy.content || '')
       setValue('featuredImage', vacancy.featuredImage || '')
+      setValue(
+        'associated_organization_name',
+        vacancy.associated_organization_name || ''
+      )
       setUploadedFiles({
         featuredImage: vacancy.featuredImage || ''
       })
-
-      if (vacancy.college_id) {
-        setValue('college_id', vacancy.college_id)
-      } else {
-        setValue('college_id', '')
-      }
     } catch (error) {
       toast.error('Failed to fetch vacancy details')
     } finally {
@@ -332,17 +304,19 @@ const VacancyManager = () => {
 
   const columns = [
     {
-      header: 'ID',
-      accessorKey: 'id'
+      header: 'S.N',
+      id: 'sn',
+      cell: ({ row }) =>
+        (pagination.currentPage - 1) * (pagination.limit ?? 10) + row.index + 1
     },
     {
       header: 'Title',
       accessorKey: 'title'
     },
     {
-      header: 'Associated College',
-      accessorKey: 'college.name',
-      cell: ({ row }) => row.original.vacancyCollege?.name || 'N/A'
+      header: 'Associated Organization / Institution',
+      accessorKey: 'associated_organization_name',
+      cell: ({ row }) => row.original.associated_organization_name || 'N/A'
     },
     {
       header: 'Description',
@@ -428,7 +402,6 @@ const VacancyManager = () => {
                 setEditingId(null)
                 reset()
                 setUploadedFiles({ featuredImage: '' })
-                fetchAllColleges()
               }}
             >
               Add Vacancy
@@ -483,21 +456,16 @@ const VacancyManager = () => {
                       )}
                     </div>
 
-                    <SearchableSelect
-                      id='college_id'
-                      label='Associated College'
-                      options={colleges}
-                      value={watch('college_id')}
-                      onChange={(option) => {
-                        setValue('college_id', option?.id || '', {
-                          shouldValidate: true,
-                          shouldDirty: true
-                        })
-                      }}
-                      placeholder='Search and select college'
-                      error={errors.college_id?.message}
-                      loading={loadCollegesList}
-                    />
+                    <div className='space-y-2'>
+                      <Label htmlFor='associated_organization_name'>
+                        Associated Organization / Institution Name
+                      </Label>
+                      <Input
+                        id='associated_organization_name'
+                        placeholder='Enter organization or institution name'
+                        {...register('associated_organization_name')}
+                      />
+                    </div>
                   </div>
 
                   <div className='space-y-2 mt-4'>
@@ -601,6 +569,11 @@ const VacancyManager = () => {
               <h2 className='text-2xl font-bold text-gray-800'>
                 {viewVacancyData.title}
               </h2>
+              {viewVacancyData.associated_organization_name && (
+                <p className='text-sm text-gray-500 mt-1'>
+                  {viewVacancyData.associated_organization_name}
+                </p>
+              )}
             </div>
 
             {viewVacancyData.description && (

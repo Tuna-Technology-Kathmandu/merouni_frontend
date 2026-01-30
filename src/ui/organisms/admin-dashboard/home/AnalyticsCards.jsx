@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import UserCard from '@/ui/molecules/UserCard'
+import UserCard from '@/ui/molecules/cards/UserCard'
 
 const AnalyticsCards = ({ analytics, loading }) => {
   const cards = [

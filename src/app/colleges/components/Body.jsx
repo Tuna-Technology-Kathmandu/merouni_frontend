@@ -6,18 +6,13 @@ import { Search, Building2, School } from 'lucide-react'
 import { FaExpandAlt } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
 import { motion, AnimatePresence } from 'framer-motion'
-
+import EmptyState from '@/ui/shadcn/EmptyState'
 import UniversityCardShimmer from './UniversityShimmerCard'
 import Pagination from '@/app/blogs/components/Pagination'
 import UniversityCard from './UniversityCard'
 import { authFetch } from '@/app/utils/authFetch'
 import { DotenvConfig } from '@/config/env.config'
-<<<<<<< HEAD
-import EmptyState from '@/ui/shadcn/EmptyState'
-=======
-import EmptyState from '@/components/ui/EmptyState'
 import { DistrictLists } from '@/constants/district'
->>>>>>> a01b8f31c52222f3dfa4c2f7e49e896c890131d5
 
 // Client-side fetch functions
 const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
@@ -166,89 +161,6 @@ const getUniversity = async (searchQuery = '') => {
   }
 }
 
-<<<<<<< HEAD
-const districts = [
-  'Bhojpur',
-  'Dhankuta',
-  'Ilam',
-  'Jhapa',
-  'Khotang',
-  'Morang',
-  'Okhaladhunga',
-  'Panchthar',
-  'Sankhuwasabha',
-  'Solukhumbu',
-  'Sunsari',
-  'Taplejung',
-  'Terhathum',
-  'Udayapur',
-  'Bara',
-  'Dhanusha',
-  'Mahottari',
-  'Parsa',
-  'Rautahat',
-  'Saptari',
-  'Sarlahi',
-  'Siraha',
-  'Bhaktapur',
-  'Chitawan',
-  'Dhading',
-  'Dolakha',
-  'Kathmandu',
-  'Kavrepalanchok',
-  'Lalitpur',
-  'Makwanpur',
-  'Nuwakot',
-  'Ramechhap',
-  'Rasuwa',
-  'Sindhuli',
-  'Sindhupalchok',
-  'Baglung',
-  'Gorkha',
-  'Kaski',
-  'Lamjung',
-  'Manang',
-  'Mustang',
-  'Myagdi',
-  'Nawalpur',
-  'Parbat',
-  'Syangja',
-  'Tanahu',
-  'Arghakhanchi',
-  'Banke',
-  'Bardiya',
-  'Dang',
-  'Gulmi',
-  'Kapilbastu',
-  'Nawalparasi',
-  'Palpa',
-  'Pyuthan',
-  'Rolpa',
-  'Rukum Purba',
-  'Rupandehi',
-  'Dailekh',
-  'Dolpa',
-  'Humla',
-  'Jajarkot',
-  'Jumla',
-  'Kalikot',
-  'Mugu',
-  'Rukum Paschim',
-  'Salyan',
-  'Surkhet',
-  'Achham',
-  'Baitadi',
-  'Bajhang',
-  'Bajura',
-  'Dadeldhura',
-  'Darchula',
-  'Doti',
-  'Kailali',
-  'Kanchanpur'
-]
-=======
->>>>>>> a01b8f31c52222f3dfa4c2f7e49e896c890131d5
-
 // Memoized FilterSection with local state for performant typing
 const FilterSection = React.memo(function FilterSection({
   title,
@@ -292,7 +204,7 @@ const FilterSection = React.memo(function FilterSection({
           value={localSearch}
           onChange={handleInputChange}
           placeholder={`Search ${title.toLowerCase()}...`}
-          className='w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all transition-all'
+          className='w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all'
         />
         {isLoading && (
           <div className='absolute right-3'>
@@ -583,7 +495,7 @@ const CollegeFinder = () => {
   }
 
   const handleModalFilterChange = (filterType, value) => {
-    console.log(value,"Valueeee")
+    console.log(value, 'Valueeee')
     setModalSelectedFilters((prev) => {
       const arr = prev[filterType]
       return {
@@ -616,14 +528,11 @@ const CollegeFinder = () => {
     }
   }, [searchQuery, fetchCollegesData])
 
-<<<<<<< HEAD
   const filteredDistricts = useMemo(
     () =>
-      districts
-        .filter((d) =>
-          d.toLowerCase().includes(filterInputs.district.toLowerCase())
-        )
-        .map((d) => ({ name: d })),
+      DistrictLists.filter((d) =>
+        d.toLowerCase().includes(filterInputs.district.toLowerCase())
+      ).map((d) => ({ name: d })),
     [filterInputs.district]
   )
   const filteredInstituteTypes = useMemo(
@@ -638,11 +547,9 @@ const CollegeFinder = () => {
 
   const modalFilteredDistricts = useMemo(
     () =>
-      districts
-        .filter((d) =>
-          d.toLowerCase().includes(modalFilterInputs.district.toLowerCase())
-        )
-        .map((d) => ({ name: d })),
+      DistrictLists.filter((d) =>
+        d.toLowerCase().includes(modalFilterInputs.district.toLowerCase())
+      ).map((d) => ({ name: d })),
     [modalFilterInputs.district]
   )
   const modalFilteredInstituteTypes = useMemo(
@@ -656,13 +563,6 @@ const CollegeFinder = () => {
         .map((t) => ({ name: t })),
     [modalFilterInputs.instituteType]
   )
-=======
-  const filteredDistricts = useMemo(() => DistrictLists.filter(d => d.toLowerCase().includes(filterInputs.district.toLowerCase())).map(d => ({ name: d })), [filterInputs.district])
-  const filteredInstituteTypes = useMemo(() => ['private', 'public'].filter(t => t.toLowerCase().includes(filterInputs.instituteType.toLowerCase())).map(t => ({ name: t })), [filterInputs.instituteType])
-
-  const modalFilteredDistricts = useMemo(() => DistrictLists.filter(d => d.toLowerCase().includes(modalFilterInputs.district.toLowerCase())).map(d => ({ name: d })), [modalFilterInputs.district])
-  const modalFilteredInstituteTypes = useMemo(() => ['private', 'public'].filter(t => t.toLowerCase().includes(modalFilterInputs.instituteType.toLowerCase())).map(t => ({ name: t })), [modalFilterInputs.instituteType])
->>>>>>> a01b8f31c52222f3dfa4c2f7e49e896c890131d5
 
   const handleApplyModalFilters = () => {
     setFilterInputs(modalFilterInputs)

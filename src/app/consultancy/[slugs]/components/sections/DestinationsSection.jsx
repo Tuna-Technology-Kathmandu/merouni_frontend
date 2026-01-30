@@ -30,7 +30,7 @@ const DestinationsSection = ({ consultancy }) => {
         <ul className='list-disc list-inside text-gray-800 mt-9 max-[1120px]:mt-6 leading-7 text-xs md:text-sm lg:text-base space-y-2'>
           {destinations.map((d, i) => (
             <li key={i} className='font-medium'>
-              {d.city}, {d.country}
+              {typeof d === 'string' ? d : (d?.country ?? '—')}
             </li>
           ))}
         </ul>

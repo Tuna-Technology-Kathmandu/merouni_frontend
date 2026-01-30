@@ -185,9 +185,11 @@ const AppliedScholarshipsPage = () => {
         accessorKey: 'scholarship',
         cell: ({ getValue }) => {
           const scholarship = getValue()
-          return scholarship?.amount
-            ? `$${parseFloat(scholarship.amount).toLocaleString()}`
-            : 'N/A'
+          if (!scholarship?.amount) return 'N/A'
+          const num = parseFloat(scholarship.amount)
+          return Number.isNaN(num)
+            ? scholarship.amount
+            : `Rs. ${num.toLocaleString()}`
         }
       },
       {

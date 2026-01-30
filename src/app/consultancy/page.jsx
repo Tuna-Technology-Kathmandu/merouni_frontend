@@ -115,10 +115,6 @@ export default function ConsultanciesPage() {
                 </h1>
                 <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
               </div>
-              <p className='text-gray-500 max-w-xl font-medium text-lg mt-2'>
-                Discover trusted consultancies that guide you through
-                admissions, applications, and career opportunities abroad.
-              </p>
             </div>
 
             {/* Clear All Button */}

@@ -4,12 +4,12 @@ import { useEffect, useState, useCallback, useLayoutEffect } from 'react'
 import { getCareers } from './actions'
 import Link from 'next/link'
 import { Search, Briefcase, X } from 'lucide-react'
-import EmptyState from '@/components/ui/EmptyState'
+import EmptyState from '@/ui/shadcn/EmptyState'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
 import Pagination from '../blogs/components/Pagination'
-import { CardSkeleton } from '@/components/ui/CardSkeleton'
+import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 
 function formatDate(dateString) {
   if (!dateString) return ''
@@ -100,12 +100,14 @@ const CareerPage = () => {
             <div>
               <div className='relative inline-block mb-3'>
                 <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight'>
-                  Explore Career <span className='text-[#0A6FA7]'>Opportunities</span>
+                  Explore Career{' '}
+                  <span className='text-[#0A6FA7]'>Opportunities</span>
                 </h1>
                 <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
               </div>
               <p className='text-gray-500 max-w-xl font-medium text-lg mt-2'>
-                Join our team and build a rewarding career with us. Browse open positions and find the role that best fits your skills.
+                Join our team and build a rewarding career with us. Browse open
+                positions and find the role that best fits your skills.
               </p>
             </div>
 
@@ -124,7 +126,9 @@ const CareerPage = () => {
           {/* Search Bar */}
           <div className='bg-white rounded-[32px] p-8 shadow-[0_2px_15px_rgba(0,0,0,0.02)] border border-gray-100 mb-12'>
             <div className='max-w-2xl mx-auto'>
-              <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>Search Careers</label>
+              <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                Search Careers
+              </label>
               <div className='relative group'>
                 <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors' />
                 <input
@@ -147,7 +151,10 @@ const CareerPage = () => {
           {!loading && !isScrolling && (
             <div className='mb-8 px-2'>
               <p className='text-sm text-gray-500 font-semibold'>
-                Showing <span className='text-gray-900'>{careers.length}</span> of <span className='text-gray-900'>{pagination.totalCount}</span> results
+                Showing <span className='text-gray-900'>{careers.length}</span>{' '}
+                of{' '}
+                <span className='text-gray-900'>{pagination.totalCount}</span>{' '}
+                results
               </p>
             </div>
           )}
@@ -155,7 +162,11 @@ const CareerPage = () => {
           {/* Career Cards Grid */}
           {loading || isScrolling ? (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-              {Array(6).fill('').map((_, index) => <CardSkeleton key={index} />)}
+              {Array(6)
+                .fill('')
+                .map((_, index) => (
+                  <CardSkeleton key={index} />
+                ))}
             </div>
           ) : careers.length === 0 ? (
             <div className='bg-white rounded-[32px] border border-gray-100 border-dashed py-20'>
@@ -174,110 +185,6 @@ const CareerPage = () => {
                 }
               />
             </div>
-<<<<<<< HEAD
-          </div>
-
-          {/* Error State */}
-          {error && (
-            <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6'>
-              Error loading careers: {error}
-            </div>
-          )}
-
-          {/* No Results */}
-          {!loading && !error && careersData.items?.length === 0 && (
-            <EmptyState
-              icon={Briefcase}
-              title='No Careers Found'
-              description={
-                debouncedSearch
-                  ? `No career opportunities match your search "${debouncedSearch}"`
-                  : 'No career opportunities are currently available'
-              }
-              action={
-                debouncedSearch
-                  ? {
-                      label: 'Clear Search',
-                      onClick: () => {
-                        setSearchTerm('')
-                        setDebouncedSearch('')
-                      }
-                    }
-                  : null
-              }
-            />
-          )}
-
-          {/* Cards Grid */}
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {loading
-              ? // Show shimmer cards while loading
-                Array.from({ length: 6 }).map((_, index) => (
-                  <CareerCardShimmer key={`shimmer-${index}`} />
-                ))
-              : // Show actual career cards when not loading
-                careersData.items?.map((career) => (
-                  <Link
-                    href={`/career/${career.slugs}`}
-                    key={career.id}
-                    className='block hover:shadow-xl transition-shadow duration-300'
-                  >
-                    <div className='bg-white rounded-lg shadow-md overflow-hidden h-full'>
-                      <div className='h-48 w-full'>
-                        <img
-                          src={career?.featuredImage || '/images/job.webp'}
-                          alt={career.title}
-                          fill
-                          className='object-cover w-full h-full '
-                        />
-                      </div>
-                      <div className='p-4'>
-                        <h2 className='text-xl max-md:text-lg font-semibold text-gray-900 mb-2 line-clamp-2'>
-                          {career.title}
-                        </h2>
-                        <p className='text-gray-600 mb-4 line-clamp-3 max-sm:text-sm max-sm:mb-2'>
-                          {career.description}
-                        </p>
-                        <div className='text-sm text-gray-500'>
-                          <p>Posted: {formatDate(career.createdAt)}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-          </div>
-
-          {/* Pagination */}
-          {!loading && careersData.pagination?.totalPages > 1 && (
-            <div className='flex items-center justify-center gap-4 mt-8'>
-              <button
-                onClick={() =>
-                  handlePageChange(careersData.pagination.currentPage - 1)
-                }
-                disabled={careersData.pagination.currentPage === 1}
-                className='px-4 py-2 bg-gray-300 rounded-full mx-2 disabled:opacity-50'
-              >
-                &lt;
-              </button>
-
-              <span className='text-gray-700'>
-                Page {careersData.pagination.currentPage} of{' '}
-                {careersData.pagination.totalPages}
-              </span>
-
-              <button
-                onClick={() =>
-                  handlePageChange(careersData.pagination.currentPage + 1)
-                }
-                disabled={
-                  careersData.pagination.currentPage ===
-                  careersData.pagination.totalPages
-                }
-                className='px-4 py-2 bg-gray-300 rounded-full mx-2 disabled:opacity-50'
-              >
-                &gt;
-              </button>
-=======
           ) : (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
               {careers.map((career) => (
@@ -314,8 +221,12 @@ const CareerPage = () => {
 
                       <div className='mt-auto pt-6 border-t border-gray-50 flex items-center justify-between'>
                         <div className='flex flex-col'>
-                          <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>Posted</span>
-                          <span className='text-sm font-bold text-gray-700'>{formatDate(career.createdAt)}</span>
+                          <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
+                            Posted
+                          </span>
+                          <span className='text-sm font-bold text-gray-700'>
+                            {formatDate(career.createdAt)}
+                          </span>
                         </div>
                         <div className='w-8 h-8 rounded-full bg-[#0A6FA7]/10 flex items-center justify-center group-hover:bg-[#0A6FA7] transition-colors duration-500'>
                           <Briefcase className='w-4 h-4 text-[#0A6FA7] group-hover:text-white transition-colors duration-500' />
@@ -325,7 +236,6 @@ const CareerPage = () => {
                   </div>
                 </Link>
               ))}
->>>>>>> a01b8f31c52222f3dfa4c2f7e49e896c890131d5
             </div>
           )}
 
@@ -340,7 +250,6 @@ const CareerPage = () => {
               </div>
             </div>
           )}
-
         </div>
       </div>
       <Footer />
