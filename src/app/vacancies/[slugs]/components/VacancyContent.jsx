@@ -166,16 +166,7 @@ const VacancyContent = ({ vacancy }) => {
                         dangerouslySetInnerHTML={{ __html: processContent(vacancy.content) }}
                     />
 
-                    {/* Application CTA
-                    <div className='mt-16 p-8 bg-[#0A6FA7]/5 rounded-3xl border border-[#0A6FA7]/10 text-center'>
-                        <h3 className='text-xl font-bold text-gray-900 mb-4'>Interested in this position?</h3>
-                        <p className='text-gray-600 mb-8 max-w-md mx-auto'>
-                            Ready to take the next step in your career? Reviews the requirements above and apply if you're a good fit.
-                        </p>
-                        <button className='px-8 py-4 bg-[#0A6FA7] text-white font-bold rounded-xl shadow-lg shadow-[#0A6FA7]/20 hover:bg-[#085a87] hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300'>
-                            Apply for this Position
-                        </button>
-                    </div> */}
+                   
                 </motion.div>
             </div>
         </div>
