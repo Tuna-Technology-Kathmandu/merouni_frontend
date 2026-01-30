@@ -57,6 +57,7 @@ const DegreePage = () => {
     return () => clearTimeout(handler)
   }, [searchTerm])
 
+<<<<<<< HEAD
   // Load degrees
   const loadDegrees = useCallback(
     async (page = 1, search = '', faculty = '', level = '') => {
@@ -77,6 +78,24 @@ const DegreePage = () => {
     },
     []
   )
+=======
+  const loadDegrees = useCallback(async (page = 1, search = '', facultyId = '', level = '') => {
+    setLoading(true)
+    try {
+      const response = await fetchDegrees(search, page, facultyId, level)
+      setCourses(response.items)
+      setPagination((prev) => ({
+        ...prev,
+        totalPages: response.pagination.totalPages,
+        totalCount: response.pagination.totalCount
+      }))
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+>>>>>>> a01b8f31c52222f3dfa4c2f7e49e896c890131d5
 
   // Reset to page 1 when search or filters change
   useLayoutEffect(() => {
@@ -85,6 +104,7 @@ const DegreePage = () => {
 
   // Fetch when page, search, or filters change
   useEffect(() => {
+<<<<<<< HEAD
     loadDegrees(
       pagination.currentPage,
       debouncedSearch,
@@ -98,6 +118,10 @@ const DegreePage = () => {
     selectedLevel,
     loadDegrees
   ])
+=======
+    loadDegrees(pagination.currentPage, debouncedSearch, selectedFaculty, selectedLevel)
+  }, [debouncedSearch, pagination.currentPage, selectedFaculty, selectedLevel])
+>>>>>>> a01b8f31c52222f3dfa4c2f7e49e896c890131d5
 
   // Handle page change
   const handlePageChange = (page) => {

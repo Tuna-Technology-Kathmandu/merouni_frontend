@@ -1,9 +1,19 @@
 import { DotenvConfig } from "@/config/env.config"
 
-export async function getCareers(page = 1, searchQuery = '') {
+export async function getCareers(page = 1, searchQuery = '', collegeId = '') {
   try {
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      q: searchQuery,
+      limit: '15'
+    })
+
+    if (collegeId) {
+      queryParams.append('college_id', collegeId)
+    }
+
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/career?page=${page}&q=${searchQuery}&limit=15`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/career?${queryParams.toString()}`,
       {
         method: 'GET',
         headers: {

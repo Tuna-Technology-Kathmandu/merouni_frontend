@@ -1,6 +1,5 @@
 import GoogleMap from '@/app/colleges/[slugs]/components/GoogleMap'
-import React from 'react'
-import { FaUser, FaCalendarAlt, FaClock, FaMapMarkerAlt } from 'react-icons/fa'
+import { FaMapMarkerAlt } from 'react-icons/fa'
 
 const Description = ({ event }) => {
   const hostData = event?.event_host ? (typeof event.event_host === 'string' ? JSON.parse(event.event_host) : event.event_host) : {}

@@ -12,7 +12,12 @@ import Pagination from '@/app/blogs/components/Pagination'
 import UniversityCard from './UniversityCard'
 import { authFetch } from '@/app/utils/authFetch'
 import { DotenvConfig } from '@/config/env.config'
+<<<<<<< HEAD
 import EmptyState from '@/ui/shadcn/EmptyState'
+=======
+import EmptyState from '@/components/ui/EmptyState'
+import { DistrictLists } from '@/constants/district'
+>>>>>>> a01b8f31c52222f3dfa4c2f7e49e896c890131d5
 
 // Client-side fetch functions
 const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
@@ -161,6 +166,7 @@ const getUniversity = async (searchQuery = '') => {
   }
 }
 
+<<<<<<< HEAD
 const districts = [
   'Bhojpur',
   'Dhankuta',
@@ -240,6 +246,8 @@ const districts = [
   'Kailali',
   'Kanchanpur'
 ]
+=======
+>>>>>>> a01b8f31c52222f3dfa4c2f7e49e896c890131d5
 
 // Memoized FilterSection with local state for performant typing
 const FilterSection = React.memo(function FilterSection({
@@ -575,6 +583,7 @@ const CollegeFinder = () => {
   }
 
   const handleModalFilterChange = (filterType, value) => {
+    console.log(value,"Valueeee")
     setModalSelectedFilters((prev) => {
       const arr = prev[filterType]
       return {
@@ -607,6 +616,7 @@ const CollegeFinder = () => {
     }
   }, [searchQuery, fetchCollegesData])
 
+<<<<<<< HEAD
   const filteredDistricts = useMemo(
     () =>
       districts
@@ -646,6 +656,13 @@ const CollegeFinder = () => {
         .map((t) => ({ name: t })),
     [modalFilterInputs.instituteType]
   )
+=======
+  const filteredDistricts = useMemo(() => DistrictLists.filter(d => d.toLowerCase().includes(filterInputs.district.toLowerCase())).map(d => ({ name: d })), [filterInputs.district])
+  const filteredInstituteTypes = useMemo(() => ['private', 'public'].filter(t => t.toLowerCase().includes(filterInputs.instituteType.toLowerCase())).map(t => ({ name: t })), [filterInputs.instituteType])
+
+  const modalFilteredDistricts = useMemo(() => DistrictLists.filter(d => d.toLowerCase().includes(modalFilterInputs.district.toLowerCase())).map(d => ({ name: d })), [modalFilterInputs.district])
+  const modalFilteredInstituteTypes = useMemo(() => ['private', 'public'].filter(t => t.toLowerCase().includes(modalFilterInputs.instituteType.toLowerCase())).map(t => ({ name: t })), [modalFilterInputs.instituteType])
+>>>>>>> a01b8f31c52222f3dfa4c2f7e49e896c890131d5
 
   const handleApplyModalFilters = () => {
     setFilterInputs(modalFilterInputs)

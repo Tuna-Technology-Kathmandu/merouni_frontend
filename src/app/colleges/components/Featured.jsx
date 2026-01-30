@@ -1,11 +1,9 @@
 'use client'
 
-import React, { useRef, useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { GoArrowLeft, GoArrowRight } from 'react-icons/go'
 import FcollegeShimmer from './FCollegeShimmer'
 import Fcollege from './Fcollege'
-import { GoArrowLeft } from 'react-icons/go'
-import { GoArrowRight } from 'react-icons/go'
-import { getFilteredPinFeatColleges } from '@/app/action'
 
 const Featured = () => {
   const scrollRef = useRef(null)
@@ -45,7 +43,8 @@ const Featured = () => {
 
   const fetchFeaturedColleges = async () => {
     try {
-      const response = await getFilteredPinFeatColleges(true)
+      const response = await 
+      (true)
       setFeaturedColleges(response.items || [])
     } catch (error) {
       setError('Failed to load featured Colleges')

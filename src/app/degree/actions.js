@@ -6,8 +6,8 @@ export const fetchDegrees = async (search = '', page = 1, faculty = '', level = 
     url.searchParams.append('q', search)
     url.searchParams.append('page', page)
     url.searchParams.append('limit', 15)
-    if (faculty) url.searchParams.append('faculty', faculty)
-    if (level) url.searchParams.append('level', level)
+    if (faculty) url.searchParams.append('facultyId', faculty)
+    if (level) url.searchParams.append('levelId', level)
 
     const response = await fetch(url.toString())
     const data = await response.json()

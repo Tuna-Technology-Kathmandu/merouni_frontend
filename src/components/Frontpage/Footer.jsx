@@ -65,7 +65,6 @@ const Footer = () => {
     fetchFooterData()
   }, [])
 
-  console.log(sections, "sectionssections")
 
   const toggleSection = (index) => {
     setOpenSections((prev) => ({
@@ -75,7 +74,7 @@ const Footer = () => {
   }
 
   return (
-    <div className='shadow-md'>
+    <div className='shadow-md border-t border-gray-200'>
       <div className='hidden md:block shadow-md'>
         <header className='bg-white text-[#0870A8] shadow-md'>
           <div className='container mx-auto px-4'>

@@ -7,7 +7,7 @@ export async function getColleges(page = 1, filters = {}) {
     // Initialize query parameters with page
     const queryParams = new URLSearchParams({
       page: page.toString(),
-      limit: '24'
+      limit: filters.limit ? filters.limit.toString() : '24'
     })
 
     // Only add filter parameters if provided

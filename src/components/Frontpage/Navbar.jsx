@@ -337,6 +337,16 @@ const Navbar = () => {
                     Career
                   </Link>
                   <Link
+                    href='/vacancies'
+                    onClick={() => setIsMoreOpen(false)}
+                    className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/vacancies')
+                      ? 'font-semibold bg-teal-600'
+                      : ''
+                      }`}
+                  >
+                    Vacancies
+                  </Link>
+                  <Link
                     href='/contact'
                     onClick={() => setIsMoreOpen(false)}
                     className={`block px-4 py-2.5 text-white hover:bg-teal-600 transition-colors ${pathname?.startsWith('/contact')

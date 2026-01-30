@@ -1,6 +1,6 @@
 'use server'
 
-import { DotenvConfig } from "@/config/env.config"
+import { DotenvConfig } from '@/config/env.config'
 
 export async function getEvents(page = 1) {
   try {
@@ -21,26 +21,6 @@ export async function getEvents(page = 1) {
     return await response.json()
   } catch (error) {
     console.error('Error fetching events:', error)
-    throw error
-  }
-}
-
-export async function searchEvent(query) {
-  try {
-    const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event?q=${query}`,
-      {
-        cache: 'no-store'
-      }
-    )
-
-    if (!response.ok) {
-      throw new Error('Failed to search events')
-    }
-    const data = await response.json()
-    return data
-  } catch (error) {
-    console.error('Error searching events:', error)
     throw error
   }
 }
@@ -160,6 +140,108 @@ export async function getUnexpiredEvents() {
     return data
   } catch (error) {
     console.error('Failed to fetch events:', error)
+    throw error
+  }
+}
+
+export const fetchEvents = async (page = 1, collegeId = '') => {
+  try {
+    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event`)
+    url.searchParams.append('page', page)
+    url.searchParams.append('limit', 12)
+    if (collegeId) {
+      url.searchParams.append('college_id', collegeId)
+    }
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch events: ${response.statusText}`)
+    }
+    return await response.json()
+  } catch (error) {
+    console.error('Error fetching events:', error)
+    throw error
+  }
+}
+
+export const searchEvent = async (query, collegeId = '') => {
+  try {
+    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event`)
+    url.searchParams.append('q', query)
+    if (collegeId) {
+      url.searchParams.append('college_id', collegeId)
+    }
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to search events: ${response.statusText}`)
+    }
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('Error searching events:', error)
+    throw error
+  }
+}
+
+export const fetchThisWeekEvents = async (collegeId = '') => {
+  try {
+    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event/this-week`)
+    if (collegeId) url.searchParams.append('college_id', collegeId)
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch this week's events")
+    }
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching this week's events:", error)
+    throw error
+  }
+}
+
+export const fetchNextWeekEvents = async (collegeId = '') => {
+  try {
+    const url = new URL(
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/next-month`
+    )
+    if (collegeId) url.searchParams.append('college_id', collegeId)
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch next week's events")
+    }
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching next week's events:", error)
     throw error
   }
 }
