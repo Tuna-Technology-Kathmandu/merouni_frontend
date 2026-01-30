@@ -1,28 +1,26 @@
 'use client'
-import dynamic from 'next/dynamic'
-import React, { useState, useEffect, useMemo, useRef } from 'react'
-import Table from '../../../../components/Table'
-import { Edit2, Trash2, Search, Eye, Globe } from 'lucide-react'
-import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
 import { getEvents } from '@/app/action'
-import { useForm } from 'react-hook-form'
-import FileUpload from '../addCollege/FileUpload'
-import { MapPin } from 'lucide-react'
-import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { fetchCategories } from '../category/action'
-import { X } from 'lucide-react'
-import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../components/UserModal'
-import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
-import { useSearchParams, useRouter } from 'next/navigation'
 import { DotenvConfig } from '@/config/env.config'
-import { Button } from '@/components/ui/button'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { Edit2, Eye, MapPin, Search, Trash2, X } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useRouter, useSearchParams } from 'next/navigation'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useSelector } from 'react-redux'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import Table from '../../../../components/Table'
+import { Modal } from '../../../../components/UserModal'
+import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import FileUpload from '../addCollege/FileUpload'
+import { fetchCategories } from '../category/action'
+
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
@@ -126,7 +124,6 @@ export default function EventManager() {
     }
   }, [searchTimeout])
 
-  const { requireAdmin } = useAdminPermission()
 
   const searchCollege = async (e) => {
     const query = e.target.value
@@ -388,10 +385,8 @@ export default function EventManager() {
   }
 
   const handleDeleteClick = (id) => {
-    requireAdmin(() => {
-      setDeleteId(id)
-      setIsDialogOpen(true)
-    })
+    setDeleteId(id)
+    setIsDialogOpen(true)
   }
 
   const handleDeleteConfirm = async () => {
@@ -465,7 +460,8 @@ export default function EventManager() {
           const rawValue = row.original.event_host
           if (!rawValue) return ''
           try {
-            const eventHost = JSON.parse(rawValue)
+
+            const eventHost = rawValue
             return eventHost.host || ''
           } catch (error) {
             console.error('JSON parsing error for host:', error)
@@ -480,7 +476,7 @@ export default function EventManager() {
           const rawValue = row.original.event_host
           if (!rawValue) return ''
           try {
-            const eventHost = JSON.parse(rawValue)
+            const eventHost = rawValue
             return eventHost.start_date || ''
           } catch (error) {
             console.error('JSON parsing error for start_date:', error)
@@ -495,7 +491,7 @@ export default function EventManager() {
           const rawValue = row.original.event_host
           if (!rawValue) return ''
           try {
-            const eventHost = JSON.parse(rawValue)
+            const eventHost = rawValue
             return eventHost.end_date || ''
           } catch (error) {
             console.error('JSON parsing error for end_date:', error)
@@ -510,7 +506,7 @@ export default function EventManager() {
           const rawValue = row.original.event_host
           if (!rawValue) return ''
           try {
-            const eventHost = JSON.parse(rawValue)
+            const eventHost = rawValue
             return eventHost.time || ''
           } catch (error) {
             console.error('JSON parsing error for time:', error)
@@ -525,7 +521,7 @@ export default function EventManager() {
           const rawValue = row.original.event_host
           if (!rawValue) return 'N/A'
           try {
-            const eventHost = JSON.parse(rawValue)
+            const eventHost = rawValue
             return eventHost.map_url ? (
               <a
                 href={eventHost.map_url}
@@ -882,17 +878,16 @@ export default function EventManager() {
 
               {/* Submit Button - Sticky Footer */}
               <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <button
+                <Button
                   type='submit'
                   disabled={loading}
-                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
                 >
                   {loading
                     ? 'Processing...'
                     : editing
                       ? 'Update Event'
                       : 'Create Event'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -983,10 +978,7 @@ export default function EventManager() {
                 <h3 className='text-lg font-semibold mb-2'>Event Details</h3>
                 <div className='space-y-2'>
                   {(() => {
-                    const eventHost =
-                      typeof viewEventData.event_host === 'string'
-                        ? JSON.parse(viewEventData.event_host)
-                        : viewEventData.event_host
+                    const eventHost = viewEventData.event_host
                     return (
                       <>
                         {eventHost.host && (

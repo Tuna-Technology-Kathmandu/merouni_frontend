@@ -5,13 +5,13 @@ import { LiaUniversitySolid } from 'react-icons/lia'
 import { BsGlobe2 } from 'react-icons/bs'
 import { Eye } from 'lucide-react'
 
-const ImageSection = ({ college }) => {
-  const hasAddress = college?.collegeAddress?.street || college?.collegeAddress?.city
-  const hasContacts = college?.collegeContacts && college.collegeContacts.length > 0
-  const hasWebsite = !!college?.website_url
-  const hasUniversity = !!college?.university?.fullname
-  const hasInstituteType = !!college?.institute_type
-  const instituteLevels = JSON.parse(college?.institute_level || '[]')
+const SchoolUpperSection = ({ school }) => {
+  const hasAddress = school?.schoolAddress?.street || school?.schoolAddress?.city
+  const hasContacts = school?.schoolContacts && school.schoolContacts.length > 0
+  const hasWebsite = !!school?.website_url
+  const hasUniversity = !!school?.university?.fullname
+  const hasInstituteType = !!school?.institute_type
+  const instituteLevels = JSON.parse(school?.institute_level || '[]')
   const hasInstituteLevel = instituteLevels.length > 0
 
   return (
@@ -20,7 +20,7 @@ const ImageSection = ({ college }) => {
       <div className='w-full'>
         <div className='w-full h-[300px] sm:h-[350px] md:h-[400px] bg-gray-100 flex items-center justify-center relative overflow-hidden'>
           <img
-            src={college?.featured_img || '/images/degreeHero.webp'}
+            src={school?.featured_img || '/images/degreeHero.webp'}
             alt='College Photo'
             className='w-full h-full object-cover'
           />
@@ -30,33 +30,33 @@ const ImageSection = ({ college }) => {
           <div className='flex items-center justify-center rounded-2xl bg-white -translate-y-10 sm:-translate-y-12 md:-translate-y-16 overflow-hidden w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 flex-shrink-0 shadow-xl border-4 border-white transition-transform hover:scale-105 duration-300'>
             <img
               src={
-                college?.college_logo ||
-                `https://avatar.iran.liara.run/username?username=${college?.name}`
+                school?.school_logo ||
+                `https://avatar.iran.liara.run/username?username=${school?.name}`
               }
-              alt='College Logo'
+              alt='School Logo'
               className='object-cover w-full h-full rounded-xl aspect-square'
             />
           </div>
           <div className='flex-1 min-w-0 -mt-2'>
             <h1 className='font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-900 truncate'>
-              {college?.name}
+              {school?.name}
             </h1>
             {hasAddress && (
               <div className='flex flex-row items-center gap-1.5 mt-1 text-gray-600'>
                 <span className='flex-shrink-0'>
-                  <IoIosGlobe className='w-4 h-4 sm:w-5 sm:h-5 text-[#30AD8F]' />
+                   <IoIosGlobe className='w-4 h-4 sm:w-5 sm:h-5 text-[#30AD8F]' />
                 </span>
                 <p className='font-bold text-xs sm:text-sm md:text-base truncate'>
-                  {college?.collegeAddress?.street}{college?.collegeAddress?.street && college?.collegeAddress?.city ? ', ' : ''}{college?.collegeAddress?.city}
+                  {school?.schoolAddress?.street}{school?.schoolAddress?.street && school?.schoolAddress?.city ? ', ' : ''}{school?.schoolAddress?.city}
                 </p>
               </div>
             )}
           </div>
           {/* View Brochure Button */}
-          {college?.college_broucher && (
+          {school?.school_broucher && (
             <div className='hidden sm:flex items-center gap-4'>
               <a
-                href={college.college_broucher}
+                href={school.school_broucher}
                 target='_blank'
                 rel='noopener noreferrer'
                 className='flex items-center gap-2 px-6 py-3 bg-[#0A6FA7] text-white rounded-xl font-bold hover:bg-[#085a86] transition-all shadow-md active:scale-[0.98] text-sm uppercase tracking-wide'
@@ -80,7 +80,7 @@ const ImageSection = ({ college }) => {
               </div>
               <p className='text-[10px] uppercase tracking-wide font-bold text-gray-400 mb-1'>University</p>
               <p className='text-sm md:text-base font-bold text-gray-800 line-clamp-2'>
-                {college?.university?.fullname}
+                {school?.university?.fullname}
               </p>
             </div>
           )}
@@ -93,7 +93,7 @@ const ImageSection = ({ college }) => {
               </div>
               <p className='text-[10px] uppercase tracking-wide font-bold text-gray-400 mb-1'>Institute Type</p>
               <p className='text-sm md:text-base font-bold text-gray-800 whitespace-nowrap'>
-                {college?.institute_type}
+                {school?.institute_type}
               </p>
             </div>
           )}
@@ -130,7 +130,7 @@ const ImageSection = ({ college }) => {
               </div>
               <p className='text-[10px] uppercase tracking-wide font-bold text-gray-400 mb-1'>Contact</p>
               <div className='space-y-1'>
-                {college.collegeContacts.slice(0, 2).map((contact, index) => (
+                {school.schoolContacts.slice(0, 2).map((contact, index) => (
                   <a
                     key={index}
                     href={`tel:${contact?.contact_number || ''}`}
@@ -150,13 +150,13 @@ const ImageSection = ({ college }) => {
                 <BsGlobe2 className='w-5 h-5 text-sky-500' />
               </div>
               <p className='text-[10px] uppercase tracking-wide font-bold text-gray-400 mb-1'>Website</p>
-              <a
-                href={college.website_url}
+              <a  
+                href={school.website_url}
                 target='_blank'
                 rel='noopener noreferrer'
                 className='text-sm md:text-base font-bold text-gray-800 hover:text-[#0A6FA7] transition-colors line-clamp-1 break-all'
               >
-                {college.website_url.replace(/^https?:\/\//, '')}
+                {school.website_url.replace(/^https?:\/\//, '')}
               </a>
             </div>
           )}
@@ -166,4 +166,4 @@ const ImageSection = ({ college }) => {
   )
 }
 
-export default ImageSection
+export default SchoolUpperSection;

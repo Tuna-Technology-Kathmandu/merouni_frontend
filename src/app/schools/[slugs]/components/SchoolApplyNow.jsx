@@ -1,8 +1,8 @@
 import React from 'react'
 import { ArrowRight, School } from 'lucide-react'
 
-const ApplyNow = ({ college }) => {
-  if (!college?.website_url) return null
+const SchoolApplyNow = ({ school }) => {
+  if (!school?.website_url) return null
 
   return (
     <section className='px-4 sm:px-8 md:px-12 lg:px-24 mb-20'>
@@ -19,12 +19,12 @@ const ApplyNow = ({ college }) => {
             Are you ready to take the next step toward your future?
           </h2>
           <p className='text-gray-600 font-bold'>
-            Explore more about {college.name} and start your journey today.
+            Explore more about {school.name} and start your journey today.
           </p>
         </div>
 
         <a
-          href={college.website_url}
+          href={school.website_url}
           target='_blank'
           rel='noopener noreferrer'
           className='flex items-center gap-3 px-8 py-4 bg-[#0A6FA7] text-white rounded-2xl font-bold hover:bg-[#085a86] transition-all shadow-lg active:scale-[0.98] group/btn'
@@ -37,4 +37,4 @@ const ApplyNow = ({ college }) => {
   )
 }
 
-export default ApplyNow
+export default SchoolApplyNow

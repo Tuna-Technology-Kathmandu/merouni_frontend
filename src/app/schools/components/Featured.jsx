@@ -9,7 +9,7 @@ import { getFilteredPinFeatColleges } from '@/app/action'
 const Featured = () => {
   const [featuredColleges, setFeaturedColleges] = useState([])
   const [filteredColleges, setFilteredColleges] = useState([])
-  const [loading, setLoading] = useState(true)
+const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const scrollRef = useRef(null)
 
@@ -54,9 +54,23 @@ const Featured = () => {
   }, [])
 
   useEffect(() => {
+    const safeJsonParse = (str) => {
+      try {
+        if (!str) return []
+        if (typeof str !== 'string') return Array.isArray(str) ? str : []
+        if (str.startsWith('[') || str.startsWith('{')) {
+          return JSON.parse(str)
+        }
+        return [str] // Treat plain string as single array element
+      } catch (err) {
+        console.error('JSON parse error:', err, 'for string:', str)
+        return []
+      }
+    }
+
     setFilteredColleges(
       featuredColleges.filter((college) => {
-        const levels = JSON.parse(college.institute_level || '[]')
+        const levels = safeJsonParse(college.institute_level)
         return levels.includes('School')
       })
     )
@@ -115,20 +129,20 @@ const Featured = () => {
           >
             {filteredColleges.length > 0
               ? filteredColleges.map((college, index) => (
-                  <Fcollege
-                    description={college.address}
-                    name={college.name}
-                    image={college?.featured_img}
-                    key={college.id || index} // Better to use college.id if available
-                    slug={college.slugs}
-                  />
-                ))
+                <Fcollege
+                  description={college.address}
+                  name={college.name}
+                  image={college?.featured_img}
+                  key={college.id || index} // Better to use college.id if available
+                  slug={college.slugs}
+                />
+              ))
               : !loading &&
-                !error && (
-                  <div className='w-full text-center py-10 text-gray-500'>
-                    No featured colleges available at the moment.
-                  </div>
-                )}
+              !error && (
+                <div className='w-full text-center py-10 text-gray-500'>
+                  No featured colleges available at the moment.
+                </div>
+              )}
           </div>
 
           {/* Right Scroll Button - Only show if there are colleges to scroll through */}

@@ -1,29 +1,8 @@
 import { Skeleton } from '../ui/Skeleton'
 
-const defaultImages = [
-  '/images/UTCBanners/UTCLarge.gif',
-  '/images/UTCBanners/UTCLarge2.gif',
-  '/images/UTCBanners/UTCLarge3.gif'
-]
-const AdLayout = ({ banners = [], size = '', number = 1, loading = false }) => {
-  const fallBackBanners = [
-    {
-      imageUrl: '/images/UTCBanners/UTCLarge.gif',
-      title: 'Mero Uni 1',
-      websiteUrl: 'https://merouni.com/'
-    },
 
-    {
-      imageUrl: '/images/UTCBanners/UTCLarge2.gif',
-      title: 'Mero Uni 2',
-      websiteUrl: 'https://merouni.com/'
-    },
-    {
-      imageUrl: '/images/UTCBanners/UTCLarge3.gif',
-      title: 'Mero Uni 3',
-      websiteUrl: 'https://merouni.com/'
-    }
-  ]
+const AdLayout = ({ banners = [], size = '', number = 1, loading = false }) => {
+ 
 
   const displayBanners = [8, 9, 10].map((position) =>
     banners.find((banner) => banner.display_position === position)

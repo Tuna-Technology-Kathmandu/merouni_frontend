@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 
-const FormSection = ({ id, college }) => {
+const ApplyFormSection = ({ id, college }) => {
   const [formData, setFormData] = useState({
     college_id: college?.id || 0,
     student_name: '',
@@ -107,29 +107,7 @@ const FormSection = ({ id, college }) => {
     }
   }
 
-  // const courseOption = React.useMemo(() => {
-  //   if (!college?.collegeCourses) return []
-
-  //   if (id) {
-  //     const options = college.collegeCourses.filter((item) => item.id == id)
-  //     if (options.length > 0) {
-  //       setSelectedCourse(options[0]?.program?.title)
-  //       setFormData((prev) => ({ ...prev, course: options[0]?.id }))
-  //     }
-  //   }
-  //   return college.collegeCourses
-  // }, [id, college?.collegeCourses])
-
-  // //for drop down selection
-
-  // const handleDrop = (courseId, courseTitle) => {
-  //   setShowDrop(false)
-  //   setSelectedCourse(courseTitle)
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     course: courseId
-  //   }))
-  // }
+ 
 
   console.log(formData)
 
@@ -177,29 +155,6 @@ const FormSection = ({ id, college }) => {
               <p className='text-red-500 text-sm'>{errors.student_phone_no}</p>
             )}
           </div>
-          {/* <div className='relative'>
-            <h1
-              onClick={() => setShowDrop(!showDrop)}
-              className={`${selectedCourse == 'select course' ? 'text-black/40' : 'text-black'} w-full px-4 py-2 border rounded-lg cursor-pointer `}
-            >
-              {selectedCourse}
-            </h1>
-            {showDrop && (
-              <div className='absolute bg-white w-full rounded-lg mt-3 border border-ring-blue-500 overflow-hidden'>
-                {courseOption.map((item, index) => {
-                  return (
-                    <div
-                      onClick={() => handleDrop(item?.id, item?.program?.title)}
-                      key={index}
-                      className={`w-full hover:bg-slate-100 cursor-pointer py-2 px-4 ${index !== courseOption.length - 1 ? 'border-b-black/50 border-b-[0.4px]' : ''}`}
-                    >
-                      <p>{item?.program?.title}</p>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div> */}
           <div>
             <textarea
               name='student_description'
@@ -229,4 +184,4 @@ const FormSection = ({ id, college }) => {
   )
 }
 
-export default FormSection
+export default ApplyFormSection

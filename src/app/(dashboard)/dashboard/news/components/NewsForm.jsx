@@ -69,7 +69,7 @@ export default function NewsForm({
             setValue('status', initialData.status || 'draft')
             setValue('visibility', initialData.visibility || 'private')
             setValue('college_id', initialData.college_id || initialData.vacancyCollege?.id || '')
-            setValue('category_id', initialData.category_id || initialData.category?.id || '')
+            setValue('category_id', initialData.category_id || initialData.newsCategory?.id || '')
         }
     }, [editing, initialData, isOpen, setValue])
 

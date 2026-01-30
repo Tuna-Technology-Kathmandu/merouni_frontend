@@ -4,12 +4,12 @@ import React, { useState, useEffect, use } from 'react'
 import Navbar from '../../../../components/Frontpage/Navbar'
 import Header from '../../../../components/Frontpage/Header'
 import Footer from '../../../../components/Frontpage/Footer'
-import ImageSection from './components/upperSection'
-import FormSection from './components/formSection'
-import { getCollegeBySlug } from '../../actions'
+import ApplyImageSection from './components/ApplyUpperSection'
+import ApplyFormSection from './components/ApplyFormSection'
+import { getSchoolBySlug } from '../../actions'
 
 const ApplyPage = ({ params }) => {
-  const [college, setCollege] = useState(null)
+  const [school, setSchool] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -19,10 +19,10 @@ const ApplyPage = ({ params }) => {
     const fetchCollegeDetails = async () => {
       try {
         console.log('Fetching college apply details for slug:', slugs)
-        const collegeData = await getCollegeBySlug(slugs)
+        const schoolData = await getSchoolBySlug(slugs)
 
-        if (collegeData) {
-          setCollege(collegeData)
+        if (schoolData) {
+          setSchool(schoolData)
         } else {
           setError('No data found')
         }
@@ -43,8 +43,8 @@ const ApplyPage = ({ params }) => {
     <main className='w-full'>
       <Header />
       <Navbar />
-      <ImageSection college={college} loading={loading} />
-      <FormSection college={college} />
+      <ApplyImageSection college={college} loading={loading} />
+      <ApplyFormSection college={college} />
       <Footer />
     </main>
   )

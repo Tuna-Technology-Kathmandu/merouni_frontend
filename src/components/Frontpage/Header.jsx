@@ -21,7 +21,7 @@ const Header = () => {
     { title: 'Blogs', href: '/blogs' },
     { title: 'Exams', href: '/exams' },
     // {title: " Consultancy,Materials,Events,School,Videos,Universities,Career,Vacancy,Wishlist"}
-    { title: 'Consultancy', href: '/events' },
+    { title: 'Consultancy', href: '/consultancy' },
     { title: 'School', href: '/schools' },
     { title: 'Universites', href: '/universities' },
     { title: 'Career', href: '/career' }

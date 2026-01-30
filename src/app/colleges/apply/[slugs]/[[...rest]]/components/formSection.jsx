@@ -1,17 +1,18 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
-import { useSelector } from 'react-redux'
-import { destr } from 'destr'
-import { toast } from 'react-toastify'
-import Link from 'next/link'
-import { useMutation } from '@tanstack/react-query'
-import { applyToCollege } from '../query/applyCollege.query'
-import { FaSpinner } from 'react-icons/fa'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
+import { SearchableSelect } from '@/components/ui/SearchableSelect'
+import { useMutation } from '@tanstack/react-query'
+import { destr } from 'destr'
+import { GraduationCap } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useMemo, useState } from 'react'
+import { FaSpinner as FaSpinnerIcon } from 'react-icons/fa'
+import { useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
+import { applyToCollege } from '../query/applyCollege.query'
 
 const FormSection = ({ id, college }) => {
   const user = useSelector((state) => state.user?.data)
@@ -131,132 +132,167 @@ const FormSection = ({ id, college }) => {
 
   if (isLoggedIn && isAgent) {
     return (
-      <div className='w-full max-w-2xl bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center'>
-        <h2 className='text-2xl font-bold text-gray-900 mb-4'>Apply For College</h2>
-        <p className='text-gray-600 mb-6'>As an agent, please visit your dashboard to manage applications.</p>
-        <Link href='/dashboard'>
-          <Button>Go to Dashboard</Button>
-        </Link>
+      <div className='w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden text-center'>
+        <div className='bg-gradient-to-r from-[#30ad8f] to-[#2c9a7f] p-8 text-white relative overflow-hidden mb-6'>
+          <div className='relative z-10'>
+            <div className='flex items-center justify-center gap-3 mb-2'>
+              <GraduationCap className='w-8 h-8' />
+              <h2 className='text-3xl font-bold'>Apply For College</h2>
+            </div>
+            <p className='text-teal-50/80'>Manage applications from your dashboard</p>
+          </div>
+          <div className='absolute -right-8 -bottom-8 opacity-10'>
+            <GraduationCap size={160} />
+          </div>
+        </div>
+        <div className='p-8 pt-0'>
+          <p className='text-gray-600 mb-8'>As an agent, please visit your dashboard to manage student applications and tracking.</p>
+          <Link href='/dashboard'>
+            <Button className='min-w-[200px] h-12 text-lg font-semibold bg-[#30ad8f] hover:bg-[#2c9a7f] transition-all'>Go to Dashboard</Button>
+          </Link>
+        </div>
       </div>
     )
   }
 
   if (!isLoggedIn) {
     return (
-      <div className='w-full max-w-2xl bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center'>
-        <h2 className='text-2xl font-bold text-gray-900 mb-4'>Apply For College</h2>
-        <p className='text-gray-600 mb-6'>Please login or sign up to apply for this college.</p>
-        <div className='flex flex-col sm:flex-row items-center justify-center gap-3'>
-          <Link href='/sign-in' className='w-full sm:w-auto'>
-            <Button className='w-full'>Login</Button>
-          </Link>
-          <Link href='/signup' className='w-full sm:w-auto'>
-            <Button variant='outline' className='w-full'>Sign Up</Button>
-          </Link>
+      <div className='w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden text-center'>
+        <div className='bg-gradient-to-r from-[#30ad8f] to-[#2c9a7f] p-8 text-white relative overflow-hidden mb-6'>
+          <div className='relative z-10'>
+            <div className='flex items-center justify-center gap-3 mb-2'>
+              <GraduationCap className='w-8 h-8' />
+              <h2 className='text-3xl font-bold'>Apply For College</h2>
+            </div>
+            <p className='text-teal-50/80'>Login to begin your application</p>
+          </div>
+          <div className='absolute -right-8 -bottom-8 opacity-10'>
+            <GraduationCap size={160} />
+          </div>
+        </div>
+        <div className='p-8 pt-0'>
+          <p className='text-gray-600 mb-8'>Join our community to apply for top colleges and track your progress in real-time.</p>
+          <div className='flex flex-col sm:flex-row items-center justify-center gap-4'>
+            <Link href='/sign-in' className='w-full sm:w-auto'>
+              <Button className='w-full min-w-[160px] h-12 text-lg font-semibold bg-[#30ad8f] hover:bg-[#2c9a7f] transition-all'>Login Now</Button>
+            </Link>
+            <Link href='/signup' className='w-full sm:w-auto'>
+              <Button variant='outline' className='w-full min-w-[160px] h-12 text-lg font-semibold border-2 border-[#30ad8f] text-[#30ad8f] hover:bg-[#30ad8f]/10 transition-all'>Create Account</Button>
+            </Link>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className='w-full max-w-2xl bg-white rounded-lg shadow-sm border border-gray-200 p-6 md:p-10'>
-      <h2 className='text-2xl font-bold text-gray-900 mb-8 border-b pb-4'>Apply For College</h2>
-      <form className='space-y-6' onSubmit={handleSubmit}>
-        <div className='space-y-2'>
-          <Label htmlFor='student_name'>Full Name</Label>
-          <Input
-            id='student_name'
-            name='student_name'
-            placeholder='Student Name'
-            value={formData.student_name}
-            onChange={handleChange}
-            disabled={isLoggedIn}
-            className={errors.student_name ? 'border-red-500' : ''}
-          />
-          {errors.student_name && <p className='text-red-500 text-xs'>{errors.student_name}</p>}
+    <div className='w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden'>
+      <div className='bg-gradient-to-r from-[#30ad8f] to-[#2c9a7f] p-8 text-white relative overflow-hidden'>
+        <div className='relative z-10 text-left'>
+          <div className='flex items-center gap-3 mb-2'>
+            <GraduationCap className='w-8 h-8' />
+            <h2 className='text-3xl font-bold font-poppins'>Apply For College</h2>
+          </div>
+          <p className='text-teal-50/80'>Begin your academic journey today</p>
         </div>
+        <div className='absolute -right-8 -bottom-8 opacity-10'>
+          <GraduationCap size={160} />
+        </div>
+      </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+      <div className='p-8 md:p-10'>
+        <form className='space-y-6' onSubmit={handleSubmit}>
           <div className='space-y-2'>
-            <Label htmlFor='student_email'>Email Address</Label>
+            <Label htmlFor='student_name'>Full Name</Label>
             <Input
-              id='student_email'
-              type='email'
-              name='student_email'
-              placeholder='Email Address'
-              value={formData.student_email}
+              id='student_name'
+              name='student_name'
+              placeholder='Student Name'
+              value={formData.student_name}
               onChange={handleChange}
               disabled={isLoggedIn}
-              className={errors.student_email ? 'border-red-500' : ''}
+              className={errors.student_name ? 'border-red-500' : ''}
             />
-            {errors.student_email && <p className='text-red-500 text-xs'>{errors.student_email}</p>}
+            {errors.student_name && <p className='text-red-500 text-xs'>{errors.student_name}</p>}
           </div>
-          <div className='space-y-2'>
-            <Label htmlFor='student_phone_no'>Phone Number</Label>
-            <Input
-              id='student_phone_no'
-              type='tel'
-              name='student_phone_no'
-              placeholder='Phone Number'
-              value={formData.student_phone_no}
-              onChange={handleChange}
-              disabled={isLoggedIn}
-              className={errors.student_phone_no ? 'border-red-500' : ''}
-            />
-            {errors.student_phone_no && <p className='text-red-500 text-xs'>{errors.student_phone_no}</p>}
-          </div>
-        </div>
 
-        <div className='space-y-2'>
-          <Label htmlFor='course'>Select Program</Label>
-          <Select
-            id='course'
-            name='course'
-            value={formData.course}
-            onChange={(e) => {
-              handleChange(e)
-              if (errors.course) setErrors(prev => ({ ...prev, course: '' }))
-            }}
-            className={errors.course ? 'border-red-500' : ''}
-          >
-            <option value=''>Select a program</option>
-            {courseOptions.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item?.program?.title}
-              </option>
-            ))}
-          </Select>
-          {errors.course && <p className='text-red-500 text-xs'>{errors.course}</p>}
-        </div>
-
-        <div className='space-y-2'>
-          <Label htmlFor='student_description'>Description (Optional)</Label>
-          <textarea
-            id='student_description'
-            name='student_description'
-            placeholder='Additional information...'
-            value={formData.student_description}
-            onChange={handleChange}
-            rows={4}
-            className='flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all resize-none'
-          />
-        </div>
-
-        <Button
-          type='submit'
-          disabled={applyMutation.isPending}
-          className='w-full py-6 text-lg font-semibold h-12'
-        >
-          {applyMutation.isPending ? (
-            <div className='flex items-center gap-2'>
-              <FaSpinner className='animate-spin' />
-              <span>Submitting...</span>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <div className='space-y-2'>
+              <Label htmlFor='student_email'>Email Address</Label>
+              <Input
+                id='student_email'
+                type='email'
+                name='student_email'
+                placeholder='Email Address'
+                value={formData.student_email}
+                onChange={handleChange}
+                disabled={isLoggedIn}
+                className={errors.student_email ? 'border-red-500' : ''}
+              />
+              {errors.student_email && <p className='text-red-500 text-xs'>{errors.student_email}</p>}
             </div>
-          ) : (
-            'Submit Application'
-          )}
-        </Button>
-      </form>
+            <div className='space-y-2'>
+              <Label htmlFor='student_phone_no'>Phone Number</Label>
+              <Input
+                id='student_phone_no'
+                type='tel'
+                name='student_phone_no'
+                placeholder='Phone Number'
+                value={formData.student_phone_no}
+                onChange={handleChange}
+                disabled={isLoggedIn}
+                className={errors.student_phone_no ? 'border-red-500' : ''}
+              />
+              {errors.student_phone_no && <p className='text-red-500 text-xs'>{errors.student_phone_no}</p>}
+            </div>
+          </div>
+
+          <div className='space-y-4'>
+            <SearchableSelect
+              id='course'
+              label='Select Program'
+              options={courseOptions}
+              displayKey={(opt) => opt?.program?.title || 'Unknown Program'}
+              value={formData.course}
+              onChange={(option) => {
+                setFormData(prev => ({ ...prev, course: option?.id || '' }))
+                if (errors.course) setErrors(prev => ({ ...prev, course: '' }))
+              }}
+              placeholder='Search and select a program'
+              error={errors.course}
+              required
+            />
+          </div>
+
+          <div className='space-y-2'>
+            <Label htmlFor='student_description'>Description (Optional)</Label>
+            <textarea
+              id='student_description'
+              name='student_description'
+              placeholder='Additional information...'
+              value={formData.student_description}
+              onChange={handleChange}
+              rows={4}
+              className='flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all resize-none'
+            />
+          </div>
+
+          <Button
+            type='submit'
+            disabled={applyMutation.isPending}
+            className='w-full py-6 text-lg font-semibold h-12 bg-[#30ad8f] hover:bg-[#2c9a7f] transition-all shadow-md active:scale-[0.98]'
+          >
+            {applyMutation.isPending ? (
+              <div className='flex items-center gap-2'>
+                <FaSpinnerIcon className='animate-spin' />
+                <span>Submitting...</span>
+              </div>
+            ) : (
+              'Submit Application'
+            )}
+          </Button>
+        </form>
+      </div>
     </div>
   )
 }

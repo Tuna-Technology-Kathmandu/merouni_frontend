@@ -6,15 +6,15 @@ import Footer from '../../../components/Frontpage/Footer'
 import Header from '../../../components/Frontpage/Header'
 import Navbar from '../../../components/Frontpage/Navbar'
 import Loading from '../../../components/Loading'
-import ApplyNow from './components/applyNow'
-import CollegeOverview from './components/collegeOverview'
-import RelatedColleges from './components/RelatedColleges'
-import ImageSection from './components/upperSection'
+import SchoolApplyNow from './components/SchoolApplyNow'
+import RelatedSchools from './components/RelatedSchool'
+import SchoolOverview from './components/schoolOverview'
+import SchoolImageSection from './components/SchoolUpperSection'
 
 // Share Section Component
-const ShareSection = ({ college }) => {
+const ShareSection = ({ school }) => {
   const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
-  const shareTitle = `Check out ${college?.name} on our platform`
+  const shareTitle = `Check out ${school?.name} on our platform`
 
   const handleFacebookShare = () => {
     window.open(
@@ -102,30 +102,30 @@ const ShareSection = ({ college }) => {
   )
 }
 
-const CollegeDetailPage = ({ params }) => {
-  const [college, setCollege] = useState(null)
+const SchoolDetailPage = ({ params }) => {
+  const [school, setSchool] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    const fetchSlugAndCollegeDetails = async () => {
+    const fetchSlugAndSchoolDetails = async () => {
       try {
         const resolvedParams = await params
         const slugs = resolvedParams.slugs
-        fetchCollegeDetails(slugs)
+        fetchSchoolDetails(slugs)
       } catch (error) {
         console.error('Error resolving params:', error)
       }
     }
-    fetchSlugAndCollegeDetails()
+    fetchSlugAndSchoolDetails()
   }, [])
 
-  const fetchCollegeDetails = async (slugs) => {
+  const fetchSchoolDetails = async (slugs) => {
     if (typeof window === 'undefined') return
 
     try {
       const response = await fetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/${slugs}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/school/${slugs}`,
         {
           method: 'GET',
           headers: {
@@ -137,21 +137,21 @@ const CollegeDetailPage = ({ params }) => {
 
       if (!response.ok) {
         throw new Error(
-          `Failed to fetch college details: ${response.statusText}`
+          `Failed to fetch school details: ${response.statusText}`
         )
       }
 
       const data = await response.json()
-      const collegeData = data.item
+      const schoolData = data.item
 
-      if (collegeData) {
-        setCollege(collegeData)
+      if (schoolData) {
+        setSchool(schoolData)
       } else {
         setError('No data found')
       }
     } catch (error) {
-      console.error('Error fetching college details:', error)
-      setError(error.message || 'Failed to load college details')
+      console.error('Error fetching school details:', error)
+      setError(error.message || 'Failed to load school details')
     } finally {
       setLoading(false)
     }
@@ -165,27 +165,29 @@ const CollegeDetailPage = ({ params }) => {
     return <div>Error: {error}</div>
   }
 
-  if (!college) {
-    return <div>No college data available.</div>
+  if (!school) {
+    return <div>No school data available.</div>
   }
+
+  console.log(school)
 
   return (
     <div className='bg-white min-h-screen'>
       <Header />
       <Navbar />
       <div className='flex flex-col gap-16 md:gap-24 pb-20'>
-        <ImageSection college={college} />
-        <CollegeOverview college={college} />
-        <ApplyNow college={college} />
-        <RelatedColleges college={college} />
+        <SchoolImageSection school={school} />
+        <SchoolOverview college={school} />
+        <SchoolApplyNow school={school} />
+        <RelatedSchools school={school} />
       </div>
 
       {/* Share Section - Bottom Center */}
-      <ShareSection college={college} />
+      <ShareSection school={school} />
 
       <Footer />
     </div>
   )
 }
 
-export default CollegeDetailPage
+export default SchoolDetailPage

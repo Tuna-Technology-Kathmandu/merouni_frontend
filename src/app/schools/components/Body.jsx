@@ -85,7 +85,7 @@ const CollegeFinder = () => {
       }
 
       const queryString = buildQueryString(queryParams)
-      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/list-school?${queryString}`
+      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/school?${queryString}`
 
       const response = await fetch(url, { cache: 'no-store' })
 

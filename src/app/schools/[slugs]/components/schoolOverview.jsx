@@ -5,7 +5,7 @@ import GoogleMap from '../../../colleges/[slugs]/components/GoogleMap'
 import GallerySection from '../../../colleges/[slugs]/components/sections/GallerySection'
 import FacilitySection from '../../../colleges/[slugs]/components/sections/FacilitySection'
 
-const CollegeOverview = ({ college }) => {
+const SchoolOverview = ({ college }) => {
   const overviewRef = useRef(null)
   const membersRef = useRef(null)
   const galleryRef = useRef(null)
@@ -185,4 +185,4 @@ const CollegeOverview = ({ college }) => {
   )
 }
 
-export default CollegeOverview
+export default SchoolOverview

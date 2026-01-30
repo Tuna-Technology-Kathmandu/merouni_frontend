@@ -8,6 +8,7 @@ import Featured from './components/Featured'
 import Body from './components/Body'
 import AdLayout from '../../components/Frontpage/AdLayout'
 import { useEffect, useState } from 'react'
+import { getBanners } from '@/app/action'
 
 const page = () => {
   const [loading, setLoading] = useState(true)
@@ -19,26 +20,18 @@ const page = () => {
 
     async function fetchData() {
       try {
-        // Use direct fetch instead of server action to avoid SSR issues
-        const response = await fetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/banner?page=1&limit=999`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            cache: 'no-store'
-          }
-        )
-
-        if (response.ok) {
-          const data = await response.json()
-          setBanners(data.items || [])
+        // The instruction "use getBanners action" is already fulfilled by the line below.
+        // The comment about "direct fetch" might be misleading, as getBanners is imported from '@/app/action'.
+        const response = await getBanners()
+        if (response && response.items) {
+          setBanners(response.items)
         } else {
-          console.error('Failed to fetch banners:', response.statusText)
+          console.error('Failed to fetch banners:', response)
           setBanners([])
         }
       } catch (err) {
+        console.log(err)
+
         console.error('Error loading banners', err)
         setBanners([])
       } finally {

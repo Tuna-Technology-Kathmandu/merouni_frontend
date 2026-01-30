@@ -1,26 +1,26 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { getColleges } from '../../actions'
+import { getSchools } from '../../actions'
 import Link from 'next/link'
 import { MapPin } from 'lucide-react'
 
-const RelatedColleges = ({ college }) => {
-  const [colleges, setColleges] = useState([])
+const RelatedSchool = ({ school }) => {
+  const [schools, setSchools] = useState([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    getRelatedColleges()
+    getRelatedSchool()
   }, [])
 
-  const getRelatedColleges = async () => {
+  const getRelatedSchool = async () => {
     setIsLoading(true)
     try {
-      const data = await getColleges()
-      const filteredColleges = data.colleges.filter(
-        (c) => c.collegeId !== college._id
+      const data = await getSchools()
+      const filteredSchools = data.schools.filter(
+        (c) => c.schoolId !== college._id
       )
-      setColleges(filteredColleges.slice(0, 3))
+      setSchools(filteredSchools.slice(0, 3))
     } catch (error) {
       console.error('Error fetching colleges:', error)
     } finally {
@@ -29,7 +29,7 @@ const RelatedColleges = ({ college }) => {
   }
 
   if (isLoading) return null
-  if (colleges.length === 0) return null
+  if (schools.length === 0) return null
 
   return (
     <section className='px-4 sm:px-8 md:px-12 lg:px-24 mb-20'>
@@ -41,7 +41,7 @@ const RelatedColleges = ({ college }) => {
       </div>
 
       <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-        {colleges.map((item, index) => (
+        {schools.map((item, index) => (
           <Link href={`/schools/${item.slug}`} key={index} className='group'>
             <div className='bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)] transition-all duration-300 hover:border-[#30AD8F]/20 flex flex-col h-full'>
               <div className='aspect-[4/3] relative overflow-hidden bg-gray-50 flex items-center justify-center p-8'>
@@ -77,4 +77,4 @@ const RelatedColleges = ({ college }) => {
   )
 }
 
-export default RelatedColleges
+export default RelatedSchool

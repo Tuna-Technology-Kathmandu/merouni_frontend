@@ -1,10 +1,10 @@
 'use server'
 import { DotenvConfig } from '../../config/env.config'
 
-export async function getColleges(page = 1, sort = 'ASC') {
+export async function getSchools(page = 1, sort = 'ASC') {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/list-school?page=${page}&sort=${sort}&limit=24`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/school?page=${page}&sort=${sort}&limit=24`,
       {
         cache: 'no-store'
       }
@@ -17,12 +17,12 @@ export async function getColleges(page = 1, sort = 'ASC') {
     const data = await response.json()
 
     return {
-      colleges: data.items.map((college) => ({
-        name: college.name,
-        description: college.description,
-        googleMapUrl: college.google_map_url,
-        instituteType: college.institute_type,
-        slug: college.slugs,
+      schools: data.items.map((school) => ({
+        name: school.name,
+        description: school.description,
+        googleMapUrl: school.google_map_url,
+        instituteType: school.institute_type,
+        slug: school.slugs,
         collegeId: college.id
       })),
       pagination: data.pagination || {
@@ -48,10 +48,10 @@ export async function getColleges(page = 1, sort = 'ASC') {
   }
 }
 
-export async function searchColleges(query, page = 1) {
+export async function searchSchools(query, page = 1) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/search?q=${encodeURIComponent(query)}&page=${page}&limit=24`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/school/search?q=${encodeURIComponent(query)}&page=${page}&limit=24`,
       {
         cache: 'no-store'
       }
@@ -105,13 +105,13 @@ export async function searchColleges(query, page = 1) {
   }
 }
 
-export async function getCollegeBySlug(slug) {
+export async function getSchoolBySlug(slug) {
   try {
     // console.log("Fetching college details for slug:", slug);
-    console.log(`${DotenvConfig.NEXT_APP_API_BASE_URL}/college/${slug}`)
+    console.log(`${DotenvConfig.NEXT_APP_API_BASE_URL}/school/${slug}`)
 
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/${slug}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/school/${slug}`,
       {
         method: 'GET',
         headers: {
@@ -124,14 +124,14 @@ export async function getCollegeBySlug(slug) {
     console.log('RESPOnse:', response)
 
     if (!response.ok) {
-      throw new Error('Failed to fetch College Details')
+      throw new Error('Failed to fetch School Details')
     }
 
     const data = await response.json()
     console.log('Data:', data)
     return data.item
   } catch (error) {
-    console.error('Error fetching college details:', error)
+    console.error('Error fetching  school details:', error)
     throw error
   }
 }

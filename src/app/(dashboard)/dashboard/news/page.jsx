@@ -17,6 +17,7 @@ import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { fetchCategories } from '../category/action.js'
 import { createNews, deleteNews, fetchNews, getNewsById, updateNews } from './action'
 import NewsForm from './components/NewsForm'
+import { FormatDate } from '@/lib/date'
 
 export default function NewsManager() {
     const { setHeading } = usePageHeading()
@@ -443,7 +444,7 @@ export default function NewsManager() {
                         </div>
                         {viewNewsData.createdAt && (
                             <div className='text-sm text-gray-500'>
-                                Created: {new Date(viewNewsData.createdAt).toLocaleString()}
+                                Created: {FormatDate.formatDate(viewNewsData.createdAt)}
                             </div>
                         )}
                     </div>

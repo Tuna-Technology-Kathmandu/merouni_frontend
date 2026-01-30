@@ -1,15 +1,13 @@
-import React from 'react'
-import { IoIosGlobe } from 'react-icons/io'
-import { PiLineVerticalThin } from 'react-icons/pi'
-import { FaUniversity, FaPhoneAlt } from 'react-icons/fa'
-import { IoMdMail } from 'react-icons/io'
-import { LiaUniversitySolid } from 'react-icons/lia'
-import { BsGlobe2 } from 'react-icons/bs'
 import clsx from 'clsx'
+import { BsGlobe2 } from 'react-icons/bs'
+import { FaPhoneAlt, FaUniversity } from 'react-icons/fa'
+import { IoIosGlobe } from 'react-icons/io'
+import { LiaUniversitySolid } from 'react-icons/lia'
+import { PiLineVerticalThin } from 'react-icons/pi'
 
 const shimmerStyle = 'animate-pulse bg-slate-300'
 
-const ImageSection = ({ college, loading }) => {
+const ApplyImageSection = ({ college, loading }) => {
   return (
     <>
       <div className='flex flex-col items-center w-full'>
@@ -27,23 +25,7 @@ const ImageSection = ({ college, loading }) => {
             )}
           </div>
           <div className='flex flex-row bg-[#30AD8F] bg-opacity-5 h-[110px] justify-center items-center p-0 mt-4 sm:mt-0'>
-            {/* <div className='w-[100px] h-[100px] md:h-[150px] md:w-[150px] bg-slate-400 rounded-full flex justify-center items-center overflow-hidden'>
-              {loading ? (
-                <div
-                  className={clsx(shimmerStyle, 'w-full h-full rounded-full')}
-                />
-              ) : (
-                <img
-                  src={
-                    college?.college_logo ||
-                    `https://avatar.iran.liara.run/username?username=${college?.name}`
-                  }
-                  alt='College Logo'
-                  className='w-full h-full object-cover'
-                  loading='lazy'
-                />
-              )}
-            </div> */}
+           
             <div className='w-full flex justify-center flex-col items-center'>
               <h2 className='font-bold text-3xl leading-10'>{college?.name}</h2>
               <div className='flex flex-row justify-center'>
@@ -126,4 +108,4 @@ const ImageSection = ({ college, loading }) => {
   )
 }
 
-export default ImageSection
+export default ApplyImageSection
