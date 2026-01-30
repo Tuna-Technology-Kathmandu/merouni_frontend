@@ -65,7 +65,6 @@ const Footer = () => {
     fetchFooterData()
   }, [])
 
-  console.log(sections, "sectionssections")
 
   const toggleSection = (index) => {
     setOpenSections((prev) => ({

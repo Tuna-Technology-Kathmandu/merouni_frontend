@@ -3,6 +3,3 @@ export class DotenvConfig {
   static NEXT_APP_MEDIA_BASE_URL = "https://uploads.merouni.com/api/v1"
   static NEXT_APP_CK_EDITOR_KEY = process.env.NEXT_APP_CK_EDITOR_KEY
 }
-
-
-console.log(DotenvConfig.NEXT_APP_API_BASE_URL,"WOWO")

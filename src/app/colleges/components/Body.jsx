@@ -13,6 +13,7 @@ import UniversityCard from './UniversityCard'
 import { authFetch } from '@/app/utils/authFetch'
 import { DotenvConfig } from '@/config/env.config'
 import EmptyState from '@/components/ui/EmptyState'
+import { DistrictLists } from '@/constants/district'
 
 // Client-side fetch functions
 const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
@@ -144,18 +145,6 @@ const getUniversity = async (searchQuery = '') => {
   }
 }
 
-const districts = [
-  'Bhojpur', 'Dhankuta', 'Ilam', 'Jhapa', 'Khotang', 'Morang', 'Okhaladhunga', 'Panchthar',
-  'Sankhuwasabha', 'Solukhumbu', 'Sunsari', 'Taplejung', 'Terhathum', 'Udayapur', 'Bara',
-  'Dhanusha', 'Mahottari', 'Parsa', 'Rautahat', 'Saptari', 'Sarlahi', 'Siraha', 'Bhaktapur',
-  'Chitawan', 'Dhading', 'Dolakha', 'Kathmandu', 'Kavrepalanchok', 'Lalitpur', 'Makwanpur',
-  'Nuwakot', 'Ramechhap', 'Rasuwa', 'Sindhuli', 'Sindhupalchok', 'Baglung', 'Gorkha', 'Kaski',
-  'Lamjung', 'Manang', 'Mustang', 'Myagdi', 'Nawalpur', 'Parbat', 'Syangja', 'Tanahu',
-  'Arghakhanchi', 'Banke', 'Bardiya', 'Dang', 'Gulmi', 'Kapilbastu', 'Nawalparasi', 'Palpa',
-  'Pyuthan', 'Rolpa', 'Rukum Purba', 'Rupandehi', 'Dailekh', 'Dolpa', 'Humla', 'Jajarkot',
-  'Jumla', 'Kalikot', 'Mugu', 'Rukum Paschim', 'Salyan', 'Surkhet', 'Achham', 'Baitadi',
-  'Bajhang', 'Bajura', 'Dadeldhura', 'Darchula', 'Doti', 'Kailali', 'Kanchanpur'
-]
 
 // Memoized FilterSection with local state for performant typing
 const FilterSection = React.memo(function FilterSection({
@@ -376,6 +365,7 @@ const CollegeFinder = () => {
   }
 
   const handleModalFilterChange = (filterType, value) => {
+    console.log(value,"Valueeee")
     setModalSelectedFilters((prev) => {
       const arr = prev[filterType]
       return { ...prev, [filterType]: arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value] }
@@ -393,10 +383,10 @@ const CollegeFinder = () => {
     else { fetchCollegesData(1) }
   }, [searchQuery, fetchCollegesData])
 
-  const filteredDistricts = useMemo(() => districts.filter(d => d.toLowerCase().includes(filterInputs.district.toLowerCase())).map(d => ({ name: d })), [filterInputs.district])
+  const filteredDistricts = useMemo(() => DistrictLists.filter(d => d.toLowerCase().includes(filterInputs.district.toLowerCase())).map(d => ({ name: d })), [filterInputs.district])
   const filteredInstituteTypes = useMemo(() => ['private', 'public'].filter(t => t.toLowerCase().includes(filterInputs.instituteType.toLowerCase())).map(t => ({ name: t })), [filterInputs.instituteType])
 
-  const modalFilteredDistricts = useMemo(() => districts.filter(d => d.toLowerCase().includes(modalFilterInputs.district.toLowerCase())).map(d => ({ name: d })), [modalFilterInputs.district])
+  const modalFilteredDistricts = useMemo(() => DistrictLists.filter(d => d.toLowerCase().includes(modalFilterInputs.district.toLowerCase())).map(d => ({ name: d })), [modalFilterInputs.district])
   const modalFilteredInstituteTypes = useMemo(() => ['private', 'public'].filter(t => t.toLowerCase().includes(modalFilterInputs.instituteType.toLowerCase())).map(t => ({ name: t })), [modalFilterInputs.instituteType])
 
   const handleApplyModalFilters = () => {
