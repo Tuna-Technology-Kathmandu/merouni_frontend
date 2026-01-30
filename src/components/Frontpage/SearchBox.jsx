@@ -1,10 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { IoIosSearch } from 'react-icons/io'
-import { RxCross2 } from 'react-icons/rx'
-import { Search, X, Calendar, BookOpen, GraduationCap, ChevronRight } from 'lucide-react'
+import { BookOpen, Calendar, ChevronRight, GraduationCap, Search, X } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { DotenvConfig } from '../../config/env.config'
 
 const SearchBox = ({ onClose }) => {

@@ -1,14 +1,14 @@
 'use client'
-import React, { useState, useEffect } from 'react'
-import Navbar from '../../../components/Frontpage/Navbar'
-import Footer from '../../../components/Frontpage/Footer'
-import Header from '../../../components/Frontpage/Header'
-import Hero from './components/Hero'
-import Description from './components/Description'
-import Cardlist from './components/Cardlist'
-import Loading from '../../../components/Loading'
 import Banner from '@/app/blogs/[slugs]/components/Banner'
 import { DotenvConfig } from '@/config/env.config'
+import { useEffect, useState } from 'react'
+import Footer from '../../../components/Frontpage/Footer'
+import Header from '../../../components/Frontpage/Header'
+import Navbar from '../../../components/Frontpage/Navbar'
+import Loading from '../../../components/Loading'
+import Cardlist from './components/Cardlist'
+import Description from './components/Description'
+import Hero from './components/Hero'
 
 // Client-side fetch functions to replace server actions
 const fetchEventBySlug = async (slug) => {

@@ -1,15 +1,15 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import Navbar from '../../../components/Frontpage/Navbar'
-import Header from '../../../components/Frontpage/Header'
-import Footer from '../../../components/Frontpage/Footer'
-import ImageSection from './components/upperSection'
-import CollegeOverview from './components/collegeOverview'
-import ApplyNow from './components/applyNow'
-import RelatedColleges from './components/RelatedColleges'
-import Loading from '../../../components/Loading'
 import { DotenvConfig } from '@/config/env.config'
+import { useEffect, useState } from 'react'
+import Footer from '../../../components/Frontpage/Footer'
+import Header from '../../../components/Frontpage/Header'
+import Navbar from '../../../components/Frontpage/Navbar'
+import Loading from '../../../components/Loading'
+import ApplyNow from './components/applyNow'
+import CollegeOverview from './components/collegeOverview'
+import RelatedColleges from './components/RelatedColleges'
+import ImageSection from './components/upperSection'
 
 // Share Section Component
 const ShareSection = ({ college }) => {

@@ -1,7 +1,7 @@
 'use client'
-import React, { useEffect, useState } from 'react'
-import { DotenvConfig } from '../../config/env.config'
+import { useEffect, useState } from 'react'
 import { ImCross } from 'react-icons/im'
+import { DotenvConfig } from '../../config/env.config'
 
 const FieldofStudy = () => {
   const [study, setStudy] = useState([])

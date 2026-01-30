@@ -1,5 +1,5 @@
 import { DotenvConfig } from '@/config/env.config'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Marquee from 'react-fast-marquee'
 
 const Sponsors = () => {

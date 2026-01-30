@@ -1,4 +1,5 @@
 'use client'
+import { DotenvConfig } from '@/config/env.config'
 import { useState } from 'react'
 
 export default function ExportModal({ isOpen, onClose }) {

@@ -1,4 +1,7 @@
 'use server'
+
+import { DotenvConfig } from "@/config/env.config"
+
 export async function getColleges(page = 1, filters = {}) {
   try {
     // Initialize query parameters with page

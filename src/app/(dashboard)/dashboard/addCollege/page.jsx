@@ -1120,13 +1120,10 @@ export default function CollegeForm() {
                         Institute Type <span className='text-red-500'>*</span>
                       </Label>
                       <Select
-                        className='w-full'
+                        className={`w-full ${errors.institute_type ? 'border-destructive' : ''}`}
                         {...register('institute_type', { required: true })}
                         id='institute_type'
                         aria-invalid={errors.institute_type ? 'true' : 'false'}
-                        className={
-                          errors.institute_type ? 'border-destructive' : ''
-                        }
                       >
                         <option value='Private'>Private</option>
                         <option value='Public'>Public</option>

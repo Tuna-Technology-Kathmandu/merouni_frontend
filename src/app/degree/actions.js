@@ -1,6 +1,5 @@
 import { DotenvConfig } from "@/config/env.config"
 
-// services.js
 export const fetchDegrees = async (search = '', page = 1, faculty = '', level = '') => {
   try {
     const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/program`)

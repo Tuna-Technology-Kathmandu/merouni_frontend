@@ -33,6 +33,7 @@ import { TbBrandGoogleAnalytics } from 'react-icons/tb'
 import { FaHandshake } from 'react-icons/fa'
 import { MdBackHand } from 'react-icons/md'
 import { VscReferences } from 'react-icons/vsc'
+import { DotenvConfig } from '@/config/env.config'
 
 const menuItems = [
   {

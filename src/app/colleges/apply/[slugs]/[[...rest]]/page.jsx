@@ -8,13 +8,14 @@ import FormSection from './components/formSection'
 import { getCollegeBySlug } from '../../../actions'
 import { FaArrowLeft } from 'react-icons/fa'
 
+import { ArrowLeft } from 'lucide-react'
+
 const ApplyPage = ({ params }) => {
   const router = useRouter()
   const headerRef = useRef(null)
   const [college, setCollege] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [headerHeight, setHeaderHeight] = useState(0)
 
   const { slugs, rest } = use(params)
   const id = rest?.[0]
@@ -22,9 +23,7 @@ const ApplyPage = ({ params }) => {
   useEffect(() => {
     const fetchCollegeDetails = async () => {
       try {
-        console.log('Fetching college apply details for slug:', slugs)
         const collegeData = await getCollegeBySlug(slugs)
-
         if (collegeData) {
           setCollege(collegeData)
         } else {
@@ -43,80 +42,42 @@ const ApplyPage = ({ params }) => {
     }
   }, [slugs])
 
-  useEffect(() => {
-    // Calculate header height
-    const updateHeaderHeight = () => {
-      if (headerRef.current) {
-        setHeaderHeight(headerRef.current.offsetHeight)
-      }
-    }
-
-    updateHeaderHeight()
-    window.addEventListener('resize', updateHeaderHeight)
-
-    return () => {
-      window.removeEventListener('resize', updateHeaderHeight)
-    }
-  }, [])
-
   return (
     <>
       <style jsx global>{`
-        html {
+        html, body {
           scrollbar-width: none;
           -ms-overflow-style: none;
         }
-        html::-webkit-scrollbar {
-          display: none;
-        }
-        body {
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-        body::-webkit-scrollbar {
+        html::-webkit-scrollbar, body::-webkit-scrollbar {
           display: none;
         }
       `}</style>
-      <main className='w-full min-h-screen relative'>
-        {/* Header and Navbar - Above everything with sticky positioning */}
-        <div ref={headerRef} className='sticky top-0 z-50 bg-white'>
+      <main className='w-full min-h-screen bg-gray-50 flex flex-col'>
+        {/* Header and Navbar */}
+        <div ref={headerRef} className='sticky top-0 z-50 bg-white border-b border-gray-100'>
           <Header />
           <Navbar />
         </div>
 
-        {/* Banner Image Background - Starts after header */}
-        <div
-          className='fixed left-0 right-0 bottom-0 z-0'
-          style={{ top: `${headerHeight}px` }}
-        >
-          {loading ? (
-            <div className='w-full h-full bg-slate-300 animate-pulse' />
-          ) : (
-            <img
-              src={college?.featured_img || '/images/degreeHero.webp'}
-              className='object-cover w-full h-full'
-              alt='College Banner'
-              loading='lazy'
-            />
-          )}
-          {/* Dark overlay for better form visibility */}
-          <div className='absolute inset-0 bg-black bg-opacity-40' />
-        </div>
+        <div className='flex-1 py-12 px-4 sm:px-6 lg:px-8'>
+          <div className='max-w-7xl mx-auto'>
+            {/* Back Button */}
+            <div className='mb-8 max-w-2xl mx-auto'>
+              <button
+                onClick={() => router.back()}
+                className='inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors font-medium'
+              >
+                <ArrowLeft className='w-4 h-4' />
+                <span>Back</span>
+              </button>
+            </div>
 
-        {/* Back Button */}
-        <div className='relative z-20 pt-4 px-4 md:px-8'>
-          <button
-            onClick={() => router.back()}
-            className='inline-flex items-center gap-2 px-4 py-2 bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-md hover:bg-opacity-100 transition-all text-gray-700 hover:text-gray-900'
-          >
-            <FaArrowLeft className='w-4 h-4' />
-            <span className='font-medium'>Back</span>
-          </button>
-        </div>
-
-        {/* Form Section Overlay */}
-        <div className='relative z-10 min-h-screen flex items-start justify-center pt-20 pb-12 px-4'>
-          <FormSection college={college} id={id} />
+            {/* Form Section - Centered */}
+            <div className='flex justify-center'>
+              <FormSection college={college} id={id} />
+            </div>
+          </div>
         </div>
       </main>
     </>

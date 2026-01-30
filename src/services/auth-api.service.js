@@ -1,4 +1,3 @@
-// src/services/auth-api.service.js
 import { authFetch } from '../app/utils/authFetch'
 import { DotenvConfig } from '../config/env.config'
 

@@ -6,6 +6,7 @@ import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
+import { DotenvConfig } from '@/config/env.config'
 
 const ProfileUpdate = () => {
   const userData = useSelector((state) => state.user.data)
