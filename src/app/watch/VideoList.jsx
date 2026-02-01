@@ -3,7 +3,7 @@
 import { PlayCircle, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { fetchMedias } from '../(dashboard)/dashboard/videos/action'
+import { fetchVideos } from '../(dashboard)/dashboard/videos/action'
 import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 import EmptyState from '@/ui/shadcn/EmptyState'
 
@@ -39,7 +39,7 @@ export default function VideoList({ initialData }) {
     const fetchVideos = async (page, search, reset = false) => {
         setLoading(true)
         try {
-            const response = await fetchMedias(page, 20, search)
+            const response = await fetchVideos(page, 20, search)
             if (reset) {
                 setVideos(response.items || [])
             } else {

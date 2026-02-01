@@ -1,11 +1,11 @@
 import Header from '@/components/Frontpage/Header'
-import { fetchMedias } from '../(dashboard)/dashboard/videos/action'
+import { fetchVideos } from '../(dashboard)/dashboard/videos/action'
 import VideoList from './VideoList'
 import Navbar from '@/components/Frontpage/Navbar'
 import Footer from '@/components/Frontpage/Footer'
 
 export default async function WatchPage() {
-    const data = await fetchMedias(1, 100)
+    const data = await fetchVideos(1, 100)
 
     return (
         <>

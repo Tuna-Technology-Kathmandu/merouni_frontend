@@ -39,7 +39,8 @@ export const PERMISSIONS_VIA_ROLE = {
     '/dashboard/tag',
     '/dashboard/set-referral-point',
     '/dashboard/discipline',
-    '/dashboard/skill-based-courses'
+    '/dashboard/skill-based-courses',
+    '/dashboard/videos'
 
   ],
   [APP_ROLES.editor]: [

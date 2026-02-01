@@ -2,23 +2,24 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
-import { fetchMedias } from './action'
+import { fetchVideos } from './action'
 import Loader from '../../../../ui/molecules/Loading'
 import Table from '../../../../ui/molecules/Table'
-import { Edit2, Trash2, Search, ExternalLink } from 'lucide-react'
+import { Edit2, Trash2, Search, ExternalLink, Eye } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { Modal } from '../../../../ui/molecules/Modal'
+import { Modal } from '@/ui/molecules/Modal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/ui/shadcn/button'
 import FileUpload from '../addCollege/FileUpload'
-import Header from '@/components/Frontpage/Header'
-import Navbar from '@/components/Frontpage/Navbar'
-import Footer from '@/components/Frontpage/Footer'
+import { Label } from '@/ui/shadcn/label'
+import { Input } from '@/ui/shadcn/input'
+import { formatDate } from '@/utils/date.util'
+import { Select } from '@/ui/shadcn/select'
 
 export default function VideoManager() {
   const { setHeading } = usePageHeading()
@@ -37,17 +38,23 @@ export default function VideoManager() {
       yt_video_link: '',
       description: '',
       featured_image: '',
+      status: 'inactive',
       author: author_id
     }
   })
 
-  const [medias, setMedias] = useState([])
+  const [videos, setVideos] = useState([])
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState(null)
   const [editing, setEditing] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  // View Modal State
+  const [viewingVideo, setViewingVideo] = useState(null)
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -80,9 +87,23 @@ export default function VideoManager() {
         )
       },
       {
+        header: 'Status',
+        accessorKey: 'status',
+        cell: ({ getValue }) => (
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${getValue() === 'active'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-gray-100 text-gray-800'
+              }`}
+          >
+            {getValue() ? getValue().charAt(0).toUpperCase() + getValue().slice(1) : 'Inactive'}
+          </span>
+        )
+      },
+      {
         header: 'Created At',
         accessorKey: 'createdAt',
-        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString()
+        cell: ({ getValue }) => formatDate(getValue())
       },
       {
         header: 'Featured Image',
@@ -91,7 +112,7 @@ export default function VideoManager() {
           getValue() ? (
             <img
               src={getValue()}
-              alt='Media'
+              alt='Video'
               className='w-10 h-10 object-cover rounded-md'
             />
           ) : 'N/A'
@@ -103,14 +124,23 @@ export default function VideoManager() {
         cell: ({ row }) => (
           <div className='flex gap-2'>
             <button
+              onClick={() => handleView(row.original)}
+              className='p-1 text-gray-600 hover:text-gray-900'
+              title="View Details"
+            >
+              <Eye className='w-4 h-4' />
+            </button>
+            <button
               onClick={() => handleEdit(row.original)}
               className='p-1 text-blue-600 hover:text-blue-800'
+              title="Edit"
             >
               <Edit2 className='w-4 h-4' />
             </button>
             <button
               onClick={() => handleDeleteClick(row.original.id)}
               className='p-1 text-red-600 hover:text-red-800'
+              title="Delete"
             >
               <Trash2 className='w-4 h-4' />
             </button>
@@ -123,7 +153,7 @@ export default function VideoManager() {
 
   useEffect(() => {
     setHeading('Video Management')
-    loadMedias()
+    loadVideos()
     return () => setHeading(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setHeading])
@@ -136,27 +166,27 @@ export default function VideoManager() {
     }
   }, [searchTimeout])
 
-  const loadMedias = async (page = 1) => {
+  const loadVideos = async (page = 1) => {
     try {
-      const response = await fetchMedias(page)
-      setMedias(response.items)
+      const response = await fetchVideos(page)
+      setVideos(response.items)
       setPagination({
         currentPage: response.pagination.currentPage,
         totalPages: response.pagination.totalPages,
         total: response.pagination.totalCount
       })
     } catch (err) {
-      // toast.error('Failed to load media')
-      console.error('Error loading media:', err)
+      toast.error('Failed to load videos')
+      console.error('Error loading videos:', err)
     } finally {
       setLoading(false)
     }
   }
 
-  const createMedia = async (data) => {
+  const createVideo = async (data) => {
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/media`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/video`,
         {
           method: 'POST',
           headers: {
@@ -171,15 +201,15 @@ export default function VideoManager() {
       }
       return await response.json()
     } catch (error) {
-      console.error('Error creating media:', error)
+      console.error('Error creating video:', error)
       throw error
     }
   }
 
-  const updateMedia = async (data, id) => {
+  const updateVideo = async (data, id) => {
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/media?media_id=${id}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/video/${id}`,
         {
           method: 'PUT',
           headers: {
@@ -189,11 +219,11 @@ export default function VideoManager() {
         }
       )
       if (!response.ok) {
-        throw new Error('Failed to update media')
+        throw new Error('Failed to update video')
       }
       return await response.json()
     } catch (error) {
-      console.error('Error updating media:', error)
+      console.error('Error updating video:', error)
       throw error
     }
   }
@@ -206,38 +236,44 @@ export default function VideoManager() {
     }
     try {
       if (editingId) {
-        // Update media if in edit mode
-        await updateMedia(formattedData, editingId)
-        toast.success('Media updated successfully')
+        // Update video if in edit mode
+        await updateVideo(formattedData, editingId)
+        toast.success('Video updated successfully')
       } else {
-        // Otherwise, create a new media
-        await createMedia(formattedData)
-        toast.success('Media created successfully')
+        // Otherwise, create a new video
+        await createVideo(formattedData)
+        toast.success('Video created successfully')
       }
       reset() // Clear form
       setEditingId(null)
       setEditing(false)
       setIsOpen(false)
       setUploadedFiles({ featured_image: '' })
-      loadMedias()
+      loadVideos()
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Network error occurred'
       toast.error(
-        `Failed to ${editingId ? 'update' : 'create'} media: ${errorMsg}`
+        `Failed to ${editingId ? 'update' : 'create'} video: ${errorMsg}`
       )
-      console.error('Error saving media:', err)
+      console.error('Error saving video:', err)
     }
   }
 
-  const handleEdit = (media) => {
-    setEditingId(media.id)
+  const handleView = (video) => {
+    setViewingVideo(video)
+    setIsViewModalOpen(true)
+  }
+
+  const handleEdit = (video) => {
+    setEditingId(video.id)
     setEditing(true)
     setIsOpen(true)
-    setValue('title', media.title)
-    setValue('yt_video_link', media.yt_video_link || '')
-    setValue('description', media.description || '')
-    setValue('featured_image', media.featured_image || '')
-    setUploadedFiles({ featured_image: media.featured_image || '' })
+    setValue('title', video.title)
+    setValue('yt_video_link', video.yt_video_link || '')
+    setValue('description', video.description || '')
+    setValue('featured_image', video.featured_image || '')
+    setValue('status', video.status || 'inactive')
+    setUploadedFiles({ featured_image: video.featured_image || '' })
   }
 
   const handleDeleteClick = (id) => {
@@ -249,7 +285,7 @@ export default function VideoManager() {
     if (!deleteId) return
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/media?media_id=${deleteId}`,
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/video/${deleteId}`,
         {
           method: 'DELETE',
           headers: {
@@ -259,7 +295,7 @@ export default function VideoManager() {
       )
       const res = await response.json()
       toast.success(res.message)
-      loadMedias()
+      loadVideos()
     } catch (err) {
       toast.error(err.message)
     } finally {
@@ -275,17 +311,17 @@ export default function VideoManager() {
 
   const handleSearch = async (query) => {
     if (!query) {
-      loadMedias()
+      loadVideos()
       return
     }
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/media?q=${query}`
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/video?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()
-        setMedias(data.items)
+        setVideos(data.items)
 
         if (data.pagination) {
           setPagination({
@@ -296,11 +332,11 @@ export default function VideoManager() {
         }
       } else {
         console.error('Error fetching results:', response.statusText)
-        setMedias([])
+        setVideos([])
       }
     } catch (error) {
-      console.error('Error fetching media search results:', error.message)
-      setMedias([])
+      console.error('Error fetching video search results:', error.message)
+      setVideos([])
     }
   }
 
@@ -382,13 +418,15 @@ export default function VideoManager() {
             >
               <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
                 <div className='bg-white p-6 rounded-lg shadow-md'>
-
+                  <h2 className='text-xl font-semibold mb-4'>
+                    Video Information
+                  </h2>
                   <div className='space-y-4'>
                     <div>
-                      <label className='block mb-2'>
+                      <Label>
                         Title <span className='text-red-500'>*</span>
-                      </label>
-                      <input
+                      </Label>
+                      <Input
                         type='text'
                         placeholder='Video Title'
                         {...register('title', {
@@ -403,10 +441,10 @@ export default function VideoManager() {
                       )}
                     </div>
                     <div>
-                      <label className='block mb-2'>
+                      <Label>
                         Youtube Link <span className='text-red-500'>*</span>
-                      </label>
-                      <input
+                      </Label>
+                      <Input
                         type='url'
                         placeholder='https://youtube.com/...'
                         {...register('yt_video_link', {
@@ -420,35 +458,38 @@ export default function VideoManager() {
                         </span>
                       )}
                     </div>
-                  </div>
-                  <div className='mt-4'>
-                    <label className='block mb-2'>
-                      Description
-                    </label>
-                    <textarea
-                      placeholder='Video Description'
-                      {...register('description')}
-                      className='w-full p-2 border rounded min-h-[100px]'
-                      rows={4}
-                    />
-                  </div>
-                  <div className='mt-4'>
-                    <label className='block mb-2'>Featured Image (Optional)</label>
-                    <FileUpload
-                      key={uploadedFiles.featured_image}
-                      onFilesSelected={(files) => {
-                        if (files.length > 0) {
-                          setUploadedFiles({ ...uploadedFiles, featured_image: files[0].url })
-                          setValue('featured_image', files[0].url)
-                        }
-                      }}
-                      initialFiles={
-                        uploadedFiles.featured_image
-                          ? [{ url: uploadedFiles.featured_image, name: 'Featured Image' }]
-                          : []
-                      }
-                      multiple={false}
-                    />
+                    <div>
+                      <Label>Status</Label>
+                      <Select
+                        {...register('status')}
+                        className='w-full p-2 border rounded'
+                      >
+                        <option value="inactive">Inactive</option>
+                        <option value="active">Active</option>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Description</Label>
+                      <textarea
+                        placeholder='Video Description'
+                        {...register('description')}
+                        className='w-full p-2 border rounded min-h-[100px]'
+                        rows={4}
+                      />
+                    </div>
+                    <div>
+                      <Label>Featured Image (Optional)</Label>
+                      <FileUpload
+                        defaultPreview={uploadedFiles.featured_image}
+                        onUploadComplete={(url) => {
+                          setUploadedFiles((prev) => ({
+                            ...prev,
+                            featured_image: url
+                          }))
+                          setValue('featured_image', url)
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -479,15 +520,89 @@ export default function VideoManager() {
         {/* Table */}
         <div className='mt-8'>
           <Table
-            data={medias}
+            data={videos}
             columns={columns}
             pagination={pagination}
-            onPageChange={(newPage) => loadMedias(newPage)}
+            onPageChange={(newPage) => loadVideos(newPage)}
             onSearch={handleSearch}
             showSearch={false}
           />
         </div>
       </div>
+
+      {/* View Modal */}
+      <Modal
+        isOpen={isViewModalOpen}
+        onClose={() => {
+          setIsViewModalOpen(false)
+          setViewingVideo(null)
+        }}
+        title="Video Details"
+        className="max-w-2xl"
+      >
+        <div className="p-6 space-y-6">
+          {/* Featured Image */}
+          {viewingVideo?.featured_image && (
+            <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-100 mb-6 border border-gray-200">
+              <img
+                src={viewingVideo.featured_image}
+                alt={viewingVideo.title}
+                className="w-full h-full object-contain"
+              />
+            </div>
+          )}
+
+          {/* Details Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+              <h3 className="text-sm font-medium text-gray-500">Title</h3>
+              <p className="mt-1 text-lg font-semibold text-gray-900">{viewingVideo?.title}</p>
+            </div>
+
+            <div className="md:col-span-2">
+              <h3 className="text-sm font-medium text-gray-500">YouTube Link</h3>
+              <a
+                href={viewingVideo?.yt_video_link}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='mt-1 text-blue-600 hover:underline flex items-center gap-1'
+              >
+                {viewingVideo?.yt_video_link} <ExternalLink className='w-3 h-3' />
+              </a>
+            </div>
+
+            <div className="md:col-span-2">
+              <h3 className="text-sm font-medium text-gray-500">Status</h3>
+              <span
+                className={`inline-flex mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${viewingVideo?.status === 'active'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-gray-100 text-gray-800'
+                  }`}
+              >
+                {viewingVideo?.status ? viewingVideo.status.charAt(0).toUpperCase() + viewingVideo.status.slice(1) : 'Inactive'}
+              </span>
+            </div>
+
+            <div className="md:col-span-2">
+              <h3 className="text-sm font-medium text-gray-500">Description</h3>
+              <div className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                {viewingVideo?.description || "No description provided."}
+              </div>
+            </div>
+
+            <div className="md:col-span-2">
+              <h3 className="text-sm font-medium text-gray-500">Created At</h3>
+              <p className="mt-1 text-gray-900">{viewingVideo?.createdAt ? formatDate(viewingVideo.createdAt) : 'N/A'}</p>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-4 border-t mt-6">
+            <Button onClick={() => setIsViewModalOpen(false)}>
+              Close
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <ConfirmationDialog
         open={isDialogOpen}

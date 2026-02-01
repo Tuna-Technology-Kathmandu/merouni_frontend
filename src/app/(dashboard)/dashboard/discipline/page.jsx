@@ -427,8 +427,8 @@ export default function DisciplineManager() {
                                                 {...register('status')}
                                                 className='w-full p-2 border rounded'
                                             >
-                                                <option value="draft">Draft</option>
-                                                <option value="published">Published</option>
+                                                <option value="inactive">Inactive</option>
+                                                <option value="active">Active</option>
                                             </Select>
                                         </div>
                                         <div>

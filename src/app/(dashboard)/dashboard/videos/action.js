@@ -5,7 +5,7 @@ import { DotenvConfig } from "@/config/env.config"
 
 let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/video`
 
-export async function fetchMedias(page = 1, limit = 1000, search = '') {
+export async function fetchVideos(page = 1, limit = 1000, search = '') {
   try {
     const urlWithParams = new URL(url)
     urlWithParams.searchParams.append('page', page)
@@ -17,40 +17,39 @@ export async function fetchMedias(page = 1, limit = 1000, search = '') {
     const response = await fetch(urlWithParams.toString(), {
       cache: 'no-store'
     })
-    console.log(response, "YOYO")
 
     if (!response.ok) {
-      throw new Error('Failed to fetch media')
+      throw new Error('Failed to fetch videos')
     }
 
     return await response.json()
   } catch (error) {
-    console.error('Error fetching media:', error)
+    console.error('Error fetching videos:', error)
     throw error
   }
 }
 
 
 
-export async function getMediaBySlug(slug) {
+export async function getVideoBySlug(slug) {
   try {
     const response = await fetch(`${url}?slug=${slug}`, {
       cache: 'no-store'
     })
 
     if (!response.ok) {
-      throw new Error('Failed to fetch media details')
+      throw new Error('Failed to fetch video details')
     }
 
     const data = await response.json()
     return data.items ? data.items[0] : data
   } catch (error) {
-    console.error('Error fetching media details:', error)
+    console.error('Error fetching video details:', error)
     return null
   }
 }
 
-export async function createMedia(data) {
+export async function createVideo(data) {
   try {
     const response = await fetch(`${url}`, {
       method: 'POST',
@@ -61,19 +60,19 @@ export async function createMedia(data) {
     })
 
     if (!response.ok) {
-      throw new Error('Failed to create media')
+      throw new Error('Failed to create video')
     }
 
     return await response.json()
   } catch (error) {
-    console.error('Error creating media:', error)
+    console.error('Error creating video:', error)
     throw error
   }
 }
 
-export async function updateMedia(mediaId, data) {
+export async function updateVideo(videoId, data) {
   try {
-    const response = await fetch(`${url}?media_id=${mediaId}`, {
+    const response = await fetch(`${url}?video_id=${videoId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -82,29 +81,29 @@ export async function updateMedia(mediaId, data) {
     })
 
     if (!response.ok) {
-      throw new Error('Failed to update media')
+      throw new Error('Failed to update video')
     }
 
     return await response.json()
   } catch (error) {
-    console.error('Error updating media:', error)
+    console.error('Error updating video:', error)
     throw error
   }
 }
 
-export async function deleteMedia(mediaId) {
+export async function deleteVideo(videoId) {
   try {
-    const response = await fetch(`${url}?media_id=${mediaId}`, {
+    const response = await fetch(`${url}?video_id=${videoId}`, {
       method: 'DELETE'
     })
 
     if (!response.ok) {
-      throw new Error('Failed to delete media')
+      throw new Error('Failed to delete video')
     }
     const res = await response.json()
     return res
   } catch (error) {
-    console.error('Error deleting media:', error)
+    console.error('Error deleting video:', error)
     throw error
   }
 }

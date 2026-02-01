@@ -28,6 +28,7 @@ import { VscReferences } from 'react-icons/vsc'
 import { Book } from 'lucide-react'
 import { Rss } from 'lucide-react'
 import { HandCoins } from 'lucide-react'
+import { Lightbulb, PlayCircle } from 'lucide-react'
 
 export const menuItems = [
   {
@@ -116,9 +117,9 @@ export const menuItems = [
       },
 
       {
-        icon: <MdOutlinePermMedia className='text-xl' />,
-        label: 'Media',
-        href: '/dashboard/media',
+        icon: <PlayCircle className='text-xl' />,
+        label: 'Videos',
+        href: '/dashboard/videos',
         visible: ['admin', 'editor']
       },
       {
@@ -173,6 +174,12 @@ export const menuItems = [
         icon: <FaBriefcase className='text-xl' />,
         label: 'MeroUni Careers',
         href: '/dashboard/career',
+        visible: ['admin', 'editor']
+      },
+      {
+        icon: <Lightbulb className='text-xl' />,
+        label: 'Skill Based Concepts',
+        href: '/dashboard/skill-based-courses',
         visible: ['admin', 'editor']
       }
     ]
