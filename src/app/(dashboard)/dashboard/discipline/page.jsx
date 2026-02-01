@@ -16,6 +16,9 @@ import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/ui/shadcn/button'
 import FileUpload from '../addCollege/FileUpload'
+import { Label } from '@/ui/shadcn/label'
+import { Input } from '@/ui/shadcn/input'
+import { formatDate } from '@/utils/date.util'
 
 export default function DisciplineManager() {
     const { setHeading } = usePageHeading()
@@ -53,7 +56,7 @@ export default function DisciplineManager() {
     const [searchQuery, setSearchQuery] = useState('')
     const [searchTimeout, setSearchTimeout] = useState(null)
     const [uploadedFiles, setUploadedFiles] = useState({
-        image: ''
+        featured_image: ''
     })
 
     const columns = useMemo(
@@ -68,7 +71,7 @@ export default function DisciplineManager() {
             },
             {
                 header: 'Image',
-                accessorKey: 'image',
+                accessorKey: 'featured_image',
                 cell: ({ getValue }) => (
                     getValue() ? (
                         <img
@@ -82,7 +85,7 @@ export default function DisciplineManager() {
             {
                 header: 'Created At',
                 accessorKey: 'createdAt',
-                cell: ({ getValue }) => new Date(getValue()).toLocaleDateString()
+                cell: ({ getValue }) => formatDate(getValue())
             },
             {
                 header: 'Actions',
@@ -188,7 +191,7 @@ export default function DisciplineManager() {
     const onSubmit = async (data) => {
         const formattedData = {
             ...data,
-            image: uploadedFiles.image
+            featured_image: uploadedFiles.featured_image
         }
         try {
             if (editingId) {
@@ -204,7 +207,7 @@ export default function DisciplineManager() {
             setEditingId(null)
             setEditing(false)
             setIsOpen(false)
-            setUploadedFiles({ image: '' })
+            setUploadedFiles({ featured_image: '' })
             loadDisciplines()
         } catch (err) {
             const errorMsg = err.response?.data?.message || 'Network error occurred'
@@ -221,8 +224,8 @@ export default function DisciplineManager() {
         setIsOpen(true)
         setValue('title', discipline.title)
         setValue('description', discipline.description || '')
-        setValue('image', discipline.image || '')
-        setUploadedFiles({ image: discipline.image || '' })
+        setValue('featured_image', discipline.featured_image || '')
+        setUploadedFiles({ featured_image: discipline.featured_image || '' })
     }
 
     const handleDeleteClick = (id) => {
@@ -234,7 +237,7 @@ export default function DisciplineManager() {
         if (!deleteId) return
         try {
             const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline?discipline_id=${deleteId}`,
+                `${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline/${deleteId}`,
                 {
                     method: 'DELETE',
                     headers: {
@@ -339,7 +342,7 @@ export default function DisciplineManager() {
                                 setEditingId(null)
                                 setEditingId(null)
                                 reset()
-                                setUploadedFiles({ image: '' })
+                                setUploadedFiles({ featured_image: '' })
                             }}
                         >
                             Add Discipline
@@ -355,7 +358,7 @@ export default function DisciplineManager() {
                         setEditing(false)
                         setEditingId(null)
                         reset()
-                        setUploadedFiles({ image: '' })
+                        setUploadedFiles({ featured_image: '' })
                     }}
                     title={editing ? 'Edit Discipline' : 'Add Discipline'}
                     className='max-w-2xl'
@@ -372,10 +375,10 @@ export default function DisciplineManager() {
                                     </h2>
                                     <div className='space-y-4'>
                                         <div>
-                                            <label className='block mb-2'>
+                                            <Label>
                                                 Discipline Title <span className='text-red-500'>*</span>
-                                            </label>
-                                            <input
+                                            </Label>
+                                            <Input
                                                 type='text'
                                                 placeholder='Discipline Title'
                                                 {...register('title', {
@@ -390,7 +393,7 @@ export default function DisciplineManager() {
                                             )}
                                         </div>
                                         <div>
-                                            <label className='block mb-2'>Description</label>
+                                            <Label>Description</Label>
                                             <textarea
                                                 placeholder='Description'
                                                 {...register('description')}
@@ -399,21 +402,16 @@ export default function DisciplineManager() {
                                             />
                                         </div>
                                         <div>
-                                            <label className='block mb-2'>Image</label>
+                                            <Label>Image</Label>
                                             <FileUpload
-                                                key={uploadedFiles.image}
-                                                onFilesSelected={(files) => {
-                                                    if (files.length > 0) {
-                                                        setUploadedFiles({ ...uploadedFiles, image: files[0].url })
-                                                        setValue('image', files[0].url)
-                                                    }
+                                                defaultPreview={uploadedFiles.featured_image}
+                                                onUploadComplete={(url) => {
+                                                    setUploadedFiles((prev) => ({
+                                                        ...prev,
+                                                        featured_image: url
+                                                    }))
+                                                    setValue('featured_image', url)
                                                 }}
-                                                initialFiles={
-                                                    uploadedFiles.image
-                                                        ? [{ url: uploadedFiles.image, name: 'Image' }]
-                                                        : []
-                                                }
-                                                multiple={false}
                                             />
                                         </div>
                                     </div>

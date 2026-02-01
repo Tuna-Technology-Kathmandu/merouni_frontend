@@ -187,6 +187,12 @@ export const menuItems = [
         visible: ['admin', 'editor']
       },
       {
+        icon: <FaChalkboardTeacher className='text-xl' />,
+        label: 'Discipline',
+        href: '/dashboard/discipline',
+        visible: ['admin', 'editor']
+      },
+      {
         icon: <BsLayers className='text-xl' />,
         label: 'Level',
         href: '/dashboard/level',

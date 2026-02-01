@@ -12,11 +12,15 @@ import 'react-toastify/dist/ReactToastify.css'
 import { fetchPublicSkillCourses } from './actions'
 import { THEME_BLUE } from '@/constants/constants'
 
+import { fetchDisciplines } from '../(dashboard)/dashboard/discipline/action'
+
 const SkillCoursesPage = () => {
     const [courses, setCourses] = useState([])
     const [loading, setLoading] = useState(false)
     const [debouncedSearch, setDebouncedSearch] = useState('')
     const [searchTerm, setSearchTerm] = useState('')
+    const [disciplines, setDisciplines] = useState([])
+    const [selectedDiscipline, setSelectedDiscipline] = useState('')
 
     // Debounce search
     useEffect(() => {
@@ -27,6 +31,19 @@ const SkillCoursesPage = () => {
         return () => clearTimeout(handler)
     }, [searchTerm])
 
+    // Fetch disciplines
+    useEffect(() => {
+        const getDisciplines = async () => {
+            try {
+                const response = await fetchDisciplines(1, 100)
+                setDisciplines(response.items || [])
+            } catch (error) {
+                console.error('Error fetching disciplines:', error)
+            }
+        }
+        getDisciplines()
+    }, [])
+
     // Fetch courses
     useEffect(() => {
         const getCourses = async () => {
@@ -34,6 +51,7 @@ const SkillCoursesPage = () => {
             try {
                 const response = await fetchPublicSkillCourses({
                     q: debouncedSearch,
+                    discipline: selectedDiscipline
                 })
                 setCourses(response.items || [])
             } catch (error) {
@@ -43,10 +61,11 @@ const SkillCoursesPage = () => {
             }
         }
         getCourses()
-    }, [debouncedSearch])
+    }, [debouncedSearch, selectedDiscipline])
 
     const clearFilters = () => {
         setSearchTerm('')
+        setSelectedDiscipline('')
     }
 
 
@@ -69,7 +88,7 @@ const SkillCoursesPage = () => {
                         </div>
 
                         {/* Clear All Button */}
-                        {searchTerm && (
+                        {(searchTerm || selectedDiscipline) && (
                             <button
                                 onClick={clearFilters}
                                 className='flex items-center gap-2 text-sm font-medium text-red-500 hover:text-red-700 transition-colors bg-red-50 px-4 py-2 rounded-lg'
@@ -82,15 +101,40 @@ const SkillCoursesPage = () => {
 
                     {/* Filters Bar */}
                     <div className='bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-10'>
-                        <div className='relative max-w-xl'>
-                            <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400' />
-                            <input
-                                type='text'
-                                placeholder='Search courses by title...'
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                value={searchTerm}
-                                className='w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#387cae]/20 focus:border-[#387cae] focus:bg-white transition-all text-gray-900 placeholder-gray-400'
-                            />
+                        <div className='grid grid-cols-1 md:grid-cols-12 gap-6'>
+                            <div className='md:col-span-8'>
+                                <div className='relative'>
+                                    <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400' />
+                                    <input
+                                        type='text'
+                                        placeholder='Search courses by title...'
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        value={searchTerm}
+                                        className='w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#387cae]/20 focus:border-[#387cae] focus:bg-white transition-all text-gray-900 placeholder-gray-400'
+                                    />
+                                </div>
+                            </div>
+                            <div className='md:col-span-4'>
+                                <select
+                                    value={selectedDiscipline}
+                                    onChange={(e) => setSelectedDiscipline(e.target.value)}
+                                    className='w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#387cae]/20 focus:border-[#387cae] focus:bg-white transition-all text-gray-900 cursor-pointer appearance-none'
+                                    style={{
+                                        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                                        backgroundPosition: `right 1rem center`,
+                                        backgroundRepeat: `no-repeat`,
+                                        backgroundSize: `1.5em 1.5em`,
+                                        paddingRight: `2.5rem`
+                                    }}
+                                >
+                                    <option value="">All Disciplines</option>
+                                    {disciplines.map((discipline) => (
+                                        <option key={discipline.id} value={discipline.slug || discipline.id}>
+                                            {discipline.name || discipline.title}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -118,12 +162,12 @@ const SkillCoursesPage = () => {
                                 icon={BookOpen}
                                 title='No Courses Found'
                                 description={
-                                    searchTerm
+                                    searchTerm || selectedDiscipline
                                         ? 'No courses match your search criteria'
                                         : 'No courses are currently available'
                                 }
                                 action={
-                                    searchTerm
+                                    searchTerm || selectedDiscipline
                                         ? {
                                             label: 'Clear Filters',
                                             onClick: clearFilters
