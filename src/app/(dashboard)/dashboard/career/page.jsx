@@ -14,7 +14,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import dynamic from 'next/dynamic'
-import { Modal } from '../../../../ui/molecules/UserModal'
+import { Modal } from '../../../../ui/molecules/Modal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/ui/shadcn/button'
@@ -301,11 +301,10 @@ export default function CareerForm() {
         const status = row.original.status || 'active'
         return (
           <span
-            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-              status === 'active'
+            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${status === 'active'
                 ? 'bg-green-100 text-green-800'
                 : 'bg-gray-100 text-gray-800'
-            }`}
+              }`}
           >
             {status === 'active' ? 'Active' : 'Inactive'}
           </span>
@@ -535,11 +534,10 @@ export default function CareerForm() {
               </h2>
               {viewCareerData.status && (
                 <span
-                  className={`inline-flex mt-2 px-2 py-1 text-xs font-semibold rounded-full ${
-                    viewCareerData.status === 'active'
+                  className={`inline-flex mt-2 px-2 py-1 text-xs font-semibold rounded-full ${viewCareerData.status === 'active'
                       ? 'bg-green-100 text-green-800'
                       : 'bg-gray-100 text-gray-800'
-                  }`}
+                    }`}
                 >
                   {viewCareerData.status === 'active' ? 'Active' : 'Inactive'}
                 </span>

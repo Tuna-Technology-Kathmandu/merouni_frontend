@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import { destr } from 'destr'
 import { fetchReferrals, updateReferralStatus, deleteReferral } from './action'
 import { FaTrashAlt, FaEdit } from 'react-icons/fa'
-import { Modal } from '../../../../ui/molecules/UserModal'
+import { Modal } from '../../../../ui/molecules/Modal'
 import ShimmerEffect from '../../../../ui/molecules/ShimmerEffect'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import {
@@ -204,10 +204,10 @@ const ReferralsPage = () => {
         prev.map((ref) =>
           ref.id === selectedReferral.id
             ? {
-                ...ref,
-                status: statusForm.status,
-                remarks: statusForm.remarks || null
-              }
+              ...ref,
+              status: statusForm.status,
+              remarks: statusForm.remarks || null
+            }
             : ref
         )
       )
@@ -215,10 +215,10 @@ const ReferralsPage = () => {
         prev.map((ref) =>
           ref.id === selectedReferral.id
             ? {
-                ...ref,
-                status: statusForm.status,
-                remarks: statusForm.remarks || null
-              }
+              ...ref,
+              status: statusForm.status,
+              remarks: statusForm.remarks || null
+            }
             : ref
         )
       )
@@ -307,9 +307,8 @@ const ReferralsPage = () => {
               </span>
             </button>
             <ChevronDown
-              className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${
-                statusDropdownOpen ? 'rotate-180' : ''
-              }`}
+              className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${statusDropdownOpen ? 'rotate-180' : ''
+                }`}
             />
 
             {statusDropdownOpen && (
@@ -339,11 +338,10 @@ const ReferralsPage = () => {
                           setStatusSearchTerm('')
                           setStatusDropdownOpen(false)
                         }}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${
-                          statusFilter === option.value
+                        className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${statusFilter === option.value
                             ? 'bg-blue-100 text-blue-700 font-medium'
                             : 'text-gray-700'
-                        }`}
+                          }`}
                       >
                         {option.label}
                       </button>
@@ -453,8 +451,7 @@ const ReferralsPage = () => {
                     <>
                       <TableCell>
                         {referral.referralAgent
-                          ? `${referral.referralAgent.firstName} ${
-                              referral.referralAgent.middleName || ''
+                          ? `${referral.referralAgent.firstName} ${referral.referralAgent.middleName || ''
                             } ${referral.referralAgent.lastName}`.trim()
                           : referral.application_type === 'self'
                             ? 'Self'
@@ -467,13 +464,12 @@ const ReferralsPage = () => {
                   )}
                   <TableCell>
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                        referral.status === 'ACCEPTED'
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${referral.status === 'ACCEPTED'
                           ? 'bg-green-100 text-green-800'
                           : referral.status === 'REJECTED'
                             ? 'bg-red-100 text-red-800'
                             : 'bg-yellow-100 text-yellow-800'
-                      }`}
+                        }`}
                     >
                       {referral.status || 'IN_PROGRESS'}
                     </span>

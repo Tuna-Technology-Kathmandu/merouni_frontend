@@ -13,7 +13,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { X } from 'lucide-react'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../ui/molecules/UserModal'
+import { Modal } from '../../../../ui/molecules/Modal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/ui/shadcn/button'
@@ -213,8 +213,8 @@ export default function ConsultancyForm() {
         title: data.title?.trim() || '',
         destination: Array.isArray(data.destination)
           ? data.destination
-              .map((d) => (typeof d === 'string' ? d : (d?.country ?? '')))
-              .filter(Boolean)
+            .map((d) => (typeof d === 'string' ? d : (d?.country ?? '')))
+            .filter(Boolean)
           : [],
         address: data.address || {},
         featured_image: uploadedFiles.featured || '',
@@ -307,12 +307,12 @@ export default function ConsultancyForm() {
         ? consultancy.destination
         : typeof consultancy.destination === 'string'
           ? (() => {
-              try {
-                return JSON.parse(consultancy.destination)
-              } catch {
-                return []
-              }
-            })()
+            try {
+              return JSON.parse(consultancy.destination)
+            } catch {
+              return []
+            }
+          })()
           : []
       const destinationForForm = (
         Array.isArray(parsedDestination) ? parsedDestination : []

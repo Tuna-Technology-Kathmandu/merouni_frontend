@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Table from '../../../../ui/molecules/Table'
-import { Modal } from '../../../../ui/molecules/UserModal'
+import { Modal } from '../../../../ui/molecules/Modal'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { fetchCategories } from '../category/action.js'
 import {
@@ -425,20 +425,18 @@ export default function NewsManager() {
               <h2 className='text-2xl font-bold mb-2'>{viewNewsData.title}</h2>
               <div className='flex gap-2 mb-4'>
                 <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    viewNewsData.status === 'published'
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${viewNewsData.status === 'published'
                       ? 'bg-green-100 text-green-800'
                       : 'bg-yellow-100 text-yellow-800'
-                  }`}
+                    }`}
                 >
                   {viewNewsData.status}
                 </span>
                 <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    viewNewsData.visibility === 'public'
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${viewNewsData.visibility === 'public'
                       ? 'bg-blue-100 text-blue-800'
                       : 'bg-gray-100 text-gray-800'
-                  }`}
+                    }`}
                 >
                   {viewNewsData.visibility}
                 </span>

@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../ui/molecules/UserModal'
+import { Modal } from '../../../../ui/molecules/Modal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '../../../../ui/shadcn/button'
@@ -615,12 +615,12 @@ export default function BlogsManager() {
     )
 
   const handleCloseModal = () => {
-            setIsOpen(false)
-            setEditing(false)
-            setEditingId(null)
-            reset()
-            setSelectedTags([])
-            setUploadedFiles({ featuredImage: '' })
+    setIsOpen(false)
+    setEditing(false)
+    setEditingId(null)
+    reset()
+    setSelectedTags([])
+    setUploadedFiles({ featuredImage: '' })
 
   }
 
@@ -673,7 +673,7 @@ export default function BlogsManager() {
         <Modal
           isOpen={isOpen}
           onClose={() => {
-           handleCloseModal()
+            handleCloseModal()
           }}
           title={editing ? 'Edit Blog' : 'Add Blog'}
           className='max-w-5xl'
@@ -945,8 +945,8 @@ export default function BlogsManager() {
                 {viewNewsData.status && (
                   <span
                     className={`px-2 py-0.5 text-xs font-semibold rounded-full ${viewNewsData.status === 'published'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-yellow-100 text-yellow-800'
                       }`}
                   >
                     {viewNewsData.status}
@@ -955,8 +955,8 @@ export default function BlogsManager() {
                 {viewNewsData.visibility && (
                   <span
                     className={`px-2 py-0.5 text-xs font-semibold rounded-full ${viewNewsData.visibility === 'public'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-gray-100 text-gray-800'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-gray-100 text-gray-800'
                       }`}
                   >
                     {viewNewsData.visibility}

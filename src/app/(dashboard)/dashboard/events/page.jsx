@@ -16,7 +16,7 @@ import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Table from '../../../../ui/molecules/Table'
-import { Modal } from '../../../../ui/molecules/UserModal'
+import { Modal } from '../../../../ui/molecules/Modal'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import FileUpload from '../addCollege/FileUpload'
 import { fetchCategories } from '../category/action'
@@ -88,7 +88,7 @@ export default function EventManager() {
       try {
         const categoriesList = await fetchCategories()
         setCategories(categoriesList.items)
-      } catch (error) {}
+      } catch (error) { }
     }
     loadCategories()
   }, [])

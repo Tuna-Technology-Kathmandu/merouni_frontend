@@ -12,7 +12,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import { useDebounce } from 'use-debounce'
 import { fetchUniversities, fetchLevel } from './actions'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../ui/molecules/UserModal'
+import { Modal } from '../../../../ui/molecules/Modal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { Button } from '../../../../ui/shadcn/button'
@@ -410,15 +410,15 @@ export default function ExamManager() {
         exam.exam_details && exam.exam_details.length > 0
           ? exam.exam_details
           : [
-              {
-                exam_type: 'Written',
-                full_marks: '',
-                pass_marks: '',
-                number_of_question: '',
-                question_type: 'MCQ',
-                duration: ''
-              }
-            ],
+            {
+              exam_type: 'Written',
+              full_marks: '',
+              pass_marks: '',
+              number_of_question: '',
+              question_type: 'MCQ',
+              duration: ''
+            }
+          ],
       applicationDetails: exam.application_details[0] || {
         normal_fee: '',
         late_fee: '',

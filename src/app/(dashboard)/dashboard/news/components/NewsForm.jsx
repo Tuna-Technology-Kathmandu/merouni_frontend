@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
-import { Modal } from '../../../../../ui/molecules/UserModal'
+import { Modal } from '../../../../../ui/molecules/Modal'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'

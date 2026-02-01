@@ -10,7 +10,7 @@ import { useFieldArray, useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import { useDebounce } from 'use-debounce'
-import { Modal } from '../../../../ui/molecules/UserModal'
+import { Modal } from '../../../../ui/molecules/Modal'
 import Table from '../../../../ui/molecules/Table'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { fetchExam, fetchScholarship } from './actions'
@@ -1042,11 +1042,10 @@ export default function ProgramForm() {
                             setCurrentYear(year)
                             setCurrentSemester(sem)
                           }}
-                          className={`w-full py-2 px-3 rounded text-sm ${
-                            currentYear === year && currentSemester === sem
+                          className={`w-full py-2 px-3 rounded text-sm ${currentYear === year && currentSemester === sem
                               ? 'bg-blue-500 text-white'
                               : 'bg-white border hover:bg-gray-100'
-                          }`}
+                            }`}
                         >
                           {sem !== 0
                             ? `
@@ -1119,8 +1118,8 @@ export default function ProgramForm() {
                           const title =
                             fieldIndex >= 0
                               ? watch(`syllabus.${fieldIndex}._title`) ||
-                                course.title ||
-                                'Unknown Course'
+                              course.title ||
+                              'Unknown Course'
                               : course.title || 'Unknown Course'
 
                           return (

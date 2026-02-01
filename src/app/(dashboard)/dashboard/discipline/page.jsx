@@ -5,20 +5,22 @@ import { useForm } from 'react-hook-form'
 import { fetchDisciplines } from './action'
 import Loader from '../../../../ui/molecules/Loading'
 import Table from '../../../../ui/molecules/Table'
-import { Edit2, Trash2, Search } from 'lucide-react'
-import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import { Edit2, Trash2, Search, Eye } from 'lucide-react'
+import { Button } from '@/ui/shadcn/button'
+import { ToastContainer } from 'react-toastify'
+import { Modal } from '@/ui/molecules/Modal'
+
+import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { Modal } from '../../../../ui/molecules/UserModal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
-import { Button } from '@/ui/shadcn/button'
 import FileUpload from '../addCollege/FileUpload'
 import { Label } from '@/ui/shadcn/label'
 import { Input } from '@/ui/shadcn/input'
 import { formatDate } from '@/utils/date.util'
+import { Select } from '@/ui/shadcn/select'
 
 export default function DisciplineManager() {
     const { setHeading } = usePageHeading()
@@ -34,9 +36,9 @@ export default function DisciplineManager() {
     } = useForm({
         defaultValues: {
             title: '',
-
             description: '',
-            image: '',
+            featured_image: '',
+            status: 'draft',
             author: author_id
         }
     })
@@ -48,6 +50,11 @@ export default function DisciplineManager() {
     const [isOpen, setIsOpen] = useState(false)
     const [deleteId, setDeleteId] = useState(null)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+    // View Modal State
+    const [viewingDiscipline, setViewingDiscipline] = useState(null)
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+
     const [pagination, setPagination] = useState({
         currentPage: 1,
         totalPages: 1,
@@ -67,7 +74,22 @@ export default function DisciplineManager() {
             },
             {
                 header: 'Description',
-                accessorKey: 'description'
+                accessorKey: 'description',
+                cell: ({ getValue }) => <span className="line-clamp-2">{getValue()}</span>
+            },
+            {
+                header: 'Status',
+                accessorKey: 'status',
+                cell: ({ getValue }) => (
+                    <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getValue() === 'published'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                            }`}
+                    >
+                        {getValue() ? getValue().charAt(0).toUpperCase() + getValue().slice(1) : 'Draft'}
+                    </span>
+                )
             },
             {
                 header: 'Image',
@@ -93,14 +115,23 @@ export default function DisciplineManager() {
                 cell: ({ row }) => (
                     <div className='flex gap-2'>
                         <button
+                            onClick={() => handleView(row.original)}
+                            className='p-1 text-gray-600 hover:text-gray-900'
+                            title="View Details"
+                        >
+                            <Eye className='w-4 h-4' />
+                        </button>
+                        <button
                             onClick={() => handleEdit(row.original)}
                             className='p-1 text-blue-600 hover:text-blue-800'
+                            title="Edit"
                         >
                             <Edit2 className='w-4 h-4' />
                         </button>
                         <button
                             onClick={() => handleDeleteClick(row.original.id)}
                             className='p-1 text-red-600 hover:text-red-800'
+                            title="Delete"
                         >
                             <Trash2 className='w-4 h-4' />
                         </button>
@@ -110,6 +141,21 @@ export default function DisciplineManager() {
         ],
         []
     )
+    const handleView = (discipline) => {
+        setViewingDiscipline(discipline)
+        setIsViewModalOpen(true)
+    }
+
+    const handleEdit = (discipline) => {
+        setEditingId(discipline.id)
+        setEditing(true)
+        setIsOpen(true)
+        setValue('title', discipline.title)
+        setValue('description', discipline.description || '')
+        setValue('featured_image', discipline.featured_image || '')
+        setValue('status', discipline.status || 'draft')
+        setUploadedFiles({ featured_image: discipline.featured_image || '' })
+    }
 
     useEffect(() => {
         setHeading('Discipline Management')
@@ -218,16 +264,6 @@ export default function DisciplineManager() {
         }
     }
 
-    const handleEdit = (discipline) => {
-        setEditingId(discipline.id)
-        setEditing(true)
-        setIsOpen(true)
-        setValue('title', discipline.title)
-        setValue('description', discipline.description || '')
-        setValue('featured_image', discipline.featured_image || '')
-        setUploadedFiles({ featured_image: discipline.featured_image || '' })
-    }
-
     const handleDeleteClick = (id) => {
         setDeleteId(id)
         setIsDialogOpen(true)
@@ -309,16 +345,10 @@ export default function DisciplineManager() {
         }
     }
 
-    if (loading)
-        return (
-            <div className='mx-auto'>
-                <Loader />
-            </div>
-        )
-
     return (
         <>
             <div className='p-4 w-full'>
+                {/* ... Header and Search ... */}
                 <div className='flex justify-between items-center mb-4'>
                     {/* Search Bar */}
                     <div className='relative w-full max-w-md'>
@@ -349,8 +379,7 @@ export default function DisciplineManager() {
                         </Button>
                     </div>
                 </div>
-                <ToastContainer />
-
+                {/* Add/Edit Modal */}
                 <Modal
                     isOpen={isOpen}
                     onClose={() => {
@@ -393,6 +422,16 @@ export default function DisciplineManager() {
                                             )}
                                         </div>
                                         <div>
+                                            <Label>Status</Label>
+                                            <Select
+                                                {...register('status')}
+                                                className='w-full p-2 border rounded'
+                                            >
+                                                <option value="draft">Draft</option>
+                                                <option value="published">Published</option>
+                                            </Select>
+                                        </div>
+                                        <div>
                                             <Label>Description</Label>
                                             <textarea
                                                 placeholder='Description'
@@ -428,7 +467,7 @@ export default function DisciplineManager() {
                                         setEditing(false)
                                         setEditingId(null)
                                         reset()
-                                        setUploadedFiles({ image: '' })
+                                        setUploadedFiles({ featured_image: '' })
                                     }}
                                 >
                                     Cancel
@@ -453,6 +492,68 @@ export default function DisciplineManager() {
                     />
                 </div>
             </div>
+
+            {/* View Modal */}
+            <Modal
+                isOpen={isViewModalOpen}
+                onClose={() => {
+                    setIsViewModalOpen(false)
+                    setViewingDiscipline(null)
+                }}
+                title="Discipline Details"
+                className="max-w-2xl"
+            >
+                <div className="p-6 space-y-6">
+                    {/* Image */}
+                    {viewingDiscipline?.featured_image && (
+                        <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-100 mb-6 border border-gray-200">
+                            <img
+                                src={viewingDiscipline.featured_image}
+                                alt={viewingDiscipline.title}
+                                className="w-full h-full object-contain"
+                            />
+                        </div>
+                    )}
+
+                    {/* Details Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 className="text-sm font-medium text-gray-500">Title</h3>
+                            <p className="mt-1 text-lg font-semibold text-gray-900">{viewingDiscipline?.title}</p>
+                        </div>
+
+                        <div>
+                            <h3 className="text-sm font-medium text-gray-500">Status</h3>
+                            <span
+                                className={`inline-flex mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${viewingDiscipline?.status === 'published'
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-gray-100 text-gray-800'
+                                    }`}
+                            >
+                                {viewingDiscipline?.status ? viewingDiscipline.status.charAt(0).toUpperCase() + viewingDiscipline.status.slice(1) : 'Draft'}
+                            </span>
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <h3 className="text-sm font-medium text-gray-500">Description</h3>
+                            <div className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                                {viewingDiscipline?.description || "No description provided."}
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <h3 className="text-sm font-medium text-gray-500">Created At</h3>
+                            <p className="mt-1 text-gray-900">{viewingDiscipline?.createdAt ? formatDate(viewingDiscipline.createdAt) : 'N/A'}</p>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end pt-4 border-t mt-6">
+                        <Button onClick={() => setIsViewModalOpen(false)}>
+                            Close
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
 
             <ConfirmationDialog
                 open={isDialogOpen}
