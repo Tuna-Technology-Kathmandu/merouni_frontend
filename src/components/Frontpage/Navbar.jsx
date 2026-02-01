@@ -25,6 +25,8 @@ const moreLinks = [
   { href: '/news', label: 'News' },
   { href: '/universities', label: 'Universities' },
   { href: '/career', label: 'Careers at MeroUni' },
+  { href: '/watch', label: 'Videos' },
+  { href: '/skill-based-courses', label: 'Skill Based Courses' },
   { href: '/contact', label: 'Contact Us' }
 ]
 

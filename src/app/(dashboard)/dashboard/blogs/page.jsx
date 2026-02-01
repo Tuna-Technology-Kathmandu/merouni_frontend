@@ -614,6 +614,16 @@ export default function BlogsManager() {
       </div>
     )
 
+  const handleCloseModal = () => {
+            setIsOpen(false)
+            setEditing(false)
+            setEditingId(null)
+            reset()
+            setSelectedTags([])
+            setUploadedFiles({ featuredImage: '' })
+
+  }
+
   return (
     <>
       <div className='p-4 w-full'>
@@ -663,12 +673,7 @@ export default function BlogsManager() {
         <Modal
           isOpen={isOpen}
           onClose={() => {
-            setIsOpen(false)
-            setEditing(false)
-            setEditingId(null)
-            reset()
-            setSelectedTags([])
-            setUploadedFiles({ featuredImage: '' })
+           handleCloseModal()
           }}
           title={editing ? 'Edit Blog' : 'Add Blog'}
           className='max-w-5xl'
@@ -861,7 +866,15 @@ export default function BlogsManager() {
               </div>
 
               {/* Submit Button - Sticky Footer */}
-              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
+              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
+                <Button
+                  type='button'
+                  onClick={handleCloseModal}
+                  variant='outline'
+                  size='sm'
+                >
+                  Cancel
+                </Button>
                 <Button
                   type='submit'
                   className=' text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
@@ -931,22 +944,20 @@ export default function BlogsManager() {
               <div className='flex gap-2 mt-2'>
                 {viewNewsData.status && (
                   <span
-                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
-                      viewNewsData.status === 'published'
+                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${viewNewsData.status === 'published'
                         ? 'bg-green-100 text-green-800'
                         : 'bg-yellow-100 text-yellow-800'
-                    }`}
+                      }`}
                   >
                     {viewNewsData.status}
                   </span>
                 )}
                 {viewNewsData.visibility && (
                   <span
-                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
-                      viewNewsData.visibility === 'public'
+                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${viewNewsData.visibility === 'public'
                         ? 'bg-blue-100 text-blue-800'
                         : 'bg-gray-100 text-gray-800'
-                    }`}
+                      }`}
                   >
                     {viewNewsData.visibility}
                   </span>

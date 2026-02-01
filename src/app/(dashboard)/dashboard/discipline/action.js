@@ -1,0 +1,83 @@
+'use server'
+
+import { DotenvConfig } from "@/config/env.config"
+
+
+let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline`
+
+export async function fetchDisciplines(page = 1, limit = 1000) {
+    try {
+        const response = await fetch(`${url}?page=${page}&limit=${limit}`, {
+            cache: 'no-store'
+        })
+
+        if (!response.ok) {
+            throw response.json()
+        }
+
+        return await response.json()
+    } catch (error) {
+        
+        console.error('Error fetching disciplines:', error)
+        throw error
+    }
+}
+
+export async function createDiscipline(data) {
+    try {
+        const response = await fetch(`${url}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+
+        if (!response.ok) {
+            throw new Error('Failed to create discipline')
+        }
+
+        return await response.json()
+    } catch (error) {
+        console.error('Error creating discipline:', error)
+        throw error
+    }
+}
+
+export async function updateDiscipline(disciplineId, data) {
+    try {
+        const response = await fetch(`${url}?discipline_id=${disciplineId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+
+        if (!response.ok) {
+            throw new Error('Failed to update discipline')
+        }
+
+        return await response.json()
+    } catch (error) {
+        console.error('Error updating discipline:', error)
+        throw error
+    }
+}
+
+export async function deleteDiscipline(disciplineId) {
+    try {
+        const response = await fetch(`${url}?discipline_id=${disciplineId}`, {
+            method: 'DELETE'
+        })
+
+        if (!response.ok) {
+            throw new Error('Failed to delete discipline')
+        }
+        const res = await response.json()
+        return res
+    } catch (error) {
+        console.error('Error deleting discipline:', error)
+        throw error
+    }
+}

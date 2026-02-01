@@ -1043,6 +1043,11 @@ export default function CollegeForm() {
     handleDeleteClick
   })
 
+  const handleCloseModal = () => {
+    setIsOpen(false)
+    reset()
+  }
+
   return (
     <>
       <div className='p-4 w-full'>
@@ -1083,7 +1088,7 @@ export default function CollegeForm() {
 
         <Modal
           isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
+          onClose={handleCloseModal}
           title={editing ? 'Edit College' : 'Add College'}
           className='max-w-5xl'
         >
@@ -1699,7 +1704,15 @@ export default function CollegeForm() {
               </div>
 
               {/* Submit Button - Sticky Footer */}
-              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
+              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
+                <Button
+                  type='button'
+                  onClick={handleCloseModal}
+                  variant='outline'
+                  size='sm'
+                >
+                  Cancel
+                </Button>
                 <Button type='submit' disabled={submitting} size='sm'>
                   {submitting
                     ? editing
