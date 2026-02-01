@@ -34,6 +34,7 @@ export const PERMISSIONS_VIA_ROLE = {
     '/dashboard/vacancy',
     '/dashboard/college-rankings',
     '/dashboard/college-orderings',
+    '/dashboard/degrees',
     '/dashboard/level',
     '/dashboard/tag',
     '/dashboard/set-referral-point'
@@ -59,6 +60,7 @@ export const PERMISSIONS_VIA_ROLE = {
     '/dashboard/agent',
     '/dashboard/career',
     '/dashboard/consultancy',
+    '/dashboard/degrees',
     '/dashboard/level',
     '/dashboard/tag',
     '/dashboard/material',

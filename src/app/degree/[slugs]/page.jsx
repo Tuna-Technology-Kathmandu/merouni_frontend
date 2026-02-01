@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import Footer from '../../../components/Frontpage/Footer'
 import Header from '../../../components/Frontpage/Header'
 import Navbar from '../../../components/Frontpage/Navbar'
@@ -11,7 +12,7 @@ import RelatedCourses from './components/RelatedCourses'
 import Syllabus from './components/syllabus'
 import ImageSection from './components/upperSection'
 import { slugify } from '@/lib/slugify'
-import { BookOpen } from 'lucide-react'
+import { BookOpen, GraduationCap } from 'lucide-react'
 import EmptyState from '@/ui/shadcn/EmptyState'
 
 const CourseDescription = ({ params }) => {
@@ -91,6 +92,8 @@ const CourseDescription = ({ params }) => {
     )
   }
 
+  const isSimpleDegree = degree && degree.short_name != null && !degree.syllabus
+
   return (
     <>
       <div>
@@ -98,10 +101,98 @@ const CourseDescription = ({ params }) => {
         <Navbar />
         {degree && (
           <>
-            <ImageSection degree={degree} />
-            <Syllabus degree={degree} />
-            <CollegeTeach degree={degree} />
-            <RelatedCourses degree={degree} />
+            {isSimpleDegree ? (
+              <div className='bg-white min-h-screen'>
+                <div className='w-full bg-gray-50 border-b border-gray-100 py-16 md:py-24'>
+                  <div className='container mx-auto px-4'>
+                    <div className='max-w-4xl'>
+                      {degree.short_name && (
+                        <p className='text-sm font-semibold text-[#0A6FA7] uppercase tracking-wide mb-2'>
+                          {degree.short_name}
+                        </p>
+                      )}
+                      <h1 className='text-3xl md:text-4xl font-bold text-gray-900 mb-6'>
+                        {degree.title}
+                      </h1>
+                    </div>
+                  </div>
+                </div>
+                {degree.cover_image && (
+                  <div className='container mx-auto px-4 -mt-8'>
+                    <div className='w-full max-w-4xl mx-auto aspect-video rounded-2xl overflow-hidden shadow-xl border border-gray-100'>
+                      <img
+                        src={degree.cover_image}
+                        alt={degree.title}
+                        className='w-full h-full object-cover'
+                      />
+                    </div>
+                  </div>
+                )}
+                {degree.programs && degree.programs.length > 0 && (
+                  <div className='container mx-auto px-4 py-12'>
+                    <div className='max-w-4xl mx-auto'>
+                      <h2 className='text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2'>
+                        <GraduationCap className='w-6 h-6 text-[#0A6FA7]' />
+                        Programs under this degree
+                      </h2>
+                      <ul className='space-y-2'>
+                        {degree.programs.map((program) => (
+                          <li key={program.id}>
+                            {program.slugs ? (
+                              <Link
+                                href={`/program/${encodeURIComponent(program.slugs)}`}
+                                className='block py-2 px-4 rounded-lg border border-gray-200 hover:border-[#0A6FA7] hover:bg-[#0A6FA7]/5 transition-colors text-gray-800 hover:text-[#0A6FA7]'
+                              >
+                                <span className='font-medium'>{program.title}</span>
+                                {program.code && (
+                                  <span className='text-sm text-gray-500 ml-2'>
+                                    ({program.code})
+                                  </span>
+                                )}
+                                {program.duration && (
+                                  <span className='text-sm text-gray-500 ml-2'>
+                                    · {program.duration}
+                                  </span>
+                                )}
+                              </Link>
+                            ) : (
+                              <div className='block py-2 px-4 rounded-lg border border-gray-200 text-gray-800'>
+                                <span className='font-medium'>{program.title}</span>
+                                {program.code && (
+                                  <span className='text-sm text-gray-500 ml-2'>
+                                    ({program.code})
+                                  </span>
+                                )}
+                                {program.duration && (
+                                  <span className='text-sm text-gray-500 ml-2'>
+                                    · {program.duration}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+                <div className='container mx-auto px-4 py-12'>
+                  <a
+                    href='/degree'
+                    className='inline-flex items-center text-sm font-medium text-[#0A6FA7] hover:underline'
+                  >
+                    ← Browse all degrees
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <>
+                <ImageSection degree={degree} />
+                <Syllabus degree={degree} />
+                <CollegeTeach degree={degree} />
+                <RelatedCourses degree={degree} />
+              </>
+            )}
           </>
         )}
         <Footer />

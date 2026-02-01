@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import BlogCard from './BlogCard'
+import BlogCard from '@/ui/molecules/cards/BlogCard'
 import Pagination from './Pagination'
 import FeaturedBlogsShimmer from './FeaturedBlogShimmer'
 import Link from 'next/link'

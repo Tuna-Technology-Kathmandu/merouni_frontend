@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import EmptyState from '@/ui/shadcn/EmptyState'
 import UniversityCardShimmer from './UniversityShimmerCard'
 import Pagination from '@/app/blogs/components/Pagination'
-import UniversityCard from './UniversityCard'
+import CollegeCard from '@/ui/molecules/cards/CollegeCard'
 import { authFetch } from '@/app/utils/authFetch'
 import { DotenvConfig } from '@/config/env.config'
 import { DistrictLists } from '@/constants/district'
@@ -692,9 +692,14 @@ const CollegeFinder = () => {
           ) : universities.length > 0 ? (
             <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10'>
               {universities.map((u, idx) => (
-                <UniversityCard
-                  {...u}
-                  key={idx}
+                <CollegeCard
+                  key={u.collegeId ?? idx}
+                  name={u.name}
+                  location={u.location}
+                  collegeId={u.collegeId}
+                  slug={u.slug}
+                  collegeImage={u.collegeImage}
+                  instituteType={u.instituteType}
                   wishlistCollegeIds={wishlistCollegeIds}
                   onWishlistUpdate={setWishlistCollegeIds}
                 />

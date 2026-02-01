@@ -7,12 +7,11 @@ import Header from '../../../components/Frontpage/Header'
 import Footer from '../../../components/Frontpage/Footer'
 import ImageSection from './components/upperSection'
 import ConsultancyOverview from './components/ConsultancyOverview'
-import ContactNow from './components/ContactNow'
 import RelatedConsultancies from './components/RelatedConsultancies'
 import { getConsultancyBySlug } from '../actions'
 import Loading from '../../../ui/molecules/Loading'
 
-// Share Section Component
+// Share Section — matches college detail page style
 const ShareSection = ({ consultancy }) => {
   const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
   const shareTitle = `Check out ${consultancy?.title || consultancy?.name} on our platform`
@@ -47,60 +46,39 @@ const ShareSection = ({ consultancy }) => {
   }
 
   return (
-    <div className='fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 shadow-lg z-50 py-3 sm:py-4'>
-      <div className='max-w-[1600px] mx-auto px-4'>
-        <div className='text-black font-bold text-xs sm:text-sm mb-3 text-center'>
+    <div className='fixed bottom-8 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md border border-gray-100 shadow-2xl z-50 py-3 px-6 rounded-2xl transition-all hover:scale-105'>
+      <div className='flex flex-row gap-5 items-center justify-center'>
+        <span className='text-gray-700 text-xs uppercase tracking-wider font-medium mr-2'>
           Share
-        </div>
-        <div className='flex flex-row gap-3 sm:gap-4 items-center justify-center'>
-          {/* Facebook */}
-          <button
-            onClick={handleFacebookShare}
-            className='hover:opacity-80 transition-opacity hover:scale-110'
-            aria-label='Share on Facebook'
-          >
-            <img src='/images/fb.png' alt='Facebook' className='w-5 sm:w-6' />
-          </button>
-
-          {/* Twitter/X */}
-          <button
-            onClick={handleTwitterShare}
-            className='hover:opacity-80 transition-opacity hover:scale-110'
-            aria-label='Share on Twitter'
-          >
-            <img
-              src='/images/twitter.png'
-              alt='Twitter'
-              className='w-5 sm:w-6'
-            />
-          </button>
-
-          {/* LinkedIn */}
-          <button
-            onClick={handleLinkedInShare}
-            className='hover:opacity-80 transition-opacity hover:scale-110'
-            aria-label='Share on LinkedIn'
-          >
-            <img
-              src='/images/linkedin.png'
-              alt='LinkedIn'
-              className='w-5 sm:w-6'
-            />
-          </button>
-
-          {/* Instagram */}
-          <button
-            onClick={handleInstagramShare}
-            className='hover:opacity-80 transition-opacity hover:scale-110'
-            aria-label='Share on Instagram'
-          >
-            <img
-              src='/images/insta.png'
-              alt='Instagram'
-              className='w-5 sm:w-6'
-            />
-          </button>
-        </div>
+        </span>
+        <button
+          onClick={handleFacebookShare}
+          className='hover:opacity-80 transition-all hover:-translate-y-1'
+          aria-label='Share on Facebook'
+        >
+          <img src='/images/fb.png' alt='Facebook' className='w-5' />
+        </button>
+        <button
+          onClick={handleTwitterShare}
+          className='hover:opacity-80 transition-all hover:-translate-y-1'
+          aria-label='Share on Twitter'
+        >
+          <img src='/images/twitter.png' alt='Twitter' className='w-5' />
+        </button>
+        <button
+          onClick={handleLinkedInShare}
+          className='hover:opacity-80 transition-all hover:-translate-y-1'
+          aria-label='Share on LinkedIn'
+        >
+          <img src='/images/linkedin.png' alt='LinkedIn' className='w-5' />
+        </button>
+        <button
+          onClick={handleInstagramShare}
+          className='hover:opacity-80 transition-all hover:-translate-y-1'
+          aria-label='Share on Instagram'
+        >
+          <img src='/images/insta.png' alt='Instagram' className='w-5' />
+        </button>
       </div>
     </div>
   )
@@ -160,13 +138,15 @@ const ConsultancyDetailPage = ({ params }) => {
       <>
         <Header />
         <Navbar />
-        <div className='min-h-screen flex items-center justify-center'>
-          <div className='text-center'>
-            <h1 className='text-2xl font-bold text-gray-800 mb-4'>Error</h1>
-            <p className='text-gray-600 mb-4'>{error}</p>
+        <div className='min-h-screen bg-gray-50/50 flex items-center justify-center px-4'>
+          <div className='text-center max-w-md'>
+            <h1 className='text-xl font-semibold text-gray-900 mb-3'>
+              Something went wrong
+            </h1>
+            <p className='text-gray-600 mb-6'>{error}</p>
             <button
               onClick={() => router.push('/consultancy')}
-              className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600'
+              className='bg-[#0A6FA7] hover:bg-[#085e8a] text-white px-6 py-3 rounded-xl font-semibold transition-colors'
             >
               Back to Consultancies
             </button>
@@ -182,14 +162,18 @@ const ConsultancyDetailPage = ({ params }) => {
       <>
         <Header />
         <Navbar />
-        <div className='min-h-screen flex items-center justify-center'>
-          <div className='text-center'>
-            <h1 className='text-2xl font-bold text-gray-800 mb-4'>
-              Consultancy Not Found
+        <div className='min-h-screen bg-gray-50/50 flex items-center justify-center px-4'>
+          <div className='text-center max-w-md'>
+            <h1 className='text-xl font-semibold text-gray-900 mb-3'>
+              Consultancy not found
             </h1>
+            <p className='text-gray-600 mb-6'>
+              The consultancy you&apos;re looking for doesn&apos;t exist or was
+              removed.
+            </p>
             <button
               onClick={() => router.push('/consultancy')}
-              className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600'
+              className='bg-[#0A6FA7] hover:bg-[#085e8a] text-white px-6 py-3 rounded-xl font-semibold transition-colors'
             >
               Back to Consultancies
             </button>
@@ -205,8 +189,9 @@ const ConsultancyDetailPage = ({ params }) => {
       <Header />
       <Navbar />
       <ImageSection consultancy={consultancy} />
+      <br />
+      <br />
       <ConsultancyOverview consultancy={consultancy} />
-      <ContactNow consultancy={consultancy} />
       <RelatedConsultancies consultancy={consultancy} />
       <ShareSection consultancy={consultancy} />
       <Footer />

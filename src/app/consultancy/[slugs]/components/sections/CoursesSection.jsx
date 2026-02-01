@@ -1,4 +1,7 @@
+'use client'
+
 import React from 'react'
+import { BookOpen } from 'lucide-react'
 
 const CoursesSection = ({ consultancy }) => {
   const courses = consultancy?.consultancyCourses || []
@@ -8,25 +11,16 @@ const CoursesSection = ({ consultancy }) => {
   }
 
   return (
-    <div>
-      <h2 className='text-sm md:text-lg lg:text-xl font-bold'>
+    <div className='max-w-4xl'>
+      <h2 className='text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2'>
+        <BookOpen className='w-5 h-5 text-[#0A6FA7]' />
         Offered Courses
       </h2>
-      {courses.length > 0 ? (
-        <div className='mt-7 max-[1120px]:mt-5 max-md:mt-4'>
-          <ul className='list-disc list-inside space-y-2 text-gray-800 text-xs md:text-sm lg:text-base'>
-            {courses.map((course, index) => (
-              <li key={index} className='font-medium'>
-                {course.title}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <p className='text-gray-700 mt-9 max-[1120px]:mt-6 leading-7 text-xs md:text-sm lg:text-base'>
-          No courses available at the moment.
-        </p>
-      )}
+      <ul className='list-disc list-inside space-y-2 text-gray-600 text-sm'>
+        {courses.map((course, index) => (
+          <li key={index}>{course.title}</li>
+        ))}
+      </ul>
     </div>
   )
 }

@@ -24,14 +24,14 @@ const ApplyNow = ({ college }) => {
           <div className='flex-1 text-center md:text-left'>
             <div className='flex items-center justify-center md:justify-start gap-2 mb-4'>
               <FaGraduationCap className='w-6 h-6 md:w-8 md:h-8 text-white' />
-              <h3 className='text-lg md:text-xl lg:text-2xl font-bold text-white'>
+              <h3 className='text-lg md:text-xl font-semibold text-white'>
                 Ready to Start Your Journey?
               </h3>
             </div>
-            <p className='text-base md:text-lg lg:text-xl font-semibold text-white/90 mb-2'>
+            <p className='text-sm md:text-base text-white/90 mb-2'>
               Are you ready to take the next step toward your future career?
             </p>
-            <p className='text-sm md:text-base text-white/80'>
+            <p className='text-sm text-white/80'>
               Join thousands of students who have chosen excellence
             </p>
           </div>
@@ -41,7 +41,7 @@ const ApplyNow = ({ college }) => {
             {college?.slugs && (
               <button
                 onClick={handleApplyClick}
-                className='group bg-white text-[#0870A8] px-6 md:px-8 py-3 md:py-4 rounded-xl font-bold text-sm md:text-base shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 min-w-[160px] justify-center'
+                className='group bg-white text-[#0870A8] px-6 md:px-8 py-3 md:py-4 rounded-xl font-medium text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 min-w-[160px] justify-center'
               >
                 <span>Apply Now</span>
                 <FaArrowRight className='w-4 h-4 group-hover:translate-x-1 transition-transform' />
@@ -53,7 +53,7 @@ const ApplyNow = ({ college }) => {
                 href={college.website_url}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='group bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl font-semibold text-sm md:text-base hover:bg-white/20 hover:border-white/50 transition-all duration-300 flex items-center gap-2 min-w-[160px] justify-center'
+                className='group bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl font-medium text-sm hover:bg-white/20 hover:border-white/50 transition-all duration-300 flex items-center gap-2 min-w-[160px] justify-center'
               >
                 <span>Visit Website</span>
                 <FaArrowRight className='w-4 h-4 group-hover:translate-x-1 transition-transform' />

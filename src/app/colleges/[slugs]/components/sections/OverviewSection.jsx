@@ -27,7 +27,7 @@ const OverviewSection = ({ college }) => {
 
   return (
     <div className='max-w-4xl'>
-      <h2 className='text-xl md:text-2xl font-bold mb-6 text-gray-900'>Description</h2>
+      <h2 className='text-lg font-semibold text-gray-900 mb-6'>Description</h2>
 
       {/* Plain description text */}
       {college?.description && (
@@ -38,7 +38,7 @@ const OverviewSection = ({ college }) => {
           </p>
 
           {/* Desktop view - full description */}
-          <p className='hidden md:block text-gray-600 leading-relaxed text-justify text-base lg:text-lg'>
+          <p className='hidden md:block text-gray-600 leading-relaxed text-justify text-sm md:text-base'>
             {fullDescription}
           </p>
 
@@ -46,7 +46,7 @@ const OverviewSection = ({ college }) => {
           {shouldTruncate && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className='md:hidden mt-4 text-[#0A6FA7] hover:text-[#085e8a] font-bold text-sm flex items-center gap-1'
+              className='md:hidden mt-4 text-[#0A6FA7] hover:text-[#085e8a] font-medium text-sm flex items-center gap-1'
             >
               {isExpanded ? 'Read less ↑' : 'Read more ↓'}
             </button>
@@ -61,7 +61,7 @@ const OverviewSection = ({ college }) => {
             __html: he.decode(processContent(college.content))
           }}
           className='text-gray-600 mt-8 leading-relaxed text-justify 
-             text-sm md:text-base lg:text-lg
+             text-sm md:text-base
 
              [&>iframe]:w-full 
              [&>iframe]:max-w-[calc(100vw-40px)] 
@@ -90,7 +90,7 @@ const OverviewSection = ({ college }) => {
              [&_th]:bg-gray-50
              [&_th]:p-3
              [&_th]:text-left
-             [&_th]:font-bold
+             [&_th]:font-semibold
              [&_th]:text-gray-900
              [&_th]:border
              [&_th]:border-gray-200
@@ -100,15 +100,15 @@ const OverviewSection = ({ college }) => {
              [&_tr:nth-child(even)]:bg-gray-50/50
 
              /* Heading styles */
-             [&_h1]:text-2xl
-             [&_h1]:font-bold
-             [&_h1]:mt-10
-             [&_h1]:mb-6
+             [&_h1]:text-lg
+             [&_h1]:font-semibold
+             [&_h1]:mt-8
+             [&_h1]:mb-4
              [&_h1]:text-gray-900
-             [&_h2]:text-xl
-             [&_h2]:font-bold
-             [&_h2]:mt-8
-             [&_h2]:mb-4
+             [&_h2]:text-base
+             [&_h2]:font-semibold
+             [&_h2]:mt-6
+             [&_h2]:mb-3
              [&_h2]:text-gray-900
 
              /* List styles */

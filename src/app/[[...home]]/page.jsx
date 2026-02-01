@@ -59,26 +59,20 @@ const Page = () => {
     <>
       <Header />
       <Navbar />
-      <div className='py-4'>
-        <div className='container px-8 md:px-12 mx-auto'>
+      <div className='py-2 md:py-4'>
+        <div className='container px-4 sm:px-6 md:px-8 mx-auto'>
           <BannerLayout banners={banners} loading={loading} />
-          {/* Flex container for horizontal layout */}
-          <div className='flex gap-6'>
+          <div className='flex gap-4 md:gap-6'>
             <div className='flex flex-col md:w-4/5 w-full sm:w-full'>
-              {/* 80% Admission Cards */}
-
-              {/* <BannerLayout /> */}
               <FeaturedAdmission />
             </div>
-
-            {/* 20% Image */}
-            <div className='w-full md:w-1/5 hidden md:block mt-8'>
+            <div className='w-full md:w-1/5 hidden md:block mt-4 md:mt-6'>
               <SideBanner banners={banners} loading={loading} />
             </div>
           </div>
         </div>
       </div>
-      <div className='w-full md:w-1/5 block md:hidden mt-8'>
+      <div className='w-full md:w-1/5 block md:hidden mt-4 px-4'>
         <SideBanner banners={banners} loading={loading} />
       </div>
 

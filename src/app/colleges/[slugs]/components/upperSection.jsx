@@ -44,7 +44,7 @@ const ImageSection = ({ college }) => {
             />
           </div>
           <div className='flex-1 min-w-0 -mt-2'>
-            <h1 className='font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-900 truncate'>
+            <h1 className='font-semibold text-xl md:text-2xl text-gray-900 truncate'>
               {college?.name}
             </h1>
             {hasAddress && (
@@ -52,7 +52,7 @@ const ImageSection = ({ college }) => {
                 <span className='flex-shrink-0'>
                   <IoIosGlobe className='w-4 h-4 sm:w-5 sm:h-5 text-[#30AD8F]' />
                 </span>
-                <p className='font-medium text-xs sm:text-sm md:text-base truncate'>
+                <p className='text-sm text-gray-600 truncate'>
                   {college?.collegeAddress?.street}
                   {college?.collegeAddress?.street &&
                   college?.collegeAddress?.city
@@ -70,7 +70,7 @@ const ImageSection = ({ college }) => {
                 href={college.college_broucher}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='bg-[#0A6FA7] hover:bg-[#085e8a] text-white px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-md hover:shadow-lg text-xs sm:text-sm font-bold active:scale-95'
+                className='bg-[#0A6FA7] hover:bg-[#085e8a] text-white px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-md hover:shadow-lg text-sm font-medium active:scale-95'
               >
                 <Eye className='w-4 h-4' />
                 <span className='hidden sm:inline'>View Brochure</span>
@@ -90,10 +90,10 @@ const ImageSection = ({ college }) => {
               <div className='bg-blue-50 p-3 rounded-2xl mb-4 group-hover:bg-[#0A6FA7]/10 transition-colors duration-300'>
                 <FaUniversity className='w-6 h-6 text-[#0A6FA7]' />
               </div>
-              <p className='text-[10px] uppercase tracking-wide font-bold text-gray-400 mb-1'>
+              <p className='text-xs uppercase tracking-wider text-gray-500 font-medium mb-1'>
                 University
               </p>
-              <p className='text-sm md:text-base font-bold text-gray-800 line-clamp-2'>
+              <p className='text-sm text-gray-700 line-clamp-2'>
                 {college?.university?.fullname}
               </p>
             </div>
@@ -105,10 +105,10 @@ const ImageSection = ({ college }) => {
               <div className='bg-emerald-50 p-3 rounded-2xl mb-4 group-hover:bg-[#30AD8F]/10 transition-colors duration-300'>
                 <LiaUniversitySolid className='w-6 h-6 text-[#30AD8F]' />
               </div>
-              <p className='text-[10px] uppercase tracking-wide font-bold text-gray-400 mb-1'>
+              <p className='text-xs uppercase tracking-wider text-gray-500 font-medium mb-1'>
                 Institute Type
               </p>
-              <p className='text-sm md:text-base font-bold text-gray-800 whitespace-nowrap'>
+              <p className='text-sm text-gray-700 whitespace-nowrap'>
                 {college?.institute_type}
               </p>
             </div>
@@ -124,14 +124,14 @@ const ImageSection = ({ college }) => {
                   className='w-6 h-6 grayscale opacity-80'
                 />
               </div>
-              <p className='text-[10px] uppercase tracking-wide font-bold text-gray-400 mb-1'>
+              <p className='text-xs uppercase tracking-wider text-gray-500 font-medium mb-1'>
                 Levels
               </p>
               <div className='flex flex-wrap justify-center gap-1.5'>
                 {instituteLevels.map((level, index) => (
                   <span
                     key={index}
-                    className='text-xs font-bold text-gray-800 bg-gray-50 px-2.5 py-1 rounded-full'
+                    className='text-xs text-gray-700 bg-gray-50 px-2.5 py-1 rounded-full font-medium'
                   >
                     {level}
                   </span>
@@ -146,7 +146,7 @@ const ImageSection = ({ college }) => {
               <div className='bg-orange-50 p-3 rounded-2xl mb-4 group-hover:bg-orange-100 transition-colors duration-300'>
                 <FaPhoneAlt className='w-5 h-5 text-orange-500' />
               </div>
-              <p className='text-[10px] uppercase tracking-wide font-bold text-gray-400 mb-1'>
+              <p className='text-xs uppercase tracking-wider text-gray-500 font-medium mb-1'>
                 Contact
               </p>
               <div className='space-y-1'>
@@ -154,7 +154,7 @@ const ImageSection = ({ college }) => {
                   <a
                     key={index}
                     href={`tel:${contact?.contact_number || ''}`}
-                    className='block text-sm md:text-base font-bold text-gray-800 hover:text-[#0A6FA7] transition-colors'
+                    className='block text-sm text-gray-700 hover:text-[#0A6FA7] transition-colors'
                   >
                     {contact?.contact_number}
                   </a>
@@ -169,14 +169,14 @@ const ImageSection = ({ college }) => {
               <div className='bg-sky-50 p-3 rounded-2xl mb-4 group-hover:bg-sky-100 transition-colors duration-300'>
                 <BsGlobe2 className='w-5 h-5 text-sky-500' />
               </div>
-              <p className='text-[10px] uppercase tracking-wide font-bold text-gray-400 mb-1'>
+              <p className='text-xs uppercase tracking-wider text-gray-500 font-medium mb-1'>
                 Website
               </p>
               <a
                 href={college.website_url}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='text-sm md:text-base font-bold text-gray-800 hover:text-[#0A6FA7] transition-colors line-clamp-1 break-all'
+                className='text-sm text-gray-700 hover:text-[#0A6FA7] transition-colors line-clamp-1 break-all'
               >
                 {college.website_url.replace(/^https?:\/\//, '')}
               </a>

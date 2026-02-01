@@ -48,7 +48,7 @@ const ShareSection = ({ college }) => {
   return (
     <div className='fixed bottom-8 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md border border-gray-100 shadow-2xl z-50 py-3 px-6 rounded-2xl transition-all hover:scale-105'>
       <div className='flex flex-row gap-5 items-center justify-center'>
-        <span className='text-gray-900 font-bold text-xs uppercase tracking-widest mr-2'>
+        <span className='text-gray-700 text-xs uppercase tracking-wider font-medium mr-2'>
           Share
         </span>
 
@@ -170,6 +170,8 @@ const CollegeDetailPage = ({ params }) => {
       <Header />
       <Navbar />
       <ImageSection college={college} />
+      <br />
+      <br />
       <CollegeOverview college={college} />
       <ApplyNow college={college} />
       <RelatedColleges college={college} />

@@ -193,12 +193,6 @@ export const menuItems = [
         visible: ['admin', 'editor']
       },
       {
-        icon: <FaChalkboardTeacher className='text-xl' />,
-        label: 'Faculty',
-        href: '/dashboard/faculty',
-        visible: ['admin', 'editor']
-      },
-      {
         icon: <FaTags className='text-xl' />,
         label: 'Tags',
         href: '/dashboard/tag',
@@ -214,6 +208,12 @@ export const menuItems = [
         icon: <FaGraduationCap className='text-xl' />,
         label: 'Program',
         href: '/dashboard/program',
+        visible: ['admin', 'editor']
+      },
+      {
+        icon: <MdSchool className='text-xl' />,
+        label: 'Degree',
+        href: '/dashboard/degrees',
         visible: ['admin', 'editor']
       },
       {

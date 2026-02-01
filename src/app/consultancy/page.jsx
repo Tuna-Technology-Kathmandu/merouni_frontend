@@ -1,8 +1,7 @@
 'use client'
 import React, { useState, useEffect, useLayoutEffect } from 'react'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Search, MapPin, Filter, X } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { Select } from '@/ui/shadcn/select'
 import EmptyState from '@/ui/shadcn/EmptyState'
 import { getConsultancies, getCourses } from './actions'
@@ -11,6 +10,7 @@ import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Pagination from '../blogs/components/Pagination'
 import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
+import ConsultancyCard from '@/ui/molecules/cards/ConsultancyCard'
 
 export default function ConsultanciesPage() {
   const router = useRouter()
@@ -81,10 +81,6 @@ export default function ConsultanciesPage() {
     }
     fetchData()
   }, [pagination.currentPage, debouncedSearch, selectedCourse])
-
-  const handleClick = (slugs) => {
-    router.push(`/consultancy/${slugs}`)
-  }
 
   const handlePageChange = (page) => {
     if (page > 0 && page <= pagination.totalPages) {
@@ -213,113 +209,17 @@ export default function ConsultanciesPage() {
               />
             </div>
           ) : (
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-              {consultancyData.map((consultancy) => {
-                const destinations = JSON.parse(consultancy.destination || '[]')
-                const address = JSON.parse(consultancy.address || '{}')
-                const description = consultancy?.description || ''
-                const logo = consultancy?.logo || ''
-
-                return (
-                  <div
-                    key={consultancy.id}
-                    className='group cursor-pointer h-full'
-                    onClick={() => handleClick(consultancy.slugs)}
-                  >
-                    <div className='bg-white rounded-[32px] border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.02)] overflow-hidden h-full transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)] hover:border-[#0A6FA7]/20 flex flex-col'>
-                      {/* Banner */}
-                      <div className='relative h-48 w-full bg-gray-100'>
-                        <Image
-                          src={
-                            consultancy?.featured_image ||
-                            'https://placehold.co/600x400'
-                          }
-                          alt={consultancy.title}
-                          fill
-                          className='object-cover group-hover:scale-105 transition-transform duration-500'
-                          priority
-                        />
-
-                        {consultancy.pinned === 1 && (
-                          <span className='absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-[#0A6FA7] px-3 py-1 rounded-full text-[10px] font-bold shadow-sm border border-gray-100 uppercase tracking-wider'>
-                            Featured
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Content */}
-                      <div className='p-8 flex flex-col flex-grow'>
-                        {/* Logo and Title */}
-                        <div className='flex items-start gap-4 mb-4'>
-                          {logo && (
-                            <div className='relative w-12 h-12 flex-shrink-0 bg-white rounded-xl shadow-sm border border-gray-100 p-1'>
-                              <Image
-                                src={logo}
-                                alt={`${consultancy.title} Logo`}
-                                fill
-                                className='object-contain p-1'
-                              />
-                            </div>
-                          )}
-                          <h2 className='text-lg font-bold text-gray-900 group-hover:text-[#0A6FA7] transition-colors line-clamp-2 leading-tight'>
-                            {consultancy.title}
-                          </h2>
-                        </div>
-
-                        {/* Description */}
-                        {description && (
-                          <p className='text-gray-500 text-sm mb-6 line-clamp-2 font-medium leading-relaxed'>
-                            {description}
-                          </p>
-                        )}
-
-                        <div className='mt-auto space-y-4 pt-6 border-t border-gray-50'>
-                          {/* Destinations */}
-                          {destinations.length > 0 && (
-                            <div>
-                              <h3 className='text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
-                                Destinations
-                              </h3>
-                              <div className='flex flex-wrap gap-2'>
-                                {destinations.slice(0, 3).map((dest, index) => (
-                                  <span
-                                    key={index}
-                                    className='bg-gray-50 text-gray-600 px-2.5 py-1 rounded-lg text-xs font-bold border border-gray-100'
-                                  >
-                                    {dest.country}
-                                  </span>
-                                ))}
-                                {destinations.length > 3 && (
-                                  <span className='text-xs font-bold text-gray-400 py-1'>
-                                    +more
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Address */}
-                          {(address.city || address.street) && (
-                            <div>
-                              <h3 className='text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-1'>
-                                Location
-                              </h3>
-                              <div className='flex items-center gap-1.5 text-gray-600'>
-                                <MapPin className='w-3.5 h-3.5 text-[#0A6FA7]' />
-                                <span className='text-sm font-semibold truncate'>
-                                  {[address.street, address.city]
-                                    .filter(Boolean)
-                                    .join(', ')}
-                                </span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+              {[...consultancyData]
+                .sort(
+                  (a, b) => (b.pinned === 1 ? 1 : 0) - (a.pinned === 1 ? 1 : 0)
                 )
-              })}
+                .map((consultancy) => (
+                  <ConsultancyCard
+                    key={consultancy.id}
+                    consultancy={consultancy}
+                  />
+                ))}
             </div>
           )}
 

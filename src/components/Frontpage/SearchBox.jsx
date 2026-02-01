@@ -1,6 +1,13 @@
 'use client'
 
-import { BookOpen, Calendar, ChevronRight, GraduationCap, Search, X } from 'lucide-react'
+import {
+  BookOpen,
+  Calendar,
+  ChevronRight,
+  GraduationCap,
+  Search,
+  X
+} from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { DotenvConfig } from '../../config/env.config'
@@ -99,7 +106,9 @@ const SearchBox = ({ onClose }) => {
             <div className='p-2 bg-[#0A6FA7]/10 rounded-xl'>
               <Icon className='w-5 h-5 text-[#0A6FA7]' />
             </div>
-            <h2 className='text-lg md:text-xl font-semibold text-gray-900'>{title}</h2>
+            <h2 className='text-lg md:text-xl font-semibold text-gray-900'>
+              {title}
+            </h2>
           </div>
           {items.length > 3 && (
             <button
@@ -107,7 +116,9 @@ const SearchBox = ({ onClose }) => {
               onClick={toggleView ? viewClick : viewLess}
             >
               {toggleView ? 'View All' : 'View Less'}
-              <ChevronRight className={`w-4 h-4 transition-transform ${!toggleView ? 'rotate-90' : ''}`} />
+              <ChevronRight
+                className={`w-4 h-4 transition-transform ${!toggleView ? 'rotate-90' : ''}`}
+              />
             </button>
           )}
         </div>
@@ -132,8 +143,7 @@ const SearchBox = ({ onClose }) => {
 
   return (
     <div
-      className={`fixed inset-0 flex flex-col bg-white/95 backdrop-blur-xl transition-all duration-300 z-[100] font-sans ${searchTag.trim() ? 'h-screen overflow-auto' : 'h-[450px] shadow-lg'
-        }`}
+      className='fixed inset-0 flex flex-col bg-white/95 backdrop-blur-xl transition-all duration-300 z-[100] font-sans h-screen min-h-screen overflow-auto shadow-lg'
       onClick={(e) => e.stopPropagation()}
     >
       <div className='max-w-5xl mx-auto w-full px-6 flex flex-col pt-10'>
@@ -143,7 +153,9 @@ const SearchBox = ({ onClose }) => {
           className='self-end p-2 px-3 text-red-500 hover:text-red-600 transition flex items-center gap-1 mb-4'
         >
           <X className='w-4 h-4' />
-          <span className='text-[10px] font-semibold uppercase tracking-[0.2em]'>Close</span>
+          <span className='text-[10px] font-semibold uppercase tracking-[0.2em]'>
+            Close
+          </span>
         </button>
 
         {/* 🔹 Search Input Container */}
@@ -183,7 +195,9 @@ const SearchBox = ({ onClose }) => {
           {/* Popular Searches */}
           {!searchTag.trim() && (
             <div className='animate-in fade-in duration-500'>
-              <h3 className='text-[10px] uppercase tracking-[0.2em] font-semibold text-gray-400 mb-6'>Popular Searches</h3>
+              <h3 className='text-[10px] uppercase tracking-[0.2em] font-semibold text-gray-400 mb-6'>
+                Popular Searches
+              </h3>
               <div className='flex flex-wrap gap-2'>
                 {popularSearches.map((search, index) => (
                   <button
@@ -201,19 +215,39 @@ const SearchBox = ({ onClose }) => {
           {/* Search Results */}
           {searchTag.trim() && (
             <div className='animate-in fade-in duration-300'>
-              {!isLoading && Object.values(searchResults).every((arr) => arr.length === 0) ? (
+              {!isLoading &&
+              Object.values(searchResults).every((arr) => arr.length === 0) ? (
                 <div className='py-20 text-center'>
                   <div className='w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300'>
                     <Search size={32} />
                   </div>
-                  <h3 className='text-xl font-semibold text-gray-900 mb-1'>No results found</h3>
-                  <p className='text-gray-500 text-sm font-medium'>We couldn't find anything matching "{searchTag}"</p>
+                  <h3 className='text-xl font-semibold text-gray-900 mb-1'>
+                    No results found
+                  </h3>
+                  <p className='text-gray-500 text-sm font-medium'>
+                    We couldn't find anything matching "{searchTag}"
+                  </p>
                 </div>
               ) : (
                 <>
-                  <ResultSection title='Colleges' items={searchResults.colleges} icon={GraduationCap} path='colleges' />
-                  <ResultSection title='Events' items={searchResults.events} icon={Calendar} path='events' />
-                  <ResultSection title='Blogs' items={searchResults.blogs} icon={BookOpen} path='blogs' />
+                  <ResultSection
+                    title='Colleges'
+                    items={searchResults.colleges}
+                    icon={GraduationCap}
+                    path='colleges'
+                  />
+                  <ResultSection
+                    title='Events'
+                    items={searchResults.events}
+                    icon={Calendar}
+                    path='events'
+                  />
+                  <ResultSection
+                    title='Blogs'
+                    items={searchResults.blogs}
+                    icon={BookOpen}
+                    path='blogs'
+                  />
                 </>
               )}
             </div>

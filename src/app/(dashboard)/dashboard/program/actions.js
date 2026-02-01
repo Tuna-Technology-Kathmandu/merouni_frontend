@@ -90,4 +90,17 @@ export const fetchExam = async (searchQuery = '') => {
   }
 }
 
-//fetch degree
+// fetch degrees for program form
+export const fetchDegrees = async (searchQuery = '') => {
+  try {
+    const response = await authFetch(
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/degree${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : '?limit=100'}`
+    )
+    if (!response.ok) throw new Error('Failed to fetch degrees')
+    const data = await response.json()
+    return data.items || []
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}

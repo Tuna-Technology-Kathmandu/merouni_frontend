@@ -1,19 +1,18 @@
 import { DotenvConfig } from "@/config/env.config"
 
-export const fetchDegrees = async (search = '', page = 1, faculty = '', level = '') => {
+export const fetchDegrees = async (search = '', page = 1) => {
   try {
-    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/program`)
-    url.searchParams.append('q', search)
+    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/degree`)
+    if (search) url.searchParams.append('q', search)
     url.searchParams.append('page', page)
     url.searchParams.append('limit', 15)
-    if (faculty) url.searchParams.append('facultyId', faculty)
-    if (level) url.searchParams.append('levelId', level)
 
     const response = await fetch(url.toString())
     const data = await response.json()
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch degrees')
     return data
   } catch (error) {
-    console.error('Error fetching courses:', error)
+    console.error('Error fetching degrees:', error)
     throw error
   }
 }
@@ -45,7 +44,7 @@ export const fetchLevels = async () => {
 export const getDegreeBySlug = async (slug) => {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/program/${slug}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/degree/${encodeURIComponent(slug)}`,
       {
         method: 'GET',
         headers: {
@@ -55,12 +54,12 @@ export const getDegreeBySlug = async (slug) => {
       }
     )
     if (!response.ok) {
-      throw new Error('Failed to fetch degree description')
+      throw new Error('Failed to fetch degree')
     }
     const data = await response.json()
-    return data
+    return data?.item ?? data
   } catch (error) {
-    console.error('Error fetching college details:', error)
+    console.error('Error fetching degree:', error)
     throw error
   }
 }

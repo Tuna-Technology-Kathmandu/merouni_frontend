@@ -3,7 +3,7 @@ import { authFetch } from '@/app/utils/authFetch'
 import { DotenvConfig } from '@/config/env.config'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Edit2, Search, Trash2, X } from 'lucide-react'
+import { Edit2, Eye, Search, Trash2, X } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
@@ -13,13 +13,10 @@ import { useDebounce } from 'use-debounce'
 import { Modal } from '../../../../ui/molecules/UserModal'
 import Table from '../../../../ui/molecules/Table'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import {
-  fetchExam,
-  fetchFaculties,
-  fetchLevel,
-  fetchScholarship
-} from './actions'
+import { fetchExam, fetchScholarship } from './actions'
 import CourseSearch from './CourseSearch'
+import DegreeDropdown from '@/ui/molecules/dropdown/DegreeDropdown'
+import LevelDropdown from '@/ui/molecules/dropdown/LevelDropdown'
 import { Button } from '@/ui/shadcn/button'
 const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
@@ -44,22 +41,6 @@ export default function ProgramForm() {
   const [currentCourse, setCurrentCourse] = useState({ id: '', title: '' })
 
   // States for dropdowns
-  //for faculties search
-  const [facSearch, setFacSearch] = useState('')
-  const [debouncedFac] = useDebounce(facSearch, 300)
-  const [faculties, setFaculties] = useState([])
-  const [loadFac, setLoadFac] = useState(false)
-  const [showFacDrop, setShowFacDrop] = useState(false)
-  const [hasSelectedFac, setHasSelectedFac] = useState(false)
-
-  //for level search
-  const [levelSearch, setLevelSearch] = useState('')
-  const [debouncedLevel] = useDebounce(levelSearch, 300)
-  const [levels, setLevels] = useState([])
-  const [loadLevel, setLoadLevel] = useState(false)
-  const [showLevelDrop, setShowLevelDrop] = useState(false)
-  const [hasSelectedLevel, setHasSelectedLevel] = useState(false)
-
   //for scholarship search
   const [scholarSearch, setScholarSearch] = useState('')
   const [debouncedScholar] = useDebounce(scholarSearch, 300)
@@ -83,6 +64,10 @@ export default function ProgramForm() {
 
   const [syllabusSearch, setSyllabusSearch] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  const [viewProgram, setViewProgram] = useState(null)
+  const [viewLoading, setViewLoading] = useState(false)
+  const [isViewOpen, setIsViewOpen] = useState(false)
 
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -143,10 +128,10 @@ export default function ProgramForm() {
       title: '',
       code: '',
       author: author_id,
-      faculty_id: '',
       duration: '',
       credits: '',
       level_id: '',
+      degree_id: '',
       language: '',
       eligibility_criteria: '',
       fee: '',
@@ -191,10 +176,6 @@ export default function ProgramForm() {
       setIsOpen(true)
       setEditing(false)
       reset()
-      setFacSearch('')
-      setHasSelectedFac(false)
-      setLevelSearch('')
-      setHasSelectedLevel(false)
       setSelectedColleges([])
       setCollegeSearch('')
     }
@@ -209,50 +190,6 @@ export default function ProgramForm() {
   }, [searchTimeout])
 
   const { requireAdmin } = useAdminPermission()
-
-  //for faculties
-  useEffect(() => {
-    if (hasSelectedFac) return
-
-    const getFaculties = async () => {
-      setLoadFac(true)
-      try {
-        const facultyList = await fetchFaculties(debouncedFac)
-        setFaculties(facultyList)
-        setShowFacDrop(true)
-        setLoadFac(false)
-      } catch (error) {
-        console.error('Error fetching Faculties:', error)
-      }
-    }
-    if (debouncedFac !== '') {
-      getFaculties()
-    } else {
-      setShowFacDrop(false)
-    }
-  }, [debouncedFac])
-
-  //for level searching
-  useEffect(() => {
-    if (hasSelectedLevel) return
-
-    const getLevels = async () => {
-      setLoadLevel(true)
-      try {
-        const levelList = await fetchLevel(debouncedLevel)
-        setLevels(levelList)
-        setShowLevelDrop(true)
-        setLoadLevel(false)
-      } catch (error) {
-        console.error('Error fetching levels:', error)
-      }
-    }
-    if (debouncedLevel !== '') {
-      getLevels()
-    } else {
-      setShowLevelDrop(false)
-    }
-  }, [debouncedLevel])
 
   //for scholarships searching
   useEffect(() => {
@@ -344,6 +281,9 @@ export default function ProgramForm() {
       setSubmitting(true)
       const cleanedData = {
         ...data,
+        faculty_id: null,
+        level_id: data.level_id ? Number(data.level_id) : undefined,
+        degree_id: data.degree_id ? Number(data.degree_id) : null,
         syllabus: data.syllabus.map((item) => ({
           year: item.year,
           semester: item.semester,
@@ -385,15 +325,10 @@ export default function ProgramForm() {
       setCollegeSearch('')
       fetchPrograms()
       setIsOpen(false)
-
-      setFacSearch('')
-      setHasSelectedFac(false)
       setScholarSearch('')
       setHasSelectedScholar(false)
       setExamSearch('')
       setHasSelectedExam(false)
-      setLevelSearch('')
-      setHasSelectedLevel(false)
     } catch (error) {
       // Handle different error types
       if (
@@ -412,14 +347,10 @@ export default function ProgramForm() {
   }
 
   const handleEdit = async (slug) => {
-    setFacSearch('')
-    setHasSelectedFac(false)
     setScholarSearch('')
     setHasSelectedScholar(false)
     setExamSearch('')
     setHasSelectedExam(false)
-    setLevelSearch('')
-    setHasSelectedLevel(false)
     try {
       setEditing(true)
       setLoading(true)
@@ -455,13 +386,6 @@ export default function ProgramForm() {
 
       setValue('syllabus', enrichedSyllabus)
 
-      if (program.programfaculty?.title) {
-        setFacSearch(program.programfaculty.title)
-      } else {
-        setFacSearch('')
-        setHasSelectedFac(true) // Don't auto-open if there's nothing to pre-fill
-      }
-
       if (program.programscholarship?.name) {
         setScholarSearch(program.programscholarship.name)
       } else {
@@ -476,13 +400,8 @@ export default function ProgramForm() {
         setHasSelectedExam(true)
       }
 
-      if (program.programlevel?.title) {
-        setLevelSearch(program.programlevel.title)
-        setHasSelectedLevel(false) // allow dropdown to auto-open
-      } else {
-        setLevelSearch('')
-        setHasSelectedLevel(true) // prevent auto-opening dropdown
-      }
+      setValue('level_id', program.level_id ?? '')
+      setValue('degree_id', program.degree_id ?? '')
 
       // Set colleges - extract college_ids from program_college
       if (program.colleges) {
@@ -513,12 +432,6 @@ export default function ProgramForm() {
   }
 
   useEffect(() => {
-    if (facSearch && faculties.length > 0 && !hasSelectedFac) {
-      setShowFacDrop(true)
-    }
-  }, [facSearch, faculties])
-
-  useEffect(() => {
     if (scholarSearch && scholarships.length > 0 && !hasSelectedScholar) {
       setShowScholarDrop(true)
     }
@@ -529,12 +442,6 @@ export default function ProgramForm() {
       setShowExamDrop(true)
     }
   }, [examSearch, exams])
-
-  useEffect(() => {
-    if (levelSearch && levels.length > 0 && !hasSelectedLevel) {
-      setShowLevelDrop(true)
-    }
-  }, [levelSearch, levels])
 
   const handleDeleteClick = (id) => {
     requireAdmin(() => {
@@ -575,14 +482,10 @@ export default function ProgramForm() {
     reset()
     setSelectedColleges([])
     setCollegeSearch('')
-    setFacSearch('')
-    setHasSelectedFac(false)
     setScholarSearch('')
     setHasSelectedScholar(false)
     setExamSearch('')
     setHasSelectedExam(false)
-    setLevelSearch('')
-    setHasSelectedLevel(false)
   }
 
   const handleSearchInput = (value) => {
@@ -602,14 +505,28 @@ export default function ProgramForm() {
     }
   }
 
+  const handleView = async (slug) => {
+    setIsViewOpen(true)
+    setViewProgram(null)
+    setViewLoading(true)
+    try {
+      const response = await authFetch(
+        `${DotenvConfig.NEXT_APP_API_BASE_URL}/program/${slug}`
+      )
+      const program = await response.json()
+      setViewProgram(program)
+    } catch (error) {
+      toast.error('Failed to load program details')
+      setIsViewOpen(false)
+    } finally {
+      setViewLoading(false)
+    }
+  }
+
   const columns = [
     {
       header: 'Title',
       accessorKey: 'title'
-    },
-    {
-      header: 'Faculty',
-      accessorKey: 'faculty_id'
     },
     {
       header: 'Duration',
@@ -620,23 +537,28 @@ export default function ProgramForm() {
       accessorKey: 'fee'
     },
     {
-      header: 'Level',
-      accessorKey: 'level_id'
-    },
-    {
       header: 'Actions',
       id: 'actions',
       cell: ({ row }) => (
         <div className='flex gap-2'>
           <button
+            onClick={() => handleView(row.original.slugs)}
+            className='p-1 text-gray-600 hover:text-gray-800'
+            title='View'
+          >
+            <Eye className='w-4 h-4' />
+          </button>
+          <button
             onClick={() => handleEdit(row.original.slugs)}
             className='p-1 text-blue-600 hover:text-blue-800'
+            title='Edit'
           >
             <Edit2 className='w-4 h-4' />
           </button>
           <button
             onClick={() => handleDeleteClick(row.original.id)}
             className='p-1 text-red-600 hover:text-red-800'
+            title='Delete'
           >
             <Trash2 className='w-4 h-4' />
           </button>
@@ -737,14 +659,10 @@ export default function ProgramForm() {
                 reset()
                 setSelectedColleges([])
                 setCollegeSearch('')
-                setFacSearch('')
-                setHasSelectedFac(false)
                 setScholarSearch('')
                 setHasSelectedScholar(false)
                 setExamSearch('')
                 setHasSelectedExam(false)
-                setLevelSearch('')
-                setHasSelectedLevel(false)
                 setIsOpen(true)
               }}
             >
@@ -802,57 +720,6 @@ export default function ProgramForm() {
                   />
                 </div>
 
-                <div className='relative'>
-                  <label className='block mb-2'>
-                    Faculty <span className='text-red-500'>*</span>
-                  </label>
-
-                  <input
-                    type='text'
-                    className='w-full p-2 border rounded'
-                    value={facSearch}
-                    onChange={(e) => {
-                      setFacSearch(e.target.value)
-                      setHasSelectedFac(false)
-                    }}
-                    placeholder='Search Faculty'
-                  />
-
-                  {/* Hidden input for react-hook-form binding */}
-                  <input
-                    type='hidden'
-                    {...register('faculty_id', { required: true })}
-                  />
-                  {loadFac ? (
-                    <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
-                      Loading...
-                    </div>
-                  ) : showFacDrop ? (
-                    faculties.length > 0 ? (
-                      <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
-                        {faculties.map((fac) => (
-                          <li
-                            key={fac.id}
-                            className='p-2 cursor-pointer hover:bg-gray-100'
-                            onClick={() => {
-                              setValue('faculty_id', fac.id)
-                              setFacSearch(fac.title)
-                              setShowFacDrop(false)
-                              setHasSelectedFac(true)
-                            }}
-                          >
-                            {fac.title}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
-                        No faculty found.
-                      </div>
-                    )
-                  ) : null}
-                </div>
-
                 <div>
                   <label className='block mb-2'>
                     Duration <span className='text-red-500'>*</span>
@@ -879,55 +746,36 @@ export default function ProgramForm() {
                   />
                 </div>
 
-                {/* level search box */}
-                <div className='relative'>
+                <div>
                   <label className='block mb-2'>
                     Level <span className='text-red-500'>*</span>
                   </label>
                   <input
-                    type='text'
-                    className='w-full p-2 border rounded'
-                    value={levelSearch}
-                    onChange={(e) => {
-                      setLevelSearch(e.target.value)
-                      setHasSelectedLevel(false)
-                    }}
-                    placeholder='Search Levels'
-                  />
-
-                  {/* Hidden input for react-hook-form binding */}
-                  <input
                     type='hidden'
-                    {...register('level_id', { required: true })}
+                    {...register('level_id', { required: 'Level is required' })}
                   />
-                  {loadLevel ? (
-                    <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
-                      Loading...
-                    </div>
-                  ) : showLevelDrop ? (
-                    levels.length > 0 ? (
-                      <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
-                        {levels.map((level) => (
-                          <li
-                            key={level.id}
-                            className='p-2 cursor-pointer hover:bg-gray-100'
-                            onClick={() => {
-                              setValue('level_id', level.id)
-                              setLevelSearch(level.title)
-                              setShowLevelDrop(false)
-                              setHasSelectedLevel(true)
-                            }}
-                          >
-                            {level.title}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
-                        No levels found.
-                      </div>
-                    )
-                  ) : null}
+                  <LevelDropdown
+                    value={watch('level_id') ?? ''}
+                    onChange={(id) => setValue('level_id', id || '')}
+                    placeholder='Select level'
+                    className='w-full'
+                  />
+                  {errors.level_id && (
+                    <span className='text-red-500 text-sm mt-1'>
+                      {errors.level_id.message}
+                    </span>
+                  )}
+                </div>
+
+                {/* Degree (optional) */}
+                <div>
+                  <label className='block mb-2'>Degree</label>
+                  <DegreeDropdown
+                    value={watch('degree_id') ?? ''}
+                    onChange={(id) => setValue('degree_id', id || '')}
+                    placeholder='Select degree'
+                    className='w-full'
+                  />
                 </div>
 
                 <div>
@@ -1350,6 +1198,174 @@ export default function ProgramForm() {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      {/* View Program Detail Modal */}
+      <Modal
+        isOpen={isViewOpen}
+        onClose={() => {
+          setIsViewOpen(false)
+          setViewProgram(null)
+        }}
+        title='Program Details'
+        className='max-w-2xl max-h-[90vh] overflow-hidden flex flex-col'
+      >
+        <div className='overflow-y-auto flex-1 -m-6 p-6'>
+          {viewLoading ? (
+            <div className='flex items-center justify-center py-12'>
+              <div className='animate-spin rounded-full h-10 w-10 border-b-2 border-[#0A6FA7]' />
+            </div>
+          ) : viewProgram ? (
+            <div className='space-y-6'>
+              <div>
+                <h3 className='text-lg font-semibold text-gray-900 border-b pb-2 mb-2'>
+                  {viewProgram.title}
+                </h3>
+                {viewProgram.code && (
+                  <p className='text-sm text-gray-500'>
+                    Code: {viewProgram.code}
+                  </p>
+                )}
+              </div>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm'>
+                {viewProgram.programfaculty?.title && (
+                  <div>
+                    <span className='font-medium text-gray-500'>Faculty</span>
+                    <p className='text-gray-900'>
+                      {viewProgram.programfaculty.title}
+                    </p>
+                  </div>
+                )}
+                {viewProgram.programlevel?.title && (
+                  <div>
+                    <span className='font-medium text-gray-500'>Level</span>
+                    <p className='text-gray-900'>
+                      {viewProgram.programlevel.title}
+                    </p>
+                  </div>
+                )}
+                {viewProgram.programdegree?.title && (
+                  <div>
+                    <span className='font-medium text-gray-500'>Degree</span>
+                    <p className='text-gray-900'>
+                      {viewProgram.programdegree.title}
+                    </p>
+                  </div>
+                )}
+                {viewProgram.duration && (
+                  <div>
+                    <span className='font-medium text-gray-500'>Duration</span>
+                    <p className='text-gray-900'>{viewProgram.duration}</p>
+                  </div>
+                )}
+                {viewProgram.credits != null && (
+                  <div>
+                    <span className='font-medium text-gray-500'>Credits</span>
+                    <p className='text-gray-900'>{viewProgram.credits}</p>
+                  </div>
+                )}
+                {viewProgram.fee && (
+                  <div>
+                    <span className='font-medium text-gray-500'>Fee</span>
+                    <p className='text-gray-900'>{viewProgram.fee}</p>
+                  </div>
+                )}
+                {viewProgram.delivery_type && (
+                  <div>
+                    <span className='font-medium text-gray-500'>
+                      Delivery Type
+                    </span>
+                    <p className='text-gray-900'>{viewProgram.delivery_type}</p>
+                  </div>
+                )}
+                {viewProgram.delivery_mode && (
+                  <div>
+                    <span className='font-medium text-gray-500'>
+                      Delivery Mode
+                    </span>
+                    <p className='text-gray-900'>{viewProgram.delivery_mode}</p>
+                  </div>
+                )}
+              </div>
+              {viewProgram.eligibility_criteria && (
+                <div>
+                  <span className='block font-medium text-gray-500 text-sm mb-1'>
+                    Eligibility Criteria
+                  </span>
+                  <div
+                    className='text-gray-900 text-sm prose prose-sm max-w-none'
+                    dangerouslySetInnerHTML={{
+                      __html: viewProgram.eligibility_criteria
+                    }}
+                  />
+                </div>
+              )}
+              {viewProgram.learning_outcomes && (
+                <div>
+                  <span className='block font-medium text-gray-500 text-sm mb-1'>
+                    Learning Outcomes
+                  </span>
+                  <div
+                    className='text-gray-900 text-sm prose prose-sm max-w-none'
+                    dangerouslySetInnerHTML={{
+                      __html: viewProgram.learning_outcomes
+                    }}
+                  />
+                </div>
+              )}
+              {viewProgram.syllabus?.length > 0 && (
+                <div>
+                  <span className='block font-medium text-gray-500 text-sm mb-2'>
+                    Syllabus
+                  </span>
+                  <div className='border rounded-lg overflow-hidden'>
+                    <table className='w-full text-sm'>
+                      <thead className='bg-gray-50'>
+                        <tr>
+                          <th className='text-left p-2'>Year</th>
+                          <th className='text-left p-2'>Semester</th>
+                          <th className='text-left p-2'>Course</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {viewProgram.syllabus.map((s, i) => (
+                          <tr key={i} className='border-t'>
+                            <td className='p-2'>{s.year}</td>
+                            <td className='p-2'>{s.semester}</td>
+                            <td className='p-2'>
+                              {s.programCourse?.title ?? '—'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : null}
+        </div>
+        {!viewLoading && viewProgram && (
+          <div className='flex justify-end gap-2 pt-4 border-t mt-4'>
+            <Button
+              variant='outline'
+              onClick={() => {
+                setIsViewOpen(false)
+                setViewProgram(null)
+              }}
+            >
+              Close
+            </Button>
+            <Button
+              onClick={() => {
+                setIsViewOpen(false)
+                handleEdit(viewProgram.slugs)
+              }}
+            >
+              Edit Program
+            </Button>
+          </div>
+        )}
       </Modal>
 
       {/* Confirmation Dialog */}

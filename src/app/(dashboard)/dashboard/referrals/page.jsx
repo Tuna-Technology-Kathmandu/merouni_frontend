@@ -18,7 +18,7 @@ import {
 } from '@/ui/shadcn/table'
 import { Button } from '@/ui/shadcn/button'
 import { Search, X, Filter, ChevronDown } from 'lucide-react'
-import CollegesDropdown from '@/ui/molecules/CollegesDropdown'
+import CollegesDropdown from '@/ui/molecules/dropdown/CollegesDropdown'
 
 const ReferralsPage = () => {
   const { setHeading } = usePageHeading()

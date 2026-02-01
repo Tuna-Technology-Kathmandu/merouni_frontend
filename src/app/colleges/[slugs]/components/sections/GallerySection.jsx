@@ -13,7 +13,7 @@ const GallerySection = ({ college }) => {
 
   return (
     <div>
-      <h2 className='text-sm md:text-lg lg:text-xl font-bold'>Gallery</h2>
+      <h2 className='text-lg font-semibold text-gray-900 mb-6'>Gallery</h2>
 
       {images.length > 0 && (
         <div className='grid grid-cols-3 max-[550px]:grid-cols-2  gap-4 mt-12 max-[1120px]:mt-9'>

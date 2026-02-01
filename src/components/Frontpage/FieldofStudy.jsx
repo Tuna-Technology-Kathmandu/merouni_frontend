@@ -39,13 +39,13 @@ const FieldofStudy = () => {
   }
 
   return (
-    <div className='bg-gradient-to-br from-green-50 via-white to-blue-50 py-12 md:py-16 relative'>
-      <div className='container mx-auto px-8 md:px-12'>
-        <h1 className='text-xl font-semibold text-gray-800 my-8 pb-2 relative inline-block'>
+    <div className='bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 md:py-10 relative'>
+      <div className='container mx-auto px-4 sm:px-6 md:px-8'>
+        <h1 className='text-xl font-semibold text-gray-800 mt-4 mb-5 md:mt-5 md:mb-6 pb-2 relative inline-block'>
           Field of Study
           <span className='absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#0870A8] to-[#31AD8F]'></span>
         </h1>
-        <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6'>
+        <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5'>
           {study.map((item, index) => (
             <div
               key={item.id}

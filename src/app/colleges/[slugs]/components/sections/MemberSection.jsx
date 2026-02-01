@@ -4,9 +4,7 @@ import { FaUser, FaPhoneAlt, FaBriefcase } from 'react-icons/fa'
 const MemberSection = ({ validMembers }) => {
   return (
     <div className='max-w-4xl'>
-      <h2 className='text-xl md:text-2xl font-bold mb-8 text-gray-900'>
-        Our Team
-      </h2>
+      <h2 className='text-lg font-semibold text-gray-900 mb-8'>Our Team</h2>
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6'>
         {validMembers.map((member, index) => (
           <div
@@ -19,7 +17,7 @@ const MemberSection = ({ validMembers }) => {
                 <div className='flex-shrink-0 w-12 h-12 rounded-2xl bg-[#30AD8F]/10 flex items-center justify-center group-hover:bg-[#30AD8F]/20 transition-colors'>
                   <FaUser className='w-5 h-5 text-[#30AD8F]' />
                 </div>
-                <h3 className='text-lg font-bold text-gray-900 leading-tight'>
+                <h3 className='text-base font-semibold text-gray-900 leading-tight'>
                   {member.name}
                 </h3>
               </div>
@@ -33,8 +31,10 @@ const MemberSection = ({ validMembers }) => {
                     <FaBriefcase className='w-3.5 h-3.5 text-gray-400' />
                   </div>
                   <div>
-                    <p className='text-[10px] text-gray-400 font-bold uppercase tracking-widest'>Role</p>
-                    <p className='text-sm md:text-base text-gray-600 font-medium mt-0.5'>
+                    <p className='text-xs text-gray-500 uppercase tracking-wider font-medium'>
+                      Role
+                    </p>
+                    <p className='text-sm text-gray-600 mt-0.5'>
                       {member.role}
                     </p>
                   </div>
@@ -48,10 +48,12 @@ const MemberSection = ({ validMembers }) => {
                     <FaPhoneAlt className='w-3.5 h-3.5 text-orange-400' />
                   </div>
                   <div>
-                    <p className='text-[10px] text-gray-400 font-bold uppercase tracking-widest'>Contact</p>
+                    <p className='text-xs text-gray-500 uppercase tracking-wider font-medium'>
+                      Contact
+                    </p>
                     <a
                       href={`tel:${member.contact_number}`}
-                      className='text-sm md:text-base text-[#0A6FA7] font-bold mt-0.5 block hover:underline transition-all'
+                      className='text-sm text-[#0A6FA7] mt-0.5 block hover:underline transition-all'
                     >
                       {member.contact_number}
                     </a>

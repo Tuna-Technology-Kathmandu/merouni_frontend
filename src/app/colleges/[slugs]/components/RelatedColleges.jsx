@@ -83,7 +83,7 @@ const RelatedColleges = ({ college }) => {
 
   return (
     <div className='flex flex-col max-w-[1600px] mx-auto mb-10 sm:mb-20 px-4 sm:px-8 md:px-16 lg:px-24'>
-      <h2 className='font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl leading-7 sm:leading-10 m-2 sm:m-4 text-center sm:text-left'>
+      <h2 className='text-lg font-semibold text-gray-900 m-2 sm:m-4 text-center sm:text-left'>
         Colleges you may like
       </h2>
       <div className='relative'>
@@ -121,10 +121,10 @@ const RelatedColleges = ({ college }) => {
                     />
                   </div>
                   <div className='px-2 sm:px-4 pb-2 sm:pb-4 flex flex-col'>
-                    <h3 className='text-sm sm:text-base md:text-lg font-bold text-center line-clamp-2'>
+                    <h3 className='text-sm font-medium text-center line-clamp-2 text-gray-900'>
                       {college.name}
                     </h3>
-                    <p className='text-xs text-gray-700 text-center line-clamp-1 mt-1'>
+                    <p className='text-xs text-gray-500 text-center line-clamp-1 mt-1'>
                       {college.location}
                     </p>
                   </div>

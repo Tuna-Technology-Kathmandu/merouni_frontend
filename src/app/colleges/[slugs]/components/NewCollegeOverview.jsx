@@ -123,9 +123,9 @@ const CollegeOverview = ({ college }) => {
       {/* Sidebar Navigation */}
       {visibleSections.length > 0 && (
         <aside className='w-full md:w-48 lg:w-56 md:sticky md:top-32 flex-shrink-0'>
-          <div className='flex items-center gap-2 mb-6 hidden md:flex'>
-            <div className='w-1 h-6 bg-[#0A6FA7] rounded-full'></div>
-            <p className='font-bold text-lg text-gray-900'>Contents</p>
+          <div className='hidden md:flex items-center gap-2 mb-6'>
+            <div className='w-1 h-5 bg-[#0A6FA7] rounded-full' />
+            <p className='text-sm font-medium text-gray-900'>Contents</p>
           </div>
 
           <ul className='flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-y-auto no-scrollbar pb-4 md:pb-0 border-b md:border-b-0 border-gray-100'>
@@ -133,10 +133,11 @@ const CollegeOverview = ({ college }) => {
               <li
                 key={index}
                 onClick={() => handleScroll(index)}
-                className={`text-sm lg:text-base font-bold cursor-pointer whitespace-nowrap px-4 py-2 md:px-0 md:py-2.5 transition-all relative group ${activeSection === index
-                  ? 'text-[#0A6FA7]'
-                  : 'text-gray-400 hover:text-gray-700'
-                  }`}
+                className={`text-sm font-medium cursor-pointer whitespace-nowrap px-4 py-2 md:px-0 md:py-2.5 transition-all relative group ${
+                  activeSection === index
+                    ? 'text-[#0A6FA7]'
+                    : 'text-gray-500 hover:text-gray-800'
+                }`}
               >
                 {section.name}
                 {activeSection === index && (
@@ -158,16 +159,75 @@ const CollegeOverview = ({ college }) => {
             {section.component}
           </div>
         ))}
+
+        {/* Location block - visible on mobile/tablet only (below main content) */}
+        {(college?.google_map_url || hasAddress) && (
+          <div className='xl:hidden w-full pt-4'>
+            <div className='bg-gray-50/30 rounded-3xl p-6 border border-gray-100/50'>
+              {college?.google_map_url && (
+                <div className='mb-6'>
+                  <p className='text-sm font-medium text-gray-900 mb-4 flex items-center gap-2'>
+                    <span className='w-1 h-4 bg-[#30AD8F] rounded-full' />
+                    Location Map
+                  </p>
+                  <div className='w-full h-44 rounded-2xl overflow-hidden border border-white bg-white'>
+                    <GoogleMap mapUrl={college.google_map_url} />
+                  </div>
+                </div>
+              )}
+              {hasAddress && (
+                <div>
+                  <p className='text-sm font-medium text-gray-900 mb-4 flex items-center gap-2'>
+                    <span className='w-1 h-4 bg-[#0A6FA7] rounded-full' />
+                    Office Address
+                  </p>
+                  <div className='space-y-3'>
+                    <div className='bg-white/80 p-4 rounded-2xl border border-gray-100'>
+                      <p className='text-xs text-gray-500 uppercase tracking-wider font-medium mb-1'>
+                        Street & City
+                      </p>
+                      <p className='text-sm text-gray-700 leading-snug'>
+                        {college?.collegeAddress?.street
+                          ? `${college.collegeAddress.street}, `
+                          : ''}
+                        {college?.collegeAddress?.city || ''}
+                      </p>
+                      {(college?.collegeAddress?.state ||
+                        college?.collegeAddress?.country) && (
+                        <p className='text-xs text-gray-500 mt-1'>
+                          {college?.collegeAddress?.state
+                            ? `${college.collegeAddress.state}, `
+                            : ''}
+                          {college?.collegeAddress?.country || ''}
+                        </p>
+                      )}
+                    </div>
+                    {college?.collegeAddress?.postal_code && (
+                      <div className='bg-white/80 p-4 rounded-2xl border border-gray-100'>
+                        <p className='text-xs text-gray-500 uppercase tracking-wider font-medium mb-1'>
+                          Postcode
+                        </p>
+                        <p className='text-sm text-gray-700'>
+                          {college?.collegeAddress?.postal_code}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Right Sidebar - Shortcuts/Location */}
+      {/* Right Sidebar - Location (desktop xl only) */}
       {(college?.google_map_url || hasAddress) && (
         <aside className='w-full md:w-64 lg:w-72 md:sticky md:top-32 flex-shrink-0 hidden xl:block'>
           <div className='bg-gray-50/30 rounded-3xl p-6 border border-gray-100/50'>
             {college?.google_map_url && (
               <div className='mb-8'>
-                <p className='font-bold text-gray-900 mb-4 flex items-center gap-2'>
-                  <span className='w-1 h-4 bg-[#30AD8F] rounded-full'></span>
+                <p className='text-sm font-medium text-gray-900 mb-4 flex items-center gap-2'>
+                  <span className='w-1 h-4 bg-[#30AD8F] rounded-full' />
                   Location Map
                 </p>
                 <div className='w-full h-44 rounded-2xl overflow-hidden border border-white bg-white'>
@@ -178,20 +238,27 @@ const CollegeOverview = ({ college }) => {
 
             {hasAddress && (
               <div>
-                <p className='font-bold text-gray-900 mb-4 flex items-center gap-2'>
-                  <span className='w-1 h-4 bg-[#0A6FA7] rounded-full'></span>
+                <p className='text-sm font-medium text-gray-900 mb-4 flex items-center gap-2'>
+                  <span className='w-1 h-4 bg-[#0A6FA7] rounded-full' />
                   Office Address
                 </p>
                 <div className='space-y-3'>
                   <div className='bg-white/80 p-4 rounded-2xl border border-gray-100'>
-                    <p className='text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1'>Street & City</p>
-                    <p className='text-sm font-bold text-gray-700 leading-snug'>
-                      {college?.collegeAddress?.street ? `${college.collegeAddress.street}, ` : ''}
+                    <p className='text-xs text-gray-500 uppercase tracking-wider font-medium mb-1'>
+                      Street & City
+                    </p>
+                    <p className='text-sm text-gray-700 leading-snug'>
+                      {college?.collegeAddress?.street
+                        ? `${college.collegeAddress.street}, `
+                        : ''}
                       {college?.collegeAddress?.city || ''}
                     </p>
-                    {(college?.collegeAddress?.state || college?.collegeAddress?.country) && (
-                      <p className='text-[11px] font-medium text-gray-400 mt-1'>
-                        {college?.collegeAddress?.state ? `${college.collegeAddress.state}, ` : ''}
+                    {(college?.collegeAddress?.state ||
+                      college?.collegeAddress?.country) && (
+                      <p className='text-xs text-gray-500 mt-1'>
+                        {college?.collegeAddress?.state
+                          ? `${college.collegeAddress.state}, `
+                          : ''}
                         {college?.collegeAddress?.country || ''}
                       </p>
                     )}
@@ -199,8 +266,10 @@ const CollegeOverview = ({ college }) => {
 
                   {college?.collegeAddress?.postal_code && (
                     <div className='bg-white/80 p-4 rounded-2xl border border-gray-100'>
-                      <p className='text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1'>Postcode</p>
-                      <p className='text-sm font-bold text-gray-700'>
+                      <p className='text-xs text-gray-500 uppercase tracking-wider font-medium mb-1'>
+                        Postcode
+                      </p>
+                      <p className='text-sm text-gray-700'>
                         {college?.collegeAddress?.postal_code}
                       </p>
                     </div>
