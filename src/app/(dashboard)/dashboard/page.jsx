@@ -13,6 +13,7 @@ import AnalyticsCards from '@/ui/organisms/admin-dashboard/home/AnalyticsCards'
 import TopAgentsTable from '@/ui/organisms/admin-dashboard/home/TopAgentsTable'
 import DashboardCharts from '@/ui/organisms/admin-dashboard/home/DashboardCharts'
 import UserCard from '@/ui/molecules/cards/UserCard'
+import AgentsListModal from '@/ui/organisms/admin-dashboard/home/AgentsListModal'
 
 const AdminDashboard = () => {
   const { setHeading } = usePageHeading()
@@ -21,6 +22,7 @@ const AdminDashboard = () => {
   const [selectedYears, setSelectedYears] = useState([])
   const [topAgents, setTopAgents] = useState([])
   const [topAgentsLoading, setTopAgentsLoading] = useState(true)
+  const [isAgentsModalOpen, setAgentsModalOpen] = useState(false)
 
   useEffect(() => {
     setHeading('Admin Dashboard')
@@ -130,7 +132,16 @@ const AdminDashboard = () => {
         />
 
         {/* TOP AGENTS TABLE */}
-        <TopAgentsTable topAgents={topAgents} loading={topAgentsLoading} />
+        <TopAgentsTable
+          topAgents={topAgents}
+          loading={topAgentsLoading}
+          onViewAll={() => setAgentsModalOpen(true)}
+        />
+
+        <AgentsListModal
+          isOpen={isAgentsModalOpen}
+          onClose={() => setAgentsModalOpen(false)}
+        />
       </div>
     </div>
   )
@@ -335,13 +346,12 @@ const StudentDashboard = () => {
                               </p>
                               {app?.status && (
                                 <span
-                                  className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                                    app.status === 'ACCEPTED'
-                                      ? 'bg-green-100 text-green-800'
-                                      : app.status === 'REJECTED'
-                                        ? 'bg-red-100 text-red-800'
-                                        : 'bg-yellow-100 text-yellow-800'
-                                  }`}
+                                  className={`px-2 py-1 text-xs font-semibold rounded-full ${app.status === 'ACCEPTED'
+                                    ? 'bg-green-100 text-green-800'
+                                    : app.status === 'REJECTED'
+                                      ? 'bg-red-100 text-red-800'
+                                      : 'bg-yellow-100 text-yellow-800'
+                                    }`}
                                 >
                                   {app.status}
                                 </span>
@@ -350,30 +360,30 @@ const StudentDashboard = () => {
                             {/* College Contact and Location in single row */}
                             {(app?.referralCollege?.contacts?.length > 0 ||
                               app?.referralCollege?.address) && (
-                              <div className='text-xs text-gray-500 mt-1 flex flex-wrap items-center gap-2'>
-                                {app?.referralCollege?.contacts?.length > 0 && (
-                                  <span className='flex items-center gap-1'>
-                                    <Phone className='w-3 h-3' />
-                                    {app.referralCollege.contacts
-                                      .map((contact) => contact.contact_number)
-                                      .join(', ')}
-                                  </span>
-                                )}
+                                <div className='text-xs text-gray-500 mt-1 flex flex-wrap items-center gap-2'>
+                                  {app?.referralCollege?.contacts?.length > 0 && (
+                                    <span className='flex items-center gap-1'>
+                                      <Phone className='w-3 h-3' />
+                                      {app.referralCollege.contacts
+                                        .map((contact) => contact.contact_number)
+                                        .join(', ')}
+                                    </span>
+                                  )}
 
-                                {app?.referralCollege?.address && (
-                                  <span className='flex items-center gap-1'>
-                                    <MapPin className='w-3 h-3' />
-                                    {[
-                                      app.referralCollege.address.city,
-                                      app.referralCollege.address.state,
-                                      app.referralCollege.address.country
-                                    ]
-                                      .filter(Boolean)
-                                      .join(', ')}
-                                  </span>
-                                )}
-                              </div>
-                            )}
+                                  {app?.referralCollege?.address && (
+                                    <span className='flex items-center gap-1'>
+                                      <MapPin className='w-3 h-3' />
+                                      {[
+                                        app.referralCollege.address.city,
+                                        app.referralCollege.address.state,
+                                        app.referralCollege.address.country
+                                      ]
+                                        .filter(Boolean)
+                                        .join(', ')}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
 
                             {/* Other Details */}
                             {app?.course && (
@@ -475,26 +485,25 @@ const StudentDashboard = () => {
                               </p>
                               {app?.status && (
                                 <span
-                                  className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                                    app.status === 'ACCEPTED'
-                                      ? 'bg-green-100 text-green-800'
-                                      : app.status === 'REJECTED'
-                                        ? 'bg-red-100 text-red-800'
-                                        : 'bg-yellow-100 text-yellow-800'
-                                  }`}
+                                  className={`px-2 py-1 text-xs font-semibold rounded-full ${app.status === 'ACCEPTED'
+                                    ? 'bg-green-100 text-green-800'
+                                    : app.status === 'REJECTED'
+                                      ? 'bg-red-100 text-red-800'
+                                      : 'bg-yellow-100 text-yellow-800'
+                                    }`}
                                 >
                                   {app.status}
                                 </span>
                               )}
                             </div>
-                            
+
                             <div className='text-xs text-gray-500 mt-1 flex flex-wrap items-center gap-2'>
                               {app?.consultancy?.address && (
                                 <span className='flex items-center gap-1'>
                                   <MapPin className='w-3 h-3' />
-                                  {typeof app.consultancy.address === 'string' 
-                                    ? app.consultancy.address 
-                                    : Array.isArray(app.consultancy.address) 
+                                  {typeof app.consultancy.address === 'string'
+                                    ? app.consultancy.address
+                                    : Array.isArray(app.consultancy.address)
                                       ? app.consultancy.address[0]?.city || app.consultancy.address[0]
                                       : 'Address listed'}
                                 </span>
@@ -761,7 +770,7 @@ const DashboardPage = () => {
     return <ConsultancyDashboard />
   }
 
-  else if(role?.admin){
+  else if (role?.admin) {
     return <AdminDashboard />
   }
 

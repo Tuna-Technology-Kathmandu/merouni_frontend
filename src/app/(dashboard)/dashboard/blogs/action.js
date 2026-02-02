@@ -86,20 +86,3 @@ export async function updateBlogs(eventId, data) {
   }
 }
 
-export async function deleteBlogs(eventId) {
-  try {
-    const response = await fetch(`${url}?event_id=${eventId}`, {
-      method: 'DELETE'
-    })
-
-    if (!response.ok) {
-      throw new Error('Failed to delete category')
-    }
-    const blogs = await response.json()
-
-    return blogs
-  } catch (error) {
-    console.error('Error deleting category:', error)
-    throw error
-  }
-}

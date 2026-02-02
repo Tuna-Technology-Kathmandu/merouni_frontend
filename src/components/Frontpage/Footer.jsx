@@ -7,10 +7,13 @@ import { FaFacebook, FaInstagram } from 'react-icons/fa6'
 import { TiSocialLinkedinCircular } from 'react-icons/ti'
 import { PiXLogoLight } from 'react-icons/pi'
 import { ChevronDown } from 'lucide-react'
+
 import { getExams, getColleges, getBlogs } from '@/app/action.js'
+import { getSiteConfig } from '@/app/actions/siteConfigActions'
 
 const Footer = () => {
   const [openSections, setOpenSections] = useState({})
+  const [socialLinks, setSocialLinks] = useState({})
   const [sections, setSections] = useState({
     Exams: { header: 'Top Exams', list: [] },
     Colleges: { header: 'Colleges', list: [] },
@@ -20,11 +23,22 @@ const Footer = () => {
   useEffect(() => {
     const fetchFooterData = async () => {
       try {
-        const [examsRes, collegesRes, resourcesRes] = await Promise.all([
+        const [examsRes, collegesRes, resourcesRes, socialRes] = await Promise.all([
           getExams(5, 1),
           getColleges(null, null, 5, 1),
-          getBlogs(1, '', '')
+          getBlogs(1, '', ''),
+          getSiteConfig({ types: 'social_facebook,social_instagram,social_linkedin,social_twitter' })
         ])
+
+        // Parse social links
+        const socials = {}
+        if (socialRes?.items && Array.isArray(socialRes.items)) {
+          socialRes.items.forEach(item => {
+            socials[item.type] = item.value
+          })
+        }
+        setSocialLinks(socials)
+
         setSections({
           Exams: {
             header: 'Top Exams',
@@ -141,42 +155,50 @@ const Footer = () => {
               />
             </Link>
             <div className='flex items-center gap-4'>
-              <a
-                href='https://www.facebook.com/people/MeroUni/61570894206794/'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-gray-500 hover:text-[#0A6FA7] transition-colors p-1'
-                aria-label='Facebook'
-              >
-                <FaFacebook className='w-5 h-5' />
-              </a>
-              <a
-                href='#'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-gray-500 hover:text-[#0A6FA7] transition-colors p-1'
-                aria-label='Instagram'
-              >
-                <FaInstagram className='w-5 h-5' />
-              </a>
-              <a
-                href='https://www.linkedin.com/company/merouni/?originalSubdomain=np'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-gray-500 hover:text-[#0A6FA7] transition-colors p-1'
-                aria-label='LinkedIn'
-              >
-                <TiSocialLinkedinCircular className='w-6 h-6' />
-              </a>
-              <a
-                href='#'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-gray-500 hover:text-[#0A6FA7] transition-colors p-1'
-                aria-label='X'
-              >
-                <PiXLogoLight className='w-5 h-5' />
-              </a>
+              {socialLinks.social_facebook && (
+                <a
+                  href={socialLinks.social_facebook}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='text-gray-500 hover:text-[#0A6FA7] transition-colors p-1'
+                  aria-label='Facebook'
+                >
+                  <FaFacebook className='w-5 h-5' />
+                </a>
+              )}
+              {socialLinks.social_instagram && (
+                <a
+                  href={socialLinks.social_instagram}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='text-gray-500 hover:text-[#0A6FA7] transition-colors p-1'
+                  aria-label='Instagram'
+                >
+                  <FaInstagram className='w-5 h-5' />
+                </a>
+              )}
+              {socialLinks.social_linkedin && (
+                <a
+                  href={socialLinks.social_linkedin}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='text-gray-500 hover:text-[#0A6FA7] transition-colors p-1'
+                  aria-label='LinkedIn'
+                >
+                  <TiSocialLinkedinCircular className='w-6 h-6' />
+                </a>
+              )}
+              {socialLinks.social_twitter && (
+                <a
+                  href={socialLinks.social_twitter}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='text-gray-500 hover:text-[#0A6FA7] transition-colors p-1'
+                  aria-label='X'
+                >
+                  <PiXLogoLight className='w-5 h-5' />
+                </a>
+              )}
             </div>
           </div>
           <div className='flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-500'>
@@ -203,5 +225,6 @@ const Footer = () => {
     </footer>
   )
 }
+
 
 export default Footer

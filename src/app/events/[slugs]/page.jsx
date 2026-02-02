@@ -93,12 +93,10 @@ const EventDetailsPage = ({ params }) => {
     }
 
     fetchEventDetails()
-  }, [params]) // Add params to dependency array
+  }, [params]) 
 
 
-  // if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>
-  // if (!event) return <div>No event found</div>;
 
   return (
     <div className='bg-white min-h-screen'>

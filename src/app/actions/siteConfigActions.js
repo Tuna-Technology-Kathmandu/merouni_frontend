@@ -1,9 +1,12 @@
 import { authFetch } from '../utils/authFetch'
 import { DotenvConfig } from '../../config/env.config'
 
-export async function getSiteConfig() {
+export async function getSiteConfig(params = {}) {
     try {
-        const response = await authFetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/config`, {
+        const query = new URLSearchParams(params).toString()
+        const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/config${query ? `?${query}` : ''}`
+
+        const response = await authFetch(url, {
             cache: 'no-store'
         })
 

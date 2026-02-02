@@ -3,34 +3,19 @@
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import Loading from '@/ui/molecules/Loading'
 import { Button } from '@/ui/shadcn/button'
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/ui/shadcn/dialog'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import {
     Select
 } from '@/ui/shadcn/select'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/ui/shadcn/table'
-import { Plus } from 'lucide-react'
-import { FaEdit } from 'react-icons/fa'
-import { useEffect, useState } from 'react'
-import { toast } from 'react-toastify'
+import { Edit2, Search, Plus } from 'lucide-react'
+import { useEffect, useState, useMemo } from 'react'
+import { toast, ToastContainer } from 'react-toastify'
 import { useForm, Controller } from 'react-hook-form'
 import { getSiteConfig, updateSiteConfig } from '../../../actions/siteConfigActions'
 import dynamic from 'next/dynamic'
+import Table from '../../../../ui/molecules/Table'
+import { Modal } from '../../../../ui/molecules/Modal'
 
 
 const CKUni = dynamic(() => import('@/app/(dashboard)/dashboard/component/CKUni'), {
@@ -62,14 +47,24 @@ export default function SiteControlPage() {
     const { setHeading } = usePageHeading()
     const [loading, setLoading] = useState(true)
     const [configs, setConfigs] = useState([])
+    const [filteredConfigs, setFilteredConfigs] = useState([])
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingConfig, setEditingConfig] = useState(null) // null = adding new
     const [saving, setSaving] = useState(false)
 
+    // Search & Pagination State for Table Molecule
+    const [searchQuery, setSearchQuery] = useState('')
+    const [searchTimeout, setSearchTimeout] = useState(null)
+    const [pagination, setPagination] = useState({
+        currentPage: 1,
+        totalPages: 1,
+        total: 0
+    })
+
     // React Hook Form
-    const { control, handleSubmit, reset, watch, setValue, register, formState: { errors } } = useForm({
+    const { control, handleSubmit, reset, watch, register, formState: { errors } } = useForm({
         defaultValues: {
             type: '',
             value: ''
@@ -87,14 +82,32 @@ export default function SiteControlPage() {
         loadConfig()
     }, [])
 
+    useEffect(() => {
+        // Client-side filtering
+        let filtered = configs
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase()
+            filtered = configs.filter(c =>
+                c.type.toLowerCase().includes(query) ||
+                (c.value && c.value.toLowerCase().includes(query))
+            )
+        }
+        setFilteredConfigs(filtered)
+        setPagination(prev => ({
+            ...prev,
+            total: filtered.length,
+            totalPages: Math.ceil(filtered.length / 10) || 1
+        }))
+
+    }, [configs, searchQuery])
+
+
     const loadConfig = async () => {
+        setLoading(true)
         try {
             const data = await getSiteConfig()
-            if (Array.isArray(data)) {
-                setConfigs(data)
-            } else {
-                setConfigs([])
-            }
+            const configItems = Array.isArray(data) ? data : (data?.items || [])
+            setConfigs(configItems)
         } catch (error) {
             console.error(error)
             toast.error('Failed to load site configuration')
@@ -115,18 +128,29 @@ export default function SiteControlPage() {
         setIsModalOpen(true)
     }
 
+    const handleModalClose = () => {
+        setIsModalOpen(false)
+        reset()
+    }
+
     const onSubmit = async (data) => {
         setSaving(true)
         try {
             await updateSiteConfig({ type: data.type, value: data.value })
             toast.success('Configuration saved successfully')
             loadConfig()
-            setIsModalOpen(false)
+            handleModalClose()
         } catch (error) {
             toast.error('Failed to save configuration')
         } finally {
             setSaving(false)
         }
+    }
+
+    const handleSearchInput = (value) => {
+        setSearchQuery(value)
+        // Since we are doing client side filtering for now (API returns all), direct update is fine.
+        // Keeping structure similar to Tags page if server-side search is added later.
     }
 
     // Helper to get logic for selected type
@@ -135,6 +159,61 @@ export default function SiteControlPage() {
     }
 
     const selectedTypeConfig = getSelectedTypeConfig(selectedType)
+
+    const columns = useMemo(() => [
+        {
+            header: 'Configuration Type',
+            accessorKey: 'type',
+            cell: ({ row }) => {
+                const config = row.original;
+                const typeDef = CONFIG_TYPES.find(ct => ct.value === config.type)
+                const label = typeDef ? typeDef.label : config.type
+                return (
+                    <div>
+                        <span className="font-medium">{label}</span>
+                        <span className="block text-xs text-gray-400 font-normal">{config.type}</span>
+                    </div>
+                )
+            }
+        },
+        {
+            header: 'Value',
+            accessorKey: 'value',
+            cell: ({ row }) => {
+                const config = row.original;
+                const typeDef = CONFIG_TYPES.find(ct => ct.value === config.type)
+                let displayValue = config.value || ''
+                if (typeDef?.inputType === 'richtext') {
+                    displayValue = displayValue.replace(/<[^>]*>?/gm, '') // Simple strip tags
+                }
+                if (displayValue.length > 100) displayValue = displayValue.substring(0, 100) + '...'
+                return <span className="text-gray-600">{displayValue}</span>
+            }
+        },
+        {
+            header: 'Actions',
+            id: 'actions',
+            cell: ({ row }) => (
+                <div className='flex gap-2'>
+                    <button
+                        onClick={() => handleEdit(row.original)}
+                        className='p-1 text-blue-600 hover:text-blue-800'
+                    >
+                        <Edit2 className='w-4 h-4' />
+                    </button>
+                    {/* Delete not implemented yet for configs as per previous reqs */}
+                </div>
+            )
+        }
+    ], [])
+
+
+    const paginatedData = useMemo(() => {
+        const startIndex = (pagination.currentPage - 1) * 10
+        const endIndex = startIndex + 10
+        return filteredConfigs.slice(startIndex, endIndex)
+    }, [filteredConfigs, pagination.currentPage])
+
 
     if (loading) {
         return (
@@ -145,138 +224,119 @@ export default function SiteControlPage() {
     }
 
     return (
-        <div className='p-4 bg-white min-h-screen'>
-            <div className="flex justify-end mb-6">
-                <Button onClick={handleAdd} className="bg-blue-600 hover:bg-blue-700">
-                    <Plus className="w-4 h-4 mr-2" /> Add Configuration
-                </Button>
+        <>
+            <div className='p-4 w-full'>
+                <div className='flex justify-between items-center mb-4'>
+                    {/* Search Bar */}
+                    <div className='relative w-full max-w-md'>
+                        <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+                            <Search className='w-4 h-4 text-gray-500' />
+                        </div>
+                        <input
+                            type='text'
+                            value={searchQuery}
+                            onChange={(e) => handleSearchInput(e.target.value)}
+                            className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                            placeholder='Search configurations...'
+                        />
+                    </div>
+                    {/* Button */}
+                    <div className='flex gap-2'>
+                        <Button onClick={handleAdd}>
+                            <Plus className="w-4 h-4 mr-2" /> Add Configuration
+                        </Button>
+                    </div>
+                </div>
+                <ToastContainer />
+
+                {/* Table */}
+                <div className='mt-8'>
+                    <Table
+                        loading={loading}
+                        data={paginatedData}
+                        columns={columns}
+                        pagination={pagination}
+                        onPageChange={(p) => setPagination(prev => ({ ...prev, currentPage: p }))}
+                        onSearch={handleSearchInput}
+                        showSearch={false} // We implemented external search bar above to match Tag UI
+                    />
+                </div>
             </div>
 
-            <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-[300px] text-gray-600">Configuration Type</TableHead>
-                            <TableHead className="text-gray-600">Value</TableHead>
-                            <TableHead className="w-[100px] text-right text-gray-600">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {configs.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={3} className="text-center py-8 text-gray-500">
-                                    No configurations found. Click "Add Configuration" to start.
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            configs.map((config) => {
-                                const typeDef = CONFIG_TYPES.find(ct => ct.value === config.type)
-                                const label = typeDef ? typeDef.label : config.type
-
-                                // Truncate value for display, strip HTML tags if rich text
-                                let displayValue = config.value || ''
-                                if (typeDef?.inputType === 'richtext') {
-                                    displayValue = displayValue.replace(/<[^>]*>?/gm, '') // Simple strip tags
-                                }
-                                if (displayValue.length > 100) displayValue = displayValue.substring(0, 100) + '...'
-
-                                return (
-                                    <TableRow key={config.id || config.type}>
-                                        <TableCell className="font-medium">
-                                            {label}
-                                            <span className="block text-xs text-gray-400 font-normal">{config.type}</span>
-                                        </TableCell>
-                                        <TableCell className="text-gray-600">
-                                            {displayValue}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleEdit(config)}
-                                                className="h-8 w-8"
-                                            >
-                                                <FaEdit className="w-4 h-4 text-blue-600" />
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                )
-                            })
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
-
-            <Dialog isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>{editingConfig ? 'Edit Configuration' : 'Add Configuration'}</DialogTitle>
-                        <DialogDescription>
-                            {editingConfig ? 'Update the value for this configuration.' : 'Select a type and enter a value.'}
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <div className="space-y-4 py-4">
-                            <div className="space-y-2">
-                                <Label>Configuration Type <span className="text-red-500">*</span></Label>
-                                <Controller
-                                    name="type"
-                                    control={control}
-                                    rules={{ required: 'Configuration type is required' }}
-                                    render={({ field }) => (
-                                        <Select
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            disabled={!!editingConfig} // Lock type when editing
-                                        >
-                                            <option value="" disabled>Select a type...</option>
-                                            {CONFIG_TYPES.map((type) => (
-                                                <option key={type.value} value={type.value}>
-                                                    {type.label}
-                                                </option>
-                                            ))}
-                                        </Select>
-                                    )}
-                                />
-                                {errors.type && <span className="text-sm text-red-500">{errors.type.message}</span>}
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>Value <span className="text-red-500">*</span></Label>
-                                {selectedTypeConfig?.inputType === 'richtext' ? (
-                                    <Controller
-                                        name="value"
-                                        control={control}
-                                        rules={{ required: 'Value is required' }}
-                                        render={({ field }) => (
-                                            <CKUni
-                                                initialData={field.value}
-                                                onChange={field.onChange}
-                                                id="config-editor"
-                                            />
-                                        )}
-                                    />
-                                ) : (
-                                    <Input
-                                        type={selectedTypeConfig?.inputType || 'text'}
-                                        placeholder={selectedTypeConfig ? `Enter ${selectedTypeConfig.label.toLowerCase()}...` : 'Enter value...'}
-                                        {...register('value', { required: 'Value is required' })}
-                                    />
+            {/* Form Modal */}
+            <Modal
+                isOpen={isModalOpen}
+                onClose={handleModalClose}
+                title={editingConfig ? 'Edit Configuration' : 'Add Configuration'}
+                className='max-w-4xl' // Keeping wide modal for CKEditor
+            >
+                <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label>Configuration Type <span className="text-red-500">*</span></Label>
+                            <Controller
+                                name="type"
+                                control={control}
+                                rules={{ required: 'Configuration type is required' }}
+                                render={({ field }) => (
+                                    <Select
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        disabled={!!editingConfig}
+                                    >
+                                        <option value="" disabled>Select a type...</option>
+                                        {CONFIG_TYPES.map((type) => (
+                                            <option key={type.value} value={type.value}>
+                                                {type.label}
+                                            </option>
+                                        ))}
+                                    </Select>
                                 )}
-                                {errors.value && <span className="text-sm text-red-500">{errors.value.message}</span>}
-                            </div>
+                            />
+                            {errors.type && <span className="text-sm text-red-500">{errors.type.message}</span>}
                         </div>
 
-                        <DialogFooter>
-                            <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-                            <Button type="submit" disabled={saving}>
-                                {saving ? 'Saving...' : 'Save Configuration'}
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
-        </div>
+                        <div className="space-y-2">
+                            <Label>Value <span className="text-red-500">*</span></Label>
+                            {selectedTypeConfig?.inputType === 'richtext' ? (
+                                <Controller
+                                    name="value"
+                                    control={control}
+                                    rules={{ required: 'Value is required' }}
+                                    render={({ field }) => (
+                                        <CKUni
+                                            key={selectedType || 'editor'}
+                                            initialData={field.value}
+                                            onChange={(data) => field.onChange(data)}
+                                            id={`site-control-config-editor`}
+                                        />
+                                    )}
+                                />
+                            ) : (
+                                <Input
+                                    type={selectedTypeConfig?.inputType || 'text'}
+                                    placeholder={selectedTypeConfig ? `Enter ${selectedTypeConfig.label.toLowerCase()}...` : 'Enter value...'}
+                                    {...register('value', { required: 'Value is required' })}
+                                />
+                            )}
+                            {errors.value && <span className="text-sm text-red-500">{errors.value.message}</span>}
+                        </div>
+                    </div>
+
+                    <div className='flex justify-end gap-2'>
+                        <button
+                            type='button'
+                            onClick={handleModalClose}
+                            className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors'
+                        >
+                            Cancel
+                        </button>
+                        <Button type="submit" disabled={saving}>
+                            {saving ? 'Saving...' : 'Save Configuration'}
+                        </Button>
+                    </div>
+                </form>
+            </Modal>
+        </>
     )
 }

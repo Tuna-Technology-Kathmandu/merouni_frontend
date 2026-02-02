@@ -13,7 +13,8 @@ const PrivacyPolicy = () => {
     React.useEffect(() => {
         const fetchContent = async () => {
             try {
-                const config = await getConfigByType('legal_privacy_policy')
+                const configRes = await getConfigByType('legal_privacy_policy')
+                const config = configRes?.config
                 if (config?.value) {
                     setContent(config.value)
                 }

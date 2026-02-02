@@ -1,6 +1,7 @@
 import React from 'react'
 import { FaArrowRight, FaHandshake } from 'react-icons/fa'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 const ApplyNow = ({ consultancy }) => {
   const router = useRouter()
@@ -38,13 +39,13 @@ const ApplyNow = ({ consultancy }) => {
           {/* Right side - Action buttons */}
           <div className='flex flex-col sm:flex-row gap-4 items-center'>
             {consultancy?.slugs && (
-              <button
-                onClick={handleApplyClick}
+              <Link
+                href={`/consultancy/apply/${consultancy.slugs}`}
                 className='group bg-white text-[#0870A8] px-6 md:px-8 py-3 md:py-4 rounded-xl font-medium text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 min-w-[160px] justify-center'
               >
                 <span>Apply Now</span>
                 <FaArrowRight className='w-4 h-4 group-hover:translate-x-1 transition-transform' />
-              </button>
+              </Link>
             )}
 
             {consultancy?.website_url && (

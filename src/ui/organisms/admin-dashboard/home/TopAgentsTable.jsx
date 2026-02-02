@@ -2,12 +2,22 @@
 
 import React from 'react'
 
-const TopAgentsTable = ({ topAgents, loading }) => {
+const TopAgentsTable = ({ topAgents, loading, onViewAll }) => {
   return (
     <div className='bg-white rounded-2xl shadow-sm border border-gray-100/80 p-6'>
-      <h2 className='text-lg font-semibold text-gray-800 tracking-tight mb-4'>
-        Top Performing Agents
-      </h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className='text-lg font-semibold text-gray-800 tracking-tight'>
+          Top Performing Agents
+        </h2>
+        {onViewAll && (
+          <button
+            onClick={onViewAll}
+            className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
+          >
+            View All
+          </button>
+        )}
+      </div>
       {loading ? (
         <div className='flex items-center justify-center h-32'>
           <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600'></div>
