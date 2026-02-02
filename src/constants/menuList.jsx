@@ -1,7 +1,7 @@
 import { FaHome } from 'react-icons/fa'
 
 // Icons
-import { SortAsc } from 'lucide-react'
+import { HandCoins, Lightbulb, PlayCircle, Rss, SortAsc } from 'lucide-react'
 import { BsCalendarEvent, BsLayers, BsNewspaper } from 'react-icons/bs'
 import {
   FaBook,
@@ -20,15 +20,10 @@ import {
   MdCategory,
   MdEmojiEvents,
   MdOutlineDescription,
-  MdOutlinePermMedia,
   MdQuiz,
   MdSchool
 } from 'react-icons/md'
 import { VscReferences } from 'react-icons/vsc'
-import { Book } from 'lucide-react'
-import { Rss } from 'lucide-react'
-import { HandCoins } from 'lucide-react'
-import { Lightbulb, PlayCircle } from 'lucide-react'
 
 export const menuItems = [
   {
@@ -38,7 +33,7 @@ export const menuItems = [
         icon: <FaHome className='text-xl' />,
         label: 'Home',
         href: '/dashboard',
-        visible: ['admin', 'editor', 'student', 'institution']
+        visible: ['admin', 'editor', 'student', 'institution', 'consultancy']
       },
       {
         icon: <VscReferences />,
@@ -156,13 +151,19 @@ export const menuItems = [
         icon: <VscReferences />,
         label: 'View Applications',
         href: '/dashboard/applications',
-        visible: ['institution']
+        visible: ['institution', 'consultancy']
       },
       {
         icon: <IoSchoolSharp className='text-xl' />,
         label: 'Edit College Info',
         href: '/dashboard/edit-college',
         visible: ['institution']
+      },
+      {
+        icon: <FaHandshake className='text-xl' />,
+        label: 'Edit Consultancy Info',
+        href: '/dashboard/consultancy',
+        visible: ['consultancy']
       },
       {
         icon: <HiOutlineUsers className='text-xl' />,

@@ -27,14 +27,9 @@ const SkillCourseDetailsPage = ({ params }) => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
-    // Unwrap params using React.use() or await if next.js 15, but for safety in older/current patterns:
-    // In Next.js 13/14 client components, params is a prop, but sometimes needs unwrapping if it's a promise in newer versions.
-    // The scholarship page used `const resolvedParams = await params` inside useEffect. I will follow that pattern as it seems robust.
-
     useEffect(() => {
         const fetchDetails = async () => {
             try {
-                // Handle params if it's a promise (Next.js 15) or object (Next.js 13/14)
                 const resolvedParams = await params
                 const slug = resolvedParams.slug
 
@@ -202,14 +197,6 @@ const SkillCourseDetailsPage = ({ params }) => {
                                 {/* Author info could go here if available */}
                             </div>
 
-                            <div className="mt-8">
-                                <button className="w-full py-3 px-4 bg-[#30ad8f] hover:bg-[#208c72] text-white font-bold rounded-xl transition-colors shadow-lg shadow-[#30ad8f]/20">
-                                    Enroll Now
-                                </button>
-                                <p className="text-xs text-center text-gray-500 mt-3">
-                                    Secure enrollment via MeroUni
-                                </p>
-                            </div>
 
                         </div>
                     </div>

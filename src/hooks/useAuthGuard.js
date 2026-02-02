@@ -64,7 +64,10 @@ export default function useAuthGuard() {
       // Validate token
       try {
         const user = decodeJwt(token)
+        console.log('Decoded user:', user)
         const role = user?.data?.role ? destr(user?.data?.role) : {}
+        console.log('Parsed role:', role)
+
 
         // Check if user has access to this route
         if (!hasAccess(role, pathname)) {

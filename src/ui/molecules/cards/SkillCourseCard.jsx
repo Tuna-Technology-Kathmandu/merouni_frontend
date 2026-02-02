@@ -47,7 +47,7 @@ const SkillCourseCard = ({ course }) => {
 
                 <div className='mt-auto pt-4 border-t border-gray-100'>
                     <Link
-                        href={`/skill-based-courses/${course.slugs || course.id}`}
+                        href={`/skill-based-courses/${course.slug}`}
                         className='block w-full py-2.5 rounded-lg text-center text-sm font-semibold text-white bg-[#387cae] hover:bg-[#2c6590] transition-colors shadow-sm hover:shadow active:scale-[0.98]'
                     >
                         View Details

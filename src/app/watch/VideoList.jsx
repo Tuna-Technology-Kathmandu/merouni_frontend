@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { fetchVideos } from '../(dashboard)/dashboard/videos/action'
 import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 import EmptyState from '@/ui/shadcn/EmptyState'
+import { formatDate } from '@/utils/date.util'
 
 export default function VideoList({ initialData }) {
     const [videos, setVideos] = useState(initialData?.items || [])
@@ -103,7 +104,7 @@ export default function VideoList({ initialData }) {
                                         </p>
                                         <div className='flex items-center justify-between text-xs text-gray-400 font-medium pt-3 border-t border-gray-50'>
                                             <span className='bg-gray-100 px-2 py-1 rounded-md text-gray-600'>Video</span>
-                                            <span>{new Date(video.createdAt).toLocaleDateString()}</span>
+                                            <span>{formatDate(video.createdAt)}</span>
                                         </div>
                                     </div>
                                 </Link>
