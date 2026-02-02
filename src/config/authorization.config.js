@@ -3,7 +3,8 @@ export const APP_ROLES = {
   editor: 'editor',
   agent: 'agent',
   student: 'student',
-  institution: 'institution'
+  institution: 'institution',
+  consultancy: 'consultancy'
 }
 
 export const PERMISSIONS_VIA_ROLE = {
@@ -88,5 +89,10 @@ export const PERMISSIONS_VIA_ROLE = {
     '/dashboard/profile',
     '/dashboard/applications',
     '/dashboard/edit-college'
+  ],
+  [APP_ROLES.consultancy]: [
+    '/dashboard',
+    '/dashboard/profile',
+    '/dashboard/consultancy',
   ]
 }

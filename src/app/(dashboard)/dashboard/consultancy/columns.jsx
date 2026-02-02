@@ -94,18 +94,19 @@ export const createColumns = ({
           >
             <Trash2 className='w-4 h-4' />
           </button>
-          <button
-            onClick={() => handleOpenCredentialsModal(row.original)}
-            className={`p-1 ${row.original.has_account ? 'text-green-600' : 'text-orange-600'
-              } hover:text-orange-800`}
-            title={
-              row.original.has_account
-                ? 'Credentials Created'
-                : 'Create Credentials'
-            }
-          >
-            <UserPlus className='w-4 h-4' />
-          </button>
+          {!row.original.has_account ? (
+            <button
+              onClick={() => handleOpenCredentialsModal(row.original)}
+              className='p-1.5 bg-indigo-50 text-indigo-600 rounded-md hover:bg-indigo-100 transition-colors'
+              title='Create Credentials'
+            >
+              <UserPlus className='w-4 h-4' />
+            </button>
+          ) : (
+            <div className='p-1.5 bg-green-50 text-green-600 rounded-md' title='Account Active'>
+              <UserPlus className='w-4 h-4' />
+            </div>
+          )}
         </div>
       )
     }
