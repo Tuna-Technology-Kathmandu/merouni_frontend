@@ -1,25 +1,23 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import EmptyState from '@/ui/shadcn/EmptyState'
+import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import {
     FaArrowLeft,
     FaAward,
-    FaCalendar,
-    FaDollarSign,
-    FaUser,
+    FaCheckCircle,
     FaClock,
-    FaThumbsUp,
-    FaCheckCircle
+    FaDollarSign,
+    FaThumbsUp
 } from 'react-icons/fa'
-import Link from 'next/link'
 import Footer from '../../../components/Frontpage/Footer'
 import Header from '../../../components/Frontpage/Header'
 import Navbar from '../../../components/Frontpage/Navbar'
 import Loading from '../../../ui/molecules/Loading'
-import EmptyState from '@/ui/shadcn/EmptyState'
 import { fetchSkillCourseBySlug } from '../actions'
-import Image from 'next/image'
 
 const SkillCourseDetailsPage = ({ params }) => {
     const router = useRouter()

@@ -1,11 +1,11 @@
 'use client'
 
-import { destr, safeDestr } from 'destr'
-import { useCallback, useEffect, useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
-import { decodeJwt } from 'jose'
 import { PERMISSIONS_VIA_ROLE } from '@/config/authorization.config'
-import { DASHBOARD_ROUTE, FORBIDDEN, SIGN_IN } from '@/config/route.config'
+import { DASHBOARD_ROUTE, SIGN_IN } from '@/config/route.config'
+import { destr } from 'destr'
+import { decodeJwt } from 'jose'
+import { usePathname, useRouter } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
 
 function hasAccess(role, pathname) {
   return Object.entries(PERMISSIONS_VIA_ROLE).some(([roleName, paths]) => {
