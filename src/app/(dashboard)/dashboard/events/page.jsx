@@ -459,7 +459,7 @@ export default function EventManager() {
           const rawValue = row.original.event_host
           if (!rawValue) return ''
           try {
-            const eventHost = rawValue
+            const eventHost = JSON.parse(rawValue)
             return eventHost.host || ''
           } catch (error) {
             console.error('JSON parsing error for host:', error)
@@ -474,7 +474,8 @@ export default function EventManager() {
           const rawValue = row.original.event_host
           if (!rawValue) return ''
           try {
-            const eventHost = rawValue
+            const eventHost = JSON.parse(rawValue)
+            console.log(eventHost,"YOOYO")
             return eventHost.start_date || ''
           } catch (error) {
             console.error('JSON parsing error for start_date:', error)
@@ -489,7 +490,7 @@ export default function EventManager() {
           const rawValue = row.original.event_host
           if (!rawValue) return ''
           try {
-            const eventHost = rawValue
+            const eventHost = JSON.parse(rawValue)
             return eventHost.end_date || ''
           } catch (error) {
             console.error('JSON parsing error for end_date:', error)
@@ -504,7 +505,7 @@ export default function EventManager() {
           const rawValue = row.original.event_host
           if (!rawValue) return ''
           try {
-            const eventHost = rawValue
+            const eventHost = JSON.parse(rawValue)
             return eventHost.time || ''
           } catch (error) {
             console.error('JSON parsing error for time:', error)

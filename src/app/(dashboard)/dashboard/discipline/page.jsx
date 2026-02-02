@@ -1,53 +1,32 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
-import { fetchDisciplines } from './action'
-import Loader from '../../../../ui/molecules/Loading'
-import Table from '../../../../ui/molecules/Table'
-import { Edit2, Trash2, Search, Eye } from 'lucide-react'
-import { Button } from '@/ui/shadcn/button'
-import { ToastContainer } from 'react-toastify'
 import { Modal } from '@/ui/molecules/Modal'
+import { Button } from '@/ui/shadcn/button'
+import { Edit2, Eye, Search, Trash2 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import Table from '../../../../ui/molecules/Table'
+import { fetchDisciplines } from './action'
 
-import { toast } from 'react-toastify'
-import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
-import FileUpload from '../addCollege/FileUpload'
-import { Label } from '@/ui/shadcn/label'
-import { Input } from '@/ui/shadcn/input'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+import CreateUpdateDiscipline from '@/ui/molecules/modals/CreateUpdateDiscipline'
 import { formatDate } from '@/utils/date.util'
-import { Select } from '@/ui/shadcn/select'
+import { useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
+import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 
 export default function DisciplineManager() {
     const { setHeading } = usePageHeading()
     const author_id = useSelector((state) => state.user.data.id)
 
-    // Initialize react-hook-form
-    const {
-        register,
-        handleSubmit,
-        reset,
-        setValue,
-        formState: { errors }
-    } = useForm({
-        defaultValues: {
-            title: '',
-            description: '',
-            featured_image: '',
-            status: 'draft',
-            author: author_id
-        }
-    })
-
     const [disciplines, setDisciplines] = useState([])
     const [loading, setLoading] = useState(true)
-    const [editingId, setEditingId] = useState(null)
-    const [editing, setEditing] = useState(false)
+
+    // Edit/Create Modal State
+    const [editingDiscipline, setEditingDiscipline] = useState(null)
     const [isOpen, setIsOpen] = useState(false)
+
     const [deleteId, setDeleteId] = useState(null)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -62,9 +41,6 @@ export default function DisciplineManager() {
     })
     const [searchQuery, setSearchQuery] = useState('')
     const [searchTimeout, setSearchTimeout] = useState(null)
-    const [uploadedFiles, setUploadedFiles] = useState({
-        featured_image: ''
-    })
 
     const columns = useMemo(
         () => [
@@ -82,7 +58,7 @@ export default function DisciplineManager() {
                 accessorKey: 'status',
                 cell: ({ getValue }) => (
                     <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getValue() === 'published'
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getValue() === 'published' || getValue() === 'active'
                             ? 'bg-green-100 text-green-800'
                             : 'bg-gray-100 text-gray-800'
                             }`}
@@ -147,14 +123,8 @@ export default function DisciplineManager() {
     }
 
     const handleEdit = (discipline) => {
-        setEditingId(discipline.id)
-        setEditing(true)
+        setEditingDiscipline(discipline)
         setIsOpen(true)
-        setValue('title', discipline.title)
-        setValue('description', discipline.description || '')
-        setValue('featured_image', discipline.featured_image || '')
-        setValue('status', discipline.status || 'draft')
-        setUploadedFiles({ featured_image: discipline.featured_image || '' })
     }
 
     useEffect(() => {
@@ -186,81 +156,6 @@ export default function DisciplineManager() {
             console.error('Error loading disciplines:', err)
         } finally {
             setLoading(false)
-        }
-    }
-
-    const createDiscipline = async (data) => {
-        try {
-            const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                }
-            )
-            if (!response.ok) {
-                throw new Error('Failed to create discipline')
-            }
-            return await response.json()
-        } catch (error) {
-            console.error('Error creating discipline:', error)
-            throw error
-        }
-    }
-
-    const updateDiscipline = async (data, id) => {
-        try {
-            const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline?discipline_id=${id}`,
-                {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                }
-            )
-            if (!response.ok) {
-                throw new Error('Failed to update discipline')
-            }
-            return await response.json()
-        } catch (error) {
-            console.error('Error updating discipline:', error)
-            throw error
-        }
-    }
-
-    // Use react-hook-form's handleSubmit to process the form data.
-    const onSubmit = async (data) => {
-        const formattedData = {
-            ...data,
-            featured_image: uploadedFiles.featured_image
-        }
-        try {
-            if (editingId) {
-                // Update discipline if in edit mode
-                await updateDiscipline(formattedData, editingId)
-                toast.success('Discipline updated successfully')
-            } else {
-                // Otherwise, create a new discipline
-                await createDiscipline(formattedData)
-                toast.success('Discipline created successfully')
-            }
-            reset() // Clear form
-            setEditingId(null)
-            setEditing(false)
-            setIsOpen(false)
-            setUploadedFiles({ featured_image: '' })
-            loadDisciplines()
-        } catch (err) {
-            const errorMsg = err.response?.data?.message || 'Network error occurred'
-            toast.error(
-                `Failed to ${editingId ? 'update' : 'create'} discipline: ${errorMsg}`
-            )
-            console.error('Error saving discipline:', err)
         }
     }
 
@@ -367,118 +262,24 @@ export default function DisciplineManager() {
                     <div className='flex gap-2'>
                         <Button
                             onClick={() => {
+                                setEditingDiscipline(null)
                                 setIsOpen(true)
-                                setEditing(false)
-                                setEditingId(null)
-                                setEditingId(null)
-                                reset()
-                                setUploadedFiles({ featured_image: '' })
                             }}
                         >
                             Add Discipline
                         </Button>
                     </div>
                 </div>
-                {/* Add/Edit Modal */}
-                <Modal
-                    isOpen={isOpen}
-                    onClose={() => {
-                        setIsOpen(false)
-                        setEditing(false)
-                        setEditingId(null)
-                        reset()
-                        setUploadedFiles({ featured_image: '' })
-                    }}
-                    title={editing ? 'Edit Discipline' : 'Add Discipline'}
-                    className='max-w-2xl'
-                >
-                    <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
-                        <form
-                            onSubmit={handleSubmit(onSubmit)}
-                            className='flex flex-col flex-1 overflow-hidden'
-                        >
-                            <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                                <div className='bg-white p-6 rounded-lg shadow-md'>
-                                    <h2 className='text-xl font-semibold mb-4'>
-                                        Discipline Information
-                                    </h2>
-                                    <div className='space-y-4'>
-                                        <div>
-                                            <Label>
-                                                Discipline Title <span className='text-red-500'>*</span>
-                                            </Label>
-                                            <Input
-                                                type='text'
-                                                placeholder='Discipline Title'
-                                                {...register('title', {
-                                                    required: 'Title is required'
-                                                })}
-                                                className='w-full p-2 border rounded'
-                                            />
-                                            {errors.title && (
-                                                <span className='text-red-500 text-sm'>
-                                                    {errors.title.message}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <Label>Status</Label>
-                                            <Select
-                                                {...register('status')}
-                                                className='w-full p-2 border rounded'
-                                            >
-                                                <option value="inactive">Inactive</option>
-                                                <option value="active">Active</option>
-                                            </Select>
-                                        </div>
-                                        <div>
-                                            <Label>Description</Label>
-                                            <textarea
-                                                placeholder='Description'
-                                                {...register('description')}
-                                                className='w-full p-2 border rounded'
-                                                rows={4}
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Image</Label>
-                                            <FileUpload
-                                                defaultPreview={uploadedFiles.featured_image}
-                                                onUploadComplete={(url) => {
-                                                    setUploadedFiles((prev) => ({
-                                                        ...prev,
-                                                        featured_image: url
-                                                    }))
-                                                    setValue('featured_image', url)
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            {/* Submit Button - Sticky Footer */}
-                            <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
-                                <Button
-                                    type='button'
-                                    variant='outline'
-                                    onClick={() => {
-                                        setIsOpen(false)
-                                        setEditing(false)
-                                        setEditingId(null)
-                                        reset()
-                                        setUploadedFiles({ featured_image: '' })
-                                    }}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button type='submit'>
-                                    {editing ? 'Update Discipline' : 'Create Discipline'}
-                                </Button>
-                            </div>
-                        </form>
-                    </div>
-                </Modal>
+                <CreateUpdateDiscipline
+                    isOpen={isOpen}
+                    onClose={() => setIsOpen(false)}
+                    onSuccess={() => {
+                        loadDisciplines()
+                    }}
+                    initialData={editingDiscipline}
+                    authorId={author_id}
+                />
 
                 {/* Table */}
                 <div className='mt-8'>

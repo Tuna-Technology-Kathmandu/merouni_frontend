@@ -1,0 +1,224 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
+import { Modal } from '@/ui/molecules/Modal'
+import { Button } from '@/ui/shadcn/button'
+import { Input } from '@/ui/shadcn/input'
+import { Label } from '@/ui/shadcn/label'
+import { Select } from '@/ui/shadcn/select'
+import FileUpload from '@/app/(dashboard)/dashboard/addCollege/FileUpload'
+import { authFetch } from '@/app/utils/authFetch'
+import { DotenvConfig } from '@/config/env.config'
+
+export default function CreateUpdateDiscipline({
+    isOpen,
+    onClose,
+    onSuccess,
+    initialData = null,
+    authorId
+}) {
+    const [uploadedFiles, setUploadedFiles] = useState({
+        featured_image: ''
+    })
+
+    const {
+        register,
+        handleSubmit,
+        reset,
+        setValue,
+        formState: { errors }
+    } = useForm({
+        defaultValues: {
+            title: '',
+            description: '',
+            featured_image: '',
+            status: 'active', // Default to active
+            author: authorId
+        }
+    })
+
+    useEffect(() => {
+        if (isOpen) {
+            if (initialData) {
+                // Edit mode
+                setValue('title', initialData.title)
+                setValue('description', initialData.description || '')
+                setValue('featured_image', initialData.featured_image || '')
+                setValue('status', initialData.status || 'draft')
+                setUploadedFiles({ featured_image: initialData.featured_image || '' })
+            } else {
+                // Create mode - reset to defaults
+                reset({
+                    title: '',
+                    description: '',
+                    featured_image: '',
+                    status: 'active',
+                    author: authorId
+                })
+                setUploadedFiles({ featured_image: '' })
+            }
+        }
+    }, [isOpen, initialData, setValue, reset, authorId])
+
+    const createDiscipline = async (data) => {
+        try {
+            const response = await authFetch(
+                `${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                }
+            )
+            if (!response.ok) {
+                throw new Error('Failed to create discipline')
+            }
+            return await response.json()
+        } catch (error) {
+            console.error('Error creating discipline:', error)
+            throw error
+        }
+    }
+
+    const updateDiscipline = async (data, id) => {
+        try {
+            const response = await authFetch(
+                `${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline?discipline_id=${id}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                }
+            )
+            if (!response.ok) {
+                throw new Error('Failed to update discipline')
+            }
+            return await response.json()
+        } catch (error) {
+            console.error('Error updating discipline:', error)
+            throw error
+        }
+    }
+
+    const onSubmit = async (data) => {
+        const formattedData = {
+            ...data,
+            featured_image: uploadedFiles.featured_image
+        }
+        try {
+            if (initialData?.id) {
+                // Update
+                await updateDiscipline(formattedData, initialData.id)
+                toast.success('Discipline updated successfully')
+            } else {
+                // Create
+                await createDiscipline(formattedData)
+                toast.success('Discipline created successfully')
+            }
+            onSuccess?.()
+            onClose()
+        } catch (err) {
+            const errorMsg = err.response?.data?.message || err.message || 'Network error occurred'
+            toast.error(
+                `Failed to ${initialData ? 'update' : 'create'} discipline: ${errorMsg}`
+            )
+        }
+    }
+
+    return (
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={initialData ? 'Edit Discipline' : 'Add Discipline'}
+            className='max-w-2xl'
+        >
+            <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className='flex flex-col flex-1 overflow-hidden'
+                >
+                    <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+                        <div className='bg-white p-6 rounded-lg shadow-md'>
+                            <h2 className='text-xl font-semibold mb-4'>
+                                Discipline Information
+                            </h2>
+                            <div className='space-y-4'>
+                                <div>
+                                    <Label>
+                                        Discipline Title <span className='text-red-500'>*</span>
+                                    </Label>
+                                    <Input
+                                        type='text'
+                                        placeholder='Discipline Title'
+                                        {...register('title', {
+                                            required: 'Title is required'
+                                        })}
+                                        className='w-full p-2 border rounded'
+                                    />
+                                    {errors.title && (
+                                        <span className='text-red-500 text-sm'>
+                                            {errors.title.message}
+                                        </span>
+                                    )}
+                                </div>
+                                <div>
+                                    <Label>Status</Label>
+                                    <Select
+                                        {...register('status')}
+                                        className='w-full p-2 border rounded'
+                                    >
+                                        <option value="active">Active</option>
+                                        <option value="inactive">Inactive</option>
+                                        <option value="draft">Draft</option>
+                                    </Select>
+                                </div>
+                                <div>
+                                    <Label>Description</Label>
+                                    <textarea
+                                        placeholder='Description'
+                                        {...register('description')}
+                                        className='w-full p-2 border rounded'
+                                        rows={4}
+                                    />
+                                </div>
+                                <div>
+                                    <Label>Image</Label>
+                                    <FileUpload
+                                        defaultPreview={uploadedFiles.featured_image}
+                                        onUploadComplete={(url) => {
+                                            setUploadedFiles((prev) => ({
+                                                ...prev,
+                                                featured_image: url
+                                            }))
+                                            setValue('featured_image', url)
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Submit Button - Sticky Footer */}
+                    <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
+                        <Button
+                            type='button'
+                            variant='outline'
+                            onClick={onClose}
+                        >
+                            Cancel
+                        </Button>
+                        <Button type='submit'>
+                            {initialData ? 'Update Discipline' : 'Create Discipline'}
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </Modal>
+    )
+}

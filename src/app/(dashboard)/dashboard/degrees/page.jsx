@@ -1,26 +1,30 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
 import Table from '../../../../ui/molecules/Table'
-import { Edit2, Trash2, Search } from 'lucide-react'
+import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import FileUpload from '../addCollege/FileUpload'
-import { Modal } from '../../../../ui/molecules/Modal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/ui/shadcn/button'
+import CreateUpdateDegree from '@/ui/molecules/modals/CreateUpdateDegree'
+import ViewDegree from '@/ui/molecules/modals/ViewDegree'
 
 export default function DegreePage() {
   const { setHeading } = usePageHeading()
-  const [isOpen, setIsOpen] = useState(false)
   const [degrees, setDegrees] = useState([])
   const [tableLoading, setTableLoading] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [editing, setEditing] = useState(false)
-  const [editId, setEditId] = useState(null)
+
+  // Create/Edit Modal State
+  const [isOpen, setIsOpen] = useState(false)
+  const [editingDegree, setEditingDegree] = useState(null)
+
+  // View Modal State
+  const [viewingDegree, setViewingDegree] = useState(null)
+  const [isViewOpen, setIsViewOpen] = useState(false)
+
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -29,21 +33,6 @@ export default function DegreePage() {
     currentPage: 1,
     totalPages: 1,
     total: 0
-  })
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    watch,
-    formState: { errors }
-  } = useForm({
-    defaultValues: {
-      cover_image: '',
-      short_name: '',
-      title: ''
-    }
   })
 
   useEffect(() => {
@@ -79,62 +68,14 @@ export default function DegreePage() {
     }
   }
 
-  const onSubmit = async (data) => {
-    try {
-      setSubmitting(true)
-      const baseUrl = DotenvConfig.NEXT_APP_API_BASE_URL
-      const payload = {
-        cover_image: data.cover_image?.trim() || null,
-        short_name: data.short_name.trim(),
-        title: data.title.trim()
-      }
-
-      if (editing && editId) {
-        const response = await authFetch(`${baseUrl}/degree/${editId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        })
-        const result = await response.json()
-        if (!response.ok) throw new Error(result.error || 'Update failed')
-        toast.success('Degree updated successfully!')
-      } else {
-        const response = await authFetch(`${baseUrl}/degree`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        })
-        const result = await response.json()
-        if (!response.ok) throw new Error(result.error || 'Create failed')
-        toast.success('Degree created successfully!')
-      }
-
-      reset()
-      setEditing(false)
-      setEditId(null)
-      setIsOpen(false)
-      fetchDegrees()
-    } catch (error) {
-      toast.error(error.message || 'Failed to save degree')
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
   const handleEdit = (degree) => {
-    setEditing(true)
-    setEditId(degree.id)
+    setEditingDegree(degree)
     setIsOpen(true)
-    setValue('cover_image', degree.cover_image || '')
-    setValue('short_name', degree.short_name || '')
-    setValue('title', degree.title || '')
   }
 
-  const handleModalClose = () => {
-    setIsOpen(false)
-    setEditing(false)
-    setEditId(null)
-    reset()
+  const handleView = (degree) => {
+    setViewingDegree(degree)
+    setIsViewOpen(true)
   }
 
   const handleSearchInput = (value) => {
@@ -199,23 +140,21 @@ export default function DegreePage() {
   }
 
   const columns = [
-    {
-      header: 'Short Name',
-      accessorKey: 'short_name'
-    },
+
     {
       header: 'Title',
       accessorKey: 'title'
     },
     {
-      header: 'Slug',
-      accessorKey: 'slug'
+      header: 'Description',
+      accessorKey: 'description',
+      cell: ({ getValue }) => <span className="line-clamp-2 text-sm text-gray-600">{getValue() || '-'}</span>
     },
     {
       header: 'Cover',
       id: 'cover',
       cell: ({ row }) => {
-        const url = row.original.cover_image
+        const url = row.original.featured_image
         if (!url) return <span className='text-gray-400'>—</span>
         return (
           <img
@@ -232,8 +171,17 @@ export default function DegreePage() {
       cell: ({ row }) => (
         <div className='flex gap-2'>
           <button
+            onClick={() => handleView(row.original)}
+            className='p-1 text-gray-600 hover:text-gray-900'
+            title="View Details"
+            type='button'
+          >
+            <Eye className='w-4 h-4' />
+          </button>
+          <button
             onClick={() => handleEdit(row.original)}
             className='p-1 text-blue-600 hover:text-blue-800'
+            title="Edit"
             type='button'
           >
             <Edit2 className='w-4 h-4' />
@@ -241,6 +189,7 @@ export default function DegreePage() {
           <button
             onClick={() => handleDeleteClick(row.original.id)}
             className='p-1 text-red-600 hover:text-red-800'
+            title="Delete"
             type='button'
           >
             <Trash2 className='w-4 h-4' />
@@ -269,17 +218,14 @@ export default function DegreePage() {
           <div className='flex gap-2'>
             <Button
               onClick={() => {
+                setEditingDegree(null)
                 setIsOpen(true)
-                setEditing(false)
-                setEditId(null)
-                reset()
               }}
             >
               Add Degree
             </Button>
           </div>
         </div>
-        <ToastContainer />
 
         <div className='mt-8'>
           <Table
@@ -294,73 +240,18 @@ export default function DegreePage() {
         </div>
       </div>
 
-      <Modal
+      <CreateUpdateDegree
         isOpen={isOpen}
-        onClose={handleModalClose}
-        title={editing ? 'Edit Degree' : 'Add Degree'}
-        className='max-w-md'
-      >
-        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-          <div className='space-y-4'>
-            <div>
-              <FileUpload
-                label='Cover Image'
-                onUploadComplete={(url) => setValue('cover_image', url || '')}
-                defaultPreview={watch('cover_image')}
-              />
-            </div>
-            <div>
-              <label className='block mb-2'>
-                Short Name <span className='text-red-500'>*</span>
-              </label>
-              <input
-                {...register('short_name', {
-                  required: 'Short name is required',
-                  minLength: { value: 1, message: 'Short name is required' }
-                })}
-                className='w-full p-2 border rounded'
-                placeholder='e.g. BCS'
-              />
-              {errors.short_name && (
-                <span className='text-red-500 text-sm'>{errors.short_name.message}</span>
-              )}
-            </div>
-            <div>
-              <label className='block mb-2'>
-                Title <span className='text-red-500'>*</span>
-              </label>
-              <input
-                {...register('title', {
-                  required: 'Title is required',
-                  minLength: { value: 2, message: 'Title must be at least 2 characters' }
-                })}
-                className='w-full p-2 border rounded'
-                placeholder='e.g. Bachelor of Computer Science'
-              />
-              {errors.title && (
-                <span className='text-red-500 text-sm'>{errors.title.message}</span>
-              )}
-            </div>
-          </div>
+        onClose={() => setIsOpen(false)}
+        initialData={editingDegree}
+        onSuccess={fetchDegrees}
+      />
 
-          <div className='flex justify-end gap-2'>
-            <button
-              type='button'
-              onClick={handleModalClose}
-              className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors'
-            >
-              Cancel
-            </button>
-            <Button type='submit' disabled={submitting}>
-              {submitting
-                ? 'Processing...'
-                : editing
-                  ? 'Update Degree'
-                  : 'Create Degree'}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      <ViewDegree
+        isOpen={isViewOpen}
+        onClose={() => setIsViewOpen(false)}
+        degree={viewingDegree}
+      />
 
       <ConfirmationDialog
         open={isDialogOpen}
