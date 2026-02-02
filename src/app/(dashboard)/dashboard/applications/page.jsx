@@ -7,12 +7,19 @@ import { Modal } from '../../../../ui/molecules/Modal'
 import ShimmerEffect from '../../../../ui/molecules/ShimmerEffect'
 import { DotenvConfig } from '@/config/env.config'
 
+import { useSelector } from 'react-redux'
+import { destr } from 'destr'
+
 const ApplicationsPage = () => {
   const [applications, setApplications] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [updatingId, setUpdatingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
+  
+  const rawRole = useSelector((state) => state.user?.data?.roles || state.user?.data?.role)
+  const role = typeof rawRole === 'string' ? destr(rawRole) || {} : rawRole || {}
+  const isConsultancy = role?.consultancy
   const [statusModalOpen, setStatusModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState(null)
   const [statusForm, setStatusForm] = useState({
@@ -28,10 +35,12 @@ const ApplicationsPage = () => {
     try {
       setLoading(true)
       setError(null)
-      const res = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/institution/applications`,
-        { cache: 'no-store' }
-      )
+      
+      const endpoint = isConsultancy 
+        ? `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/mine`
+        : `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/institution/applications`
+
+      const res = await authFetch(endpoint, { cache: 'no-store' })
 
       if (!res.ok) {
         throw new Error('Failed to load applications')
@@ -71,19 +80,21 @@ const ApplicationsPage = () => {
 
     try {
       setUpdatingId(selectedApplication.id)
-      const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/${selectedApplication.id}/status`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            status: statusForm.status,
-            remarks: statusForm.remarks || null
-          })
-        }
-      )
+      
+      const endpoint = isConsultancy
+        ? `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/${selectedApplication.id}/status`
+        : `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/${selectedApplication.id}/status`
+
+      const response = await authFetch(endpoint, {
+        method: isConsultancy ? 'PATCH' : 'PATCH', // Both use PATCH
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          status: statusForm.status,
+          remarks: statusForm.remarks || null
+        })
+      })
 
       if (!response.ok) {
         throw new Error('Failed to update application status')
@@ -106,12 +117,14 @@ const ApplicationsPage = () => {
 
     try {
       setDeletingId(id)
-      const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/${id}`,
-        {
-          method: 'DELETE'
-        }
-      )
+      
+      const endpoint = isConsultancy
+        ? `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/${id}`
+        : `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/${id}`
+
+      const response = await authFetch(endpoint, {
+        method: 'DELETE'
+      })
 
       if (!response.ok) {
         throw new Error('Failed to delete application')
@@ -142,13 +155,13 @@ const ApplicationsPage = () => {
         <table className='min-w-full bg-white border border-gray-200 shadow-md'>
           <thead>
             <tr className='bg-gray-100 border-b'>
-              <th className='px-4 py-2 border'>Student Name</th>
-              <th className='px-4 py-2 border'>Email</th>
-              <th className='px-4 py-2 border'>Phone</th>
-              <th className='px-4 py-2 border'>Course</th>
-              <th className='px-4 py-2 border'>Description</th>
-              <th className='px-4 py-2 border'>Status</th>
-              <th className='px-4 py-2 border'>Remarks</th>
+              <th className='px-4 py-2 border text-left'>Student Name</th>
+              <th className='px-4 py-2 border text-left'>Email</th>
+              <th className='px-4 py-2 border text-left'>Phone</th>
+              {!isConsultancy && <th className='px-4 py-2 border text-left'>Course</th>}
+              <th className='px-4 py-2 border text-left'>Description</th>
+              <th className='px-4 py-2 border text-left'>Status</th>
+              <th className='px-4 py-2 border text-left'>Remarks</th>
               <th className='px-4 py-2 border text-center'>Actions</th>
             </tr>
           </thead>
@@ -171,9 +184,11 @@ const ApplicationsPage = () => {
                   <td className='px-4 py-2 border'>
                     {app.student_phone_no || 'N/A'}
                   </td>
-                  <td className='px-4 py-2 border'>
-                    {app?.course?.title || 'N/A'}
-                  </td>
+                  {!isConsultancy && (
+                    <td className='px-4 py-2 border'>
+                      {app?.course?.title || 'N/A'}
+                    </td>
+                  )}
                   <td className='px-4 py-2 border'>
                     <span className='text-sm text-gray-600'>
                       {app.student_description

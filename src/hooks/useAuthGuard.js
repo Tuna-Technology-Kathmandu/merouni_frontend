@@ -1,26 +1,61 @@
 'use client'
 
-import { PERMISSIONS_VIA_ROLE } from '@/config/authorization.config'
+import { menuItems } from '@/constants/menuList'
 import { DASHBOARD_ROUTE, SIGN_IN } from '@/config/route.config'
 import { destr } from 'destr'
 import { decodeJwt } from 'jose'
 import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
-function hasAccess(role, pathname) {
-  return Object.entries(PERMISSIONS_VIA_ROLE).some(([roleName, paths]) => {
-    return role[roleName] && (paths.includes(pathname) || paths.includes('*'))
-  })
+const isRouteAllowed = (path, roleName) => {
+  // Flatten all menu items into a single list of allowed paths for the role
+  const getAllowedPaths = (items) => {
+    let allowed = []
+    items.forEach((item) => {
+      // If the item is visible to the role
+      if (item.visible && item.visible.includes(roleName)) {
+        if (item.href) {
+          allowed.push(item.href)
+        }
+        // If it has submenus, check those too
+        if (item.submenus && item.submenus.length > 0) {
+          allowed = [...allowed, ...getAllowedPaths(item.submenus)]
+        }
+      }
+    })
+    return allowed
+  }
+
+  const allowedPaths = menuItems.reduce((acc, section) => {
+    return [...acc, ...getAllowedPaths(section.items)]
+  }, [])
+  
+  // Add common routes that might not be in the menu but should be allowed if logged in
+  allowedPaths.push('/dashboard/profile') 
+
+  // Check if the current path starts with any of the allowed paths
+  // Using startsWith to handle dynamic routes or sub-routes not explicitly in menu
+  return allowedPaths.some(allowedPath => 
+    path === allowedPath || path.startsWith(`${allowedPath}/`)
+  )
 }
 
-function getFirstAllowedRoute(role) {
-  // Find the first route the user has access to
-  for (const [roleName, paths] of Object.entries(PERMISSIONS_VIA_ROLE)) {
-    if (role[roleName] && paths.length > 0) {
-      return paths[0] // Return the first allowed route
+const getFirstAllowedRoute = (roleName) => {
+  for (const section of menuItems) {
+    for (const item of section.items) {
+      if (item.visible && item.visible.includes(roleName)) {
+        if (item.href) return item.href
+        if (item.submenus && item.submenus.length > 0) {
+          for (const sub of item.submenus) {
+            if (sub.visible && sub.visible.includes(roleName) && sub.href) {
+              return sub.href
+            }
+          }
+        }
+      }
     }
   }
-  return DASHBOARD_ROUTE // Fallback to dashboard
+  return DASHBOARD_ROUTE
 }
 
 export default function useAuthGuard() {
@@ -64,17 +99,20 @@ export default function useAuthGuard() {
       // Validate token
       try {
         const user = decodeJwt(token)
-        console.log('Decoded user:', user)
-        const role = user?.data?.role ? destr(user?.data?.role) : {}
-        console.log('Parsed role:', role)
-
+        // console.log('Decoded user:', user)
+        const roleObj = user?.data?.role ? destr(user?.data?.role) : {}
+        
+        // Determine the primary role key (e.g., 'admin', 'student')
+        // Assuming roleObj has boolean flags like { admin: true } or similar
+        const userRole = Object.keys(roleObj).find(key => roleObj[key]) || 'student'
+        // console.log('User role:', userRole)
 
         // Check if user has access to this route
-        if (!hasAccess(role, pathname)) {
+        if (!isRouteAllowed(pathname, userRole)) {
           console.log('No access to route:', pathname)
           // Redirect to first allowed route for this user
-          const firstAllowedRoute = getFirstAllowedRoute(role)
-          router.replace(firstAllowedRoute)
+          const firstAllowed = getFirstAllowedRoute(userRole)
+          router.replace(firstAllowed)
           setIsBooted(true)
           return
         }
@@ -98,10 +136,12 @@ export default function useAuthGuard() {
       if (pathname === SIGN_IN && token && refreshToken) {
         try {
           const user = decodeJwt(token)
-          const role = user?.data?.role ? destr(user?.data?.role) : {}
+          const roleObj = user?.data?.role ? destr(user?.data?.role) : {}
+          const userRole = Object.keys(roleObj).find(key => roleObj[key]) || 'student'
+
           // Token is valid, redirect to first allowed route
-          const firstAllowedRoute = getFirstAllowedRoute(role)
-          router.replace(firstAllowedRoute)
+          const firstAllowed = getFirstAllowedRoute(userRole)
+          router.replace(firstAllowed)
           setIsBooted(true)
           return
         } catch (err) {

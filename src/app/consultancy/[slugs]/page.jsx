@@ -10,6 +10,7 @@ import ConsultancyOverview from './components/ConsultancyOverview'
 import RelatedConsultancies from './components/RelatedConsultancies'
 import { getConsultancyBySlug } from '../actions'
 import Loading from '../../../ui/molecules/Loading'
+import ApplyNow from './components/ApplyNow'
 
 // Share Section — matches college detail page style
 const ShareSection = ({ consultancy }) => {
@@ -192,6 +193,7 @@ const ConsultancyDetailPage = ({ params }) => {
       <br />
       <br />
       <ConsultancyOverview consultancy={consultancy} />
+      <ApplyNow consultancy={consultancy} />
       <RelatedConsultancies consultancy={consultancy} />
       <ShareSection consultancy={consultancy} />
       <Footer />

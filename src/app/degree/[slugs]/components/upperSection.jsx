@@ -63,11 +63,17 @@ const ImageSection = ({ degree }) => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className='w-full h-[300px] md:h-[500px] rounded-[2rem] overflow-hidden shadow-2xl shadow-gray-200 border border-gray-100'
         >
-          <img
-            src={'/images/degreeHero.webp'}
-            alt={degree?.title || 'Degree Image'}
-            className='object-cover w-full h-full'
-          />
+          <div className='w-full h-full bg-gray-50 flex items-center justify-center'>
+            <img
+              src={degree?.cover_image || degree?.featured_image || '/images/logo.png'}
+              alt={degree?.title || 'Degree Image'}
+              className={
+                degree?.cover_image || degree?.featured_image
+                  ? 'w-full h-full object-cover'
+                  : 'w-1/3 h-auto object-contain opacity-50'
+              }
+            />
+          </div>
         </motion.div>
       </div>
 

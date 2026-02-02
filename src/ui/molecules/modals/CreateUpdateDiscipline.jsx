@@ -34,7 +34,6 @@ export default function CreateUpdateDiscipline({
             title: '',
             description: '',
             featured_image: '',
-            status: 'active', // Default to active
             author: authorId
         }
     })
@@ -46,7 +45,6 @@ export default function CreateUpdateDiscipline({
                 setValue('title', initialData.title)
                 setValue('description', initialData.description || '')
                 setValue('featured_image', initialData.featured_image || '')
-                setValue('status', initialData.status || 'draft')
                 setUploadedFiles({ featured_image: initialData.featured_image || '' })
             } else {
                 // Create mode - reset to defaults
@@ -54,7 +52,6 @@ export default function CreateUpdateDiscipline({
                     title: '',
                     description: '',
                     featured_image: '',
-                    status: 'active',
                     author: authorId
                 })
                 setUploadedFiles({ featured_image: '' })
@@ -145,9 +142,7 @@ export default function CreateUpdateDiscipline({
                 >
                     <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
                         <div className='bg-white p-6 rounded-lg shadow-md'>
-                            <h2 className='text-xl font-semibold mb-4'>
-                                Discipline Information
-                            </h2>
+                          
                             <div className='space-y-4'>
                                 <div>
                                     <Label>
@@ -166,17 +161,6 @@ export default function CreateUpdateDiscipline({
                                             {errors.title.message}
                                         </span>
                                     )}
-                                </div>
-                                <div>
-                                    <Label>Status</Label>
-                                    <Select
-                                        {...register('status')}
-                                        className='w-full p-2 border rounded'
-                                    >
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
-                                        <option value="draft">Draft</option>
-                                    </Select>
                                 </div>
                                 <div>
                                     <Label>Description</Label>

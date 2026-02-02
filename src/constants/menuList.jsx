@@ -48,6 +48,12 @@ export const menuItems = [
         visible: ['student']
       },
       {
+        icon: <FaHandshake className='text-xl' />,
+        label: 'Applied Consultancies',
+        href: '/dashboard/applied-consultancies',
+        visible: ['student']
+      },
+      {
         icon: <MdQuiz className='text-xl' />,
         label: 'Exams',
         href: '/dashboard/exams',
@@ -236,12 +242,12 @@ export const menuItems = [
         href: '/dashboard/university',
         visible: ['admin', 'editor']
       },
-      {
-        icon: <FaChalkboardTeacher className='text-xl' />,
-        label: 'Faculty',
-        href: '/dashboard/faculty',
-        visible: ['admin', 'editor']
-      },
+      // {
+      //   icon: <FaChalkboardTeacher className='text-xl' />,
+      //   label: 'Faculty',
+      //   href: '/dashboard/faculty',
+      //   visible: ['admin', 'editor']
+      // },
       {
         icon: <HandCoins className='text-xl' />,
         label: 'Set Referral Point',

@@ -14,9 +14,7 @@ import { Trash2, X } from 'lucide-react'
 // Dropdowns
 import CollegesDropdown from '@/ui/molecules/dropdown/CollegesDropdown'
 import DegreeDropdown from '@/ui/molecules/dropdown/DegreeDropdown'
-import DisciplineDropdown from '@/ui/molecules/dropdown/DisciplineDropdown'
 import ExamDropdown from '@/ui/molecules/dropdown/ExamDropdown'
-import FacultyDropdown from '@/ui/molecules/dropdown/FacultyDropdown'
 import LevelDropdown from '@/ui/molecules/dropdown/LevelDropdown'
 import ScholarshipDropdown from '@/ui/molecules/dropdown/ScholarshipDropdown'
 import CourseDropdown from '@/ui/molecules/dropdown/CourseDropdown'
@@ -56,8 +54,6 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
             credits: '',
             level_id: '',
             degree_id: '',
-            discipline_id: '',
-            faculty_id: '',
             language: '',
             eligibility_criteria: '',
             fee: '',
@@ -101,8 +97,6 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                     credits: '',
                     level_id: '',
                     degree_id: '',
-                    discipline_id: '',
-                    faculty_id: '',
                     language: '',
                     eligibility_criteria: '',
                     fee: '',
@@ -170,8 +164,8 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
             setValue('exam_id', program.exam_id ?? program.programexam?.id ?? '')
             setValue('level_id', program.level_id ?? program.programlevel?.id ?? '')
             setValue('degree_id', program.degree_id ?? program.programdegree?.id ?? '')
-            setValue('discipline_id', program.discipline_id ?? program.discipline?.id ?? '')
-            setValue('faculty_id', program.faculty_id ?? program.programfaculty?.id ?? '')
+
+
 
             if (program.colleges) {
                 const collegeIds = program.colleges.map(
@@ -251,10 +245,8 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
             setSubmitting(true)
             const cleanedData = {
                 ...data,
-                faculty_id: data.faculty_id ? Number(data.faculty_id) : null,
                 level_id: data.level_id ? Number(data.level_id) : undefined,
                 degree_id: data.degree_id ? Number(data.degree_id) : null,
-                discipline_id: data.discipline_id ? Number(data.discipline_id) : null,
                 syllabus: data.syllabus.map((item) => ({
                     year: item.year,
                     semester: item.semester,
@@ -411,40 +403,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                 />
                             </div>
 
-                            {/* Discipline (optional) */}
-                            <div>
-                                <label className='block mb-2'>Discipline</label>
-                                <DisciplineDropdown
-                                    value={watch('discipline_id') ?? ''}
-                                    onChange={(id) => setValue('discipline_id', id || '')}
-                                    placeholder='Select discipline'
-                                    className='w-full'
-                                />
-                            </div>
 
-                            {/* Faculty (Required) */}
-                            <div>
-                                <label className='block mb-2'>
-                                    Faculty <span className='text-red-500'>*</span>
-                                </label>
-                                <input
-                                    type='hidden'
-                                    {...register('faculty_id', {
-                                        required: 'Faculty is required'
-                                    })}
-                                />
-                                <FacultyDropdown
-                                    value={watch('faculty_id') ?? ''}
-                                    onChange={(id) => setValue('faculty_id', id || '')}
-                                    placeholder='Select faculty'
-                                    className='w-full'
-                                />
-                                {errors.faculty_id && (
-                                    <span className='text-red-500 text-sm mt-1'>
-                                        {errors.faculty_id.message}
-                                    </span>
-                                )}
-                            </div>
 
                             <div>
                                 <label className='block mb-2'>

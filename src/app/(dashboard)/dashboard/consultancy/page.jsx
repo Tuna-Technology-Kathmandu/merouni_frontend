@@ -15,8 +15,16 @@ import { toast } from 'react-toastify'
 import Table from '../../../../ui/molecules/Table'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { createColumns } from './columns'
+import EditConsultancyPage from './EditConsultancyPage'
 
 export default function ConsultancyForm() {
+  const { role } = useAdminPermission()
+  
+  // If user is consultancy, show the edit page
+  if (role.consultancy) {
+    return <EditConsultancyPage />
+  }
+
   const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data.id)
   const searchParams = useSearchParams()

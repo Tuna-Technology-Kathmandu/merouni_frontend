@@ -8,15 +8,17 @@ const DegreeCard = ({ degree }) => {
 
   return (
     <article className='bg-white rounded-xl border border-gray-100 overflow-hidden flex flex-col hover:border-gray-200 hover:shadow-sm transition-all duration-200'>
-      {degree.cover_image && (
-        <div className='aspect-video w-full bg-gray-100'>
-          <img
-            src={degree.cover_image}
-            alt={degree.title}
-            className='w-full h-full object-cover'
-          />
-        </div>
-      )}
+      <div className='aspect-video w-full bg-gray-50 flex items-center justify-center overflow-hidden'>
+        <img
+          src={degree.cover_image || degree.featured_image || '/images/logo.png'}
+          alt={degree.title}
+          className={
+            degree.cover_image || degree.featured_image
+              ? 'w-full h-full object-cover'
+              : 'w-2/3 h-auto object-contain opacity-50'
+          }
+        />
+      </div>
       <div className='p-5 flex flex-col flex-1'>
         {degree.short_name && (
           <p className='text-xs font-semibold text-[#0A6FA7] uppercase tracking-wide mb-1'>

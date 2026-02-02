@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSelector } from 'react-redux'
 import { destr } from 'destr'
-import { Phone, MapPin } from 'lucide-react'
+import { Phone, MapPin, Handshake } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
@@ -144,6 +144,9 @@ const StudentDashboard = () => {
   const [wishlist, setWishlist] = useState([])
   const [wishlistLoading, setWishlistLoading] = useState(true)
   const [wishlistError, setWishlistError] = useState(null)
+  const [consultancyApplications, setConsultancyApplications] = useState([])
+  const [consultancyLoading, setConsultancyLoading] = useState(true)
+  const [consultancyError, setConsultancyError] = useState(null)
 
   useEffect(() => {
     let isMounted = true
@@ -222,6 +225,44 @@ const StudentDashboard = () => {
       isMounted = false
     }
   }, [user?.id])
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadConsultancyApplications = async () => {
+      try {
+        setConsultancyLoading(true)
+        setConsultancyError(null)
+        const res = await authFetch(
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/user/applications`,
+          { cache: 'no-store' }
+        )
+
+        if (!res.ok) {
+          throw new Error('Failed to load consultancy applications')
+        }
+
+        const data = await res.json()
+        if (!isMounted) return
+        setConsultancyApplications(Array.isArray(data) ? data : [])
+      } catch (err) {
+        console.error('Error loading consultancy applications:', err)
+        if (isMounted) {
+          setConsultancyError(err.message || 'Failed to load consultancy applications')
+        }
+      } finally {
+        if (isMounted) {
+          setConsultancyLoading(false)
+        }
+      }
+    }
+
+    loadConsultancyApplications()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   return (
     <div className='p-4 space-y-6'>
@@ -381,7 +422,110 @@ const StudentDashboard = () => {
               </>
             )}
           </div>
+
+          <div className='bg-white rounded-xl shadow p-4 mt-6'>
+            <h2 className='text-lg font-semibold mb-2'>
+              Your Applied Consultancies
+            </h2>
+            <p className='text-sm text-gray-600 mb-3'>
+              Track your expert consultation requests.
+            </p>
+
+            {consultancyLoading && (
+              <div className='flex justify-center items-center h-24'>
+                <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-green-500'></div>
+              </div>
+            )}
+
+            {!consultancyLoading && consultancyError && (
+              <p className='text-sm text-red-600'>Error: {consultancyError}</p>
+            )}
+
+            {!consultancyLoading && !consultancyError && (
+              <>
+                {consultancyApplications.length === 0 ? (
+                  <p className='text-sm text-gray-500'>
+                    You haven&apos;t applied to any consultancies yet.
+                  </p>
+                ) : (
+                  <div className='space-y-3'>
+                    {consultancyApplications.map((app) => (
+                      <div
+                        key={app.id}
+                        className='flex flex-col md:flex-row md:items-center justify-between border rounded-lg px-3 py-3 gap-2'
+                      >
+                        <div className='flex-1 flex items-start gap-3'>
+                          <div className='flex-shrink-0'>
+                            {app?.consultancy?.logo ? (
+                              <img
+                                src={app.consultancy.logo}
+                                alt={app?.consultancy?.title || 'Logo'}
+                                className='w-12 h-12 object-contain rounded'
+                              />
+                            ) : (
+                              <div className='w-12 h-12 bg-gray-100 rounded flex items-center justify-center'>
+                                <Handshake className='w-6 h-6 text-gray-400' />
+                              </div>
+                            )}
+                          </div>
+                          <div className='flex-1'>
+                            <div className='flex items-center gap-2 mb-1'>
+                              <p className='font-semibold text-gray-900'>
+                                {app?.consultancy?.title || 'Unnamed Consultancy'}
+                              </p>
+                              {app?.status && (
+                                <span
+                                  className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                                    app.status === 'ACCEPTED'
+                                      ? 'bg-green-100 text-green-800'
+                                      : app.status === 'REJECTED'
+                                        ? 'bg-red-100 text-red-800'
+                                        : 'bg-yellow-100 text-yellow-800'
+                                  }`}
+                                >
+                                  {app.status}
+                                </span>
+                              )}
+                            </div>
+                            
+                            <div className='text-xs text-gray-500 mt-1 flex flex-wrap items-center gap-2'>
+                              {app?.consultancy?.address && (
+                                <span className='flex items-center gap-1'>
+                                  <MapPin className='w-3 h-3' />
+                                  {typeof app.consultancy.address === 'string' 
+                                    ? app.consultancy.address 
+                                    : Array.isArray(app.consultancy.address) 
+                                      ? app.consultancy.address[0]?.city || app.consultancy.address[0]
+                                      : 'Address listed'}
+                                </span>
+                              )}
+                            </div>
+
+                            {app?.createdAt && (
+                              <p className='text-xs text-gray-500 mt-1'>
+                                Applied:{' '}
+                                {new Date(app.createdAt).toLocaleDateString()}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        {app?.consultancy?.slugs && (
+                          <Link
+                            href={`/consultancy/${app.consultancy.slugs}`}
+                            className='inline-flex items-center text-sm font-medium text-blue-600 hover:underline'
+                          >
+                            View Consultancy
+                          </Link>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
+
         {/* Wishlist - 20% width (1/5 column) */}
         <div className='lg:col-span-1'>
           <div className='bg-white rounded-xl shadow p-4'>
@@ -520,8 +664,83 @@ const InstitutionDashboard = () => {
   )
 }
 
+const ConsultancyDashboard = () => {
+  const user = useSelector((state) => state.user?.data)
+  const [applicationsCount, setApplicationsCount] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadApplicationsCount = async () => {
+      if (!user?.consultancyId) return
+
+      try {
+        setLoading(true)
+        setError(null)
+        const res = await authFetch(
+          `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/mine`,
+          { cache: 'no-store' }
+        )
+
+        if (!res.ok) {
+          throw new Error('Failed to load applications')
+        }
+
+        const data = await res.json()
+        if (!isMounted) return
+        const applications = Array.isArray(data) ? data : []
+        setApplicationsCount(applications.length)
+      } catch (err) {
+        console.error('Error loading applications:', err)
+        if (isMounted) {
+          setError(err.message || 'Failed to load applications')
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadApplicationsCount()
+
+    return () => {
+      isMounted = false
+    }
+  }, [user?.consultancyId])
+
+  return (
+    <div className='p-4 space-y-6'>
+      <div className='flex items-center justify-between mb-4'>
+        <div>
+          <h1 className='text-2xl font-bold'>
+            Welcome{user?.firstName ? `, ${user.firstName}` : ''} 👋
+          </h1>
+          <p className='text-gray-600 text-sm mt-1'>Manage your consultancy.</p>
+        </div>
+      </div>
+
+      <div className='flex gap-4 justify-between flex-wrap'>
+        <UserCard
+          type='Total Applications'
+          value={applicationsCount}
+          loading={loading}
+        />
+      </div>
+
+      {error && (
+        <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
+          <p className='text-sm text-red-600'>Error: {error}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const DashboardPage = () => {
-  const rawRole = useSelector((state) => state.user?.data?.role)
+  const rawRole = useSelector((state) => state.user?.data?.roles || state.user?.data?.role)
   const role =
     typeof rawRole === 'string' ? destr(rawRole) || {} : rawRole || {}
 
@@ -538,7 +757,15 @@ const DashboardPage = () => {
     return <InstitutionDashboard />
   }
 
-  return <AdminDashboard />
+  if (role?.consultancy) {
+    return <ConsultancyDashboard />
+  }
+
+  else if(role?.admin){
+    return <AdminDashboard />
+  }
+
+  return <>Loading...</>
 }
 
 export default DashboardPage

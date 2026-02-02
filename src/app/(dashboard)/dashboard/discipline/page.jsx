@@ -53,20 +53,7 @@ export default function DisciplineManager() {
                 accessorKey: 'description',
                 cell: ({ getValue }) => <span className="line-clamp-2">{getValue()}</span>
             },
-            {
-                header: 'Status',
-                accessorKey: 'status',
-                cell: ({ getValue }) => (
-                    <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getValue() === 'published' || getValue() === 'active'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                            }`}
-                    >
-                        {getValue() ? getValue().charAt(0).toUpperCase() + getValue().slice(1) : 'Draft'}
-                    </span>
-                )
-            },
+
             {
                 header: 'Image',
                 accessorKey: 'featured_image',
@@ -323,17 +310,7 @@ export default function DisciplineManager() {
                             <p className="mt-1 text-lg font-semibold text-gray-900">{viewingDiscipline?.title}</p>
                         </div>
 
-                        <div>
-                            <h3 className="text-sm font-medium text-gray-500">Status</h3>
-                            <span
-                                className={`inline-flex mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${viewingDiscipline?.status === 'published'
-                                    ? 'bg-green-100 text-green-800'
-                                    : 'bg-gray-100 text-gray-800'
-                                    }`}
-                            >
-                                {viewingDiscipline?.status ? viewingDiscipline.status.charAt(0).toUpperCase() + viewingDiscipline.status.slice(1) : 'Draft'}
-                            </span>
-                        </div>
+
 
                         <div className="md:col-span-2">
                             <h3 className="text-sm font-medium text-gray-500">Description</h3>

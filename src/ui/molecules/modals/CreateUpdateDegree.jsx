@@ -19,6 +19,8 @@ export default function CreateUpdateDegree({
     initialData = null
 }) {
     const [submitting, setSubmitting] = useState(false)
+    const [allDisciplines, setAllDisciplines] = useState([])
+    const [selectedDisciplines, setSelectedDisciplines] = useState([])
 
     const {
         register,
@@ -30,6 +32,7 @@ export default function CreateUpdateDegree({
     } = useForm({
         defaultValues: {
             featured_image: '',
+            short_name: '',
             title: '',
             description: ''
         }
@@ -39,20 +42,65 @@ export default function CreateUpdateDegree({
     const coverImage = watch('featured_image')
 
     useEffect(() => {
+        // Fetch disciplines
+        const fetchDisciplines = async () => {
+            try {
+                const response = await authFetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline`)
+                const data = await response.json()
+                if (response.ok) {
+                    setAllDisciplines(data.items || [])
+                }
+            } catch (err) {
+                console.error('Failed to fetch disciplines', err)
+            }
+        }
+        fetchDisciplines()
+    }, [])
+
+    useEffect(() => {
         if (isOpen) {
             if (initialData) {
                 setValue('featured_image', initialData.featured_image || '')
+                setValue('short_name', initialData.short_name || '')
                 setValue('title', initialData.title || '')
                 setValue('description', initialData.description || '')
+                
+                // Set selected disciplines if available
+                // Assuming initialData.disciplines is an array of IDs or objects
+                let existingDisciplines = []
+                if (Array.isArray(initialData.disciplines)) {
+                     // If it's array of objects, map to ID. If IDs, use as is.
+                     // The backend stores JSON, so it might be [1, 2] or [{"id":1}, ...] depending on how we saved it.
+                     // Our validator allows array. We will save array of IDs.
+                     existingDisciplines = initialData.disciplines.map(d => (typeof d === 'object' ? d.id : d))
+                } else if (typeof initialData.disciplines === 'string') {
+                    try {
+                        existingDisciplines = JSON.parse(initialData.disciplines)
+                    } catch(e) {/* ignore */}
+                }
+                setSelectedDisciplines(existingDisciplines)
+
             } else {
                 reset({
                     featured_image: '',
+                    short_name: '',
                     title: '',
                     description: ''
                 })
+                setSelectedDisciplines([])
             }
         }
     }, [isOpen, initialData, setValue, reset])
+
+    const handleDisciplineToggle = (id) => {
+        setSelectedDisciplines(prev => {
+            if (prev.includes(id)) {
+                return prev.filter(d => d !== id)
+            } else {
+                return [...prev, id]
+            }
+        })
+    }
 
     const onSubmit = async (data) => {
         try {
@@ -60,8 +108,10 @@ export default function CreateUpdateDegree({
             const baseUrl = DotenvConfig.NEXT_APP_API_BASE_URL
             const payload = {
                 featured_image: data.featured_image?.trim() || null,
+                short_name: data.short_name.trim(),
                 title: data.title.trim(),
-                description: data.description?.trim() || null
+                description: data.description?.trim() || null,
+                disciplines: selectedDisciplines
             }
 
             let response
@@ -111,6 +161,22 @@ export default function CreateUpdateDegree({
                  
                     <div>
                         <Label className='block mb-2 text-sm font-medium'>
+                            Short Name <span className='text-red-500'>*</span>
+                        </Label>
+                        <Input
+                            {...register('short_name', {
+                                required: 'Short name is required'
+                            })}
+                            className='w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none'
+                            placeholder='e.g. BCS, BBA'
+                        />
+                        {errors.short_name && (
+                            <span className='text-red-500 text-sm'>{errors.short_name.message}</span>
+                        )}
+                    </div>
+                 
+                    <div>
+                        <Label className='block mb-2 text-sm font-medium'>
                             Title <span className='text-red-500'>*</span>
                         </Label>
                         <Input
@@ -125,6 +191,31 @@ export default function CreateUpdateDegree({
                             <span className='text-red-500 text-sm'>{errors.title.message}</span>
                         )}
                     </div>
+                    
+                    {/* Disciplines Multi-select */}
+                    <div>
+                        <Label className='block mb-2 text-sm font-medium'>
+                            Disciplines 
+                        </Label>
+                        <div className="border rounded-md p-2 max-h-40 overflow-y-auto space-y-2">
+                            {allDisciplines.length > 0 ? (
+                                allDisciplines.map(discipline => (
+                                    <label key={discipline.id} className="flex items-center space-x-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedDisciplines.includes(discipline.id)}
+                                            onChange={() => handleDisciplineToggle(discipline.id)}
+                                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        />
+                                        <span className="text-sm">{discipline.title || discipline.name}</span>
+                                    </label>
+                                ))
+                            ) : (
+                                <p className="text-sm text-gray-500">No disciplines found.</p>
+                            )}
+                        </div>
+                    </div>
+
                     <div>
                         <Label className='block mb-2 text-sm font-medium'>
                             Description

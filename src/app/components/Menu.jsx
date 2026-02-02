@@ -100,6 +100,12 @@ const menuItems = [
         visible: ['admin', 'editor']
       },
       {
+        icon: <FaWpforms className='text-xl' />,
+        label: 'Consultancy Applications',
+        href: '/dashboard/consultancy-applications',
+        visible: ['admin']
+      },
+      {
         icon: <BsCalendarEvent className='text-xl' />,
         label: 'Events',
         href: '/dashboard/events',
@@ -176,8 +182,7 @@ const Menu = ({ isCollapsed = false }) => {
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
 
   const role = useSelector((state) => {
-    const roleData = state.user?.data?.role
-    console.log(roleData, 'roleData')
+    const roleData = state.user?.data?.roles || state.user?.data?.role
     const parsedRole = typeof roleData === 'string' ? destr(roleData) : roleData
     if (!parsedRole || typeof parsedRole !== 'object') return {}
 
@@ -186,6 +191,9 @@ const Menu = ({ isCollapsed = false }) => {
       return acc
     }, {})
   })
+
+  // Debug: Log the role to help troubleshoot
+  console.log('User role in Menu:', role)
 
   const handleLogout = async () => {
     try {

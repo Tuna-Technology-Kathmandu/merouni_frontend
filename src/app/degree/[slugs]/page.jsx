@@ -117,17 +117,19 @@ const CourseDescription = ({ params }) => {
                     </div>
                   </div>
                 </div>
-                {degree.cover_image && (
-                  <div className='container mx-auto px-4 -mt-8'>
-                    <div className='w-full max-w-4xl mx-auto aspect-video rounded-2xl overflow-hidden shadow-xl border border-gray-100'>
-                      <img
-                        src={degree.cover_image}
-                        alt={degree.title}
-                        className='w-full h-full object-cover'
-                      />
-                    </div>
+                <div className='container mx-auto px-4 -mt-8'>
+                  <div className='w-full max-w-4xl mx-auto aspect-video rounded-2xl overflow-hidden shadow-xl border border-gray-100 bg-gray-50 flex items-center justify-center'>
+                    <img
+                      src={degree.cover_image || degree.featured_image || '/images/logo.png'}
+                      alt={degree.title}
+                      className={
+                        degree.cover_image || degree.featured_image
+                          ? 'w-full h-full object-cover'
+                          : 'w-2/3 h-auto object-contain opacity-50'
+                      }
+                    />
                   </div>
-                )}
+                </div>
                 {degree.programs && degree.programs.length > 0 && (
                   <div className='container mx-auto px-4 py-12'>
                     <div className='max-w-4xl mx-auto'>
@@ -191,6 +193,50 @@ const CourseDescription = ({ params }) => {
                 <Syllabus degree={degree} />
                 <CollegeTeach degree={degree} />
                 <RelatedCourses degree={degree} />
+                {degree.programs && degree.programs.length > 0 && (
+                  <div className='container mx-auto px-4 py-12'>
+                    <div className='max-w-4xl mx-auto'>
+                      <h2 className='text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2'>
+                        <GraduationCap className='w-6 h-6 text-[#0A6FA7]' />
+                        Programs under this degree
+                      </h2>
+                      <ul className='space-y-4'>
+                        {degree.programs.map((program) => (
+                          <li key={program.id}>
+                            <Link
+                              href={`/program/${encodeURIComponent(program.slugs || program.slug)}`}
+                              className='block p-4 rounded-xl border border-gray-100 bg-white hover:border-[#0A6FA7] hover:shadow-md transition-all group'
+                            >
+                              <div className='flex items-center justify-between'>
+                                <div className='flex-1'>
+                                  <h3 className='font-bold text-gray-900 group-hover:text-[#0A6FA7] transition-colors'>
+                                    {program.title}
+                                  </h3>
+                                  <div className='flex flex-wrap gap-x-3 gap-y-1 mt-1 text-sm text-gray-500'>
+                                    {program.code && (
+                                      <span>Code: {program.code}</span>
+                                    )}
+                                    {program.duration && (
+                                      <span>· {program.duration}</span>
+                                    )}
+                                    {program.credits && (
+                                      <span>· {program.credits} Credits</span>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className='ml-4'>
+                                  <span className='px-4 py-2 rounded-lg bg-gray-50 text-[#0A6FA7] text-sm font-semibold group-hover:bg-[#0A6FA7] group-hover:text-white transition-all'>
+                                    View Program
+                                  </span>
+                                </div>
+                              </div>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </>

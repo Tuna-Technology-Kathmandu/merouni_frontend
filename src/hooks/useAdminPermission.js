@@ -5,17 +5,18 @@ import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
 const useAdminPermission = () => {
-  // Get role string from Redux store
-  const rawRole = useSelector((state) => state.user?.data?.role || '{}')
+  // Get role from Redux store
+  const roleData = useSelector((state) => state.user?.data?.roles || state.user?.data?.role || '{}')
 
   // Parse and memoize role
   const role = useMemo(() => {
+    if (typeof roleData === 'object') return roleData
     try {
-      return JSON.parse(rawRole)
+      return JSON.parse(roleData)
     } catch {
       return {}
     }
-  }, [rawRole])
+  }, [roleData])
 
   // Boolean: is user an admin?
   const isAdmin = !!role.admin
