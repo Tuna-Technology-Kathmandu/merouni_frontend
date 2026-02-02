@@ -223,6 +223,7 @@ const ReferralsPage = () => {
         )
       )
       handleCloseStatusModal()
+      toast.success('Referral status updated successfully')
     } catch (err) {
       setError(err.message || 'Failed to update referral status')
     } finally {
@@ -558,20 +559,19 @@ const ReferralsPage = () => {
           {error && <div className='text-red-500 text-sm'>{error}</div>}
 
           <div className='flex justify-end gap-2 pt-2'>
-            <button
+            <Button
               type='button'
               onClick={handleCloseStatusModal}
-              className='px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200'
+              variant='outline'
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type='submit'
               disabled={updatingId === selectedReferral?.id}
-              className='px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50'
             >
               {updatingId === selectedReferral?.id ? 'Updating...' : 'Update'}
-            </button>
+            </Button>
           </div>
         </form>
       </Modal>

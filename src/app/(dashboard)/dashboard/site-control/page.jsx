@@ -18,7 +18,7 @@ import Table from '../../../../ui/molecules/Table'
 import { Modal } from '../../../../ui/molecules/Modal'
 
 
-const CKUni = dynamic(() => import('@/app/(dashboard)/dashboard/component/CKUni'), {
+const CKSiteControl = dynamic(() => import('./CKSiteControl'), {
     ssr: false
 })
 
@@ -65,6 +65,7 @@ export default function SiteControlPage() {
 
     // React Hook Form
     const { control, handleSubmit, reset, watch, register, formState: { errors } } = useForm({
+        shouldUnregister: true,
         defaultValues: {
             type: '',
             value: ''
@@ -304,11 +305,11 @@ export default function SiteControlPage() {
                                     control={control}
                                     rules={{ required: 'Value is required' }}
                                     render={({ field }) => (
-                                        <CKUni
+                                        <CKSiteControl
                                             key={selectedType || 'editor'}
-                                            initialData={field.value}
+                                            value={field.value}
                                             onChange={(data) => field.onChange(data)}
-                                            id={`site-control-config-editor`}
+                                            id={`site-control-config-editor-${selectedType}`}
                                         />
                                     )}
                                 />

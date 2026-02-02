@@ -14,8 +14,8 @@ const Disclaimer = () => {
         const fetchContent = async () => {
             try {
                 const config = await getConfigByType('legal_disclaimer')
-                if (config?.value) {
-                    setContent(config.value)
+                if (config?.config) {
+                    setContent(config.config.value)
                 }
             } catch (error) {
                 console.error('Failed to fetch disclaimer:', error)

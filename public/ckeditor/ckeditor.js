@@ -370,6 +370,7 @@ For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
   CKEDITOR.on(
     'log',
     function (a) {
+      if (window.console && window.console.log) {
         var d = console[a.data.type] ? a.data.type : 'log',
           b = a.data.errorCode
         if ((a = a.data.additionalData))
