@@ -3,45 +3,15 @@
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import Loading from '@/ui/molecules/Loading'
 import { Button } from '@/ui/shadcn/button'
-import { Input } from '@/ui/shadcn/input'
-import { Label } from '@/ui/shadcn/label'
-import {
-    Select
-} from '@/ui/shadcn/select'
-import { Edit2, Search, Plus } from 'lucide-react'
+import { Edit2, Search, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState, useMemo } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
-import { useForm, Controller } from 'react-hook-form'
-import { getSiteConfig, updateSiteConfig } from '../../../actions/siteConfigActions'
-import dynamic from 'next/dynamic'
+import { getSiteConfig, deleteSiteConfig } from '../../../actions/siteConfigActions'
 import Table from '../../../../ui/molecules/Table'
-import { Modal } from '../../../../ui/molecules/Modal'
-
-
-const CKSiteControl = dynamic(() => import('./CKSiteControl'), {
-    ssr: false
-})
-
-
-// Define the expected configuration keys and their metadata
-const CONFIG_TYPES = [
-    // Social Media
-    { value: 'social_facebook', label: 'Facebook URL', section: 'Social', inputType: 'text' },
-    { value: 'social_twitter', label: 'Twitter (X) URL', section: 'Social', inputType: 'text' },
-    { value: 'social_linkedin', label: 'LinkedIn URL', section: 'Social', inputType: 'text' },
-    { value: 'social_instagram', label: 'Instagram URL', section: 'Social', inputType: 'text' },
-    { value: 'social_youtube', label: 'YouTube URL', section: 'Social', inputType: 'text' },
-
-    // Contact Information
-    { value: 'contact_email', label: 'Contact Email', section: 'Contact', inputType: 'email' },
-    { value: 'contact_phone', label: 'Phone Number', section: 'Contact', inputType: 'text' },
-    { value: 'contact_address', label: 'Physical Address', section: 'Contact', inputType: 'text' },
-
-    // Legal & Policies
-    { value: 'legal_disclaimer', label: 'Site Disclaimer', section: 'Legal', inputType: 'richtext' },
-    { value: 'legal_privacy_policy', label: 'Privacy Policy', section: 'Legal', inputType: 'richtext' },
-    { value: 'legal_terms_conditions', label: 'Terms & Conditions', section: 'Legal', inputType: 'richtext' },
-]
+import { CONFIG_TYPES } from './siteControlConstants'
+import SiteControlCreateModal from './SiteControlCreateModal'
+import SiteControlEditModal from './SiteControlEditModal'
+import SiteControlDeleteModal from './SiteControlDeleteModal'
 
 export default function SiteControlPage() {
     const { setHeading } = usePageHeading()
@@ -50,29 +20,17 @@ export default function SiteControlPage() {
     const [filteredConfigs, setFilteredConfigs] = useState([])
 
     // Modal State
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [editingConfig, setEditingConfig] = useState(null) // null = adding new
-    const [saving, setSaving] = useState(false)
+    const [isCreateOpen, setIsCreateOpen] = useState(false)
+    const [editingConfig, setEditingConfig] = useState(null) // Object when editing, null when closed
+    const [deletingConfig, setDeletingConfig] = useState(null) // Object when deleting
 
     // Search & Pagination State for Table Molecule
     const [searchQuery, setSearchQuery] = useState('')
-    const [searchTimeout, setSearchTimeout] = useState(null)
     const [pagination, setPagination] = useState({
         currentPage: 1,
         totalPages: 1,
         total: 0
     })
-
-    // React Hook Form
-    const { control, handleSubmit, reset, watch, register, formState: { errors } } = useForm({
-        shouldUnregister: true,
-        defaultValues: {
-            type: '',
-            value: ''
-        }
-    })
-
-    const selectedType = watch('type')
 
     useEffect(() => {
         setHeading('Site Control')
@@ -118,48 +76,36 @@ export default function SiteControlPage() {
     }
 
     const handleAdd = () => {
-        setEditingConfig(null)
-        reset({ type: '', value: '' })
-        setIsModalOpen(true)
+        setIsCreateOpen(true)
     }
 
     const handleEdit = (config) => {
         setEditingConfig(config)
-        reset({ type: config.type, value: config.value || '' })
-        setIsModalOpen(true)
     }
 
-    const handleModalClose = () => {
-        setIsModalOpen(false)
-        reset()
+    const handleDelete = (config) => {
+        setDeletingConfig(config)
     }
 
-    const onSubmit = async (data) => {
-        setSaving(true)
-        try {
-            await updateSiteConfig({ type: data.type, value: data.value })
-            toast.success('Configuration saved successfully')
-            loadConfig()
-            handleModalClose()
-        } catch (error) {
-            toast.error('Failed to save configuration')
-        } finally {
-            setSaving(false)
-        }
+    const handleCloseCreate = () => {
+        setIsCreateOpen(false)
+    }
+
+    const handleCloseEdit = () => {
+        setEditingConfig(null)
+    }
+
+    const handleCloseDelete = () => {
+        setDeletingConfig(null)
+    }
+
+    const handleSuccess = () => {
+        loadConfig()
     }
 
     const handleSearchInput = (value) => {
         setSearchQuery(value)
-        // Since we are doing client side filtering for now (API returns all), direct update is fine.
-        // Keeping structure similar to Tags page if server-side search is added later.
     }
-
-    // Helper to get logic for selected type
-    const getSelectedTypeConfig = (typeValue) => {
-        return CONFIG_TYPES.find(ct => ct.value === typeValue)
-    }
-
-    const selectedTypeConfig = getSelectedTypeConfig(selectedType)
 
     const columns = useMemo(() => [
         {
@@ -202,7 +148,12 @@ export default function SiteControlPage() {
                     >
                         <Edit2 className='w-4 h-4' />
                     </button>
-                    {/* Delete not implemented yet for configs as per previous reqs */}
+                    <button
+                        onClick={() => handleDelete(row.original)}
+                        className='p-1 text-red-600 hover:text-red-800'
+                    >
+                        <Trash2 className='w-4 h-4' />
+                    </button>
                 </div>
             )
         }
@@ -264,80 +215,28 @@ export default function SiteControlPage() {
                 </div>
             </div>
 
-            {/* Form Modal */}
-            <Modal
-                isOpen={isModalOpen}
-                onClose={handleModalClose}
-                title={editingConfig ? 'Edit Configuration' : 'Add Configuration'}
-                className='max-w-4xl' // Keeping wide modal for CKEditor
-            >
-                <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <Label>Configuration Type <span className="text-red-500">*</span></Label>
-                            <Controller
-                                name="type"
-                                control={control}
-                                rules={{ required: 'Configuration type is required' }}
-                                render={({ field }) => (
-                                    <Select
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        disabled={!!editingConfig}
-                                    >
-                                        <option value="" disabled>Select a type...</option>
-                                        {CONFIG_TYPES.map((type) => (
-                                            <option key={type.value} value={type.value}>
-                                                {type.label}
-                                            </option>
-                                        ))}
-                                    </Select>
-                                )}
-                            />
-                            {errors.type && <span className="text-sm text-red-500">{errors.type.message}</span>}
-                        </div>
+            {/* Create Modal */}
+            <SiteControlCreateModal
+                isOpen={isCreateOpen}
+                onClose={handleCloseCreate}
+                onSuccess={handleSuccess}
+            />
 
-                        <div className="space-y-2">
-                            <Label>Value <span className="text-red-500">*</span></Label>
-                            {selectedTypeConfig?.inputType === 'richtext' ? (
-                                <Controller
-                                    name="value"
-                                    control={control}
-                                    rules={{ required: 'Value is required' }}
-                                    render={({ field }) => (
-                                        <CKSiteControl
-                                            key={selectedType || 'editor'}
-                                            value={field.value}
-                                            onChange={(data) => field.onChange(data)}
-                                            id={`site-control-config-editor-${selectedType}`}
-                                        />
-                                    )}
-                                />
-                            ) : (
-                                <Input
-                                    type={selectedTypeConfig?.inputType || 'text'}
-                                    placeholder={selectedTypeConfig ? `Enter ${selectedTypeConfig.label.toLowerCase()}...` : 'Enter value...'}
-                                    {...register('value', { required: 'Value is required' })}
-                                />
-                            )}
-                            {errors.value && <span className="text-sm text-red-500">{errors.value.message}</span>}
-                        </div>
-                    </div>
+            {/* Edit Modal */}
+            <SiteControlEditModal
+                isOpen={!!editingConfig}
+                onClose={handleCloseEdit}
+                onSuccess={handleSuccess}
+                config={editingConfig}
+            />
 
-                    <div className='flex justify-end gap-2'>
-                        <button
-                            type='button'
-                            onClick={handleModalClose}
-                            className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors'
-                        >
-                            Cancel
-                        </button>
-                        <Button type="submit" disabled={saving}>
-                            {saving ? 'Saving...' : 'Save Configuration'}
-                        </Button>
-                    </div>
-                </form>
-            </Modal>
+            {/* Delete Modal */}
+            <SiteControlDeleteModal
+                isOpen={!!deletingConfig}
+                onClose={handleCloseDelete}
+                onSuccess={handleSuccess}
+                config={deletingConfig}
+            />
         </>
     )
 }

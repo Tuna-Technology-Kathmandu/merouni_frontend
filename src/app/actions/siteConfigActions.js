@@ -46,6 +46,29 @@ export async function updateSiteConfig(data) {
     }
 }
 
+export async function deleteSiteConfig(type) {
+    try {
+        const token = localStorage.getItem('access_token')
+        if (!token) throw new Error('No authentication token provided')
+
+        const response = await authFetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/config/${type}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+
+        if (!response.ok) {
+            throw new Error('Failed to delete site configuration')
+        }
+
+        return await response.json()
+    } catch (error) {
+        console.error('Error deleting site config:', error)
+        throw error
+    }
+}
+
 export async function getConfigByType(type) {
     try {
         const response = await fetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/config/${type}`, {

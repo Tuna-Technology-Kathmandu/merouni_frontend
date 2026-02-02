@@ -1,576 +1,421 @@
 'use client'
 
-import React, { useEffect, useState, useMemo, useRef } from 'react'
-import { useSelector } from 'react-redux'
-import { destr } from 'destr'
-import { fetchReferrals, updateReferralStatus, deleteReferral } from './action'
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react'
+import { fetchConsultancyApplications, fetchAllConsultancies, updateConsultancyApplicationStatus, deleteConsultancyApplication } from './action'
 import { FaTrashAlt, FaEdit } from 'react-icons/fa'
 import { Modal } from '../../../../ui/molecules/Modal'
-import ShimmerEffect from '../../../../ui/molecules/ShimmerEffect'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/ui/shadcn/table'
 import { Button } from '@/ui/shadcn/button'
-import { Search, X, Filter, ChevronDown } from 'lucide-react'
-import CollegesDropdown from '@/ui/molecules/dropdown/CollegesDropdown'
+import { Search, X, ChevronDown } from 'lucide-react'
+import { toast, ToastContainer } from 'react-toastify'
+import Table from '../../../../ui/molecules/Table'
 
-const ReferralsPage = () => {
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+  return debouncedValue;
+}
+
+const ConsultancyReferralsPage = () => {
   const { setHeading } = usePageHeading()
-  const [referrals, setReferrals] = useState([])
-  const [allReferrals, setAllReferrals] = useState([])
+
+  // Data State
+  const [applications, setApplications] = useState([])
+  const [consultancies, setConsultancies] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  // Action States
   const [updatingId, setUpdatingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [statusModalOpen, setStatusModalOpen] = useState(false)
-  const [selectedReferral, setSelectedReferral] = useState(null)
-  const [statusForm, setStatusForm] = useState({
-    status: 'IN_PROGRESS',
-    remarks: ''
-  })
+  const [selectedApp, setSelectedApp] = useState(null)
+  const [statusForm, setStatusForm] = useState({ status: 'PENDING', remarks: '' })
 
-  // Search and filter states
+  // Filter States
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [collegeFilter, setCollegeFilter] = useState('')
+  const [consultancyFilter, setConsultancyFilter] = useState('') // IDs as string
 
-  // Dropdown states
+  const debouncedSearch = useDebounce(searchQuery, 500)
+
+  // UI States
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false)
-  const [statusSearchTerm, setStatusSearchTerm] = useState('')
-
-  // Get user role from Redux
-  const rawRole = useSelector((state) => state.user?.data?.role)
-
-  // Check if user is an institution/college (has institution role but not admin/editor)
-  const isInstitution = useMemo(() => {
-    const role = typeof rawRole === 'string' ? destr(rawRole) : rawRole || {}
-    return !!(role?.institution && !role?.admin && !role?.editor)
-  }, [rawRole])
-
-  // Check if user is a student (has student role but not admin/editor)
-  const isStudent = useMemo(() => {
-    const role = typeof rawRole === 'string' ? destr(rawRole) : rawRole || {}
-    return !!(role?.student && !role?.admin && !role?.editor)
-  }, [rawRole])
-
-  useEffect(() => {
-    setHeading(isStudent ? 'Applied Colleges' : 'Referrals')
-    return () => setHeading(null)
-  }, [setHeading, isStudent])
-
-  useEffect(() => {
-    const loadReferrals = async () => {
-      try {
-        const data = await fetchReferrals(1, isStudent)
-        // For students, the API returns an array directly
-        const referralsArray = Array.isArray(data)
-          ? data
-          : data.items || data.referrals || []
-        setAllReferrals(referralsArray)
-        setReferrals(referralsArray)
-      } catch (err) {
-        setError(err.message)
-        console.error('Error loading referrals:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    loadReferrals()
-  }, [isStudent])
-
-  // Refs for dropdown click outside
+  const [consultancyDropdownOpen, setConsultancyDropdownOpen] = useState(false)
   const statusDropdownRef = useRef(null)
+  const consultancyDropdownRef = useRef(null)
 
-  // Status options
-  const statusOptions = useMemo(
-    () => [
-      { value: '', label: 'All Status' },
-      { value: 'IN_PROGRESS', label: 'IN_PROGRESS' },
-      { value: 'ACCEPTED', label: 'ACCEPTED' },
-      { value: 'REJECTED', label: 'REJECTED' }
-    ],
-    []
-  )
+  // Pagination State
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0
+  })
 
-  // Filtered status options
-  const filteredStatusOptions = useMemo(() => {
-    if (!statusSearchTerm) return statusOptions
-    return statusOptions.filter((option) =>
-      option.label.toLowerCase().includes(statusSearchTerm.toLowerCase())
-    )
-  }, [statusOptions, statusSearchTerm])
-
-  // Get selected status label
-  const selectedStatusLabel = useMemo(
-    () =>
-      statusOptions.find((opt) => opt.value === statusFilter)?.label ||
-      'All Status',
-    [statusOptions, statusFilter]
-  )
-
-  // Filter referrals based on search and filters
   useEffect(() => {
-    let filtered = [...allReferrals]
+    setHeading('Consultancy Referrals')
+    return () => setHeading(null)
+  }, [setHeading])
 
-    // Search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter((referral) => {
-        const studentName = (referral.student_name || '').toLowerCase()
-        const studentEmail = (referral.student_email || '').toLowerCase()
-        const studentPhone = (referral.student_phone_no || '').toLowerCase()
-        const collegeName = (referral.referralCollege?.name || '').toLowerCase()
-        const agentName = referral.referralAgent
-          ? `${referral.referralAgent.firstName || ''} ${referral.referralAgent.lastName || ''}`.toLowerCase()
-          : ''
-
-        return (
-          studentName.includes(query) ||
-          studentEmail.includes(query) ||
-          studentPhone.includes(query) ||
-          collegeName.includes(query) ||
-          agentName.includes(query)
-        )
-      })
-    }
-
-    // Status filter
-    if (statusFilter) {
-      filtered = filtered.filter((referral) => referral.status === statusFilter)
-    }
-
-    // College filter
-    if (collegeFilter) {
-      filtered = filtered.filter(
-        (referral) => referral.referralCollege?.id === parseInt(collegeFilter)
-      )
-    }
-
-    setReferrals(filtered)
-  }, [searchQuery, statusFilter, collegeFilter, allReferrals])
-
-  // Close dropdowns when clicking outside
+  // Initial Load (Consultancies list only needs to load once)
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        statusDropdownRef.current &&
-        !statusDropdownRef.current.contains(event.target)
-      ) {
-        setStatusDropdownOpen(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    loadConsultancies()
   }, [])
 
-  const handleOpenStatusModal = (referral) => {
-    setSelectedReferral(referral)
+  // Main Data Load Trigger
+  useEffect(() => {
+    loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, statusFilter, consultancyFilter, pagination.currentPage])
+
+  const loadConsultancies = async () => {
+    try {
+      const consulData = await fetchAllConsultancies()
+      const consulList = Array.isArray(consulData) ? consulData : (consulData.items || [])
+      setConsultancies(consulList)
+    } catch (err) {
+      console.error("Failed to load consultancies", err)
+    }
+  }
+
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      const params = {
+        page: pagination.currentPage,
+        ...(debouncedSearch && { search: debouncedSearch }),
+        ...(statusFilter && { status: statusFilter }),
+        ...(consultancyFilter && { consultancy_id: consultancyFilter })
+      }
+
+      const appData = await fetchConsultancyApplications(params)
+
+      const appList = Array.isArray(appData) ? appData : (appData.items || appData.applications || [])
+      const meta = appData.meta || {} // Assuming API returns meta for pagination, or we calculate if not
+
+      setApplications(appList)
+
+      // Update pagination based on response, fallback to manual calc if needed
+      setPagination(prev => ({
+        ...prev,
+        totalPages: meta.totalPages || (appData.totalPages) || Math.ceil((meta.totalItems || appList.length) / 10) || 1,
+        total: meta.totalItems || (appData.total) || appList.length
+      }))
+
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to load data')
+      setApplications([])
+      setPagination(prev => ({ ...prev, total: 0, totalPages: 1 }))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Handlers for Actions
+  const handleOpenStatusModal = (app) => {
+    setSelectedApp(app)
     setStatusForm({
-      status: referral.status || 'IN_PROGRESS',
-      remarks: referral.remarks || ''
+      status: app.status || 'IN_PROGRESS',
+      remarks: app.remarks || ''
     })
     setStatusModalOpen(true)
   }
 
-  const handleCloseStatusModal = () => {
-    setStatusModalOpen(false)
-    setSelectedReferral(null)
-    setStatusForm({
-      status: 'IN_PROGRESS',
-      remarks: ''
-    })
-  }
-
   const handleStatusSubmit = async (e) => {
     e.preventDefault()
-    if (!selectedReferral) return
+    if (!selectedApp) return
 
     try {
-      setUpdatingId(selectedReferral.id)
-      await updateReferralStatus(
-        selectedReferral.id,
-        statusForm.status,
-        statusForm.remarks || null
-      )
-      setAllReferrals((prev) =>
-        prev.map((ref) =>
-          ref.id === selectedReferral.id
-            ? {
-              ...ref,
-              status: statusForm.status,
-              remarks: statusForm.remarks || null
-            }
-            : ref
-        )
-      )
-      setReferrals((prev) =>
-        prev.map((ref) =>
-          ref.id === selectedReferral.id
-            ? {
-              ...ref,
-              status: statusForm.status,
-              remarks: statusForm.remarks || null
-            }
-            : ref
-        )
-      )
-      handleCloseStatusModal()
-      toast.success('Referral status updated successfully')
+      setUpdatingId(selectedApp.id)
+      await updateConsultancyApplicationStatus(selectedApp.id, statusForm.status, statusForm.remarks)
+
+      // Optimistic Update locally to avoid full reload
+      setApplications(prev => prev.map(app =>
+        app.id === selectedApp.id ? { ...app, status: statusForm.status, remarks: statusForm.remarks } : app
+      ))
+
+      toast.success('Status updated successfully')
+      setStatusModalOpen(false)
     } catch (err) {
-      setError(err.message || 'Failed to update referral status')
+      toast.error('Failed to update status')
     } finally {
       setUpdatingId(null)
     }
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this referral?')) {
-      return
-    }
+    if (!window.confirm('Are you sure you want to delete this application?')) return
 
     try {
       setDeletingId(id)
-      await deleteReferral(id)
-      setAllReferrals((prev) => prev.filter((ref) => ref.id !== id))
-      setReferrals((prev) => prev.filter((ref) => ref.id !== id))
+      await deleteConsultancyApplication(id)
+      setApplications(prev => prev.filter(app => app.id !== id))
+      toast.success('Deleted successfully')
     } catch (err) {
-      setError(err.message || 'Failed to delete referral')
+      toast.error('Failed to delete')
     } finally {
       setDeletingId(null)
     }
   }
 
+  // Handlers for Filters
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value)
+    setPagination(prev => ({ ...prev, currentPage: 1 })) // Reset page on search
+  }
+
+  const handleStatusSelect = (status) => {
+    setStatusFilter(status)
+    setStatusDropdownOpen(false)
+    setPagination(prev => ({ ...prev, currentPage: 1 }))
+  }
+
+  const handleConsultancySelect = (id) => {
+    setConsultancyFilter(id)
+    setConsultancyDropdownOpen(false)
+    setPagination(prev => ({ ...prev, currentPage: 1 }))
+  }
+
   const handleClearFilters = () => {
     setSearchQuery('')
     setStatusFilter('')
-    setCollegeFilter('')
-    setStatusSearchTerm('')
+    setConsultancyFilter('')
+    setPagination(prev => ({ ...prev, currentPage: 1 }))
   }
 
-  const hasActiveFilters = searchQuery || statusFilter || collegeFilter
+  // Click Outside for dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target)) {
+        setStatusDropdownOpen(false)
+      }
+      if (consultancyDropdownRef.current && !consultancyDropdownRef.current.contains(event.target)) {
+        setConsultancyDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
-  if (loading) return <ShimmerEffect />
-  if (error)
-    return (
-      <p className='flex items-center justify-center text-center'>
-        Error: {error}
-      </p>
-    )
+
+  const statusOptions = ['IN_PROGRESS', 'ACCEPTED', 'REJECTED']
+  const hasActiveFilters = searchQuery || statusFilter || consultancyFilter
+
+  // Columns
+  const columns = useMemo(() => [
+    {
+      header: 'ID',
+      accessorKey: 'id',
+    },
+    {
+      header: 'Student Info',
+      accessorKey: 'student_name',
+      cell: ({ row }) => {
+        const app = row.original;
+        return (
+          <div className="flex flex-col">
+            <span className="font-medium">{app.student_name}</span>
+            <span className="text-xs text-gray-500">{app.student_email}</span>
+            <span className="text-xs text-gray-500">{app.student_phone_no}</span>
+          </div>
+        )
+      }
+    },
+    {
+      header: 'Consultancy',
+      accessorKey: 'consultancy.title',
+      cell: ({ row }) => row.original.consultancy?.title || row.original.consultancy?.consultany_details?.name || 'N/A'
+    },
+    {
+      header: 'Description',
+      accessorKey: 'student_description',
+      cell: ({ row }) => (
+        <div className="max-w-xs truncate" title={row.original.student_description}>
+          {row.original.student_description || '-'}
+        </div>
+      )
+    },
+    {
+      header: 'Status',
+      accessorKey: 'status',
+      cell: ({ row }) => {
+        const status = row.original.status;
+        return (
+          <span className={`px-2 py-1 rounded-full text-xs font-semibold
+                    ${status === 'ACCEPTED' ? 'bg-green-100 text-green-800' :
+              status === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                'bg-yellow-100 text-yellow-800'}
+                `}>
+            {status || 'IN_PROGRESS'}
+          </span>
+        )
+      }
+    },
+    {
+      header: 'Remarks',
+      accessorKey: 'remarks',
+      cell: ({ row }) => (
+        <div className="max-w-xs truncate" title={row.original.remarks}>
+          {row.original.remarks || '-'}
+        </div>
+      )
+    },
+    {
+      header: 'Actions',
+      id: 'actions',
+      cell: ({ row }) => (
+        <div className="flex gap-2">
+          <Button size="icon" variant="ghost" onClick={() => handleOpenStatusModal(row.original)}>
+            <FaEdit className="w-4 h-4 text-blue-600" />
+          </Button>
+          <Button size="icon" variant="ghost" onClick={() => handleDelete(row.original.id)}>
+            <FaTrashAlt className="w-4 h-4 text-red-600" />
+          </Button>
+        </div>
+      )
+    }
+  ], [])
+
+  if (error) {
+    // Just log or toast, don't block
+    console.error(error)
+  }
 
   return (
     <div className='p-4 bg-white min-h-screen'>
-      {/* Search and Filter Section */}
-      <div className='mb-6 space-y-4'>
-        <div className='flex flex-col md:flex-row gap-4'>
-          {/* Search Input */}
-          <div className='flex-1 relative'>
-            <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
-            <input
-              type='text'
-              placeholder='Search by student name, email, phone, college, or agent...'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className='w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600'
-              >
-                <X className='w-4 h-4' />
-              </button>
-            )}
-          </div>
+      <ToastContainer />
 
-          {/* Status Filter - Searchable Dropdown */}
-          <div className='relative' ref={statusDropdownRef}>
-            <Filter className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10' />
-            <button
-              type='button'
-              onClick={() => {
-                setStatusDropdownOpen(!statusDropdownOpen)
-                setCollegeDropdownOpen(false)
-              }}
-              className='w-full pl-10 pr-8 py-2 text-left border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white min-w-[180px] hover:bg-gray-50 transition-colors'
-            >
-              <span
-                className={statusFilter ? 'text-gray-900' : 'text-gray-500'}
-              >
-                {selectedStatusLabel}
-              </span>
-            </button>
-            <ChevronDown
-              className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${statusDropdownOpen ? 'rotate-180' : ''
-                }`}
-            />
-
-            {statusDropdownOpen && (
-              <div className='absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-hidden'>
-                <div className='p-2 border-b border-gray-200'>
-                  <div className='relative'>
-                    <Search className='absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
-                    <input
-                      type='text'
-                      placeholder='Search status...'
-                      value={statusSearchTerm}
-                      onChange={(e) => setStatusSearchTerm(e.target.value)}
-                      onClick={(e) => e.stopPropagation()}
-                      className='w-full pl-8 pr-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500'
-                      autoFocus
-                    />
-                  </div>
-                </div>
-                <div className='max-h-48 overflow-y-auto'>
-                  {filteredStatusOptions.length > 0 ? (
-                    filteredStatusOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        type='button'
-                        onClick={() => {
-                          setStatusFilter(option.value)
-                          setStatusSearchTerm('')
-                          setStatusDropdownOpen(false)
-                        }}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${statusFilter === option.value
-                            ? 'bg-blue-100 text-blue-700 font-medium'
-                            : 'text-gray-700'
-                          }`}
-                      >
-                        {option.label}
-                      </button>
-                    ))
-                  ) : (
-                    <div className='px-3 py-2 text-sm text-gray-500 text-center'>
-                      No status found
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* College Filter - Searchable Dropdown */}
-          <CollegesDropdown
-            value={collegeFilter}
-            onChange={setCollegeFilter}
-            placeholder='All Colleges'
-            minWidth={200}
+      {/* Filters Section */}
+      <div className='flex flex-col md:flex-row gap-4 mb-6'>
+        {/* Search Filter */}
+        <div className='flex-1 relative'>
+          <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+          <input
+            type='text'
+            placeholder='Search applications...'
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className='w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
           />
-
-          {/* Clear Filters Button */}
-          {hasActiveFilters && (
-            <Button
-              variant='outline'
-              onClick={handleClearFilters}
-              className='whitespace-nowrap'
-            >
-              <X className='w-4 h-4 mr-1' />
-              Clear Filters
-            </Button>
+          {searchQuery && (
+            <button onClick={handleClearFilters} className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600'>
+              <X className='w-4 h-4' />
+            </button>
           )}
         </div>
 
-        {/* Results Count */}
+        {/* Status Filter Dropdown */}
+        <div className='relative' ref={statusDropdownRef}>
+          <button
+            type='button'
+            onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
+            className='w-full md:w-48 pl-4 pr-10 py-2 text-left border border-gray-300 rounded-lg bg-white hover:bg-gray-50'
+          >
+            <span className={statusFilter ? 'text-gray-900' : 'text-gray-500'}>
+              {statusFilter || 'All Status'}
+            </span>
+            <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${statusDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {statusDropdownOpen && (
+            <div className='absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden'>
+              <button onClick={() => handleStatusSelect('')} className='w-full text-left px-4 py-2 hover:bg-gray-50 text-sm'>All Status</button>
+              {statusOptions.map(option => (
+                <button key={option} onClick={() => handleStatusSelect(option)} className={`w-full text-left px-4 py-2 hover:bg-blue-50 text-sm ${statusFilter === option ? 'bg-blue-50 text-blue-600' : ''}`}>
+                  {option}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Consultancy Filter Dropdown */}
+        <div className='relative' ref={consultancyDropdownRef}>
+          <button
+            type='button'
+            onClick={() => setConsultancyDropdownOpen(!consultancyDropdownOpen)}
+            className='w-full md:w-64 pl-4 pr-10 py-2 text-left border border-gray-300 rounded-lg bg-white hover:bg-gray-50'
+          >
+            <span className={consultancyFilter ? 'text-gray-900' : 'text-gray-500 truncate block'}>
+              {consultancyFilter
+                ? (consultancies.find(c => c.id === parseInt(consultancyFilter))?.title || 'Selected')
+                : 'All Consultancies'}
+            </span>
+            <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${consultancyDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {consultancyDropdownOpen && (
+            <div className='absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto'>
+              <button onClick={() => handleConsultancySelect('')} className='w-full text-left px-4 py-2 hover:bg-gray-50 text-sm'>All Consultancies</button>
+              {consultancies.map(c => (
+                <button key={c.id} onClick={() => handleConsultancySelect(c.id.toString())} className={`w-full text-left px-4 py-2 hover:bg-blue-50 text-sm ${consultancyFilter === c.id.toString() ? 'bg-blue-50 text-blue-600' : ''}`}>
+                  {c.title || 'Unknown Consultancy'}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         {hasActiveFilters && (
-          <div className='text-sm text-gray-600'>
-            Showing {referrals.length} of {allReferrals.length} referrals
-          </div>
+          <Button variant="outline" onClick={handleClearFilters}>
+            <X className="w-4 h-4 mr-2" /> Clear
+          </Button>
         )}
       </div>
 
-      <div className='rounded-md border'>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className='w-[60px] text-gray-600'>S.N.</TableHead>
-              <TableHead className='text-gray-600'>Student Details</TableHead>
-              <TableHead className='text-gray-600'>Applied College</TableHead>
-              {!isInstitution && (
-                <>
-                  <TableHead className='text-gray-600'>Referred By</TableHead>
-                  <TableHead className='text-gray-600'>
-                    Application Type
-                  </TableHead>
-                </>
-              )}
-              <TableHead className='text-gray-600'>Status</TableHead>
-              <TableHead className='text-gray-600'>Remarks</TableHead>
-              {!isStudent && (
-                <TableHead className='text-center text-gray-600'>
-                  Actions
-                </TableHead>
-              )}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {referrals.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={
-                    isStudent
-                      ? isInstitution
-                        ? 5
-                        : 7
-                      : isInstitution
-                        ? 6
-                        : 8
-                  }
-                  className='text-center py-8 text-muted-foreground'
-                >
-                  No referrals found
-                </TableCell>
-              </TableRow>
-            ) : (
-              referrals.map((referral, index) => (
-                <TableRow key={referral.id}>
-                  <TableCell className='font-medium'>{index + 1}</TableCell>
-                  <TableCell>
-                    <div className='flex flex-col space-y-1'>
-                      <div className='font-medium'>
-                        {referral.student_name || 'N/A'}
-                      </div>
-                      <div className='text-sm text-muted-foreground'>
-                        {referral.student_email || 'N/A'}
-                      </div>
-                      <div className='text-sm text-muted-foreground'>
-                        {referral.student_phone_no || 'N/A'}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {referral.referralCollege?.name || 'N/A'}
-                  </TableCell>
-                  {!isInstitution && (
-                    <>
-                      <TableCell>
-                        {referral.referralAgent
-                          ? `${referral.referralAgent.firstName} ${referral.referralAgent.middleName || ''
-                            } ${referral.referralAgent.lastName}`.trim()
-                          : referral.application_type === 'self'
-                            ? 'Self'
-                            : 'N/A'}
-                      </TableCell>
-                      <TableCell className='capitalize'>
-                        {referral.application_type}
-                      </TableCell>
-                    </>
-                  )}
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${referral.status === 'ACCEPTED'
-                          ? 'bg-green-100 text-green-800'
-                          : referral.status === 'REJECTED'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}
-                    >
-                      {referral.status || 'IN_PROGRESS'}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span className='text-sm text-muted-foreground'>
-                      {referral.remarks
-                        ? referral.remarks.length > 50
-                          ? `${referral.remarks.substring(0, 50)}...`
-                          : referral.remarks
-                        : 'N/A'}
-                    </span>
-                  </TableCell>
-                  {!isStudent && (
-                    <TableCell>
-                      <div className='flex items-center justify-center gap-2'>
-                        <Button
-                          variant='ghost'
-                          size='icon'
-                          onClick={() => handleOpenStatusModal(referral)}
-                          disabled={updatingId === referral.id}
-                          title='Update Status'
-                        >
-                          <FaEdit className='h-4 w-4 text-blue-600' />
-                        </Button>
-                        <Button
-                          variant='ghost'
-                          size='icon'
-                          onClick={() => handleDelete(referral.id)}
-                          disabled={deletingId === referral.id}
-                          title='Delete'
-                        >
-                          <FaTrashAlt className='h-4 w-4 text-red-600' />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      {/* Table Component */}
+      <Table
+        data={applications}
+        columns={columns}
+        loading={loading}
+        pagination={pagination}
+        onPageChange={(page) => setPagination(prev => ({ ...prev, currentPage: page }))}
+        showSearch={false}
+        emptyContent="No applications found."
+      />
 
-      {/* Update Status Modal */}
+      {/* Status Modal */}
       <Modal
         isOpen={statusModalOpen}
-        onClose={handleCloseStatusModal}
-        title='Update Referral Status'
+        onClose={() => setStatusModalOpen(false)}
+        title='Update Status'
         className='max-w-md'
       >
-        <form onSubmit={handleStatusSubmit} className='space-y-4'>
+        <form onSubmit={handleStatusSubmit} className="space-y-4">
           <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Status <span className='text-red-500'>*</span>
-            </label>
+            <label className="block text-sm font-medium mb-1">Status</label>
             <select
-              className='w-full p-2 border rounded'
+              className="w-full border rounded p-2"
               value={statusForm.status}
-              onChange={(e) =>
-                setStatusForm({ ...statusForm, status: e.target.value })
-              }
-              required
+              onChange={(e) => setStatusForm({ ...statusForm, status: e.target.value })}
             >
-              <option value='IN_PROGRESS'>IN_PROGRESS</option>
-              <option value='ACCEPTED'>ACCEPTED</option>
-              <option value='REJECTED'>REJECTED</option>
+              {statusOptions.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
             </select>
           </div>
-
           <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Remarks
-            </label>
+            <label className="block text-sm font-medium mb-1">Remarks</label>
             <textarea
-              className='w-full p-2 border rounded'
-              rows={4}
+              className="w-full border rounded p-2"
+              rows={3}
               value={statusForm.remarks}
-              onChange={(e) =>
-                setStatusForm({ ...statusForm, remarks: e.target.value })
-              }
-              placeholder='Enter remarks (optional)'
+              onChange={(e) => setStatusForm({ ...statusForm, remarks: e.target.value })}
+              placeholder="Add remarks..."
             />
           </div>
-
-          {error && <div className='text-red-500 text-sm'>{error}</div>}
-
-          <div className='flex justify-end gap-2 pt-2'>
-            <Button
-              type='button'
-              onClick={handleCloseStatusModal}
-              variant='outline'
-            >
-              Cancel
-            </Button>
-            <Button
-              type='submit'
-              disabled={updatingId === selectedReferral?.id}
-            >
-              {updatingId === selectedReferral?.id ? 'Updating...' : 'Update'}
+          <div className="flex justify-end gap-2 mt-4">
+            <Button type="button" variant="outline" onClick={() => setStatusModalOpen(false)}>Cancel</Button>
+            <Button type="submit" disabled={!!updatingId}>
+              {updatingId ? 'Updating...' : 'Update'}
             </Button>
           </div>
         </form>
@@ -579,4 +424,4 @@ const ReferralsPage = () => {
   )
 }
 
-export default ReferralsPage
+export default ConsultancyReferralsPage

@@ -1,34 +1,37 @@
 import { authFetch } from '@/app/utils/authFetch'
 import { DotenvConfig } from '@/config/env.config'
 
-export async function fetchReferrals(page = 1, isStudent = false) {
+export async function fetchConsultancyApplications(params = {}) {
   try {
-    // Use different endpoint for students vs admin
-    const endpoint = isStudent 
-      ? `/referral/user/referrals`
-      : `/referral?page=${page}`
-    
+    const query = new URLSearchParams(params).toString()
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}${endpoint}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/all?${query}`,
       { cache: 'no-store' }
     )
     if (!response.ok) {
-      throw new Error('Failed to fetch referrals')
+      throw new Error('Failed to fetch consultancy applications')
     }
-    const data = await response.json()
-    // For student endpoint, it returns an array directly, not paginated
-    // For admin endpoint, it returns paginated data
-    return isStudent ? data : data
+    return await response.json()
   } catch (error) {
-    console.error('Error fetching referrals:', error)
+    console.error('Error fetching applications:', error)
     throw error
   }
 }
 
-export async function updateReferralStatus(id, status, remarks = null) {
+export async function fetchAllConsultancies() {
+  try {
+    const response = await authFetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy`, { cache: 'no-store' })
+    if (response.ok) return await response.json()
+  } catch (error) {
+    console.error('Error fetching consultancies:', error)
+    return []
+  }
+}
+
+export async function updateConsultancyApplicationStatus(id, status, remarks = null) {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/${id}/status`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/${id}/status`,
       {
         method: 'PATCH',
         headers: {
@@ -39,32 +42,32 @@ export async function updateReferralStatus(id, status, remarks = null) {
     )
 
     if (!response.ok) {
-      throw new Error('Failed to update referral status')
+      throw new Error('Failed to update status')
     }
 
     return await response.json()
   } catch (error) {
-    console.error('Error updating referral status:', error)
+    console.error('Error updating status:', error)
     throw error
   }
 }
 
-export async function deleteReferral(id) {
+export async function deleteConsultancyApplication(id) {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/${id}`,
+      `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/${id}`,
       {
         method: 'DELETE'
       }
     )
 
     if (!response.ok) {
-      throw new Error('Failed to delete referral')
+      throw new Error('Failed to delete application')
     }
 
     return await response.json()
   } catch (error) {
-    console.error('Error deleting referral:', error)
+    console.error('Error deleting application:', error)
     throw error
   }
 }

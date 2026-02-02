@@ -108,7 +108,6 @@ const CKSiteControl = ({ onChange, value = '', id = 'editor_site_control' }) => 
                 defaultValue={value}
                 rows='10'
                 cols='80'
-                style={{ visibility: 'hidden', display: 'none' }} // Hide original textarea
             />
         </div>
     )
