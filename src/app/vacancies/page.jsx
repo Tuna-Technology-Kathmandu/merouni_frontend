@@ -4,13 +4,13 @@ import { useEffect, useState, useCallback, useLayoutEffect } from 'react'
 import { getVacancies } from './actions'
 import Link from 'next/link'
 import { Search, Briefcase, X } from 'lucide-react'
-import EmptyState from '@/components/ui/EmptyState'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
 import Pagination from '../blogs/components/Pagination'
-import { CardSkeleton } from '@/components/ui/CardSkeleton'
+import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 import { formatDate } from '@/utils/date.util'
+import EmptyState from '@/ui/shadcn/EmptyState'
 
 const VacanciesPage = () => {
   const [vacancies, setVacancies] = useState([])
