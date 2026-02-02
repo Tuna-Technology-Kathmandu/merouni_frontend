@@ -95,18 +95,18 @@ const ConsultancyReferralsPage = () => {
         ...(consultancyFilter && { consultancy_id: consultancyFilter })
       }
 
-      const appData = await fetchConsultancyApplications(params)
+      const response = await fetchConsultancyApplications(params)
 
-      const appList = Array.isArray(appData) ? appData : (appData.items || appData.applications || [])
-      const meta = appData.meta || {} // Assuming API returns meta for pagination, or we calculate if not
+      const appList = response.data  || []
+      const meta = response.pagination || {} // Assuming API returns meta for pagination, or we calculate if not
 
       setApplications(appList)
 
       // Update pagination based on response, fallback to manual calc if needed
       setPagination(prev => ({
         ...prev,
-        totalPages: meta.totalPages || (appData.totalPages) || Math.ceil((meta.totalItems || appList.length) / 10) || 1,
-        total: meta.totalItems || (appData.total) || appList.length
+        totalPages: meta.totalPages || (meta.totalPages) || Math.ceil((meta.totalItems || appList.length) / 10) || 1,
+        total: meta.totalItems || (meta.total) || appList.length
       }))
 
     } catch (err) {
