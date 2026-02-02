@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import FileUpload from '../addCollege/FileUpload'
 import Table from '../../../../ui/molecules/Table'
-import { Search, Globe, MapPin } from 'lucide-react'
+import { Search, Globe, MapPin, UserPlus } from 'lucide-react'
 import { createColumns } from './columns'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
@@ -23,6 +23,7 @@ import { Textarea } from '@/ui/shadcn/textarea'
 import { Checkbox } from '@/ui/shadcn/checkbox'
 import { Controller } from 'react-hook-form'
 import { Plus, Trash2 } from 'lucide-react'
+import CreateConsultencyUser from '@/ui/molecules/modals/CreateConsultencyUser'
 
 const CKEditor = dynamic(() => import('../component/CKStable'), {
   ssr: false
@@ -58,6 +59,9 @@ export default function ConsultancyForm() {
   })
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
+
+  const [credentialsModalOpen, setCredentialsModalOpen] = useState(false)
+  const [selectedConsultancy, setSelectedConsultancy] = useState(null)
   const {
     register,
     handleSubmit,
@@ -422,11 +426,26 @@ export default function ConsultancyForm() {
     setViewConsultancyData(null)
   }
 
+  const handleOpenCredentialsModal = (consultancy) => {
+    setSelectedConsultancy(consultancy)
+    setCredentialsModalOpen(true)
+  }
+
+  const handleCloseCredentialsModal = () => {
+    setCredentialsModalOpen(false)
+    setSelectedConsultancy(null)
+  }
+
+  const handleCredentialsSuccess = () => {
+    fetchConsultancies(pagination.currentPage)
+  }
+
   // Create columns with handlers (must be after handlers are defined)
   const columns = createColumns({
     handleView,
     handleEdit,
-    handleDeleteClick
+    handleDeleteClick,
+    handleOpenCredentialsModal
   })
 
   const handleSearch = async (query) => {
@@ -1049,6 +1068,14 @@ export default function ConsultancyForm() {
           </div>
         ) : null}
       </Modal>
+
+      {/* Create Credentials Modal */}
+      <CreateConsultencyUser
+        isOpen={credentialsModalOpen}
+        onClose={handleCloseCredentialsModal}
+        selectedConsultancy={selectedConsultancy}
+        onSuccess={handleCredentialsSuccess}
+      />
     </>
   )
 }

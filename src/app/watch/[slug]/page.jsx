@@ -1,10 +1,11 @@
-import { getMediaBySlug } from '../../(dashboard)/dashboard/videos/action'
+import { getVideoBySlug } from '../../(dashboard)/dashboard/videos/action'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
+import { formatDate } from '@/utils/date.util'
 
 export default async function VideoDetailPage({ params }) {
-    const { slug } = params
-    const video = await getMediaBySlug(slug)
+    const { slug } = await params
+    const video = await getVideoBySlug(slug)
 
     if (!video) {
         return (
@@ -37,8 +38,7 @@ export default async function VideoDetailPage({ params }) {
                 <h1 className='text-3xl md:text-4xl font-bold mb-4 text-gray-900'>{video.title}</h1>
 
                 <div className='flex items-center text-gray-500 mb-6 border-b pb-6'>
-                    <span className='mr-4'>Published on {new Date(video.createdAt).toLocaleDateString()}</span>
-                    {/* Add author or other metadata here if available */}
+                    <span className='mr-4'>Published on {formatDate(video.createdAt)}</span>
                 </div>
 
                 <div className='prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap'>

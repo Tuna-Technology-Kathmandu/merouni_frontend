@@ -24,19 +24,15 @@ export default function VideoList({ initialData }) {
 
     // Load Data Effect
     useEffect(() => {
-        // Skip first render if only initialData is present (optional optimization, but we want search to trigger)
-        // Actually, we want to re-fetch when search changes.
-        // We can use a ref to skip initial mount fetch if we want, but let's just keep it simple.
         if (debouncedSearch !== '') {
-            fetchVideos(1, debouncedSearch, true)
+            fetchVideosAPI(1, debouncedSearch, true)
         } else if (videos.length === 0 && initialData?.items?.length) {
-            // If we cleared search, we might want to reset.
-            fetchVideos(1, '', true)
+            fetchVideosAPI(1, '', true)
         }
     }, [debouncedSearch])
 
 
-    const fetchVideos = async (page, search, reset = false) => {
+    const fetchVideosAPI = async (page, search, reset = false) => {
         setLoading(true)
         try {
             const response = await fetchVideos(page, 20, search)
@@ -55,7 +51,7 @@ export default function VideoList({ initialData }) {
 
     const loadMore = () => {
         if (loading || (pagination.currentPage >= pagination.totalPages)) return
-        fetchVideos(pagination.currentPage + 1, debouncedSearch, false)
+        fetchVideosAPI(pagination.currentPage + 1, debouncedSearch, false)
     }
 
     const clearSearch = () => setSearchTerm('')

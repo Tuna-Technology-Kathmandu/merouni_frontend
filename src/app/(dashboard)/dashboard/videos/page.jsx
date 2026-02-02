@@ -176,7 +176,6 @@ export default function VideoManager() {
         total: response.pagination.totalCount
       })
     } catch (err) {
-      toast.error('Failed to load videos')
       console.error('Error loading videos:', err)
     } finally {
       setLoading(false)
@@ -397,7 +396,6 @@ export default function VideoManager() {
             </Button>
           </div>
         </div>
-        <ToastContainer />
 
         <Modal
           isOpen={isOpen}

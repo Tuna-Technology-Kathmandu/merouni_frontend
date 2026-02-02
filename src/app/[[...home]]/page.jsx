@@ -8,7 +8,7 @@ import BannerLayout from '../../components/Frontpage/BannerLayout'
 import FeaturedAdmission from '../../components/Frontpage/FeaturedAdmission'
 // import LargeBanner from '../components/Frontpage/LargeBanner'
 import FeaturedDegree from '../../components/Frontpage/FeaturedDegree'
-import FieldofStudy from '../../components/Frontpage/FieldofStudy'
+import DisciplineList from '../../components/Frontpage/DisciplineList'
 import Colleges from '../../components/Frontpage/Colleges'
 import CollegeRankings from '../../components/Frontpage/CollegeRankings'
 import Degree from '../../components/Frontpage/Degree'
@@ -81,7 +81,7 @@ const Page = () => {
       <CollegeRankings />
       <Event />
       <FeaturedDegree />
-      <FieldofStudy />
+      <DisciplineList />
       <Footer />
       <ScrollToTop />
     </>

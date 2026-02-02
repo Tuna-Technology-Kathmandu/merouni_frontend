@@ -2008,11 +2008,28 @@ export default function CollegeForm() {
               </button>
             </div>
           </div>
+          {/* <div className='space-y-2'>
+            <Label htmlFor='last-name'>Last Name</Label>
+            <Input
+              id='last-name'
+              type='text'
+              placeholder='Last Name'
+              value={credentialsForm.lastName}
+              onChange={(e) =>
+                setCredentialsForm({
+                  ...credentialsForm,
+                  lastName: e.target.value
+                })
+              }
+              required
+            />
+          </div>
+ */}
 
           <div className='space-y-2'>
-            <Label htmlFor='phone-number'>Phone Number</Label>
+            <Label htmlFor='cred-phone-number'>Phone Number </Label>
             <Input
-              id='phone-number'
+              id='cred-phone-number'
               type='tel'
               placeholder='Phone Number'
               value={credentialsForm.phoneNo}
