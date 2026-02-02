@@ -21,6 +21,7 @@ import { Button } from '../../../../ui/shadcn/button'
 import { Input } from '../../../../ui/shadcn/input'
 import { Label } from '../../../../ui/shadcn/label'
 import { DotenvConfig } from '@/config/env.config'
+import { formatDate } from '@/utils/date.util'
 
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
@@ -152,9 +153,7 @@ export default function BlogsManager() {
         accessorKey: 'createdAt',
         cell: ({ getValue }) => {
           const date = new Date(getValue())
-          return (
-            <div className='whitespace-nowrap'>{date.toLocaleDateString()}</div>
-          )
+          return <div className='whitespace-nowrap'>{formatDate(date)}</div>
         }
       },
       {
