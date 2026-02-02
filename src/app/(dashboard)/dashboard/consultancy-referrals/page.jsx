@@ -19,9 +19,6 @@ import {
 import { Button } from '@/ui/shadcn/button'
 import { Search, X, Filter, ChevronDown } from 'lucide-react'
 import CollegesDropdown from '@/ui/molecules/dropdown/CollegesDropdown'
-import { Select } from '@/ui/shadcn/select'
-import { Label } from '@/ui/shadcn/label'
-import { toast } from 'react-toastify'
 
 const ReferralsPage = () => {
   const { setHeading } = usePageHeading()
@@ -225,7 +222,6 @@ const ReferralsPage = () => {
             : ref
         )
       )
-      toast.success('Referral status updated successfully')
       handleCloseStatusModal()
     } catch (err) {
       setError(err.message || 'Failed to update referral status')
@@ -527,10 +523,10 @@ const ReferralsPage = () => {
       >
         <form onSubmit={handleStatusSubmit} className='space-y-4'>
           <div>
-            <Label className='block text-sm font-medium text-gray-700 mb-1'>
+            <label className='block text-sm font-medium text-gray-700 mb-1'>
               Status <span className='text-red-500'>*</span>
-            </Label>
-            <Select
+            </label>
+            <select
               className='w-full p-2 border rounded'
               value={statusForm.status}
               onChange={(e) =>
@@ -541,7 +537,7 @@ const ReferralsPage = () => {
               <option value='IN_PROGRESS'>IN_PROGRESS</option>
               <option value='ACCEPTED'>ACCEPTED</option>
               <option value='REJECTED'>REJECTED</option>
-            </Select>
+            </select>
           </div>
 
           <div>
@@ -562,19 +558,20 @@ const ReferralsPage = () => {
           {error && <div className='text-red-500 text-sm'>{error}</div>}
 
           <div className='flex justify-end gap-2 pt-2'>
-            <Button
+            <button
               type='button'
               onClick={handleCloseStatusModal}
-              variant='outline'
+              className='px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200'
             >
               Cancel
-            </Button>
-            <Button
+            </button>
+            <button
               type='submit'
               disabled={updatingId === selectedReferral?.id}
+              className='px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50'
             >
               {updatingId === selectedReferral?.id ? 'Updating...' : 'Update'}
-            </Button>
+            </button>
           </div>
         </form>
       </Modal>

@@ -10,7 +10,6 @@ export async function getUniversities(page = 1) {
       }
     )
     const data = await response.json()
-    console.log('data', data)
     return data
   } catch (error) {
     throw new Error('Failed to fetch Universities')

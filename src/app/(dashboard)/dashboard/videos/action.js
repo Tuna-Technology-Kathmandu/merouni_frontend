@@ -21,7 +21,6 @@ export async function fetchVideos(page = 1, limit = 1000, search = '') {
     if (!response.ok) {
       throw new Error('Failed to fetch videos')
     }
-    // console.log(await response.json(),"JSON")
 
     return await response.json()
   } catch (error) {

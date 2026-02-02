@@ -149,10 +149,6 @@ const CollegeDetailPage = ({ params }) => {
     }
   }
 
-  // useEffect(() => {
-  //   console.log('College Data:', college?.collegeFacility)
-  // }, [college])
-
   if (loading) {
     return <Loading />
   }

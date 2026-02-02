@@ -97,7 +97,6 @@ export default function ExamManager() {
 
   const editorRef = useRef(null)
 
-  // console.log('formData', formData)
 
   const { requireAdmin } = useAdminPermission()
 

@@ -147,7 +147,6 @@ export default function UniversityForm() {
   const { requireAdmin } = useAdminPermission()
 
   const formData = watch()
-  console.log('fromData', formData)
 
   //for courses
   useEffect(() => {
@@ -237,8 +236,6 @@ export default function UniversityForm() {
 
       const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/university`
       const method = 'POST'
-      console.log('before submitting uni', data)
-      console.log('contact data:', data.contact)
       const response = await authFetch(url, {
         method,
         headers: {
@@ -275,7 +272,6 @@ export default function UniversityForm() {
       )
       const data = await response.json()
       const university = data
-      console.log('university', university)
 
       // Set basic fields
       setValue('id', university.id)

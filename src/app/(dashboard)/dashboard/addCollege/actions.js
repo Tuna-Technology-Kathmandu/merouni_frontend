@@ -15,7 +15,6 @@ export async function createCollege(data) {
 
   if (!response.ok) {
     const error = await response.json()
-    console.log('eeeeee', error)
 
     throw new Error(error.message || 'Failed to create college')
   }
@@ -90,7 +89,6 @@ export const fetchAllUniversity = async () => {
 
 export const getUniversityBySlug = async (slug) => {
   try {
-    console.log('Fetching university details for slug:', slug)
     const response = await authFetch(
       `${DotenvConfig.NEXT_APP_API_BASE_URL}/university/${slug}`,
       {
@@ -105,7 +103,6 @@ export const getUniversityBySlug = async (slug) => {
       throw new Error(errorData.error || 'Failed to fetch university details')
     }
     const data = await response.json()
-    console.log('University data received:', data)
     return data
   } catch (error) {
     console.error('Error fetching university details:', error)

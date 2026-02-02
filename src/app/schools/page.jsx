@@ -30,8 +30,6 @@ const page = () => {
           setBanners([])
         }
       } catch (err) {
-        console.log(err)
-
         console.error('Error loading banners', err)
         setBanners([])
       } finally {

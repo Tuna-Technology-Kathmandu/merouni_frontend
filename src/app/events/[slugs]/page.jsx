@@ -95,10 +95,6 @@ const EventDetailsPage = ({ params }) => {
     fetchEventDetails()
   }, [params]) // Add params to dependency array
 
-  // useEffect(() => {
-  //   console.log('Events:', event)
-  //   console.log('related:', event)
-  // }, [event])
 
   // if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>

@@ -24,7 +24,6 @@ export async function fetchCategories(page = 1, limit = 1000) {
 
 export async function createCategory(data) {
   try {
-    console.log('Data of category:', data)
     const response = await fetch(`${url}`, {
       method: 'POST',
       headers: {
@@ -32,7 +31,6 @@ export async function createCategory(data) {
       },
       body: JSON.stringify(data)
     })
-    console.log('Response of create category:', response)
 
     if (!response.ok) {
       throw new Error('Failed to create category')
@@ -67,7 +65,6 @@ export async function updateCategory(categoryId, data) {
 }
 
 export async function deleteCategory(categoryId) {
-  console.log('before deleteing')
   try {
     const response = await fetch(`${url}?category_id=${categoryId}`, {
       method: 'DELETE'
@@ -76,11 +73,9 @@ export async function deleteCategory(categoryId) {
     if (!response.ok) {
       throw new Error('Failed to delete category')
     }
-    console.log('just before deleteing')
-    const hehe = await response.json()
+    const category = await response.json()
 
-    console.log(hehe)
-    return hehe
+    return category
   } catch (error) {
     console.error('Error deleting category:', error)
     throw error

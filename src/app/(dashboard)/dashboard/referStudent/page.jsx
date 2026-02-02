@@ -139,7 +139,6 @@ const page = () => {
     setLoading(true)
     const cleanedFormData = formData.map(({ college_name, ...rest }) => rest)
 
-    console.log('Form to be submitted:', cleanedFormData)
     try {
       const response = await authFetch(
         `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/agent-apply`,
@@ -152,7 +151,6 @@ const page = () => {
         }
       )
 
-      console.log('Response:', response)
 
       const data = await response.json()
       if (response.ok) {

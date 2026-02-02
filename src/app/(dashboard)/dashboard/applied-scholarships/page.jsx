@@ -117,7 +117,6 @@ const AppliedScholarshipsPage = () => {
   }
 
   const handleDeleteClick = useCallback((id) => {
-    console.log('Delete clicked for application:', id)
     setDeleteId(id)
     setIsDialogOpen(true)
   }, [])

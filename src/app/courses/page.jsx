@@ -75,7 +75,6 @@ const CoursePage = () => {
       const response = await getAllFaculty(1)
       setStoreFaculties(response?.items)
     } catch (err) {
-      console.log('failed to fetch faculties')
     }
   }
 

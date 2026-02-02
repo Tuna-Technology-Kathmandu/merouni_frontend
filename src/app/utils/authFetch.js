@@ -44,7 +44,6 @@ export const authFetch = async (url, options = {}) => {
 
       // If we still have a token, try one more time to let middleware refresh
       if (response.status === 401 || response.status === 403) {
-        console.log('Token expired, attempting refresh...')
 
         const newResponse = await fetch(url, {
           ...options,

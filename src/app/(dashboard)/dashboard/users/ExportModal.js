@@ -52,7 +52,6 @@ export default function ExportModal({ isOpen, onClose }) {
       }
 
       const responseText = await response.text()
-      console.log('Response text:', responseText)
 
       // Trigger CSV download
       const blob = new Blob([responseText], { type: 'text/csv' })

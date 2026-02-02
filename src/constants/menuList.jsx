@@ -14,12 +14,13 @@ import {
   FaUniversity
 } from 'react-icons/fa'
 import { HiOutlineUsers } from 'react-icons/hi'
-import { IoSchoolSharp } from 'react-icons/io5'
+import { IoSchoolSharp, IoSettingsOutline } from 'react-icons/io5'
 import {
   MdBackHand,
   MdCategory,
   MdEmojiEvents,
   MdOutlineDescription,
+  MdPermContactCalendar,
   MdQuiz,
   MdSchool
 } from 'react-icons/md'
@@ -37,9 +38,15 @@ export const menuItems = [
       },
       {
         icon: <VscReferences />,
-        label: 'Referrals',
+        label: 'College Referrals',
         href: '/dashboard/referrals',
-        visible: ['admin', 'editor', 'student']
+        visible: ['admin', 'student']
+      },
+      {
+        icon: <FaHandshake />,
+        label: 'Consultancy Referrals',
+        href: '/dashboard/consultancy-referrals',
+        visible: ['admin', 'student']
       },
       {
         icon: <HandCoins className='text-xl' />,
@@ -172,6 +179,12 @@ export const menuItems = [
         visible: ['consultancy']
       },
       {
+        icon: <MdPermContactCalendar className='text-xl' />,
+        label: 'Contact Us',
+        href: '/dashboard/contactus',
+        visible: ['admin']
+      },
+      {
         icon: <HiOutlineUsers className='text-xl' />,
         label: 'Users',
         href: '/dashboard/users',
@@ -252,6 +265,12 @@ export const menuItems = [
         icon: <HandCoins className='text-xl' />,
         label: 'Set Referral Point',
         href: '/dashboard/set-referral-point',
+        visible: ['admin']
+      },
+      {
+        icon: <IoSettingsOutline className='text-xl' />,
+        label: 'Site Control',
+        href: '/dashboard/site-control',
         visible: ['admin']
       }
     ]

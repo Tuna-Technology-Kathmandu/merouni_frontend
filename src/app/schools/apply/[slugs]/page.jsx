@@ -18,7 +18,6 @@ const ApplyPage = ({ params }) => {
   useEffect(() => {
     const fetchCollegeDetails = async () => {
       try {
-        console.log('Fetching college apply details for slug:', slugs)
         const schoolData = await getSchoolBySlug(slugs)
 
         if (schoolData) {

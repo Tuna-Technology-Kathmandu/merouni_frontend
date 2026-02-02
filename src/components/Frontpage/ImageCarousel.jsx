@@ -16,10 +16,8 @@ const ImageCarousel = () => {
 
   const fetchFeaturedColleges = async () => {
     try {
-      console.log('Hlo zero')
       // const response = await getFeaturedColleges();
       const response = await getColleges(false, true)
-      console.log('RESOPHOSG:', response)
       setFeaturedColleges(response.items)
     } catch (error) {
       console.error('Error fetching the colleges data:', error)

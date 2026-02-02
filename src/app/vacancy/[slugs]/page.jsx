@@ -21,14 +21,12 @@ const NewsDetailsPage = ({ params }) => {
       try {
         const resolvedParams = await params
         const slugs = resolvedParams.slugs // No need to await params.slugs
-        console.log('NEws slug:', slugs)
 
         const newsData = await getNewsBySlug(slugs)
 
         setNews(newsData.blog || null) // Set eventData directly
         // setRelatedNews(allNews);
         setRelatedNews(newsData.similarBlogs || [])
-        // console.log("News Description:",news)
       } catch (err) {
         setError(err.message)
       } finally {
@@ -39,9 +37,6 @@ const NewsDetailsPage = ({ params }) => {
     fetchNewsDetails()
   }, [params]) // Add params.slugs to dependency array
 
-  useEffect(() => {
-    console.log('News:', news)
-  }, [news])
 
   // if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>

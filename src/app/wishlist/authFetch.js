@@ -13,7 +13,6 @@ export const authFetch = async (url) => {
 
     // If unauthorized, try one more time to let middleware refresh the token
     if (response.status === 401 || response.status === 403) {
-      console.log('Token expired, attempting refresh...')
 
       const newResponse = await fetch(url, {
         credentials: 'include',
@@ -22,11 +21,6 @@ export const authFetch = async (url) => {
         }
       })
 
-      // Check for new access token in Authorization header
-      const newAccessToken = newResponse.headers.get('Authorization')
-      if (newAccessToken) {
-        console.log('Received new access token')
-      }
 
       if (!newResponse.ok) {
         // if (newResponse.status === 401) {

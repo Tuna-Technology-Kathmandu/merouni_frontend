@@ -22,14 +22,10 @@ const NewsDetailsPage = ({ params }) => {
       try {
         const resolvedParams = await params
         const slugs = resolvedParams.slugs
-        console.log('Fetching blog with slug:', slugs)
         const newsData = await services.blogs.getBySlug(slugs)
-        console.log('Blog API response:', newsData)
 
         setNews(newsData.blog || null) // Set eventData directly
-        // setRelatedNews(allNews);
         setRelatedNews(newsData.similarBlogs || [])
-        // console.log("News Description:",news)
       } catch (err) {
         setError(err.message)
       } finally {

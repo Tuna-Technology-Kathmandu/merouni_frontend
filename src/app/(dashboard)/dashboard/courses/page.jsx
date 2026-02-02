@@ -93,7 +93,6 @@ export default function CourseForm() {
   const { requireAdmin } = useAdminPermission()
 
   const handleDeleteClick = (id) => {
-    console.log('courseId', id)
     requireAdmin(() => {
       setDeleteId(id)
       setIsDialogOpen(true)

@@ -255,7 +255,6 @@ export default function MaterialForm() {
 
       const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/material`
       const method = editing ? 'PUT' : 'POST'
-      console.log('before submit', payload)
       if (editing) {
         const response = await authFetch(
           `${DotenvConfig.NEXT_APP_API_BASE_URL}/material?id=${editId}`,
@@ -299,18 +298,15 @@ export default function MaterialForm() {
   }
 
   const handleEdit = async (editdata) => {
-    // console.log("coming from table", data)
     try {
       setEditing(true)
       setLoading(true)
       setIsOpen(true)
-      console.log('editdata', editdata)
       const response = await authFetch(
         `${DotenvConfig.NEXT_APP_API_BASE_URL}/material/${editdata.id}`
       )
       const data = await response.json()
       const material = data.material
-      console.log('indivi', material)
       setEditingId(material.id)
 
       setValue('title', material.title)

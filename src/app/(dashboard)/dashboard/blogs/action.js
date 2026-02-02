@@ -12,7 +12,6 @@ export async function fetchBlogs(page = 1, limit = 10, status = '') {
     const response = await fetch(query, {
       cache: 'no-store'
     })
-    console.log(`Response: ${response}`)
     if (!response.ok) {
       throw new Error('Failed to fetch events')
     }
@@ -29,7 +28,6 @@ export const fetchTags = async () => {
   try {
     // Log the full URL being called
     const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/tag`
-    console.log('Fetching tags from URL:', url)
 
     const response = await authFetch(url)
 
@@ -39,7 +37,6 @@ export const fetchTags = async () => {
     }
 
     const data = await response.json()
-    console.log('Tags data received:', data)
     return data
   } catch (error) {
     console.error('Error in fetchTags:', error)
@@ -90,7 +87,6 @@ export async function updateBlogs(eventId, data) {
 }
 
 export async function deleteBlogs(eventId) {
-  console.log('before deleteing')
   try {
     const response = await fetch(`${url}?event_id=${eventId}`, {
       method: 'DELETE'
@@ -99,11 +95,9 @@ export async function deleteBlogs(eventId) {
     if (!response.ok) {
       throw new Error('Failed to delete category')
     }
-    console.log('just before deleteing')
-    const hehe = await response.json()
+    const blogs = await response.json()
 
-    console.log(hehe)
-    return hehe
+    return blogs
   } catch (error) {
     console.error('Error deleting category:', error)
     throw error

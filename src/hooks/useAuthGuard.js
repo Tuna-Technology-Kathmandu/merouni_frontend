@@ -99,17 +99,14 @@ export default function useAuthGuard() {
       // Validate token
       try {
         const user = decodeJwt(token)
-        // console.log('Decoded user:', user)
         const roleObj = user?.data?.role ? destr(user?.data?.role) : {}
         
         // Determine the primary role key (e.g., 'admin', 'student')
         // Assuming roleObj has boolean flags like { admin: true } or similar
         const userRole = Object.keys(roleObj).find(key => roleObj[key]) || 'student'
-        // console.log('User role:', userRole)
 
         // Check if user has access to this route
         if (!isRouteAllowed(pathname, userRole)) {
-          console.log('No access to route:', pathname)
           // Redirect to first allowed route for this user
           const firstAllowed = getFirstAllowedRoute(userRole)
           router.replace(firstAllowed)

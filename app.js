@@ -10,6 +10,5 @@ app.prepare().then(() => {
   createServer((req, res) => {
     handle(req, res)
   }).listen(process.env.PORT || 3000, () => {
-    console.log('Next.js running on port ' + (process.env.PORT || 3000))
   })
 })

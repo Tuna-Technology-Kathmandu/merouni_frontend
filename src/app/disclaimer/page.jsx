@@ -4,8 +4,28 @@ import React from 'react'
 import Header from '@/components/Frontpage/Header'
 import Navbar from '@/components/Frontpage/Navbar'
 import Footer from '@/components/Frontpage/Footer'
+import { getConfigByType } from '../actions/siteConfigActions'
 
 const Disclaimer = () => {
+    const [content, setContent] = React.useState(null)
+    const [loading, setLoading] = React.useState(true)
+
+    React.useEffect(() => {
+        const fetchContent = async () => {
+            try {
+                const config = await getConfigByType('legal_disclaimer')
+                if (config?.value) {
+                    setContent(config.value)
+                }
+            } catch (error) {
+                console.error('Failed to fetch disclaimer:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchContent()
+    }, [])
+
     return (
         <>
             <Header />
@@ -14,36 +34,16 @@ const Disclaimer = () => {
                 <div className='max-w-[800px] mx-auto px-6 py-16 lg:py-24'>
                     <h1 className='text-3xl lg:text-4xl font-black text-gray-900 mb-8'>Disclaimer</h1>
 
-                    <div className='space-y-8 text-gray-600 leading-relaxed text-lg'>
-                        <p>
-                            The information provided on <strong>Mero Uni</strong> is for general informational purposes only.
-                            All information on the site is provided in good faith, however we make no representation or warranty
-                            of any kind, express or implied, regarding the accuracy, adequacy, validity, reliability, availability,
-                            or completeness of any information on the site.
-                        </p>
-
-                        <section>
-                            <h2 className='text-xl font-bold text-gray-800 mb-3'>External Links Disclaimer</h2>
-                            <p>
-                                The site may contain (or you may be sent through the site) links to other websites or content belonging
-                                to or originating from third parties. Such external links are not investigated, monitored, or checked
-                                for accuracy, adequacy, validity, reliability, availability, or completeness by us.
-                            </p>
-                        </section>
-
-                        <section>
-                            <h2 className='text-xl font-bold text-gray-800 mb-3'>Educational Information Disclaimer</h2>
-                            <p>
-                                The educational information provided is not intended as a substitute for professional advice.
-                                Before taking any actions based upon such information, we encourage you to consult with the appropriate
-                                professionals. We do not provide any kind of educational advice.
-                            </p>
-                        </section>
-
-                        <p className='text-sm text-gray-400 pt-8 border-t border-gray-100'>
-                            Last updated: January 2026
-                        </p>
-                    </div>
+                    {loading ? (
+                        <div className="flex justify-center py-20">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+                        </div>
+                    ) : (
+                        <div
+                            className='space-y-8 text-gray-600 leading-relaxed text-lg prose prose-lg max-w-none'
+                            dangerouslySetInnerHTML={{ __html: content || '<p>No disclaimer content available.</p>' }}
+                        />
+                    )}
                 </div>
             </div>
             <Footer />

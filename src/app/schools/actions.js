@@ -107,8 +107,6 @@ export async function searchSchools(query, page = 1) {
 
 export async function getSchoolBySlug(slug) {
   try {
-    // console.log("Fetching college details for slug:", slug);
-    console.log(`${DotenvConfig.NEXT_APP_API_BASE_URL}/school/${slug}`)
 
     const response = await fetch(
       `${DotenvConfig.NEXT_APP_API_BASE_URL}/school/${slug}`,
@@ -121,14 +119,12 @@ export async function getSchoolBySlug(slug) {
       }
     )
 
-    console.log('RESPOnse:', response)
 
     if (!response.ok) {
       throw new Error('Failed to fetch School Details')
     }
 
     const data = await response.json()
-    console.log('Data:', data)
     return data.item
   } catch (error) {
     console.error('Error fetching  school details:', error)

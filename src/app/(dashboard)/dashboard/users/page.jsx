@@ -109,8 +109,6 @@ export default function UsersManager() {
   }
 
   useEffect(() => {
-    console.log('USERS:', users)
-    console.log('PAGINATION:', pagination)
   }, [users, pagination])
 
   const handleSearch = async (query) => {
@@ -120,7 +118,6 @@ export default function UsersManager() {
     }
     try {
       const token = localStorage.getItem('access_token')
-      console.log('Query:', query)
 
       // Build URL with search query and role filter
       let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/users?q=${query}`
@@ -136,7 +133,6 @@ export default function UsersManager() {
 
       if (response.ok) {
         const data = await response.json()
-        console.log('REsponse of serach:', data)
 
         setUsers(data.items)
 
@@ -182,9 +178,6 @@ export default function UsersManager() {
     }
   }, [searchTimeout])
 
-  useEffect(() => {
-    console.log('USErs searching:', users)
-  }, [users])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -237,7 +230,6 @@ export default function UsersManager() {
       } else {
         // Add created_by_admin flag for new user creation
         submitData.created_by_admin = 1
-        console.log('Form Data:', submitData)
         await createUser(submitData)
         toast.success('User created successfully')
       }
@@ -323,13 +315,11 @@ export default function UsersManager() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        console.log('selectedDelete', id)
         await deleteUser(id, userData)
         loadUsers()
         setError(null)
       } catch (err) {
         setError('Failed to delete user')
-        console.error('Error deleting user:', err)
       }
     }
   }
@@ -603,23 +593,21 @@ export default function UsersManager() {
                   }
                 })
               }}
-              className='bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600'
             >
               Cancel
             </button>
-            <button
+            <Button
               type='submit'
-              className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
             >
               {editingId ? 'Update User' : 'Create User'}
-            </button>
+            </Button>
           </div>
         </form>
       </Modal>
 
       <ExportModal
         isOpen={isExportModalOpen}
-        onClose={() => setIsExportModalOpen(false)}
+        onClose={() => setIsExportModalOpen(false)} 
       >
         <h2 className='text-xl font-bold mb-4'>Export Users</h2>
         <p>This is the modal content. You can add any form or content here.</p>

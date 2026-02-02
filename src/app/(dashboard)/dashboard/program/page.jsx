@@ -72,7 +72,6 @@ export default function ProgramForm() {
         total: data.pagination.totalCount
       })
     } catch (error) {
-      console.log(error, 'DONEDONE')
       toast.error('Failed to fetch programs')
     } finally {
       setTableLoading(false)

@@ -159,7 +159,6 @@ const SchoolDetailPage = ({ params }) => {
     return <div>No school data available.</div>
   }
 
-  console.log(school)
 
   return (
     <div className='bg-white min-h-screen'>

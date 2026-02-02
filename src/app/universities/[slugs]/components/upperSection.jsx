@@ -8,7 +8,6 @@ import he from 'he'
 import { FormatDate } from '@/lib/date'
 
 const ImageSection = ({ university }) => {
-  console.log('univeristy', university)
   return (
     <div className='flex flex-col items-center'>
       {/* Top Section (Already Styled) */}

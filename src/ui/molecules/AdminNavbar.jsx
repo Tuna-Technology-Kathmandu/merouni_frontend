@@ -26,10 +26,8 @@ const AdminNavbar = () => {
 
   // Parse the role JSON string if it exists, otherwise default to an empty object
   let userRoles = {}
-  console.log('userData,', userData)
   if (userData?.role) {
     try {
-      console.log('User Data id:', userData.id)
       const parsedRole =
         typeof userData.role === 'string' ? destr(userData.role) : userData.role
       userRoles = parsedRole && typeof parsedRole === 'object' ? parsedRole : {}
@@ -83,7 +81,6 @@ const AdminNavbar = () => {
       toast.success(
         data.message || 'Agent verification request sent successfully!'
       )
-      console.log('Verification request sent')
     } catch (error) {
       console.error('Error during agent verification:', error)
       toast.error(

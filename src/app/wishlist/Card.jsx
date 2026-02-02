@@ -34,8 +34,6 @@ const WishlistCollegeCard = ({
           })
         }
       )
-      // console.log("res is" + res);
-      // const response = await res.json();
       if (!res.ok) {
         throw new Error(`HTTP Error! Status: ${res.status}`)
       }

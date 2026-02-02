@@ -4,7 +4,6 @@ import RelatedCard from './RelatedCard'
 import Banner from './Banner'
 
 const Cardlist = ({ news }) => {
-  console.log('Blogs obtained after passing :', news)
   const truncateString = (str, maxLength) => {
     if (str.length > maxLength) {
       return str.slice(0, maxLength) + '...'

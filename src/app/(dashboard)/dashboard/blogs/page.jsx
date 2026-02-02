@@ -190,18 +190,14 @@ export default function BlogsManager() {
   )
 
   const fetchTagById = async (tagId) => {
-    console.log('I am here')
+    
     const response = await authFetch(
       `${DotenvConfig.NEXT_APP_API_BASE_URL}/tag/${tagId}`
     )
     const data = await response.json()
-    console.log('Data of tag id:', data)
     return data.item || data
   }
 
-  useEffect(() => {
-    console.log('Tags state updated:', tags)
-  }, [tags])
 
   useEffect(() => {
     const limit = 1000
@@ -221,10 +217,8 @@ export default function BlogsManager() {
       setTagsLoading(true)
       try {
         const tagList = await fetchTags()
-        console.log('Fetched tags from API:', tagList) // Debug log
         if (tagList && tagList.items) {
           setTags(tagList.items)
-          console.log('Set tags state to:', tagList.items) // Debug log
         } else {
           console.error('Invalid tags data structure:', tagList)
         }
@@ -406,7 +400,6 @@ export default function BlogsManager() {
       }
     }
 
-    console.log('Parsed blog tags:', blogTags)
 
     // First fetch any missing tags
     const missingTagIds = blogTags.filter(
@@ -442,7 +435,6 @@ export default function BlogsManager() {
       console.warn('blog.tags is not an array after parsing:', blogTags)
     }
 
-    console.log('Existing tags for editing:', existingTags)
 
     // Update state and form values
     setSelectedTags(existingTags)

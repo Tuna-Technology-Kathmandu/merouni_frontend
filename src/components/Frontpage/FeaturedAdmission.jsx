@@ -19,10 +19,7 @@ const FeaturedAdmission = () => {
       // Use direct fetch instead of server action to avoid SSR issues and ensure correct API URL
       const apiUrl = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?pinned=true&page=1&limit=6`
 
-      // Debug: Log API URL in development (remove in production if needed)
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Fetching featured colleges from:', apiUrl)
-      }
+    
 
       const response = await fetch(apiUrl, {
         method: 'GET',

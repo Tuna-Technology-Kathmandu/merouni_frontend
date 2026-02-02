@@ -13,8 +13,7 @@ const GallerySection = ({
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef(null)
 
-  console.log('uploaded files', uploadedFiles)
-
+  
   const handleBulkUpload = async (event) => {
     const files = Array.from(event.target.files)
     if (files.length === 0) return

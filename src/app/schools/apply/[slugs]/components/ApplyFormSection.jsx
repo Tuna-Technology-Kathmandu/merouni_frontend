@@ -109,7 +109,6 @@ const ApplyFormSection = ({ id, college }) => {
 
  
 
-  console.log(formData)
 
   return (
     <div className='flex flex-col items-center bg-[#D9D9D9] bg-opacity-30 p-6'>

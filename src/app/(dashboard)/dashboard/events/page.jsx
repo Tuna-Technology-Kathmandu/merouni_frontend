@@ -308,7 +308,6 @@ export default function EventManager() {
       )
       let eventData = await response.json()
       eventData = eventData.item // Assuming the event data is nested under `item`
-      // console.log("Cate:", categories);
       setEditingEventId(eventData.id)
 
       // Populate form fields with event data
@@ -325,7 +324,6 @@ export default function EventManager() {
           setValue('category_id', categoryID)
         }
       }
-      console.log(eventData)
 
       if (eventData?.college) {
         const response = await authFetch(
@@ -475,7 +473,6 @@ export default function EventManager() {
           if (!rawValue) return ''
           try {
             const eventHost = JSON.parse(rawValue)
-            console.log(eventHost,"YOOYO")
             return eventHost.start_date || ''
           } catch (error) {
             console.error('JSON parsing error for start_date:', error)

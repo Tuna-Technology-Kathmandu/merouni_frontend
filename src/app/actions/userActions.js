@@ -13,7 +13,6 @@ export async function getUsers(page = 1, token) {
       {
         headers: {
           Authorization: `Bearer ${token}`
-          // Role: role.join(',')
         },
         cache: 'no-store'
       }
@@ -43,9 +42,6 @@ export async function getUsers(page = 1, token) {
 
 export async function createUser(formData) {
   try {
-    // const userData = Object.fromEntries(formData);
-    console.log('FORM Data:', formData)
-
     const response = await fetch(
       `${DotenvConfig.NEXT_APP_API_BASE_URL}/auth/register`,
       {
@@ -65,8 +61,6 @@ export async function createUser(formData) {
 
 export async function updateUser(userId, formData) {
   try {
-    // const userData = Object.fromEntries(formData)
-    console.log('formDatafromAPi', formData)
     const response = await authFetch(
       `${DotenvConfig.NEXT_APP_API_BASE_URL}/users/edit-profile?user_id=${userId}`,
       {

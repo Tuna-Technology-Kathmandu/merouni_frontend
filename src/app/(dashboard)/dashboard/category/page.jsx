@@ -145,7 +145,6 @@ export default function CategoryManager() {
 
   const updateCategory = async (data, id) => {
     try {
-      console.log('Updating category with data:', data, 'and id:', id)
       const response = await authFetch(
         `${DotenvConfig.NEXT_APP_API_BASE_URL}/category?category_id=${id}`,
         {
@@ -208,7 +207,6 @@ export default function CategoryManager() {
   const handleDeleteConfirm = async () => {
     if (!deleteId) return
     try {
-      console.log('Deleting id is :', deleteId)
 
       const response = await authFetch(
         `${DotenvConfig.NEXT_APP_API_BASE_URL}/category?category_id=${deleteId}`,

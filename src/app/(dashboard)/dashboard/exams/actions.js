@@ -9,7 +9,6 @@ export async function getAllExams(page) {
       cache: 'no-store'
     })
     const data = await response.json()
-    console.log('data', data)
     return data
   } catch (error) {
     throw new Error('Failed to fetch scholarships')
@@ -18,7 +17,6 @@ export async function getAllExams(page) {
 
 export async function createExam(data) {
   try {
-    console.log(`Exam Data : ${data}`)
 
     const response = await authFetch(`${url}`, {
       method: 'POST',

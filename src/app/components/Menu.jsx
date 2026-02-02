@@ -192,8 +192,6 @@ const Menu = ({ isCollapsed = false }) => {
     }, {})
   })
 
-  // Debug: Log the role to help troubleshoot
-  console.log('User role in Menu:', role)
 
   const handleLogout = async () => {
     try {

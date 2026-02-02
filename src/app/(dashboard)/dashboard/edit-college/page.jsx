@@ -485,8 +485,6 @@ const EditCollegePage = () => {
   }
 
   const onSubmit = async (data) => {
-    console.log('Form submitted with data:', data)
-    console.log('Form errors:', errors)
     try {
       setSubmitting(true)
 
@@ -1108,7 +1106,6 @@ const EditCollegePage = () => {
             onClick={(e) => {
               // Debug: log form errors
               if (Object.keys(errors).length > 0) {
-                console.log('Form errors:', errors)
                 toast.error('Please fix form errors before submitting')
               }
             }}

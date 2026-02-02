@@ -397,7 +397,6 @@ export default function CollegeForm() {
     } catch (error) {
       // Extract error message from different error formats
 
-      console.log('Error response', error['message'])
       let errorMessage = 'Failed to create college'
 
       if (error.message) {
@@ -734,7 +733,6 @@ export default function CollegeForm() {
       let collegeData = await response.json()
       collegeData = collegeData.item
 
-      console.log('CData', collegeData)
 
       // Basic Information
       setValue('id', collegeData.id)
@@ -918,7 +916,6 @@ export default function CollegeForm() {
   }
 
   const handleSearch = async (query) => {
-    console.log('q', query)
     if (!query) {
       // getColleges();
       loadColleges()
@@ -971,7 +968,6 @@ export default function CollegeForm() {
   const formData = watch()
 
   useEffect(() => {
-    console.log('Form data:', formData)
   }, [formData])
 
   const fetchUniversityDetails = async (slugs) => {
@@ -981,10 +977,7 @@ export default function CollegeForm() {
     }
     try {
       setLoadingPrograms(true)
-      console.log('Fetching university programs for slug:', slugs)
       const universityData = await getUniversityBySlug(slugs)
-      console.log('University data received:', universityData)
-      // Extract program IDs from university_programs array
       const universityPrograms = universityData.university_programs || []
 
       setUniversityPrograms(universityPrograms)

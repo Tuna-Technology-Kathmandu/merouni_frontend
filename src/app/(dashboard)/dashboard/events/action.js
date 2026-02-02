@@ -9,7 +9,6 @@ export async function fetchEvents(page = 1, limit = 10) {
     const response = await fetch(`${url}?limit=${limit}&page=${page}`, {
       cache: 'no-store'
     })
-    console.log(`Response: ${response}`)
     if (!response.ok) {
       throw new Error('Failed to fetch events')
     }
@@ -21,30 +20,10 @@ export async function fetchEvents(page = 1, limit = 10) {
   }
 }
 
-// export async function createEvent(data) {
-//   try {
-//     const response = await fetch(`${url}`, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify(data),
-//     });
 
-//     if (!response.ok) {
-//       throw new Error("Failed to create events");
-//     }
-
-//     return await response.json();
-//   } catch (error) {
-//     console.error("Error creating events:", error);
-//     throw error;
-//   }
-// }
 
 export async function createEvent(data) {
   try {
-    console.log('creating event with data:', data)
     const response = await fetch(`${url}`, {
       method: 'POST',
       headers: {
@@ -90,7 +69,6 @@ export async function updateEvent(eventId, data) {
 }
 
 export async function deleteEvent(eventId) {
-  console.log('before deleteing')
   try {
     const response = await fetch(`${url}?event_id=${eventId}`, {
       method: 'DELETE'
@@ -99,11 +77,9 @@ export async function deleteEvent(eventId) {
     if (!response.ok) {
       throw new Error('Failed to delete category')
     }
-    console.log('just before deleteing')
-    const hehe = await response.json()
+    const event = await response.json()
 
-    console.log(hehe)
-    return hehe
+    return event
   } catch (error) {
     console.error('Error deleting category:', error)
     throw error

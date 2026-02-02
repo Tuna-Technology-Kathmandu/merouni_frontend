@@ -11,7 +11,6 @@ export async function getAllScholarships(page) {
       cache: 'no-store'
     })
     const data = await response.json()
-    console.log('data', data)
     return data
   } catch (error) {
     throw new Error('Failed to fetch scholarships')
@@ -20,7 +19,6 @@ export async function getAllScholarships(page) {
 
 export async function createScholarship(data) {
   try {
-    console.log(`Scholarship Data : ${data}`)
 
     const response = await authFetch(`${url}`, {
       method: 'POST',
