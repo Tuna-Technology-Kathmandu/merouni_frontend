@@ -103,10 +103,9 @@ export const createColumns = ({
               <UserPlus className='w-4 h-4' />
             </button>
           ) : (
-            <div className='p-1.5 bg-green-50 text-green-600 rounded-md' title='Account Active'>
-              <UserPlus className='w-4 h-4' />
-            </div>
-          )}
+
+            null
+)}
         </div>
       )
     }

@@ -96,13 +96,11 @@ export default function ConsultancyForm() {
   }
 
   const handleDeleteClick = (id) => {
-    requireAdmin(() => {
-      setDeleteId(id)
-      setIsDialogOpen(true)
-    })
+    setDeleteId(id)
+    setIsDialogOpen(true)
   }
 
-  const handleDialogClose = () => {
+  function handleDialogClose() {
     setIsDialogOpen(false)
     setDeleteId(null)
   }
@@ -236,7 +234,6 @@ export default function ConsultancyForm() {
             </Button>
           </div>
         </div>
-        <ToastContainer />
 
         <CreateUpdateConsultancy
           isOpen={isOpen}
