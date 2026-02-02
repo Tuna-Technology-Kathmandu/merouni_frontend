@@ -3,21 +3,24 @@ import { authFetch } from '@/app/utils/authFetch'
 import { DotenvConfig } from '@/config/env.config'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
+import CollegesDropdown from '@/ui/molecules/dropdown/CollegesDropdown'
+import DegreeDropdown from '@/ui/molecules/dropdown/DegreeDropdown'
+import DisciplineDropdown from '@/ui/molecules/dropdown/DisciplineDropdown'
+import ExamDropdown from '@/ui/molecules/dropdown/ExamDropdown'
+import FacultyDropdown from '@/ui/molecules/dropdown/FacultyDropdown'
+import LevelDropdown from '@/ui/molecules/dropdown/LevelDropdown'
+import ScholarshipDropdown from '@/ui/molecules/dropdown/ScholarshipDropdown'
+import { Button } from '@/ui/shadcn/button'
 import { Edit2, Eye, Search, Trash2, X } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
-import { useDebounce } from 'use-debounce'
 import { Modal } from '../../../../ui/molecules/Modal'
 import Table from '../../../../ui/molecules/Table'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { fetchExam, fetchScholarship } from './actions'
-import CourseSearch from './CourseSearch'
-import DegreeDropdown from '@/ui/molecules/dropdown/DegreeDropdown'
-import LevelDropdown from '@/ui/molecules/dropdown/LevelDropdown'
-import { Button } from '@/ui/shadcn/button'
+import CourseDropdown from '@/ui/molecules/dropdown/CourseDropdown'
 const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
 })
@@ -41,27 +44,8 @@ export default function ProgramForm() {
   const [currentCourse, setCurrentCourse] = useState({ id: '', title: '' })
 
   // States for dropdowns
-  //for scholarship search
-  const [scholarSearch, setScholarSearch] = useState('')
-  const [debouncedScholar] = useDebounce(scholarSearch, 300)
-  const [scholarships, setScholarships] = useState([])
-  const [loadScholar, setLoadScholar] = useState(false)
-  const [showScholarDrop, setShowScholarDrop] = useState(false)
-  const [hasSelectedScholar, setHasSelectedScholar] = useState(false)
-
-  //for exam searchs
-  const [examSearch, setExamSearch] = useState('')
-  const [debouncedExam] = useDebounce(examSearch, 300)
-  const [exams, setExams] = useState([])
-  const [loadExam, setLoadExam] = useState(false)
-  const [showExamDrop, setShowExamDrop] = useState(false)
-  const [hasSelectedExam, setHasSelectedExam] = useState(false)
-
-  const [colleges, setColleges] = useState([])
-  const [collegeSearch, setCollegeSearch] = useState('')
+  const [colleges, setColleges] = useState([]) // Keep to avoid errors if used elsewhere, but mainly using Dropdown now
   const [selectedColleges, setSelectedColleges] = useState([])
-  const [searchResults, setSearchResults] = useState([])
-
   const [syllabusSearch, setSyllabusSearch] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -74,44 +58,21 @@ export default function ProgramForm() {
     totalPages: 1,
     total: 0
   })
-  const searchCollege = async (e) => {
-    const query = e.target.value
-    setCollegeSearch(query)
-    if (query.length < 2) {
-      setSearchResults([])
-      return
-    }
 
-    try {
-      const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${query}`
-      )
-      const data = await response.json()
-      setSearchResults(data.items || [])
-    } catch (error) {
-      console.error('College Search Error:', error)
-      toast.error('Failed to search colleges')
-    }
-  }
   const addCollege = (college) => {
+    if (!college) return
     if (!selectedColleges.some((c) => c.id === college.id)) {
-      setSelectedColleges((prev) => [...prev, college])
-      // Update form value
-      const collegeIds = [...selectedColleges, college].map((c) => c.id)
-      setValue('colleges', collegeIds)
+      const newSelected = [...selectedColleges, college]
+      setSelectedColleges(newSelected)
+      setValue('colleges', newSelected.map(c => c.id))
     }
-    setCollegeSearch('')
-    setSearchResults([])
   }
 
   // Add function to remove college
   const removeCollege = (collegeId) => {
-    setSelectedColleges((prev) => prev.filter((c) => c.id !== collegeId))
-    // Update form value
-    const updatedCollegeIds = selectedColleges
-      .filter((c) => c.id !== collegeId)
-      .map((c) => c.id)
-    setValue('colleges', updatedCollegeIds)
+    const newSelected = selectedColleges.filter((c) => c.id !== collegeId)
+    setSelectedColleges(newSelected)
+    setValue('colleges', newSelected.map(c => c.id))
   }
 
   const {
@@ -132,6 +93,8 @@ export default function ProgramForm() {
       credits: '',
       level_id: '',
       degree_id: '',
+      discipline_id: '',
+      faculty_id: '',
       language: '',
       eligibility_criteria: '',
       fee: '',
@@ -177,7 +140,6 @@ export default function ProgramForm() {
       setEditing(false)
       reset()
       setSelectedColleges([])
-      setCollegeSearch('')
     }
   }, [reset])
 
@@ -191,56 +153,7 @@ export default function ProgramForm() {
 
   const { requireAdmin } = useAdminPermission()
 
-  //for scholarships searching
-  useEffect(() => {
-    if (hasSelectedScholar) return
 
-    const getScholarship = async () => {
-      setLoadScholar(true)
-      try {
-        const ScholarList = await fetchScholarship(debouncedScholar)
-        setScholarships(ScholarList)
-        setShowScholarDrop(true)
-        setLoadScholar(false)
-      } catch (error) {
-        console.error('Error fetching scholarships:', error)
-      }
-    }
-    if (debouncedScholar !== '') {
-      getScholarship()
-    } else {
-      setShowScholarDrop(false)
-    }
-  }, [debouncedScholar])
-
-  //watch form data
-  // const formData = watch()
-
-  // useEffect(() => {
-  //   console.log('Form data:', formData)
-  // }, [formData]) // Runs every time formData changes
-
-  //for exams searching
-  useEffect(() => {
-    if (hasSelectedExam) return
-
-    const getExam = async () => {
-      setLoadExam(true)
-      try {
-        const ExamList = await fetchExam(debouncedExam)
-        setExams(ExamList)
-        setShowExamDrop(true)
-        setLoadExam(false)
-      } catch (error) {
-        console.error('Error fetching exams:', error)
-      }
-    }
-    if (debouncedExam !== '') {
-      getExam()
-    } else {
-      setShowExamDrop(false)
-    }
-  }, [debouncedExam])
 
   // Fetch functions for all dropdown data
   const fetchPrograms = async (page = 1) => {
@@ -281,9 +194,10 @@ export default function ProgramForm() {
       setSubmitting(true)
       const cleanedData = {
         ...data,
-        faculty_id: null,
+        faculty_id: data.faculty_id ? Number(data.faculty_id) : null,
         level_id: data.level_id ? Number(data.level_id) : undefined,
         degree_id: data.degree_id ? Number(data.degree_id) : null,
+        discipline_id: data.discipline_id ? Number(data.discipline_id) : null,
         syllabus: data.syllabus.map((item) => ({
           year: item.year,
           semester: item.semester,
@@ -322,13 +236,8 @@ export default function ProgramForm() {
       setEditing(false)
       reset()
       setSelectedColleges([])
-      setCollegeSearch('')
       fetchPrograms()
       setIsOpen(false)
-      setScholarSearch('')
-      setHasSelectedScholar(false)
-      setExamSearch('')
-      setHasSelectedExam(false)
     } catch (error) {
       // Handle different error types
       if (
@@ -386,22 +295,13 @@ export default function ProgramForm() {
 
       setValue('syllabus', enrichedSyllabus)
 
-      if (program.programscholarship?.name) {
-        setScholarSearch(program.programscholarship.name)
-      } else {
-        setScholarSearch('')
-        setHasSelectedScholar(true)
-      }
-
-      if (program.programexam?.title) {
-        setExamSearch(program.programexam.title)
-      } else {
-        setExamSearch('')
-        setHasSelectedExam(true)
-      }
+      setValue('scholarship_id', program.scholarship_id ?? '')
+      setValue('exam_id', program.exam_id ?? '')
 
       setValue('level_id', program.level_id ?? '')
       setValue('degree_id', program.degree_id ?? '')
+      setValue('discipline_id', program.discipline_id ?? '')
+      setValue('faculty_id', program.faculty_id ?? '')
 
       // Set colleges - extract college_ids from program_college
       if (program.colleges) {
@@ -431,17 +331,7 @@ export default function ProgramForm() {
     }
   }
 
-  useEffect(() => {
-    if (scholarSearch && scholarships.length > 0 && !hasSelectedScholar) {
-      setShowScholarDrop(true)
-    }
-  }, [scholarSearch, scholarships])
 
-  useEffect(() => {
-    if (examSearch && exams.length > 0 && !hasSelectedExam) {
-      setShowExamDrop(true)
-    }
-  }, [examSearch, exams])
 
   const handleDeleteClick = (id) => {
     requireAdmin(() => {
@@ -481,11 +371,6 @@ export default function ProgramForm() {
     setEditing(false)
     reset()
     setSelectedColleges([])
-    setCollegeSearch('')
-    setScholarSearch('')
-    setHasSelectedScholar(false)
-    setExamSearch('')
-    setHasSelectedExam(false)
   }
 
   const handleSearchInput = (value) => {
@@ -658,11 +543,6 @@ export default function ProgramForm() {
                 setEditing(false)
                 reset()
                 setSelectedColleges([])
-                setCollegeSearch('')
-                setScholarSearch('')
-                setHasSelectedScholar(false)
-                setExamSearch('')
-                setHasSelectedExam(false)
                 setIsOpen(true)
               }}
             >
@@ -778,6 +658,41 @@ export default function ProgramForm() {
                   />
                 </div>
 
+                {/* Discipline (optional) */}
+                <div>
+                  <label className='block mb-2'>Discipline</label>
+                  <DisciplineDropdown
+                    value={watch('discipline_id') ?? ''}
+                    onChange={(id) => setValue('discipline_id', id || '')}
+                    placeholder='Select discipline'
+                    className='w-full'
+                  />
+                </div>
+
+                {/* Faculty (Required) */}
+                <div>
+                  <label className='block mb-2'>
+                    Faculty <span className='text-red-500'>*</span>
+                  </label>
+                  <input
+                    type='hidden'
+                    {...register('faculty_id', {
+                      required: 'Faculty is required'
+                    })}
+                  />
+                  <FacultyDropdown
+                    value={watch('faculty_id') ?? ''}
+                    onChange={(id) => setValue('faculty_id', id || '')}
+                    placeholder='Select faculty'
+                    className='w-full'
+                  />
+                  {errors.faculty_id && (
+                    <span className='text-red-500 text-sm mt-1'>
+                      {errors.faculty_id.message}
+                    </span>
+                  )}
+                </div>
+
                 <div>
                   <label className='block mb-2'>
                     Language <span className='text-red-500'>*</span>
@@ -864,6 +779,69 @@ export default function ProgramForm() {
               </div>
             </div>
 
+            {/* Scholarship & Exams */}
+            <div className='bg-white p-6 rounded-lg shadow-md'>
+              <h2 className='text-xl font-semibold mb-4'>
+                Scholarships & Exams
+              </h2>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                {/* Scholarship */}
+                <div>
+                  <label className='block mb-2'>Scholarship</label>
+                  <ScholarshipDropdown
+                    value={watch('scholarship_id') ?? ''}
+                    onChange={(id) => setValue('scholarship_id', id || '')}
+                    placeholder='Select scholarship'
+                    className='w-full'
+                  />
+                </div>
+
+                {/* Exam */}
+                <div>
+                  <label className='block mb-2'>Entrance Exam</label>
+                  <ExamDropdown
+                    value={watch('exam_id') ?? ''}
+                    onChange={(id) => setValue('exam_id', id || '')}
+                    placeholder='Select exam'
+                    className='w-full'
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* College Selection */}
+            <div className='bg-white p-6 rounded-lg shadow-md'>
+              <h2 className='text-xl font-semibold mb-4'>Select Colleges</h2>
+              <div className='mb-4'>
+                <CollegesDropdown
+                  onChange={(id, college) => {
+                    if (college) addCollege(college)
+                  }}
+                  placeholder="Search and select college to add..."
+                  className='w-full'
+                />
+                <div className='mt-4 flex flex-wrap gap-2'>
+                  {selectedColleges.map((college) => (
+                    <div
+                      key={college.id}
+                      className='bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center gap-2'
+                    >
+                      <span>{college.name}</span>
+                      <button
+                        type='button'
+                        onClick={() => removeCollege(college.id)}
+                        className='text-blue-600 hover:text-blue-800'
+                      >
+                        <X className='w-4 h-4' />
+                      </button>
+                    </div>
+                  ))}
+                  {selectedColleges.length === 0 && (
+                    <p className="text-gray-500 text-sm">No colleges selected.</p>
+                  )}
+                </div>
+              </div>
+            </div>
             {/* Additional Information */}
             <div className='bg-white p-6 rounded-lg shadow-md'>
               <h2 className='text-xl font-semibold mb-4'>
@@ -872,98 +850,11 @@ export default function ProgramForm() {
               Plus
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {/* for scholarships */}
-                <div className='relative'>
-                  <label className='block mb-2'>Scholarship</label>
-                  <input
-                    type='text'
-                    className='w-full p-2 border rounded'
-                    value={scholarSearch}
-                    onChange={(e) => {
-                      setScholarSearch(e.target.value)
-                      setHasSelectedScholar(false)
-                    }}
-                    placeholder='Search Scholarships'
-                  />
 
-                  {/* Hidden input for react-hook-form binding */}
-                  <input type='hidden' {...register('scholarship_id')} />
-                  {loadScholar ? (
-                    <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
-                      Loading...
-                    </div>
-                  ) : showScholarDrop ? (
-                    scholarships.length > 0 ? (
-                      <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
-                        {scholarships.map((item) => (
-                          <li
-                            key={item.id}
-                            className='p-2 cursor-pointer hover:bg-gray-100'
-                            onClick={() => {
-                              setValue('scholarship_id', item.id)
-                              setScholarSearch(item.name)
-                              setShowScholarDrop(false)
-                              setHasSelectedScholar(true)
-                            }}
-                          >
-                            {item.name}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
-                        No scholarships found.
-                      </div>
-                    )
-                  ) : null}
-                </div>
 
                 {/* for exam */}
 
-                <div className='relative'>
-                  <label className='block mb-2'>Exam</label>
-                  <input
-                    type='text'
-                    className='w-full p-2 border rounded'
-                    value={examSearch}
-                    onChange={(e) => {
-                      setExamSearch(e.target.value)
-                      setHasSelectedExam(false)
-                    }}
-                    placeholder='Search Exams'
-                  />
 
-                  {/* Hidden input for react-hook-form binding */}
-                  <input type='hidden' {...register('exam_id')} />
-                  {loadExam ? (
-                    <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2'>
-                      Loading...
-                    </div>
-                  ) : showExamDrop ? (
-                    exams.length > 0 ? (
-                      <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md'>
-                        toot
-                        {exams.map((item) => (
-                          <li
-                            key={item.id}
-                            className='p-2 cursor-pointer hover:bg-gray-100'
-                            onClick={() => {
-                              setValue('exam_id', item.id)
-                              setExamSearch(item.title)
-                              setShowExamDrop(false)
-                              setHasSelectedExam(true)
-                            }}
-                          >
-                            {item.title}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 text-gray-500'>
-                        No exams found.
-                      </div>
-                    )
-                  ) : null}
-                </div>
 
                 <div>
                   <label className='block mb-2'>Career Opportunities</label>
@@ -975,50 +866,7 @@ export default function ProgramForm() {
                   />
                 </div>
 
-                <div className='mb-4'>
-                  <label className='block mb-2'>Colleges</label>
-                  <div className='flex flex-wrap gap-2 mb-2'>
-                    {selectedColleges.map((college) => (
-                      <div
-                        key={college.id}
-                        className='flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full'
-                      >
-                        <span>{college.name}</span>
-                        <button
-                          type='button'
-                          onClick={() => removeCollege(college.id)}
-                          className='text-blue-600 hover:text-blue-800'
-                        >
-                          <X className='w-4 h-4' />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
 
-                  <div className='relative'>
-                    <input
-                      type='text'
-                      value={collegeSearch}
-                      onChange={searchCollege}
-                      className='w-full p-2 border rounded'
-                      placeholder='Search colleges...'
-                    />
-
-                    {searchResults.length > 0 && (
-                      <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto'>
-                        {searchResults.map((college) => (
-                          <div
-                            key={college.id}
-                            onClick={() => addCollege(college)}
-                            className='p-2 hover:bg-gray-100 cursor-pointer'
-                          >
-                            {college.name}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
               </div>
             </div>
             {/* new one */}
@@ -1043,8 +891,8 @@ export default function ProgramForm() {
                             setCurrentSemester(sem)
                           }}
                           className={`w-full py-2 px-3 rounded text-sm ${currentYear === year && currentSemester === sem
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-white border hover:bg-gray-100'
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-white border hover:bg-gray-100'
                             }`}
                         >
                           {sem !== 0
@@ -1072,13 +920,17 @@ export default function ProgramForm() {
                 {/* Course Search - Quick Add */}
                 <div className='flex gap-2 items-end'>
                   <div className='flex-1'>
-                    <CourseSearch
-                      search={syllabusSearch}
-                      setSearch={setSyllabusSearch}
+                    <CourseDropdown
                       value={currentCourse.id}
-                      onChange={(id, title) => setCurrentCourse({ id, title })}
-                      title={currentCourse.title}
-                      placeholder='Search courses to add...'
+                      onChange={(id, course) => {
+                        if (course) {
+                          setCurrentCourse({ id: course.id, title: course.title })
+                        } else {
+                          setCurrentCourse({ id: '', title: '' })
+                        }
+                      }}
+                      placeholder="Search and select course"
+                      className="w-full"
                     />
                   </div>
                   <div>

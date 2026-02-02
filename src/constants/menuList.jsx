@@ -237,6 +237,12 @@ export const menuItems = [
         visible: ['admin', 'editor']
       },
       {
+        icon: <FaChalkboardTeacher className='text-xl' />,
+        label: 'Faculty',
+        href: '/dashboard/faculty',
+        visible: ['admin', 'editor']
+      },
+      {
         icon: <HandCoins className='text-xl' />,
         label: 'Set Referral Point',
         href: '/dashboard/set-referral-point',

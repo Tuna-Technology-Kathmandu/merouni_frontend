@@ -6,11 +6,10 @@ import {
   updateFaculty,
   deleteFaculty
 } from './action'
-// import dynamic from 'next/dynamic'
 import { useSelector } from 'react-redux'
 import Loader from '../../../../ui/molecules/Loading'
-import Table from '../../../../ui/molecules/Table' // Adjust the import path as needed
-import { Edit2, Trash2, Search } from 'lucide-react' // For action icons
+import Table from '../../../../ui/molecules/Table' 
+import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import useAdminPermission from '@/hooks/useAdminPermission'
@@ -19,10 +18,7 @@ import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { DotenvConfig } from '@/config/env.config'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { Button } from '@/ui/shadcn/button'
-
-// const CKEditor4 = dynamic(() => import('../component/CKEditor4'), {
-//   ssr: false
-// })
+import ViewFaculty from '@/ui/molecules/modals/ViewFaculty'
 
 export default function FacultyManager() {
   const { setHeading } = usePageHeading()
@@ -40,6 +36,11 @@ export default function FacultyManager() {
   const [deleteId, setDeleteId] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
+
+  // View Modal State
+  const [viewingFaculty, setViewingFaculty] = useState(null)
+  const [isViewOpen, setIsViewOpen] = useState(false)
+
   const author_id = useSelector((state) => state.user.data.id)
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -76,14 +77,23 @@ export default function FacultyManager() {
         cell: ({ row }) => (
           <div className='flex gap-2'>
             <button
+              onClick={() => handleView(row.original)}
+              className='p-1 text-gray-600 hover:text-gray-900'
+              title="View Details"
+            >
+              <Eye className='w-4 h-4' />
+            </button>
+            <button
               onClick={() => handleEdit(row.original)}
               className='p-1 text-blue-600 hover:text-blue-800'
+              title="Edit"
             >
               <Edit2 className='w-4 h-4' />
             </button>
             <button
               onClick={() => handleDeleteClick(row.original.id)}
               className='p-1 text-red-600 hover:text-red-800'
+              title="Delete"
             >
               <Trash2 className='w-4 h-4' />
             </button>
@@ -161,6 +171,11 @@ export default function FacultyManager() {
     })
     setEditingId(faculty.id)
     setIsOpen(true)
+  }
+
+  const handleView = (faculty) => {
+    setViewingFaculty(faculty)
+    setIsViewOpen(true)
   }
 
   const handleModalClose = () => {
@@ -335,27 +350,32 @@ export default function FacultyManager() {
           </div>
 
           <div className='flex justify-end gap-2'>
-            <button
+            <Button
               type='button'
+              variant='outline'
               onClick={handleModalClose}
-              className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors'
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type='submit'
               disabled={submitting}
-              className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
             >
               {submitting
                 ? 'Processing...'
                 : editingId
                   ? 'Update Faculty'
                   : 'Create Faculty'}
-            </button>
+            </Button>
           </div>
         </form>
       </Modal>
+
+      <ViewFaculty
+        isOpen={isViewOpen}
+        onClose={() => setIsViewOpen(false)}
+        faculty={viewingFaculty}
+      />
 
       <ConfirmationDialog
         open={isDialogOpen}

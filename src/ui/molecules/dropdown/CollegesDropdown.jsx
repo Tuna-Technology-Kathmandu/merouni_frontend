@@ -80,7 +80,8 @@ const CollegesDropdown = ({
   }, [])
 
   const handleSelect = (collegeId) => {
-    onChange(collegeId)
+    const selectedCollege = colleges.find((c) => String(c.id) === String(collegeId))
+    onChange(collegeId, selectedCollege)
     setIsOpen(false)
     setSearchTerm('')
   }
@@ -99,9 +100,8 @@ const CollegesDropdown = ({
         </span>
       </button>
       <ChevronDown
-        className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${
-          isOpen ? 'rotate-180' : ''
-        } ${loading ? 'opacity-50' : ''}`}
+        className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''
+          } ${loading ? 'opacity-50' : ''}`}
       />
 
       {isOpen && !loading && (
@@ -124,11 +124,10 @@ const CollegesDropdown = ({
             <button
               type='button'
               onClick={() => handleSelect('')}
-              className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${
-                !value
+              className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${!value
                   ? 'bg-blue-100 text-blue-700 font-medium'
                   : 'text-gray-700'
-              }`}
+                }`}
             >
               {placeholder}
             </button>
@@ -138,11 +137,10 @@ const CollegesDropdown = ({
                   key={college.id}
                   type='button'
                   onClick={() => handleSelect(String(college.id))}
-                  className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${
-                    value === String(college.id)
+                  className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${value === String(college.id)
                       ? 'bg-blue-100 text-blue-700 font-medium'
                       : 'text-gray-700'
-                  }`}
+                    }`}
                 >
                   {college.name}
                 </button>
