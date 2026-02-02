@@ -98,11 +98,10 @@ const ConsultancyReferralsPage = () => {
       const response = await fetchConsultancyApplications(params)
 
       const appList = response.data  || []
-      const meta = response.pagination || {} // Assuming API returns meta for pagination, or we calculate if not
+      const meta = response.pagination || {}
 
       setApplications(appList)
 
-      // Update pagination based on response, fallback to manual calc if needed
       setPagination(prev => ({
         ...prev,
         totalPages: meta.totalPages || (meta.totalPages) || Math.ceil((meta.totalItems || appList.length) / 10) || 1,
