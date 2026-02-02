@@ -1,12 +1,13 @@
 'use client'
 
 import { ProgressProvider as BProgress } from '@bprogress/next/app'
+import {THEME_BLUE } from "@/constants/constants"
 
 export default function BProgressProvider({ children }) {
     return (
         <BProgress
-            height='4px'
-            color='#387cae'
+            height='2px'
+            color={THEME_BLUE}
             options={{
                 showSpinner: false,
                 easing: 'ease',
