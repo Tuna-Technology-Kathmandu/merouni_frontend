@@ -41,7 +41,7 @@ export default function UserDropdown() {
           Login
         </button>
       </Link>
-      <Link href='/signup'>
+      <Link href='/sign-in?mode=signup'>
         <button className='px-6 py-2.5 bg-white text-[#0A6FA7] border-2 border-[#0A6FA7] rounded-xl font-extrabold hover:bg-blue-50/50 transition-all text-xs sm:text-sm uppercase tracking-widest active:scale-[0.98]'>
           Sign Up
         </button>

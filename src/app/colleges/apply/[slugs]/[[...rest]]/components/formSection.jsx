@@ -195,7 +195,7 @@ const FormSection = ({ id, college }) => {
                 Login Now
               </Button>
             </Link>
-            <Link href='/signup' className='w-full sm:w-auto'>
+            <Link href='/sign-in?mode=signup' className='w-full sm:w-auto'>
               <Button
                 variant='outline'
                 className='w-full min-w-[160px] h-12 text-lg font-semibold border-2 border-[#30ad8f] text-[#30ad8f] hover:bg-[#30ad8f]/10 transition-all'

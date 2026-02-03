@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
 import { DotenvConfig } from '../../../config/env.config'
+import { Modal } from '../../../ui/molecules/Modal'
 
 const SignInPage = ({ defaultMode = 'login' }) => {
   const dispatch = useDispatch()
@@ -44,6 +45,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
   })
   const [errors, setErrors] = useState({})
   const [showPassword, setShowPassword] = useState(false)
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false)
 
   const togglePassword = () => setShowPassword((prev) => !prev)
 
@@ -129,8 +131,15 @@ const SignInPage = ({ defaultMode = 'login' }) => {
           toast.error("Error signing in. Please try again.")
         }
       } else {
-        toast.success('Account created! Please verify your email.')
-        router.push(`/verify-otp?email=${formData.email}`)
+        toast.success('Account created! Please sign in.')
+        setIsLogin(true)
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: formData.email,
+          phoneNo: '',
+          password: ''
+        })
       }
     },
     onError: (error) => {
@@ -229,9 +238,13 @@ const SignInPage = ({ defaultMode = 'login' }) => {
             <div className='flex justify-between items-center ml-1'>
               <label className='text-xs font-bold text-gray-700 uppercase tracking-widest'>Password</label>
               {isLogin && (
-                <Link href="/forgot-password" size="sm" className='text-xs font-bold text-[#0A6FA7] hover:underline'>
+                <button 
+                  type="button"
+                  onClick={() => setIsForgotPasswordOpen(true)}
+                  className='text-xs font-bold text-[#0A6FA7] hover:underline'
+                >
                   Forgot?
-                </Link>
+                </button>
               )}
             </div>
             <div className='relative'>
@@ -275,6 +288,28 @@ const SignInPage = ({ defaultMode = 'login' }) => {
           </button>
         </div>
       </div>
+
+      <Modal
+        isOpen={isForgotPasswordOpen}
+        onClose={() => setIsForgotPasswordOpen(false)}
+        title='Reset Password'
+        className='max-w-md'
+      >
+        <div className='p-6 text-center'>
+          <div className='mb-4 flex justify-center'>
+            <div className='w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center'>
+              <svg className='w-8 h-8 text-[#0A6FA7]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' />
+              </svg>
+            </div>
+          </div>
+          <h3 className='text-xl font-bold text-gray-900 mb-2'>Contact Administrator</h3>
+          <p className='text-gray-600 mb-6'>
+            Please contact the <strong>Mero Uni Admin</strong> to reset your password. Our team will verify your identity and assist you further.
+          </p>
+         
+        </div>
+      </Modal>
     </div>
   )
 }

@@ -46,7 +46,7 @@ export const menuItems = [
         icon: <FaHandshake />,
         label: 'Consultancy Referrals',
         href: '/dashboard/consultancy-referrals',
-        visible: ['admin', 'student']
+        visible: ['admin']
       },
       {
         icon: <HandCoins className='text-xl' />,

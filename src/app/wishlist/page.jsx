@@ -4,7 +4,8 @@ import Navbar from '../../components/Frontpage/Navbar'
 import Header from '../../components/Frontpage/Header'
 import Footer from '../../components/Frontpage/Footer'
 import UniversityCard from './Card'
-import { authFetch } from './authFetch'
+import { authFetch } from '../utils/authFetch'
+import { DotenvConfig } from '../../config/env.config'
 import { getToken } from '../action' // Import the function to get the token
 import { useSelector } from 'react-redux'
 
