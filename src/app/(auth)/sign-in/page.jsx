@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation'
 import { FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa'
 import { v4 as uuidv4 } from 'uuid'
 import { useDispatch } from 'react-redux'
-import { addUser } from '../utils/userSlice'
+import { addUser } from '../../utils/userSlice'
 import { jwtDecode } from 'jwt-decode'
 import Link from 'next/link'
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
-import { DotenvConfig } from '../../config/env.config'
+import { DotenvConfig } from '../../../config/env.config'
 
 const SignInPage = ({ defaultMode = 'login' }) => {
   const dispatch = useDispatch()

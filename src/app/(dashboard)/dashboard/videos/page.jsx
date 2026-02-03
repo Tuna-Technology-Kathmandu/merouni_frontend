@@ -38,7 +38,6 @@ export default function VideoManager() {
       yt_video_link: '',
       description: '',
       featured_image: '',
-      status: 'inactive',
       author: author_id
     }
   })
@@ -86,20 +85,7 @@ export default function VideoManager() {
           </a>
         )
       },
-      {
-        header: 'Status',
-        accessorKey: 'status',
-        cell: ({ getValue }) => (
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${getValue() === 'active'
-              ? 'bg-green-100 text-green-800'
-              : 'bg-gray-100 text-gray-800'
-              }`}
-          >
-            {getValue() ? getValue().charAt(0).toUpperCase() + getValue().slice(1) : 'Inactive'}
-          </span>
-        )
-      },
+
       {
         header: 'Created At',
         accessorKey: 'createdAt',
@@ -271,7 +257,6 @@ export default function VideoManager() {
     setValue('yt_video_link', video.yt_video_link || '')
     setValue('description', video.description || '')
     setValue('featured_image', video.featured_image || '')
-    setValue('status', video.status || 'inactive')
     setUploadedFiles({ featured_image: video.featured_image || '' })
   }
 
@@ -456,16 +441,7 @@ export default function VideoManager() {
                         </span>
                       )}
                     </div>
-                    <div>
-                      <Label>Status</Label>
-                      <Select
-                        {...register('status')}
-                        className='w-full p-2 border rounded'
-                      >
-                        <option value="inactive">Inactive</option>
-                        <option value="active">Active</option>
-                      </Select>
-                    </div>
+
                     <div>
                       <Label>Description</Label>
                       <textarea
@@ -569,17 +545,7 @@ export default function VideoManager() {
               </a>
             </div>
 
-            <div className="md:col-span-2">
-              <h3 className="text-sm font-medium text-gray-500">Status</h3>
-              <span
-                className={`inline-flex mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${viewingVideo?.status === 'active'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-100 text-gray-800'
-                  }`}
-              >
-                {viewingVideo?.status ? viewingVideo.status.charAt(0).toUpperCase() + viewingVideo.status.slice(1) : 'Inactive'}
-              </span>
-            </div>
+
 
             <div className="md:col-span-2">
               <h3 className="text-sm font-medium text-gray-500">Description</h3>

@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { DotenvConfig } from '../../config/env.config'
+import { DotenvConfig } from '../../../config/env.config'
 import Link from 'next/link'
 import { FaArrowLeft } from 'react-icons/fa'
 

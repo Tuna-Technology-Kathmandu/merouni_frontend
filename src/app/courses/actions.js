@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { DotenvConfig } from '../config/env.config'
+import { DotenvConfig } from '@/config/env.config'
 
 export const fetchCourses = async (
   credits = '',

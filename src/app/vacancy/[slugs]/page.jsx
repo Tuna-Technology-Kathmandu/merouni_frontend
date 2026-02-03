@@ -1,14 +1,14 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { getNewsBySlug } from '../../blogs/action'
-import Navbar from '../../../components/Frontpage/Navbar'
-import Footer from '../../../components/Frontpage/Footer'
-import Header from '../../../components/Frontpage/Header'
-import Hero from './components/Hero'
-import Description from './components/Description'
-import Cardlist from './components/Cardlist'
-import Loading from '../../../ui/molecules/Loading'
-import SmallCardList from './components/SmallCardList'
+import { getNewsBySlug } from '@/app/(dashboard)/dashboard/news/action'
+import Navbar from '@/components/Frontpage/Navbar'
+import Footer from '@/components/Frontpage/Footer'
+import Header from '@/components/Frontpage/Header'
+import Hero from '@/app/blogs/[slugs]/components/Hero'
+import Description from '@/app/blogs/[slugs]/components/Description'
+import Cardlist from '@/app/blogs/[slugs]/components/Cardlist'
+import Loading from '@/ui/molecules/Loading'
+import SmallCardList from '@/app/blogs/[slugs]/components/SmallCardList'
 
 const NewsDetailsPage = ({ params }) => {
   const [news, setNews] = useState(null)

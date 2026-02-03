@@ -1,10 +1,12 @@
 'use client'
 import React, { useState } from 'react'
 
+import { DotenvConfig } from '@/config/env.config'
+
 const verifyEmail = () => {
   const [otp, setOtp] = useState('')
-  const baseUrl = process.env.baseUrl
-  const version = process.env.version
+  const baseUrl = DotenvConfig.NEXT_APP_API_BASE_URL
+  
   const handleChange = (e) => {
     setOtp(e.target.value)
   }
@@ -13,7 +15,7 @@ const verifyEmail = () => {
     e.preventDefault()
 
     try {
-      const response = await fetch(`${baseUrl}${version}/auth/verify-email`, {
+      const response = await fetch(`${baseUrl}/auth/verify-email`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -66,7 +68,7 @@ const verifyEmail = () => {
               onChange={(e) => handleChange(e)}
             />
 
-            <button type='button' onClick={handleSubmit}>
+            <button type='submit' className="w-full mt-4 bg-[#0450A4] text-white py-2 rounded-md hover:bg-[#034083] transition-colors">
               Submit
             </button>
           </form>

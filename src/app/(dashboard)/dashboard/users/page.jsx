@@ -38,7 +38,7 @@ export default function UsersManager() {
     password: '',
     phoneNo: '',
     roles: {
-      student: false,
+      student: true,
       editor: false,
       admin: false,
       agent: false,
@@ -324,14 +324,27 @@ export default function UsersManager() {
     }
   }
 
-  const handleRoleToggle = (role) => {
+  const handleRoleChange = (selectedRole) => {
     setFormData({
       ...formData,
       roles: {
-        ...formData.roles,
-        [role]: !formData.roles[role]
+        student: selectedRole === 'student',
+        editor: selectedRole === 'editor',
+        admin: selectedRole === 'admin',
+        agent: selectedRole === 'agent',
+        institution: selectedRole === 'institution'
       }
     })
+  }
+
+  // Get current selected role from object
+  const getSelectedRole = () => {
+    const roles = formData.roles || {}
+    if (roles.admin) return 'admin'
+    if (roles.editor) return 'editor'
+    if (roles.agent) return 'agent'
+    if (roles.institution) return 'institution'
+    return 'student'
   }
 
   // Create columns with handlers (must be after handlers are defined)
@@ -383,6 +396,8 @@ export default function UsersManager() {
               <option value='editor'>Editor</option>
               <option value='admin'>Admin</option>
               <option value='agent'>Partner (Agent)</option>
+              <option value='consultancy'>Consultancy</option>
+              <option value='institution'>Institution (College/School)</option>
             </select>
           </div>
         </div>
@@ -403,7 +418,7 @@ export default function UsersManager() {
                 password: '',
                 phoneNo: '',
                 roles: {
-                  student: false,
+                  student: true,
                   editor: false,
                   admin: false,
                   agent: false,
@@ -549,21 +564,17 @@ export default function UsersManager() {
             <label className='block text-sm font-medium text-gray-700 mb-2'>
               Select Role <span className='text-red-500'>*</span>
             </label>
-            <div className='flex gap-4'>
-              {['student', 'editor', 'admin', 'agent'].map((role) => (
-                <label key={role} className='flex items-center space-x-2'>
-                  <input
-                    type='checkbox'
-                    checked={formData.roles[role] || false}
-                    onChange={() => handleRoleToggle(role)}
-                    className='rounded'
-                  />
-                  <span className='capitalize'>
-                    {role === 'agent' ? 'Partner (Agent)' : role}
-                  </span>
-                </label>
-              ))}
-            </div>
+            <select
+              value={getSelectedRole()}
+              onChange={(e) => handleRoleChange(e.target.value)}
+              className='w-full p-2 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500'
+              required
+            >
+              <option value='student'>Student</option>
+              <option value='editor'>Editor</option>
+              <option value='admin'>Admin</option>
+              <option value='agent'>Partner (Agent)</option>
+            </select>
           </div>
 
           {error && <div className='text-red-500'>{error}</div>}
@@ -585,7 +596,7 @@ export default function UsersManager() {
                   phoneNo: '',
                   password: '',
                   roles: {
-                    student: false,
+                    student: true,
                     editor: false,
                     admin: false,
                     agent: false,

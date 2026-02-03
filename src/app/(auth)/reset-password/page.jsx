@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { FaEye, FaEyeSlash, FaArrowLeft } from 'react-icons/fa'
-import { DotenvConfig } from '../../config/env.config'
+import { DotenvConfig } from '../../../config/env.config'
 import Link from 'next/link'
 
 const ResetPassword = () => {

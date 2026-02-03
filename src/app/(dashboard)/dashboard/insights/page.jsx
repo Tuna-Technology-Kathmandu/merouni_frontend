@@ -2,7 +2,7 @@ import React from 'react'
 import StudentEnrollmentGrowthChart from '../../../../ui/molecules/EnrollmentChart'
 import Announcements from '../../../../ui/molecules/Announcements'
 import Calendar from '../../../../ui/molecules/Calendar'
-import UserCard from '../../../../ui/molecules/UserCard'
+import UserCard from '../../../../ui/molecules/cards/UserCard'
 import Piechart from '../../../../ui/molecules/Piechart'
 import Barchart from '../../../../ui/molecules/Barchart'
 const page = () => {

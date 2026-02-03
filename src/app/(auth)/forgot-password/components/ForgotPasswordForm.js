@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { FaArrowLeft } from 'react-icons/fa'
-import { DotenvConfig } from '../../../config/env.config'
+import { DotenvConfig } from '../../../../config/env.config'
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState('')
