@@ -1,9 +1,8 @@
 'use server'
 
-import { DotenvConfig } from "@/config/env.config"
 
 
-let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline`
+let url = `${process.env.baseUrl}/discipline`
 
 export async function fetchDisciplines(page = 1, limit = 1000) {
     try {

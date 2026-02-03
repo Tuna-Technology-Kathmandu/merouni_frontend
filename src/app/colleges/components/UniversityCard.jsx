@@ -7,7 +7,6 @@ import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { DotenvConfig } from '@/config/env.config'
 
 const UniversityCard = ({
   name,
@@ -43,7 +42,7 @@ const UniversityCard = ({
     try {
       const method = isWishlistPage || isInWishlist ? 'DELETE' : 'POST'
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist`,
+        `${process.env.baseUrl}/wishlist`,
         {
           method,
           headers: {

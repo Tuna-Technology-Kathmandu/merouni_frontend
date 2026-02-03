@@ -1,6 +1,5 @@
 'use client'
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import CreateConsultencyUser from '@/ui/molecules/modals/CreateConsultencyUser'
@@ -81,7 +80,7 @@ export default function ConsultancyForm() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy?page=${page}`
+        `${process.env.baseUrl}/consultancy?page=${page}`
       )
       const data = await response.json()
       setConsultancies(data.items)
@@ -117,7 +116,7 @@ export default function ConsultancyForm() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy?id=${deleteId}`,
+        `${process.env.baseUrl}/consultancy?id=${deleteId}`,
         {
           method: 'DELETE'
         }
@@ -173,7 +172,7 @@ export default function ConsultancyForm() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy?q=${query}`
+        `${process.env.baseUrl}/consultancy?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

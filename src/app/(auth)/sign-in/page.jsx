@@ -10,7 +10,6 @@ import { jwtDecode } from 'jwt-decode'
 import Link from 'next/link'
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
-import { DotenvConfig } from '../../../config/env.config'
 import { Modal } from '../../../ui/molecules/Modal'
 
 const SignInPage = ({ defaultMode = 'login' }) => {
@@ -100,7 +99,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
         }
 
       const response = await axios.post(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}${endpoint}`,
+        `${process.env.baseUrl}${endpoint}`,
         filteredData,
         {
           headers: {

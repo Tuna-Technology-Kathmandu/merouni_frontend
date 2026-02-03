@@ -20,7 +20,6 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '../../../../ui/shadcn/button'
 import { Input } from '../../../../ui/shadcn/input'
 import { Label } from '../../../../ui/shadcn/label'
-import { DotenvConfig } from '@/config/env.config'
 import { formatDate } from '@/utils/date.util'
 
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
@@ -191,7 +190,7 @@ export default function BlogsManager() {
   const fetchTagById = async (tagId) => {
     
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/tag/${tagId}`
+      `${process.env.baseUrl}/tag/${tagId}`
     )
     const data = await response.json()
     return data.item || data
@@ -243,7 +242,7 @@ export default function BlogsManager() {
     searchTimeout.current = setTimeout(async () => {
       try {
         const response = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/tag?q=${query}`
+          `${process.env.baseUrl}/tag?q=${query}`
         )
         const data = await response.json()
         setSearchResults(data.items || [])
@@ -334,7 +333,7 @@ export default function BlogsManager() {
       }
 
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs`,
+        `${process.env.baseUrl}/blogs`,
         {
           method: 'POST',
           headers: {
@@ -363,7 +362,7 @@ export default function BlogsManager() {
         featuredImage: uploadedFiles.featuredImage
       }
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs?id=${id}`,
+        `${process.env.baseUrl}/blogs?id=${id}`,
         {
           method: 'PUT',
           headers: {
@@ -465,7 +464,7 @@ export default function BlogsManager() {
     }
 
     try {
-      let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs?q=${query}`
+      let url = `${process.env.baseUrl}/blogs?q=${query}`
       if (statusFilter && statusFilter !== 'all') {
         url += `&status=${statusFilter}`
       }
@@ -548,7 +547,7 @@ export default function BlogsManager() {
     if (!deleteId) return
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs?id=${deleteId}`,
+        `${process.env.baseUrl}/blogs?id=${deleteId}`,
         {
           method: 'DELETE',
           headers: {
@@ -577,7 +576,7 @@ export default function BlogsManager() {
       setLoadingView(true)
       setViewModalOpen(true)
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs/${slug}`,
+        `${process.env.baseUrl}/blogs/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
       if (!response.ok) {

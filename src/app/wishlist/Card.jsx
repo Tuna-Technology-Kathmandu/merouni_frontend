@@ -5,7 +5,6 @@ import { toast } from 'react-toastify'
 import { getToken } from '../action'
 import { useSelector } from 'react-redux'
 import { authFetch } from '../utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
 const WishlistCollegeCard = ({
   name,
@@ -22,7 +21,7 @@ const WishlistCollegeCard = ({
 
     try {
       const res = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist`,
+        `${process.env.baseUrl}/wishlist`,
         {
           method: 'DELETE',
           headers: {

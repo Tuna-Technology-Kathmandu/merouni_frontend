@@ -2,7 +2,6 @@
 
 import { authFetch } from '@/app/utils/authFetch'
 import { Button } from '@/ui/shadcn/button'
-import { DotenvConfig } from '@/config/env.config'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Edit2, Eye, Trash2, Search } from 'lucide-react'
@@ -184,7 +183,7 @@ export default function NewsManager() {
     try {
       setLoadingColleges(true)
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?limit=1000`
+        `${process.env.baseUrl}/college?limit=1000`
       )
       if (response.ok) {
         const data = await response.json()

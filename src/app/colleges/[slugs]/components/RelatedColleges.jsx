@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { DotenvConfig } from '@/config/env.config'
 
 const RelatedColleges = ({ college }) => {
   const [colleges, setColleges] = useState([])
@@ -21,7 +20,7 @@ const RelatedColleges = ({ college }) => {
     try {
       // Use direct fetch instead of server action to avoid SSR issues
       const response = await fetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?page=1&limit=24`,
+        `${process.env.baseUrl}/college?page=1&limit=24`,
         {
           method: 'GET',
           headers: {

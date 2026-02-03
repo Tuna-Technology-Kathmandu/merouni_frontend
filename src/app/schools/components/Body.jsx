@@ -8,7 +8,6 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { debounce } from 'lodash'
 import Pagination from '@/app/blogs/components/Pagination'
 import { ShimmerCard } from './ShimmerCard'
-import { DotenvConfig } from '@/config/env.config'
 import { buildQueryString } from '@/lib/queryString'
 
 const CollegeFinder = () => {
@@ -85,7 +84,7 @@ const CollegeFinder = () => {
       }
 
       const queryString = buildQueryString(queryParams)
-      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/school?${queryString}`
+      const url = `${process.env.baseUrl}/school?${queryString}`
 
       const response = await fetch(url, { cache: 'no-store' })
 

@@ -7,7 +7,6 @@ import { destr } from 'destr'
 import { Phone, MapPin, Handshake } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { DotenvConfig } from '@/config/env.config'
 import QuickActions from '@/ui/organisms/admin-dashboard/home/QuickActions'
 import AnalyticsCards from '@/ui/organisms/admin-dashboard/home/AnalyticsCards'
 import TopAgentsTable from '@/ui/organisms/admin-dashboard/home/TopAgentsTable'
@@ -41,7 +40,7 @@ const AdminDashboard = () => {
           selectedYears.length > 0
             ? '?' + selectedYears.map((y) => `years=${y}`).join('&')
             : ''
-        const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/analytics/admin-overview${yearsParam}`
+        const url = `${process.env.baseUrl}/analytics/admin-overview${yearsParam}`
 
         const res = await authFetch(url, { cache: 'no-store' })
 
@@ -83,7 +82,7 @@ const AdminDashboard = () => {
       try {
         setTopAgentsLoading(true)
         const res = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/top-agents?limit=5`,
+          `${process.env.baseUrl}/referral/top-agents?limit=5`,
           { cache: 'no-store' }
         )
 
@@ -167,7 +166,7 @@ const StudentDashboard = () => {
         setLoading(true)
         setError(null)
         const res = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/user/referrals`,
+          `${process.env.baseUrl}/referral/user/referrals`,
           { cache: 'no-store' }
         )
 
@@ -207,7 +206,7 @@ const StudentDashboard = () => {
         setWishlistLoading(true)
         setWishlistError(null)
         const res = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist?user_id=${user.id}`,
+          `${process.env.baseUrl}/wishlist?user_id=${user.id}`,
           { cache: 'no-store' }
         )
 
@@ -245,7 +244,7 @@ const StudentDashboard = () => {
         setConsultancyLoading(true)
         setConsultancyError(null)
         const res = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/user/applications`,
+          `${process.env.baseUrl}/consultancy-application/user/applications`,
           { cache: 'no-store' }
         )
 
@@ -612,7 +611,7 @@ const InstitutionDashboard = () => {
         setLoading(true)
         setError(null)
         const res = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/institution/applications`,
+          `${process.env.baseUrl}/referral/institution/applications`,
           { cache: 'no-store' }
         )
 
@@ -689,7 +688,7 @@ const ConsultancyDashboard = () => {
         setLoading(true)
         setError(null)
         const res = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/mine`,
+          `${process.env.baseUrl}/consultancy-application/mine`,
           { cache: 'no-store' }
         )
 

@@ -1,7 +1,6 @@
 // app/actions/userActions.js
 
 import { authFetch } from '../utils/authFetch'
-import { DotenvConfig } from '../../config/env.config'
 
 export async function getUsers(page = 1, token) {
   if (!token) {
@@ -9,7 +8,7 @@ export async function getUsers(page = 1, token) {
   }
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/users?page=${page}`,
+      `${process.env.baseUrl}/users?page=${page}`,
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -43,7 +42,7 @@ export async function getUsers(page = 1, token) {
 export async function createUser(formData) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/auth/register`,
+      `${process.env.baseUrl}/auth/register`,
       {
         method: 'POST',
         headers: {
@@ -62,7 +61,7 @@ export async function createUser(formData) {
 export async function updateUser(userId, formData) {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/users/edit-profile?user_id=${userId}`,
+      `${process.env.baseUrl}/users/edit-profile?user_id=${userId}`,
       {
         method: 'PUT',
         headers: {
@@ -86,7 +85,7 @@ export async function updateUser(userId, formData) {
 export async function deleteUser(userId, userData) {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/users`,
+      `${process.env.baseUrl}/users`,
       {
         method: 'DELETE',
         headers: {

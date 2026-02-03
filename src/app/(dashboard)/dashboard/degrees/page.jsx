@@ -7,7 +7,6 @@ import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/ui/shadcn/button'
 import CreateUpdateDegree from '@/ui/molecules/modals/CreateUpdateDegree'
 import ViewDegree from '@/ui/molecules/modals/ViewDegree'
@@ -51,7 +50,7 @@ export default function DegreePage() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/degree?page=${page}`
+        `${process.env.baseUrl}/degree?page=${page}`
       )
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Failed to fetch degrees')
@@ -95,7 +94,7 @@ export default function DegreePage() {
     }
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/degree?q=${encodeURIComponent(query)}`
+        `${process.env.baseUrl}/degree?q=${encodeURIComponent(query)}`
       )
       const data = await response.json()
       if (response.ok) {
@@ -124,7 +123,7 @@ export default function DegreePage() {
     if (!deleteId) return
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/degree/${deleteId}`,
+        `${process.env.baseUrl}/degree/${deleteId}`,
         { method: 'DELETE' }
       )
       const result = await response.json()

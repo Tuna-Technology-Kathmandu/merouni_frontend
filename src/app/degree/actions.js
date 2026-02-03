@@ -1,8 +1,7 @@
-import { DotenvConfig } from "@/config/env.config"
 
 export const fetchDegrees = async (search = '', page = 1, disciplines = []) => {
   try {
-    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/degree`)
+    const url = new URL(`${process.env.baseUrl}/degree`)
     if (search) url.searchParams.append('q', search)
     if (disciplines && disciplines.length > 0) {
       url.searchParams.append('discipline_id', disciplines.join(','))
@@ -22,7 +21,7 @@ export const fetchDegrees = async (search = '', page = 1, disciplines = []) => {
 
 export const fetchFaculties = async () => {
   try {
-    const response = await fetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/faculty`)
+    const response = await fetch(`${process.env.baseUrl}/faculty`)
     if (!response.ok) throw new Error('Failed to fetch faculties')
     const data = await response.json()
     return data.items
@@ -36,7 +35,7 @@ export const getPrograms = async (searchQuery = '') => {
   try {
     const queryParams = new URLSearchParams()
     if (searchQuery) queryParams.append('q', searchQuery)
-    const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?${queryParams.toString()}`
+    const url = `${process.env.baseUrl}/program?${queryParams.toString()}`
     const response = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
@@ -55,7 +54,7 @@ export const getDiscipline = async (searchQuery = '') => {
   try {
     const queryParams = new URLSearchParams()
     if (searchQuery) queryParams.append('q', searchQuery)
-    const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline?${queryParams.toString()}`
+    const url = `${process.env.baseUrl}/discipline?${queryParams.toString()}`
     const response = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
@@ -72,7 +71,7 @@ export const getDiscipline = async (searchQuery = '') => {
 
 export const fetchLevels = async () => {
   try {
-    const response = await fetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/level`)
+    const response = await fetch(`${process.env.baseUrl}/level`)
     if (!response.ok) throw new Error('Failed to fetch levels')
     const data = await response.json()
     return data.items
@@ -85,7 +84,7 @@ export const fetchLevels = async () => {
 export const getDegreeBySlug = async (slug) => {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/degree/${encodeURIComponent(slug)}`,
+      `${process.env.baseUrl}/degree/${encodeURIComponent(slug)}`,
       {
         method: 'GET',
         headers: {
@@ -107,7 +106,7 @@ export const getDegreeBySlug = async (slug) => {
 export const getCourseBySlug = async (slug) => {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/course/${slug}`,
+      `${process.env.baseUrl}/course/${slug}`,
       {
         method: 'GET',
         headers: {

@@ -1,7 +1,6 @@
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
-const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/news`
+const url = `${process.env.baseUrl}/news`
 
 export async function fetchNews(page = 1, search = '') {
     try {

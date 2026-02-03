@@ -1,9 +1,8 @@
 // app/actions/scholarship.js
 
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
-let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/scholarship`
+let url = `${process.env.baseUrl}/scholarship`
 
 export async function getAllScholarships(page) {
   try {
@@ -63,7 +62,7 @@ export async function deleteScholarship(id) {
 export async function getScholarshipApplications(scholarshipId, page = 1) {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/scholarship-application?scholarshipId=${scholarshipId}&page=${page}&limit=10`,
+      `${process.env.baseUrl}/scholarship-application?scholarshipId=${scholarshipId}&page=${page}&limit=10`,
       {
         cache: 'no-store'
       }

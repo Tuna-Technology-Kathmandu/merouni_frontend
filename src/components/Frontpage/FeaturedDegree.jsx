@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { DotenvConfig } from '../../config/env.config'
 import { toast } from 'react-toastify'
 
 const FeaturedDegree = () => {
@@ -11,7 +10,7 @@ const FeaturedDegree = () => {
     try {
       setLoading(true)
       const response = await fetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/degree?page=1&limit=6`
+        `${process.env.baseUrl}/degree?page=1&limit=6`
       )
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Failed to fetch degrees')

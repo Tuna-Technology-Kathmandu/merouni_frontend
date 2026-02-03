@@ -1,9 +1,8 @@
 import { authFetch } from '../utils/authFetch'
-import { DotenvConfig } from '../../config/env.config'
 
 export async function getContacts(page = 1, status = 'all', query = '') {
     try {
-        let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/contact-us?page=${page}`
+        let url = `${process.env.baseUrl}/contact-us?page=${page}`
         if (status !== 'all') {
             url += `&status=${status}`
         }
@@ -51,7 +50,7 @@ export async function updateContact(id, data) {
         if (!token) throw new Error('No authentication token provided')
 
         const response = await authFetch(
-            `${DotenvConfig.NEXT_APP_API_BASE_URL}/contact-us/update-status?id=${id}`,
+            `${process.env.baseUrl}/contact-us/update-status?id=${id}`,
             {
                 method: 'PATCH',
                 headers: {
@@ -79,7 +78,7 @@ export async function deleteContact(id) {
         if (!token) throw new Error('No authentication token provided')
 
         const response = await authFetch(
-            `${DotenvConfig.NEXT_APP_API_BASE_URL}/contact-us/${id}`,
+            `${process.env.baseUrl}/contact-us/${id}`,
             {
                 method: 'DELETE',
                 headers: {

@@ -33,7 +33,6 @@ import { TbBrandGoogleAnalytics } from 'react-icons/tb'
 import { FaHandshake } from 'react-icons/fa'
 import { MdBackHand } from 'react-icons/md'
 import { VscReferences } from 'react-icons/vsc'
-import { DotenvConfig } from '@/config/env.config'
 
 const menuItems = [
   {
@@ -196,7 +195,7 @@ const Menu = ({ isCollapsed = false }) => {
   const handleLogout = async () => {
     try {
       const response = await fetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/auth/logout`,
+        `${process.env.baseUrl}/auth/logout`,
         {
           method: 'POST',
           credentials: 'include'

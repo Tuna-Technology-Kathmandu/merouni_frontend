@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/ui/shadcn/button'
 
 const CONFIG_TYPE_REFERRAL_POINT = 'referral_point'
@@ -36,7 +35,7 @@ export default function SetReferralPointPage() {
     setLoading(true)
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/config/${CONFIG_TYPE_REFERRAL_POINT}`
+        `${process.env.baseUrl}/config/${CONFIG_TYPE_REFERRAL_POINT}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -58,7 +57,7 @@ export default function SetReferralPointPage() {
     try {
       setSubmitting(true)
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/config`,
+        `${process.env.baseUrl}/config`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

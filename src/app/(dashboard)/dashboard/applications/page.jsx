@@ -5,7 +5,6 @@ import { authFetch } from '@/app/utils/authFetch'
 import { FaEdit, FaTrashAlt } from 'react-icons/fa'
 import { Modal } from '../../../../ui/molecules/Modal'
 import ShimmerEffect from '../../../../ui/molecules/ShimmerEffect'
-import { DotenvConfig } from '@/config/env.config'
 
 import { useSelector } from 'react-redux'
 import { destr } from 'destr'
@@ -37,8 +36,8 @@ const ApplicationsPage = () => {
       setError(null)
       
       const endpoint = isConsultancy 
-        ? `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/mine`
-        : `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/institution/applications`
+        ? `${process.env.baseUrl}/consultancy-application/mine`
+        : `${process.env.baseUrl}/referral/institution/applications`
 
       const res = await authFetch(endpoint, { cache: 'no-store' })
 
@@ -82,8 +81,8 @@ const ApplicationsPage = () => {
       setUpdatingId(selectedApplication.id)
       
       const endpoint = isConsultancy
-        ? `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/${selectedApplication.id}/status`
-        : `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/${selectedApplication.id}/status`
+        ? `${process.env.baseUrl}/consultancy-application/${selectedApplication.id}/status`
+        : `${process.env.baseUrl}/referral/${selectedApplication.id}/status`
 
       const response = await authFetch(endpoint, {
         method: isConsultancy ? 'PATCH' : 'PATCH', // Both use PATCH
@@ -119,8 +118,8 @@ const ApplicationsPage = () => {
       setDeletingId(id)
       
       const endpoint = isConsultancy
-        ? `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/${id}`
-        : `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/${id}`
+        ? `${process.env.baseUrl}/consultancy-application/${id}`
+        : `${process.env.baseUrl}/referral/${id}`
 
       const response = await authFetch(endpoint, {
         method: 'DELETE'

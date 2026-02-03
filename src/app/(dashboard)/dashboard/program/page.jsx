@@ -1,6 +1,5 @@
 'use client'
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Button } from '@/ui/shadcn/button'
@@ -62,7 +61,7 @@ export default function ProgramForm() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?page=${page}`
+        `${process.env.baseUrl}/program?page=${page}`
       )
       const data = await response.json()
       setPrograms(data.items)
@@ -110,7 +109,7 @@ export default function ProgramForm() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/program/${deleteId}`,
+        `${process.env.baseUrl}/program/${deleteId}`,
         {
           method: 'DELETE'
         }
@@ -151,7 +150,7 @@ export default function ProgramForm() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?q=${query}`
+        `${process.env.baseUrl}/program?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

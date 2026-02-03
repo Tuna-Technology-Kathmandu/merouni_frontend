@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Search, Plus, Trash2, X, UserPlus, Building2 } from 'lucide-react'
-import { DotenvConfig } from '@/config/env.config'
 
 const page = () => {
   const { setHeading } = usePageHeading()
@@ -26,7 +25,7 @@ const page = () => {
 
     try {
       const response = await fetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${query}`
+        `${process.env.baseUrl}/college?q=${query}`
       )
       const data = await response.json()
       setSearchResults(data.items || [])
@@ -141,7 +140,7 @@ const page = () => {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/agent-apply`,
+        `${process.env.baseUrl}/referral/agent-apply`,
         {
           method: 'POST',
           headers: {

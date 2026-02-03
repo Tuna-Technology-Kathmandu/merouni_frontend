@@ -1,10 +1,9 @@
 import { authFetch } from '../utils/authFetch'
-import { DotenvConfig } from '../../config/env.config'
 
 export async function getSiteConfig(params = {}) {
     try {
         const query = new URLSearchParams(params).toString()
-        const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/config${query ? `?${query}` : ''}`
+        const url = `${process.env.baseUrl}/config${query ? `?${query}` : ''}`
 
         const response = await authFetch(url, {
             cache: 'no-store'
@@ -26,7 +25,7 @@ export async function updateSiteConfig(data) {
         const token = localStorage.getItem('access_token')
         if (!token) throw new Error('No authentication token provided')
 
-        const response = await authFetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/config`, {
+        const response = await authFetch(`${process.env.baseUrl}/config`, {
             method: 'POST', // Assuming POST for creating/updating config as getting started
             headers: {
                 'Content-Type': 'application/json',
@@ -51,7 +50,7 @@ export async function deleteSiteConfig(type) {
         const token = localStorage.getItem('access_token')
         if (!token) throw new Error('No authentication token provided')
 
-        const response = await authFetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/config/${type}`, {
+        const response = await authFetch(`${process.env.baseUrl}/config/${type}`, {
             method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${token}`
@@ -71,7 +70,7 @@ export async function deleteSiteConfig(type) {
 
 export async function getConfigByType(type) {
     try {
-        const response = await fetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/config/${type}`, {
+        const response = await fetch(`${process.env.baseUrl}/config/${type}`, {
             cache: 'no-store'
         })
 

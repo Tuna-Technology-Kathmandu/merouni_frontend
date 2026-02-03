@@ -1,8 +1,7 @@
-import { DotenvConfig } from "@/config/env.config"
 
 export async function getExams(page = 1, search = '', examType = '', level = '', affiliation = '', faculty = '') {
   try {
-    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/exam`)
+    const url = new URL(`${process.env.baseUrl}/exam`)
     url.searchParams.append('page', page)
     url.searchParams.append('limit', 15)
 
@@ -32,7 +31,7 @@ export async function getExams(page = 1, search = '', examType = '', level = '',
 
 export const fetchFaculties = async () => {
   try {
-    const response = await fetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/faculty`)
+    const response = await fetch(`${process.env.baseUrl}/faculty`)
     if (!response.ok) throw new Error('Failed to fetch faculties')
     const data = await response.json()
     return data.items
@@ -44,7 +43,7 @@ export const fetchFaculties = async () => {
 
 export const fetchLevels = async () => {
   try {
-    const response = await fetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/level`)
+    const response = await fetch(`${process.env.baseUrl}/level`)
     if (!response.ok) throw new Error('Failed to fetch levels')
     const data = await response.json()
     return data.items
@@ -56,7 +55,7 @@ export const fetchLevels = async () => {
 
 export const fetchUniversities = async () => {
   try {
-    const response = await fetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/university`)
+    const response = await fetch(`${process.env.baseUrl}/university`)
     if (!response.ok) throw new Error('Failed to fetch universities')
     const data = await response.json()
     return data.items

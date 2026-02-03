@@ -7,7 +7,6 @@ import { Modal } from '@/ui/molecules/Modal'
 import { Button } from '@/ui/shadcn/button'
 import FileUpload from '@/app/(dashboard)/dashboard/addCollege/FileUpload'
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { Textarea } from '@/ui/shadcn/textarea'
@@ -45,7 +44,7 @@ export default function CreateUpdateDegree({
         // Fetch disciplines
         const fetchDisciplines = async () => {
             try {
-                const response = await authFetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline`)
+                const response = await authFetch(`${process.env.baseUrl}/discipline`)
                 const data = await response.json()
                 if (response.ok) {
                     setAllDisciplines(data.items || [])
@@ -105,7 +104,7 @@ export default function CreateUpdateDegree({
     const onSubmit = async (data) => {
         try {
             setSubmitting(true)
-            const baseUrl = DotenvConfig.NEXT_APP_API_BASE_URL
+            const baseUrl = process.env.baseUrl
             const payload = {
                 featured_image: data.featured_image?.trim() || null,
                 short_name: data.short_name.trim(),

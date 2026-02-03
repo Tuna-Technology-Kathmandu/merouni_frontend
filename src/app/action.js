@@ -1,7 +1,6 @@
 'use server'
 
 import { buildQueryString } from '@/lib/queryString'
-import { DotenvConfig } from '../config/env.config'
 import services from './apiService'
 
 // const cookieStore = await
@@ -104,7 +103,7 @@ export async function getEvents(page, limit = 10) {
     limit
   }
   const queryString = new URLSearchParams(params).toString()
-  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/event?${queryString}`
+  const url = `${process.env.baseUrl}/event?${queryString}`
   const response = await fetch(url, {
     cache: 'no-store'
   })
@@ -121,7 +120,7 @@ export async function getBlogs(page, category_title = '', search = '') {
     category_title,
     q: search
   }
-  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/blogs?${new URLSearchParams(params).toString()}`
+  const url = `${process.env.baseUrl}/blogs?${new URLSearchParams(params).toString()}`
   const response = await fetch(url, {
     cache: 'no-store'
   })
@@ -148,7 +147,7 @@ export async function getVacancies(page, category_title, search) {
     q: search
   }
   // This likely needs authFetch or similar fix if authFetch is missing
-  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy?limit=10&page=${page}`
+  const url = `${process.env.baseUrl}/vacancy?limit=10&page=${page}`
   const response = await fetch(url, { cache: 'no-store' })
   if (!response.ok) {
     return { items: [], pagination: { totalCount: 0 } }
@@ -165,7 +164,7 @@ export async function getNews(page, category_title, search) {
     category_title
   }
   const queryString = buildQueryString(queryParams)
-  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/news?${queryString}`
+  const url = `${process.env.baseUrl}/news?${queryString}`
 
   const response = await fetch(url, { cache: 'no-store' })
   if (!response.ok) {
@@ -217,7 +216,7 @@ export async function getColleges(
     pinned
   })
 
-  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college${
+  const url = `${process.env.baseUrl}/college${
     query ? `?${query}` : ''
   }`
 
@@ -256,7 +255,7 @@ export async function getFilteredPinFeatColleges(
     pinned
   })
 
-  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college${
+  const url = `${process.env.baseUrl}/college${
     query ? `?${query}` : ''
   }`
 
@@ -277,7 +276,7 @@ export async function getExams(limit, page) {
     page
   })
 
-  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/exam${
+  const url = `${process.env.baseUrl}/exam${
     query ? `?${query}` : ''
   }`
 
@@ -293,7 +292,7 @@ export async function getExams(limit, page) {
 export async function getBannerById(id) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/banner/${id}`,
+      `${process.env.baseUrl}/banner/${id}`,
       {
         method: 'GET',
         headers: {
@@ -319,7 +318,7 @@ export async function getBannerById(id) {
 
 export async function getCategories(queryParams = {}) {
   const queryString = new URLSearchParams(queryParams).toString()
-  const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/category${queryString ? `?${queryString}` : ''}`
+  const url = `${process.env.baseUrl}/category${queryString ? `?${queryString}` : ''}`
   const response = await fetch(url, {
     cache: 'no-store'
   })

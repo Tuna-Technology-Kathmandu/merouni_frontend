@@ -1,11 +1,10 @@
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
 export async function fetchConsultancyApplications(params = {}) {
   try {
     const query = new URLSearchParams(params).toString()
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/all?${query}`,
+      `${process.env.baseUrl}/consultancy-application/all?${query}`,
       { cache: 'no-store' }
     )
     if (!response.ok) {
@@ -20,7 +19,7 @@ export async function fetchConsultancyApplications(params = {}) {
 
 export async function fetchAllConsultancies() {
   try {
-    const response = await authFetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy`, { cache: 'no-store' })
+    const response = await authFetch(`${process.env.baseUrl}/consultancy`, { cache: 'no-store' })
     if (response.ok) return await response.json()
   } catch (error) {
     console.error('Error fetching consultancies:', error)
@@ -31,7 +30,7 @@ export async function fetchAllConsultancies() {
 export async function updateConsultancyApplicationStatus(id, status, remarks = null) {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/${id}/status`,
+      `${process.env.baseUrl}/consultancy-application/${id}/status`,
       {
         method: 'PATCH',
         headers: {
@@ -55,7 +54,7 @@ export async function updateConsultancyApplicationStatus(id, status, remarks = n
 export async function deleteConsultancyApplication(id) {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/${id}`,
+      `${process.env.baseUrl}/consultancy-application/${id}`,
       {
         method: 'DELETE'
       }

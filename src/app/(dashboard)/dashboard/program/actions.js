@@ -1,10 +1,9 @@
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
 export const fetchFaculties = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/faculty${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${process.env.baseUrl}/faculty${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
 
     if (!response.ok) {
@@ -22,7 +21,7 @@ export const fetchFaculties = async (searchQuery = '') => {
 export const fetchLevel = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/level${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${process.env.baseUrl}/level${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch level')
@@ -39,7 +38,7 @@ export const fetchLevel = async (searchQuery = '') => {
 export const fetchCourse = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/course${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${process.env.baseUrl}/course${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
 
     if (!response.ok) {
@@ -57,7 +56,7 @@ export const fetchCourse = async (searchQuery = '') => {
 export const fetchScholarship = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/scholarship${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${process.env.baseUrl}/scholarship${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
 
     if (!response.ok) {
@@ -76,7 +75,7 @@ export const fetchScholarship = async (searchQuery = '') => {
 export const fetchExam = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/exam${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${process.env.baseUrl}/exam${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
 
     if (!response.ok) {
@@ -94,7 +93,7 @@ export const fetchExam = async (searchQuery = '') => {
 export const fetchDegrees = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/degree${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : '?limit=100'}`
+      `${process.env.baseUrl}/degree${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : '?limit=100'}`
     )
     if (!response.ok) throw new Error('Failed to fetch degrees')
     const data = await response.json()

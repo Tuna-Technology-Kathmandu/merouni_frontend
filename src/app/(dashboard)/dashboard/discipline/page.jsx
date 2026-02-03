@@ -8,7 +8,6 @@ import Table from '../../../../ui/molecules/Table'
 import { fetchDisciplines } from './action'
 
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import CreateUpdateDiscipline from '@/ui/molecules/modals/CreateUpdateDiscipline'
 import { formatDate } from '@/utils/date.util'
@@ -155,7 +154,7 @@ export default function DisciplineManager() {
         if (!deleteId) return
         try {
             const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline/${deleteId}`,
+                `${process.env.baseUrl}/discipline/${deleteId}`,
                 {
                     method: 'DELETE',
                     headers: {
@@ -187,7 +186,7 @@ export default function DisciplineManager() {
 
         try {
             const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline?q=${query}`
+                `${process.env.baseUrl}/discipline?q=${query}`
             )
             if (response.ok) {
                 const data = await response.json()

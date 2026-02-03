@@ -1,9 +1,8 @@
 import { authFetch } from "@/app/utils/authFetch"
-import { DotenvConfig } from "@/config/env.config"
 
 export async function applyToConsultancy({ payload }) {
   const response = await authFetch(
-    `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/apply`,
+    `${process.env.baseUrl}/consultancy-application/apply`,
     {
       method: 'POST',
       headers: {

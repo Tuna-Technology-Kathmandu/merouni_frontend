@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { Search, ChevronDown } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
 /**
  * FacultyDropdown - A searchable dropdown component for selecting faculties
@@ -35,7 +34,7 @@ const FacultyDropdown = ({
                 setLoading(true)
                 // Adjust endpoint limit if needed, defaulting to a reasonably high number
                 const response = await authFetch(
-                    `${DotenvConfig.NEXT_APP_API_BASE_URL}/faculty?limit=500`,
+                    `${process.env.baseUrl}/faculty?limit=500`,
                     { cache: 'no-store' }
                 )
                 if (response.ok) {

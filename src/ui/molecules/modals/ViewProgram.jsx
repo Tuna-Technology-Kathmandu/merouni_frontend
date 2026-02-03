@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { Modal } from '@/ui/molecules/Modal'
 import { Button } from '@/ui/shadcn/button'
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 import { toast } from 'react-toastify'
 
 const ViewProgram = ({ isOpen, onClose, slug }) => {
@@ -22,7 +21,7 @@ const ViewProgram = ({ isOpen, onClose, slug }) => {
         setViewLoading(true)
         try {
             const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/program/${slug}`
+                `${process.env.baseUrl}/program/${slug}`
             )
             if (!response.ok) throw new Error('Failed to fetch program')
             const program = await response.json()

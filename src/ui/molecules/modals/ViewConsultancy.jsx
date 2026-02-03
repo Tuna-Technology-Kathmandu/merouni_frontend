@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import { Modal } from '@/ui/molecules/Modal'
 import { Globe, MapPin } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 import { toast } from 'react-toastify'
 
 export default function ViewConsultancy({ isOpen, onClose, slug }) {
@@ -23,7 +22,7 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
         setLoading(true)
         try {
             const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy/${slug}`,
+                `${process.env.baseUrl}/consultancy/${slug}`,
                 { headers: { 'Content-Type': 'application/json' } }
             )
 

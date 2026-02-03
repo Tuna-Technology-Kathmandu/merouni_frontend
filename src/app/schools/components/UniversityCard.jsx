@@ -4,7 +4,6 @@ import { toast } from 'react-toastify'
 import { useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
 const UniversityCard = ({
   name,
@@ -28,7 +27,7 @@ const UniversityCard = ({
   const checkWishlistStatus = async () => {
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist?user_id=${user.id}`,
+        `${process.env.baseUrl}/wishlist?user_id=${user.id}`,
         {
           method: 'GET',
           headers: {
@@ -63,7 +62,7 @@ const UniversityCard = ({
     try {
       const method = isWishlistPage || isInWishlist ? 'DELETE' : 'POST'
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist`,
+        `${process.env.baseUrl}/wishlist`,
         {
           method,
           headers: {

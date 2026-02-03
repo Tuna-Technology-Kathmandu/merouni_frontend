@@ -1,4 +1,3 @@
-import { DotenvConfig } from '@/config/env.config'
 
 export async function getVacancies(page = 1, searchQuery = '') {
   try {
@@ -9,7 +8,7 @@ export async function getVacancies(page = 1, searchQuery = '') {
     })
 
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy?${queryParams.toString()}`,
+      `${process.env.baseUrl}/vacancy?${queryParams.toString()}`,
       {
         method: 'GET',
         headers: {
@@ -33,7 +32,7 @@ export async function getVacancies(page = 1, searchQuery = '') {
 export async function getVacancy(slug) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/vacancy/${slug}`,
+      `${process.env.baseUrl}/vacancy/${slug}`,
       {
         method: 'GET',
         headers: {

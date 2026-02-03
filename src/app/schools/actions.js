@@ -1,10 +1,9 @@
 'use server'
-import { DotenvConfig } from '../../config/env.config'
 
 export async function getSchools(page = 1, sort = 'ASC') {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/school?page=${page}&sort=${sort}&limit=24`,
+      `${process.env.baseUrl}/school?page=${page}&sort=${sort}&limit=24`,
       {
         cache: 'no-store'
       }
@@ -51,7 +50,7 @@ export async function getSchools(page = 1, sort = 'ASC') {
 export async function searchSchools(query, page = 1) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/school/search?q=${encodeURIComponent(query)}&page=${page}&limit=24`,
+      `${process.env.baseUrl}/school/search?q=${encodeURIComponent(query)}&page=${page}&limit=24`,
       {
         cache: 'no-store'
       }
@@ -109,7 +108,7 @@ export async function getSchoolBySlug(slug) {
   try {
 
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/school/${slug}`,
+      `${process.env.baseUrl}/school/${slug}`,
       {
         method: 'GET',
         headers: {

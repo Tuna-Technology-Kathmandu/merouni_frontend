@@ -9,7 +9,6 @@ import { Checkbox } from '@/ui/shadcn/checkbox'
 import { Plus, Trash2, X } from 'lucide-react'
 import FileUpload from '@/app/(dashboard)/dashboard/addCollege/FileUpload'
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 import { toast } from 'react-toastify'
 import dynamic from 'next/dynamic'
 import { useSelector } from 'react-redux'
@@ -76,7 +75,7 @@ export default function EditConsultancyPage() {
     try {
       setLoading(true)
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy/me`
+        `${process.env.baseUrl}/consultancy/me`
       )
       
       if (!response.ok) {
@@ -188,7 +187,7 @@ export default function EditConsultancyPage() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/course?q=${query}`
+        `${process.env.baseUrl}/course?q=${query}`
       )
       const data = await response.json()
       setSearchResults(data.items || [])
@@ -269,7 +268,7 @@ export default function EditConsultancyPage() {
       // otherwise fallback to general endpoint with ID.
       // Assuming PUT to /consultancy/my-consultancy updates the user's consultancy.
       
-      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy`
+      const url = `${process.env.baseUrl}/consultancy`
       
       const response = await authFetch(url, {
         method: 'POST',

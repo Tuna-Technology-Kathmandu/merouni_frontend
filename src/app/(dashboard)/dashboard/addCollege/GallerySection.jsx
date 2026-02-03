@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
-import { DotenvConfig } from '@/config/env.config'
 
 const GallerySection = ({
   control,
@@ -31,7 +30,7 @@ const GallerySection = ({
         formData.append('authorId', '1')
 
         const response = await axios.post(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/media/upload`,
+          `${process.env.baseUrl}/media/upload`,
           formData,
           { headers: { 'Content-Type': 'multipart/form-data' } }
         )

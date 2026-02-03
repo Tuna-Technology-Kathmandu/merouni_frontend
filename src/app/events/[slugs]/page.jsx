@@ -1,6 +1,5 @@
 'use client'
 import Banner from '@/app/blogs/[slugs]/components/Banner'
-import { DotenvConfig } from '@/config/env.config'
 import { useEffect, useState } from 'react'
 import Footer from '../../../components/Frontpage/Footer'
 import Header from '../../../components/Frontpage/Header'
@@ -14,7 +13,7 @@ import Hero from './components/Hero'
 const fetchEventBySlug = async (slug) => {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/${slug}`,
+      `${process.env.baseUrl}/event/${slug}`,
       {
         method: 'GET',
         headers: {
@@ -38,7 +37,7 @@ const fetchEventBySlug = async (slug) => {
 const fetchRelatedEvents = async () => {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event`,
+      `${process.env.baseUrl}/event`,
       {
         method: 'GET',
         headers: {

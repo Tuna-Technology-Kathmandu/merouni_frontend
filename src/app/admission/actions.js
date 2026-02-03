@@ -1,8 +1,7 @@
-import { DotenvConfig } from "@/config/env.config"
 
 export async function getAdmission(search = '', page = 1, program = '') {
   try {
-    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/college/admission`)
+    const url = new URL(`${process.env.baseUrl}/college/admission`)
     url.searchParams.append('q', search)
     url.searchParams.append('page', page)
     url.searchParams.append('limit', 15)
@@ -45,7 +44,7 @@ export async function getAdmission(search = '', page = 1, program = '') {
 
 export async function fetchPrograms() {
   try {
-    const response = await fetch(`${DotenvConfig.NEXT_APP_API_BASE_URL}/program?limit=100`)
+    const response = await fetch(`${process.env.baseUrl}/program?limit=100`)
     if (!response.ok) throw new Error('Failed to fetch programs')
     const data = await response.json()
     return data.items

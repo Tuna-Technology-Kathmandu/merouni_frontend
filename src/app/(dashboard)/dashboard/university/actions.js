@@ -1,10 +1,9 @@
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
 export async function getUniversities(page = 1) {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/university`,
+      `${process.env.baseUrl}/university`,
       {
         cache: 'no-store'
       }
@@ -19,7 +18,7 @@ export async function getUniversities(page = 1) {
 export async function createUniversity(data) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/university`,
+      `${process.env.baseUrl}/university`,
       {
         method: 'POST',
         headers: {
@@ -37,7 +36,7 @@ export async function createUniversity(data) {
 export async function updateUniversity(id, data) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/university?university_id=${id}`,
+      `${process.env.baseUrl}/university?university_id=${id}`,
       {
         method: 'PUT',
         headers: {
@@ -55,7 +54,7 @@ export async function updateUniversity(id, data) {
 export async function deleteUniversity(id) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/university?university_id=${id}`,
+      `${process.env.baseUrl}/university?university_id=${id}`,
       {
         method: 'DELETE'
       }
@@ -70,7 +69,7 @@ export async function deleteUniversity(id) {
 export const fetchLevel = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/level${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${process.env.baseUrl}/level${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch level')
@@ -86,7 +85,7 @@ export const fetchLevel = async (searchQuery = '') => {
 export const fetchAllCourse = async () => {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?limit=100`
+      `${process.env.baseUrl}/program?limit=100`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch courses')

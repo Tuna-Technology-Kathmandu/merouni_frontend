@@ -1,9 +1,8 @@
-import { DotenvConfig } from '@/config/env.config'
 
 export async function getProgramBySlug(slug) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/program/${encodeURIComponent(slug)}`,
+      `${process.env.baseUrl}/program/${encodeURIComponent(slug)}`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },

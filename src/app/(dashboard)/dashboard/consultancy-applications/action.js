@@ -1,10 +1,9 @@
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
 export async function fetchConsultancyApplications() {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/all`,
+      `${process.env.baseUrl}/consultancy-application/all`,
       { cache: 'no-store' }
     )
     if (!response.ok) {
@@ -20,7 +19,7 @@ export async function fetchConsultancyApplications() {
 export async function updateApplicationStatus(id, status, remarks = null) {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/${id}/status`,
+      `${process.env.baseUrl}/consultancy-application/${id}/status`,
       {
         method: 'PATCH',
         headers: {

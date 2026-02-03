@@ -17,7 +17,6 @@ import Loading from '../../../../ui/molecules/Loading'
 import Table from '../../../../ui/molecules/Table'
 import { createColumns } from './columns'
 import ExportModal from './ExportModal'
-import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/ui/shadcn/button'
 
 export default function UsersManager() {
@@ -74,7 +73,7 @@ export default function UsersManager() {
       setLoading(true)
 
       // Build URL with role filter if not 'all'
-      let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/users?page=${page}`
+      let url = `${process.env.baseUrl}/users?page=${page}`
       if (selectedUserType !== 'all') {
         url += `&role=${selectedUserType}`
       }
@@ -120,7 +119,7 @@ export default function UsersManager() {
       const token = localStorage.getItem('access_token')
 
       // Build URL with search query and role filter
-      let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/users?q=${query}`
+      let url = `${process.env.baseUrl}/users?q=${query}`
       if (selectedUserType !== 'all') {
         url += `&role=${selectedUserType}`
       }

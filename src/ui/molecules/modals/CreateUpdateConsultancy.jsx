@@ -10,7 +10,6 @@ import { Checkbox } from '@/ui/shadcn/checkbox'
 import { Plus, Trash2, X } from 'lucide-react'
 import FileUpload from '@/app/(dashboard)/dashboard/addCollege/FileUpload' // Adjust path if needed
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 import { toast } from 'react-toastify'
 import dynamic from 'next/dynamic'
 
@@ -183,7 +182,7 @@ export default function CreateUpdateConsultancy({
 
         try {
             const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/course?q=${query}`
+                `${process.env.baseUrl}/course?q=${query}`
             )
             const data = await response.json()
             setSearchResults(data.items || [])
@@ -256,7 +255,7 @@ export default function CreateUpdateConsultancy({
                 payload.id = initialData.id
             }
 
-            const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy`
+            const url = `${process.env.baseUrl}/consultancy`
             const method = 'POST' // Same endpoint for create and update based on payload ID? Yes as per old code
 
             const response = await authFetch(url, {

@@ -15,7 +15,6 @@ import {
   fetchAllUniversity,
   getUniversityBySlug
 } from '../addCollege/actions'
-import { DotenvConfig } from '@/config/env.config'
 import { Upload } from 'lucide-react'
 
 const CKUni = dynamic(() => import('../component/CKUni'), {
@@ -62,7 +61,7 @@ const FileUploadWithPreview = ({
 
     try {
       const response = await axios.post(
-        `${DotenvConfig.NEXT_APP_MEDIA_BASE_URL}/media/upload`,
+        `${process.env.mediaUrl}/media/upload`,
         formData,
         {
           headers: {
@@ -302,7 +301,7 @@ const EditCollegePage = () => {
     try {
       setLoading(true)
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/institution/my-college`,
+        `${process.env.baseUrl}/college/institution/my-college`,
         { headers: { 'Content-Type': 'application/json' } }
       )
 
@@ -562,7 +561,7 @@ const EditCollegePage = () => {
       data.author_id = author_id
 
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/institution/my-college`,
+        `${process.env.baseUrl}/college/institution/my-college`,
         {
           method: 'PUT',
           headers: {

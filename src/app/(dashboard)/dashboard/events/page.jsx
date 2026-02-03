@@ -5,7 +5,6 @@ import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { Select } from '@/ui/shadcn/select'
-import { DotenvConfig } from '@/config/env.config'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Edit2, Eye, MapPin, Search, Trash2, X } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -134,7 +133,7 @@ export default function EventManager() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${query}`
+        `${process.env.baseUrl}/college?q=${query}`
       )
       const data = await response.json()
       setSearchResults(data.items || [])
@@ -176,7 +175,7 @@ export default function EventManager() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/event?q=${query}`
+        `${process.env.baseUrl}/event?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -257,7 +256,7 @@ export default function EventManager() {
       }
       // Use the same endpoint for both create and update
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/event`,
+        `${process.env.baseUrl}/event`,
         {
           method: 'POST',
           headers: {
@@ -299,7 +298,7 @@ export default function EventManager() {
       setLoading(true)
       setIsOpen(true)
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/${data.slugs}`,
+        `${process.env.baseUrl}/event/${data.slugs}`,
         {
           headers: {
             'Content-Type': 'application/json'
@@ -327,7 +326,7 @@ export default function EventManager() {
 
       if (eventData?.college) {
         const response = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${eventData.college.slugs}`
+          `${process.env.baseUrl}/college?q=${eventData.college.slugs}`
         )
         const collegeData = await response.json()
         const collegeId = collegeData.items[0]?.id
@@ -390,7 +389,7 @@ export default function EventManager() {
     if (!deleteId) return
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/event?event_id=${deleteId}`,
+        `${process.env.baseUrl}/event?event_id=${deleteId}`,
         {
           method: 'DELETE',
           headers: {
@@ -423,7 +422,7 @@ export default function EventManager() {
       setLoadingView(true)
       setViewModalOpen(true)
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/${slug}`,
+        `${process.env.baseUrl}/event/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
       if (!response.ok) {

@@ -10,7 +10,6 @@ import { useDispatch, useSelector } from 'react-redux'
 // Icons
 import { menuItems } from '@/constants/menuList'
 import { ChevronDown, ChevronRight } from 'lucide-react'
-import { DotenvConfig } from '@/config/env.config'
 
 
 const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
@@ -52,7 +51,7 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
 
     try {
       const response = await fetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/auth/logout`,
+        `${process.env.baseUrl}/auth/logout`,
         {
           method: 'POST',
           credentials: 'include'

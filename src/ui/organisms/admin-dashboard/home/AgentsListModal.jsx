@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import Table from '@/ui/molecules/Table'
 import { Modal } from '@/ui/molecules/Modal'
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
 const AgentsListModal = ({ isOpen, onClose }) => {
     const [agents, setAgents] = useState([])
@@ -20,7 +19,7 @@ const AgentsListModal = ({ isOpen, onClose }) => {
         setLoading(true)
         try {
             const res = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/top-agents?limit=100`,
+                `${process.env.baseUrl}/referral/top-agents?limit=100`,
                 { cache: 'no-store' }
             )
             if (res.ok) {

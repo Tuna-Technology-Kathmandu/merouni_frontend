@@ -6,7 +6,6 @@ import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
 import { useRouter } from 'next/navigation'
-import { DotenvConfig } from '@/config/env.config'
 
 /**
  * Reusable college card. Accepts either a `college` object or flat props.
@@ -67,7 +66,7 @@ const CollegeCard = ({
   const checkWishlistStatus = async () => {
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist?user_id=${user.id}`,
+        `${process.env.baseUrl}/wishlist?user_id=${user.id}`,
         { method: 'GET', headers: { 'Content-Type': 'application/json' } }
       )
       if (!response.ok) return
@@ -95,7 +94,7 @@ const CollegeCard = ({
     try {
       const method = isInWishlist ? 'DELETE' : 'POST'
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist`,
+        `${process.env.baseUrl}/wishlist`,
         {
           method,
           headers: { 'Content-Type': 'application/json' },

@@ -1,5 +1,4 @@
 'use client'
-import { DotenvConfig } from '@/config/env.config'
 import { useState } from 'react'
 
 export default function ExportModal({ isOpen, onClose }) {
@@ -43,7 +42,7 @@ export default function ExportModal({ isOpen, onClose }) {
       }
 
       const response = await fetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/users/export?${queryParams}`,
+        `${process.env.baseUrl}/users/export?${queryParams}`,
         { method: 'GET' }
       )
 

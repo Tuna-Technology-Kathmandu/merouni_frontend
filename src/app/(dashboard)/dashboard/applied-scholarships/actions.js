@@ -1,5 +1,4 @@
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
 export const fetchStudentScholarshipApplications = async (query = {}) => {
   try {
@@ -9,7 +8,7 @@ export const fetchStudentScholarshipApplications = async (query = {}) => {
     if (query.limit) queryParams.append('limit', query.limit)
     if (query.status) queryParams.append('status', query.status)
 
-    const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/scholarship-application/my-applications${queryParams.toString() ? '?' + queryParams.toString() : ''}`
+    const url = `${process.env.baseUrl}/scholarship-application/my-applications${queryParams.toString() ? '?' + queryParams.toString() : ''}`
 
     const response = await authFetch(url, {
       cache: 'no-store'
@@ -31,7 +30,7 @@ export const deleteScholarshipApplication = async (applicationId) => {
   try {
     const { authFetch } = await import('@/app/utils/authFetch')
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/scholarship-application/${applicationId}`,
+      `${process.env.baseUrl}/scholarship-application/${applicationId}`,
       {
         method: 'DELETE',
         cache: 'no-store'

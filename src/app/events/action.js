@@ -1,11 +1,10 @@
 'use server'
 
-import { DotenvConfig } from '@/config/env.config'
 
 export async function getEvents(page = 1) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event?page=${page}&limit=9`,
+      `${process.env.baseUrl}/event?page=${page}&limit=9`,
       {
         method: 'GET',
         headers: {
@@ -28,7 +27,7 @@ export async function getEvents(page = 1) {
 export async function getThisWeekEvents() {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/this-week`,
+      `${process.env.baseUrl}/event/this-week`,
       {
         method: 'GET',
         headers: {
@@ -51,7 +50,7 @@ export async function getThisWeekEvents() {
 export async function getNextWeekEvents() {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/next-month`,
+      `${process.env.baseUrl}/event/next-month`,
       {
         method: 'GET',
         headers: {
@@ -74,7 +73,7 @@ export async function getNextWeekEvents() {
 export async function getEventBySlug(slug) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/${slug}`,
+      `${process.env.baseUrl}/event/${slug}`,
       {
         method: 'GET',
         headers: {
@@ -98,7 +97,7 @@ export async function getEventBySlug(slug) {
 export async function getRelatedEvents() {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event`,
+      `${process.env.baseUrl}/event`,
       {
         method: 'GET',
         headers: {
@@ -122,7 +121,7 @@ export async function getRelatedEvents() {
 
 export async function getUnexpiredEvents() {
   try {
-    const apiUrl = `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/unexpired?limit=999`
+    const apiUrl = `${process.env.baseUrl}/event/unexpired?limit=100`
 
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -146,7 +145,7 @@ export async function getUnexpiredEvents() {
 
 export const fetchEvents = async (page = 1, collegeId = '') => {
   try {
-    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event`)
+    const url = new URL(`${process.env.baseUrl}/event`)
     url.searchParams.append('page', page)
     url.searchParams.append('limit', 12)
     if (collegeId) {
@@ -173,7 +172,7 @@ export const fetchEvents = async (page = 1, collegeId = '') => {
 
 export const searchEvent = async (query, collegeId = '') => {
   try {
-    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event`)
+    const url = new URL(`${process.env.baseUrl}/event`)
     url.searchParams.append('q', query)
     if (collegeId) {
       url.searchParams.append('college_id', collegeId)
@@ -200,7 +199,7 @@ export const searchEvent = async (query, collegeId = '') => {
 
 export const fetchThisWeekEvents = async (collegeId = '') => {
   try {
-    const url = new URL(`${DotenvConfig.NEXT_APP_API_BASE_URL}/event/this-week`)
+    const url = new URL(`${process.env.baseUrl}/event/this-week`)
     if (collegeId) url.searchParams.append('college_id', collegeId)
 
     const response = await fetch(url.toString(), {
@@ -224,7 +223,7 @@ export const fetchThisWeekEvents = async (collegeId = '') => {
 export const fetchNextWeekEvents = async (collegeId = '') => {
   try {
     const url = new URL(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/next-month`
+      `${process.env.baseUrl}/event/next-month`
     )
     if (collegeId) url.searchParams.append('college_id', collegeId)
 

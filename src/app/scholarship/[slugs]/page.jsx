@@ -17,7 +17,6 @@ import Navbar from '../../../components/Frontpage/Navbar'
 import Loading from '../../../ui/molecules/Loading'
 import EmptyState from '@/ui/shadcn/EmptyState'
 import { getScholarshipBySlug } from '../actions'
-import { DotenvConfig } from '@/config/env.config'
 
 const ScholarshipDetailsPage = ({ params }) => {
   const router = useRouter()

@@ -10,7 +10,6 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { DotenvConfig } from '../../config/env.config'
 
 const SearchBox = ({ onClose }) => {
   const popularSearches = [
@@ -49,7 +48,7 @@ const SearchBox = ({ onClose }) => {
     setIsLoading(true)
     try {
       const response = await fetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/search?q=${encodeURIComponent(query)}`
+        `${process.env.baseUrl}/search?q=${encodeURIComponent(query)}`
       )
       if (response.ok) {
         const data = await response.json()

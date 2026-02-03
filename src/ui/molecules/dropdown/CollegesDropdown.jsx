@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { Search, ChevronDown } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
 /**
  * CollegesDropdown - A searchable dropdown component for selecting colleges
@@ -34,7 +33,7 @@ const CollegesDropdown = ({
       try {
         setLoading(true)
         const response = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?limit=1000`,
+          `${process.env.baseUrl}/college?limit=1000`,
           { cache: 'no-store' }
         )
         if (response.ok) {

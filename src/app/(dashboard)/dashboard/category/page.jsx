@@ -13,7 +13,6 @@ import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { Modal } from '../../../../ui/molecules/Modal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/ui/shadcn/button'
 
 export default function CategoryManager() {
@@ -124,7 +123,7 @@ export default function CategoryManager() {
   const createCategory = async (data) => {
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/category`,
+        `${process.env.baseUrl}/category`,
         {
           method: 'POST',
           headers: {
@@ -146,7 +145,7 @@ export default function CategoryManager() {
   const updateCategory = async (data, id) => {
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/category?category_id=${id}`,
+        `${process.env.baseUrl}/category?category_id=${id}`,
         {
           method: 'PUT',
           headers: {
@@ -209,7 +208,7 @@ export default function CategoryManager() {
     try {
 
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/category?category_id=${deleteId}`,
+        `${process.env.baseUrl}/category?category_id=${deleteId}`,
         {
           method: 'DELETE',
           headers: {
@@ -241,7 +240,7 @@ export default function CategoryManager() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/category?q=${query}`
+        `${process.env.baseUrl}/category?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

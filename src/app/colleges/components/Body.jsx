@@ -11,7 +11,6 @@ import UniversityCardShimmer from './UniversityShimmerCard'
 import Pagination from '@/app/blogs/components/Pagination'
 import CollegeCard from '@/ui/molecules/cards/CollegeCard'
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 import { DistrictLists } from '@/constants/district'
 
 // Client-side fetch functions
@@ -29,7 +28,7 @@ const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
       type: filters.type || []
     }
 
-    const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/filter?${queryParams.toString()}`
+    const url = `${process.env.baseUrl}/college/filter?${queryParams.toString()}`
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -72,7 +71,7 @@ const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
 const searchColleges = async (query) => {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${encodeURIComponent(query)}`,
+      `${process.env.baseUrl}/college?q=${encodeURIComponent(query)}`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
@@ -122,7 +121,7 @@ const getPrograms = async (searchQuery = '') => {
   try {
     const queryParams = new URLSearchParams()
     if (searchQuery) queryParams.append('q', searchQuery)
-    const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?${queryParams.toString()}`
+    const url = `${process.env.baseUrl}/program?${queryParams.toString()}`
     const response = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
@@ -141,7 +140,7 @@ const getUniversity = async (searchQuery = '') => {
   try {
     const queryParams = new URLSearchParams()
     if (searchQuery) queryParams.append('q', searchQuery)
-    const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/university?${queryParams.toString()}`
+    const url = `${process.env.baseUrl}/university?${queryParams.toString()}`
     const response = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
@@ -273,7 +272,7 @@ const CollegeFinder = () => {
       if (!user?.id) return setWishlistCollegeIds(new Set())
       try {
         const response = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist?user_id=${user.id}`
+          `${process.env.baseUrl}/wishlist?user_id=${user.id}`
         )
         if (response.ok) {
           const data = await response.json()

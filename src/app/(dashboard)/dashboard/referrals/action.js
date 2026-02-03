@@ -1,5 +1,4 @@
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
 export async function fetchReferrals(page = 1, isStudent = false) {
   try {
@@ -9,7 +8,7 @@ export async function fetchReferrals(page = 1, isStudent = false) {
       : `/referral?page=${page}`
     
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}${endpoint}`,
+      `${process.env.baseUrl}${endpoint}`,
       { cache: 'no-store' }
     )
     if (!response.ok) {
@@ -28,7 +27,7 @@ export async function fetchReferrals(page = 1, isStudent = false) {
 export async function updateReferralStatus(id, status, remarks = null) {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/${id}/status`,
+      `${process.env.baseUrl}/referral/${id}/status`,
       {
         method: 'PATCH',
         headers: {
@@ -52,7 +51,7 @@ export async function updateReferralStatus(id, status, remarks = null) {
 export async function deleteReferral(id) {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/${id}`,
+      `${process.env.baseUrl}/referral/${id}`,
       {
         method: 'DELETE'
       }

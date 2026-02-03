@@ -1,9 +1,8 @@
 'use server'
 
-import { DotenvConfig } from "@/config/env.config"
 
 
-let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/video`
+let url = `${process.env.baseUrl}/video`
 
 export async function fetchVideos(page = 1, limit = 1000, search = '') {
   try {

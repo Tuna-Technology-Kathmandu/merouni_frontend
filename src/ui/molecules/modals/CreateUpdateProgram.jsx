@@ -5,7 +5,6 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import { Modal } from '@/ui/molecules/Modal'
 import { Button } from '@/ui/shadcn/button'
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
 import dynamic from 'next/dynamic'
@@ -130,7 +129,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
         setLoading(true)
         try {
             const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/program/${slug}`
+                `${process.env.baseUrl}/program/${slug}`
             )
             if (!response.ok) throw new Error('Failed to fetch program details')
             const program = await response.json()
@@ -255,7 +254,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                 }))
             }
 
-            const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/program`
+            const url = `${process.env.baseUrl}/program`
             const method = 'POST' // Always POST for create/update logic (handled by backend or if ID is present?)
             // Check original code: it was always POST to /program. 
             // Wait, update usually needs PUT. The original code used POST to /program even for edits?
@@ -268,7 +267,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
             // Usually update is PUT /program/:id.
             // Let me check existing `onSubmit` in `page.jsx`.
             /*
-              const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/program`
+              const url = `${process.env.baseUrl}/program`
               const method = 'POST'
             */
             // It seems it was always POST. I will stick to the original implementation to be safe, but it's suspicious for "Edit".

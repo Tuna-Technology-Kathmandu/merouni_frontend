@@ -2,7 +2,6 @@ import { Upload, X, FileText, Loader2 } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-toastify'
 import axios from 'axios'
-import { DotenvConfig } from '@/config/env.config'
 import { Label } from '@/ui/shadcn/label'
 import { cn } from '@/app/lib/utils'
 
@@ -57,7 +56,7 @@ const FileUpload = ({
 
     try {
       const response = await axios.post(
-        `${DotenvConfig.NEXT_APP_MEDIA_BASE_URL}/media/upload`,
+        `${process.env.mediaUrl}/media/upload`,
         formData,
         {
           headers: {

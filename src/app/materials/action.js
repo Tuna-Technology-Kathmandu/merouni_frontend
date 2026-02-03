@@ -1,6 +1,5 @@
 'use server'
 
-import { DotenvConfig } from "@/config/env.config"
 
 export async function getMaterialsByCategory(
   page = 1,
@@ -8,7 +7,7 @@ export async function getMaterialsByCategory(
   categoryId = null
 ) {
   try {
-    let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/material/category?page=${page}&limit=12`
+    let url = `${process.env.baseUrl}/material/category?page=${page}&limit=12`
     if (search) {
       url += `&q=${encodeURIComponent(search)}`
     }
@@ -44,7 +43,7 @@ export async function getMaterialsByCategory(
 export async function getMaterialCategories() {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/material-category?page=1&limit=100`,
+      `${process.env.baseUrl}/material-category?page=1&limit=100`,
       {
         method: 'GET',
         headers: {

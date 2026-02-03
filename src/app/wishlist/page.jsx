@@ -5,7 +5,6 @@ import Header from '../../components/Frontpage/Header'
 import Footer from '../../components/Frontpage/Footer'
 import UniversityCard from './Card'
 import { authFetch } from '../utils/authFetch'
-import { DotenvConfig } from '../../config/env.config'
 import { getToken } from '../action' // Import the function to get the token
 import { useSelector } from 'react-redux'
 
@@ -22,7 +21,7 @@ const WishlistPage = () => {
       setLoading(true)
       try {
         const response = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/wishlist?user_id=${user.id}`
+          `${process.env.baseUrl}/wishlist?user_id=${user.id}`
         )
         const data = await response.json()
         setWishlist(data.items || [])

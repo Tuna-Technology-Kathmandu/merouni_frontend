@@ -1,9 +1,8 @@
 'use server'
 
-import { DotenvConfig } from "@/config/env.config"
 
 
-let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/category`
+let url = `${process.env.baseUrl}/category`
 
 export async function fetchCategories(page = 1, limit = 1000) {
   try {

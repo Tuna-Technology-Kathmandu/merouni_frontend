@@ -76,7 +76,7 @@ const ApplyFormSection = ({ id, college }) => {
     setLoading(true)
     try {
       const response = await fetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/self-apply`,
+        `${process.env.baseUrl}/referral/self-apply`,
         {
           method: 'POST',
           headers: {

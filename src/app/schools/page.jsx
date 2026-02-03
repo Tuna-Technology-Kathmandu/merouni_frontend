@@ -1,5 +1,4 @@
 'use client'
-import { DotenvConfig } from '../../config/env.config'
 
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'

@@ -15,7 +15,6 @@ import { toast, ToastContainer } from 'react-toastify'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Modal } from '../../../../ui/molecules/Modal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { DotenvConfig } from '@/config/env.config'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { Button } from '@/ui/shadcn/button'
 import ViewFaculty from '@/ui/molecules/modals/ViewFaculty'
@@ -218,7 +217,7 @@ export default function FacultyManager() {
     }
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/faculty?q=${query}`
+        `${process.env.baseUrl}/faculty?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

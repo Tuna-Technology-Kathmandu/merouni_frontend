@@ -1,4 +1,3 @@
-import { DotenvConfig } from '@/config/env.config'
 import { useEffect, useState } from 'react'
 import Marquee from 'react-fast-marquee'
 
@@ -14,7 +13,7 @@ const Sponsors = () => {
       try {
         // Use direct fetch instead of server action to avoid SSR issues
         const response = await fetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/banner?page=1&limit=100`,
+          `${process.env.baseUrl}/banner?page=1&limit=100`,
           {
             method: 'GET',
             headers: {

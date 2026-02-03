@@ -1,9 +1,8 @@
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
 export const fetchStudentConsultancyApplications = async () => {
   try {
-    const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy-application/user/applications`
+    const url = `${process.env.baseUrl}/consultancy-application/user/applications`
 
     const response = await authFetch(url, {
       cache: 'no-store'

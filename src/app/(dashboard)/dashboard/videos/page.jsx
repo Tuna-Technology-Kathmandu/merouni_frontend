@@ -13,7 +13,6 @@ import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { Modal } from '@/ui/molecules/Modal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/ui/shadcn/button'
 import FileUpload from '../addCollege/FileUpload'
 import { Label } from '@/ui/shadcn/label'
@@ -171,7 +170,7 @@ export default function VideoManager() {
   const createVideo = async (data) => {
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/video`,
+        `${process.env.baseUrl}/video`,
         {
           method: 'POST',
           headers: {
@@ -194,7 +193,7 @@ export default function VideoManager() {
   const updateVideo = async (data, id) => {
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/video/${id}`,
+        `${process.env.baseUrl}/video/${id}`,
         {
           method: 'PUT',
           headers: {
@@ -269,7 +268,7 @@ export default function VideoManager() {
     if (!deleteId) return
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/video/${deleteId}`,
+        `${process.env.baseUrl}/video/${deleteId}`,
         {
           method: 'DELETE',
           headers: {
@@ -301,7 +300,7 @@ export default function VideoManager() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/video?q=${query}`
+        `${process.env.baseUrl}/video?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

@@ -18,7 +18,6 @@ import { Input } from '../../../../ui/shadcn/input'
 import { Label } from '../../../../ui/shadcn/label'
 import { Dialog, DialogHeader, DialogTitle } from '../../../../ui/shadcn/dialog'
 import { Modal } from '../../../../ui/molecules/Modal'
-import { DotenvConfig } from '@/config/env.config'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
@@ -130,7 +129,7 @@ export default function CourseForm() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/course?page=${page}`
+        `${process.env.baseUrl}/course?page=${page}`
       )
       const data = await response.json()
       setCourses(data.items)
@@ -171,7 +170,7 @@ export default function CourseForm() {
   const onSubmit = async (data) => {
     setSubmitting(true)
     try {
-      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/course`
+      const url = `${process.env.baseUrl}/course`
       const method = 'POST'
 
       // Convert syllabus to array if it's a string
@@ -214,7 +213,7 @@ export default function CourseForm() {
       setIsOpen(true)
 
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/course/${slug}`
+        `${process.env.baseUrl}/course/${slug}`
       )
       const course = await response.json()
 
@@ -276,7 +275,7 @@ export default function CourseForm() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/course?id=${deleteId}`,
+        `${process.env.baseUrl}/course?id=${deleteId}`,
         {
           method: 'DELETE'
         }
@@ -297,7 +296,7 @@ export default function CourseForm() {
       setLoadingView(true)
       setViewModalOpen(true)
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/course/${slug}`,
+        `${process.env.baseUrl}/course/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
       if (!response.ok) {
@@ -374,7 +373,7 @@ export default function CourseForm() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/course?q=${query}`
+        `${process.env.baseUrl}/course?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

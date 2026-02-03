@@ -19,7 +19,6 @@ import { Button } from '../../../../ui/shadcn/button'
 import { Input } from '../../../../ui/shadcn/input'
 import { Label } from '../../../../ui/shadcn/label'
 import { Select } from '../../../../ui/shadcn/select'
-import { DotenvConfig } from '@/config/env.config'
 const CKExam = dynamic(() => import('../component/CKExam'), {
   ssr: false
 })
@@ -303,7 +302,7 @@ export default function ExamManager() {
     }
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/exam?q=${query}`
+        `${process.env.baseUrl}/exam?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

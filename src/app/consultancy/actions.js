@@ -1,8 +1,7 @@
-import { DotenvConfig } from "@/config/env.config"
 
 export async function getConsultancies(page = 1, searchQuery = '', courseId = '') {
   try {
-    let url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy?page=${page}&sort=desc&q=${searchQuery}&limit=15`
+    let url = `${process.env.baseUrl}/consultancy?page=${page}&sort=desc&q=${searchQuery}&limit=15`
     if (courseId) {
       url += `&courseId=${courseId}`
     }
@@ -30,7 +29,7 @@ export async function getConsultancies(page = 1, searchQuery = '', courseId = ''
 export async function getConsultancyBySlug(slugs) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/consultancy/${slugs}`,
+      `${process.env.baseUrl}/consultancy/${slugs}`,
       {
         method: 'GET',
         headers: {
@@ -54,7 +53,7 @@ export async function getConsultancyBySlug(slugs) {
 export async function getCourses() {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?limit=100`,
+      `${process.env.baseUrl}/program?limit=100`,
       {
         method: 'GET',
         headers: {

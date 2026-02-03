@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react'
 import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import ShimmerEffect from '@/ui/molecules/ShimmerEffect'
-import { DotenvConfig } from '@/config/env.config'
 import {
   Building2,
   Mail,
@@ -33,7 +32,7 @@ const ReferedStudentsPage = () => {
         setLoading(true)
         setError(null)
         const response = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/referral/user/referrals`,
+          `${process.env.baseUrl}/referral/user/referrals`,
           { cache: 'no-store' }
         )
 

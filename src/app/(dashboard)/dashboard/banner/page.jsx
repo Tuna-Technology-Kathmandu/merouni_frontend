@@ -8,7 +8,6 @@ import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { DotenvConfig } from '@/config/env.config'
 
 export default function BannerForm() {
   const { setHeading } = usePageHeading()
@@ -77,7 +76,7 @@ export default function BannerForm() {
   const fetchBannersByPosition = async () => {
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/banner`
+        `${process.env.baseUrl}/banner`
       )
       const data = await response.json()
       const grouped = {}
@@ -125,7 +124,7 @@ export default function BannerForm() {
     searchTimeoutRef.current = setTimeout(async () => {
       try {
         const response = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${query}`
+          `${process.env.baseUrl}/college?q=${query}`
         )
         const data = await response.json()
         setSearchResults(data.items || [])
@@ -175,7 +174,7 @@ export default function BannerForm() {
         })
       }
 
-      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/banner`
+      const url = `${process.env.baseUrl}/banner`
       const method = editing ? 'PUT' : 'POST'
 
       await authFetch(editing ? `${url}/${editId}` : url, {
@@ -294,7 +293,7 @@ export default function BannerForm() {
 
     try {
       await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/banner/${deleteId}`,
+        `${process.env.baseUrl}/banner/${deleteId}`,
         { method: 'DELETE' }
       )
       toast.success('Banner deleted successfully')

@@ -7,7 +7,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { apiAuth } from '../../app/utils/agentverify'
-import { DotenvConfig } from '../../config/env.config'
 import { usePageHeading } from '../../contexts/PageHeadingContext'
 import { FaUserCircle, FaUser, FaSignOutAlt } from 'react-icons/fa'
 import { removeUser } from '../../app/utils/userSlice'
@@ -60,7 +59,7 @@ const AdminNavbar = () => {
     setLoading(true)
     try {
       const response = await apiAuth(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/users/apply-agent`,
+        `${process.env.baseUrl}/users/apply-agent`,
         {
           method: 'PUT',
           headers: {
@@ -107,7 +106,7 @@ const AdminNavbar = () => {
 
     try {
       const response = await fetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/auth/logout`,
+        `${process.env.baseUrl}/auth/logout`,
         {
           method: 'POST',
           credentials: 'include'

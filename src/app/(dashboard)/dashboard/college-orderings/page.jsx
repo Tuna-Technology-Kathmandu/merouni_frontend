@@ -4,7 +4,6 @@ import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
 import ShimmerEffect from '@/ui/molecules/ShimmerEffect'
-import { DotenvConfig } from '@/config/env.config'
 import {
   DndContext,
   closestCenter,
@@ -114,7 +113,7 @@ const CollegeOrderingsPage = () => {
 
       while (hasMore) {
         const response = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?page=${currentPage}&limit=${limit}`
+          `${process.env.baseUrl}/college?page=${currentPage}&limit=${limit}`
         )
 
         if (!response.ok) {
@@ -178,7 +177,7 @@ const CollegeOrderingsPage = () => {
     try {
       setSaving(true)
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/order`,
+        `${process.env.baseUrl}/college/order`,
         {
           method: 'PUT',
           headers: {

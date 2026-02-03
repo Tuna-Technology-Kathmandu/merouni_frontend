@@ -13,7 +13,6 @@ import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { Modal } from '@/ui/molecules/Modal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/ui/shadcn/button'
 import FileUpload from '../addCollege/FileUpload'
 import { Label } from '@/ui/shadcn/label'
@@ -185,7 +184,7 @@ export default function SkillsCoursesManager() {
     const createCourse = async (data) => {
         try {
             const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/skills-based-courses`,
+                `${process.env.baseUrl}/skills-based-courses`,
                 {
                     method: 'POST',
                     headers: {
@@ -208,7 +207,7 @@ export default function SkillsCoursesManager() {
     const updateCourse = async (data, id) => {
         try {
             const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/skills-based-courses/${id}`,
+                `${process.env.baseUrl}/skills-based-courses/${id}`,
                 {
                     method: 'PUT',
                     headers: {
@@ -288,7 +287,7 @@ export default function SkillsCoursesManager() {
         if (!deleteId) return
         try {
             const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/skills-based-courses/${deleteId}`,
+                `${process.env.baseUrl}/skills-based-courses/${deleteId}`,
                 {
                     method: 'DELETE',
                     headers: {
@@ -320,7 +319,7 @@ export default function SkillsCoursesManager() {
 
         try {
             const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/skills-based-courses?q=${query}`
+                `${process.env.baseUrl}/skills-based-courses?q=${query}`
             )
             if (response.ok) {
                 const data = await response.json()

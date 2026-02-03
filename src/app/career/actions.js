@@ -1,4 +1,3 @@
-import { DotenvConfig } from "@/config/env.config"
 
 export async function getCareers(page = 1, searchQuery = '', collegeId = '') {
   try {
@@ -13,7 +12,7 @@ export async function getCareers(page = 1, searchQuery = '', collegeId = '') {
     }
 
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/career?${queryParams.toString()}`,
+      `${process.env.baseUrl}/career?${queryParams.toString()}`,
       {
         method: 'GET',
         headers: {
@@ -37,7 +36,7 @@ export async function getCareers(page = 1, searchQuery = '', collegeId = '') {
 export async function getCareer(slug) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/career/${slug}`,
+      `${process.env.baseUrl}/career/${slug}`,
       {
         method: 'GET',
         headers: {

@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { DotenvConfig } from '@/config/env.config'
 
 export const fetchCourses = async (
   credits = '',
@@ -17,7 +16,7 @@ export const fetchCourses = async (
     if (debouncedSearch) params.q = debouncedSearch
 
     const response = await axios.get(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/course?limit=12`,
+      `${process.env.baseUrl}/course?limit=12`,
       { params }
     )
 

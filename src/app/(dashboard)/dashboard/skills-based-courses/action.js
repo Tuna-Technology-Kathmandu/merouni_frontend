@@ -1,8 +1,7 @@
 'use server'
 
-import { DotenvConfig } from "@/config/env.config"
 
-const API_URL = `${DotenvConfig.NEXT_APP_API_BASE_URL}/skills-based-courses`
+const API_URL = `${process.env.baseUrl}/skills-based-courses`
 
 export async function fetchSkillsCourses(page = 1, limit = 10) {
     try {

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import { DotenvConfig } from '../../config/env.config'
 import CollegeCard from '@/ui/molecules/cards/CollegeCard'
 
 const FeaturedAdmission = () => {
@@ -17,7 +16,7 @@ const FeaturedAdmission = () => {
   const fetchItems = async () => {
     try {
       // Use direct fetch instead of server action to avoid SSR issues and ensure correct API URL
-      const apiUrl = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?pinned=true&page=1&limit=6`
+      const apiUrl = `${process.env.baseUrl}/college?pinned=true&page=1&limit=6`
 
     
 

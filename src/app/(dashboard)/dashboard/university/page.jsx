@@ -22,7 +22,6 @@ import { fetchAllCourse } from './actions'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import GallerySection from './GallerySection'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { DotenvConfig } from '@/config/env.config'
 import { Button } from '../../../../ui/shadcn/button'
 import { Input } from '../../../../ui/shadcn/input'
 import { Label } from '../../../../ui/shadcn/label'
@@ -169,7 +168,7 @@ export default function UniversityForm() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/university?page=${page}`
+        `${process.env.baseUrl}/university?page=${page}`
       )
       const data = await response.json()
       setUniversities(data.items)
@@ -234,7 +233,7 @@ export default function UniversityForm() {
         }
       }
 
-      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/university`
+      const url = `${process.env.baseUrl}/university`
       const method = 'POST'
       const response = await authFetch(url, {
         method,
@@ -268,7 +267,7 @@ export default function UniversityForm() {
       setIsOpen(true)
 
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/university/${slugs}`
+        `${process.env.baseUrl}/university/${slugs}`
       )
       const data = await response.json()
       const university = data
@@ -359,7 +358,7 @@ export default function UniversityForm() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/university?id=${deleteId}`,
+        `${process.env.baseUrl}/university?id=${deleteId}`,
         {
           method: 'DELETE',
           headers: {
@@ -384,7 +383,7 @@ export default function UniversityForm() {
       setViewModalOpen(true)
 
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/university/${slug}`,
+        `${process.env.baseUrl}/university/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
 
@@ -422,7 +421,7 @@ export default function UniversityForm() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/university?q=${query}`
+        `${process.env.baseUrl}/university?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

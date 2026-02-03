@@ -7,7 +7,6 @@ import { Label } from '@/ui/shadcn/label'
 import { Eye, EyeOff } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
-import { DotenvConfig } from '@/config/env.config'
 
 export default function CreateConsultencyUser({
     isOpen,
@@ -94,7 +93,7 @@ export default function CreateConsultencyUser({
             delete payload.emailName
 
             const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/users/consultancy-credentials`,
+                `${process.env.baseUrl}/users/consultancy-credentials`,
                 {
                     method: 'POST',
                     headers: {

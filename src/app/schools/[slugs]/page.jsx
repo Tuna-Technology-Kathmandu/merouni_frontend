@@ -1,6 +1,5 @@
 'use client'
 
-import { DotenvConfig } from '@/config/env.config'
 import { useEffect, useState } from 'react'
 import Footer from '../../../components/Frontpage/Footer'
 import Header from '../../../components/Frontpage/Header'
@@ -115,7 +114,7 @@ const SchoolDetailPage = ({ params }) => {
 
     try {
       const response = await fetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/school/${slugs}`,
+        `${process.env.baseUrl}/school/${slugs}`,
         {
           method: 'GET',
           headers: {

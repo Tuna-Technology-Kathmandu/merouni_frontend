@@ -14,7 +14,6 @@ import {
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
-import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
@@ -93,7 +92,7 @@ const ProfileUpdate = () => {
     setIsLoading(true)
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/users/edit-profile?user_id=${userData.id}`,
+        `${process.env.baseUrl}/users/edit-profile?user_id=${userData.id}`,
         {
           method: 'PUT',
           body: JSON.stringify({
@@ -139,7 +138,7 @@ const ProfileUpdate = () => {
     setIsLoading(true)
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/users/edit-profile?user_id=${userData.id}`,
+        `${process.env.baseUrl}/users/edit-profile?user_id=${userData.id}`,
         {
           method: 'PUT',
           body: JSON.stringify({

@@ -10,7 +10,6 @@ import { Label } from '@/ui/shadcn/label'
 import { Select } from '@/ui/shadcn/select'
 import FileUpload from '@/app/(dashboard)/dashboard/addCollege/FileUpload'
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
 export default function CreateUpdateDiscipline({
     isOpen,
@@ -62,7 +61,7 @@ export default function CreateUpdateDiscipline({
     const createDiscipline = async (data) => {
         try {
             const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline`,
+                `${process.env.baseUrl}/discipline`,
                 {
                     method: 'POST',
                     headers: {
@@ -84,7 +83,7 @@ export default function CreateUpdateDiscipline({
     const updateDiscipline = async (data, id) => {
         try {
             const response = await authFetch(
-                `${DotenvConfig.NEXT_APP_API_BASE_URL}/discipline?discipline_id=${id}`,
+                `${process.env.baseUrl}/discipline?discipline_id=${id}`,
                 {
                     method: 'PUT',
                     headers: {

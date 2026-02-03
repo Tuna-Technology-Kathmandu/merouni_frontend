@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { DotenvConfig } from '../../config/env.config'
 import { ChevronLeft, ChevronRight, GraduationCap } from 'lucide-react'
 
 const CollegeRankings = () => {
@@ -43,7 +42,7 @@ const CollegeRankings = () => {
     try {
       setLoading(true)
       const response = await fetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college-ranking?limit=100`,
+        `${process.env.baseUrl}/college-ranking?limit=100`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },

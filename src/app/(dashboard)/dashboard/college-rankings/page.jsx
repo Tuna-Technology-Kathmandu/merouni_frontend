@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { DotenvConfig } from '@/config/env.config'
 import { Edit2, Trash2, Plus, GripVertical, X, ChevronDown } from 'lucide-react'
 import { Modal } from '../../../../ui/molecules/Modal'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
@@ -33,7 +32,7 @@ export default function CollegeRankingsPage() {
     setLoading(true)
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college-ranking?limit=100`
+        `${process.env.baseUrl}/college-ranking?limit=100`
       )
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -60,7 +59,7 @@ export default function CollegeRankingsPage() {
     try {
       // Fetch all programs without limit
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?limit=1000`
+        `${process.env.baseUrl}/program?limit=1000`
       )
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -82,7 +81,7 @@ export default function CollegeRankingsPage() {
       }
 
       // Build URL with program_id filter to only get colleges offering this program
-      const baseUrl = `${DotenvConfig.NEXT_APP_API_BASE_URL}/college`
+      const baseUrl = `${process.env.baseUrl}/college`
       const params = new URLSearchParams({
         program_id: selectedProgram.id.toString(),
         limit: '100'
@@ -115,7 +114,7 @@ export default function CollegeRankingsPage() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college-ranking/program?program_id=${deleteProgramId}`,
+        `${process.env.baseUrl}/college-ranking/program?program_id=${deleteProgramId}`,
         { method: 'DELETE' }
       )
       await response.json()
@@ -164,7 +163,7 @@ export default function CollegeRankingsPage() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college-ranking/order`,
+        `${process.env.baseUrl}/college-ranking/order`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -229,7 +228,7 @@ export default function CollegeRankingsPage() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college-ranking/program-order`,
+        `${process.env.baseUrl}/college-ranking/program-order`,
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -256,7 +255,7 @@ export default function CollegeRankingsPage() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college-ranking`,
+        `${process.env.baseUrl}/college-ranking`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -291,7 +290,7 @@ export default function CollegeRankingsPage() {
   const handleDeleteRanking = async (rankingId) => {
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college-ranking?ranking_id=${rankingId}`,
+        `${process.env.baseUrl}/college-ranking?ranking_id=${rankingId}`,
         { method: 'DELETE' }
       )
       await response.json()

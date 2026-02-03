@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Send, CheckCircle } from 'lucide-react'
 import { toast } from 'react-toastify'
-import { DotenvConfig } from '@/config/env.config'
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -26,7 +25,7 @@ export default function ContactForm() {
 
     try {
       const res = await fetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/contact-us`,
+        `${process.env.baseUrl}/contact-us`,
         {
           method: 'POST',
           headers: {

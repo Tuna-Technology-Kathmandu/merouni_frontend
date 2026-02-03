@@ -1,10 +1,9 @@
 'use server'
-import { DotenvConfig } from '../../config/env.config'
 
 export async function getItems(title) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/home-post?title=${title}`,
+      `${process.env.baseUrl}/home-post?title=${title}`,
       {
         method: 'GET',
         headers: {
@@ -27,7 +26,7 @@ export async function getItems(title) {
 export async function getFeaturedCollege() {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?pinned=true&page=1&limit=6`,
+      `${process.env.baseUrl}/college?pinned=true&page=1&limit=6`,
       {
         method: 'GET',
         headers: {
@@ -50,7 +49,7 @@ export async function getFeaturedCollege() {
 export async function getBanner(page = 1, limit = 999) {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/banner?page=${page}&limit=${limit}`,
+      `${process.env.baseUrl}/banner?page=${page}&limit=${limit}`,
       {
         method: 'GET',
         headers: {
@@ -74,7 +73,7 @@ export async function getBanner(page = 1, limit = 999) {
 export async function getEvents() {
   try {
     const response = await fetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/event/unexpired?limit=999`,
+      `${process.env.baseUrl}/event/unexpired?limit=100`,
       {
         method: 'GET',
         headers: {

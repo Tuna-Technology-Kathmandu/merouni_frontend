@@ -1,9 +1,8 @@
 import { authFetch } from '@/app/utils/authFetch'
-import { DotenvConfig } from '@/config/env.config'
 
 export async function createCollege(data) {
   const response = await authFetch(
-    `${DotenvConfig.NEXT_APP_API_BASE_URL}/college`,
+    `${process.env.baseUrl}/college`,
     {
       method: 'POST',
       headers: {
@@ -25,7 +24,7 @@ export async function createCollege(data) {
 export const fetchUniversities = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/university${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${process.env.baseUrl}/university${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch universities')
@@ -41,7 +40,7 @@ export const fetchUniversities = async (searchQuery = '') => {
 export const fetchCourse = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/program${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${process.env.baseUrl}/program${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
     )
 
     if (!response.ok) {
@@ -58,7 +57,7 @@ export const fetchCourse = async (searchQuery = '') => {
 export const fetchAllCourse = async () => {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/program?limit=100`
+      `${process.env.baseUrl}/program?limit=100`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch courses')
@@ -74,7 +73,7 @@ export const fetchAllCourse = async () => {
 export const fetchAllUniversity = async () => {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/university?limit=100`
+      `${process.env.baseUrl}/university?limit=100`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch universities')
@@ -90,7 +89,7 @@ export const fetchAllUniversity = async () => {
 export const getUniversityBySlug = async (slug) => {
   try {
     const response = await authFetch(
-      `${DotenvConfig.NEXT_APP_API_BASE_URL}/university/${slug}`,
+      `${process.env.baseUrl}/university/${slug}`,
       {
         method: 'GET',
         headers: {

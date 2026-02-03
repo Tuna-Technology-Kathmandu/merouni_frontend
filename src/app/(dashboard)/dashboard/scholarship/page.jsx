@@ -10,7 +10,6 @@ import {
   DialogTitle
 } from '@/ui/shadcn/dialog'
 import { Label } from '@/ui/shadcn/label'
-import { DotenvConfig } from '@/config/env.config'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Edit2, Eye, Search, Trash2, Users } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -323,7 +322,7 @@ export default function ScholarshipManager() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/scholarship?q=${query}`
+        `${process.env.baseUrl}/scholarship?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()

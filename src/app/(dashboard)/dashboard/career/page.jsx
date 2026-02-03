@@ -16,7 +16,6 @@ import useAdminPermission from '@/hooks/useAdminPermission'
 import dynamic from 'next/dynamic'
 import { Modal } from '../../../../ui/molecules/Modal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { DotenvConfig } from '@/config/env.config'
 import { Button } from '@/ui/shadcn/button'
 
 // Dynamically import CKEditor to avoid SSR issues
@@ -88,7 +87,7 @@ export default function CareerForm() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/career?page=${page}`
+        `${process.env.baseUrl}/career?page=${page}`
       )
       const data = await response.json()
       setCareers(data.items)
@@ -112,7 +111,7 @@ export default function CareerForm() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/career?q=${query}`
+        `${process.env.baseUrl}/career?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -156,12 +155,12 @@ export default function CareerForm() {
     try {
       data.featuredImage = uploadedFiles.featured
 
-      const url = `${DotenvConfig.NEXT_APP_API_BASE_URL}/career`
+      const url = `${process.env.baseUrl}/career`
       const method = editing ? 'PUT' : 'POST'
 
       if (editing) {
         const response = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/career?id=${editId}`,
+          `${process.env.baseUrl}/career?id=${editId}`,
           {
             method,
             headers: {
@@ -203,7 +202,7 @@ export default function CareerForm() {
       setLoading(true)
       setIsOpen(true)
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/career/${slug}`
+        `${process.env.baseUrl}/career/${slug}`
       )
       const data = await response.json()
       const career = data.item
@@ -243,7 +242,7 @@ export default function CareerForm() {
       setLoadingView(true)
       setViewModalOpen(true)
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/career/${slug}`,
+        `${process.env.baseUrl}/career/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
       if (!response.ok) throw new Error('Failed to fetch career details')
@@ -267,7 +266,7 @@ export default function CareerForm() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/career?id=${deleteId}`,
+        `${process.env.baseUrl}/career?id=${deleteId}`,
         {
           method: 'DELETE'
         }

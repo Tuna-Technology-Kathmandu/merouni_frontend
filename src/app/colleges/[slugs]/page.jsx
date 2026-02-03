@@ -9,7 +9,6 @@ import CollegeOverview from './components/NewCollegeOverview'
 import ApplyNow from './components/applyNow'
 import RelatedColleges from './components/RelatedColleges'
 import Loading from '../../../ui/molecules/Loading'
-import { DotenvConfig } from '@/config/env.config'
 
 // Share Section Component
 const ShareSection = ({ college }) => {
@@ -117,7 +116,7 @@ const CollegeDetailPage = ({ params }) => {
     try {
       // Use direct fetch instead of server action to avoid SSR issues
       const response = await fetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/${slugs}`,
+        `${process.env.baseUrl}/college/${slugs}`,
         {
           method: 'GET',
           headers: {

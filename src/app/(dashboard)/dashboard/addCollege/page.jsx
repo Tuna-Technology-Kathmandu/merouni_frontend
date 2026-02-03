@@ -46,7 +46,6 @@ import GallerySection from './GallerySection'
 import VideoSection from './VideoSection'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { createColumns } from './columns'
-import { DotenvConfig } from '@/config/env.config'
 
 const FileUploadWithPreview = ({
   onUploadComplete,
@@ -89,7 +88,7 @@ const FileUploadWithPreview = ({
 
     try {
       const response = await axios.post(
-        `${DotenvConfig.NEXT_APP_MEDIA_BASE_URL}/media/upload`,
+        `${process.env.mediaUrl}/media/upload`,
         formData,
         {
           headers: {
@@ -495,7 +494,7 @@ export default function CollegeForm() {
       try {
         // Use authFetch directly instead of server action to avoid SSR issues
         const response = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?limit=10&page=1`
+          `${process.env.baseUrl}/college?limit=10&page=1`
         )
         if (response.ok) {
           const data = await response.json()
@@ -565,7 +564,7 @@ export default function CollegeForm() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/${deleteId}`,
+        `${process.env.baseUrl}/college/${deleteId}`,
         {
           method: 'DELETE',
           headers: {
@@ -577,7 +576,7 @@ export default function CollegeForm() {
       toast.success(res.message)
       // Reload colleges using authFetch
       const reloadResponse = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?limit=10&page=${pagination.currentPage}`
+        `${process.env.baseUrl}/college?limit=10&page=${pagination.currentPage}`
       )
       if (reloadResponse.ok) {
         const reloadData = await reloadResponse.json()
@@ -671,7 +670,7 @@ export default function CollegeForm() {
       delete payload.emailName
 
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/users/college-credentials`,
+        `${process.env.baseUrl}/users/college-credentials`,
         {
           method: 'POST',
           headers: {
@@ -694,7 +693,7 @@ export default function CollegeForm() {
       setTableLoading(true)
       try {
         const response2 = await authFetch(
-          `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?limit=10&page=${pagination.currentPage}`
+          `${process.env.baseUrl}/college?limit=10&page=${pagination.currentPage}`
         )
         if (response2.ok) {
           const data = await response2.json()
@@ -726,7 +725,7 @@ export default function CollegeForm() {
       reset()
 
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/${slug}`,
+        `${process.env.baseUrl}/college/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
 
@@ -893,7 +892,7 @@ export default function CollegeForm() {
     try {
       // Use authFetch directly instead of server action to avoid SSR issues
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?limit=10&page=${page}`
+        `${process.env.baseUrl}/college?limit=10&page=${page}`
       )
 
       if (response.ok) {
@@ -924,7 +923,7 @@ export default function CollegeForm() {
 
     try {
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college?q=${query}`
+        `${process.env.baseUrl}/college?q=${query}`
       )
       if (response.ok) {
         const data = await response.json()
@@ -1005,7 +1004,7 @@ export default function CollegeForm() {
       setViewModalOpen(true)
 
       const response = await authFetch(
-        `${DotenvConfig.NEXT_APP_API_BASE_URL}/college/${slug}`,
+        `${process.env.baseUrl}/college/${slug}`,
         { headers: { 'Content-Type': 'application/json' } }
       )
 
