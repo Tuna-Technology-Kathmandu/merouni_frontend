@@ -30,7 +30,7 @@ const GallerySection = ({
         formData.append('authorId', '1')
 
         const response = await axios.post(
-          `${process.env.baseUrl}/media/upload`,
+          `${process.env.mediaUrl}${process.env.version}/media/upload`,
           formData,
           { headers: { 'Content-Type': 'multipart/form-data' } }
         )

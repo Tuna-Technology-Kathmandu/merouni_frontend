@@ -245,7 +245,6 @@ const ScholarshipDetailsPage = ({ params }) => {
                 {scholarship.amount && (
                   <div className='flex flex-col border-b border-gray-100 pb-4'>
                     <span className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-2'>
-                      <FaDollarSign className='w-3 h-3' />
                       Amount
                     </span>
                     <span className='text-2xl font-bold text-green-700'>

@@ -56,7 +56,7 @@ const FileUpload = ({
 
     try {
       const response = await axios.post(
-        `${process.env.mediaUrl}/media/upload`,
+        `${process.env.mediaUrl}${process.env.version}/media/upload`,
         formData,
         {
           headers: {
