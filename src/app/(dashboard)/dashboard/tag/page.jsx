@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
-import Table from '../../../../ui/molecules/Table'
+import Loader from '../../../../ui/molecules/Loading'
 import { Edit2, Trash2, Search } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
@@ -63,7 +63,7 @@ export default function TagForm() {
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}/tag?page=${page}`
+        `${process.env.baseUrl}/tag?page=${page}&limit=50`
       )
       const data = await response.json()
       setTags(data.items)
@@ -172,7 +172,7 @@ export default function TagForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}/tag?id=${deleteId}`,
+        `${process.env.baseUrl}/tag?tag_id=${deleteId}`,
         {
           method: 'DELETE'
         }
@@ -188,32 +188,7 @@ export default function TagForm() {
     }
   }
 
-  const columns = [
-    {
-      header: 'Title',
-      accessorKey: 'title'
-    },
-    {
-      header: 'Actions',
-      id: 'actions',
-      cell: ({ row }) => (
-        <div className='flex gap-2'>
-          <button
-            onClick={() => handleEdit(row.original)}
-            className='p-1 text-blue-600 hover:text-blue-800'
-          >
-            <Edit2 className='w-4 h-4' />
-          </button>
-          <button
-            onClick={() => handleDeleteClick(row.original.id)}
-            className='p-1 text-red-600 hover:text-red-800'
-          >
-            <Trash2 className='w-4 h-4' />
-          </button>
-        </div>
-      )
-    }
-  ]
+
 
   const handleSearch = async (query) => {
     if (!query) {
@@ -223,7 +198,7 @@ export default function TagForm() {
 
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}/tag?q=${query}`
+        `${process.env.baseUrl}/tag?q=${query}&limit=50`
       )
       if (response.ok) {
         const data = await response.json()
@@ -278,17 +253,89 @@ export default function TagForm() {
         </div>
         <ToastContainer />
 
-        {/* Table */}
+        {/* Badge Layout */}
         <div className='mt-8'>
-          <Table
-            loading={tableLoading}
-            data={tags}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => fetchTags(newPage)}
-            onSearch={handleSearch}
-            showSearch={false}
-          />
+          {tableLoading ? (
+            <div className='flex justify-center p-12'>
+              <Loader />
+            </div>
+          ) : (
+            <div className='space-y-8'>
+              <div className='flex flex-wrap gap-3'>
+                {tags.map((tag) => (
+                  <div
+                    key={tag.id}
+                    className='group flex items-center gap-2 bg-white border border-gray-200 hover:border-blue-300 hover:bg-blue-50 px-4 py-2 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md'
+                  >
+                    <span className='text-sm font-semibold text-gray-700 group-hover:text-blue-700'>
+                      {tag.title}
+                    </span>
+                    <div className='flex items-center gap-1 ml-2 pl-2 border-l border-gray-100 group-hover:border-blue-200 transition-colors'>
+                      <button
+                        onClick={() => handleEdit(tag)}
+                        className='p-1.5 text-blue-500 hover:bg-blue-100 rounded-lg transition-colors'
+                        title='Edit Tag'
+                      >
+                        <Edit2 className='w-3.5 h-3.5' />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(tag.id)}
+                        className='p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors'
+                        title='Delete Tag'
+                      >
+                        <Trash2 className='w-3.5 h-3.5' />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {tags.length === 0 && (
+                  <div className='w-full flex flex-col items-center justify-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200'>
+                    <div className='bg-white p-4 rounded-full shadow-sm mb-4'>
+                      <Search className='w-8 h-8 text-gray-300' />
+                    </div>
+                    <p className='text-gray-500 font-medium'>No tags discovered yet</p>
+                    <p className='text-gray-400 text-sm'>Try a different search or add a new tag</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Pagination */}
+              {pagination.totalPages > 1 && (
+                <div className='flex items-center justify-between border-t border-gray-100 pt-6'>
+                  <p className='text-sm text-gray-500'>
+                    Showing <span className='font-semibold text-gray-900'>{tags.length}</span> tags of{' '}
+                    <span className='font-semibold text-gray-900'>{pagination.total}</span> total
+                  </p>
+                  <div className='flex gap-2'>
+                    <button
+                      onClick={() => fetchTags(pagination.currentPage - 1)}
+                      disabled={pagination.currentPage === 1}
+                      className='px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm'
+                    >
+                      Previous
+                    </button>
+                    <div className='flex items-center px-4 bg-gray-50 rounded-lg border border-gray-200'>
+                      <span className='text-sm font-semibold text-blue-600'>
+                        {pagination.currentPage}
+                      </span>
+                      <span className='text-sm text-gray-400 mx-1'>/</span>
+                      <span className='text-sm text-gray-500'>
+                        {pagination.totalPages}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => fetchTags(pagination.currentPage + 1)}
+                      disabled={pagination.currentPage === pagination.totalPages}
+                      className='px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm'
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

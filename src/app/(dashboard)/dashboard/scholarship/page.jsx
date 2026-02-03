@@ -94,10 +94,7 @@ export default function ScholarshipManager() {
         accessorKey: 'applicationDeadline',
         cell: ({ getValue }) => new Date(getValue()).toLocaleDateString()
       },
-      {
-        header: 'Renewal Criteria',
-        accessorKey: 'renewalCriteria'
-      },
+
       {
         header: 'Actions',
         id: 'actions',
