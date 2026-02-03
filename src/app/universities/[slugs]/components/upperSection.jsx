@@ -1,13 +1,19 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { PiLineVerticalThin } from 'react-icons/pi'
 import { MdDateRange } from 'react-icons/md'
 import { LiaUniversitySolid } from 'react-icons/lia'
-import { FaPhoneAlt, FaUniversity } from 'react-icons/fa'
+import { FaPhoneAlt } from 'react-icons/fa'
+import { ImCross } from 'react-icons/im'
 import { IoMdMail } from 'react-icons/io'
 import he from 'he'
 import { FormatDate } from '@/lib/date'
+import AddressSection from './AddressAndContactSection'
+import MemberSection from './MemberSection'
+import VideoSection from './VideoSection'
+import LevelSections from './LevelSections'
 
 const ImageSection = ({ university }) => {
+  const [selectedImage, setSelectedImage] = useState(null);
   return (
     <div className='flex flex-col items-center'>
       {/* Top Section (Already Styled) */}
@@ -93,7 +99,7 @@ const ImageSection = ({ university }) => {
       </div>
 
       {/* Why Study Here */}
-      <div className=' rounded-xl p-8 w-full lp:w-[80%] mb-12 px-[75px] max-md:px-[30px]'>
+      <div className=' rounded-xl p-8 w-full lp:w-[80%] mb-12 max-md:mb-7 px-[75px] max-md:px-[30px]'>
         <h2 className='font-bold text-xl md:text-2xl mb-4'>
           About {university?.fullname}
         </h2>
@@ -158,7 +164,7 @@ const ImageSection = ({ university }) => {
       </div>
 
       {/* Programs Section */}
-      {Array.isArray(university?.programs) &&
+      {/* {Array.isArray(university?.programs) &&
         university?.programs?.program?.length > 0 && (
           <div className='bg-[#30AD8F] bg-opacity-10 rounded-xl p-8 w-full mb-12 px-[75px] max-md:px-[30px] overflow-hidden'>
             <h2 className='font-bold text-xl md:text-2xl mb-6'>
@@ -180,11 +186,61 @@ const ImageSection = ({ university }) => {
               ))}
             </ul>
           </div>
+        )} */}
+
+      {/* college programs */}
+
+      {Array.isArray(university?.programs) &&
+        university.programs.length > 0 && (
+          <section className="w-full mb-14 max-md:mb-7">
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#30AD8F]/10 to-[#30AD8F]/5 p-10 max-md:p-6 px-[75px] max-md:px-[30px]">
+
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="font-bold text-lg md:text-xl mb-4 text-gray-900">
+                  Programs Offered
+                </h2>
+
+                <span className="text-sm font-medium bg-[#30AD8F]/20 text-[#30AD8F] px-4 py-1.5 rounded-full">
+                  {university.programs.length} Program
+                  {university.programs.length > 1 && "s"}
+                </span>
+              </div>
+
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {university.programs.map((item, idx) => (
+                  <li
+                    key={item.id || idx}
+                    className="group flex items-center gap-3 rounded-xl bg-white px-5 py-4 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+                  >
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#30AD8F] group-hover:scale-125 transition-transform" />
+
+                    <span className="text-sm md:text-base font-medium text-gray-800">
+                      {item?.program?.title || "N/A"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
         )}
+
+      {/* levels */}
+      <LevelSections university={university} />
+
+
+      {/* members */}
+      <MemberSection university={university} />
+
+
+      {/* addressSection */}
+      <AddressSection university={university} />
+
+      {/* contact section */}
+
 
       {/* Gallery Section */}
       {Array.isArray(university?.gallery) && university.gallery.length > 0 && (
-        <div className=' rounded-xl p-8 w-full lp:w-[80%] mb-12 px-[75px] max-md:px-[30px]'>
+        <div className=' rounded-xl p-8 w-full mb-12 px-[75px] max-md:px-[30px]'>
           <h2 className='font-bold text-xl md:text-2xl mb-6'>Gallery</h2>
           <div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
             {university.gallery.map((img, idx) => (
@@ -192,10 +248,34 @@ const ImageSection = ({ university }) => {
                 key={idx}
                 src={img}
                 alt={`Gallery ${idx + 1}`}
-                className='w-full h-40 object-cover rounded-lg shadow-sm hover:scale-105 transition-transform'
+                className='w-full h-40 object-cover rounded-lg shadow-md cursor-pointer'
+                onClick={() => setSelectedImage(img)}
               />
             ))}
           </div>
+        </div>
+      )}
+
+      {/* video */}
+      <VideoSection university={university} />
+
+
+
+      {/* image show */}
+      {selectedImage && (
+        <div className='fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50'>
+          <button
+            onClick={() => setSelectedImage(null)}
+            className='cursor-pointer'
+          >
+            <ImCross className=' cursor-pointer absolute right-3 top-7 z-10 text-white sm:text-lg md:text-2xl lg:text-3xl' />
+          </button>
+
+          <img
+            src={selectedImage}
+            alt='Full View'
+            className='w-[90%] h-[50%] md:h-[70%] lg:h-[90%] rounded-lg shadow-lg'
+          />
         </div>
       )}
     </div>

@@ -49,7 +49,7 @@ const RelatedUniversities = ({ university }) => {
   }
 
   return (
-    <div className='flex flex-col w-full max-w-[1150px] mx-auto mb-20 px-4'>
+    <div className='flex flex-col w-full max-w-[1150px] mx-auto mb-20 px-4 mt-10'>
       <h2 className='font-bold text-3xl leading-10 mb-4'>
         Other Universities you might like
       </h2>

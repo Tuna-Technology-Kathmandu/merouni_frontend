@@ -4,7 +4,7 @@ const FacilitySection = ({ college }) => {
     <div className='max-w-4xl'>
       <h2 className='text-lg font-semibold text-gray-900 mb-8'>Facilities</h2>
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8'>
-        {college?.collegeFacility.map((item, index) => {
+        {college?.facilities?.map((item, index) => {
           return (
             <div
               key={index}

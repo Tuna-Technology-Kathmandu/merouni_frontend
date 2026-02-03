@@ -50,7 +50,7 @@ const CollegeOverview = ({ college }) => {
     },
     {
       name: 'Facility',
-      visible: college?.collegeFacility?.length > 0,
+      visible: college?.facilities?.length > 0,
       ref: facilityRef,
       component: <FacilitySection college={college} />
     },

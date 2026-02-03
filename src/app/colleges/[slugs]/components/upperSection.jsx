@@ -20,6 +20,8 @@ const ImageSection = ({ college }) => {
   const instituteLevels = JSON.parse(college?.institute_level || '[]')
   const hasInstituteLevel = instituteLevels.length > 0
 
+
+
   return (
     <div className='flex flex-col items-center relative gap-8 md:gap-12 lg:gap-16'>
       {/* College image, name and location */}
