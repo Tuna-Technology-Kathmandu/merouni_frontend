@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { fetchCategories, deleteCategory } from './action'
 import Loader from '../../../../ui/molecules/Loading'
 import Table from '../../../../ui/molecules/Table'
-import { Edit2, Trash2, Search } from 'lucide-react'
+import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
@@ -41,6 +41,8 @@ export default function CategoryManager() {
   const [isOpen, setIsOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [viewingCategory, setViewingCategory] = useState(null)
+  const [isViewOpen, setIsViewOpen] = useState(false)
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -57,27 +59,39 @@ export default function CategoryManager() {
       },
       {
         header: 'Description',
-        accessorKey: 'description'
+        accessorKey: 'description',
+        cell: ({ getValue }) => {
+          const description = getValue()
+          if (!description) return '-'
+          return description.length > 60
+            ? `${description.substring(0, 60)}...`
+            : description
+        }
       },
-      {
-        header: 'Created At',
-        accessorKey: 'createdAt',
-        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString()
-      },
+    
       {
         header: 'Actions',
         id: 'actions',
         cell: ({ row }) => (
           <div className='flex gap-2'>
             <button
+              onClick={() => handleView(row.original)}
+              className='p-1 text-green-600 hover:text-green-800'
+              title="View Details"
+            >
+              <Eye className='w-4 h-4' />
+            </button>
+            <button
               onClick={() => handleEdit(row.original)}
               className='p-1 text-blue-600 hover:text-blue-800'
+              title="Edit"
             >
               <Edit2 className='w-4 h-4' />
             </button>
             <button
               onClick={() => handleDeleteClick(row.original.id)}
               className='p-1 text-red-600 hover:text-red-800'
+              title="Delete"
             >
               <Trash2 className='w-4 h-4' />
             </button>
@@ -196,6 +210,11 @@ export default function CategoryManager() {
     setIsOpen(true)
     setValue('title', category.title)
     setValue('description', category.description || '')
+  }
+
+  const handleView = (category) => {
+    setViewingCategory(category)
+    setIsViewOpen(true)
   }
 
   const handleDeleteClick = (id) => {
@@ -380,6 +399,46 @@ export default function CategoryManager() {
                 </Button>
               </div>
             </form>
+          </div>
+        </Modal>
+
+        <Modal
+          isOpen={isViewOpen}
+          onClose={() => {
+            setIsViewOpen(false)
+            setViewingCategory(null)
+          }}
+          title='Category Details'
+          className='max-w-2xl'
+        >
+          <div className='p-6 space-y-6'>
+            <div>
+              <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Title</h3>
+              <p className='text-lg font-semibold text-gray-900'>{viewingCategory?.title}</p>
+            </div>
+            <div>
+              <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Description</h3>
+              <p className='text-gray-700 leading-relaxed whitespace-pre-wrap'>
+                {viewingCategory?.description || 'No description provided.'}
+              </p>
+            </div>
+            <div className='grid grid-cols-2 gap-4'>
+              <div>
+                <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Created At</h3>
+                <p className='text-sm text-gray-600'>
+                  {viewingCategory?.createdAt ? new Date(viewingCategory.createdAt).toLocaleDateString() : '-'}
+                </p>
+              </div>
+              <div>
+                <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Updated At</h3>
+                <p className='text-sm text-gray-600'>
+                  {viewingCategory?.updatedAt ? new Date(viewingCategory.updatedAt).toLocaleDateString() : '-'}
+                </p>
+              </div>
+            </div>
+            <div className='flex justify-end pt-4'>
+              <Button onClick={() => setIsViewOpen(false)}>Close</Button>
+            </div>
           </div>
         </Modal>
 

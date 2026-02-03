@@ -8,7 +8,7 @@ import { TiSocialLinkedinCircular } from 'react-icons/ti'
 import { PiXLogoLight } from 'react-icons/pi'
 import { ChevronDown } from 'lucide-react'
 
-import { getExams, getColleges, getBlogs } from '@/app/action.js'
+import { getExams, getColleges } from '@/app/action.js'
 import { getSiteConfig } from '@/app/actions/siteConfigActions'
 
 const Footer = () => {
@@ -22,54 +22,75 @@ const Footer = () => {
 
   useEffect(() => {
     const fetchFooterData = async () => {
+      // 1. Fetch Exams
       try {
-        const [examsRes, collegesRes, resourcesRes, socialRes] = await Promise.all([
-          getExams(5, 1),
-          getColleges(null, null, 5, 1),
-          getBlogs(1, '', ''),
-          getSiteConfig({ types: 'social_facebook,social_instagram,social_linkedin,social_twitter' })
-        ])
+        const examsRes = await getExams(5, 1)
+        const items = examsRes?.items || examsRes || []
+        setSections(prev => ({
+          ...prev,
+          Exams: {
+            ...prev.Exams,
+            list: items.slice(0, 5).map(item => ({
+              title: item.title || item.name,
+              href: `/exams/${item.slugs || item.id}`
+            }))
+          }
+        }))
+      } catch (e) {
+        console.error('Footer: Error fetching exams:', e)
+      }
 
-        // Parse social links
+      // 2. Fetch Colleges
+      try {
+        const collegesRes = await getColleges(null, null, 5, 1)
+        const items = collegesRes?.items || collegesRes || []
+        setSections(prev => ({
+          ...prev,
+          Colleges: {
+            ...prev.Colleges,
+            list: items.slice(0, 5).map(item => ({
+              title: item.name || item.title,
+              href: `/colleges/${item.slugs || item.id}`
+            }))
+          }
+        }))
+      } catch (e) {
+        console.error('Footer: Error fetching colleges:', e)
+      }
+
+      // 3. Fetch Resources (Materials)
+      try {
+        const res = await fetch(`${process.env.baseUrl}/material-category?page=1&limit=5`)
+        if (res.ok) {
+          const materialsRes = await res.json()
+          const items = materialsRes?.items || materialsRes || []
+          setSections(prev => ({
+            ...prev,
+            Resources: {
+              ...prev.Resources,
+              list: items.slice(0, 5).map(item => ({
+                title: item.title || item.name,
+                href: `/materials/category/${item.id}`
+              }))
+            }
+          }))
+        }
+      } catch (e) {
+        console.error('Footer: Error fetching materials:', e)
+      }
+
+      // 4. Fetch Social Links
+      try {
+        const socialRes = await getSiteConfig({ types: 'social_facebook,social_instagram,social_linkedin,social_twitter' })
         const socials = {}
         if (socialRes?.items && Array.isArray(socialRes.items)) {
           socialRes.items.forEach(item => {
             socials[item.type] = item.value
           })
+          setSocialLinks(socials)
         }
-        setSocialLinks(socials)
-
-        setSections({
-          Exams: {
-            header: 'Top Exams',
-            list: (examsRes?.items || examsRes || [])
-              .slice(0, 5)
-              .map((item) => ({
-                title: item.name || item.title,
-                href: `/exams/${item.slugs || item.id}`
-              }))
-          },
-          Colleges: {
-            header: 'Colleges',
-            list: (collegesRes?.items || collegesRes || [])
-              .slice(0, 5)
-              .map((item) => ({
-                title: item.name || item.title,
-                href: `/colleges/${item.slugs || item.id}`
-              }))
-          },
-          Resources: {
-            header: 'Resources',
-            list: (resourcesRes?.items || resourcesRes || [])
-              .slice(0, 5)
-              .map((item) => ({
-                title: item.name || item.title,
-                href: `/blogs/${item.slugs || item.id}`
-              }))
-          }
-        })
-      } catch (error) {
-        console.error('Error fetching footer data:', error)
+      } catch (e) {
+        console.error('Footer: Error fetching social links:', e)
       }
     }
     fetchFooterData()

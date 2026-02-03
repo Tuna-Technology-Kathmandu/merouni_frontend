@@ -38,15 +38,23 @@ export const menuItems = [
       },
       {
         icon: <VscReferences />,
-        label: 'College Referrals',
-        href: '/dashboard/referrals',
-        visible: ['admin', 'student']
-      },
-      {
-        icon: <FaHandshake />,
-        label: 'Consultancy Referrals',
-        href: '/dashboard/consultancy-referrals',
-        visible: ['admin']
+        label: 'Referrals',
+        href: null,
+        visible: ['admin'],
+        submenus: [
+          {
+            icon: <VscReferences />,
+            label: 'College Referrals',
+            href: '/dashboard/referrals',
+            visible: ['admin']
+          },
+          {
+            icon: <FaHandshake />,
+            label: 'Consultancy Referrals',
+            href: '/dashboard/consultancy-referrals',
+            visible: ['admin']
+          }
+        ]
       },
       {
         icon: <HandCoins className='text-xl' />,
