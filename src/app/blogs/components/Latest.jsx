@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { getBlogs } from '@/app/action'
 import LatestBlogsShimmer from '../components/LatestBlogShimmer'
 import LatestBlogs from './LatestBlogs'
+import { formatDate } from '@/utils/date.util'
 
 const Latest = ({ blogs }) => {
   // Get top 5 blogs from props
@@ -15,14 +16,7 @@ const Latest = ({ blogs }) => {
     return null
   }
 
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' }
-    try {
-      return new Date(dateString).toLocaleDateString(undefined, options)
-    } catch (error) {
-      return ''
-    }
-  }
+
 
   return (
     <div className='bg-gray-50 w-full relative py-12'>

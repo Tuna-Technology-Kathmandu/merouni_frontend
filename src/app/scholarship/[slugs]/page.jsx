@@ -17,6 +17,7 @@ import Navbar from '../../../components/Frontpage/Navbar'
 import Loading from '../../../ui/molecules/Loading'
 import EmptyState from '@/ui/shadcn/EmptyState'
 import { getScholarshipBySlug } from '../actions'
+import { formatDate } from '@/utils/date.util'
 
 const ScholarshipDetailsPage = ({ params }) => {
   const router = useRouter()
@@ -82,18 +83,7 @@ const ScholarshipDetailsPage = ({ params }) => {
     )
   }
 
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A'
-    try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-    } catch (e) {
-      return dateString
-    }
-  }
+
 
   // Safely parse eligibilityCriteria
   const parseCriteria = (value) => {

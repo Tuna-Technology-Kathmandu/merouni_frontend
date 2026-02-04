@@ -7,6 +7,7 @@ import FeaturedBlogsShimmer from './FeaturedBlogShimmer'
 import Link from 'next/link'
 import { Newspaper } from 'lucide-react'
 import EmptyState from '@/ui/shadcn/EmptyState'
+import { formatDate } from '@/utils/date.util'
 
 const FeaturedBlogs = ({ blogs, loading, pagination, onPageChange }) => {
   const truncateString = (str, maxLength) => {
@@ -16,14 +17,6 @@ const FeaturedBlogs = ({ blogs, loading, pagination, onPageChange }) => {
     return str || ''
   }
 
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' }
-    try {
-      return new Date(dateString).toLocaleDateString(undefined, options)
-    } catch (e) {
-      return ''
-    }
-  }
 
   return (
     <div className='max-w-[1600px] mx-auto px-4 sm:px-8 mb-8'>

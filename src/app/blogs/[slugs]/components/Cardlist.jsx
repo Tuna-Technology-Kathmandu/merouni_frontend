@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import RelatedCard from './RelatedCard'
 import Banner from './Banner'
+import { formatDate } from '@/utils/date.util'
 
 const Cardlist = ({ news }) => {
   const truncateString = (str, maxLength) => {
@@ -11,10 +12,7 @@ const Cardlist = ({ news }) => {
     return str
   }
 
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' }
-    return new Date(dateString).toLocaleDateString(undefined, options)
-  }
+
 
   return (
     <div className='flex gap-5 relative max-[868px]:hidden'>

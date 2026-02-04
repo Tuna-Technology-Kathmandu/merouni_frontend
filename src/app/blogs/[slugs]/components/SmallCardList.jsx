@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import RelatedCard from './RelatedCard'
+import { formatDate } from '@/utils/date.util'
 
 const SmallCardList = ({ news }) => {
   const truncateString = (str, maxLength) => {
@@ -9,10 +10,7 @@ const SmallCardList = ({ news }) => {
     return str
   }
 
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' }
-    return new Date(dateString).toLocaleDateString(undefined, options)
-  }
+
 
   return (
     <div className=''>

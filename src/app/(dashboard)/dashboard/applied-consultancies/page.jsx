@@ -21,6 +21,7 @@ import { useSelector } from 'react-redux'
 import { destr } from 'destr'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { formatDate } from '@/utils/date.util'
 
 const AppliedConsultanciesPage = () => {
   const { setHeading, setSubheading } = usePageHeading()
@@ -101,18 +102,6 @@ const AppliedConsultanciesPage = () => {
     }
   }
 
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A'
-    try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-    } catch (e) {
-      return dateString
-    }
-  }
 
   const renderAddress = (address) => {
     if (!address) return 'N/A'

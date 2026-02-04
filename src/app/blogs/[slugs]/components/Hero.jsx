@@ -1,3 +1,4 @@
+import { formatDate } from '@/utils/date.util'
 import React from 'react'
 
 const Hero = ({ news }) => {
@@ -29,15 +30,7 @@ const Hero = ({ news }) => {
       'width=550,height=420'
     )
   }
-  const formatDate = (dateString) => {
-    if (!dateString) return ''
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
+
   const handleInstagramShare = () => {
     navigator.clipboard.writeText(`${shareTitle}\n${currentUrl}`)
     alert('Link copied to clipboard! You can now paste it in Instagram')

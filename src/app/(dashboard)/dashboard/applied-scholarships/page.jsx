@@ -23,6 +23,7 @@ import { Button } from '@/ui/shadcn/button'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import { formatDate } from '@/utils/date.util'
 
 const AppliedScholarshipsPage = () => {
   const { setHeading, setSubheading } = usePageHeading()
@@ -103,18 +104,6 @@ const AppliedScholarshipsPage = () => {
     }
   }
 
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A'
-    try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-    } catch (e) {
-      return dateString
-    }
-  }
 
   const handleDeleteClick = useCallback((id) => {
     setDeleteId(id)

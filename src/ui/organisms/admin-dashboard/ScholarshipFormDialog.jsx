@@ -14,6 +14,7 @@ import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { Select } from '@/ui/shadcn/select'
 import dynamic from 'next/dynamic'
+import { formatDate } from '@/utils/date.util'
 
 const CKEditor = dynamic(
   () => import('@/app/(dashboard)/dashboard/component/CKStable'),
@@ -81,9 +82,6 @@ const ScholarshipFormDialog = ({
     return new Date(dateString).toISOString().split('T')[0]
   }
 
-  const formatDate = (date) => {
-    return date.split('-').join('/')
-  }
 
   const handleEditorChange = useCallback((content) => {
     setFormData((prev) => ({

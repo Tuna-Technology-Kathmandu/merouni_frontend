@@ -4,6 +4,7 @@ import Image from 'next/image'
 import React, { useState, useEffect, useRef } from 'react'
 import { getBlogs } from '@/app/action'
 import Link from 'next/link'
+import { formatDate } from '@/utils/date.util'
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState([])
@@ -41,14 +42,7 @@ const Blogs = () => {
     return () => observer.disconnect()
   }, [])
 
-  const formatDate = (isoString) => {
-    const date = new Date(isoString)
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
+ 
 
   useEffect(() => {}, [blogs])
 
