@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { Loader2 } from 'lucide-react'
 
 function cn(...inputs) {
   return twMerge(clsx(inputs))
@@ -16,6 +17,8 @@ const ConfirmationDialog = ({
   confirmText = 'Confirm',
   cancelText = 'Cancel'
 }) => {
+  const [isLoading, setIsLoading] = useState(false)
+
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (open) {
@@ -28,6 +31,23 @@ const ConfirmationDialog = ({
     }
   }, [open])
 
+  // Reset loading state when dialog closes/opens
+  useEffect(() => {
+    if (!open) {
+      setIsLoading(false)
+    }
+  }, [open])
+
+  const handleConfirm = async () => {
+    try {
+      setIsLoading(true)
+      await onConfirm()
+    } catch (error) {
+      console.error('Confirmation failed:', error)
+      setIsLoading(false)
+    }
+  }
+
   return (
     <AnimatePresence>
       {open && (
@@ -37,7 +57,7 @@ const ConfirmationDialog = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={!isLoading ? onClose : undefined}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
             aria-hidden="true"
           />
@@ -70,6 +90,7 @@ const ConfirmationDialog = ({
               <button
                 type="button"
                 onClick={onClose}
+                disabled={isLoading}
                 className={cn(
                   "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
                   "border border-input hover:bg-accent hover:text-accent-foreground",
@@ -80,13 +101,15 @@ const ConfirmationDialog = ({
               </button>
               <button
                 type="button"
-                onClick={onConfirm}
+                onClick={handleConfirm}
+                disabled={isLoading}
                 className={cn(
                   "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
                   "bg-destructive text-destructive-foreground hover:bg-destructive/90",
                   "h-10 py-2 px-4"
                 )}
               >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {confirmText}
               </button>
             </div>
