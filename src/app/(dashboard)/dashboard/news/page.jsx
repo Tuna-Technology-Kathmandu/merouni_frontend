@@ -23,6 +23,7 @@ import {
 } from './action'
 import NewsForm from './components/NewsForm'
 import { FormatDate } from '@/lib/date'
+import { formatDate } from '@/utils/date.util'
 
 export default function NewsManager() {
   const { setHeading } = usePageHeading()
@@ -467,7 +468,7 @@ export default function NewsManager() {
             </div>
             {viewNewsData.createdAt && (
               <div className='text-sm text-gray-500'>
-                Created: {FormatDate.formatDate(viewNewsData.createdAt)}
+                Created: {formatDate(viewNewsData.createdAt)}
               </div>
             )}
           </div>

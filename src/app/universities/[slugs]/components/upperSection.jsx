@@ -11,6 +11,7 @@ import AddressSection from './AddressAndContactSection'
 import MemberSection from './MemberSection'
 import VideoSection from './VideoSection'
 import LevelSections from './LevelSections'
+import { formatDate } from '@/utils/date.util'
 
 const ImageSection = ({ university }) => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -57,7 +58,7 @@ const ImageSection = ({ university }) => {
         <div className='flex flex-col items-center min-[1037px]:pr-14'>
           <MdDateRange size={30} className='text-[#30AD8F]' />
           <p className='whitespace-nowrap text-sm'>
-            {FormatDate.formatDate(university?.date_of_establish) || 'N/A'}
+            {formatDate(university?.date_of_establish) || 'N/A'}
           </p>
         </div>
 

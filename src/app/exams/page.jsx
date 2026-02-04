@@ -16,6 +16,7 @@ import {
 } from './actions'
 import ExamShimmer from './components/ExamShimmer'
 import SingleExam from './components/SingleExam'
+import { formatDate } from '@/utils/date.util'
 
 export default function ExamsPage() {
   const [exams, setExams] = useState([])
@@ -359,7 +360,7 @@ export default function ExamsPage() {
                                 Closing Date
                               </span>
                               <span className='text-sm font-bold text-gray-700'>
-                                {FormatDate.formatDate(
+                                {formatDate(
                                   exam.application_details[0].closing_date
                                 ) ?? 'TBD'}
                               </span>
@@ -369,7 +370,7 @@ export default function ExamsPage() {
                                 Exam Date
                               </span>
                               <span className='text-sm font-bold text-[#0A6FA7]'>
-                                {FormatDate.formatDate(
+                                {formatDate(
                                   exam.application_details[0].exam_date
                                 ) ?? 'TBD'}
                               </span>
