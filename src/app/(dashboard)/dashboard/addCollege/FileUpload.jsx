@@ -16,11 +16,9 @@ const FileUpload = ({
   const [fileType, setFileType] = useState(null)
   const fileInputRef = useRef(null)
 
-  // Add useEffect to update preview when defaultPreview changes
   useEffect(() => {
     setPreview(defaultPreview)
     if (defaultPreview) {
-      // Check if it's a PDF file
       if (defaultPreview.includes('.pdf') || defaultPreview.endsWith('.pdf')) {
         setFileType('pdf')
       } else {
@@ -40,9 +38,8 @@ const FileUpload = ({
       reader.onloadend = () => setPreview(reader.result)
       reader.readAsDataURL(file)
     } else if (file.type === 'application/pdf') {
-      // For PDF files, set file type but don't create image preview
       setFileType('pdf')
-      setPreview(file.name) // Store file name for display
+      setPreview(file.name) 
     }
 
     setIsUploading(true)

@@ -1,60 +1,11 @@
-import React from 'react'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogContentText from '@mui/material/DialogContentText'
-import DialogTitle from '@mui/material/DialogTitle'
-import Button from '@mui/material/Button'
-import { styled } from '@mui/material/styles'
-import Slide from '@mui/material/Slide'
+import React, { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
-// Slide transition for the dialog
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction='up' ref={ref} {...props} />
-})
-
-// Custom styled components
-const StyledDialog = styled(Dialog)(({ theme }) => ({
-  '& .MuiDialog-paper': {
-    borderRadius: '8px',
-    padding: 0,
-    boxShadow: '0px 2px 12px rgba(0, 0, 0, 0.15)',
-    background: theme.palette.background.paper,
-    minWidth: '320px',
-    maxWidth: '400px'
-  }
-}))
-
-const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
-  fontSize: '1.125rem',
-  fontWeight: '600',
-  textAlign: 'center',
-  color: theme.palette.text.primary,
-  padding: theme.spacing(2, 2, 1, 2),
-  margin: 0
-}))
-
-const StyledDialogContentText = styled(DialogContentText)(({ theme }) => ({
-  fontSize: '0.875rem',
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-  padding: theme.spacing(0, 2, 1, 2),
-  margin: 0
-}))
-
-const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
-  justifyContent: 'center',
-  padding: theme.spacing(1.5, 2, 2, 2),
-  gap: theme.spacing(1),
-  '& .MuiButton-root': {
-    margin: 0,
-    padding: theme.spacing(0.75, 2.5),
-    borderRadius: '6px',
-    textTransform: 'none',
-    fontSize: '0.875rem',
-    minWidth: '80px'
-  }
-}))
+function cn(...inputs) {
+  return twMerge(clsx(inputs))
+}
 
 const ConfirmationDialog = ({
   open,
@@ -65,51 +16,84 @@ const ConfirmationDialog = ({
   confirmText = 'Confirm',
   cancelText = 'Cancel'
 }) => {
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [open])
+
   return (
-    <StyledDialog
-      open={open}
-      onClose={onClose}
-      TransitionComponent={Transition}
-      aria-labelledby='confirmation-dialog-title'
-      aria-describedby='confirmation-dialog-description'
-    >
-      <StyledDialogTitle id='confirmation-dialog-title'>
-        {title}
-      </StyledDialogTitle>
-      <DialogContent sx={{ padding: '0 16px 8px 16px' }}>
-        <StyledDialogContentText id='confirmation-dialog-description'>
-          {message}
-        </StyledDialogContentText>
-      </DialogContent>
-      <StyledDialogActions>
-        <Button
-          onClick={onClose}
-          variant='outlined'
-          color='primary'
-          sx={{
-            border: '1.5px solid',
-            '&:hover': {
-              backgroundColor: 'rgba(25, 118, 210, 0.04)',
-              border: '1.5px solid'
-            }
-          }}
-        >
-          {cancelText}
-        </Button>
-        <Button
-          onClick={onConfirm}
-          variant='contained'
-          sx={{
-            backgroundColor: '#ef4444',
-            '&:hover': {
-              backgroundColor: '#dc2626'
-            }
-          }}
-        >
-          {confirmText}
-        </Button>
-      </StyledDialogActions>
-    </StyledDialog>
+    <AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+            aria-hidden="true"
+          />
+
+          {/* Dialog Panel */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="z-50 grid w-full max-w-lg scale-100 gap-4 border border-border bg-background p-6 shadow-lg duration-200 sm:rounded-lg"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirmation-dialog-title"
+            aria-describedby="confirmation-dialog-description"
+          >
+            <div className="flex flex-col space-y-1.5 text-center sm:text-left">
+              <h2
+                id="confirmation-dialog-title"
+                className="text-lg font-semibold leading-none tracking-tight text-foreground"
+              >
+                {title}
+              </h2>
+              <div id="confirmation-dialog-description" className="text-sm text-muted-foreground">
+                {message}
+              </div>
+            </div>
+
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className={cn(
+                  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
+                  "border border-input hover:bg-accent hover:text-accent-foreground",
+                  "h-10 py-2 px-4 mt-2 sm:mt-0"
+                )}
+              >
+                {cancelText}
+              </button>
+              <button
+                type="button"
+                onClick={onConfirm}
+                className={cn(
+                  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
+                  "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+                  "h-10 py-2 px-4"
+                )}
+              >
+                {confirmText}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   )
 }
 
