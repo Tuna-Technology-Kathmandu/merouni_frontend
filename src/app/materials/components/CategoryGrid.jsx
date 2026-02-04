@@ -1,13 +1,17 @@
 'use client'
 import React from 'react'
 import CategoryCard from './CategoryCard'
-import { Folder, Plus } from 'lucide-react'
+import CategoryCardSkeleton from '@/ui/shadcn/CategoryCardSkeleton'
 import { GridSkeleton } from '@/ui/shadcn/GridSkeleton'
-import EmptyState from '@/ui/shadcn/EmptyState'
+import { Plus } from 'lucide-react'
 
 const CategoryGrid = ({ categories, onCategoryClick, loading }) => {
   if (loading) {
-    return <GridSkeleton className='p-4 mb-10' />
+    return (
+      <GridSkeleton className='p-4 mb-10'>
+        <CategoryCardSkeleton />
+      </GridSkeleton>
+    )
   }
 
   if (!loading && categories.length === 0) {

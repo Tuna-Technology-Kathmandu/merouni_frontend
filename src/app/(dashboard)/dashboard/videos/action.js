@@ -4,6 +4,7 @@
 
 let url = `${process.env.baseUrl}/video`
 
+console.log(process.env.baseUrl, "process.env.baseUrlprocess.env.baseUrl")
 export async function fetchVideos(page = 1, limit = 1000, search = '') {
   try {
     const urlWithParams = new URL(url)

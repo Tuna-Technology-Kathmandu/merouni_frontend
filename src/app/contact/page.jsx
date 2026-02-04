@@ -1,41 +1,37 @@
 'use client'
 
-import ContactHeroSection from './components/HeroSection'
-import ContactNewsletter from './components/ContactNewsLetter'
+import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
-import Footer from '../../components/Frontpage/Footer'
-import ContactInfoCard from './components/ContactInfoCard'
-import ContactMap from './components/ContactMap'
 import ContactForm from './components/ContactForm'
+import ContactSidebar from './components/ContactSidebar'
+import ContactHeroSection from './components/HeroSection'
 
 export default function ContactPage() {
   return (
     <>
       <Header />
       <Navbar />
-      <main className='w-full'>
+      <main className='w-full bg-[#fcfcfc]'>
         {/* Hero Section */}
         <ContactHeroSection />
 
-        {/* Contact Forms Section */}
-        <section className='py-16 bg-white'>
+        {/* Content Section */}
+        <section className='pb-20 pt-10'>
           <div className='container mx-auto px-4'>
-            <div className='grid md:grid-cols-3 gap-8'>
-              {/* Main Contact Form */}
-              <ContactForm />
+            <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+              {/* Contact Form - Takes up 2 columns on large screens */}
+              <div className='lg:col-span-2'>
+                <ContactForm />
+              </div>
 
-              {/* Newsletter Form */}
-              <ContactNewsletter />
+              {/* Sidebar - Takes up 1 column */}
+              <div className='lg:col-span-1'>
+                <ContactSidebar />
+              </div>
             </div>
           </div>
         </section>
-
-        {/* Contact Info Cards */}
-        <ContactInfoCard />
-
-        {/* Map Section */}
-        <ContactMap />
       </main>
       <Footer />
     </>

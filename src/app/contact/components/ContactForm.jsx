@@ -53,7 +53,7 @@ export default function ContactForm() {
   }
 
   return (
-    <div className='md:col-span-2 bg-white p-8 md:p-10 rounded-3xl border border-gray-100 shadow-sm h-full relative overflow-hidden'>
+    <div className='bg-white p-8 md:p-10 rounded-3xl border border-gray-100 shadow-sm h-full relative overflow-hidden'>
       <AnimatePresence mode='wait'>
         {isSuccess ? (
           <motion.div

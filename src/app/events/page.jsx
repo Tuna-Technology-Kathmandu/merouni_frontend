@@ -1,5 +1,8 @@
 'use client'
 import EmptyState from '@/ui/shadcn/EmptyState'
+import EventCardSkeleton from '@/ui/shadcn/EventCardSkeleton'
+import { GridSkeleton } from '@/ui/shadcn/GridSkeleton'
+import { formatDate } from '@/utils/date.util'
 import { debounce } from 'lodash'
 import { Calendar } from 'lucide-react'
 import Link from 'next/link'
@@ -10,7 +13,6 @@ import EventCard from '../../components/Frontpage/EventCard'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
-import Loading from '../../ui/molecules/Loading'
 import { getColleges } from '../action'
 import Pagination from '../blogs/components/Pagination'
 import useMediaQuery from './MediaQuery'
@@ -22,7 +24,6 @@ import {
   fetchThisWeekEvents,
   searchEvent
 } from './action'
-import { formatDate } from '@/utils/date.util'
 
 const Events = () => {
   const [allEvents, setAllEvents] = useState([])
@@ -57,9 +58,6 @@ const Events = () => {
   }, [])
 
   useEffect(() => {
-    // Only run on client side
-    if (typeof window === 'undefined') return
-
     if (searchQuery) {
       debouncedSearch(searchQuery, selectedCollege)
     } else {
@@ -154,7 +152,23 @@ const Events = () => {
       <Navbar />
 
       {loading ? (
-        <Loading />
+        <div className='mx-auto'>
+          {/* Featured Skeleton */}
+          <div className='flex flex-col lg:flex-row items-center justify-between p-0 lg:p-10 max-w-[1600px] mx-auto opacity-70 animate-pulse'>
+            <div className='order-1 lg:order-2 w-full lg:w-1/3 h-[400px] bg-gray-200 rounded-lg'></div>
+            <div className='order-2 lg:order-1 lg:w-1/2 flex flex-col gap-4 mt-4 lg:mt-0'>
+              <div className='h-8 w-3/4 bg-gray-200 rounded'></div>
+              <div className='h-4 w-full bg-gray-200 rounded'></div>
+              <div className='h-32 w-full max-w-[600px] bg-gray-200 rounded-lg mt-4'></div>
+            </div>
+          </div>
+
+          <div className='container mx-auto px-4 py-12'>
+            <GridSkeleton count={6}>
+              <EventCardSkeleton />
+            </GridSkeleton>
+          </div>
+        </div>
       ) : (
         <div className='mx-auto'>
           {featuredEvent && featuredEvent.event_host && (
@@ -212,12 +226,12 @@ const Events = () => {
                           const host = featuredEvent.event_host
                           return host?.time
                             ? new Date(
-                                `1970-01-01T${host.time}:00`
-                              ).toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: 'numeric',
-                                hour12: true
-                              })
+                              `1970-01-01T${host.time}:00`
+                            ).toLocaleTimeString('en-US', {
+                              hour: 'numeric',
+                              minute: 'numeric',
+                              hour12: true
+                            })
                             : 'No Time Available'
                         } catch (e) {
                           return 'Invalid Time Data'
@@ -347,7 +361,7 @@ const Events = () => {
                   <h2 className='text-2xl font-bold text-gray-900'>
                     {selectedCollege
                       ? colleges.find((c) => c.id === selectedCollege)?.name +
-                        ' Events'
+                      ' Events'
                       : 'All Events'}
                   </h2>
                   <div className='text-sm text-gray-500 font-medium'>
@@ -358,12 +372,9 @@ const Events = () => {
                 {/* Responsive Grid */}
                 <div className='grid grid-cols-1 sm:grid-cols-2 min-[1330px]:grid-cols-3 gap-6 md:gap-8'>
                   {allLoading ? (
-                    [...Array(6)].map((_, i) => (
-                      <div
-                        key={i}
-                        className='bg-gray-100 rounded-lg h-80 animate-pulse'
-                      ></div>
-                    ))
+                    <GridSkeleton count={6} className='col-span-1 sm:col-span-2 min-[1330px]:col-span-3 !grid-cols-1 sm:!grid-cols-2 lg:!grid-cols-3 xl:!grid-cols-3'>
+                      <EventCardSkeleton />
+                    </GridSkeleton>
                   ) : allEvents.length === 0 ? (
                     <div className='col-span-full'>
                       <EmptyState
@@ -377,12 +388,12 @@ const Events = () => {
                         action={
                           searchQuery
                             ? {
-                                label: 'Clear Search',
-                                onClick: () => {
-                                  setSearchQuery('')
-                                  loadEvents(1)
-                                }
+                              label: 'Clear Search',
+                              onClick: () => {
+                                setSearchQuery('')
+                                loadEvents(1)
                               }
+                            }
                             : null
                         }
                       />
