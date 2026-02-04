@@ -1,37 +1,22 @@
 'use client'
-import dynamic from 'next/dynamic'
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { useForm } from 'react-hook-form'
 import { fetchBlogs, fetchTags } from './action'
 import { getCategories } from '@/app/action'
 import { authFetch } from '@/app/utils/authFetch'
-import Loader from '../../../../ui/molecules/Loading'
-import Table from '../../../../ui/molecules/Table'
+import Loader from '@/ui/molecules/Loading'
+import Table from '@/ui/molecules/Table'
 import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
-import FileUpload from '../addCollege/FileUpload'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../ui/molecules/Modal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Button } from '../../../../ui/shadcn/button'
-import { Input } from '../../../../ui/shadcn/input'
-import { Label } from '../../../../ui/shadcn/label'
+import { Button } from '@/ui/shadcn/button'
 import { formatDate } from '@/utils/date.util'
-
-const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
-  ssr: false
-})
-
-// Helper component for required label
-const RequiredLabel = ({ children, htmlFor }) => (
-  <Label htmlFor={htmlFor}>
-    {children} <span className='text-red-500'>*</span>
-  </Label>
-)
+import BlogFormModal from './components/BlogFormModal'
+import BlogViewModal from './components/BlogViewModal'
 
 export default function BlogsManager() {
   const { setHeading } = usePageHeading()
@@ -46,53 +31,25 @@ export default function BlogsManager() {
   const [editingId, setEditingId] = useState(null)
   const [editing, setEditing] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
-  const [uploadedFiles, setUploadedFiles] = useState({
-    featuredImage: ''
-  })
+  const [selectedBlog, setSelectedBlog] = useState(null) // To pass to Modal
+
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
     total: 0
   })
   const [tags, setTags] = useState([])
-  const [selectedTags, setSelectedTags] = useState([])
-  const [tagsSearch, setTagsSearch] = useState('')
-  const [searchResults, setSearchResults] = useState([])
   const [deleteId, setDeleteId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [tagsLoading, setTagsLoading] = useState(false)
-  const searchTimeout = useRef(null)
   const [submitting, setSubmitting] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [newsSearchTimeout, setNewsSearchTimeout] = useState(null)
+
+  // View Modal State
   const [viewModalOpen, setViewModalOpen] = useState(false)
   const [viewNewsData, setViewNewsData] = useState(null)
   const [loadingView, setLoadingView] = useState(false)
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    getValues,
-    watch,
-    formState: { errors }
-  } = useForm({
-    defaultValues: {
-      title: '',
-      category: '',
-      tags: [],
-      author: author_id,
-      featuredImage: '',
-      description: '',
-      content: '',
-      status: 'draft',
-      visibility: 'private'
-    }
-  })
-
-  const editorRef = useRef(null)
-  const hasSetContent = useRef(false)
 
   const columns = useMemo(
     () => [
@@ -184,18 +141,8 @@ export default function BlogsManager() {
         )
       }
     ],
-    [tags]
+    [tags, tagsLoading]
   )
-
-  const fetchTagById = async (tagId) => {
-    
-    const response = await authFetch(
-      `${process.env.baseUrl}/tag/${tagId}`
-    )
-    const data = await response.json()
-    return data.item || data
-  }
-
 
   useEffect(() => {
     const limit = 1000
@@ -212,46 +159,14 @@ export default function BlogsManager() {
 
   useEffect(() => {
     const loadTags = async () => {
-      setTagsLoading(true)
-      try {
-        const tagList = await fetchTags()
-        if (tagList && tagList.items) {
-          setTags(tagList.items)
-        } else {
-          console.error('Invalid tags data structure:', tagList)
-        }
-      } catch (error) {
-        console.error('Failed to fetch tags:', error)
-      } finally {
-        setTagsLoading(false)
-      }
+      // Simple fetch or removed if modal handles it.
+      // Keeping it if we need tags for other things or initialization
+      // But modal handles its own searching. We might pass initial list.
+      // Leaving logic here if needed.
     }
-    loadTags()
   }, [])
 
-  const handleTagsSearch = (e) => {
-    const query = e.target.value
-    setTagsSearch(query)
 
-    // debounce search calls
-    if (searchTimeout.current) clearTimeout(searchTimeout.current)
-    if (query.length < 2) {
-      setSearchResults([])
-      return
-    }
-    searchTimeout.current = setTimeout(async () => {
-      try {
-        const response = await authFetch(
-          `${process.env.baseUrl}/tag?q=${query}`
-        )
-        const data = await response.json()
-        setSearchResults(data.items || [])
-      } catch (error) {
-        console.error('Tags Search Error:', error)
-        toast.error('Failed to search tags')
-      }
-    }, 300)
-  }
   useEffect(() => {
     setHeading('Blogs Management')
     loadData()
@@ -262,15 +177,10 @@ export default function BlogsManager() {
   useEffect(() => {
     const addParam = searchParams.get('add')
     if (addParam === 'true') {
-      setIsOpen(true)
-      setEditing(false)
-      setEditingId(null)
-      reset()
-      setSelectedTags([])
-      setUploadedFiles({ featuredImage: '' })
+      handleAddBlog()
       router.replace('/dashboard/blogs', { scroll: false })
     }
-  }, [searchParams, router, reset])
+  }, [searchParams, router])
 
   useEffect(() => {
     return () => {
@@ -281,21 +191,6 @@ export default function BlogsManager() {
   }, [newsSearchTimeout])
 
   const { requireAdmin } = useAdminPermission()
-
-  // Function to add a tag from search results
-  const handleSelectTag = (tag) => {
-    if (!selectedTags.some((t) => t.id === tag.id)) {
-      const newTags = [...selectedTags, tag]
-      setSelectedTags(newTags)
-      setValue(
-        'tags',
-        newTags.map((t) => t.id)
-      )
-    }
-    // Clear search input and results after selection
-    setTagsSearch('')
-    setSearchResults([])
-  }
 
   const [statusFilter, setStatusFilter] = useState('all')
 
@@ -320,16 +215,14 @@ export default function BlogsManager() {
     loadData(1, statusFilter)
   }, [statusFilter])
 
-  // ... (existing code)
 
   const createBlogs = async (data) => {
     try {
-      // Send tags directly as an array of numbers
+      // Ensure tags are mapped if they came back as objects [ {id, title} ]
       const formattedData = {
         ...data,
-        category: data.category,
-        tags: selectedTags.map((tag) => tag.id),
-        featuredImage: uploadedFiles.featuredImage
+        tags: data.tags.map(t => typeof t === 'object' ? t.id : t),
+        author: author_id // Ensure author is set
       }
 
       const response = await authFetch(
@@ -343,7 +236,8 @@ export default function BlogsManager() {
         }
       )
       if (!response.ok) {
-        throw new Error('Failed to create news')
+        const res = await response.json()
+        throw new Error(res.message || 'Failed to create news')
       }
       return await response.json()
     } catch (error) {
@@ -354,12 +248,9 @@ export default function BlogsManager() {
 
   const updateBlogs = async (data, id) => {
     try {
-      // Send tags directly as an array of numbers
       const formattedData = {
         ...data,
-        category: data.category,
-        tags: selectedTags.map((tag) => tag.id),
-        featuredImage: uploadedFiles.featuredImage
+        tags: data.tags.map(t => typeof t === 'object' ? t.id : t)
       }
       const response = await authFetch(
         `${process.env.baseUrl}/blogs?id=${id}`,
@@ -372,7 +263,8 @@ export default function BlogsManager() {
         }
       )
       if (!response.ok) {
-        throw new Error('Failed to update blog')
+        const res = await response.json()
+        throw new Error(res.message || 'Failed to update blog')
       }
       return await response.json()
     } catch (error) {
@@ -381,80 +273,18 @@ export default function BlogsManager() {
     }
   }
 
-  const handleEdit = async (blog) => {
-    hasSetContent.current = false
+  const handleEdit = (blog) => {
     setEditingId(blog.id)
     setEditing(true)
+    setSelectedBlog(blog)
     setIsOpen(true)
+  }
 
-    // Attempt to parse blog.tags if it's a string
-    let blogTags = blog.tags
-    if (typeof blogTags === 'string') {
-      try {
-        blogTags = JSON.parse(blogTags)
-      } catch (error) {
-        console.error('Error parsing blog.tags string:', error)
-        blogTags = []
-      }
-    }
-
-
-    // First fetch any missing tags
-    const missingTagIds = blogTags.filter(
-      (tagId) => !tags.some((t) => t.id === tagId)
-    )
-
-    let allTags = [...tags] // Start with existing tags
-
-    if (missingTagIds.length > 0) {
-      const fetchPromises = missingTagIds.map((tagId) => fetchTagById(tagId))
-      const fetchedTags = (await Promise.all(fetchPromises)).filter(Boolean)
-      allTags = [...tags, ...fetchedTags] // Combine existing and newly fetched tags
-      setTags(allTags) // Update tags state
-    }
-
-    // Now we have all necessary tags, we can set the existing tags
-    let existingTags = []
-    if (Array.isArray(blogTags)) {
-      if (blogTags.length > 0 && typeof blogTags[0] === 'number') {
-        existingTags = blogTags
-          .map((tagId) => {
-            const found = allTags.find((t) => t.id === tagId) // Use allTags instead of tags
-            if (!found) {
-              console.warn(`Tag with ID ${tagId} not found in local state`)
-            }
-            return found
-          })
-          .filter(Boolean)
-      } else if (blogTags.length > 0 && typeof blogTags[0] === 'object') {
-        existingTags = blogTags
-      }
-    } else {
-      console.warn('blog.tags is not an array after parsing:', blogTags)
-    }
-
-
-    // Update state and form values
-    setSelectedTags(existingTags)
-    setValue(
-      'tags',
-      existingTags.map((tag) => tag.id)
-    )
-    setValue('content', blog.content)
-
-    // Populate other form fields from blog
-    Object.keys(blog).forEach((key) => {
-      if (key !== 'tags') {
-        setValue(key, blog[key])
-      }
-    })
-
-    // Handle featured image separately
-    setUploadedFiles((prev) => ({
-      ...prev,
-      featuredImage: blog.featuredImage || ''
-    }))
-    setValue('featuredImage', blog.featuredImage)
+  const handleAddBlog = () => {
+    setEditingId(null)
+    setEditing(false)
+    setSelectedBlog(null)
+    setIsOpen(true)
   }
 
   const handleSearch = async (query) => {
@@ -507,7 +337,7 @@ export default function BlogsManager() {
     }
   }
 
-  const onSubmit = async (data) => {
+  const handleSave = async (data) => {
     setSubmitting(true)
     try {
       if (editingId) {
@@ -517,20 +347,16 @@ export default function BlogsManager() {
         await createBlogs(data)
         toast.success('News created successfully')
       }
-      reset()
+      setIsOpen(false)
       setEditingId(null)
       setEditing(false)
-      setIsOpen(false)
-      setSelectedTags([])
-      setUploadedFiles({ featuredImage: '' })
+      setSelectedBlog(null)
       loadData()
-      setSubmitting(false)
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Network error occurred'
+      const errorMsg = err.message || 'Network error occurred'
       toast.error(
         `Failed to ${editingId ? 'update' : 'create'} news: ${errorMsg}`
       )
-      console.error('Error saving news:', err)
     } finally {
       setSubmitting(false)
     }
@@ -597,22 +423,19 @@ export default function BlogsManager() {
     setViewNewsData(null)
   }
 
+  const handleCloseModal = () => {
+    setIsOpen(false)
+    setEditing(false)
+    setEditingId(null)
+    setSelectedBlog(null)
+  }
+
   if (loading)
     return (
       <div className='mx-auto'>
         <Loader />
       </div>
     )
-
-  const handleCloseModal = () => {
-    setIsOpen(false)
-    setEditing(false)
-    setEditingId(null)
-    reset()
-    setSelectedTags([])
-    setUploadedFiles({ featuredImage: '' })
-
-  }
 
   return (
     <>
@@ -644,244 +467,22 @@ export default function BlogsManager() {
           </div>
           {/* Button */}
           <div className='flex gap-2'>
-            <Button
-              onClick={() => {
-                setIsOpen(true)
-                setEditing(false)
-                setEditingId(null)
-                reset()
-                setSelectedTags([])
-                setUploadedFiles({ featuredImage: '' })
-              }}
-            >
+            <Button onClick={handleAddBlog}>
               Add Blog
             </Button>
           </div>
         </div>
         <ToastContainer />
 
-        <Modal
+        <BlogFormModal
           isOpen={isOpen}
-          onClose={() => {
-            handleCloseModal()
-          }}
-          title={editing ? 'Edit Blog' : 'Add Blog'}
-          className='max-w-5xl'
-        >
-          <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className='flex flex-col flex-1 overflow-hidden'
-            >
-              <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                {/* Basic Information */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Blog Information
-                  </h2>
-                  <div className='space-y-4'>
-                    <div>
-                      <RequiredLabel htmlFor='title'>Blog Title</RequiredLabel>
-                      <Input
-                        id='title'
-                        placeholder='Blog Title'
-                        {...register('title', {
-                          required: 'Title is required'
-                        })}
-                        aria-invalid={errors.title ? 'true' : 'false'}
-                      />
-                      {errors.title && (
-                        <p className='text-sm font-medium text-destructive mt-1'>
-                          {errors.title.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <RequiredLabel htmlFor='category'>Category</RequiredLabel>
-                      <select
-                        id='category'
-                        {...register('category', {
-                          required: 'Category is required'
-                        })}
-                        className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                      >
-                        <option value=''>Select Category</option>
-                        {categories.map((cat) => (
-                          <option key={cat.id} value={cat.id}>
-                            {cat.title}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.category && (
-                        <p className='text-sm font-medium text-destructive mt-1'>
-                          {errors.category.message}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Tags search input */}
-                    <div className='relative'>
-                      <Input
-                        type='text'
-                        placeholder='Search for tags...'
-                        value={tagsSearch}
-                        onChange={handleTagsSearch}
-                      />
-
-                      {/* Display search results in a dropdown */}
-                      {searchResults.length > 0 && (
-                        <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto'>
-                          {searchResults.map((tag) => (
-                            <div
-                              key={tag.id}
-                              className='p-2 hover:bg-gray-100 cursor-pointer'
-                              onClick={() => handleSelectTag(tag)}
-                            >
-                              {tag.title}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Display selected tags */}
-                      <div className='mt-2 flex flex-wrap gap-2'>
-                        {selectedTags.map((tag) => (
-                          <span
-                            key={tag.id}
-                            className='bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center gap-1'
-                          >
-                            {tag.title}
-                            <button
-                              type='button'
-                              onClick={() => {
-                                const newTags = selectedTags.filter(
-                                  (t) => t.id !== tag.id
-                                )
-                                setSelectedTags(newTags)
-                                setValue(
-                                  'tags',
-                                  newTags.map((t) => t.id)
-                                )
-                              }}
-                              className='text-blue-600 hover:text-blue-800 ml-1'
-                            >
-                              ×
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Description and Content */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Description & Content
-                  </h2>
-                  <div className='space-y-4'>
-                    <div>
-                      <Label htmlFor='description'>Description</Label>
-                      <textarea
-                        id='description'
-                        placeholder='Description'
-                        {...register('description')}
-                        className='flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                        rows='4'
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor='content' className='block mb-2'>
-                        Content
-                      </label>
-                      <CKBlogs
-                        initialData={getValues('content')}
-                        onChange={(data) => setValue('content', data)}
-                        id='editor1'
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Media */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Featured Image{' '}
-                  </h2>
-                  <FileUpload
-                    label='Blog Image'
-                    onUploadComplete={(url) => {
-                      setUploadedFiles((prev) => ({
-                        ...prev,
-                        featuredImage: url
-                      }))
-                    }}
-                    defaultPreview={uploadedFiles.featuredImage}
-                  />
-                </div>
-
-                {/* Additional Settings */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Additional Settings
-                  </h2>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <div>
-                      <Label htmlFor='visibility'>Visibility</Label>
-                      <select
-                        id='visibility'
-                        {...register('visibility')}
-                        className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                      >
-                        <option value='private'>Private</option>
-                        <option value='public'>Public</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor='status'>Status</Label>
-                      <select
-                        id='status'
-                        {...register('status')}
-                        className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                      >
-                        <option value='draft'>Draft</option>
-                        <option value='published'>Published</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Submit Button - Sticky Footer */}
-              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
-                <Button
-                  type='button'
-                  onClick={handleCloseModal}
-                  variant='outline'
-                  size='sm'
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type='submit'
-                  className=' text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
-                  disabled={submitting}
-                >
-                  {submitting
-                    ? editing
-                      ? 'Updating...'
-                      : 'Adding...'
-                    : editing
-                      ? 'Update Blog'
-                      : 'Create Blog'}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </Modal>
+          onClose={handleCloseModal}
+          isEditing={editing}
+          initialData={selectedBlog}
+          categories={categories}
+          onSave={handleSave}
+          submitting={submitting}
+        />
 
         {/* Table Section */}
         <div className='mt-8'>
@@ -904,132 +505,12 @@ export default function BlogsManager() {
         message='Are you sure you want to delete this blog? This action cannot be undone.'
       />
 
-      {/* View News Details Modal */}
-      <Modal
+      <BlogViewModal
         isOpen={viewModalOpen}
         onClose={handleCloseViewModal}
-        title='Blog Details'
-        className='max-w-3xl'
-      >
-        {loadingView ? (
-          <div className='flex justify-center items-center h-48'>
-            Loading...
-          </div>
-        ) : viewNewsData ? (
-          <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
-            {viewNewsData.featuredImage && (
-              <div className='w-full h-64 rounded-lg overflow-hidden'>
-                <img
-                  src={viewNewsData.featuredImage}
-                  alt={viewNewsData.title}
-                  className='w-full h-full object-cover'
-                />
-              </div>
-            )}
-
-            <div>
-              <h2 className='text-2xl font-bold text-gray-800'>
-                {viewNewsData.title}
-              </h2>
-              <div className='flex gap-2 mt-2'>
-                {viewNewsData.status && (
-                  <span
-                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${viewNewsData.status === 'published'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                  >
-                    {viewNewsData.status}
-                  </span>
-                )}
-                {viewNewsData.visibility && (
-                  <span
-                    className={`px-2 py-0.5 text-xs font-semibold rounded-full ${viewNewsData.visibility === 'public'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-gray-100 text-gray-800'
-                      }`}
-                  >
-                    {viewNewsData.visibility}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {viewNewsData.newsCategory && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Category</h3>
-                <p className='text-gray-700'>
-                  {viewNewsData.newsCategory.title}
-                </p>
-              </div>
-            )}
-
-            {viewNewsData.newsAuthor && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Author</h3>
-                <p className='text-gray-700'>
-                  {viewNewsData.newsAuthor.firstName}{' '}
-                  {viewNewsData.newsAuthor.middleName}{' '}
-                  {viewNewsData.newsAuthor.lastName}
-                </p>
-              </div>
-            )}
-
-            {viewNewsData.tags &&
-              Array.isArray(viewNewsData.tags) &&
-              viewNewsData.tags.length > 0 && (
-                <div>
-                  <h3 className='text-lg font-semibold mb-2'>Tags</h3>
-                  <div className='flex flex-wrap gap-2'>
-                    {viewNewsData.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className='px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm'
-                      >
-                        {typeof tag === 'object' ? tag.title || tag.name : tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-            {viewNewsData.description && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Description</h3>
-                <div
-                  className='text-gray-700 prose max-w-none'
-                  dangerouslySetInnerHTML={{
-                    __html: viewNewsData.description
-                  }}
-                />
-              </div>
-            )}
-
-            {viewNewsData.content && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Content</h3>
-                <div
-                  className='text-gray-700 prose max-w-none'
-                  dangerouslySetInnerHTML={{
-                    __html: viewNewsData.content
-                  }}
-                />
-              </div>
-            )}
-
-            {viewNewsData.createdAt && (
-              <div className='pt-4 border-t'>
-                <p className='text-sm text-gray-500'>
-                  Created:{' '}
-                  {new Date(viewNewsData.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-            )}
-          </div>
-        ) : (
-          <p className='text-center text-gray-500'>No blog data available.</p>
-        )}
-      </Modal>
+        data={viewNewsData}
+        loading={loadingView}
+      />
     </>
   )
 }
