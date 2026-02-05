@@ -12,7 +12,7 @@ import { FaUserCircle, FaUser, FaSignOutAlt } from 'react-icons/fa'
 import { removeUser } from '../../app/utils/userSlice'
 import { ChevronDown } from 'lucide-react'
 
-const AdminNavbar = () => {
+const AdminNavbar = ({ onMenuClick }) => {
   const { heading, subheading } = usePageHeading()
   const [loading, setLoading] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -84,7 +84,7 @@ const AdminNavbar = () => {
       console.error('Error during agent verification:', error)
       toast.error(
         error.message ||
-          'Failed to send verification request. Please try again.'
+        'Failed to send verification request. Please try again.'
       )
     } finally {
       setLoading(false)
@@ -135,14 +135,24 @@ const AdminNavbar = () => {
 
   return (
     <div className='sticky top-0 z-40 bg-[#F7F8FA] flex items-center justify-between p-4 border-b border-gray-200'>
-      {/* HEADING */}
-      <div>
-        {heading && <h1 className='text-2xl font-bold'>{heading}</h1>}
-        {subheading && (
-          <p className='text-sm text-gray-500 mt-1'>{subheading}</p>
-        )}
+      {/* HEADING & MOBILE TOGGLE */}
+      <div className='flex items-center gap-3'>
+        <button
+          onClick={onMenuClick}
+          className='md:hidden p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors'
+          aria-label="Open menu"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <div>
+          {heading && <h1 className='text-xl md:text-2xl font-bold'>{heading}</h1>}
+          {subheading && (
+            <p className='text-xs md:text-sm text-gray-500 mt-1'>{subheading}</p>
+          )}
+        </div>
       </div>
-      {!heading && <div></div>}
       {/* ICONS AND USER */}
       <div className='flex items-center gap-4 justify-end'>
         {/* Only show verification button if user doesn't have agent role */}
@@ -186,9 +196,8 @@ const AdminNavbar = () => {
               </span>
             </div>
             <ChevronDown
-              className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-                isDropdownOpen ? 'rotate-180' : ''
-              }`}
+              className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''
+                }`}
             />
           </button>
 

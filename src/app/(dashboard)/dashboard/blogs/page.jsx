@@ -5,7 +5,8 @@ import { getCategories } from '@/app/action'
 import { authFetch } from '@/app/utils/authFetch'
 import Loader from '@/ui/molecules/Loading'
 import Table from '@/ui/molecules/Table'
-import { Edit2, Trash2, Search, Eye } from 'lucide-react'
+import { Edit2, Trash2, Eye } from 'lucide-react'
+import SearchInput from '@/ui/molecules/SearchInput'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
@@ -443,18 +444,12 @@ export default function BlogsManager() {
         <div className='flex justify-between items-center mb-4'>
           {/* Search Bar */}
           <div className='relative w-full max-w-md flex gap-2'>
-            <div className='relative flex-1'>
-              <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-                <Search className='w-4 h-4 text-gray-500' />
-              </div>
-              <input
-                type='text'
-                value={searchQuery}
-                onChange={(e) => handleSearchInput(e.target.value)}
-                className='w-full pl-10 pr-4 py-2 text-sm border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring'
-                placeholder='Search blogs...'
-              />
-            </div>
+            <SearchInput
+              className='flex-1'
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              placeholder='Search blogs...'
+            />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}

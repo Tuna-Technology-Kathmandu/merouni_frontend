@@ -9,6 +9,7 @@ import { Button } from '@/ui/shadcn/button'
 import { Search, X, ChevronDown } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import Table from '../../../../ui/molecules/Table'
+import SearchInput from '@/ui/molecules/SearchInput'
 
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -295,21 +296,12 @@ const ConsultancyReferralsPage = () => {
       {/* Filters Section */}
       <div className='flex flex-col md:flex-row gap-4 mb-6'>
         {/* Search Filter */}
-        <div className='flex-1 relative'>
-          <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
-          <input
-            type='text'
-            placeholder='Search applications...'
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className='w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-          />
-          {searchQuery && (
-            <button onClick={handleClearFilters} className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600'>
-              <X className='w-4 h-4' />
-            </button>
-          )}
-        </div>
+        <SearchInput
+          value={searchQuery}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          placeholder='Search consultancy referrals...'
+          className='max-w-md'
+        />
 
         {/* Status Filter Dropdown */}
         <div className='relative' ref={statusDropdownRef}>

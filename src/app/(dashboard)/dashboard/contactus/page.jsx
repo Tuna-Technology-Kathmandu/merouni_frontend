@@ -14,6 +14,7 @@ import { Button } from '@/ui/shadcn/button'
 import { Label } from '@/ui/shadcn/label'
 
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function ContactUsManager() {
     const { setHeading } = usePageHeading()
@@ -149,18 +150,13 @@ export default function ContactUsManager() {
         <div className='p-6 w-full space-y-6'>
             <div className='flex justify-between items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100'>
                 {/* Search */}
-                <div className='relative flex-1 max-w-md'>
-                    <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-                        <Search className='w-4 h-4 text-gray-500' />
-                    </div>
-                    <input
-                        type='text'
-                        value={searchQuery}
-                        onChange={handleSearch}
-                        className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 focus:bg-white transition-colors'
-                        placeholder='Search by name, email or subject...'
-                    />
-                </div>
+                    {/* Search Bar */}
+                         <SearchInput
+                           value={searchQuery}
+                           onChange={(e) => handleSearch(e.target.value)}
+                           placeholder='Search courses...'
+                           className='max-w-md'
+                         />
 
                 {/* Filters */}
                 <div className='min-w-[180px]'>
@@ -173,7 +169,7 @@ export default function ContactUsManager() {
                         className='w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer'
                     >
                         <option value='all'>All Status</option>
-                        <option value='new'>New</option>
+                        <option value='unread'>UnRead</option>
                         <option value='in_progress'>In Progress</option>
                         <option value='resolved'>Resolved</option>
                     </select>

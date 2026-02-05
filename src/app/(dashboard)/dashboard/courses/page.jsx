@@ -18,6 +18,7 @@ import { Input } from '../../../../ui/shadcn/input'
 import { Label } from '../../../../ui/shadcn/label'
 import { Dialog, DialogHeader, DialogTitle } from '../../../../ui/shadcn/dialog'
 import { Modal } from '../../../../ui/molecules/Modal'
+import SearchInput from '@/ui/molecules/SearchInput'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
 })
@@ -401,18 +402,13 @@ export default function CourseForm() {
       <div className='p-4 w-full'>
         <div className='flex justify-between items-center mb-4 gap-4'>
           {/* Search Bar */}
-          <div className='relative w-full max-w-md'>
-            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-              <Search className='w-4 h-4 text-muted-foreground' />
-            </div>
-            <Input
-              type='text'
-              value={searchQuery}
-              onChange={(e) => handleSearchInput(e.target.value)}
-              className='pl-10 pr-4'
-              placeholder='Search courses...'
-            />
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder='Search courses...'
+            className='max-w-md'
+          />
+
           {/* Button */}
           <div className='flex gap-2'>
             <Button

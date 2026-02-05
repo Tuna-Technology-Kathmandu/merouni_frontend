@@ -19,6 +19,7 @@ import { Button } from '../../../../ui/shadcn/button'
 import { Input } from '../../../../ui/shadcn/input'
 import { Label } from '../../../../ui/shadcn/label'
 import { Select } from '../../../../ui/shadcn/select'
+import SearchInput from '@/ui/molecules/SearchInput'
 const CKExam = dynamic(() => import('../component/CKExam'), {
   ssr: false
 })
@@ -532,18 +533,13 @@ export default function ExamManager() {
       <div className='p-4 w-full'>
         <div className='flex justify-between items-center mb-4'>
           {/* Search Bar */}
-          <div className='relative w-full max-w-md'>
-            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-              <Search className='w-4 h-4 text-gray-500' />
-            </div>
-            <input
-              type='text'
-              value={searchQuery}
-              onChange={(e) => handleSearchInput(e.target.value)}
-              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-              placeholder='Search exams...'
-            />
-          </div>
+                 <SearchInput
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder='Search news...'
+            className='max-w-md'
+          />
+
           {/* Button */}
           <div className='flex gap-2'>
             <Button

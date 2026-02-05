@@ -8,7 +8,7 @@ import { useState, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { destr } from 'destr'
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
-import { Search, X } from 'lucide-react'
+import SearchInput from '../../../ui/molecules/SearchInput'
 import { PageHeadingProvider } from '@/contexts/PageHeadingContext'
 
 export default function DashboardLayout({ children }) {
@@ -48,100 +48,90 @@ export default function DashboardLayout({ children }) {
 
   return (
     <PageHeadingProvider>
-      <div className='h-screen flex text-black'>
-        {/* LEFT */}
+      <div className='min-h-screen bg-[#F7F8FA] flex text-black font-sans'>
+
+        {/* BACKDROP for Mobile */}
         <div
-          className={`${isCollapsed
-            ? 'w-[80px] md:w-[80px] lg:w-[80px] xl:w-[80px]'
-            : 'w-[19%] md:w-[13%] lg:w-[22%] xl:w-[20%]'
-            } flex flex-col transition-all duration-300 relative z-50 bg-white`}
+          className={`fixed inset-0 bg-black/50 z-40 transition-opacity md:hidden ${!isCollapsed ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            }`}
+          onClick={() => setIsCollapsed(true)} // Close on click
+        />
+
+        {/* SIDEBAR */}
+        <div
+          className={`
+            fixed md:sticky top-0 h-screen bg-white z-50 border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out
+            ${isCollapsed
+              ? '-translate-x-full md:translate-x-0 md:w-20'
+              : 'translate-x-0 md:w-64'
+            }
+          `}
         >
           {/* Sticky Header - Logo and Search Bar */}
-          <div className='sticky top-0 bg-white z-10 border-b border-gray-200'>
-            <div className='p-4 pb-2'>
-              <div className='flex items-center justify-center'>
-                <Link
-                  href='/'
-                  className={`flex items-center gap-2 ${isCollapsed ? 'justify-center' : 'justify-start'
-                    }`}
-                >
-                  <Image
-                    src='/images/logo.png'
-                    alt='logo'
-                    width={isCollapsed ? 40 : 150}
-                    height={isCollapsed ? 40 : 150}
-                    className='transition-all duration-300'
-                  />
-                </Link>
-                <button
-                  onClick={toggleSidebar}
-                  className='absolute -right-3 top-6 bg-white border border-gray-300 rounded-full p-1 shadow-md hover:bg-gray-50 z-[100] transition-all duration-300'
-                  aria-label='Toggle sidebar'
-                >
-                  {isCollapsed ? (
-                    <FaChevronRight className='w-4 h-4 text-gray-600' />
-                  ) : (
-                    <FaChevronLeft className='w-4 h-4 text-gray-600' />
-                  )}
-                </button>
-              </div>
+          <div className='flex-shrink-0 bg-white z-10 border-b border-gray-100'>
+            <div className='p-4 flex items-center justify-between h-[70px]'>
+              <Link
+                href='/'
+                className={`flex items-center gap-2 overflow-hidden transition-all duration-300 ${isCollapsed ? 'md:justify-center w-full' : 'justify-start'
+                  }`}
+              >
+                <Image
+                  src='/images/logo.png'
+                  alt='logo'
+                  width={isCollapsed ? 40 : 140}
+                  height={isCollapsed ? 40 : 50}
+                  className='object-contain transition-all duration-300'
+                  priority
+                />
+              </Link>
+
+              {/* Toggle Button (Desktop & Mobile Close) */}
+              <button
+                onClick={toggleSidebar}
+                className={`
+                    absolute -right-3 top-6 
+                    hidden md:flex 
+                    bg-white border border-gray-200 text-gray-500 hover:text-[#0A6FA7] hover:border-[#0A6FA7]
+                    rounded-full p-1.5 shadow-sm z-[100] transition-all duration-200
+                  `}
+                aria-label='Toggle sidebar'
+              >
+                {isCollapsed ? (
+                  <FaChevronRight className='w-3 h-3' />
+                ) : (
+                  <FaChevronLeft className='w-3 h-3' />
+                )}
+              </button>
             </div>
-            {/* Search Bar - Only for admin */}
+
+            {/* Search Bar - Only for admin & when Expanded */}
             {isAdmin && !isCollapsed && (
-              <div className="px-4 pb-3">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search menus"
-                    className="
-        w-full rounded-lg
-        bg-gray-50
-        border border-gray-200
-        py-2.5 pl-10 pr-9 text-sm
-        text-gray-900 placeholder-gray-400
-        outline-none
-        transition
-        focus:bg-white
-        focus:border-[#0A6FA7]
-        focus:ring-1 focus:ring-[#0A6FA7]/30
-      "
-                  />
-
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery("")}
-                      className="
-          absolute right-3 top-1/2 -translate-y-1/2
-          text-gray-400 hover:text-gray-600
-        "
-                      aria-label="Clear search"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
+              <div className="px-4 pb-4 animate-in fade-in zoom-in duration-200">
+                <SearchInput
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onClear={() => setSearchQuery('')}
+                  placeholder='Search menus...'
+                />
               </div>
-
             )}
           </div>
+
           {/* Scrollable Menu */}
-          <div className='flex-1 overflow-y-auto sidebar-scrollbar'>
+          <div className='flex-1 overflow-y-auto sidebar-scrollbar custom-scrollbar'>
             <Menu isCollapsed={isCollapsed} searchQuery={searchQuery} />
           </div>
         </div>
-        {/* RIGHT */}
-        <div
-          className={`${isCollapsed
-            ? 'w-[calc(100%-80px)] md:w-[calc(100%-80px)] lg:w-[calc(100%-80px)] xl:w-[calc(100%-80px)]'
-            : 'w-[81%] md:w-[87%] lg:w-[78%] xl:w-[80%]'
-            } bg-[#F7F8FA] overflow-scroll flex flex-col transition-all duration-300`}
-        >
-          <AdminNavbar />
-          {children}
+
+        {/* RIGHT CONTENT */}
+        <div className='flex-1 flex flex-col min-w-0 transition-all duration-300'>
+
+          <AdminNavbar onMenuClick={() => setIsCollapsed(false)} />
+
+          {/* Main Content Area */}
+          <main className='flex-1 p-4 md:p-6 overflow-y-auto overflow-x-hidden'>
+            {children}
+          </main>
         </div>
       </div>
     </PageHeadingProvider>
