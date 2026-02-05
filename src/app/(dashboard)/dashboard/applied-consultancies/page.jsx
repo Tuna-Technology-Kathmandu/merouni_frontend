@@ -1,27 +1,26 @@
 'use client'
 
-import React, { useEffect, useState, useMemo } from 'react'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { fetchStudentConsultancyApplications } from './actions'
-import {
-  Handshake,
-  Calendar,
-  CheckCircle,
-  XCircle,
-  Clock,
-  MapPin,
-  ExternalLink
-} from 'lucide-react'
 import Loading from '@/ui/molecules/Loading'
-import EmptyState from '@/ui/shadcn/EmptyState'
 import Table from '@/ui/molecules/Table'
 import { Button } from '@/ui/shadcn/button'
-import Link from 'next/link'
-import { useSelector } from 'react-redux'
-import { destr } from 'destr'
-import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import EmptyState from '@/ui/shadcn/EmptyState'
 import { formatDate } from '@/utils/date.util'
+import { destr } from 'destr'
+import {
+  Calendar,
+  CheckCircle,
+  Clock,
+  ExternalLink,
+  Handshake,
+  MapPin,
+  XCircle
+} from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useMemo, useState } from 'react'
+import { useSelector } from 'react-redux'
+import 'react-toastify/dist/ReactToastify.css'
+import { fetchStudentConsultancyApplications } from './actions'
 
 const AppliedConsultanciesPage = () => {
   const { setHeading, setSubheading } = usePageHeading()
@@ -255,7 +254,7 @@ const AppliedConsultanciesPage = () => {
         <div className='bg-red-50 border border-red-200 rounded-lg p-4 mb-6'>
           <p className='text-sm text-red-600'>Error: {error}</p>
         </div>
-      )}
+      )} 
 
       {applications.length === 0 && !loading ? (
         <div className='bg-white rounded-lg border border-gray-200 p-12'>
@@ -285,7 +284,6 @@ const AppliedConsultanciesPage = () => {
         </div>
       )}
 
-      <ToastContainer position='top-right' autoClose={3000} />
     </div>
   )
 }

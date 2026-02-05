@@ -10,6 +10,7 @@ import Table from '../../../../ui/molecules/Table'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import CreateUpdateProgram from '@/ui/molecules/modals/CreateUpdateProgram'
 import ViewProgram from '@/ui/molecules/modals/ViewProgram'
+import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function ProgramForm() {
   const { setHeading } = usePageHeading()
@@ -222,18 +223,12 @@ export default function ProgramForm() {
       <div className='p-4 w-full'>
         <div className='flex justify-between items-center mb-4'>
           {/* Search Bar */}
-          <div className='relative w-full max-w-md'>
-            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-              <Search className='w-4 h-4 text-gray-500' />
-            </div>
-            <input
-              type='text'
-              value={searchQuery}
-              onChange={(e) => handleSearchInput(e.target.value)}
-              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-              placeholder='Search programs...'
-            />
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder='Search programs...'
+            className='max-w-md'
+          />
           {/* Button */}
           <div className='flex gap-2'>
             <Button onClick={handleCreate}>

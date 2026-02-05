@@ -465,7 +465,7 @@ export default function BannerForm() {
                         style={{ color: THEME_BLUE }}
                       >
                         {banner.website_url}
-                      </a>
+                      </a> 
                     )}
 
                     {banner.date_of_expiry && (

@@ -16,6 +16,7 @@ import {
 } from '@/ui/shadcn/table'
 import { Button } from '@/ui/shadcn/button'
 import { Search, X, Filter, ChevronDown } from 'lucide-react'
+import SearchInput from '@/ui/molecules/SearchInput'
 
 const ConsultancyApplicationsPage = () => {
   const { setHeading } = usePageHeading()
@@ -206,24 +207,12 @@ const ConsultancyApplicationsPage = () => {
       <div className='mb-6 space-y-4'>
         <div className='flex flex-col md:flex-row gap-4'>
           {/* Search Input */}
-          <div className='flex-1 relative'>
-            <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
-            <input
-              type='text'
-              placeholder='Search by student name, email, phone, or consultancy...'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className='w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600'
-              >
-                <X className='w-4 h-4' />
-              </button>
-            )}
-          </div>
+                                 <SearchInput
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder='Search applications...'
+            className='max-w-md'
+          />
 
           {/* Status Filter - Searchable Dropdown */}
           <div className='relative' ref={statusDropdownRef}>

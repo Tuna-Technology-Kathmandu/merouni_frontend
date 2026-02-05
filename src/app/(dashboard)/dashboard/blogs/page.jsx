@@ -158,15 +158,6 @@ export default function BlogsManager() {
     loadCategories()
   }, [])
 
-  useEffect(() => {
-    const loadTags = async () => {
-      // Simple fetch or removed if modal handles it.
-      // Keeping it if we need tags for other things or initialization
-      // But modal handles its own searching. We might pass initial list.
-      // Leaving logic here if needed.
-    }
-  }, [])
-
 
   useEffect(() => {
     setHeading('Blogs Management')
@@ -443,23 +434,12 @@ export default function BlogsManager() {
       <div className='p-4 w-full'>
         <div className='flex justify-between items-center mb-4'>
           {/* Search Bar */}
-          <div className='relative w-full max-w-md flex gap-2'>
-            <SearchInput
-              className='flex-1'
-              value={searchQuery}
-              onChange={(e) => handleSearchInput(e.target.value)}
-              placeholder='Search blogs...'
-            />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className='w-40 px-3 py-2 text-sm border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-white'
-            >
-              <option value='all'>All Status</option>
-              <option value='published'>Published</option>
-              <option value='draft'>Draft</option>
-            </select>
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={(e) => handleSearchInput(e.target.value)}
+            placeholder='Search blogs...'
+            className='max-w-md'
+          />
           {/* Button */}
           <div className='flex gap-2'>
             <Button onClick={handleAddBlog}>
@@ -467,7 +447,6 @@ export default function BlogsManager() {
             </Button>
           </div>
         </div>
-        <ToastContainer />
 
         <BlogFormModal
           isOpen={isOpen}

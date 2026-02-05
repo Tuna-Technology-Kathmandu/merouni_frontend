@@ -36,7 +36,6 @@ export default function NewsForm({
       description: '',
       featuredImage: '',
       status: 'draft',
-      visibility: 'private',
       college_id: '',
       category_id: ''
     }
@@ -50,7 +49,6 @@ export default function NewsForm({
         description: '',
         featuredImage: '',
         status: 'draft',
-        visibility: 'private',
         college_id: '',
         category_id: ''
       })
@@ -64,7 +62,6 @@ export default function NewsForm({
       setValue('description', initialData.description || '')
       setValue('featuredImage', initialData.featuredImage || '')
       setValue('status', initialData.status || 'draft')
-      setValue('visibility', initialData.visibility || 'private')
       setValue(
         'college_id',
         initialData.college_id || initialData.vacancyCollege?.id || ''
@@ -198,17 +195,7 @@ export default function NewsForm({
                   Additional Settings
                 </h2>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                  <div className='space-y-2'>
-                    <Label htmlFor='visibility'>Visibility</Label>
-                    <Select
-                      id='visibility'
-                      {...register('visibility')}
-                      className='w-full'
-                    >
-                      <option value='private'>Private</option>
-                      <option value='public'>Public</option>
-                    </Select>
-                  </div>
+                 
 
                   <div className='space-y-2'>
                     <Label htmlFor='status'>Status</Label>
@@ -227,7 +214,10 @@ export default function NewsForm({
           </div>
 
           {/* Submit Button - Sticky Footer */}
-          <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
+          <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
+            <Button type='button' variant='outline' onClick={onClose}>
+              Cancel
+            </Button>
             <Button type='submit' disabled={submitting}>
               {submitting
                 ? editing

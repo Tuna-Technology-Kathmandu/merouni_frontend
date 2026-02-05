@@ -189,8 +189,6 @@ const ProfileUpdate = () => {
 
   return (
     <div className='p-6 max-w-4xl mx-auto'>
-      <ToastContainer position='top-right' />
-
       {/* Profile Header Card */}
       <div className='bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-6'>
         <div className='flex items-center gap-6'>

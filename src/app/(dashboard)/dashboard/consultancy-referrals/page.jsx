@@ -306,9 +306,7 @@ const ConsultancyReferralsPage = () => {
 
   return (
     <div className='p-4 bg-white min-h-screen'>
-      <ToastContainer />
 
-      {/* Filters Section */}
       <div className='flex flex-col md:flex-row gap-4 mb-6'>
         {/* Search Filter */}
         <SearchInput

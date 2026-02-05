@@ -150,13 +150,12 @@ export default function ContactUsManager() {
         <div className='p-6 w-full space-y-6'>
             <div className='flex justify-between items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100'>
                 {/* Search */}
-                    {/* Search Bar */}
-                         <SearchInput
-                           value={searchQuery}
-                           onChange={(e) => handleSearch(e.target.value)}
-                           placeholder='Search courses...'
-                           className='max-w-md'
-                         />
+                <SearchInput
+                    value={searchQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    placeholder='Search courses...'
+                    className='max-w-md'
+                />
 
                 {/* Filters */}
                 <div className='min-w-[180px]'>

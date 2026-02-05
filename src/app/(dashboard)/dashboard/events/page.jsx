@@ -579,7 +579,7 @@ export default function EventManager() {
           {/* Search Bar */}
                   <SearchInput
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleSearchInput(e.target.value)}
             placeholder='Search events...'
             className='max-w-md'
           />

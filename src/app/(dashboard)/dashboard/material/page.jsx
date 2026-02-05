@@ -15,6 +15,7 @@ import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/ui/shadcn/button'
 import SearchInput from '@/ui/molecules/SearchInput'
+import { formatDate } from '@/utils/date.util'
 
 export default function MaterialForm() {
   const { setHeading } = usePageHeading()
@@ -401,7 +402,7 @@ export default function MaterialForm() {
     {
       header: 'Created At',
       accessorKey: 'createdAt',
-      cell: ({ getValue }) => new Date(getValue()).toLocaleDateString()
+      cell: ({ getValue }) => formatDate(getValue())
     },
     {
       header: 'Actions',

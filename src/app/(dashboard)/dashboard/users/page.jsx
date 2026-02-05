@@ -18,6 +18,7 @@ import Table from '../../../../ui/molecules/Table'
 import { createColumns } from './columns'
 import ExportModal from './ExportModal'
 import { Button } from '@/ui/shadcn/button'
+import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function UsersManager() {
   const { setHeading } = usePageHeading()
@@ -367,39 +368,13 @@ export default function UsersManager() {
     <div className='p-4 w-full'>
       <div className='flex justify-between items-center mb-4 gap-4'>
         {/* Search Bar and Filter */}
-        <div className='flex gap-3 flex-1 max-w-2xl'>
-          <div className='relative flex-1 max-w-md'>
-            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-              <Search className='w-4 h-4 text-gray-500' />
-            </div>
-            <input
-              type='text'
-              value={searchQuery}
-              onChange={(e) => handleSearchInput(e.target.value)}
-              className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-              placeholder='Search users...'
-            />
-          </div>
-          {/* User Type Filter */}
-          <div className='min-w-[180px]'>
-            <select
-              value={selectedUserType}
-              onChange={(e) => {
-                setSelectedUserType(e.target.value)
-                setPagination((prev) => ({ ...prev, currentPage: 1 }))
-              }}
-              className='w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white'
-            >
-              <option value='all'>All Users</option>
-              <option value='student'>Student</option>
-              <option value='editor'>Editor</option>
-              <option value='admin'>Admin</option>
-              <option value='agent'>Partner (Agent)</option>
-              <option value='consultancy'>Consultancy</option>
-              <option value='institution'>Institution (College/School)</option>
-            </select>
-          </div>
-        </div>
+        
+                     <SearchInput
+                    value={searchQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    placeholder='Search users...'
+                    className='max-w-md'
+                  />
         {/* Buttons */}
         <div className='flex gap-2'>
           <Button
