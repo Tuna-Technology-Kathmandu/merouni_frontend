@@ -91,7 +91,7 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
     return items.filter((item) => {
       const hasAccess = item.visible.some((r) => role[r])
       if (!hasAccess) return false
-      
+
       // For items with submenus, check if any submenu is accessible
       if (item.submenus && item.submenus.length > 0) {
         return item.submenus.some((submenu) =>
@@ -106,7 +106,7 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
   const filterMenuItems = (items) => {
     // First filter by access
     const accessibleItems = filterItemsByAccess(items)
-    
+
     if (!searchQuery.trim()) return accessibleItems
 
     const query = searchQuery.toLowerCase()
@@ -168,7 +168,7 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
 
                   // Handle menu items with submenus
                   if (item.submenus && item.submenus.length > 0) {
-                    // Use explicitly set state if available, otherwise default to expanded if submenu is active
+
                     const isExpanded =
                       expandedMenus[item.label] !== undefined
                         ? expandedMenus[item.label]
@@ -181,8 +181,8 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
 
                     const menuItemClasses = `
                       flex items-center w-full p-2 text-gray-600 transition-colors rounded-lg
-                      hover:bg-gray-100 hover:text-blue-600
-                      ${isSubmenuActive(item) ? 'bg-blue-50 text-blue-600' : ''}
+                      hover:bg-gray-50 hover:text-[#0A6FA7]
+                      ${isSubmenuActive(item) ? 'bg-[#0A6FA7]/10 text-[#0A6FA7]' : ''}
                       group
                       ${isCollapsed ? 'justify-center' : ''}
                       cursor-pointer
@@ -206,7 +206,7 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
                           className={menuItemClasses}
                           title={isCollapsed ? item.label : ''}
                         >
-                          <span className='flex items-center justify-center w-8 h-8 text-gray-500 group-hover:text-blue-600'>
+                          <span className='flex items-center justify-center w-8 h-8 text-gray-500 group-hover:text-[#0A6FA7]'>
                             {item.icon}
                           </span>
                           {!isCollapsed && (
@@ -233,8 +233,8 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
                               const isSubActive = pathname === submenu.href
                               const submenuClasses = `
                                 flex items-center w-full p-2 text-gray-600 transition-colors rounded-lg
-                                hover:bg-gray-100 hover:text-blue-600
-                                ${isSubActive ? 'bg-blue-50 text-blue-600 font-medium' : ''}
+                                hover:bg-gray-50 hover:text-[#0A6FA7]
+                                ${isSubActive ? 'bg-[#0A6FA7]/10 text-[#0A6FA7] font-medium' : ''}
                                 group
                               `
 
@@ -250,7 +250,7 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
                                   onClick={handleSubmenuClick}
                                   className={submenuClasses}
                                 >
-                                  <span className='flex items-center justify-center w-6 h-6 text-gray-400 group-hover:text-blue-600'>
+                                  <span className='flex items-center justify-center w-6 h-6 text-gray-400 group-hover:text-[#0A6FA7]'>
                                     {submenu.icon}
                                   </span>
                                   <span className='hidden lg:block ml-3 text-sm'>
@@ -276,8 +276,8 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
                       : item.label
                   const itemClasses = `
                   flex items-center w-full p-2 text-gray-600 transition-colors rounded-lg
-                  hover:bg-gray-100 hover:text-blue-600
-                  ${isActive ? 'bg-blue-50 text-blue-600' : ''}
+                  hover:bg-gray-50 hover:text-[#0A6FA7]
+                  ${isActive ? 'bg-[#0A6FA7]/10 text-[#0A6FA7]' : ''}
                   group
                   ${isCollapsed ? 'justify-center' : ''}
                 `
@@ -298,7 +298,7 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
                         className={itemClasses}
                         title={isCollapsed ? item.label : ''}
                       >
-                        <span className='flex items-center justify-center w-8 h-8 text-gray-500 group-hover:text-blue-600'>
+                        <span className='flex items-center justify-center w-8 h-8 text-gray-500 group-hover:text-[#0A6FA7]'>
                           {item.icon}
                         </span>
                         {!isCollapsed && (
@@ -318,7 +318,7 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
                       className={itemClasses}
                       title={isCollapsed ? item.label : ''}
                     >
-                      <span className='flex items-center justify-center w-8 h-8 text-gray-500 group-hover:text-blue-600'>
+                      <span className='flex items-center justify-center w-8 h-8 text-gray-500 group-hover:text-[#0A6FA7]'>
                         {item.icon}
                       </span>
                       {!isCollapsed && (

@@ -51,11 +51,10 @@ export default function DashboardLayout({ children }) {
       <div className='h-screen flex text-black'>
         {/* LEFT */}
         <div
-          className={`${
-            isCollapsed
+          className={`${isCollapsed
               ? 'w-[80px] md:w-[80px] lg:w-[80px] xl:w-[80px]'
               : 'w-[19%] md:w-[13%] lg:w-[22%] xl:w-[20%]'
-          } flex flex-col transition-all duration-300 relative z-50 bg-white`}
+            } flex flex-col transition-all duration-300 relative z-50 bg-white`}
         >
           {/* Sticky Header - Logo and Search Bar */}
           <div className='sticky top-0 bg-white z-10 border-b border-gray-200'>
@@ -63,9 +62,8 @@ export default function DashboardLayout({ children }) {
               <div className='flex items-center justify-center'>
                 <Link
                   href='/'
-                  className={`flex items-center gap-2 ${
-                    isCollapsed ? 'justify-center' : 'justify-start'
-                  }`}
+                  className={`flex items-center gap-2 ${isCollapsed ? 'justify-center' : 'justify-start'
+                    }`}
                 >
                   <Image
                     src='/images/logo.png'
@@ -90,28 +88,44 @@ export default function DashboardLayout({ children }) {
             </div>
             {/* Search Bar - Only for admin */}
             {isAdmin && !isCollapsed && (
-              <div className='px-4 pb-3'>
-                <div className='relative'>
-                  <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-                    <Search className='w-4 h-4 text-gray-400' />
-                  </div>
-                  <input
-                    type='text'
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className='w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                    placeholder='Search menus...'
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => setSearchQuery('')}
-                      className='absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600'
-                    >
-                      <X className='w-4 h-4' />
-                    </button>
-                  )}
-                </div>
-              </div>
+       <div className="px-4 pb-3">
+  <div className="relative">
+    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+
+    <input
+      type="text"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      placeholder="Search menus"
+      className="
+        w-full rounded-lg
+        bg-gray-50
+        border border-gray-200
+        py-2.5 pl-10 pr-9 text-sm
+        text-gray-900 placeholder-gray-400
+        outline-none
+        transition
+        focus:bg-white
+        focus:border-[#0A6FA7]
+        focus:ring-1 focus:ring-[#0A6FA7]/30
+      "
+    />
+
+    {searchQuery && (
+      <button
+        onClick={() => setSearchQuery("")}
+        className="
+          absolute right-3 top-1/2 -translate-y-1/2
+          text-gray-400 hover:text-gray-600
+        "
+        aria-label="Clear search"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    )}
+  </div>
+</div>
+
             )}
           </div>
           {/* Scrollable Menu */}
@@ -121,11 +135,10 @@ export default function DashboardLayout({ children }) {
         </div>
         {/* RIGHT */}
         <div
-          className={`${
-            isCollapsed
+          className={`${isCollapsed
               ? 'w-[calc(100%-80px)] md:w-[calc(100%-80px)] lg:w-[calc(100%-80px)] xl:w-[calc(100%-80px)]'
               : 'w-[81%] md:w-[87%] lg:w-[78%] xl:w-[80%]'
-          } bg-[#F7F8FA] overflow-scroll flex flex-col transition-all duration-300`}
+            } bg-[#F7F8FA] overflow-scroll flex flex-col transition-all duration-300`}
         >
           <AdminNavbar />
           {children}

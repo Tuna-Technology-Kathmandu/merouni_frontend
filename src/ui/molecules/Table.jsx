@@ -88,7 +88,7 @@ const Table = ({
             type='text'
             value={filtering}
             onChange={(e) => handleSearch(e.target.value)}
-            className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+            className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A6FA7]'
             placeholder='Search...'
           />
         </div>
