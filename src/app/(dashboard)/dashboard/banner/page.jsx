@@ -8,6 +8,9 @@ import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { Button } from '@/ui/shadcn/button'
+import { THEME_BLUE } from '@/constants/constants'
+import { formatDate } from '@/utils/date.util'
 
 export default function BannerForm() {
   const { setHeading } = usePageHeading()
@@ -399,7 +402,8 @@ export default function BannerForm() {
                 <h3 className='text-lg font-semibold'>Position {position}</h3>
                 <button
                   onClick={() => handlePositionEdit(position)}
-                  className='px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2 text-sm'
+                  className='px-3 py-1.5 text-white rounded-lg hover:opacity-90 transition-all flex items-center gap-2 text-sm shadow-sm'
+                  style={{ backgroundColor: THEME_BLUE }}
                   title={hasBanner ? 'Edit Banner' : 'Create Banner'}
                 >
                   <Edit size={14} />
@@ -457,7 +461,8 @@ export default function BannerForm() {
                         href={banner.website_url}
                         target='_blank'
                         rel='noopener noreferrer'
-                        className='text-blue-600 hover:underline text-sm block mb-2 truncate'
+                        className='hover:underline text-sm block mb-2 truncate font-medium'
+                        style={{ color: THEME_BLUE }}
                       >
                         {banner.website_url}
                       </a>
@@ -469,7 +474,7 @@ export default function BannerForm() {
                           }`}
                       >
                         Expires:{' '}
-                        {new Date(banner.date_of_expiry).toLocaleDateString()}
+                        {formatDate(banner.date_of_expiry)}
                       </p>
                     )}
                   </div>
@@ -521,7 +526,8 @@ export default function BannerForm() {
                         required: 'College selection is required'
                       })}
                       onChange={(e) => searchCollege(e.target.value)}
-                      className='w-full p-2 border rounded'
+                      className='w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-opacity-50'
+                      style={{ '--tw-ring-color': THEME_BLUE }}
                       placeholder='Search for a college...'
                     />
                     {errors.collegeSearch && (
@@ -647,20 +653,6 @@ export default function BannerForm() {
                       )}
                     </div>
 
-                    {/* <div className="mb-4 flex items-center">
-                    <input
-                      type="checkbox"
-                      {...register(`bannerImages.${index}.is_featured`)}
-                      onChange={(e) =>
-                        setValue(
-                          `bannerImages.${index}.is_featured`,
-                          e.target.checked ? 1 : 0
-                        )
-                      }
-                      checked={watch(`bannerImages.${index}.is_featured`) == 1}
-                    />
-                    <label className="ml-2">Is Featured?</label>
-                  </div> */}
 
                     <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                       <div>
@@ -678,52 +670,15 @@ export default function BannerForm() {
                           )}
                         />
                       </div>
-                      {/* <div>
-                      <FileUpload
-                        label="Medium Banner Image"
-                        onUploadComplete={(url) => {
-                          setValue(
-                            `bannerImages.${index}.gallery.medium`,
-                            url
-                          )
-                        }}
-                        defaultPreview={watch(
-                          `bannerImages.${index}.gallery.medium`
-                        )}
-                      />
-                    </div> */}
-                      {/* <div>
-                      <FileUpload
-                        label="Large Banner Image"
-                        onUploadComplete={(url) => {
-                          setValue(`bannerImages.${index}.gallery.large`, url)
-                        }}
-                        defaultPreview={watch(
-                          `bannerImages.${index}.gallery.large`
-                        )}
-                      />
-                    </div> */}
+
                     </div>
                   </div>
                 ))}
 
-                {/* <button
-                type="button"
-                onClick={() =>
-                  append({
-                    title: '',
-                    gallery: { small: '', medium: '', large: '' },
-                    is_featured: 0
-                  })
-                }
-                className="flex items-center gap-2 text-blue-500 hover:text-blue-700"
-              >
-                <Plus className="w-4 h-4" /> Add Another Banner Image
-              </button> */}
               </div>
 
               <div className='flex justify-end gap-4 mt-6'>
-                <button
+                <Button
                   type='button'
                   onClick={() => {
                     setIsOpen(false)
@@ -732,21 +687,22 @@ export default function BannerForm() {
                     resetFormForPosition(activePosition)
                     setSelectedCollege(null)
                   }}
-                  className='px-6 py-2 border rounded hover:bg-gray-100'
+                  variant="outline"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type='submit'
                   disabled={loading || (!editing && !selectedCollege)}
-                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 disabled:bg-blue-300'
+                  className='text-white hover:opacity-90 px-6 py-2 transition-all shadow-md'
+                  style={{ backgroundColor: THEME_BLUE }}
                 >
                   {loading
                     ? 'Processing...'
                     : editing
                       ? 'Update Banner'
                       : 'Create Banner'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

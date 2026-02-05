@@ -536,7 +536,7 @@ export default function ExamManager() {
                  <SearchInput
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            placeholder='Search news...'
+            placeholder='Search exams...'
             className='max-w-md'
           />
 
