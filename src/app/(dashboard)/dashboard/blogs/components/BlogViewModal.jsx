@@ -1,6 +1,7 @@
 import React from 'react'
 import { Modal } from '@/ui/molecules/Modal'
 import { Button } from '@/ui/shadcn/button'
+import { formatDate } from '@/utils/date.util'
 
 const BlogViewModal = ({ isOpen, onClose, data, loading }) => {
     return (
@@ -108,7 +109,7 @@ const BlogViewModal = ({ isOpen, onClose, data, loading }) => {
                         <div>
                             <h3 className='text-lg font-semibold mb-2'>Content</h3>
                             <div
-                                className='text-gray-700 prose max-w-none'
+                                className='text-gray-700 prose prose-sm max-w-none'
                                 dangerouslySetInnerHTML={{
                                     __html: data.content
                                 }}
@@ -120,7 +121,7 @@ const BlogViewModal = ({ isOpen, onClose, data, loading }) => {
                         <div className='pt-4 border-t'>
                             <p className='text-sm text-gray-500'>
                                 Created:{' '}
-                                {new Date(data.createdAt).toLocaleDateString()}
+                                {formatDate(data.createdAt)}
                             </p>
                         </div>
                     )}

@@ -204,8 +204,8 @@ export default function BlogsManager() {
         total: response.pagination.totalCount
       })
     } catch (err) {
-      toast.error('Failed to load news')
-      console.error('Error loading news data:', err)
+      toast.error('Failed to load blogs')
+      console.error('Error loading blogs data:', err)
     } finally {
       setLoading(false)
     }
@@ -452,7 +452,7 @@ export default function BlogsManager() {
                 value={searchQuery}
                 onChange={(e) => handleSearchInput(e.target.value)}
                 className='w-full pl-10 pr-4 py-2 text-sm border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring'
-                placeholder='Search news...'
+                placeholder='Search blogs...'
               />
             </div>
             <select

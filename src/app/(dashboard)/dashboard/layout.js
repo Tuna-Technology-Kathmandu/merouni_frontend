@@ -52,8 +52,8 @@ export default function DashboardLayout({ children }) {
         {/* LEFT */}
         <div
           className={`${isCollapsed
-              ? 'w-[80px] md:w-[80px] lg:w-[80px] xl:w-[80px]'
-              : 'w-[19%] md:w-[13%] lg:w-[22%] xl:w-[20%]'
+            ? 'w-[80px] md:w-[80px] lg:w-[80px] xl:w-[80px]'
+            : 'w-[19%] md:w-[13%] lg:w-[22%] xl:w-[20%]'
             } flex flex-col transition-all duration-300 relative z-50 bg-white`}
         >
           {/* Sticky Header - Logo and Search Bar */}
@@ -88,16 +88,16 @@ export default function DashboardLayout({ children }) {
             </div>
             {/* Search Bar - Only for admin */}
             {isAdmin && !isCollapsed && (
-       <div className="px-4 pb-3">
-  <div className="relative">
-    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <div className="px-4 pb-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
 
-    <input
-      type="text"
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      placeholder="Search menus"
-      className="
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search menus"
+                    className="
         w-full rounded-lg
         bg-gray-50
         border border-gray-200
@@ -109,22 +109,22 @@ export default function DashboardLayout({ children }) {
         focus:border-[#0A6FA7]
         focus:ring-1 focus:ring-[#0A6FA7]/30
       "
-    />
+                  />
 
-    {searchQuery && (
-      <button
-        onClick={() => setSearchQuery("")}
-        className="
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="
           absolute right-3 top-1/2 -translate-y-1/2
           text-gray-400 hover:text-gray-600
         "
-        aria-label="Clear search"
-      >
-        <X className="h-4 w-4" />
-      </button>
-    )}
-  </div>
-</div>
+                      aria-label="Clear search"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
 
             )}
           </div>
@@ -136,8 +136,8 @@ export default function DashboardLayout({ children }) {
         {/* RIGHT */}
         <div
           className={`${isCollapsed
-              ? 'w-[calc(100%-80px)] md:w-[calc(100%-80px)] lg:w-[calc(100%-80px)] xl:w-[calc(100%-80px)]'
-              : 'w-[81%] md:w-[87%] lg:w-[78%] xl:w-[80%]'
+            ? 'w-[calc(100%-80px)] md:w-[calc(100%-80px)] lg:w-[calc(100%-80px)] xl:w-[calc(100%-80px)]'
+            : 'w-[81%] md:w-[87%] lg:w-[78%] xl:w-[80%]'
             } bg-[#F7F8FA] overflow-scroll flex flex-col transition-all duration-300`}
         >
           <AdminNavbar />
