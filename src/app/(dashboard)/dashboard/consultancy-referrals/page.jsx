@@ -5,6 +5,7 @@ import { fetchConsultancyApplications, fetchAllConsultancies, updateConsultancyA
 import { FaTrashAlt, FaEdit } from 'react-icons/fa'
 import { Modal } from '../../../../ui/molecules/Modal'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { Button } from '@/ui/shadcn/button'
 import { Search, X, ChevronDown } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
@@ -36,6 +37,8 @@ const ConsultancyReferralsPage = () => {
   // Action States
   const [updatingId, setUpdatingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
+  const [applicationToDelete, setApplicationToDelete] = useState(null)
   const [statusModalOpen, setStatusModalOpen] = useState(false)
   const [selectedApp, setSelectedApp] = useState(null)
   const [statusForm, setStatusForm] = useState({ status: 'PENDING', remarks: '' })
@@ -98,7 +101,7 @@ const ConsultancyReferralsPage = () => {
 
       const response = await fetchConsultancyApplications(params)
 
-      const appList = response.data  || []
+      const appList = response.data || []
       const meta = response.pagination || {}
 
       setApplications(appList)
@@ -151,19 +154,31 @@ const ConsultancyReferralsPage = () => {
     }
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this application?')) return
+  const handleDeleteClick = (id) => {
+    setApplicationToDelete(id)
+    setDeleteConfirmationOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!applicationToDelete) return
 
     try {
-      setDeletingId(id)
-      await deleteConsultancyApplication(id)
-      setApplications(prev => prev.filter(app => app.id !== id))
+      setDeletingId(applicationToDelete)
+      await deleteConsultancyApplication(applicationToDelete)
+      setApplications((prev) => prev.filter((app) => app.id !== applicationToDelete))
       toast.success('Deleted successfully')
     } catch (err) {
       toast.error('Failed to delete')
     } finally {
       setDeletingId(null)
+      setDeleteConfirmationOpen(false)
+      setApplicationToDelete(null)
     }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmationOpen(false)
+    setApplicationToDelete(null)
   }
 
   // Handlers for Filters
@@ -276,7 +291,7 @@ const ConsultancyReferralsPage = () => {
           <Button size="icon" variant="ghost" onClick={() => handleOpenStatusModal(row.original)}>
             <FaEdit className="w-4 h-4 text-blue-600" />
           </Button>
-          <Button size="icon" variant="ghost" onClick={() => handleDelete(row.original.id)}>
+          <Button size="icon" variant="ghost" onClick={() => handleDeleteClick(row.original.id)}>
             <FaTrashAlt className="w-4 h-4 text-red-600" />
           </Button>
         </div>
@@ -411,7 +426,15 @@ const ConsultancyReferralsPage = () => {
           </div>
         </form>
       </Modal>
-    </div>
+
+      <ConfirmationDialog
+        open={deleteConfirmationOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title='Confirm Deletion'
+        message='Are you sure you want to delete this application? This action cannot be undone.'
+      />
+    </div >
   )
 }
 

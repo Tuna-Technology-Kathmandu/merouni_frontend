@@ -11,6 +11,7 @@ import { usePageHeading } from '../../contexts/PageHeadingContext'
 import { FaUserCircle, FaUser, FaSignOutAlt } from 'react-icons/fa'
 import { removeUser } from '../../app/utils/userSlice'
 import { ChevronDown } from 'lucide-react'
+import {THEME_BLUE} from "@/constants/constants"
 
 const AdminNavbar = ({ onMenuClick }) => {
   const { heading, subheading } = usePageHeading()
@@ -203,22 +204,34 @@ const AdminNavbar = ({ onMenuClick }) => {
 
           {/* Dropdown Menu */}
           {isDropdownOpen && (
-            <div className='absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50'>
-              <Link
-                href='/dashboard/profile'
-                onClick={() => setIsDropdownOpen(false)}
-                className='flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors'
-              >
-                <FaUser className='w-4 h-4 text-gray-500' />
-                <span>View Profile</span>
-              </Link>
-              <button
-                onClick={handleLogout}
-                className='w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors'
-              >
-                <FaSignOutAlt className='w-4 h-4' />
-                <span>Logout</span>
-              </button>
+            <div className='absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-gray-200 py-1.5 z-50 ring-1 ring-black ring-opacity-5 animate-in fade-in zoom-in-95 duration-100'>
+              <div className='px-1.5'>
+                <Link
+                  href='/dashboard/profile'
+                  onClick={() => setIsDropdownOpen(false)}
+                  className='group flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-all duration-200'
+                  style={{ '--theme-blue': THEME_BLUE }}
+                >
+                  <FaUser
+                    className='w-4 h-4 text-gray-500 group-hover:text-[var(--theme-blue)] transition-colors'
+                  />
+                  <span
+                    className='group-hover:text-[var(--theme-blue)] transition-colors'
+                  >
+                    View Profile
+                  </span>
+                </Link>
+
+                <div className='h-px bg-gray-100 my-1 mx-2'></div>
+
+                <button
+                  onClick={handleLogout}
+                  className='w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-all duration-200 group'
+                >
+                  <FaSignOutAlt className='w-4 h-4 text-gray-500 group-hover:text-red-500 transition-colors' />
+                  <span>Logout</span>
+                </button>
+              </div>
             </div>
           )}
         </div>

@@ -22,6 +22,8 @@ import CollegesDropdown from '@/ui/molecules/dropdown/CollegesDropdown'
 import { Select } from '@/ui/shadcn/select'
 import { Label } from '@/ui/shadcn/label'
 import { toast } from 'react-toastify'
+import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import SearchInput from '@/ui/molecules/SearchInput'
 
 const ReferralsPage = () => {
   const { setHeading } = usePageHeading()
@@ -31,6 +33,8 @@ const ReferralsPage = () => {
   const [error, setError] = useState(null)
   const [updatingId, setUpdatingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
+  const [referralToDelete, setReferralToDelete] = useState(null)
   const [statusModalOpen, setStatusModalOpen] = useState(false)
   const [selectedReferral, setSelectedReferral] = useState(null)
   const [statusForm, setStatusForm] = useState({
@@ -234,21 +238,32 @@ const ReferralsPage = () => {
     }
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this referral?')) {
-      return
-    }
+  const handleDeleteClick = (id) => {
+    setReferralToDelete(id)
+    setDeleteConfirmationOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!referralToDelete) return
 
     try {
-      setDeletingId(id)
-      await deleteReferral(id)
-      setAllReferrals((prev) => prev.filter((ref) => ref.id !== id))
-      setReferrals((prev) => prev.filter((ref) => ref.id !== id))
+      setDeletingId(referralToDelete)
+      await deleteReferral(referralToDelete)
+      setAllReferrals((prev) => prev.filter((ref) => ref.id !== referralToDelete))
+      setReferrals((prev) => prev.filter((ref) => ref.id !== referralToDelete))
+      toast.success('Referral deleted successfully')
     } catch (err) {
       setError(err.message || 'Failed to delete referral')
     } finally {
       setDeletingId(null)
+      setDeleteConfirmationOpen(false)
+      setReferralToDelete(null)
     }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmationOpen(false)
+    setReferralToDelete(null)
   }
 
   const handleClearFilters = () => {
@@ -274,24 +289,14 @@ const ReferralsPage = () => {
       <div className='mb-6 space-y-4'>
         <div className='flex flex-col md:flex-row gap-4'>
           {/* Search Input */}
-          <div className='flex-1 relative'>
-            <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
-            <input
-              type='text'
-              placeholder='Search by student name, email, phone, college, or agent...'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className='w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600'
-              >
-                <X className='w-4 h-4' />
-              </button>
-            )}
-          </div>
+          {/* Search Input */}
+          <SearchInput
+            className='flex-1'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onClear={() => setSearchQuery('')}
+            placeholder='Search by student name, email, phone, college, or agent...'
+          />
 
           {/* Status Filter - Searchable Dropdown */}
           <div className='relative' ref={statusDropdownRef}>
@@ -343,8 +348,8 @@ const ReferralsPage = () => {
                           setStatusDropdownOpen(false)
                         }}
                         className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${statusFilter === option.value
-                            ? 'bg-blue-100 text-blue-700 font-medium'
-                            : 'text-gray-700'
+                          ? 'bg-blue-100 text-blue-700 font-medium'
+                          : 'text-gray-700'
                           }`}
                       >
                         {option.label}
@@ -469,10 +474,10 @@ const ReferralsPage = () => {
                   <TableCell>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${referral.status === 'ACCEPTED'
-                          ? 'bg-green-100 text-green-800'
-                          : referral.status === 'REJECTED'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-green-100 text-green-800'
+                        : referral.status === 'REJECTED'
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-yellow-100 text-yellow-800'
                         }`}
                     >
                       {referral.status || 'IN_PROGRESS'}
@@ -502,7 +507,7 @@ const ReferralsPage = () => {
                         <Button
                           variant='ghost'
                           size='icon'
-                          onClick={() => handleDelete(referral.id)}
+                          onClick={() => handleDeleteClick(referral.id)}
                           disabled={deletingId === referral.id}
                           title='Delete'
                         >
@@ -578,6 +583,13 @@ const ReferralsPage = () => {
           </div>
         </form>
       </Modal>
+      <ConfirmationDialog
+        open={deleteConfirmationOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title='Confirm Deletion'
+        message='Are you sure you want to delete this referral? This action cannot be undone.'
+      />
     </div>
   )
 }
