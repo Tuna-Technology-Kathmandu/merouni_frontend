@@ -69,7 +69,7 @@ export default function CategoryManager() {
             : description
         }
       },
-    
+
       {
         header: 'Actions',
         id: 'actions',
@@ -312,12 +312,12 @@ export default function CategoryManager() {
       <div className='p-4 w-full'>
         <div className='flex justify-between items-center mb-4'>
           {/* Search Bar */}
-                      <SearchInput
-                     value={searchQuery}
-                     onChange={(e) => handleSearch(e.target.value)}
-                     placeholder='Search categories...'
-                     className='max-w-md'
-                   />
+          <SearchInput
+            value={searchQuery}
+            onChange={(e) => handleSearchInput(e.target.value)}
+            placeholder='Search categories...'
+            className='max-w-md'
+          />
           {/* Button */}
           <div className='flex gap-2'>
             <Button

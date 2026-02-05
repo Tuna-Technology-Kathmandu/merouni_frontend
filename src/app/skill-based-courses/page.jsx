@@ -88,13 +88,13 @@ const SkillCoursesPage = () => {
                             {/* Search */}
                             <div className='lg:col-span-12'>
                                 <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
-                                    Search Courses
+                                    Search Skill Based Courses
                                 </label>
                                 <div className='relative group'>
                                     <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#30ad8f] transition-colors' />
                                     <input
                                         type='text'
-                                        placeholder='Search courses by title...'
+                                        placeholder='Search skill based courses by title...'
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         value={searchTerm}
                                         className='w-full px-5 py-3.5 pl-12 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#30ad8f]/10 focus:border-[#30ad8f] focus:bg-white transition-all text-sm font-semibold text-gray-900 placeholder-gray-400'

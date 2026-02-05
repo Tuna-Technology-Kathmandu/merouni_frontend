@@ -228,7 +228,7 @@ export default function TagForm() {
           {/* Search Bar */}
           <SearchInput
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleSearchInput(e.target.value)}
             placeholder='Search tags...'
             className='max-w-md'
           />

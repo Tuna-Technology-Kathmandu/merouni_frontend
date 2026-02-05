@@ -301,7 +301,7 @@ export default function UniversityForm() {
 
           <SearchInput
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleSearchInput(e.target.value)}
             placeholder='Search universities...'
             className='max-w-md'
           />

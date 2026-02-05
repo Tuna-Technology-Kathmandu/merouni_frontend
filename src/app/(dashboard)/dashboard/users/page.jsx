@@ -371,7 +371,7 @@ export default function UsersManager() {
         
                      <SearchInput
                     value={searchQuery}
-                    onChange={(e) => handleSearch(e.target.value)}
+                    onChange={(e) => handleSearchInput(e.target.value)}
                     placeholder='Search users...'
                     className='max-w-md'
                   />

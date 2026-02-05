@@ -225,7 +225,7 @@ export default function ProgramForm() {
           {/* Search Bar */}
           <SearchInput
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleSearchInput(e.target.value)}
             placeholder='Search programs...'
             className='max-w-md'
           />
@@ -236,7 +236,6 @@ export default function ProgramForm() {
             </Button>
           </div>
         </div>
-        <ToastContainer />
 
         {/* Table Section */}
         <div className='mt-8'>

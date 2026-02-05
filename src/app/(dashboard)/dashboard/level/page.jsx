@@ -256,7 +256,7 @@ export default function LevelForm() {
           {/* Search Bar */}
           <SearchInput
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleSearchInput(e.target.value)}
             placeholder='Search levels...'
             className='max-w-md'
           />

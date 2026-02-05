@@ -205,7 +205,7 @@ export default function DegreePage() {
         <div className='flex justify-between items-center mb-4'>
           <SearchInput
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleSearchInput(e.target.value)}
             placeholder='Search degrees...'
             className='max-w-md'
           />

@@ -118,7 +118,6 @@ export default function DisciplineManager() {
         setHeading('Discipline Management')
         loadDisciplines()
         return () => setHeading(null)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setHeading])
 
     useEffect(() => {
@@ -235,7 +234,7 @@ export default function DisciplineManager() {
                     {/* Search Bar */}
                     <SearchInput
                         value={searchQuery}
-                        onChange={(e) => handleSearch(e.target.value)}
+                        onChange={(e) => handleSearchInput(e.target.value)}
                         placeholder='Search discipline...'
                         className='max-w-md'
                     />

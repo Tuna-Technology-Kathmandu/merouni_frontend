@@ -353,7 +353,7 @@ export default function CareerForm() {
           {/* Search Bar */}
           <SearchInput
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleSearchInput(e.target.value)}
             placeholder='Search careers...'
             className='max-w-md'
           />

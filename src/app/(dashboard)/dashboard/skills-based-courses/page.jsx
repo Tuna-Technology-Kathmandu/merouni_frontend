@@ -375,8 +375,8 @@ export default function SkillsCoursesManager() {
                     {/* Search Bar */}
                     <SearchInput
                         value={searchQuery}
-                        onChange={(e) => handleSearch(e.target.value)}
-                        placeholder='Search courses...'
+                        onChange={(e) => handleSearchInput(e.target.value)}
+                        placeholder='Search skill based courses...'
                         className='max-w-md'
                     />
                     {/* Button */}

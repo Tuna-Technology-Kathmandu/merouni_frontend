@@ -404,7 +404,7 @@ export default function CourseForm() {
           {/* Search Bar */}
           <SearchInput
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleSearchInput(e.target.value)}
             placeholder='Search courses...'
             className='max-w-md'
           />
@@ -425,7 +425,6 @@ export default function CourseForm() {
             </Button>
           </div>
         </div>
-        <ToastContainer />
 
         {/* Table Section */}
         <div className='mt-8'>

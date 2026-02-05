@@ -152,8 +152,8 @@ export default function ContactUsManager() {
                 {/* Search */}
                 <SearchInput
                     value={searchQuery}
-                    onChange={(e) => handleSearch(e.target.value)}
-                    placeholder='Search courses...'
+                    onChange={(e) => handleSearch(e)}
+                    placeholder='Search contact us messages...'
                     className='max-w-md'
                 />
 
