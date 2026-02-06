@@ -39,7 +39,7 @@ const FileUpload = ({
       reader.readAsDataURL(file)
     } else if (file.type === 'application/pdf') {
       setFileType('pdf')
-      setPreview(file.name) 
+      setPreview(file.name)
     }
 
     setIsUploading(true)
@@ -116,9 +116,9 @@ const FileUpload = ({
       <div
         className={cn(
           'relative border-2 border-dashed rounded-lg p-4 transition-all duration-200',
-          'border-input bg-background/50 hover:bg-muted/30 hover:border-ring/40',
+          'border-input bg-background/50 hover:bg-muted/30 hover:border-[#387cae]/40',
           isUploading && 'opacity-60 cursor-not-allowed',
-          preview ? 'border-primary/20 bg-primary/[0.02]' : 'border-input'
+          preview ? 'border-[#387cae]/20 bg-[#387cae]/[0.02]' : 'border-input'
         )}
       >
         <div className='flex flex-col items-center justify-center min-h-[120px]'>
@@ -126,7 +126,7 @@ const FileUpload = ({
             <div className='flex flex-col items-center animate-in fade-in zoom-in duration-300'>
               <Upload className='h-8 w-8 text-muted-foreground mb-3 opacity-60' />
               <div className='text-sm text-center'>
-                <label className='cursor-pointer text-primary hover:underline font-medium'>
+                <label className='cursor-pointer text-[#387cae] hover:underline font-medium'>
                   Click to upload
                   <input
                     ref={fileInputRef}
@@ -146,7 +146,7 @@ const FileUpload = ({
 
           {isUploading && (
             <div className='flex flex-col items-center animate-in fade-in duration-300'>
-              <Loader2 className='h-8 w-8 text-primary animate-spin mb-3' />
+              <Loader2 className='h-8 w-8 text-[#387cae] animate-spin mb-3' />
               <span className='text-sm font-medium text-muted-foreground'>
                 Uploading...
               </span>
@@ -190,7 +190,7 @@ const FileUpload = ({
                         href={defaultPreview}
                         target='_blank'
                         rel='noopener noreferrer'
-                        className='text-[11px] text-muted-foreground hover:text-primary transition-colors'
+                        className='text-[11px] text-muted-foreground hover:text-[#387cae] transition-colors'
                       >
                         Open External File
                       </a>

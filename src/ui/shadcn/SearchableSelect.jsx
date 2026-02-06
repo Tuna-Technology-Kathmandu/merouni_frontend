@@ -169,7 +169,7 @@ export function SearchableSelect({
                     onFocus={() => setIsOpen(true)}
                     className={cn(
                         'pr-10 transition-all duration-200',
-                        isOpen && 'ring-2 ring-primary/20 border-primary',
+                        isOpen && 'ring-2 ring-[#387cae]/20 border-[#387cae]',
                         error && 'border-destructive focus-visible:ring-destructive'
                     )}
                     autoComplete='off'
@@ -187,7 +187,7 @@ export function SearchableSelect({
                     )}
                     <ChevronDown className={cn(
                         'h-4 w-4 text-muted-foreground/60 transition-transform duration-200 mr-1',
-                        isOpen && 'rotate-180 text-primary'
+                        isOpen && 'rotate-180 text-[#387cae]'
                     )} />
                 </div>
             </div>
@@ -206,8 +206,8 @@ export function SearchableSelect({
                                     key={option[valueKey]}
                                     className={cn(
                                         'p-2.5 cursor-pointer flex items-center transition-colors border-b border-muted/20 last:border-0 text-sm',
-                                        activeIndex === index ? 'bg-primary/5 text-primary font-medium' : 'hover:bg-muted font-normal text-muted-foreground hover:text-foreground',
-                                        String(option[valueKey]) === String(value) && 'bg-primary/[0.03] text-primary'
+                                        activeIndex === index ? 'bg-[#387cae]/5 text-[#387cae] font-medium' : 'hover:bg-muted font-normal text-muted-foreground hover:text-foreground',
+                                        String(option[valueKey]) === String(value) && 'bg-[#387cae]/[0.03] text-[#387cae]'
                                     )}
                                     onClick={() => handleSelect(option)}
                                     onMouseEnter={() => setActiveIndex(index)}

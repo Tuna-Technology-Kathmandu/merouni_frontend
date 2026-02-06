@@ -17,6 +17,10 @@ import ExamDropdown from '@/ui/molecules/dropdown/ExamDropdown'
 import LevelDropdown from '@/ui/molecules/dropdown/LevelDropdown'
 import ScholarshipDropdown from '@/ui/molecules/dropdown/ScholarshipDropdown'
 import CourseDropdown from '@/ui/molecules/dropdown/CourseDropdown'
+import { Input } from '@/ui/shadcn/input'
+import { Label } from '@/ui/shadcn/label'
+import { Textarea } from '@/ui/shadcn/textarea'
+import { Select } from '@/ui/shadcn/select'
 
 const CKUni = dynamic(() => import('@/app/(dashboard)/dashboard/component/CKUni'), {
     ssr: false
@@ -255,27 +259,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
             }
 
             const url = `${process.env.baseUrl}/program`
-            const method = 'POST' // Always POST for create/update logic (handled by backend or if ID is present?)
-            // Check original code: it was always POST to /program. 
-            // Wait, update usually needs PUT. The original code used POST to /program even for edits?
-            // Let me re-read page.jsx lines 283-310.
-            // Line 300: url = .../program
-            // Line 301: method = 'POST'
-            // It seems original code ALWAYS used POST to /program. This implies backend handles upsert or I missed something.
-            // Ah, wait. `handleEdit` fetches data. `onSubmit` sends POST.
-            // If the API supports UPSERT on POST or if the user intends to create new?
-            // Usually update is PUT /program/:id.
-            // Let me check existing `onSubmit` in `page.jsx`.
-            /*
-              const url = `${process.env.baseUrl}/program`
-              const method = 'POST'
-            */
-            // It seems it was always POST. I will stick to the original implementation to be safe, but it's suspicious for "Edit".
-            // ... Unless "Edit" was not actually working as update? Or backend handles ID? 
-            // Wait, `onSubmit` logic doesn't seemingly change based on `editing` state except for toast message.
-            // If `data.id` is present, maybe backend updates? 
-            // I will trust the original code's behavior for now.
-
+            const method = 'POST'
             const response = await authFetch(url, {
                 method,
                 headers: {
@@ -324,10 +308,10 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                         <h2 className='text-xl font-semibold mb-4'>Basic Information</h2>
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                             <div>
-                                <label className='block mb-2'>
+                                <Label className='block mb-2'>
                                     Program Title <span className='text-red-500'>*</span>
-                                </label>
-                                <input
+                                </Label>
+                                <Input
                                     {...register('title', { required: 'Title is required' })}
                                     className='w-full p-2 border rounded'
                                 />
@@ -337,18 +321,18 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                             </div>
 
                             <div>
-                                <label className='block mb-2'>Program Code</label>
-                                <input
+                                <Label className='block mb-2'>Program Code</Label>
+                                <Input
                                     {...register('code')}
                                     className='w-full p-2 border rounded'
                                 />
                             </div>
 
                             <div>
-                                <label className='block mb-2'>
+                                <Label className='block mb-2'>
                                     Duration <span className='text-red-500'>*</span>
-                                </label>
-                                <input
+                                </Label>
+                                <Input
                                     {...register('duration', { required: true })}
                                     className='w-full p-2 border rounded'
                                     placeholder='e.g., 4 years'
@@ -356,10 +340,10 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                             </div>
 
                             <div>
-                                <label className='block mb-2'>
+                                <Label className='block mb-2'>
                                     Credits <span className='text-red-500'>*</span>
-                                </label>
-                                <input
+                                </Label>
+                                <Input
                                     type='number'
                                     {...register('credits', {
                                         required: true,
@@ -371,10 +355,10 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                             </div>
 
                             <div>
-                                <label className='block mb-2'>
+                                <Label className='block mb-2'>
                                     Level <span className='text-red-500'>*</span>
-                                </label>
-                                <input
+                                </Label>
+                                <Input
                                     type='hidden'
                                     {...register('level_id', { required: 'Level is required' })}
                                 />
@@ -393,7 +377,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
 
                             {/* Degree (optional) */}
                             <div>
-                                <label className='block mb-2'>Degree</label>
+                                <Label className='block mb-2'>Degree</Label>
                                 <DegreeDropdown
                                     value={watch('degree_id') ?? ''}
                                     onChange={(id) => setValue('degree_id', id || '')}
@@ -405,10 +389,10 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
 
 
                             <div>
-                                <label className='block mb-2'>
+                                <Label className='block mb-2'>
                                     Language <span className='text-red-500'>*</span>
-                                </label>
-                                <input
+                                </Label>
+                                <Input
                                     {...register('language', { required: true })}
                                     className='w-full p-2 border rounded'
                                 />
@@ -421,7 +405,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                         <h2 className='text-xl font-semibold mb-4'>Program Details</h2>
                         <div className='grid grid-cols-1 gap-4'>
                             <div>
-                                <label className='block mb-2'>Description</label>
+                                <Label className='block mb-2'>Description</Label>
                                 <CKUni
                                     id='learning-outcomes-editor'
                                     initialData={getValues('learning_outcomes')}
@@ -429,8 +413,8 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                 />
                             </div>
                             <div>
-                                <label className='block mb-2'>Eligibility Criteria</label>
-                                <textarea
+                                <Label className='block mb-2'>Eligibility Criteria</Label>
+                                <Textarea
                                     {...register('eligibility_criteria')}
                                     className='w-full p-2 border rounded'
                                     rows='3'
@@ -438,8 +422,8 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                             </div>
 
                             <div>
-                                <label className='block mb-2'>Fee Structure</label>
-                                <input
+                                <Label className='block mb-2'>Fee Structure</Label>
+                                <Input
                                     {...register('fee')}
                                     className='w-full p-2 border rounded'
                                     placeholder='e.g. 5000 USD per year'
@@ -447,8 +431,8 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                             </div>
 
                             <div>
-                                <label className='block mb-2'>Curriculum</label>
-                                <textarea
+                                <Label className='block mb-2'>Curriculum</Label>
+                                <Textarea
                                     {...register('curriculum')}
                                     className='w-full p-2 border rounded'
                                     rows='3'
@@ -464,8 +448,8 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                         </h2>
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                             <div>
-                                <label className='block mb-2'>Delivery Type</label>
-                                <select
+                                <Label className='block mb-2'>Delivery Type</Label>
+                                <Select
                                     {...register('delivery_type')}
                                     className='w-full p-2 border rounded'
                                 >
@@ -473,19 +457,19 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     <option value='Part-time'>Part-time</option>
                                     <option value='Online'>Online</option>
                                     <option value='Hybrid'>Hybrird</option>
-                                </select>
+                                </Select>
                             </div>
 
                             <div>
-                                <label className='block mb-2'>Delivery Mode</label>
-                                <select
+                                <Label className='block mb-2'>Delivery Mode</Label>
+                                <Select
                                     {...register('delivery_mode')}
                                     className='w-full p-2 border rounded'
                                 >
                                     <option value='On-campus'>On-campus</option>
                                     <option value='Remote'>Remote</option>
                                     <option value='Blended'>Hybrid</option>
-                                </select>
+                                </Select>
                             </div>
                         </div>
                     </div>
@@ -498,7 +482,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                             {/* Scholarship */}
                             <div>
-                                <label className='block mb-2'>Scholarship</label>
+                                <Label className='block mb-2'>Scholarship</Label>
                                 <ScholarshipDropdown
                                     value={watch('scholarship_id') ?? ''}
                                     onChange={(id) => setValue('scholarship_id', id || '')}
@@ -509,7 +493,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
 
                             {/* Exam */}
                             <div>
-                                <label className='block mb-2'>Entrance Exam</label>
+                                <Label className='block mb-2'>Entrance Exam</Label>
                                 <ExamDropdown
                                     value={watch('exam_id') ?? ''}
                                     onChange={(id) => setValue('exam_id', id || '')}
