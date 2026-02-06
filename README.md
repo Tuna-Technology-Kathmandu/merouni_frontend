@@ -83,3 +83,5 @@ npm run dev
 - By default, it runs on [http://localhost:3000](http://localhost:3000).
 
 > ✅ You should now be able to navigate to `http://localhost:3000` and view the app locally.
+
+[Hosted on Vercel]
