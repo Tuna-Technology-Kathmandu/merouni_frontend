@@ -58,15 +58,19 @@ const SubMenu = ({ item, isCollapsed, isExpanded, isActive, onToggle, pathname, 
     submenu.visible.some((r) => role[r])
   )
 
-  const handleMainClick = (e) => {
-    // If accessing via keyboard or direct click, toggle expand
+  const handleMainClick = () => {
+    // For specific parent menus (Referrals, Colleges), navigate to first submenu only when expanding (not collapsing)
+    const shouldAutoNavigate =
+      (item.label === 'Referrals' || item.label === 'Colleges') && !isExpanded && firstSubmenu
+
+    // Toggle expand state
     onToggle(item.label)
 
-    // Optional: Auto-navigate to first submenu if expanded? 
-    // Usually usually better to just expand.
-    // If collapsed mode, clicking the main icon could navigate or expand popover.
-    // For now, we stick to toggle logic.
-    if (isCollapsed && firstSubmenu) {
+    // Navigate to first submenu only when expanding (was collapsed, now expanding)
+    if (shouldAutoNavigate) {
+      router.push(firstSubmenu.href)
+    } else if (isCollapsed && firstSubmenu && item.label !== 'Referrals' && item.label !== 'Colleges') {
+      // Preserve previous behavior for other menus when collapsed
       router.push(firstSubmenu.href)
     }
   }
