@@ -733,7 +733,6 @@ export default function CollegeForm() {
       let collegeData = await response.json()
       collegeData = collegeData.item
 
-
       // Basic Information
       setValue('id', collegeData.id)
       setValue('name', collegeData.name)
@@ -827,13 +826,13 @@ export default function CollegeForm() {
       const memberData = collegeData.collegeMembers?.length
         ? collegeData.collegeMembers
         : [
-          {
-            name: '',
-            contact_number: '',
-            role: '',
-            description: ''
-          }
-        ]
+            {
+              name: '',
+              contact_number: '',
+              role: '',
+              description: ''
+            }
+          ]
       setValue('members', memberData)
 
       //college_broucher
@@ -844,42 +843,42 @@ export default function CollegeForm() {
       // Set facilities
       const facilityData = collegeData.collegeFacility?.length
         ? collegeData.collegeFacility.map((facility) => ({
-          title: facility.title || '',
-          description: facility.description || '',
-          icon: facility.icon || ''
-        }))
+            title: facility.title || '',
+            description: facility.description || '',
+            icon: facility.icon || ''
+          }))
         : [
-          {
-            title: '',
-            description: '',
-            icon: ''
-          }
-        ]
+            {
+              title: '',
+              description: '',
+              icon: ''
+            }
+          ]
       setValue('facilities', facilityData)
 
       // Admissions
       const admissionData = collegeData.collegeAdmissions?.length
         ? collegeData.collegeAdmissions.map((admission) => {
-          const courseId = courses.find(
-            (c) => c.title === admission.program.title
-          )?.id
-          return {
-            course_id: courseId || '',
-            eligibility_criteria: admission.eligibility_criteria || '',
-            admission_process: admission.admission_process || '',
-            fee_details: admission.fee_details || '',
-            description: admission.description || ''
-          }
-        })
+            const courseId = courses.find(
+              (c) => c.title === admission.program.title
+            )?.id
+            return {
+              course_id: courseId || '',
+              eligibility_criteria: admission.eligibility_criteria || '',
+              admission_process: admission.admission_process || '',
+              fee_details: admission.fee_details || '',
+              description: admission.description || ''
+            }
+          })
         : [
-          {
-            course_id: '',
-            eligibility_criteria: '',
-            admission_process: '',
-            fee_details: '',
-            description: ''
-          }
-        ]
+            {
+              course_id: '',
+              eligibility_criteria: '',
+              admission_process: '',
+              fee_details: '',
+              description: ''
+            }
+          ]
       setValue('admissions', admissionData)
     } catch (error) {
       console.error('Error fetching college data:', error)
@@ -967,8 +966,7 @@ export default function CollegeForm() {
   //watch form data
   const formData = watch()
 
-  useEffect(() => {
-  }, [formData])
+  useEffect(() => {}, [formData])
 
   const fetchUniversityDetails = async (slugs) => {
     if (!slugs) {
@@ -1046,12 +1044,12 @@ export default function CollegeForm() {
       <div className='p-4 w-full'>
         <div className='flex justify-between items-center mb-4'>
           {/* Search Bar */}
-                     <SearchInput
-                    value={searchQuery}
-                    onChange={(e) => handleSearchInput(e.target.value)}
-                    placeholder='Search colleges...'
-                    className='max-w-md'
-                  />
+          <SearchInput
+            value={searchQuery}
+            onChange={(e) => handleSearchInput(e.target.value)}
+            placeholder='Search colleges...'
+            className='max-w-md'
+          />
           {/* Button */}
           <div className='flex gap-2'>
             <Button
@@ -1621,10 +1619,10 @@ export default function CollegeForm() {
                       )
                     )}
                     <div className='space-y-2'>
-                      <Label htmlFor='map-url'>Google Map URL</Label>
+                      <Label htmlFor='map-url'>Google Map Iframe Tag</Label>
                       <Input
                         id='map-url'
-                        type='url'
+                        type='text'
                         placeholder='https://maps.google.com/...'
                         {...register('google_map_url')}
                       />
