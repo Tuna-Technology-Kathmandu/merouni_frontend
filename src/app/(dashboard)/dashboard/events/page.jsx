@@ -20,6 +20,7 @@ import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import FileUpload from '../addCollege/FileUpload'
 import { fetchCategories } from '../category/action'
 import SearchInput from '@/ui/molecules/SearchInput'
+import { formatDate } from '@/utils/date.util'
 
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
@@ -473,7 +474,7 @@ export default function EventManager() {
           if (!rawValue) return ''
           try {
             const eventHost = JSON.parse(rawValue)
-            return eventHost.start_date || ''
+            return formatDate(eventHost.start_date) || ''
           } catch (error) {
             console.error('JSON parsing error for start_date:', error)
             return ''
@@ -488,7 +489,7 @@ export default function EventManager() {
           if (!rawValue) return ''
           try {
             const eventHost = JSON.parse(rawValue)
-            return eventHost.end_date || ''
+            return formatDate(eventHost.end_date) || ''
           } catch (error) {
             console.error('JSON parsing error for end_date:', error)
             return ''
@@ -572,12 +573,24 @@ export default function EventManager() {
     [categories]
   )
 
+  const handleCloseModal = () => {
+    setIsOpen(false)
+    setEditing(false)
+    setEditingEventId(null)
+    reset()
+    setUploadedFiles({ image: '' })
+    setCollegeSearch('')
+    setSelectedColleges([])
+    setEditorContent('')
+
+  }
+
   return (
     <>
       <div className='p-4 w-full'>
         <div className='flex justify-between items-center mb-4'>
           {/* Search Bar */}
-                  <SearchInput
+          <SearchInput
             value={searchQuery}
             onChange={(e) => handleSearchInput(e.target.value)}
             placeholder='Search events...'
@@ -602,20 +615,10 @@ export default function EventManager() {
             </Button>
           </div>
         </div>
-        <ToastContainer />
 
         <Modal
           isOpen={isOpen}
-          onClose={() => {
-            setIsOpen(false)
-            setEditing(false)
-            setEditingEventId(null)
-            reset()
-            setUploadedFiles({ image: '' })
-            setCollegeSearch('')
-            setSelectedColleges([])
-            setEditorContent('')
-          }}
+          onClose={handleCloseModal}
           title={editing ? 'Edit Event' : 'Add Event'}
           className='max-w-5xl'
         >
@@ -868,7 +871,10 @@ export default function EventManager() {
               </div>
 
               {/* Submit Button - Sticky Footer */}
-              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
+              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
+                <Button type='button' variant='outline' onClick={handleCloseModal}>
+                  Cancel
+                </Button>
                 <Button type='submit' disabled={loading}>
                   {loading
                     ? 'Processing...'
@@ -978,13 +984,13 @@ export default function EventManager() {
                         {eventHost.start_date && (
                           <p className='text-gray-700'>
                             <span className='font-medium'>Start Date:</span>{' '}
-                            {eventHost.start_date}
+                            {formatDate(eventHost.start_date)}
                           </p>
                         )}
                         {eventHost.end_date && (
                           <p className='text-gray-700'>
                             <span className='font-medium'>End Date:</span>{' '}
-                            {eventHost.end_date}
+                            {formatDate(eventHost.end_date)}
                           </p>
                         )}
                         {eventHost.time && (

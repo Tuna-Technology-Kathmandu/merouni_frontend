@@ -10,6 +10,7 @@ import Header from '@/components/Frontpage/Header'
 import SkillCourseCard from '@/ui/molecules/cards/SkillCourseCard'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { THEME_BLUE, THEME_GREEN } from '@/constants/constants'
 
 const SkillCoursesPage = () => {
     const [courses, setCourses] = useState([])
@@ -61,9 +62,12 @@ const SkillCoursesPage = () => {
                             <div className='relative inline-block mb-3'>
                                 <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight'>
                                     Explore &nbsp;
-                                    <span className='text-[#30ad8f]'>Skill Based Courses</span>
+                                    <span style={{ color: THEME_BLUE }}>Skill Based Courses</span>
                                 </h1>
-                                <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#30ad8f] rounded-full'></div>
+                                <div
+                                    className='absolute -bottom-2 left-0 w-16 h-1 rounded-full'
+                                    style={{ backgroundColor: THEME_BLUE }}
+                                ></div>
                             </div>
                             <p className='mt-4 text-gray-600 max-w-2xl'>
                                 Enhance your skills with our curated collection of professional courses.
@@ -91,13 +95,13 @@ const SkillCoursesPage = () => {
                                     Search Skill Based Courses
                                 </label>
                                 <div className='relative group'>
-                                    <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#30ad8f] transition-colors' />
+                                    <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#387cae] transition-colors' />
                                     <input
                                         type='text'
                                         placeholder='Search skill based courses by title...'
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         value={searchTerm}
-                                        className='w-full px-5 py-3.5 pl-12 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#30ad8f]/10 focus:border-[#30ad8f] focus:bg-white transition-all text-sm font-semibold text-gray-900 placeholder-gray-400'
+                                        className='w-full px-5 py-3.5 pl-12 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#387cae]/10 focus:border-[#387cae] focus:bg-white transition-all text-sm font-semibold text-gray-900 placeholder-gray-400'
                                     />
                                 </div>
                             </div>

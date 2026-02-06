@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import services from '../../app/apiService'
 import { Modal } from '@/ui/molecules/Modal'
 import { BookOpen, User } from 'lucide-react'
+import { THEME_BLUE } from '@/constants/constants'
 
 const DisciplineList = () => {
   const [disciplines, setDisciplines] = useState([])
@@ -52,7 +53,7 @@ const DisciplineList = () => {
           <h2 className='text-2xl md:text-3xl font-bold text-gray-900'>
             Fields of Study
           </h2>
-          <div className='h-1 w-20 bg-[#30ad8f] mt-2 rounded-full'></div>
+          <div className='h-1 w-20 mt-2 rounded-full' style={{ backgroundColor: THEME_BLUE }}></div>
           <p className='mt-3 text-gray-600 max-w-2xl text-sm md:text-base'>
             Explore our wide range of disciplines designed to help you specialize and advance your career.
           </p>
@@ -90,7 +91,7 @@ const DisciplineList = () => {
                     <span className='inline-block px-2 py-1 bg-white/20 backdrop-blur-md rounded-lg text-xs font-medium text-white mb-2 border border-white/10'>
                       Discipline
                     </span>
-                    <h3 className='text-lg font-bold text-white leading-tight group-hover:text-[#31AD8F] transition-colors'>
+                    <h3 className='text-lg font-bold text-white leading-tight group-hover:text-[#387cae] transition-colors'>
                       {item.title}
                     </h3>
                   </div>
@@ -101,10 +102,10 @@ const DisciplineList = () => {
                     {item.description || 'No description available for this discipline.'}
                   </p>
                   <div className='mt-4 pt-3 border-t border-gray-50 flex items-center justify-between'>
-                    <span className='text-xs font-semibold text-[#30ad8f] group-hover:underline'>
+                    <span className='text-xs font-semibold group-hover:underline' style={{ color: THEME_BLUE }}>
                       Read More
                     </span>
-                    <div className='w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-[#30ad8f] transition-colors'>
+                    <div className='w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-[#387cae] transition-colors'>
                       <svg className="w-3 h-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                       </svg>

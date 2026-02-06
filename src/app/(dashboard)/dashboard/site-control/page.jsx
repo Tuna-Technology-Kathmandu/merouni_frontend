@@ -187,7 +187,6 @@ export default function SiteControlPage() {
                         placeholder='Search configurations...'
                         className='max-w-md'
                     />
-                    {/* Button */}
                     <div className='flex gap-2'>
                         <Button onClick={handleAdd}>
                             <Plus className="w-4 h-4 mr-2" /> Add Configuration

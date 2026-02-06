@@ -1,10 +1,10 @@
 'use client'
-import Image from 'next/image'
-import React, { useState, useEffect, useRef } from 'react'
-import Link from 'next/link'
 import { getUnexpiredEvents } from '@/app/events/action'
+import { Skeleton } from '@/ui/shadcn/Skeleton'
 import { formatDate } from '@/utils/date.util'
-import { Calendar } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
 
 const Event = () => {
   const [events, setEvents] = useState([])
@@ -68,6 +68,10 @@ const Event = () => {
     return () => observer.disconnect()
   }, [])
 
+  if (!loading && hasFetched && events.length === 0) {
+    return null
+  }
+
   return (
     <div
       ref={eventRef}
@@ -80,8 +84,27 @@ const Event = () => {
         </h1>
 
         {loading && (
-          <div className='flex justify-center items-center h-64'>
-            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500'></div>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 w-full'>
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className='bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col'
+              >
+                {/* Image Skeleton */}
+                <div className='w-full h-48 md:h-56 bg-gray-100 relative overflow-hidden'>
+                  <Skeleton className='w-full h-full' />
+                </div>
+
+                {/* Content Skeleton */}
+                <div className='p-4 flex flex-col flex-1 gap-3'>
+                  <div className='bg-gray-50 rounded-lg'>
+                    <Skeleton className='h-6 w-3/4 mb-2' />
+                    <Skeleton className='h-6 w-1/2' />
+                  </div>
+                  <Skeleton className='h-4 w-1/3 mt-auto' />
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -120,15 +143,6 @@ const Event = () => {
                 </div>
               </Link>
             ))}
-          </div>
-        )}
-
-        {!loading && hasFetched && events.length === 0 && !error && (
-          <div className='flex flex-col items-center justify-center py-8 md:py-10'>
-            <Calendar className='w-16 h-16 md:w-20 md:h-20 text-gray-400 mb-4' />
-            <p className='text-gray-500 text-lg md:text-xl font-medium'>
-              No events found
-            </p>
           </div>
         )}
 
