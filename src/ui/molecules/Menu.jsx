@@ -21,18 +21,21 @@ const MenuItem = ({ item, isCollapsed, isActive, onClick }) => {
         relative flex items-center w-full p-3 my-1
         rounded-xl transition-all duration-200 ease-in-out
         group overflow-hidden
-        ${isActive
-          ? 'bg-[#0A6FA7]/10 text-[#0A6FA7] font-semibold'
-          : 'text-gray-600 hover:bg-gray-50 hover:text-[#0A6FA7]'
+        ${
+          isActive
+            ? 'bg-[#0A6FA7]/10 text-[#0A6FA7] font-semibold'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-[#0A6FA7]'
         }
         ${isCollapsed ? 'justify-center' : ''}
       `}
     >
-      <span className={`
+      <span
+        className={`
         flex items-center justify-center transition-colors duration-200
         ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5 mr-3'}
         ${isActive ? 'text-[#0A6FA7]' : 'text-gray-400 group-hover:text-[#0A6FA7]'}
-      `}>
+      `}
+      >
         {item.icon}
       </span>
 
@@ -44,13 +47,21 @@ const MenuItem = ({ item, isCollapsed, isActive, onClick }) => {
 
       {/* Active Indicator Bar (Optional aesthetic touch) */}
       {isActive && !isCollapsed && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#0A6FA7] rounded-r-full" />
+        <div className='absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#0A6FA7] rounded-r-full' />
       )}
     </Link>
   )
 }
 
-const SubMenu = ({ item, isCollapsed, isExpanded, isActive, onToggle, pathname, role }) => {
+const SubMenu = ({
+  item,
+  isCollapsed,
+  isExpanded,
+  isActive,
+  onToggle,
+  pathname,
+  role
+}) => {
   const router = useRouter()
 
   // Find first accessible submenu for quick navigation
@@ -61,7 +72,9 @@ const SubMenu = ({ item, isCollapsed, isExpanded, isActive, onToggle, pathname, 
   const handleMainClick = () => {
     // For specific parent menus (Referrals, Colleges), navigate to first submenu only when expanding (not collapsing)
     const shouldAutoNavigate =
-      (item.label === 'Referrals' || item.label === 'Colleges') && !isExpanded && firstSubmenu
+      (item.label === 'Referrals' || item.label === 'Colleges') &&
+      !isExpanded &&
+      firstSubmenu
 
     // Toggle expand state
     onToggle(item.label)
@@ -69,7 +82,12 @@ const SubMenu = ({ item, isCollapsed, isExpanded, isActive, onToggle, pathname, 
     // Navigate to first submenu only when expanding (was collapsed, now expanding)
     if (shouldAutoNavigate) {
       router.push(firstSubmenu.href)
-    } else if (isCollapsed && firstSubmenu && item.label !== 'Referrals' && item.label !== 'Colleges') {
+    } else if (
+      isCollapsed &&
+      firstSubmenu &&
+      item.label !== 'Referrals' &&
+      item.label !== 'Colleges'
+    ) {
       // Preserve previous behavior for other menus when collapsed
       router.push(firstSubmenu.href)
     }
@@ -79,9 +97,10 @@ const SubMenu = ({ item, isCollapsed, isExpanded, isActive, onToggle, pathname, 
     relative flex items-center w-full p-3 my-1
     rounded-xl transition-all duration-200 ease-in-out
     group cursor-pointer select-none
-    ${isActive || isExpanded
-      ? 'text-[#0A6FA7] font-semibold'
-      : 'text-gray-600 hover:bg-gray-50 hover:text-[#0A6FA7]'
+    ${
+      isActive || isExpanded
+        ? 'text-[#0A6FA7] font-semibold'
+        : 'text-gray-600 hover:bg-gray-50 hover:text-[#0A6FA7]'
     }
     ${isCollapsed ? 'justify-center' : ''}
   `
@@ -93,11 +112,13 @@ const SubMenu = ({ item, isCollapsed, isExpanded, isActive, onToggle, pathname, 
         title={isCollapsed ? item.label : ''}
         className={baseClasses}
       >
-        <span className={`
+        <span
+          className={`
           flex items-center justify-center transition-colors duration-200
           ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5 mr-3'}
           ${isActive || isExpanded ? 'text-[#0A6FA7]' : 'text-gray-400 group-hover:text-[#0A6FA7]'}
-        `}>
+        `}
+        >
           {item.icon}
         </span>
 
@@ -119,7 +140,7 @@ const SubMenu = ({ item, isCollapsed, isExpanded, isActive, onToggle, pathname, 
       {!isCollapsed && isExpanded && (
         <div className='flex flex-col ml-4 pl-3 border-l-2 border-slate-100 space-y-0.5 mt-1 mb-2 animate-in slide-in-from-top-2 duration-200'>
           {item.submenus.map((submenu) => {
-            if (!submenu.visible.some((r) => role[r])) return null;
+            if (!submenu.visible.some((r) => role[r])) return null
 
             const isSubActive = pathname === submenu.href
 
@@ -129,9 +150,10 @@ const SubMenu = ({ item, isCollapsed, isExpanded, isActive, onToggle, pathname, 
                 href={submenu.href}
                 className={`
                   flex items-center w-full py-2 px-3 text-sm rounded-lg transition-colors
-                  ${isSubActive
-                    ? 'bg-[#0A6FA7]/5 text-[#0A6FA7] font-medium'
-                    : 'text-gray-500 hover:text-[#0A6FA7] hover:bg-gray-50'
+                  ${
+                    isSubActive
+                      ? 'bg-[#0A6FA7]/5 text-[#0A6FA7] font-medium'
+                      : 'text-gray-500 hover:text-[#0A6FA7] hover:bg-gray-50'
                   }
                 `}
               >
@@ -172,33 +194,36 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
     const hasAccess = (item) => item.visible.some((r) => role[r])
     const query = searchQuery.toLowerCase().trim()
 
-    return menuItems.map(section => {
-      // Filter items in section
-      const items = section.items.filter(item => {
-        // 1. Check Access
-        if (!hasAccess(item)) return false
+    return menuItems
+      .map((section) => {
+        // Filter items in section
+        const items = section.items.filter((item) => {
+          // 1. Check Access
+          if (!hasAccess(item)) return false
 
-        // 2. Check Search (if any)
-        if (!query) return true
+          // 2. Check Search (if any)
+          if (!query) return true
 
-        const matchesLabel = item.label.toLowerCase().includes(query)
-        const matchesSubmenu = item.submenus?.some(sub => sub.label.toLowerCase().includes(query))
+          const matchesLabel = item.label.toLowerCase().includes(query)
+          const matchesSubmenu = item.submenus?.some((sub) =>
+            sub.label.toLowerCase().includes(query)
+          )
 
-        return matchesLabel || matchesSubmenu
+          return matchesLabel || matchesSubmenu
+        })
+
+        return { ...section, items }
       })
-
-      return { ...section, items }
-    }).filter(section => section.items.length > 0)
+      .filter((section) => section.items.length > 0)
   }, [role, searchQuery])
-
 
   // State Handlers
   const toggleMenu = (label) => {
-    setExpandedMenus(prev => {
+    setExpandedMenus((prev) => {
       // Close all other menus, then toggle the clicked one
       const newState = {}
       // Close all menus first
-      Object.keys(prev).forEach(key => {
+      Object.keys(prev).forEach((key) => {
         newState[key] = false
       })
       // Toggle the clicked menu
@@ -228,7 +253,10 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
     }
 
     try {
-      await fetch(`${process.env.baseUrl}/auth/logout`, { method: 'POST', credentials: 'include' })
+      await fetch(`${process.env.baseUrl}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      })
       performLogout()
     } catch (error) {
       console.error('Logout error:', error)
@@ -249,11 +277,14 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
           )}
 
           <div className='space-y-0.5'>
-            {section.items.map(item => {
+            {section.items.map((item) => {
               // 1. Logout Special Case
               if (item.href === '/dashboard/logout') {
                 return (
-                  <div key={item.label} className="mt-8 pt-4 border-t border-gray-100">
+                  <div
+                    key={item.label}
+                    className='mt-8 pt-4 border-t border-gray-100'
+                  >
                     <MenuItem
                       item={item}
                       isCollapsed={isCollapsed}
@@ -266,9 +297,17 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
 
               // 2. Submenu Case
               if (item.submenus?.length > 0) {
-                const isActive = item.submenus.some(sub => pathname === sub.href)
+                const isActive = item.submenus.some(
+                  (sub) => pathname === sub.href
+                )
                 // Auto-expand if active or search matched
-                const isExpanded = expandedMenus[item.label] ?? (isActive || (searchQuery && item.label.toLowerCase().includes(searchQuery.toLowerCase())))
+                const isExpanded =
+                  expandedMenus[item.label] ??
+                  (isActive ||
+                    (searchQuery &&
+                      item.label
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase())))
 
                 return (
                   <SubMenu
@@ -287,9 +326,12 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
               // 3. Regular Item Case
               const isActive = pathname === item.href
               // Special rename logic from original code? "Applied Colleges"
-              const displayLabel = (item.href === '/dashboard/referrals' && role.student && !role.admin)
-                ? 'Applied Colleges'
-                : item.label
+              const displayLabel =
+                item.href === '/dashboard/referrals' &&
+                role.student &&
+                !role.admin
+                  ? 'Applied Colleges'
+                  : item.label
 
               return (
                 <MenuItem
