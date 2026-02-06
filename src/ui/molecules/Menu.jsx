@@ -194,10 +194,21 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
 
   // State Handlers
   const toggleMenu = (label) => {
-    setExpandedMenus(prev => ({
-      ...prev,
-      [label]: !prev[label]
-    }))
+    setExpandedMenus(prev => {
+      // Close all other menus, then toggle the clicked one
+      const newState = {}
+      // Close all menus first
+      Object.keys(prev).forEach(key => {
+        newState[key] = false
+      })
+      // Toggle the clicked menu
+      newState[label] = !prev[label]
+      return newState
+    })
+  }
+
+  const closeAllMenus = () => {
+    setExpandedMenus({})
   }
 
   const handleLogoutClick = (e) => {
@@ -286,6 +297,7 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
                   item={{ ...item, label: displayLabel }}
                   isCollapsed={isCollapsed}
                   isActive={isActive}
+                  onClick={closeAllMenus}
                 />
               )
             })}
