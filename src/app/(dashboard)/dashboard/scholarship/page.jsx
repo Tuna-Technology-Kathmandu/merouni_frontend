@@ -28,6 +28,8 @@ import {
   getScholarshipApplications
 } from './actions'
 import SearchInput from '@/ui/molecules/SearchInput'
+import { formatDate } from '@/utils/date.util'
+import ScholarshipViewModal from './ScholarshipViewModal'
 
 export default function ScholarshipManager() {
   const { setHeading } = usePageHeading()
@@ -92,7 +94,7 @@ export default function ScholarshipManager() {
       {
         header: 'Deadline',
         accessorKey: 'applicationDeadline',
-        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString()
+        cell: ({ getValue }) => formatDate(getValue())
       },
 
       {
@@ -102,39 +104,39 @@ export default function ScholarshipManager() {
           <div className='flex gap-2'>
             <Button
               variant='ghost'
-              size='sm'
+              size='icon'
               onClick={() => {
                 setViewData(row.original)
                 setIsViewOpen(true)
               }}
-              className='p-1 text-green-600 hover:text-green-800'
+              className='text-green-600 hover:text-green-800 hover:bg-green-50'
               title='View Details'
             >
               <Eye className='w-4 h-4' />
             </Button>
             <Button
               variant='ghost'
-              size='sm'
+              size='icon'
               onClick={() => handleViewApplications(row.original.id)}
-              className='p-1 text-purple-600 hover:text-purple-800'
+              className='text-purple-600 hover:text-purple-800 hover:bg-purple-50'
               title='View Applications'
             >
               <Users className='w-4 h-4' />
             </Button>
             <Button
               variant='ghost'
-              size='sm'
+              size='icon'
               onClick={() => handleEdit(row.original)}
-              className='p-1 text-blue-600 hover:text-blue-800'
+              className='text-blue-600 hover:text-blue-800 hover:bg-blue-50'
               title='Edit'
             >
               <Edit2 className='w-4 h-4' />
             </Button>
             <Button
               variant='ghost'
-              size='sm'
+              size='icon'
               onClick={() => handleDeleteClick(row.original.id)}
-              className='p-1 text-red-600 hover:text-red-800'
+              className='text-red-600 hover:text-red-800 hover:bg-red-50'
               title='Delete'
             >
               <Trash2 className='w-4 h-4' />
@@ -354,10 +356,10 @@ export default function ScholarshipManager() {
       <div className='p-4 w-full'>
         <div className='flex justify-between items-center mb-4'>
           {/* Search Bar */}
-     
+
           <SearchInput
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleSearchInput(e.target.value)}
             placeholder='Search scholarships...'
             className='max-w-md'
           />
@@ -410,86 +412,11 @@ export default function ScholarshipManager() {
       />
 
       {/* View Scholarship Dialog */}
-      <Dialog
+      <ScholarshipViewModal
         isOpen={isViewOpen}
         onClose={() => setIsViewOpen(false)}
-        className='max-w-4xl'
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Scholarship Details</DialogTitle>
-          </DialogHeader>
-          {viewData && (
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6 py-4'>
-              <div className='space-y-1 col-span-2'>
-                <Label className='text-muted-foreground'>
-                  Scholarship Name
-                </Label>
-                <div className='text-lg font-medium'>{viewData.name}</div>
-              </div>
-
-              <div className='space-y-1 col-span-2'>
-                <Label className='text-muted-foreground'>Category</Label>
-                <div className='text-lg font-medium'>
-                  {viewData?.scholarshipCategory?.title}
-                </div>
-              </div>
-
-              <div className='space-y-1 col-span-2'>
-                <Label className='text-muted-foreground'>Description</Label>
-                <div
-                  className='prose prose-sm max-w-none dark:prose-invert border rounded-md p-4 bg-muted/20'
-                  dangerouslySetInnerHTML={{ __html: viewData.description }}
-                />
-              </div>
-
-              <div className='space-y-1'>
-                <Label className='text-muted-foreground'>
-                  Eligibility Criteria
-                </Label>
-                <div className='font-medium'>
-                  {viewData.eligibilityCriteria}
-                </div>
-              </div>
-
-              <div className='space-y-1'>
-                <Label className='text-muted-foreground'>Amount (Rs.)</Label>
-                <div className='font-medium'>
-                  {viewData.amount.toLocaleString()}
-                </div>
-              </div>
-
-              <div className='space-y-1'>
-                <Label className='text-muted-foreground'>
-                  Application Deadline
-                </Label>
-                <div className='font-medium'>
-                  {new Date(viewData.applicationDeadline).toLocaleDateString()}
-                </div>
-              </div>
-
-              <div className='space-y-1'>
-                <Label className='text-muted-foreground'>
-                  Renewal Criteria
-                </Label>
-                <div className='font-medium'>{viewData.renewalCriteria}</div>
-              </div>
-
-              <div className='space-y-1 col-span-2'>
-                <Label className='text-muted-foreground'>
-                  Contact Information
-                </Label>
-                <div className='font-medium'>{viewData.contactInfo}</div>
-              </div>
-            </div>
-          )}
-          <DialogFooter>
-            <Button variant='outline' onClick={() => setIsViewOpen(false)}>
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        scholarship={viewData}
+      />
 
       {/* Applications Dialog */}
       <Dialog
@@ -556,13 +483,12 @@ export default function ScholarshipManager() {
                       </div>
                       <div className='ml-4'>
                         <span
-                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
-                            application.status === 'APPROVED'
+                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${application.status === 'APPROVED'
                               ? 'bg-green-50 text-green-700 border border-green-200'
                               : application.status === 'REJECTED'
                                 ? 'bg-red-50 text-red-700 border border-red-200'
                                 : 'bg-yellow-50 text-yellow-700 border border-yellow-200'
-                          }`}
+                            }`}
                         >
                           {application.status}
                         </span>

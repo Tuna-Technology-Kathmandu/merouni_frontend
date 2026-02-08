@@ -311,7 +311,7 @@ const ConsultancyReferralsPage = () => {
         {/* Search Filter */}
         <SearchInput
           value={searchQuery}
-          onChange={(e) => handleSearchChange(e.target.value)}
+          onChange={(e) => handleSearchChange(e)}
           placeholder='Search consultancy referrals...'
           className='max-w-md'
         />

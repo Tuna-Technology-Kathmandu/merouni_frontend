@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { getAllExams, createExam, updateExam, deleteExam } from './actions'
 import Loading from '../../../../ui/molecules/Loading'
 import Table from '../../../../ui/molecules/Table'
-import { Edit2, Trash2, Search } from 'lucide-react'
+import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import { useDebounce } from 'use-debounce'
@@ -20,9 +20,11 @@ import { Input } from '../../../../ui/shadcn/input'
 import { Label } from '../../../../ui/shadcn/label'
 import { Select } from '../../../../ui/shadcn/select'
 import SearchInput from '@/ui/molecules/SearchInput'
+import { formatDate } from '@/utils/date.util'
 const CKExam = dynamic(() => import('../component/CKExam'), {
   ssr: false
 })
+import ExamViewModal from './ExamViewModal'
 
 // Helper component for required label
 const RequiredLabel = ({ children, htmlFor }) => (
@@ -61,6 +63,8 @@ export default function ExamManager() {
   const [isOpen, setIsOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [viewingExam, setViewingExam] = useState(null)
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
   const [pagination, setPagination] = useState({
@@ -180,7 +184,17 @@ export default function ExamManager() {
       },
       {
         header: 'Syllabus',
-        accessorKey: 'syllabus'
+        accessorKey: 'syllabus',
+        cell: ({ getValue }) => {
+          const value = getValue()
+
+          const getFirst20text = value.slice(0, 20)
+          if (value.length > 20) {
+            return getFirst20text + '...'
+          }
+          return value
+        }
+
       },
       {
         header: 'Past Questions',
@@ -199,25 +213,40 @@ export default function ExamManager() {
       {
         header: 'Created Date',
         accessorKey: 'createdAt',
-        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString()
+        cell: ({ getValue }) => formatDate(getValue())
       },
       {
         header: 'Actions',
         id: 'actions',
         cell: ({ row }) => (
           <div className='flex gap-2'>
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleView(row.original)}
+              className='text-gray-600 hover:text-gray-800 hover:bg-gray-100'
+              title='View Details'
+            >
+              <Eye className='w-4 h-4' />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => handleEdit(row.original)}
-              className='p-1 text-blue-600 hover:text-blue-800'
+              className='text-blue-600 hover:text-blue-800 hover:bg-blue-50'
+              title='Edit'
             >
               <Edit2 className='w-4 h-4' />
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => handleDeleteClick(row.original.id)}
-              className='p-1 text-red-600 hover:text-red-800'
+              className='text-red-600 hover:text-red-800 hover:bg-red-50'
+              title='Delete'
             >
               <Trash2 className='w-4 h-4' />
-            </button>
+            </Button>
           </div>
         )
       }
@@ -496,6 +525,16 @@ export default function ExamManager() {
     }
   }
 
+  const handleView = (exam) => {
+    setViewingExam(exam)
+    setIsViewModalOpen(true)
+  }
+
+  const handleViewModalClose = () => {
+    setIsViewModalOpen(false)
+    setViewingExam(null)
+  }
+
   const handleSearchInput = (value) => {
     setSearchQuery(value)
 
@@ -533,9 +572,9 @@ export default function ExamManager() {
       <div className='p-4 w-full'>
         <div className='flex justify-between items-center mb-4'>
           {/* Search Bar */}
-                 <SearchInput
+          <SearchInput
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleSearchInput(e.target.value)}
             placeholder='Search exams...'
             className='max-w-md'
           />
@@ -1065,6 +1104,12 @@ export default function ExamManager() {
         onConfirm={handleDeleteConfirm}
         title='Confirm Deletion'
         message='Are you sure you want to delete this exam? This action cannot be undone.'
+      />
+
+      <ExamViewModal
+        isOpen={isViewModalOpen}
+        onClose={handleViewModalClose}
+        exam={viewingExam}
       />
     </>
   )
