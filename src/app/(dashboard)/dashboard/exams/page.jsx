@@ -197,25 +197,6 @@ export default function ExamManager() {
 
       },
       {
-        header: 'Past Questions',
-        accessorKey: 'pastQuestion',
-        cell: ({ getValue }) => (
-          <a
-            href={getValue()}
-            className='text-blue-600 hover:underline'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            View
-          </a>
-        )
-      },
-      {
-        header: 'Created Date',
-        accessorKey: 'createdAt',
-        cell: ({ getValue }) => formatDate(getValue())
-      },
-      {
         header: 'Actions',
         id: 'actions',
         cell: ({ row }) => (
