@@ -5,6 +5,7 @@ import { getCategories } from '@/app/action'
 import { authFetch } from '@/app/utils/authFetch'
 import Loader from '@/ui/molecules/Loading'
 import Table from '@/ui/molecules/Table'
+import { Select } from '@/ui/shadcn/select'
 import { Edit2, Trash2, Eye } from 'lucide-react'
 import SearchInput from '@/ui/molecules/SearchInput'
 import { toast, ToastContainer } from 'react-toastify'
@@ -440,8 +441,18 @@ export default function BlogsManager() {
             placeholder='Search blogs...'
             className='max-w-md'
           />
-          {/* Button */}
-          <div className='flex gap-2'>
+          {/* Filters & Button */}
+          <div className='flex gap-4 items-center'>
+            <Select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className='min-w-[150px]'
+            >
+              <option value='all'>All Status</option>
+              <option value='published'>Published</option>
+              <option value='draft'>Draft</option>
+              <option value='archived'>Archived</option>
+            </Select>
             <Button onClick={handleAddBlog}>
               Add Blog
             </Button>

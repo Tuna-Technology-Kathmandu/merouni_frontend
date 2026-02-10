@@ -11,7 +11,13 @@ import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { Modal } from '../../../../ui/molecules/Modal'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose
+} from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '@/ui/shadcn/button'
 import SearchInput from '@/ui/molecules/SearchInput'
@@ -334,7 +340,7 @@ export default function CategoryManager() {
         </div>
         <ToastContainer />
 
-        <Modal
+        <Dialog
           isOpen={isOpen}
           onClose={() => {
             setIsOpen(false)
@@ -342,9 +348,22 @@ export default function CategoryManager() {
             setEditingId(null)
             reset()
           }}
-          title={editing ? 'Edit Category' : 'Add Category'}
           className='max-w-2xl'
         >
+          <DialogHeader>
+            <div className='flex items-center justify-between'>
+              <DialogTitle>{editing ? 'Edit Category' : 'Add Category'}</DialogTitle>
+              <DialogClose
+                onClick={() => {
+                  setIsOpen(false)
+                  setEditing(false)
+                  setEditingId(null)
+                  reset()
+                }}
+              />
+            </div>
+          </DialogHeader>
+          <DialogContent>
           <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
             <form
               onSubmit={handleSubmit(onSubmit)}
@@ -395,17 +414,29 @@ export default function CategoryManager() {
               </div>
             </form>
           </div>
-        </Modal>
+          </DialogContent>
+        </Dialog>
 
-        <Modal
+        <Dialog
           isOpen={isViewOpen}
           onClose={() => {
             setIsViewOpen(false)
             setViewingCategory(null)
           }}
-          title='Category Details'
           className='max-w-2xl'
         >
+          <DialogHeader>
+            <div className='flex items-center justify-between'>
+              <DialogTitle>Category Details</DialogTitle>
+              <DialogClose
+                onClick={() => {
+                  setIsViewOpen(false)
+                  setViewingCategory(null)
+                }}
+              />
+            </div>
+          </DialogHeader>
+          <DialogContent>
           <div className='p-6 space-y-6'>
             <div>
               <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Title</h3>
@@ -435,7 +466,8 @@ export default function CategoryManager() {
               <Button onClick={() => setIsViewOpen(false)}>Close</Button>
             </div>
           </div>
-        </Modal>
+        </DialogContent>
+      </Dialog>
 
         {/* Table */}
         <div className='mt-8'>

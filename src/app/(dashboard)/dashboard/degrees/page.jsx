@@ -8,8 +8,8 @@ import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '@/ui/shadcn/button'
-import CreateUpdateDegree from '@/ui/molecules/modals/CreateUpdateDegree'
-import ViewDegree from '@/ui/molecules/modals/ViewDegree'
+import CreateUpdateDegree from '@/ui/molecules/dialogs/CreateUpdateDegree'
+import ViewDegree from '@/ui/molecules/dialogs/ViewDegree'
 import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function DegreePage() {
@@ -140,16 +140,6 @@ export default function DegreePage() {
   }
 
   const columns = [
-
-    {
-      header: 'Title',
-      accessorKey: 'title'
-    },
-    {
-      header: 'Description',
-      accessorKey: 'description',
-      cell: ({ getValue }) => <span className="line-clamp-2 text-sm text-gray-600">{getValue() || '-'}</span>
-    },
     {
       header: 'Cover',
       id: 'cover',
@@ -164,6 +154,20 @@ export default function DegreePage() {
           />
         )
       }
+    },
+    {
+      header: 'Title',
+      accessorKey: 'title'
+    },
+    {
+      header: 'Description',
+      accessorKey: 'description',
+      cell: ({ getValue }) => (
+        <div className='max-w-xs overflow-hidden'>
+          {getValue()?.substring(0, 100)}
+          {getValue()?.length > 100 ? '...' : getValue() || '-'}
+        </div>
+      )
     },
     {
       header: 'Actions',

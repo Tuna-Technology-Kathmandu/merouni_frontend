@@ -1,434 +1,174 @@
 'use client'
-import EmptyState from '@/ui/shadcn/EmptyState'
-import EventCardSkeleton from '@/ui/shadcn/EventCardSkeleton'
-import { GridSkeleton } from '@/ui/shadcn/GridSkeleton'
-import { formatDate } from '@/utils/date.util'
-import { debounce } from 'lodash'
-import { Calendar } from 'lucide-react'
-import Link from 'next/link'
-import { useCallback, useEffect, useState } from 'react'
-import { IoIosArrowDroprightCircle, IoIosSearch } from 'react-icons/io'
-import { PiLineVerticalThin } from 'react-icons/pi'
-import EventCard from '../../components/Frontpage/EventCard'
-import Footer from '../../components/Frontpage/Footer'
+
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
-import { getColleges } from '../action'
-import Pagination from '../blogs/components/Pagination'
-import useMediaQuery from './MediaQuery'
+import Footer from '../../components/Frontpage/Footer'
+import EventFilters from './components/EventFilters'
+import FeaturedEvents from './components/FeaturedEvents'
 import Sponsors from './Sponsors'
-import Thisweek from './Thisweek'
-import {
-  fetchEvents,
-  fetchNextWeekEvents,
-  fetchThisWeekEvents,
-  searchEvent
-} from './action'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { fetchEvents, searchEvent, fetchThisWeekEvents } from './action'
+import { getColleges } from '../action'
 
 const Events = () => {
-  const [allEvents, setAllEvents] = useState([])
-  const [thisWeekEvents, setThisWeekEvents] = useState([])
-  const [nextWeekEvents, setNextWeekEvents] = useState([])
-  const [featuredEvent, setFeaturedEvent] = useState(null)
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    totalCount: 0
-  })
-  const [searchQuery, setSearchQuery] = useState('')
-  const [isSearching, setIsSearching] = useState(false)
-  const isMobile = useMediaQuery('(max-width: 767px)')
+    const router = useRouter()
+    const searchParams = useSearchParams()
+    const pathname = usePathname()
 
-  const [allLoading, setAllLoading] = useState(false)
-  const [colleges, setColleges] = useState([])
-  const [selectedCollege, setSelectedCollege] = useState('')
+    // State
+    const [events, setEvents] = useState([])
+    const [thisWeekEvents, setThisWeekEvents] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
 
-  useEffect(() => {
-    const fetchCollegesData = async () => {
-      try {
-        const data = await getColleges(null, null, 999, 1)
-        setColleges(data.items || [])
-      } catch (err) {
-        console.error('Failed to fetch colleges:', err)
-      }
-    }
-    fetchCollegesData()
-  }, [])
+    // Initialization from search params
+    const initialSearch = searchParams.get('q') || ''
+    const initialPage = parseInt(searchParams.get('page')) || 1
 
-  useEffect(() => {
-    if (searchQuery) {
-      debouncedSearch(searchQuery, selectedCollege)
-    } else {
-      loadEvents(pagination.currentPage, selectedCollege)
-    }
-  }, [pagination.currentPage, searchQuery, selectedCollege])
+    // Filters State
+    const [searchQuery, setSearchQuery] = useState(initialSearch)
 
-  const loadEvents = async (page = 1, collegeId = '') => {
-    try {
-      setAllLoading(true)
-      const response = await fetchEvents(page, collegeId)
-      const events = response.items || []
-      setAllEvents(events)
-      setPagination({
-        currentPage: response.pagination?.currentPage || page,
-        totalPages: response.pagination?.totalPages || 1,
-        totalCount: response.pagination?.totalCount || 0
-      })
+    // Pagination
+    const [pagination, setPagination] = useState({
+        currentPage: initialPage,
+        totalPages: 1,
+        totalCount: 0
+    })
 
-      // Fetch specific sections with college filtering
-      const thisWeek = await fetchThisWeekEvents(collegeId)
-      const nextWeek = await fetchNextWeekEvents(collegeId)
+    const debounceRef = useRef(null)
 
-      // Update states
-      setThisWeekEvents(thisWeek.events || [])
-      setNextWeekEvents(nextWeek.events || [])
-
-      const featured = thisWeek.events?.[0] || events[0] || null
-      setFeaturedEvent(featured)
-    } catch (error) {
-      setError('Failed to load Events')
-      console.error('Error loading events:', error)
-      setAllEvents([])
-      setThisWeekEvents([])
-      setNextWeekEvents([])
-      setFeaturedEvent(null)
-    } finally {
-      setLoading(false)
-      setAllLoading(false)
-    }
-  }
-
-  const handlePageChange = (page) => {
-    if (page > 0 && page <= pagination.totalPages) {
-      setPagination((prev) => ({
-        ...prev,
-        currentPage: page
-      }))
-    }
-  }
-
-  const debouncedSearch = useCallback(
-    debounce(async (query, collegeId) => {
-      if (query) {
-        setIsSearching(true)
-        try {
-          const results = await searchEvent(query, collegeId)
-          setAllEvents(results.items || [])
-          setPagination(
-            results.pagination || {
-              currentPage: 1,
-              totalPages: 1,
-              totalCount: 0
+    // URL Sync Helper
+    const updateURL = useCallback((params) => {
+        const newParams = new URLSearchParams(searchParams.toString())
+        Object.entries(params).forEach(([key, value]) => {
+            if (value) {
+                newParams.set(key, value)
+            } else {
+                newParams.delete(key)
             }
-          )
+        })
+        router.push(`${pathname}?${newParams.toString()}`, { scroll: false })
+    }, [searchParams, pathname, router])
+
+    // Data Fetching
+    const fetchEventsData = async (page = 1, search = '') => {
+        setLoading(true)
+        setError(null)
+        try {
+            // Fetch main events
+            let response
+            if (search) {
+                response = await searchEvent(search)
+            } else {
+                response = await fetchEvents(page)
+            }
+
+            if (response && response.items) {
+                setEvents(response.items)
+                if (response.pagination) {
+                    setPagination({
+                        currentPage: response.pagination.currentPage || page,
+                        totalPages: response.pagination.totalPages || 1,
+                        totalCount: response.pagination.totalCount || 0
+                    })
+                }
+            } else {
+                setEvents([])
+                setPagination(prev => ({ ...prev, totalCount: 0, currentPage: page }))
+            }
+
+            // Fetch "This Week" events if not searching and on first page
+            if (!search && page === 1) {
+                const thisWeek = await fetchThisWeekEvents()
+                setThisWeekEvents(thisWeek.events || [])
+            } else {
+                setThisWeekEvents([])
+            }
+
         } catch (error) {
-          console.error('Error searching events:', error)
-          setAllEvents([])
-          setPagination({
-            currentPage: 1,
-            totalPages: 1,
-            totalCount: 0
-          })
+            console.error('Error fetching events:', error)
+            setError('Failed to load events')
         } finally {
-          setIsSearching(false)
+            setLoading(false)
         }
-      }
-    }, 1000),
-    []
-  )
+    }
 
-  const handleSearchChange = (e) => {
-    const query = e.target.value
-    setSearchQuery(query)
-  }
+    useEffect(() => {
+        // Removed fetchCollegesData()
+    }, [])
 
-  if (error) return <div>Error: {error}</div>
+    // Sync state when URL params change
+    useEffect(() => {
+        const q = searchParams.get('q') || ''
+        const pg = parseInt(searchParams.get('page')) || 1
 
-  return (
-    <>
-      <Header />
-      <Navbar />
+        setSearchQuery(q)
+        setPagination(prev => ({ ...prev, currentPage: pg }))
+        
+        fetchEventsData(pg, q)
+    }, [searchParams])
 
-      {loading ? (
-        <div className='mx-auto'>
-          {/* Featured Skeleton */}
-          <div className='flex flex-col lg:flex-row items-center justify-between p-0 lg:p-10 max-w-[1600px] mx-auto opacity-70 animate-pulse'>
-            <div className='order-1 lg:order-2 w-full lg:w-1/3 h-[400px] bg-gray-200 rounded-lg'></div>
-            <div className='order-2 lg:order-1 lg:w-1/2 flex flex-col gap-4 mt-4 lg:mt-0'>
-              <div className='h-8 w-3/4 bg-gray-200 rounded'></div>
-              <div className='h-4 w-full bg-gray-200 rounded'></div>
-              <div className='h-32 w-full max-w-[600px] bg-gray-200 rounded-lg mt-4'></div>
-            </div>
-          </div>
+    // Effect: Debounced Search & Filter Change
+    useEffect(() => {
+        if (debounceRef.current) clearTimeout(debounceRef.current)
+        if (searchQuery === initialSearch) return
+        debounceRef.current = setTimeout(() => {
+            updateURL({ 
+                q: searchQuery, 
+                page: 1 
+            })
+        }, 500)
+        return () => clearTimeout(debounceRef.current)
+    }, [searchQuery, updateURL, initialSearch])
 
-          <div className='container mx-auto px-4 py-12'>
-            <GridSkeleton count={6}>
-              <EventCardSkeleton />
-            </GridSkeleton>
-          </div>
-        </div>
-      ) : (
-        <div className='mx-auto'>
-          {featuredEvent && featuredEvent.event_host && (
-            <div className='flex flex-col lg:flex-row items-center justify-between p-0 lg:p-10 max-w-[1600px] mx-auto '>
-              <div className='order-1 lg:order-2 w-full lg:w-1/3 flex justify-end mt-0 mb-2 lg:mb-0 lg:mt-0 h-[400px] max-lg:h-[300px]'>
-                {isMobile ? (
-                  <img
-                    src={featuredEvent.image || '/images/events.webp'}
-                    alt={featuredEvent.title ?? 'Featured Event'}
-                    className='shadow-md w-full h-full '
-                  />
-                ) : (
-                  <img
-                    src={featuredEvent.image || '/images/events.webp'}
-                    alt={featuredEvent.title ?? 'Featured Event'}
-                    className='lg:rounded-lg rounded-none shadow-md w-full h-full'
-                  />
-                )}
-              </div>
+    // Handle page change
+    const handlePageChange = (page, search = searchQuery) => {
+        if (page > 0 && page <= (pagination.totalPages || 1)) {
+            updateURL({ page, q: search })
+        }
+    }
 
-              {/* Featured Event Content */}
-              <div className='order-2 lg:order-1 lg:w-1/2 flex flex-col'>
-                <h2 className='text-2xl lg:text-3xl font-bold mb-4 mt-4 lg:mt-0 text-center lg:text-start'>
-                  {featuredEvent.title ?? 'No Title Available'}
-                </h2>
-                <p className='lg:mb-6 text-center lg:text-start'>
-                  {featuredEvent.description ?? 'No Description Available'}
-                </p>
+    // Scroll to top on any URL parameter change
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'auto' })
+    }, [searchParams])
 
-                {/* Event Details */}
-                <div className='order-2 lg:order-1 bg-gradient-to-l from-[#30AD8F] to-[#0A6FA7] text-white rounded-lg flex flex-row mb-8 items-center justify-between max-[1130px]:w-[400px] w-[600px] h-[120px] p-6 lg:p-8'>
-                  <div className='flex flex-col items-center'>
-                    <p className='text-sm font-bold'>Starts</p>
-                    <p className='whitespace-nowrap'>
-                      {formatDate(featuredEvent.event_host?.start_date)}
-                    </p>
-                  </div>
-                  <div className='flex items-center'>
-                    <PiLineVerticalThin style={{ color: 'white' }} size={50} />
-                  </div>
-                  <div className='flex flex-col items-center'>
-                    <p className='text-sm font-bold'>Ends</p>
-                    <p className='whitespace-nowrap'>
-                      {formatDate(featuredEvent.event_host?.end_date)}
-                    </p>
-                  </div>
-                  <div className='flex items-center'>
-                    <PiLineVerticalThin style={{ color: 'white' }} size={50} />
-                  </div>
-                  <div className='flex flex-col items-center'>
-                    <p className='text-sm font-bold whitespace-nowrap'>Time</p>
-                    <p className='whitespace-nowrap'>
-                      {(() => {
-                        try {
-                          const host = featuredEvent.event_host
-                          return host?.time
-                            ? new Date(
-                              `1970-01-01T${host.time}:00`
-                            ).toLocaleTimeString('en-US', {
-                              hour: 'numeric',
-                              minute: 'numeric',
-                              hour12: true
-                            })
-                            : 'No Time Available'
-                        } catch (e) {
-                          return 'Invalid Time Data'
-                        }
-                      })()}
-                    </p>
-                  </div>
+    return (
+        <>
+            <Header />
+            <Navbar />
+
+            <div className='min-h-screen bg-white'>
+                {/* Filters Section */}
+                <div className='max-w-[1600px] mx-auto px-4 sm:px-8 pt-8'>
+                    <EventFilters
+                        searchQuery={searchQuery}
+                        setSearchQuery={setSearchQuery}
+                    />
                 </div>
 
-                {/* Buttons */}
-                <div className='order-1 lg:order-2  flex flex-row mb-6 lg:mb-0 items-center justify-center lg:items-center lg:justify-start lg:flex-row gap-4'>
-                  <Link href={`/events/${featuredEvent.slugs}`}>
-                    <button className='border-2 border-black text-black px-2 py-1 lg:px-6 lg:py-2 rounded-full lg:rounded-lg hover:bg-gray-800 hover:text-white transition-all duration-300 flex flex-row items-center justify-between mt-5'>
-                      <span className='pr-2 lg:pr-4 font-semibold text-sm lg:text-base'>
-                        View More
-                      </span>
-                      <IoIosArrowDroprightCircle size={25} />
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Sponsors Section */}
-          <Sponsors />
-
-          {/* This Week's Events */}
-
-          {thisWeekEvents.length > 0 && (
-            <Thisweek
-              title='This week Events'
-              subtitle='Connect, learn, and celebrate together'
-              thisWeekEvents={thisWeekEvents}
-            />
-          )}
-
-          {/* Upcoming Events */}
-          {nextWeekEvents.length > 0 && (
-            <div className='mt-8'>
-              <Thisweek
-                title='Upcoming Events'
-                subtitle='Don’t miss what’s happening around you'
-                thisWeekEvents={nextWeekEvents}
-              />
-            </div>
-          )}
-
-          {/* All events */}
-          <div className='container mx-auto px-4 py-12 md:py-20'>
-            <div className='flex flex-col min-[1330px]:flex-row gap-6 min-[1330px]:gap-12 items-center min-[1330px]:items-start max-sm:px-9'>
-              {/* Left Section - Filters & Archive */}
-              <div className='w-full lg:w-1/4 space-y-6 min-[1330px]:space-y-8'>
-                <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
-                  <h2 className='text-xl font-bold text-gray-900 mb-6'>
-                    Filters
-                  </h2>
-
-                  {/* Search Bar */}
-                  <div className='space-y-4'>
-                    <div className='group'>
-                      <label className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block'>
-                        Search
-                      </label>
-                      <div className='relative flex items-center'>
-                        <input
-                          type='text'
-                          placeholder='Search events...'
-                          className='w-full pl-4 pr-10 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] focus:border-transparent transition-all'
-                          value={searchQuery}
-                          onChange={handleSearchChange}
-                        />
-                        <IoIosSearch className='absolute right-3 text-gray-400 text-xl group-focus-within:text-[#0A6FA7] transition-colors' />
-                      </div>
-                    </div>
-
-                    {/* College Filter */}
-                    <div className='group'>
-                      <label className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 block'>
-                        Institution
-                      </label>
-                      <div className='relative'>
-                        <select
-                          value={selectedCollege}
-                          onChange={(e) => {
-                            setSelectedCollege(e.target.value)
-                            setPagination((prev) => ({
-                              ...prev,
-                              currentPage: 1
-                            }))
-                          }}
-                          className='w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] focus:border-transparent transition-all appearance-none bg-white text-sm font-medium'
-                        >
-                          <option value=''>All Institutions</option>
-                          {colleges.map((college) => (
-                            <option key={college.id} value={college.id}>
-                              {college.name}
-                            </option>
-                          ))}
-                        </select>
-                        <div className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400'>
-                          <IoIosArrowDroprightCircle className='rotate-90' />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Reset Button */}
-                    {(selectedCollege || searchQuery) && (
-                      <button
-                        onClick={() => {
-                          setSelectedCollege('')
-                          setSearchQuery('')
-                          setPagination((prev) => ({ ...prev, currentPage: 1 }))
-                        }}
-                        className='w-full py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 transition-colors'
-                      >
-                        Reset All Filters
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Section - Events Grid */}
-              <div className='w-full lg:w-3/4'>
-                <div className='flex items-center justify-between mb-8'>
-                  <h2 className='text-2xl font-bold text-gray-900'>
-                    {selectedCollege
-                      ? colleges.find((c) => c.id === selectedCollege)?.name +
-                      ' Events'
-                      : 'All Events'}
-                  </h2>
-                  <div className='text-sm text-gray-500 font-medium'>
-                    Showing {allEvents.length} of {pagination.totalCount} events
-                  </div>
-                </div>
-
-                {/* Responsive Grid */}
-                <div className='grid grid-cols-1 sm:grid-cols-2 min-[1330px]:grid-cols-3 gap-6 md:gap-8'>
-                  {allLoading ? (
-                    <GridSkeleton count={6} className='col-span-1 sm:col-span-2 min-[1330px]:col-span-3 !grid-cols-1 sm:!grid-cols-2 lg:!grid-cols-3 xl:!grid-cols-3'>
-                      <EventCardSkeleton />
-                    </GridSkeleton>
-                  ) : allEvents.length === 0 ? (
-                    <div className='col-span-full'>
-                      <EmptyState
-                        icon={Calendar}
-                        title='No Events Found'
-                        description={
-                          searchQuery
-                            ? `No events match your search "${searchQuery}"`
-                            : 'No events are currently scheduled'
-                        }
-                        action={
-                          searchQuery
-                            ? {
-                              label: 'Clear Search',
-                              onClick: () => {
-                                setSearchQuery('')
-                                loadEvents(1)
-                              }
-                            }
-                            : null
-                        }
-                      />
-                    </div>
-                  ) : (
-                    allEvents.map((event) => (
-                      <Link
-                        href={`/events/${event.slugs}`}
-                        key={event.id}
-                        passHref
-                      >
-                        <div className='transition-transform duration-300 hover:scale-[1.02]'>
-                          <EventCard event={event} />
-                        </div>
-                      </Link>
-                    ))
-                  )}
-                </div>
-
-                {/* Pagination - Centered with responsive margin */}
-                <div className='mt-8 md:mt-12 flex justify-center'>
-                  <Pagination
+                {/* Content Section */}
+                <FeaturedEvents
+                    events={events}
+                    featuredEvents={thisWeekEvents}
+                    loading={loading}
                     pagination={pagination}
                     onPageChange={handlePageChange}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+                    searchQuery={searchQuery}
+                />
 
-      <Footer />
-    </>
-  )
+                {/* Sponsors Section at the bottom */}
+                {!loading && events.length > 0 && (
+                    <div className='mt-20'>
+                        <Sponsors />
+                    </div>
+                )}
+            </div>
+
+            <Footer />
+        </>
+    )
 }
 
 export default Events

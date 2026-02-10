@@ -5,7 +5,12 @@ import { useSelector } from 'react-redux'
 import { destr } from 'destr'
 import { fetchReferrals, updateReferralStatus, deleteReferral } from './action'
 import { FaTrashAlt, FaEdit } from 'react-icons/fa'
-import { Modal } from '../../../../ui/molecules/Modal'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/ui/shadcn/dialog'
 import ShimmerEffect from '../../../../ui/molecules/ShimmerEffect'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import {
@@ -524,12 +529,15 @@ const ReferralsPage = () => {
       </div>
 
       {/* Update Status Modal */}
-      <Modal
+      {/* Update Status Modal */}
+      <Dialog
         isOpen={statusModalOpen}
         onClose={handleCloseStatusModal}
-        title='Update Referral Status'
-        className='max-w-md'
       >
+        <DialogContent className='max-w-md'>
+          <DialogHeader>
+            <DialogTitle>Update Referral Status</DialogTitle>
+          </DialogHeader>
         <form onSubmit={handleStatusSubmit} className='space-y-4'>
           <div>
             <Label className='block text-sm font-medium text-gray-700 mb-1'>
@@ -582,7 +590,8 @@ const ReferralsPage = () => {
             </Button>
           </div>
         </form>
-      </Modal>
+        </DialogContent>
+      </Dialog>
       <ConfirmationDialog
         open={deleteConfirmationOpen}
         onClose={handleDeleteCancel}

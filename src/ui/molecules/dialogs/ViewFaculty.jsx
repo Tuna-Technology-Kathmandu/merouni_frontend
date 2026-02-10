@@ -1,18 +1,22 @@
 'use client'
 
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 
 export default function ViewFaculty({ isOpen, onClose, faculty }) {
     if (!faculty) return null
 
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title="Faculty Details"
             className="max-w-2xl"
         >
+            <DialogHeader>
+                <DialogTitle>Faculty Details</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
             <div className="p-1 space-y-6">
                 <div className="grid grid-cols-1 gap-6">
                     <div>
@@ -43,6 +47,7 @@ export default function ViewFaculty({ isOpen, onClose, faculty }) {
                     </Button>
                 </div>
             </div>
-        </Modal>
+            </DialogContent>
+        </Dialog>
     )
 }

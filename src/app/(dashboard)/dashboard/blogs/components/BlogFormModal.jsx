@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import dynamic from 'next/dynamic'
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
@@ -54,7 +54,8 @@ const BlogFormModal = ({
             description: '',
             content: '',
             status: 'draft',
-            visibility: 'private'
+            visibility: 'private',
+            is_featured: false
         }
     })
 
@@ -68,7 +69,8 @@ const BlogFormModal = ({
                     description: initialData.description || '',
                     content: initialData.content || '',
                     status: initialData.status || 'draft',
-                    visibility: initialData.visibility || 'private'
+                    visibility: initialData.visibility || 'private',
+                    is_featured: initialData.is_featured || false
                 })
                 setUploadedFiles({ featuredImage: initialData.featuredImage || '' })
                 setValue('featuredImage', initialData.featuredImage || '')
@@ -112,7 +114,8 @@ const BlogFormModal = ({
                     description: '',
                     content: '',
                     status: 'draft',
-                    visibility: 'private'
+                    visibility: 'private',
+                    is_featured: false
                 })
                 setUploadedFiles({ featuredImage: '' })
                 setSelectedTags([])
@@ -174,12 +177,16 @@ const BlogFormModal = ({
     }
 
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title={isEditing ? 'Edit Blog' : 'Add Blog'}
             className='max-w-5xl'
         >
+            <DialogHeader>
+                <DialogTitle>{isEditing ? 'Edit Blog' : 'Add Blog'}</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
             <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
                 <form
                     onSubmit={handleSubmit(onSubmitForm)}
@@ -357,6 +364,18 @@ const BlogFormModal = ({
                                     </select>
                                 </div>
 
+                                <div className="flex items-center space-x-2 pt-8">
+                                    <input
+                                        type="checkbox"
+                                        id="is_featured"
+                                        {...register('is_featured')}
+                                        className="h-4 w-4 text-[#0A70A7] focus:ring-[#0A70A7] border-gray-300 rounded"
+                                    />
+                                    <Label htmlFor="is_featured" className="text-sm font-medium text-gray-700 cursor-pointer">
+                                        Mark as Featured Blog
+                                    </Label>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -386,7 +405,8 @@ const BlogFormModal = ({
                     </div>
                 </form>
             </div>
-        </Modal>
+            </DialogContent>
+        </Dialog>
     )
 }
 

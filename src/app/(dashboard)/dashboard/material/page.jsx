@@ -10,7 +10,7 @@ import { toast } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { X } from 'lucide-react'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/ui/shadcn/button'
@@ -504,12 +504,16 @@ export default function MaterialForm() {
       </div>
 
       {/* Modal Dialog */}
-      <Modal
+      <Dialog
         isOpen={isOpen}
         onClose={handleCloseModal}
-        title={editing ? 'Edit Material' : 'Add Material'}
-        className='max-w-4xl max-h-[90vh] overflow-y-auto'
+        className='max-w-4xl'
       >
+        <DialogHeader>
+          <DialogTitle>{editing ? 'Edit Material' : 'Add Material'}</DialogTitle>
+          <DialogClose onClick={handleCloseModal} />
+        </DialogHeader>
+        <DialogContent className='max-h-[90vh] overflow-y-auto'>
         <div className='container mx-auto p-1 flex flex-col'>
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -723,7 +727,8 @@ export default function MaterialForm() {
             </div>
           </form>
         </div>
-      </Modal>
+        </DialogContent>
+      </Dialog>
 
       {/* Table */}
       <div className='p-4'>

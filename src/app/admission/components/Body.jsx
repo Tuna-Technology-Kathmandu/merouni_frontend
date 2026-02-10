@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import {
   Search,
   Clipboard,
@@ -13,8 +14,13 @@ import { getAdmission, fetchPrograms } from '../actions'
 import Link from 'next/link'
 import Pagination from '../../blogs/components/Pagination'
 import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
+import AdmissionCard from '@/ui/molecules/cards/AdmissionCard'
 
 const AdmissionPage = () => {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+
   const [admission, setAdmission] = useState([])
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -87,6 +93,11 @@ const AdmissionPage = () => {
     fetchAdmissionData
   ])
 
+  // Scroll to top on URL or pagination change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [searchParams, pagination.currentPage])
+
   const handlePageChange = (page) => {
     if (page > 0 && page <= pagination.totalPages) {
       setIsScrolling(true)
@@ -113,10 +124,7 @@ const AdmissionPage = () => {
               </h1>
               <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
             </div>
-            <p className='mt-4 text-gray-500 max-w-2xl font-medium text-base md:text-lg'>
-              Find and apply to the best college programs in Nepal. Your future
-              starts here.
-            </p>
+           
           </div>
 
           {/* Clear Filters Button */}
@@ -216,64 +224,7 @@ const AdmissionPage = () => {
           <>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
               {admission.map((admis) => (
-                <div
-                  key={admis.id}
-                  className='group bg-white rounded-[32px] p-8 border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)] hover:border-[#0A6FA7]/20 transition-all duration-300 flex flex-col'
-                >
-                  <div className='flex items-start justify-between mb-6'>
-                    <div className='p-3 bg-blue-50 rounded-2xl group-hover:bg-[#0A6FA7]/10 transition-colors duration-500'>
-                      <GraduationCap className='w-6 h-6 text-[#0A6FA7] transition-colors duration-500' />
-                    </div>
-                  </div>
-
-                  <Link href={`/degree/${admis?.program?.slugs}`}>
-                    <h2 className='text-xl font-bold text-gray-900 mb-3 group-hover:text-[#0A6FA7] transition-colors line-clamp-2 min-h-[56px] tracking-tight leading-snug'>
-                      {admis.program.title}
-                    </h2>
-                  </Link>
-
-                  <div className='space-y-4 pt-4 border-t border-gray-50'>
-                    <div className='flex flex-col gap-1'>
-                      <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
-                        College
-                      </span>
-                      <Link
-                        href={`/colleges/${admis?.collegeAdmissionCollege?.slugs}`}
-                        className='text-sm font-semibold text-[#0A6FA7] hover:underline'
-                      >
-                        {admis.collegeAdmissionCollege.name}
-                      </Link>
-                    </div>
-
-                    <div className='grid grid-cols-1 gap-3 pt-2'>
-                      <div className='flex flex-col gap-1'>
-                        <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
-                          Process
-                        </span>
-                        <span className='text-sm font-medium text-gray-600 line-clamp-1'>
-                          {admis.admission_process}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className='mt-8 pt-6 border-t border-gray-50 flex items-center justify-between'>
-                    <div className='flex flex-col'>
-                      <span className='text-[10px] uppercase tracking-widest font-bold text-gray-400'>
-                        Fees
-                      </span>
-                      <span className='text-sm font-bold text-gray-900'>
-                        {admis.fee_details || 'Contact College'}
-                      </span>
-                    </div>
-                    <Link
-                      href={`/degree/${admis?.program?.slugs}`}
-                      className='p-2 rounded-full bg-gray-50 text-gray-400 group-hover:bg-[#0A6FA7] group-hover:text-white transition-all transform group-hover:translate-x-1'
-                    >
-                      <ChevronRight size={20} />
-                    </Link>
-                  </div>
-                </div>
+                <AdmissionCard key={admis.id} admis={admis} />
               ))}
             </div>
 

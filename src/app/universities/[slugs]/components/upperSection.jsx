@@ -1,13 +1,10 @@
 import React, { useState } from 'react'
-import { PiLineVerticalThin } from 'react-icons/pi'
 import { MdDateRange } from 'react-icons/md'
 import { LiaUniversitySolid } from 'react-icons/lia'
-import { FaPhoneAlt } from 'react-icons/fa'
+import { FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa'
 import { ImCross } from 'react-icons/im'
 import { IoMdMail } from 'react-icons/io'
 import he from 'he'
-import { FormatDate } from '@/lib/date'
-import AddressSection from './AddressAndContactSection'
 import MemberSection from './MemberSection'
 import VideoSection from './VideoSection'
 import LevelSections from './LevelSections'
@@ -48,54 +45,84 @@ const ImageSection = ({ university }) => {
         </div>
       </div>
 
-      {/* Key Facts Section */}
-      <div
-        className='w-[1000px] max-[1037px]:!w-[800px] max-[818px]:!w-full bg-[#30AD8F] bg-opacity-10 text-black rounded-md 
-     flex md:flex-row md:gap-0  max-[988px]:!gap-0 my-12 items-center justify-center flex-col gap-10 max-md:space-y-4
-     px-[75px] max-md:px-[30px] h-auto md:h-[150px] p-8'
-      >
-        {/* Established */}
-        <div className='flex flex-col items-center min-[1037px]:pr-14'>
-          <MdDateRange size={30} className='text-[#30AD8F]' />
-          <p className='whitespace-nowrap text-sm'>
-            {formatDate(university?.date_of_establish) || 'N/A'}
-          </p>
-        </div>
+      {/* Key Facts Section - Re-styled as cards */}
+      <div className='px-4 sm:px-8 md:px-12 lg:px-24 w-full mt-12'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5'>
+          {/* Established */}
+          <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group'>
+            <div className='bg-blue-50 p-3 rounded-2xl mb-4 group-hover:bg-[#0A6FA7]/10 transition-colors duration-300'>
+              <MdDateRange size={24} className='text-[#0A6FA7]' />
+            </div>
+            <p className='text-xs uppercase tracking-wider text-gray-500 font-medium mb-1'>
+              Established
+            </p>
+            <p className='text-sm text-gray-700'>
+              {formatDate(university?.date_of_establish) || 'N/A'}
+            </p>
+          </div>
 
-        <div className='md:flex items-center pr-5 hidden'>
-          <PiLineVerticalThin size={60} />
-        </div>
+          {/* Type */}
+          <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group'>
+            <div className='bg-emerald-50 p-3 rounded-2xl mb-4 group-hover:bg-[#30AD8F]/10 transition-colors duration-300'>
+              <LiaUniversitySolid size={26} className='text-[#30AD8F]' />
+            </div>
+            <p className='text-xs uppercase tracking-wider text-gray-500 font-medium mb-1'>
+              Institute Type
+            </p>
+            <p className='text-sm text-gray-700 whitespace-nowrap'>
+              {university?.type_of_institute || 'N/A'}
+            </p>
+          </div>
 
-        {/* Type */}
-        <div className='flex flex-col items-center min-[1037px]:px-14'>
-          <LiaUniversitySolid size={32} className='text-[#30AD8F]' />
-          <p className='whitespace-nowrap text-sm'>
-            {university?.type_of_institute || 'N/A'}
-          </p>
-        </div>
+          {/* Contact */}
+          <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group'>
+            <div className='bg-orange-50 p-3 rounded-2xl mb-4 group-hover:bg-orange-100 transition-colors duration-300'>
+              <FaPhoneAlt size={20} className='text-orange-500' />
+            </div>
+            <p className='text-xs uppercase tracking-wider text-gray-500 font-medium mb-1'>
+              Contact
+            </p>
+            <a
+              href={`tel:${university?.contact?.phone_number || ''}`}
+              className='text-sm text-gray-700 hover:text-[#0A6FA7] transition-colors'
+            >
+              {university?.contact?.phone_number || 'N/A'}
+            </a>
+          </div>
 
-        <div className='md:flex items-center pr-5 hidden'>
-          <PiLineVerticalThin size={60} />
-        </div>
+          {/* Address */}
+          <div className='bg-white rounded-2xl shadow-[0_2px_15_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group'>
+            <div className='bg-emerald-50 p-3 rounded-2xl mb-4 group-hover:bg-[#30AD8F]/10 transition-colors duration-300'>
+              <FaMapMarkerAlt size={20} className='text-[#30AD8F]' />
+            </div>
+            <p className='text-xs uppercase tracking-wider text-gray-500 font-medium mb-1'>
+              Address
+            </p>
+            <p className='text-sm text-gray-700 line-clamp-2'>
+              {[
+                university?.street,
+                university?.city,
+                university?.state,
+                university?.country
+              ].filter(Boolean).join(', ') || 'N/A'}
+            </p>
+          </div>
 
-        {/* Phone */}
-        <div className='flex flex-col items-center min-[1037px]:px-14'>
-          <FaPhoneAlt size={24} className='text-[#30AD8F]' />
-          <p className='whitespace-nowrap text-sm'>
-            {university?.contact?.phone_number || 'N/A'}
-          </p>
-        </div>
-
-        <div className='md:flex items-center pr-5 hidden'>
-          <PiLineVerticalThin size={60} />
-        </div>
-
-        {/* Email */}
-        <div className='flex flex-col items-center min-[1037px]:pl-14'>
-          <IoMdMail size={26} className='text-[#30AD8F]' />
-          <p className='whitespace-nowrap text-sm break-words'>
-            {university?.contact?.email || 'N/A'}
-          </p>
+          {/* Email */}
+          <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group sm:col-span-2 lg:col-span-1'>
+            <div className='bg-sky-50 p-3 rounded-2xl mb-4 group-hover:bg-sky-100 transition-colors duration-300'>
+              <IoMdMail size={22} className='text-sky-500' />
+            </div>
+            <p className='text-xs uppercase tracking-wider text-gray-500 font-medium mb-1'>
+              Email
+            </p>
+            <a
+              href={`mailto:${university?.contact?.email || ''}`}
+              className='text-sm text-gray-700 hover:text-[#0A6FA7] transition-colors line-clamp-1 break-all'
+            >
+              {university?.contact?.email || 'N/A'}
+            </a>
+          </div>
         </div>
       </div>
 
@@ -233,8 +260,7 @@ const ImageSection = ({ university }) => {
       <MemberSection university={university} />
 
 
-      {/* addressSection */}
-      <AddressSection university={university} />
+
 
       {/* contact section */}
 

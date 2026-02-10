@@ -1,38 +1,59 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
-import Latest from './components/Latest'
 import FeaturedBlogs from './components/FeaturedBlogs'
 import BlogFilters from './components/BlogFilters'
 import services from '@/app/apiService'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 
 const Blogs = () => {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+
   // State
   const [blogs, setBlogs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  // Initialization from search params
+  const initialSearch = searchParams.get('q') || ''
+  const initialCategory = searchParams.get('category') || 'all'
+  const initialPage = parseInt(searchParams.get('page')) || 1
+
   // Filters
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [searchQuery, setSearchQuery] = useState(initialSearch)
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory)
 
   // Pagination
   const [pagination, setPagination] = useState({
-    currentPage: 1,
+    currentPage: initialPage,
     totalPages: 1,
     totalCount: 0
   })
 
   const debounceRef = useRef(null)
 
-  // Constants
-
+  // Categories
   const [categories, setCategories] = useState([
     { id: 'all', title: 'All' }
   ])
+
+  // URL Sync Helper
+  const updateURL = useCallback((params) => {
+    const newParams = new URLSearchParams(searchParams.toString())
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        newParams.set(key, value)
+      } else {
+        newParams.delete(key)
+      }
+    })
+    router.push(`${pathname}?${newParams.toString()}`, { scroll: false })
+  }, [searchParams, pathname, router])
 
   // Data Fetching
   const fetchBlogsData = async (page = 1, search = '', category = '') => {
@@ -43,6 +64,7 @@ const Blogs = () => {
       const params = {
         page,
         category_title: catParam,
+        status: 'published',
         q: search
       }
       const response = await services.blogs.getAll(params)
@@ -58,7 +80,7 @@ const Blogs = () => {
         }
       } else {
         setBlogs([])
-        setPagination(prev => ({ ...prev, totalCount: 0 }))
+        setPagination(prev => ({ ...prev, totalCount: 0, currentPage: page }))
       }
     } catch (error) {
       console.error('Error fetching blogs:', error)
@@ -67,7 +89,6 @@ const Blogs = () => {
       setLoading(false)
     }
   }
-
 
   const fetchCategories = async () => {
     try {
@@ -84,59 +105,49 @@ const Blogs = () => {
     fetchCategories()
   }, [])
 
-  // Effect: Debounced Search & Filter Change
+  // Sync state when URL params change (e.g. browser back/forward)
+  useEffect(() => {
+    const q = searchParams.get('q') || ''
+    const cat = searchParams.get('category') || 'all'
+    const pg = parseInt(searchParams.get('page')) || 1
+
+    setSearchQuery(q)
+    setSelectedCategory(cat)
+    setPagination(prev => ({ ...prev, currentPage: pg }))
+    
+    fetchBlogsData(pg, q, cat)
+  }, [searchParams])
+
+  // Effect: Debounced Search & Filter Change (Updates URL only)
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
 
+    // Skip initial sync to avoid double fetch on mount
+    if (searchQuery === initialSearch && selectedCategory === initialCategory) return
+
     debounceRef.current = setTimeout(() => {
-      // Reset to page 1 on filter change
-      if (pagination.currentPage !== 1) {
-        // If we were not on page 1, setPage(1) will trigger the other effect? 
-        // Better to just fetch here and update pagination state atomically.
-        setPagination(prev => ({ ...prev, currentPage: 1 }))
-        fetchBlogsData(1, searchQuery, selectedCategory)
-      } else {
-        fetchBlogsData(1, searchQuery, selectedCategory)
-      }
+      updateURL({ 
+        q: searchQuery, 
+        category: selectedCategory, 
+        page: 1 // Reset to page 1 on search/filter
+      })
     }, 500)
 
     return () => clearTimeout(debounceRef.current)
-  }, [searchQuery, selectedCategory])
+  }, [searchQuery, selectedCategory, updateURL, initialSearch, initialCategory])
 
-  // Effect: Page Change (only if triggered manually via pagination)
-  // Logic: We need to distinguish between "reset due to filter" and "user clicked page 2"
-  // Actually, simpler approach: Create a wrapper for page change and call fetch directly.
-
+  // Handle page change
   const handlePageChange = (page) => {
     if (page > 0 && page <= pagination.totalPages) {
-      setPagination(prev => ({ ...prev, currentPage: page }))
-      fetchBlogsData(page, searchQuery, selectedCategory)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      updateURL({ page })
     }
   }
 
-  // View Logic
-  // Show Hero (Latest) ONLY if: Page 1 AND No Search AND Category is 'all'
-  const isDefaultView = pagination.currentPage === 1 && !searchQuery && selectedCategory === 'all'
+  // Scroll to top on any URL parameter change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [searchParams])
 
-  // Slicing
-  let heroBlogs = []
-  let gridBlogs = []
-
-  if (loading) {
-    // While loading, we might show skeletons. 
-    // For simplicity, let's just pass empty or retain old data.
-    // But best UX is to show loading state.
-    // Latest component handles null gracefully.
-  }
-
-  if (isDefaultView && blogs.length > 0) {
-    heroBlogs = blogs.slice(0, 5)
-    gridBlogs = blogs.slice(5)
-  } else {
-    heroBlogs = []
-    gridBlogs = blogs
-  }
 
   return (
     <>
@@ -155,18 +166,13 @@ const Blogs = () => {
           />
         </div>
 
-        {/* Latest / Hero Section */}
-        {/* Only show if Default View and we have data */}
-        {isDefaultView && !loading && heroBlogs.length > 0 && (
-          <Latest blogs={heroBlogs} />
-        )}
-
-        {/* Featured / Grid Section */}
+        {/* Content Section */}
         <FeaturedBlogs
-          blogs={gridBlogs}
+          blogs={blogs}
           loading={loading}
           pagination={pagination}
           onPageChange={handlePageChange}
+          searchQuery={searchQuery}
         />
       </div>
 

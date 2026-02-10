@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Table from '@/ui/molecules/Table'
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { authFetch } from '@/app/utils/authFetch'
 
 const AgentsListModal = ({ isOpen, onClose }) => {
@@ -84,28 +84,33 @@ const AgentsListModal = ({ isOpen, onClose }) => {
     ]
 
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title="Top Performing Agents"
             className="max-w-4xl"
         >
-            <div className="mt-4">
-                <Table
-                    data={paginatedAgents}
-                    columns={columns}
-                    loading={loading}
-                    pagination={{
-                        currentPage: currentPage,
-                        totalPages: totalPages,
-                        total: agents.length
-                    }}
-                    onPageChange={(page) => setCurrentPage(page)}
-                    showSearch={false}
-                    emptyContent="No agents found."
-                />
-            </div>
-        </Modal>
+            <DialogHeader>
+                <DialogTitle>Top Performing Agents</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
+                <div className="mt-4">
+                    <Table
+                        data={paginatedAgents}
+                        columns={columns}
+                        loading={loading}
+                        pagination={{
+                            currentPage: currentPage,
+                            totalPages: totalPages,
+                            total: agents.length
+                        }}
+                        onPageChange={(page) => setCurrentPage(page)}
+                        showSearch={false}
+                        emptyContent="No agents found."
+                    />
+                </div>
+            </DialogContent>
+        </Dialog>
     )
 }
 

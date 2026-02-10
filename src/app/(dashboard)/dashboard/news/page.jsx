@@ -11,7 +11,12 @@ import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Table from '../../../../ui/molecules/Table'
-import { Modal } from '../../../../ui/molecules/Modal'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/ui/shadcn/dialog'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { fetchCategories } from '../category/action.js'
 import {
@@ -397,12 +402,14 @@ export default function NewsManager() {
       />
 
       {/* View News Details Modal */}
-      <Modal
+      <Dialog
         isOpen={viewModalOpen}
         onClose={handleCloseViewModal}
-        title='News Details'
-        className='max-w-3xl'
       >
+        <DialogContent className='max-w-3xl'>
+          <DialogHeader>
+            <DialogTitle>News Details</DialogTitle>
+          </DialogHeader>
         {loadingView ? (
           <div className='flex justify-center items-center h-48'>
             Loading...
@@ -474,7 +481,8 @@ export default function NewsManager() {
             No data available
           </div>
         )}
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

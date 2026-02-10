@@ -151,11 +151,11 @@ const CollegeCard = ({
       onKeyDown={(e) => e.key === 'Enter' && handleCardClick()}
       className='group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex flex-col h-full'
     >
-      <div className='relative h-52 overflow-hidden bg-gray-100'>
+      <div className='relative aspect-[16/10] overflow-hidden bg-gray-100'>
         <img
-          src={collegeImage || 'https://placehold.co/600x400'}
+          src={collegeImage || '/images/logo.png'}
           alt={name || 'College'}
-          className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500'
+          className='w-full h-full aspect-auto object-cover group-hover:scale-105 transition-transform duration-500'
         />
         <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent' />
 

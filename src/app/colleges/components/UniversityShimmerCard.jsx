@@ -4,7 +4,7 @@ const UniversityCardShimmer = () => {
   return (
     <div className='bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm w-full'>
       {/* Image Section */}
-      <Skeleton className='h-32 w-full rounded-none' />
+      <Skeleton className='aspect-[16/10] w-full rounded-none' />
 
       {/* Content Section */}
       <div className='p-5'>

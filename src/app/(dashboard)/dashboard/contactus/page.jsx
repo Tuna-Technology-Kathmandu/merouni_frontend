@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { toast } from 'react-toastify'
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import Loading from '@/ui/molecules/Loading'
 import Table from '@/ui/molecules/Table'
 import { Search } from 'lucide-react'
@@ -199,12 +199,16 @@ export default function ContactUsManager() {
             />
 
             {/* Status Update Modal */}
-            <Modal
+            <Dialog
                 isOpen={statusModalOpen}
                 onClose={() => setStatusModalOpen(false)}
-                title="Update Contact Status"
                 className="max-w-md"
             >
+                <DialogHeader>
+                    <DialogTitle>Update Contact Status</DialogTitle>
+                    <DialogClose onClick={() => setStatusModalOpen(false)} />
+                </DialogHeader>
+                <DialogContent>
                 <div className="space-y-4">
                     <div>
                         <Label className="block text-sm font-medium text-gray-700 mb-1">
@@ -235,7 +239,8 @@ export default function ContactUsManager() {
                         </Button>
                     </div>
                 </div>
-            </Modal>
+                </DialogContent>
+            </Dialog>
 
             <ConfirmationDialog
                 open={deleteConfirmationOpen}

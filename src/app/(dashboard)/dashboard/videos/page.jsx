@@ -2,7 +2,7 @@
 
 import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
@@ -375,7 +375,7 @@ export default function VideoManager() {
           </div>
         </div>
 
-        <Modal
+        <Dialog
           isOpen={isOpen}
           onClose={() => {
             setIsOpen(false)
@@ -384,9 +384,20 @@ export default function VideoManager() {
             reset()
             setUploadedFiles({ featured_image: '' })
           }}
-          title={editing ? 'Edit Video' : 'Add Video'}
           className='max-w-2xl'
         >
+          <DialogHeader>
+            <DialogTitle>{editing ? 'Edit Video' : 'Add Video'}</DialogTitle>
+            <DialogClose onClick={() => {
+                setIsOpen(false)
+                setEditing(false)
+                setEditingId(null)
+                reset()
+                setUploadedFiles({ featured_image: '' })
+              }} 
+            />
+          </DialogHeader>
+          <DialogContent>
           <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
             <form
               onSubmit={handleSubmit(onSubmit)}
@@ -482,7 +493,8 @@ export default function VideoManager() {
               </div>
             </form>
           </div>
-        </Modal>
+          </DialogContent>
+        </Dialog>
 
         {/* Table */}
         <div className='mt-8'>
@@ -498,15 +510,23 @@ export default function VideoManager() {
       </div>
 
       {/* View Modal */}
-      <Modal
+      <Dialog
         isOpen={isViewModalOpen}
         onClose={() => {
           setIsViewModalOpen(false)
           setViewingVideo(null)
         }}
-        title="Video Details"
         className="max-w-2xl"
       >
+        <DialogHeader>
+            <DialogTitle>Video Details</DialogTitle>
+            <DialogClose onClick={() => {
+                setIsViewModalOpen(false)
+                setViewingVideo(null)
+              }} 
+            />
+        </DialogHeader>
+        <DialogContent>
         <div className="p-6 space-y-6">
           {/* Featured Image */}
           {viewingVideo?.featured_image && (
@@ -559,7 +579,8 @@ export default function VideoManager() {
             </Button>
           </div>
         </div>
-      </Modal>
+        </DialogContent>
+      </Dialog>
 
       <ConfirmationDialog
         open={isDialogOpen}

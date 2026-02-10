@@ -3,7 +3,12 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react'
 import { fetchConsultancyApplications, updateApplicationStatus } from './action'
 import { FaEdit } from 'react-icons/fa'
-import { Modal } from '../../../../ui/molecules/Modal'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/ui/shadcn/dialog'
 import ShimmerEffect from '../../../../ui/molecules/ShimmerEffect'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import {
@@ -383,12 +388,14 @@ const ConsultancyApplicationsPage = () => {
       </div>
 
       {/* Update Status Modal */}
-      <Modal
+      <Dialog
         isOpen={statusModalOpen}
         onClose={handleCloseStatusModal}
-        title='Update Application Status'
-        className='max-w-md'
       >
+        <DialogContent className='max-w-md'>
+          <DialogHeader>
+            <DialogTitle>Update Application Status</DialogTitle>
+          </DialogHeader>
         <form onSubmit={handleStatusSubmit} className='space-y-4'>
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-1'>
@@ -442,7 +449,8 @@ const ConsultancyApplicationsPage = () => {
             </button>
           </div>
         </form>
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

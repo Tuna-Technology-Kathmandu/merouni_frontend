@@ -16,7 +16,7 @@ const FeaturedAdmission = () => {
   const fetchItems = async () => {
     try {
       // Use direct fetch instead of server action to avoid SSR issues and ensure correct API URL
-      const apiUrl = `${process.env.baseUrl}/college?pinned=true&page=1&limit=6`
+      const apiUrl = `${process.env.baseUrl}/college?page=1&limit=6`
 
     
 
@@ -58,7 +58,7 @@ const FeaturedAdmission = () => {
 
   const SkeletonLoader = () => (
     <div className='bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm animate-pulse'>
-      <div className='w-full h-52 bg-gray-200' />
+      <div className='w-full aspect-[16/10] bg-gray-200' />
       <div className='p-6'>
         <div className='h-5 bg-gray-200 rounded w-3/4 mb-4' />
         <div className='h-4 bg-gray-200 rounded w-1/2 mb-4' />

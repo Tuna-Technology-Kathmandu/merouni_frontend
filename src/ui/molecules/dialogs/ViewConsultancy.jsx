@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Globe, MapPin } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
@@ -41,12 +41,16 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
     }
 
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title='Consultancy Details'
-            className='max-w-4xl max-h-[90vh] overflow-y-auto'
+            className='max-w-4xl'
         >
+            <DialogHeader>
+                <DialogTitle>Consultancy Details</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
             {loading ? (
                 <div className='flex items-center justify-center py-8'>
                     <div className='text-gray-500'>Loading...</div>
@@ -219,6 +223,7 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                     </div>
                 </div>
             ) : null}
-        </Modal>
+            </DialogContent>
+        </Dialog>
     )
 }

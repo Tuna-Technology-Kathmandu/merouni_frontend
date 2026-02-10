@@ -13,11 +13,17 @@ import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../ui/molecules/Modal'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose
+} from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { Button } from '@/ui/shadcn/button'
-import ViewFaculty from '@/ui/molecules/modals/ViewFaculty'
+import ViewFaculty from '@/ui/molecules/dialogs/ViewFaculty'
 import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function FacultyManager() {
@@ -306,12 +312,18 @@ export default function FacultyManager() {
       </div>
 
       {/* Form Modal */}
-      <Modal
+      <Dialog
         isOpen={isOpen}
         onClose={handleModalClose}
-        title={editingId ? 'Edit Faculty' : 'Add Faculty'}
         className='max-w-md'
       >
+        <DialogHeader>
+          <div className='flex items-center justify-between'>
+            <DialogTitle>{editingId ? 'Edit Faculty' : 'Add Faculty'}</DialogTitle>
+            <DialogClose onClick={handleModalClose} />
+          </div>
+        </DialogHeader>
+        <DialogContent>
         <form onSubmit={handleSubmit} className='space-y-6'>
           <div className='space-y-4'>
             <div>
@@ -363,7 +375,8 @@ export default function FacultyManager() {
             </Button>
           </div>
         </form>
-      </Modal>
+        </DialogContent>
+      </Dialog>
 
       <ViewFaculty
         isOpen={isViewOpen}

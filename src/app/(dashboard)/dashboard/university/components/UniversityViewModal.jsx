@@ -1,22 +1,26 @@
 import React from 'react'
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import { formatDate } from '@/utils/date.util'
 
 const UniversityViewModal = ({ isOpen, onClose, data, loading }) => {
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title='University Details'
             className='max-w-4xl'
         >
+            <DialogHeader>
+                <DialogTitle>University Details</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
             {loading ? (
                 <div className='flex items-center justify-center py-8'>
                     <div className='text-gray-500'>Loading...</div>
                 </div>
             ) : data ? (
-                <div className='space-y-6 max-h-[80vh] overflow-y-auto p-1'>
+                <div className='space-y-6 overflow-y-auto p-1'>
                     {/* Logo and Basic Info */}
                     <div className='flex items-start gap-4 border-b pb-4'>
                         {data.featured_image && (
@@ -143,7 +147,8 @@ const UniversityViewModal = ({ isOpen, onClose, data, loading }) => {
                     Close
                 </Button>
             </div>
-        </Modal>
+            </DialogContent>
+        </Dialog>
     )
 }
 

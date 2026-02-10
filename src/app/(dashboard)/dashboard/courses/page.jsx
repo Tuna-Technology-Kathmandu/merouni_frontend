@@ -16,8 +16,12 @@ import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '../../../../ui/shadcn/button'
 import { Input } from '../../../../ui/shadcn/input'
 import { Label } from '../../../../ui/shadcn/label'
-import { Dialog, DialogHeader, DialogTitle } from '../../../../ui/shadcn/dialog'
-import { Modal } from '../../../../ui/molecules/Modal'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/ui/shadcn/dialog'
 import SearchInput from '@/ui/molecules/SearchInput'
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false
@@ -444,13 +448,11 @@ export default function CourseForm() {
       <Dialog
         isOpen={isOpen}
         onClose={handleModalClose}
-        className='max-w-4xl max-h-[90vh] flex flex-col p-0'
       >
-        <div className='px-6 pt-6'>
+        <DialogContent className='max-w-4xl max-h-[90vh] flex flex-col p-6'>
           <DialogHeader>
             <DialogTitle>{editing ? 'Edit Course' : 'Add Course'}</DialogTitle>
           </DialogHeader>
-        </div>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -681,6 +683,7 @@ export default function CourseForm() {
             </Button>
           </div>
         </form>
+        </DialogContent>
       </Dialog>
 
       {/* Confirmation Dialog */}
@@ -696,12 +699,14 @@ export default function CourseForm() {
       />
 
       {/* View Course Details Modal */}
-      <Modal
+      <Dialog
         isOpen={viewModalOpen}
         onClose={handleCloseViewModal}
-        title='Course Details'
-        className='max-w-3xl'
       >
+        <DialogContent className='max-w-3xl'>
+          <DialogHeader>
+            <DialogTitle>Course Details</DialogTitle>
+          </DialogHeader>
         {loadingView ? (
           <div className='flex justify-center items-center h-48'>
             Loading...
@@ -802,7 +807,8 @@ export default function CourseForm() {
             <p className='text-gray-500'>No course data available</p>
           </div>
         )}
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

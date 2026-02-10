@@ -108,3 +108,19 @@ export const getUniversityBySlug = async (slug) => {
     throw error
   }
 }
+
+export const fetchAllDegrees = async () => {
+  try {
+    const response = await authFetch(
+      `${process.env.baseUrl}/degree?limit=1000`
+    )
+    if (!response.ok) {
+      throw new Error('Failed to fetch degrees')
+    }
+    const data = await response.json()
+    return data.items
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}

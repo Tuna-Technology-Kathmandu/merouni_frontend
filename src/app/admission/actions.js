@@ -42,6 +42,28 @@ export async function getAdmission(search = '', page = 1, program = '') {
   }
 }
 
+export async function getAdmissionDetail(id) {
+  try {
+    const response = await fetch(`${process.env.baseUrl}/college/admission/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch Admission Detail')
+    }
+
+    const data = await response.json()
+    return data.item
+  } catch (error) {
+    console.error('Error fetching Admission detail:', error)
+    return null
+  }
+}
+
 export async function fetchPrograms() {
   try {
     const response = await fetch(`${process.env.baseUrl}/program?limit=100`)

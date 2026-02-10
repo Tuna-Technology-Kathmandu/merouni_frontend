@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
@@ -295,12 +295,16 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
     }
 
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title={slug ? 'Edit Program' : 'Add Program'}
             className='max-w-6xl'
         >
+            <DialogHeader>
+                <DialogTitle>{slug ? 'Edit Program' : 'Add Program'}</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
                 <div className='max-h-[calc(100vh-200px)] overflow-y-auto pr-2'>
                     {/* Basic Information */}
@@ -734,7 +738,8 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                     </Button>
                 </div>
             </form>
-        </Modal>
+            </DialogContent>
+        </Dialog>
     )
 }
 

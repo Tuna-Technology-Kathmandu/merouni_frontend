@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 
 export default function ExportModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
@@ -75,16 +76,17 @@ export default function ExportModal({ isOpen, onClose }) {
   if (!isOpen) return null
 
   return (
-    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
-      <div className='bg-white rounded-lg p-6 w-full max-w-md relative'>
-        <button
-          onClick={onClose}
-          className='absolute top-2 right-2 text-gray-500 hover:text-gray-700'
-        >
-          &times;
-        </button>
-        <h2 className='text-xl font-bold mb-4'>Export Users</h2>
-        <form onSubmit={handleSubmit} className='space-y-4'>
+    <Dialog
+      isOpen={isOpen}
+      onClose={onClose}
+      className='max-w-md'
+    >
+      <DialogHeader>
+        <DialogTitle>Export Users</DialogTitle>
+        <DialogClose onClick={onClose} />
+      </DialogHeader>
+      <DialogContent>
+        <form onSubmit={handleSubmit} className='space-y-4 pt-4'>
           <div>
             <label
               htmlFor='limit'
@@ -182,7 +184,7 @@ export default function ExportModal({ isOpen, onClose }) {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

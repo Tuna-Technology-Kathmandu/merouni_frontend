@@ -103,6 +103,28 @@ export const getDegreeBySlug = async (slug) => {
     throw error
   }
 }
+export const getDisciplineBySlug = async (slug) => {
+  try {
+    const response = await fetch(
+      `${process.env.baseUrl}/discipline/slug/${encodeURIComponent(slug)}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        cache: 'no-store'
+      }
+    )
+    if (!response.ok) {
+      throw new Error('Failed to fetch discipline')
+    }
+    return await response.json()
+  } catch (error) {
+    console.error('Error fetching discipline:', error)
+    throw error
+  }
+}
+
 export const getCourseBySlug = async (slug) => {
   try {
     const response = await fetch(

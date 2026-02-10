@@ -47,12 +47,7 @@ const ProgramSection = ({ college }) => {
         )}
       </div>
 
-      <div className='mt-16 pt-8 border-t border-gray-100'>
-        <h3 className='text-base font-semibold text-gray-900 mb-2'>
-          Institution Type
-        </h3>
-        <p className='text-sm text-gray-600'>{college?.institute_type}</p>
-      </div>
+
     </div>
   )
 }

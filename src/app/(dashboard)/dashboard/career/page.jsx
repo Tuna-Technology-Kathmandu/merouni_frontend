@@ -14,7 +14,13 @@ import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import dynamic from 'next/dynamic'
-import { Modal } from '../../../../ui/molecules/Modal'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose
+} from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '@/ui/shadcn/button'
 import SearchInput from '@/ui/molecules/SearchInput'
@@ -374,7 +380,7 @@ export default function CareerForm() {
         </div>
         <ToastContainer />
 
-        <Modal
+        <Dialog
           isOpen={isOpen}
           onClose={() => {
             setIsOpen(false)
@@ -383,10 +389,22 @@ export default function CareerForm() {
             reset()
             setUploadedFiles({ featured: '' })
           }}
-          title={editing ? 'Edit Career' : 'Add Career'}
           className='max-w-5xl'
         >
-          <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
+          <DialogContent className='max-w-5xl max-h-[90vh] flex flex-col p-0'>
+            <DialogHeader className='px-6 py-4 border-b'>
+              <DialogTitle>{editing ? 'Edit Career' : 'Add Career'}</DialogTitle>
+              <DialogClose
+                onClick={() => {
+                  setIsOpen(false)
+                  setEditing(false)
+                  setEditingId(null)
+                  reset()
+                  setUploadedFiles({ featured: '' })
+                }}
+              />
+            </DialogHeader>
+          <div className='flex-1 overflow-y-auto p-6'>
             <form
               onSubmit={handleSubmit(onSubmit)}
               className='flex flex-col flex-1 overflow-hidden'
@@ -474,7 +492,8 @@ export default function CareerForm() {
               </div>
             </form>
           </div>
-        </Modal>
+          </DialogContent>
+        </Dialog>
 
         {/* Table Section */}
         <div className='mt-8'>
@@ -500,12 +519,17 @@ export default function CareerForm() {
       />
 
       {/* View Career Details Modal */}
-      <Modal
+      {/* View Career Details Modal */}
+      <Dialog
         isOpen={viewModalOpen}
         onClose={handleCloseViewModal}
-        title='Career Details'
         className='max-w-3xl'
       >
+        <DialogContent className='max-w-3xl max-h-[80vh] overflow-y-auto'>
+          <DialogHeader>
+            <DialogTitle>Career Details</DialogTitle>
+            <DialogClose onClick={handleCloseViewModal} />
+          </DialogHeader>
         {loadingView ? (
           <div className='flex justify-center items-center h-48'>
             Loading...
@@ -560,7 +584,8 @@ export default function CareerForm() {
         ) : (
           <p className='text-center text-gray-500'>No career data available.</p>
         )}
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

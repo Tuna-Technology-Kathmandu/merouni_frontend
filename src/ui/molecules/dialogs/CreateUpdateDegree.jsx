@@ -3,13 +3,14 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import FileUpload from '@/app/(dashboard)/dashboard/addCollege/FileUpload'
 import { authFetch } from '@/app/utils/authFetch'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { Textarea } from '@/ui/shadcn/textarea'
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 
 export default function CreateUpdateDegree({
     isOpen,
@@ -20,6 +21,7 @@ export default function CreateUpdateDegree({
     const [submitting, setSubmitting] = useState(false)
     const [allDisciplines, setAllDisciplines] = useState([])
     const [selectedDisciplines, setSelectedDisciplines] = useState([])
+    const [content, setContent] = useState('')
 
     const {
         register,
@@ -33,7 +35,8 @@ export default function CreateUpdateDegree({
             featured_image: '',
             short_name: '',
             title: '',
-            description: ''
+            description: '',
+            content: ''
         }
     })
 
@@ -63,6 +66,7 @@ export default function CreateUpdateDegree({
                 setValue('short_name', initialData.short_name || '')
                 setValue('title', initialData.title || '')
                 setValue('description', initialData.description || '')
+                setContent(initialData.content || '')
                 
                 // Set selected disciplines if available
                 // Assuming initialData.disciplines is an array of IDs or objects
@@ -84,9 +88,11 @@ export default function CreateUpdateDegree({
                     featured_image: '',
                     short_name: '',
                     title: '',
-                    description: ''
+                    description: '',
+                    content: ''
                 })
                 setSelectedDisciplines([])
+                setContent('')
             }
         }
     }, [isOpen, initialData, setValue, reset])
@@ -110,6 +116,7 @@ export default function CreateUpdateDegree({
                 short_name: data.short_name.trim(),
                 title: data.title.trim(),
                 description: data.description?.trim() || null,
+                content: content?.trim() || null,
                 disciplines: selectedDisciplines
             }
 
@@ -142,22 +149,18 @@ export default function CreateUpdateDegree({
     }
 
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title={initialData ? 'Edit Degree' : 'Add Degree'}
-            className='max-w-md'
+            className='max-w-4xl'
         >
+            <DialogHeader>
+                <DialogTitle>{initialData ? 'Edit Degree' : 'Add Degree'}</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
                 <div className='space-y-4'>
-                    <div>
-                        <FileUpload
-                            label='Cover Image'
-                            onUploadComplete={(url) => setValue('featured_image', url || '')}
-                            defaultPreview={coverImage}
-                        />
-                    </div>
-                 
                     <div>
                         <Label className='block mb-2 text-sm font-medium'>
                             Short Name <span className='text-red-500'>*</span>
@@ -222,8 +225,27 @@ export default function CreateUpdateDegree({
                         <Textarea
                             {...register('description')}
                             className='w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none'
-                            placeholder='Enter degree description...'
+                            placeholder='Enter short degree description...'
                             rows={4}
+                        />
+                    </div>
+
+                    <div>
+                        <Label className='block mb-2 text-sm font-medium'>
+                            Content
+                        </Label>
+                        <TipTapEditor
+                            value={content}
+                            onChange={setContent}
+                            placeholder='Enter detailed content for the degree...'
+                        />
+                    </div>
+
+                    <div>
+                        <FileUpload
+                            label='Cover Image'
+                            onUploadComplete={(url) => setValue('featured_image', url || '')}
+                            defaultPreview={coverImage}
                         />
                     </div>
                 </div>
@@ -245,6 +267,7 @@ export default function CreateUpdateDegree({
                     </Button>
                 </div>
             </form>
-        </Modal>
+            </DialogContent>
+        </Dialog>
     )
 }

@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
@@ -36,12 +36,16 @@ const ViewProgram = ({ isOpen, onClose, slug }) => {
     }
 
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title='Program Details'
-            className='max-w-2xl max-h-[90vh] overflow-hidden flex flex-col'
+            className='max-w-2xl'
         >
+            <DialogHeader>
+                <DialogTitle>Program Details</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
             <div className='overflow-y-auto flex-1 -m-6 p-6'>
                 {viewLoading ? (
                     <div className='flex items-center justify-center py-12'>
@@ -184,7 +188,8 @@ const ViewProgram = ({ isOpen, onClose, slug }) => {
                     </Button>
                 </div>
             )}
-        </Modal>
+            </DialogContent>
+        </Dialog>
     )
 }
 

@@ -48,7 +48,12 @@ const ImageSection = ({ degree }) => {
             <h1 className='text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight'>
               {degree?.title}
             </h1>
-            <p className='text-gray-500 text-lg max-w-2xl leading-relaxed'>
+            {degree?.description && (
+              <p className='text-gray-600 text-lg max-w-2xl leading-relaxed mb-4 italic'>
+                {degree.description}
+              </p>
+            )}
+            <p className='text-gray-500 text-sm max-w-2xl leading-relaxed'>
               A comprehensive {degree?.duration} program delivered {degree?.delivery_mode} at the {degree?.programlevel?.title} level.
             </p>
           </motion.div>
@@ -109,8 +114,13 @@ const ImageSection = ({ degree }) => {
           >
             <h2 className='text-3xl font-bold text-gray-900 mb-10 flex items-center'>
               <span className='w-1.5 h-8 bg-[#30AD8F] rounded-full mr-4' />
-              Description
+              Description & Learning Outcomes
             </h2>
+            {degree?.description && !degree?.learning_outcomes?.includes(degree.description) && (
+              <p className='text-gray-700 text-lg leading-relaxed mb-8 font-medium'>
+                {degree.description}
+              </p>
+            )}
             <div
               className='prose prose-lg prose-gray max-w-none 
               [&>iframe]:w-full 

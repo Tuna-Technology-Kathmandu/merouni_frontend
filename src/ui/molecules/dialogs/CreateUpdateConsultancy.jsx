@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
@@ -283,12 +283,16 @@ export default function CreateUpdateConsultancy({
     }
 
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title={initialData ? 'Edit Consultancy' : 'Add Consultancy'}
             className='max-w-5xl'
         >
+            <DialogHeader>
+                <DialogTitle>{initialData ? 'Edit Consultancy' : 'Add Consultancy'}</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
             <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
                 <form
                     onSubmit={handleSubmit(onSubmit)}
@@ -605,6 +609,7 @@ export default function CreateUpdateConsultancy({
                     </div>
                 </form>
             </div>
-        </Modal>
+            </DialogContent>
+        </Dialog>
     )
 }

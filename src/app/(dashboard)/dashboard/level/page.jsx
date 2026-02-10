@@ -8,7 +8,7 @@ import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '@/ui/shadcn/button'
 import SearchInput from '@/ui/molecules/SearchInput'
@@ -290,53 +290,59 @@ export default function LevelForm() {
         </div>
       </div>
 
-      {/* Form Modal */}
-      <Modal
+      {/* Form Dialog */}
+      <Dialog
         isOpen={isOpen}
         onClose={handleModalClose}
-        title={editing ? 'Edit Level' : 'Add Level'}
         className='max-w-md'
       >
-        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-          <div className='space-y-4'>
+        <DialogHeader>
+          <DialogTitle>{editing ? 'Edit Level' : 'Add Level'}</DialogTitle>
+          <DialogClose onClick={handleModalClose} />
+        </DialogHeader>
+        <DialogContent>
+          <form onSubmit={handleSubmit(onSubmit)} className='space-y-4 pt-4'>
             <div>
-              <label className='block mb-2'>
-                Level Title <span className='text-red-500'>*</span>
-              </label>
-              <input
-                {...register('title', {
-                  required: 'Level title is required',
-                  minLength: {
-                    value: 2,
-                    message: 'Title must be at least 2 characters long'
-                  }
-                })}
-                className='w-full p-2 border rounded'
+              <Label htmlFor='title'>Title</Label>
+              <Input
+                id='title'
+                {...register('title', { required: 'Title is required' })}
+                className='mt-1'
               />
               {errors.title && (
-                <span className='text-red-500'>{errors.title.message}</span>
+                <p className='text-red-500 text-sm mt-1'>
+                  {errors.title.message}
+                </p>
               )}
             </div>
-          </div>
-
-          <div className='flex justify-end gap-2'>
-            <button
-              type='button'
-              onClick={handleModalClose}
-              className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors'
-            >
-              Cancel
-            </button>
-            <Button type='submit' disabled={submitting}>
-              {submitting
-                ? 'Processing...'
-                : editing
-                  ? 'Update Level'
-                  : 'Create Level'}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+            <div>
+              <Label htmlFor='author'>Author</Label>
+              <Input
+                id='author'
+                {...register('author', { required: 'Author is required' })}
+                className='mt-1'
+              />
+              {errors.author && (
+                <p className='text-red-500 text-sm mt-1'>
+                  {errors.author.message}
+                </p>
+              )}
+            </div>
+            <div className='flex justify-end gap-2'>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={handleModalClose}
+              >
+                Cancel
+              </Button>
+              <Button type='submit' disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : 'Save'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <ConfirmationDialog
         open={isDialogOpen}

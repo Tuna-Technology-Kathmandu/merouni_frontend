@@ -1,10 +1,11 @@
 'use client'
-import React, { useState, useEffect, useLayoutEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { Search, X } from 'lucide-react'
+import { IoSearch } from 'react-icons/io5'
 import { Select } from '@/ui/shadcn/select'
 import EmptyState from '@/ui/shadcn/EmptyState'
-import { getConsultancies, getCourses } from './actions'
+import { getConsultancies } from './actions'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
@@ -14,58 +15,73 @@ import ConsultancyCard from '@/ui/molecules/cards/ConsultancyCard'
 
 export default function ConsultanciesPage() {
   const router = useRouter()
-  const [searchTerm, setSearchTerm] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+
+  // Initialization from search params
+  const initialSearch = searchParams.get('q') || ''
+  const initialPage = parseInt(searchParams.get('page')) || 1
+
+  const [searchTerm, setSearchTerm] = useState(initialSearch)
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch)
   const [consultancyData, setConsultancyData] = useState([])
   const [pagination, setPagination] = useState({
-    currentPage: 1,
+    currentPage: initialPage,
     totalPages: 1,
     totalCount: 0
   })
   const [loading, setLoading] = useState(false)
-  const [courses, setCourses] = useState([])
-  const [selectedCourse, setSelectedCourse] = useState('')
   const [isScrolling, setIsScrolling] = useState(false)
 
-  // Fetch courses on mount
-  useEffect(() => {
-    const fetchCoursesData = async () => {
-      try {
-        const data = await getCourses()
-        setCourses(data)
-      } catch (err) {
-        console.error('Failed to fetch courses:', err)
+  // URL Sync Helper
+  const updateURL = useCallback((params) => {
+    const newParams = new URLSearchParams(searchParams.toString())
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        newParams.set(key, value)
+      } else {
+        newParams.delete(key)
       }
-    }
-    fetchCoursesData()
-  }, [])
+    })
+    router.push(`${pathname}?${newParams.toString()}`, { scroll: false })
+  }, [searchParams, pathname, router])
 
-  // Debouncing logic
+
+  // Sync state with URL
+  useEffect(() => {
+    const q = searchParams.get('q') || ''
+    const pg = parseInt(searchParams.get('page')) || 1
+
+    setSearchTerm(q)
+    setDebouncedSearch(q)
+    setPagination(prev => ({ ...prev, currentPage: pg }))
+  }, [searchParams])
+
+  // Scroll to top on URL change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [searchParams])
+
+  // Debouncing logic (Updates URL)
   useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedSearch(searchTerm)
+      if (searchTerm !== initialSearch) {
+        updateURL({ q: searchTerm, page: 1 })
+      }
     }, 500)
     return () => clearTimeout(handler)
-  }, [searchTerm])
+  }, [searchTerm, initialSearch, updateURL])
 
-  // Reset page on search or filter change
-  useLayoutEffect(() => {
-    setPagination((prev) =>
-      prev.currentPage !== 1 ? { ...prev, currentPage: 1 } : prev
-    )
-  }, [debouncedSearch, selectedCourse])
 
-  // Fetch consultancies
+  // Fetch consultancies when URL params change
   useEffect(() => {
     async function fetchData() {
+      const q = searchParams.get('q') || ''
+      const pg = parseInt(searchParams.get('page')) || 1
+
       setLoading(true)
       try {
-        const data = await getConsultancies(
-          pagination.currentPage,
-          debouncedSearch,
-          selectedCourse
-        )
-
+        const data = await getConsultancies(pg, q)
         setConsultancyData(data.items)
         setPagination((prev) => ({
           ...prev,
@@ -80,20 +96,16 @@ export default function ConsultanciesPage() {
       }
     }
     fetchData()
-  }, [pagination.currentPage, debouncedSearch, selectedCourse])
+  }, [searchParams])
 
   const handlePageChange = (page) => {
     if (page > 0 && page <= pagination.totalPages) {
-      setIsScrolling(true)
-      setPagination((prev) => ({ ...prev, currentPage: page }))
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-      setTimeout(() => setIsScrolling(false), 500)
+      updateURL({ page })
     }
   }
 
   const clearFilters = () => {
     setSearchTerm('')
-    setSelectedCourse('')
   }
 
   return (
@@ -102,66 +114,39 @@ export default function ConsultanciesPage() {
       <Navbar />
       <div className='min-h-screen bg-gray-50/50 py-12 px-6 font-sans'>
         <div className='max-w-7xl mx-auto'>
-          {/* Header Section */}
-          <div className='flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12'>
-            <div>
-              <div className='relative inline-block mb-3'>
-                <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight'>
-                  Explore <span className='text-[#0A6FA7]'>Consultancies</span>
-                </h1>
-                <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
-              </div>
+          {/* Header & Search Section */}
+          <div className='flex flex-col md:flex-row md:items-end justify-between gap-8 mb-10'>
+            <div className='relative'>
+              <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight'>
+                Explore <span className='text-[#0A6FA7]'>Consultancies</span>
+              </h1>
+              <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
             </div>
 
-            {/* Clear All Button */}
-            {(searchTerm || selectedCourse) && (
-              <button
-                onClick={clearFilters}
-                className='flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors'
-              >
-                <X className='w-4 h-4' />
-                Clear All Filters
-              </button>
-            )}
-          </div>
+            <div className='flex flex-col md:flex-row items-center gap-6'>
+              {/* Clear All Button */}
+              {searchTerm && (
+                <button
+                  onClick={clearFilters}
+                  className='flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors whitespace-nowrap'
+                >
+                  <X className='w-4 h-4' />
+                  Clear Filters
+                </button>
+              )}
 
-          {/* Filters Bar */}
-          <div className='bg-white rounded-[32px] p-8 shadow-[0_2px_15px_rgba(0,0,0,0.02)] border border-gray-100 mb-12'>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6'>
-              {/* Search */}
-              <div className='lg:col-span-8'>
-                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
-                  Search Consultancies
-                </label>
+              {/* Search Input - Blog Style */}
+              <div className='w-full md:w-[320px]'>
                 <div className='relative group'>
-                  <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors' />
+                  <IoSearch className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors text-lg' />
                   <input
                     type='text'
-                    placeholder='Search by consultancy name...'
-                    className='w-full px-5 py-3.5 pl-12 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#0A6FA7]/10 focus:border-[#0A6FA7] focus:bg-white transition-all text-sm font-semibold text-gray-900 placeholder-gray-400'
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder='Search consultancies...'
                     value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className='w-full py-3 pl-12 pr-4 bg-white border border-gray-200 rounded-xl outline-none text-sm text-gray-700 shadow-sm focus:border-[#0A6FA7] focus:ring-2 focus:ring-[#0A6FA7]/20 transition-all'
                   />
                 </div>
-              </div>
-
-              {/* Course Filter */}
-              <div className='lg:col-span-4'>
-                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
-                  Filter by Course
-                </label>
-                <Select
-                  value={selectedCourse}
-                  onChange={(e) => setSelectedCourse(e.target.value)}
-                  className='w-full pl-6'
-                >
-                  <option value=''>All Courses</option>
-                  {courses.map((course) => (
-                    <option key={course.id} value={course.id}>
-                      {course.title}
-                    </option>
-                  ))}
-                </Select>
               </div>
             </div>
           </div>
@@ -199,7 +184,7 @@ export default function ConsultanciesPage() {
                     : 'No consultancies are currently available'
                 }
                 action={
-                  searchTerm || selectedCourse
+                  searchTerm
                     ? {
                         label: 'Clear All Filters',
                         onClick: clearFilters

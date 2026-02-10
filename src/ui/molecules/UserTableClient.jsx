@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Edit, Trash2, Plus } from 'lucide-react'
 import { Button } from './Button'
-import { Modal } from './Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { UserForm } from './UserForm'
 import { deleteUser } from '../../app/actions/userActions'
 
@@ -88,28 +88,38 @@ export function UserTableClient({ users }) {
         </div>
       </div>
 
-      <Modal
+      <Dialog
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        title='Create New User'
       >
-        <UserForm
-          action={'/api/users/create'}
-          onComplete={() => setIsCreateModalOpen(false)}
-        />
-      </Modal>
+        <DialogHeader>
+          <DialogTitle>Create New User</DialogTitle>
+          <DialogClose onClick={() => setIsCreateModalOpen(false)} />
+        </DialogHeader>
+        <DialogContent>
+          <UserForm
+            action={'/api/users/create'}
+            onComplete={() => setIsCreateModalOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
 
-      <Modal
+      <Dialog
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        title='Edit User'
       >
-        <UserForm
-          action={`/api/users/${selectedUser?._id}/edit`}
-          initialData={selectedUser}
-          onComplete={() => setIsEditModalOpen(false)}
-        />
-      </Modal>
+        <DialogHeader>
+          <DialogTitle>Edit User</DialogTitle>
+          <DialogClose onClick={() => setIsEditModalOpen(false)} />
+        </DialogHeader>
+        <DialogContent>
+          <UserForm
+            action={`/api/users/${selectedUser?._id}/edit`}
+            initialData={selectedUser}
+            onComplete={() => setIsEditModalOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

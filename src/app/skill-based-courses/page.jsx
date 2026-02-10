@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { Search, Award, X, BookOpen } from 'lucide-react'
+import { Search, Award, X, BookOpen, Newspaper } from 'lucide-react'
+import { IoSearch } from 'react-icons/io5'
 import EmptyState from '@/ui/shadcn/EmptyState'
 import { fetchPublicSkillCourses } from './actions'
 import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
@@ -56,54 +57,30 @@ const SkillCoursesPage = () => {
 
             <div className='min-h-screen bg-gray-50/50 py-12 px-6 font-sans'>
                 <div className='max-w-7xl mx-auto'>
-                    {/* Header Section */}
-                    <div className='flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12'>
-                        <div>
-                            <div className='relative inline-block mb-3'>
-                                <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight'>
-                                    Explore &nbsp;
-                                    <span style={{ color: THEME_BLUE }}>Skill Based Courses</span>
-                                </h1>
-                                <div
-                                    className='absolute -bottom-2 left-0 w-16 h-1 rounded-full'
-                                    style={{ backgroundColor: THEME_BLUE }}
-                                ></div>
-                            </div>
-                            <p className='mt-4 text-gray-600 max-w-2xl'>
-                                Enhance your skills with our curated collection of professional courses.
-                            </p>
+                    {/* Filters Bar - Aligned with blogs */}
+                    <div className='flex flex-col md:flex-row justify-between items-center gap-6 mb-12'>
+                        {/* Header Section Inline */}
+                        <div className='relative'>
+                            <h2 className='text-3xl font-extrabold text-gray-800'>
+                                Explore <span style={{ color: THEME_BLUE }}>Courses</span>
+                            </h2>
+                            <div 
+                                className='absolute -bottom-2 left-0 w-12 h-1 rounded-full'
+                                style={{ backgroundColor: THEME_BLUE }}
+                            ></div>
                         </div>
 
-                        {/* Clear All Button */}
-                        {searchTerm && (
-                            <button
-                                onClick={clearFilters}
-                                className='flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors'
-                            >
-                                <X className='w-4 h-4' />
-                                Clear Filters
-                            </button>
-                        )}
-                    </div>
-
-                    {/* Filters Bar */}
-                    <div className='bg-white rounded-[32px] p-8 shadow-[0_2px_15px_rgba(0,0,0,0.02)] border border-gray-100 mb-12'>
-                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6'>
-                            {/* Search */}
-                            <div className='lg:col-span-12'>
-                                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
-                                    Search Skill Based Courses
-                                </label>
-                                <div className='relative group'>
-                                    <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#387cae] transition-colors' />
-                                    <input
-                                        type='text'
-                                        placeholder='Search skill based courses by title...'
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        value={searchTerm}
-                                        className='w-full px-5 py-3.5 pl-12 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#387cae]/10 focus:border-[#387cae] focus:bg-white transition-all text-sm font-semibold text-gray-900 placeholder-gray-400'
-                                    />
-                                </div>
+                        {/* Search Input - Matched with blogs */}
+                        <div className='w-full md:w-[400px]'>
+                            <div className='relative group'>
+                                <IoSearch className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#387cae] transition-colors text-lg' />
+                                <input
+                                    type='text'
+                                    placeholder='Search courses...'
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className='w-full py-3.5 pl-12 pr-4 bg-white border border-gray-100 rounded-2xl outline-none text-sm font-semibold text-gray-900 shadow-[0_2px_15px_rgba(0,0,0,0.02)] focus:ring-2 focus:ring-[#387cae]/10 focus:border-[#387cae] transition-all placeholder-gray-400'
+                                />
                             </div>
                         </div>
                     </div>
@@ -149,13 +126,42 @@ const SkillCoursesPage = () => {
                             />
                         </div>
                     ) : (
-                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-fr'>
-                            {courses.map((course) => (
-                                <SkillCourseCard
-                                    key={course.id}
-                                    course={course}
-                                />
-                            ))}
+                        <div className='space-y-12'>
+                            {/* Featured Courses */}
+                            {courses.filter(c => c.is_featured).length > 0 && (
+                                <div>
+                                    <div className='flex items-center gap-2 mb-6 border-l-4 border-[#387cae] pl-4'>
+                                        <h2 className='text-2xl font-bold text-gray-800'>Featured Courses</h2>
+                                    </div>
+                                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-fr'>
+                                        {courses.filter(c => c.is_featured).map((course) => (
+                                            <SkillCourseCard
+                                                key={course.id}
+                                                course={course}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Remaining Courses */}
+                            {courses.filter(c => !c.is_featured).length > 0 && (
+                                <div>
+                                    <div className='flex items-center gap-2 mb-6 border-l-4 border-[#387cae] pl-4'>
+                                        <h2 className='text-2xl font-bold text-gray-800'>
+                                            {searchTerm ? "All Courses" : "Recent Courses"}
+                                        </h2>
+                                    </div>
+                                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-fr'>
+                                        {courses.filter(c => !c.is_featured).map((course) => (
+                                            <SkillCourseCard
+                                                key={course.id}
+                                                course={course}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

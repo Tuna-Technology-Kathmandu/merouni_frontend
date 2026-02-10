@@ -1,15 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'react-toastify'
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { Select } from '@/ui/shadcn/select'
 import FileUpload from '@/app/(dashboard)/dashboard/addCollege/FileUpload'
 import { authFetch } from '@/app/utils/authFetch'
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 
 export default function CreateUpdateDiscipline({
     isOpen,
@@ -27,11 +28,13 @@ export default function CreateUpdateDiscipline({
         handleSubmit,
         reset,
         setValue,
+        control,
         formState: { errors }
     } = useForm({
         defaultValues: {
             title: '',
             description: '',
+            content: '',
             featured_image: '',
             author: authorId
         }
@@ -43,6 +46,7 @@ export default function CreateUpdateDiscipline({
                 // Edit mode
                 setValue('title', initialData.title)
                 setValue('description', initialData.description || '')
+                setValue('content', initialData.content || '')
                 setValue('featured_image', initialData.featured_image || '')
                 setUploadedFiles({ featured_image: initialData.featured_image || '' })
             } else {
@@ -50,6 +54,7 @@ export default function CreateUpdateDiscipline({
                 reset({
                     title: '',
                     description: '',
+                    content: '',
                     featured_image: '',
                     author: authorId
                 })
@@ -128,12 +133,16 @@ export default function CreateUpdateDiscipline({
     }
 
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title={initialData ? 'Edit Discipline' : 'Add Discipline'}
             className='max-w-2xl'
         >
+            <DialogHeader>
+                <DialogTitle>{initialData ? 'Edit Discipline' : 'Add Discipline'}</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
             <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
                 <form
                     onSubmit={handleSubmit(onSubmit)}
@@ -164,10 +173,24 @@ export default function CreateUpdateDiscipline({
                                 <div>
                                     <Label>Description</Label>
                                     <textarea
-                                        placeholder='Description'
+                                        placeholder='Short description'
                                         {...register('description')}
                                         className='w-full p-2 border rounded'
-                                        rows={4}
+                                        rows={3}
+                                    />
+                                </div>
+                                <div>
+                                    <Label>Content</Label>
+                                    <Controller
+                                        name='content'
+                                        control={control}
+                                        render={({ field }) => (
+                                            <TipTapEditor
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                placeholder='Enter detailed content with rich formatting...'
+                                            />
+                                        )}
                                     />
                                 </div>
                                 <div>
@@ -202,6 +225,7 @@ export default function CreateUpdateDiscipline({
                     </div>
                 </form>
             </div>
-        </Modal>
+            </DialogContent>
+        </Dialog>
     )
 }

@@ -1,7 +1,6 @@
 import React from 'react'
 import { IoIosGlobe } from 'react-icons/io'
-import { FaUniversity, FaPhoneAlt } from 'react-icons/fa'
-import { LiaUniversitySolid } from 'react-icons/lia'
+import { FaUniversity, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa'
 import { BsGlobe2 } from 'react-icons/bs'
 import { Eye } from 'lucide-react'
 
@@ -101,20 +100,7 @@ const ImageSection = ({ college }) => {
             </div>
           )}
 
-          {/* Institute Type */}
-          {hasInstituteType && (
-            <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group'>
-              <div className='bg-emerald-50 p-3 rounded-2xl mb-4 group-hover:bg-[#30AD8F]/10 transition-colors duration-300'>
-                <LiaUniversitySolid className='w-6 h-6 text-[#30AD8F]' />
-              </div>
-              <p className='text-xs uppercase tracking-wider text-gray-500 font-medium mb-1'>
-                Institute Type
-              </p>
-              <p className='text-sm text-gray-700 whitespace-nowrap'>
-                {college?.institute_type}
-              </p>
-            </div>
-          )}
+
 
           {/* Institute Level */}
           {hasInstituteLevel && (
@@ -167,7 +153,7 @@ const ImageSection = ({ college }) => {
 
           {/* Website */}
           {hasWebsite && (
-            <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group sm:col-span-2 lg:col-span-1'>
+            <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group'>
               <div className='bg-sky-50 p-3 rounded-2xl mb-4 group-hover:bg-sky-100 transition-colors duration-300'>
                 <BsGlobe2 className='w-5 h-5 text-sky-500' />
               </div>
@@ -182,6 +168,26 @@ const ImageSection = ({ college }) => {
               >
                 {college.website_url.replace(/^https?:\/\//, '')}
               </a>
+            </div>
+          )}
+
+          {/* New Address Card */}
+          {hasAddress && (
+            <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group'>
+              <div className='bg-emerald-50 p-3 rounded-2xl mb-4 group-hover:bg-[#30AD8F]/10 transition-colors duration-300'>
+                <FaMapMarkerAlt className='w-5 h-5 text-[#30AD8F]' />
+              </div>
+              <p className='text-xs uppercase tracking-wider text-gray-500 font-medium mb-1'>
+                Address
+              </p>
+              <p className='text-sm text-gray-700 line-clamp-2'>
+                {[
+                  college?.collegeAddress?.street,
+                  college?.collegeAddress?.city,
+                  college?.collegeAddress?.state,
+                  college?.collegeAddress?.country
+                ].filter(Boolean).join(', ')}
+              </p>
             </div>
           )}
         </div>

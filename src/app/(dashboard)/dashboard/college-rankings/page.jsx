@@ -4,7 +4,12 @@ import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Edit2, Trash2, Plus, GripVertical, X, ChevronDown } from 'lucide-react'
-import { Modal } from '../../../../ui/molecules/Modal'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/ui/shadcn/dialog'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import Image from 'next/image'
 import { Button } from '@/ui/shadcn/button'
@@ -469,7 +474,7 @@ export default function CollegeRankingsPage() {
       </div>
 
       {/* Add/Edit Ranking Modal */}
-      <Modal
+      <Dialog
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false)
@@ -480,13 +485,15 @@ export default function CollegeRankingsPage() {
           setProgramSearch('')
           setShowProgramDropdown(false)
         }}
-        title={
-          selectedProgram
-            ? `Add Colleges to ${selectedProgram?.title || 'Program'}`
-            : 'Select Program to Add Rankings'
-        }
-        className='max-w-2xl'
       >
+        <DialogContent className='max-w-2xl'>
+          <DialogHeader>
+            <DialogTitle>
+              {selectedProgram
+                ? `Add Colleges to ${selectedProgram?.title || 'Program'}`
+                : 'Select Program to Add Rankings'}
+            </DialogTitle>
+          </DialogHeader>
         <div className='p-6 space-y-6'>
           {/* Program Selection */}
           <div className='relative' ref={programDropdownRef}>
@@ -690,7 +697,8 @@ export default function CollegeRankingsPage() {
             </Button>
           </div>
         </div>
-      </Modal>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <ConfirmationDialog

@@ -5,7 +5,6 @@ import MemberSection from './sections/MemberSection'
 import GoogleMap from './GoogleMap'
 import GallerySection from './sections/GallerySection'
 import FacilitySection from './sections/FacilitySection'
-import InfoSection from './sections/InfoSection'
 
 const CollegeOverview = ({ college }) => {
   const overviewRef = useRef(null)
@@ -13,7 +12,6 @@ const CollegeOverview = ({ college }) => {
   const membersRef = useRef(null)
   const galleryRef = useRef(null)
   const facilityRef = useRef(null)
-  const infoRef = useRef(null)
   const [activeSection, setActiveSection] = useState(0)
 
   const validMembers = (college.collegeMembers || []).filter(
@@ -65,12 +63,6 @@ const CollegeOverview = ({ college }) => {
       visible: college?.collegeGallery?.length > 0,
       ref: galleryRef,
       component: <GallerySection college={college} />
-    },
-    {
-      name: 'Contact & Address',
-      visible: hasAddress || hasContact,
-      ref: infoRef,
-      component: <InfoSection college={college} />
     }
   ]
 
@@ -159,127 +151,7 @@ const CollegeOverview = ({ college }) => {
             {section.component}
           </div>
         ))}
-
-        {/* Location block - visible on mobile/tablet only (below main content) */}
-        {(college?.google_map_url || hasAddress) && (
-          <div className='xl:hidden w-full pt-4'>
-            <div className='bg-gray-50/30 rounded-3xl p-6 border border-gray-100/50'>
-              {college?.google_map_url && (
-                <div className='mb-6'>
-                  <p className='text-sm font-medium text-gray-900 mb-4 flex items-center gap-2'>
-                    <span className='w-1 h-4 bg-[#30AD8F] rounded-full' />
-                    Location Map
-                  </p>
-                  <div className='w-full h-44 rounded-2xl overflow-hidden border border-white bg-white'>
-                    <GoogleMap mapUrl={college.google_map_url} />
-                  </div>
-                </div>
-              )}
-              {hasAddress && (
-                <div>
-                  <p className='text-sm font-medium text-gray-900 mb-4 flex items-center gap-2'>
-                    <span className='w-1 h-4 bg-[#0A6FA7] rounded-full' />
-                    Office Address
-                  </p>
-                  <div className='space-y-3'>
-                    <div className='bg-white/80 p-4 rounded-2xl border border-gray-100'>
-                      <p className='text-xs text-gray-500 uppercase tracking-wider font-medium mb-1'>
-                        Street & City
-                      </p>
-                      <p className='text-sm text-gray-700 leading-snug'>
-                        {college?.collegeAddress?.street
-                          ? `${college.collegeAddress.street}, `
-                          : ''}
-                        {college?.collegeAddress?.city || ''}
-                      </p>
-                      {(college?.collegeAddress?.state ||
-                        college?.collegeAddress?.country) && (
-                        <p className='text-xs text-gray-500 mt-1'>
-                          {college?.collegeAddress?.state
-                            ? `${college.collegeAddress.state}, `
-                            : ''}
-                          {college?.collegeAddress?.country || ''}
-                        </p>
-                      )}
-                    </div>
-                    {college?.collegeAddress?.postal_code && (
-                      <div className='bg-white/80 p-4 rounded-2xl border border-gray-100'>
-                        <p className='text-xs text-gray-500 uppercase tracking-wider font-medium mb-1'>
-                          Postcode
-                        </p>
-                        <p className='text-sm text-gray-700'>
-                          {college?.collegeAddress?.postal_code}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
-
-      {/* Right Sidebar - Location (desktop xl only) */}
-      {(college?.google_map_url || hasAddress) && (
-        <aside className='w-full md:w-64 lg:w-72 md:sticky md:top-32 flex-shrink-0 hidden xl:block'>
-          <div className='bg-gray-50/30 rounded-3xl p-6 border border-gray-100/50'>
-            {college?.google_map_url && (
-              <div className='mb-8'>
-                <p className='text-sm font-medium text-gray-900 mb-4 flex items-center gap-2'>
-                  <span className='w-1 h-4 bg-[#30AD8F] rounded-full' />
-                  Location Map
-                </p>
-                <div className='w-full h-44 rounded-2xl overflow-hidden border border-white bg-white'>
-                  <GoogleMap mapUrl={college.google_map_url} />
-                </div>
-              </div>
-            )}
-
-            {hasAddress && (
-              <div>
-                <p className='text-sm font-medium text-gray-900 mb-4 flex items-center gap-2'>
-                  <span className='w-1 h-4 bg-[#0A6FA7] rounded-full' />
-                  Office Address
-                </p>
-                <div className='space-y-3'>
-                  <div className='bg-white/80 p-4 rounded-2xl border border-gray-100'>
-                    <p className='text-xs text-gray-500 uppercase tracking-wider font-medium mb-1'>
-                      Street & City
-                    </p>
-                    <p className='text-sm text-gray-700 leading-snug'>
-                      {college?.collegeAddress?.street
-                        ? `${college.collegeAddress.street}, `
-                        : ''}
-                      {college?.collegeAddress?.city || ''}
-                    </p>
-                    {(college?.collegeAddress?.state ||
-                      college?.collegeAddress?.country) && (
-                      <p className='text-xs text-gray-500 mt-1'>
-                        {college?.collegeAddress?.state
-                          ? `${college.collegeAddress.state}, `
-                          : ''}
-                        {college?.collegeAddress?.country || ''}
-                      </p>
-                    )}
-                  </div>
-
-                  {college?.collegeAddress?.postal_code && (
-                    <div className='bg-white/80 p-4 rounded-2xl border border-gray-100'>
-                      <p className='text-xs text-gray-500 uppercase tracking-wider font-medium mb-1'>
-                        Postcode
-                      </p>
-                      <p className='text-sm text-gray-700'>
-                        {college?.collegeAddress?.postal_code}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </aside>
-      )}
     </section>
   )
 }

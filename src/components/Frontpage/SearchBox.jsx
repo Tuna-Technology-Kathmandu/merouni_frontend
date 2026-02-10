@@ -6,28 +6,34 @@ import {
   ChevronRight,
   GraduationCap,
   Search,
-  X
+  X,
+  FileText,
+  Landmark,
+  Lightbulb,
+  PlayCircle,
+  Briefcase,
+  Scroll,
+  PenTool
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 const SearchBox = ({ onClose }) => {
-  const popularSearches = [
-    'KUUMAT',
-    'SEE RESULT 2025',
-    'NEB Class 12 Result 2025',
-    'IOE Entrance Exam 2025',
-    'MBBS Entrance Exam Nepal',
-    'Best College for BIT in Nepal',
-    'Lok Sewa Aayog Vacancy',
-    'TU Entrance Exam'
-  ]
+  const [popularSearches, setPopularSearches] = useState([])
 
   const [searchTag, setSearchTag] = useState('')
   const [searchResults, setSearchResults] = useState({
     events: [],
     blogs: [],
-    colleges: []
+    colleges: [],
+    scholarships: [],
+    consultancies: [],
+    skills: [],
+    videos: [],
+    degrees: [],
+    exams: [],
+    materials: [],
+    university: []
   })
   const [isLoading, setIsLoading] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -41,6 +47,28 @@ const SearchBox = ({ onClose }) => {
     handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  // Fetch popular searches
+  useEffect(() => {
+    const fetchPopularSearches = async () => {
+      try {
+        const response = await fetch(`${process.env.baseUrl}/popular-searches`)
+        if (response.ok) {
+          const data = await response.json()
+          if (Array.isArray(data.data)) {
+            setPopularSearches(data.data)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching popular searches:', error)
+      }
+    }
+
+    fetchPopularSearches()
   }, [])
 
   // Fetch search results based on input
@@ -55,7 +83,15 @@ const SearchBox = ({ onClose }) => {
         setSearchResults({
           blogs: Array.isArray(data.blogs) ? data.blogs : [],
           events: Array.isArray(data.events) ? data.events : [],
-          colleges: Array.isArray(data.colleges) ? data.colleges : []
+          colleges: Array.isArray(data.colleges) ? data.colleges : [],
+          scholarships: Array.isArray(data.scholarships) ? data.scholarships : [],
+          consultancies: Array.isArray(data.consultancies) ? data.consultancies : [],
+          skills: Array.isArray(data.skills) ? data.skills : [],
+          videos: Array.isArray(data.videos) ? data.videos : [],
+          degrees: Array.isArray(data.degrees) ? data.degrees : [],
+          exams: Array.isArray(data.exams) ? data.exams : [],
+          materials: Array.isArray(data.materials) ? data.materials : [],
+          university: Array.isArray(data.university) ? data.university : []
         })
       }
     } catch (error) {
@@ -66,11 +102,27 @@ const SearchBox = ({ onClose }) => {
   }
 
   useEffect(() => {
-    if (searchTag.trim() !== '') {
-      fetchSearchResults(searchTag)
-    } else {
-      setSearchResults({ blogs: [], events: [], colleges: [] })
-    }
+    const delayDebounceFn = setTimeout(() => {
+      if (searchTag.trim() !== '') {
+        fetchSearchResults(searchTag)
+      } else {
+        setSearchResults({
+          blogs: [],
+          events: [],
+          colleges: [],
+          scholarships: [],
+          consultancies: [],
+          skills: [],
+          videos: [],
+          degrees: [],
+          exams: [],
+          materials: [],
+          university: []
+        })
+      }
+    }, 500)
+
+    return () => clearTimeout(delayDebounceFn)
   }, [searchTag])
 
   const handleInputChange = (e) => {
@@ -236,10 +288,58 @@ const SearchBox = ({ onClose }) => {
                     path='colleges'
                   />
                   <ResultSection
+                    title='Universities'
+                    items={searchResults.university}
+                    icon={Landmark}
+                    path='universities'
+                  />
+                  <ResultSection
+                    title='Degrees'
+                    items={searchResults.degrees}
+                    icon={Scroll}
+                    path='degree'
+                  />
+                  <ResultSection
                     title='Events'
                     items={searchResults.events}
                     icon={Calendar}
                     path='events'
+                  />
+                   <ResultSection
+                    title='Scholarships'
+                    items={searchResults.scholarships}
+                    icon={GraduationCap}
+                    path='scholarship'
+                  />
+                  <ResultSection
+                    title='Consultancies'
+                    items={searchResults.consultancies}
+                    icon={Briefcase}
+                    path='consultancy'
+                  />
+                  <ResultSection
+                    title='Skills'
+                    items={searchResults.skills}
+                    icon={Lightbulb}
+                    path='skills-based-courses'
+                  />
+                  <ResultSection
+                    title='Videos'
+                    items={searchResults.videos}
+                    icon={PlayCircle}
+                    path='video'
+                  />
+                  <ResultSection
+                    title='Exams'
+                    items={searchResults.exams}
+                    icon={PenTool}
+                    path='exams'
+                  />
+                  <ResultSection
+                    title='Materials'
+                    items={searchResults.materials}
+                    icon={FileText}
+                    path='materials'
                   />
                   <ResultSection
                     title='Blogs'

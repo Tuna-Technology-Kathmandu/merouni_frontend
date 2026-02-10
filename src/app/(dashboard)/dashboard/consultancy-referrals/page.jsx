@@ -3,7 +3,12 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { fetchConsultancyApplications, fetchAllConsultancies, updateConsultancyApplicationStatus, deleteConsultancyApplication } from './action'
 import { FaTrashAlt, FaEdit } from 'react-icons/fa'
-import { Modal } from '../../../../ui/molecules/Modal'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { Button } from '@/ui/shadcn/button'
@@ -387,12 +392,14 @@ const ConsultancyReferralsPage = () => {
       />
 
       {/* Status Modal */}
-      <Modal
+      <Dialog
         isOpen={statusModalOpen}
         onClose={() => setStatusModalOpen(false)}
-        title='Update Status'
-        className='max-w-md'
       >
+        <DialogContent className='max-w-md'>
+          <DialogHeader>
+            <DialogTitle>Update Status</DialogTitle>
+          </DialogHeader>
         <form onSubmit={handleStatusSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Status</label>
@@ -423,7 +430,8 @@ const ConsultancyReferralsPage = () => {
             </Button>
           </div>
         </form>
-      </Modal>
+        </DialogContent>
+      </Dialog>
 
       <ConfirmationDialog
         open={deleteConfirmationOpen}

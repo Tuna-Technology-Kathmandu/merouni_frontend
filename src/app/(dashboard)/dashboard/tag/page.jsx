@@ -8,7 +8,7 @@ import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '@/ui/shadcn/button'
 import SearchInput from '@/ui/molecules/SearchInput'
@@ -334,54 +334,46 @@ export default function TagForm() {
         </div>
       </div>
 
-      {/* Form Modal */}
-      <Modal
-        isOpen={isOpen}
+      {/* Form Dialog */}
+      <Dialog
+        isOpen={isModalOpen}
         onClose={handleModalClose}
-        title={editing ? 'Edit Tag' : 'Add Tag'}
         className='max-w-md'
       >
-        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-          <div className='space-y-4'>
+        <DialogHeader>
+          <DialogTitle>{editingTag ? 'Edit Tag' : 'Add Tag'}</DialogTitle>
+          <DialogClose onClick={handleModalClose} />
+        </DialogHeader>
+        <DialogContent>
+          <form onSubmit={handleSubmit(onSubmit)} className='space-y-4 pt-4'>
             <div>
-              <label className='block mb-2'>
-                Tag Title <span className='text-red-500'>*</span>
-              </label>
-              <input
-                {...register('title', {
-                  required: 'Tag title is required',
-                  minLength: {
-                    value: 3,
-                    message: 'Title must be at least 3 characters long'
-                  }
-                })}
-                className='w-full p-2 border rounded'
-                placeholder='Enter tag title'
+              <Label htmlFor='title'>Title</Label>
+              <Input
+                id='title'
+                {...register('title', { required: 'Title is required' })}
+                className='mt-1'
               />
               {errors.title && (
-                <span className='text-red-500'>{errors.title.message}</span>
+                <p className='mt-1 text-sm text-red-500'>
+                  {errors.title.message}
+                </p>
               )}
             </div>
-          </div>
-
-          <div className='flex justify-end gap-2'>
-            <button
-              type='button'
-              onClick={handleModalClose}
-              className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors'
-            >
-              Cancel
-            </button>
-            <Button type='submit' disabled={submitting}>
-              {submitting
-                ? 'Processing...'
-                : editing
-                  ? 'Update Tag'
-                  : 'Create Tag'}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+            <div className='flex justify-end gap-2'>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={handleModalClose}
+              >
+                Cancel
+              </Button>
+              <Button type='submit' disabled={isSubmitting}>
+                {isSubmitting ? 'Saving...' : editingTag ? 'Save Changes' : 'Add Tag'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <ConfirmationDialog
         open={isDialogOpen}

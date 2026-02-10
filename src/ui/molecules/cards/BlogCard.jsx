@@ -17,7 +17,7 @@ const BlogCard = ({
 }) => {
   const slug = blogProp?.slug ?? slugProp
   const image =
-    blogProp?.featuredImage ?? blogProp?.featured_image ?? imageProp ?? 'https://placehold.co/600x400'
+    blogProp?.featuredImage ?? blogProp?.featured_image ?? imageProp ?? '/images/logo.png'
   const title = blogProp?.title ?? titleProp ?? ''
   const description = blogProp?.description ?? descriptionProp ?? ''
   const rawDate = blogProp?.createdAt ?? blogProp?.created_at ?? blogProp?.date ?? dateProp

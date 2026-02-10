@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
@@ -120,12 +120,16 @@ export default function CreateConsultencyUser({
     }
 
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title='Create Consultancy Credentials'
             className='max-w-md'
         >
+            <DialogHeader>
+                <DialogTitle>Create Consultancy Credentials</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
             <form onSubmit={handleCreateCredentials} className='space-y-4'>
                 <div className='space-y-2'>
                     <Label htmlFor='first-name'>First Name</Label>
@@ -247,6 +251,7 @@ export default function CreateConsultencyUser({
                     </Button>
                 </div>
             </form>
-        </Modal>
+            </DialogContent>
+        </Dialog>
     )
 }

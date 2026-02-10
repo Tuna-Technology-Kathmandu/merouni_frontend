@@ -24,12 +24,6 @@ const CollegeTeach = ({ degree }) => {
 
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 w-full'>
             {degree.colleges.map((college, index) => {
-              const collegeAddress = degree.collegesAddress?.find(
-                (address) =>
-                  address.program_college.college_id ===
-                  college.program_college.college_id
-              )
-
               return (
                 <motion.div
                   key={index}
@@ -39,11 +33,11 @@ const CollegeTeach = ({ degree }) => {
                   whileHover={{ y: -5 }}
                   viewport={{ once: true }}
                 >
-                  <Link href={`/colleges/${college.slugs}`}>
+                  <Link href={`/colleges/${college.slugs || college.slug}`}>
                     <div className='group bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 flex items-center space-x-5 h-full'>
-                      <div className='w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-100 group-hover:border-[#30AD8F]/20 transition-colors'>
+                      <div className='w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-100 group-hover:border-[#30AD8F]/20 transition-colors'>
                         <img
-                          src={college.logo || '/images/collegePhoto.png'}
+                          src={college.college_logo || college.logo || '/images/collegePhoto.png'}
                           alt={college.name}
                           className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-500'
                         />
@@ -53,14 +47,6 @@ const CollegeTeach = ({ degree }) => {
                         <h3 className='font-bold text-gray-900 group-hover:text-[#0A70A7] transition-colors line-clamp-1'>
                           {college.name}
                         </h3>
-                        {collegeAddress && (
-                          <div className='flex items-center mt-2 text-gray-500 text-sm'>
-                            <MapPin className='w-3 h-3 mr-1.5 text-gray-400' />
-                            <span className='line-clamp-1'>
-                              {collegeAddress.city}, {collegeAddress.state}
-                            </span>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </Link>

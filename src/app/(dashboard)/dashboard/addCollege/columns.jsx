@@ -93,16 +93,6 @@ export const createColumns = ({
     }
   },
   {
-    header: 'Featured',
-    accessorKey: 'isFeatured',
-    cell: ({ getValue }) => (getValue() ? 'Yes' : 'No')
-  },
-  {
-    header: 'Pinned',
-    accessorKey: 'pinned',
-    cell: ({ getValue }) => (getValue() ? 'Yes' : 'No')
-  },
-  {
     header: 'Actions',
     id: 'actions',
     cell: ({ row }) => {

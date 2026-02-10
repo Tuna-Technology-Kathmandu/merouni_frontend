@@ -5,10 +5,10 @@ import dynamic from 'next/dynamic'
 import { useForm, useFieldArray } from 'react-hook-form'
 import {
   createCollege,
-  fetchUniversities,
   fetchAllCourse,
   fetchAllUniversity,
-  getUniversityBySlug
+  getUniversityBySlug,
+  fetchAllDegrees
 } from './actions'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
@@ -29,14 +29,20 @@ import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import AdmissionItem from './AdmissionItem'
 import ConfirmationDialog from './ConfirmationDialog'
-import { Modal } from '../../../../ui/molecules/Modal'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose
+} from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '../../../../ui/shadcn/button'
 import { Input } from '../../../../ui/shadcn/input'
 import { Label } from '../../../../ui/shadcn/label'
 import { Select } from '../../../../ui/shadcn/select'
 import { Textarea } from '@/ui/shadcn/textarea'
-import { SearchableSelect } from '@/ui/shadcn/SearchableSelect'
+import UniversityDropdown from '@/ui/molecules/dropdown/UniversityDropdown'
 
 const CKUni = dynamic(() => import('../component/CKUni'), {
   ssr: false
@@ -180,13 +186,6 @@ const FileUploadWithPreview = ({
 }
 export default function CollegeForm() {
   const { setHeading } = usePageHeading()
-  //for university search
-  const [uniSearch, setUniSearch] = useState('')
-  const [debouncedUni] = useDebounce(uniSearch, 300)
-  const [universities, setUniversities] = useState([])
-  const [loadUni, setLoadUni] = useState(false)
-  const [showUniDrop, setShowUniDrop] = useState(false)
-  const [hasSelectedUni, setHasSelectedUni] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
 
@@ -197,10 +196,9 @@ export default function CollegeForm() {
   //show programs only fro selected University;
   const [loadingPrograms, setLoadingPrograms] = useState(false)
 
-  const [allUniversity, setAllUniversity] = useState([])
-
   //for allcourse
   const [courses, setCourses] = useState([])
+  const [allDegrees, setAllDegrees] = useState([])
   const [submitting, setSubmitting] = useState(false)
 
   const [uploadedFiles, setUploadedFiles] = useState({
@@ -239,23 +237,16 @@ export default function CollegeForm() {
       institute_type: 'Private',
       institute_level: [],
       courses: [],
+      degrees: [],
       description: '',
       content: '',
       website_url: '',
       google_map_url: '',
       college_logo: '',
       featured_img: '',
-      is_featured: false,
-      pinned: false,
       images: [],
       college_broucher: '',
-      facilities: [
-        {
-          title: '',
-          description: '',
-          icon: ''
-        }
-      ],
+      facilities: [],
       address: {
         country: '',
         state: '',
@@ -264,14 +255,7 @@ export default function CollegeForm() {
         postal_code: ''
       },
       contacts: ['', ''],
-      members: [
-        {
-          name: '',
-          contact_number: '',
-          role: '',
-          description: ''
-        }
-      ],
+      members: [],
       admissions: [
         {
           course_id: '',
@@ -334,10 +318,13 @@ export default function CollegeForm() {
       }
 
       // Convert boolean values to numbers
-      data.is_featured = +data.is_featured
-      data.pinned = +data.pinned
       // Convert IDs to numbers
       data.university_id = parseInt(data.university_id)
+      
+      // Convert degree IDs to numbers
+      data.degrees = (data.degrees || [])
+        .map((id) => parseInt(id))
+        .filter((id) => !isNaN(id))
 
       // Only include courses in payload if there are courses
       const coursesArray = (data.courses || [])
@@ -358,12 +345,19 @@ export default function CollegeForm() {
       data.college_broucher = data.college_broucher || ''
 
       //   Filter out empty facilities
-      data.facilities = data.facilities.filter(
+      const filteredFacilities = (data.facilities || []).filter(
         (facility) =>
           facility.title.trim() !== '' ||
           facility.description.trim() !== '' ||
           facility.icon.trim() !== ''
       )
+
+      // Only include facilities in payload if there are non-empty facilities
+      if (filteredFacilities.length > 0) {
+        data.facilities = filteredFacilities
+      } else {
+        delete data.facilities
+      }
 
       //if we have no images after remove button clicked in allimages, we send this empty values
       if (editing && data.images.length === 0) {
@@ -391,7 +385,6 @@ export default function CollegeForm() {
         images: [],
         videos: []
       })
-      setUniSearch('')
       setIsOpen(false)
       loadColleges()
     } catch (error) {
@@ -416,27 +409,6 @@ export default function CollegeForm() {
       setSubmitting(false)
     }
   }
-  //for uni in add college
-  useEffect(() => {
-    if (hasSelectedUni) return
-
-    const getUniversities = async () => {
-      setLoadUni(true)
-      try {
-        const universityList = await fetchUniversities(debouncedUni)
-        setUniversities(universityList)
-        setShowUniDrop(true)
-        setLoadUni(false)
-      } catch (error) {
-        console.error('Error fetching universities:', error)
-      }
-    }
-    if (debouncedUni !== '') {
-      getUniversities()
-    } else {
-      setShowUniDrop(false)
-    }
-  }, [debouncedUni])
 
   //for all fetching of college
   useEffect(() => {
@@ -452,19 +424,32 @@ export default function CollegeForm() {
     getCourses()
   }, [])
 
-  //for all fetching of university
+  //for all fetching of degrees
   useEffect(() => {
-    const getUniversities = async () => {
+    const getDegrees = async () => {
       try {
-        const uniList = await fetchAllUniversity()
-        setAllUniversity(uniList)
+        const degreeList = await fetchAllDegrees()
+        setAllDegrees(degreeList)
       } catch (error) {
-        console.error('Error all university:', error)
+        console.error('Error fetching degrees:', error)
       }
     }
 
-    getUniversities()
+    getDegrees()
   }, [])
+
+  const handleCloseModal = () => {
+    setIsOpen(false)
+    setEditing(false)
+    reset()
+    setUploadedFiles({
+      logo: '',
+      featured: '',
+      images: [],
+      videos: []
+    })
+    setUniSlug('')
+  }
 
   // Handle query parameter to open add form
   useEffect(() => {
@@ -473,8 +458,6 @@ export default function CollegeForm() {
       setIsOpen(true)
       setEditing(false)
       reset()
-      setUniSearch('')
-      setHasSelectedUni(false)
       setUploadedFiles({
         logo: '',
         featured: '',
@@ -747,25 +730,23 @@ export default function CollegeForm() {
       setValue('content', collegeData.content)
       setValue('website_url', collegeData.website_url)
       setValue('google_map_url', collegeData.google_map_url)
-      setValue('is_featured', collegeData.isFeatured === 1)
-      setValue('pinned', collegeData.pinned === 1)
 
-      // Set university_id from university data
+      // Set university_id
+      if (collegeData.university_id) {
+        setValue('university_id', Number(collegeData.university_id), {
+          shouldValidate: true,
+          shouldDirty: true
+        })
+      }
+
       if (collegeData.university) {
-        setHasSelectedUni(true)
-        setUniSearch(collegeData.university.fullname)
         setUniSlug(collegeData.university.slugs)
+      }
 
-        const universityId = allUniversity.find(
-          (u) => u.fullname === collegeData.university.fullname
-        )?.id
-
-        if (universityId) {
-          setValue('university_id', Number(universityId), {
-            shouldValidate: true,
-            shouldDirty: true
-          })
-        }
+      // Set degrees
+      if (collegeData.degrees && Array.isArray(collegeData.degrees)) {
+        const degreeIds = collegeData.degrees.map((degree) => String(degree.id))
+        setValue('degrees', degreeIds)
       }
 
       // Set programs - use program_id from college course data
@@ -1034,10 +1015,6 @@ export default function CollegeForm() {
     handleDeleteClick
   })
 
-  const handleCloseModal = () => {
-    setIsOpen(false)
-    reset()
-  }
 
   return (
     <>
@@ -1071,12 +1048,11 @@ export default function CollegeForm() {
         </div>
         <ToastContainer />
 
-        <Modal
-          isOpen={isOpen}
-          onClose={handleCloseModal}
-          title={editing ? 'Edit College' : 'Add College'}
-          className='max-w-5xl'
-        >
+        <Dialog isOpen={isOpen} onClose={handleCloseModal} className='max-w-7xl'>
+          <DialogContent className='max-h-[90vh] flex flex-col'>
+            <DialogHeader>
+              <DialogTitle>{editing ? 'Edit College' : 'Add College'}</DialogTitle>
+            </DialogHeader>
           <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
             <form
               onSubmit={handleSubmit(onSubmit)}
@@ -1128,7 +1104,7 @@ export default function CollegeForm() {
 
                     <div className='space-y-2'>
                       <Label>Institute Level</Label>
-                      <div className='space-y-2'>
+                      <div className='flex items-center gap-6 pt-2'>
                         {['School', 'College'].map((level) => (
                           <label
                             key={level}
@@ -1146,36 +1122,6 @@ export default function CollegeForm() {
                       </div>
                     </div>
 
-                    <SearchableSelect
-                      id='university_id'
-                      label='University'
-                      options={universities}
-                      value={watch('university_id')}
-                      displayKey='fullname'
-                      onChange={(option) => {
-                        if (option) {
-                          setValue('university_id', Number(option.id), {
-                            shouldValidate: true,
-                            shouldDirty: true
-                          })
-                          setHasSelectedUni(true)
-                          setUniSlug(option.slugs)
-                        } else {
-                          setValue('university_id', '', {
-                            shouldValidate: true
-                          })
-                          setHasSelectedUni(false)
-                          setUniSlug('')
-                        }
-                      }}
-                      onSearchChange={(val) => setUniSearch(val || '')}
-                      placeholder='Search University'
-                      error={
-                        errors.university_id ? 'This field is required' : ''
-                      }
-                      required
-                      loading={loadUni}
-                    />
 
                     <div className='md:col-span-2 space-y-2'>
                       <Label htmlFor='description'>Description</Label>
@@ -1202,6 +1148,28 @@ export default function CollegeForm() {
                 </div>
                 {editing ? <input type='hidden' {...register('id')} /> : <></>}
                 {/* Courses Section */}
+
+                <div className='bg-white p-6 rounded-lg shadow-md mb-6'>
+                  <Label className='mb-2 block'>University <span className='text-red-500'>*</span></Label>
+                  <UniversityDropdown
+                    value={watch('university_id')}
+                    onChange={(id, selectedUni) => {
+                      if (id) {
+                        setValue('university_id', Number(id), {
+                          shouldValidate: true,
+                          shouldDirty: true
+                        })
+                        setUniSlug(selectedUni?.slugs || '')
+                      } else {
+                        setValue('university_id', '', {
+                          shouldValidate: true
+                        })
+                        setUniSlug('')
+                      }
+                    }}
+                    error={errors.university_id ? 'This field is required' : ''}
+                  />
+                </div>
 
                 {/* Programs Section */}
                 {/* Programs Section */}
@@ -1287,6 +1255,28 @@ export default function CollegeForm() {
                       </div>
                     </div>
                   )}
+                </div>
+
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <h2 className='text-xl font-semibold mb-4'>Degrees Offered</h2>
+                  <div className='grid grid-cols-2 lg:grid-cols-3 gap-2 border rounded p-4 max-h-60 overflow-y-auto'>
+                    {allDegrees.map((degree) => (
+                      <label 
+                        key={degree.id} 
+                        className='flex items-center gap-2 cursor-pointer p-1 hover:bg-gray-50 rounded select-none'
+                      >
+                        <input
+                          type='checkbox'
+                          {...register('degrees')}
+                          value={String(degree.id)}
+                          className='rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+                        />
+                        <span className='text-sm text-gray-700 font-medium'>
+                          {degree.title} {degree.short_name ? `(${degree.short_name})` : ''}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
 
                 <div className='bg-white p-6 rounded-lg shadow-md'>
@@ -1378,14 +1368,12 @@ export default function CollegeForm() {
                     >
                       <div className='space-y-2'>
                         <Label htmlFor={`facility-title-${index}`}>
-                          Title <span className='text-red-500'>*</span>
+                          Title
                         </Label>
                         <Input
                           id={`facility-title-${index}`}
                           placeholder='Facility Title'
-                          {...register(`facilities.${index}.title`, {
-                            required: true
-                          })}
+                          {...register(`facilities.${index}.title`)}
                           aria-invalid={
                             errors.facilities?.[index]?.title ? 'true' : 'false'
                           }
@@ -1660,32 +1648,6 @@ export default function CollegeForm() {
                   </div>
                 </div>
 
-                {/* Featured and Pinned */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Additional Settings
-                  </h2>
-                  <div className='space-y-4'>
-                    <div className='flex items-center space-x-2'>
-                      <input
-                        id='is-featured'
-                        type='checkbox'
-                        {...register('is_featured')}
-                        className='w-4 h-4'
-                      />
-                      <Label htmlFor='is-featured'>Featured College</Label>
-                    </div>
-                    <div className='flex items-center space-x-2'>
-                      <input
-                        id='pinned'
-                        type='checkbox'
-                        {...register('pinned')}
-                        className='w-4 h-4'
-                      />
-                      <Label htmlFor='pinned'>Pinned</Label>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               {/* Submit Button - Sticky Footer */}
@@ -1710,7 +1672,8 @@ export default function CollegeForm() {
               </div>
             </form>
           </div>
-        </Modal>
+          </DialogContent>
+        </Dialog>
         <ConfirmationDialog
           open={isDialogOpen}
           onClose={handleDialogClose}
@@ -1720,12 +1683,16 @@ export default function CollegeForm() {
         />
 
         {/* View College Details Modal */}
-        <Modal
+        <Dialog
           isOpen={viewModalOpen}
           onClose={handleCloseViewModal}
-          title='College Details'
-          className='max-w-4xl max-h-[90vh] overflow-y-auto'
+          className='max-w-7xl'
         >
+          <DialogContent className='max-h-[90vh] overflow-y-auto'>
+            <DialogHeader>
+              <DialogTitle>College Details</DialogTitle>
+              <DialogClose onClick={handleCloseViewModal} />
+            </DialogHeader>
           {loadingView ? (
             <div className='flex items-center justify-center py-8'>
               <div className='text-gray-500'>Loading...</div>
@@ -1733,7 +1700,7 @@ export default function CollegeForm() {
           ) : viewCollegeData ? (
             <div className='space-y-6'>
               {/* Logo and Basic Info */}
-              <div className='flex items-start gap-4 border-b pb-4'>
+              <div className='flex items-start gap-4 border-b pb-4 mt-4'>
                 {viewCollegeData.college_logo && (
                   <img
                     src={viewCollegeData.college_logo}
@@ -1862,28 +1829,10 @@ export default function CollegeForm() {
                 </div>
               )}
 
-              {/* Status Flags */}
-              <div className='flex gap-4 pt-4 border-t'>
-                <div>
-                  <span className='text-sm font-medium text-gray-700'>
-                    Featured:{' '}
-                  </span>
-                  <span className='text-sm text-gray-600'>
-                    {viewCollegeData.isFeatured === 1 ? 'Yes' : 'No'}
-                  </span>
-                </div>
-                <div>
-                  <span className='text-sm font-medium text-gray-700'>
-                    Pinned:{' '}
-                  </span>
-                  <span className='text-sm text-gray-600'>
-                    {viewCollegeData.pinned === 1 ? 'Yes' : 'No'}
-                  </span>
-                </div>
-              </div>
             </div>
           ) : null}
-        </Modal>
+          </DialogContent>
+        </Dialog>
 
         {/*table*/}
         <Table
@@ -1898,12 +1847,14 @@ export default function CollegeForm() {
       </div>
 
       {/* Create Credentials Modal */}
-      <Modal
+      <Dialog
         isOpen={credentialsModalOpen}
         onClose={handleCloseCredentialsModal}
-        title='Create College Credentials'
-        className='max-w-md'
       >
+        <DialogContent className='max-w-md'>
+          <DialogHeader>
+            <DialogTitle>Create College Credentials</DialogTitle>
+          </DialogHeader>
         <form onSubmit={handleCreateCredentials} className='space-y-4'>
           <div className='space-y-2'>
             <Label htmlFor='first-name'>First Name</Label>
@@ -2042,7 +1993,8 @@ export default function CollegeForm() {
             </Button>
           </div>
         </form>
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

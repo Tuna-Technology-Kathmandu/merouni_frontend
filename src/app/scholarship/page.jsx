@@ -1,5 +1,6 @@
 'use client'
-import React, { useEffect, useState, useLayoutEffect } from 'react'
+import React, { useEffect, useState, useLayoutEffect, useCallback } from 'react'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { Search, Award, Filter, X } from 'lucide-react'
 import { Select } from '@/ui/shadcn/select'
 import EmptyState from '@/ui/shadcn/EmptyState'
@@ -12,7 +13,6 @@ import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
-import { useRouter } from 'next/navigation'
 import ScholarshipCard from '@/ui/molecules/cards/ScholarshipCard'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
@@ -20,17 +20,37 @@ import 'react-toastify/dist/ReactToastify.css'
 
 const ScholarshipPage = () => {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
   const user = useSelector((state) => state.user?.data)
+
+  // Initialization from URL
+  const initialSearch = searchParams.get('q') || ''
+  const initialCategory = searchParams.get('category') || ''
+
   const [scholarships, setScholarships] = useState([])
   const [loading, setLoading] = useState(false)
-  const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch)
+  const [searchTerm, setSearchTerm] = useState(initialSearch)
   const [categories, setCategories] = useState([])
   const [filters, setFilters] = useState({
-    category: ''
+    category: initialCategory
   })
   const [isScrolling, setIsScrolling] = useState(false)
   const [applyingIds, setApplyingIds] = useState(new Set())
+
+  // URL Sync Helper
+  const updateURL = useCallback((params) => {
+    const newParams = new URLSearchParams(searchParams.toString())
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        newParams.set(key, value)
+      } else {
+        newParams.delete(key)
+      }
+    })
+    router.push(`${pathname}?${newParams.toString()}`, { scroll: false })
+  }, [searchParams, pathname, router])
 
   // Fetch categories on mount
   useEffect(() => {
@@ -45,28 +65,47 @@ const ScholarshipPage = () => {
     getCategories()
   }, [])
 
-  // Debounce search
+  // Sync state with URL params
+  useEffect(() => {
+    const q = searchParams.get('q') || ''
+    const cat = searchParams.get('category') || ''
+    setSearchTerm(q)
+    setDebouncedSearch(q)
+    setFilters({ category: cat })
+  }, [searchParams])
+
+  // Scroll to top on URL change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [searchParams])
+
+  // Debounce search (Updates URL)
   useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedSearch(searchTerm)
+      if (searchTerm !== initialSearch) {
+        updateURL({ q: searchTerm })
+      }
     }, 500)
-
     return () => clearTimeout(handler)
-  }, [searchTerm])
+  }, [searchTerm, initialSearch, updateURL])
 
-  // Reset page equivalent (if we had pagination)
-  useLayoutEffect(() => {
-    // If we add pagination later, reset it here
-  }, [debouncedSearch, filters])
+  // Category filter updates URL
+  useEffect(() => {
+    if (filters.category !== initialCategory) {
+      updateURL({ category: filters.category })
+    }
+  }, [filters.category, initialCategory, updateURL])
 
-  // Fetch scholarships
+  // Fetch scholarships when URL parameters change
   useEffect(() => {
     const getScholarships = async () => {
+      const q = searchParams.get('q') || ''
+      const cat = searchParams.get('category') || ''
       setLoading(true)
       try {
         const response = await fetchScholarships({
-          q: debouncedSearch,
-          ...filters
+          q,
+          category: cat
         })
         setScholarships(response.scholarships || [])
       } catch (error) {
@@ -76,7 +115,7 @@ const ScholarshipPage = () => {
       }
     }
     getScholarships()
-  }, [debouncedSearch, filters])
+  }, [searchParams])
 
   const clearFilters = () => {
     setSearchTerm('')

@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState, useCallback, useLayoutEffect, useMemo } from 'react'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { debounce } from 'lodash'
 import { fetchDegrees, getDiscipline } from './actions'
 import { Search, BookOpen, X } from 'lucide-react'
@@ -91,32 +92,82 @@ const FilterSection = React.memo(function FilterSection({
 })
 
 const DegreePage = () => {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+
+  // Initialization from search params
+  const initialSearch = searchParams.get('q') || ''
+  const initialDisciplines = searchParams.get('disciplines')?.split(',').map(Number).filter(Boolean) || []
+  const initialPage = parseInt(searchParams.get('page')) || 1
+
   const [degrees, setDegrees] = useState([])
   const [isScrolling, setIsScrolling] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [searchTerm, setSearchTerm] = useState(initialSearch)
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch)
 
   const [pagination, setPagination] = useState({
-    currentPage: 1,
+    currentPage: initialPage,
     totalPages: 1,
     totalCount: 0
   })
   const [isSearching, setIsSearching] = useState(false)
-  const [selectedDisciplines, setSelectedDisciplines] = useState([])
+  const [selectedDisciplines, setSelectedDisciplines] = useState(initialDisciplines)
   const [filteredDisciplines, setFilteredDisciplines] = useState([])
   const [isDisciplinesLoading, setIsDisciplinesLoading] = useState(false)
   const [filterInput, setFilterInput] = useState('')
 
-  // Debounce search
+  // URL Sync Helper
+  const updateURL = useCallback((params) => {
+    const newParams = new URLSearchParams(searchParams.toString())
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        newParams.set(key, value)
+      } else {
+        newParams.delete(key)
+      }
+    })
+    router.push(`${pathname}?${newParams.toString()}`, { scroll: false })
+  }, [searchParams, pathname, router])
+
+  // Sync state with URL
+  useEffect(() => {
+    const q = searchParams.get('q') || ''
+    const discs = searchParams.get('disciplines')?.split(',').map(Number).filter(Boolean) || []
+    const pg = parseInt(searchParams.get('page')) || 1
+
+    setSearchTerm(q)
+    setDebouncedSearch(q)
+    setSelectedDisciplines(discs)
+    setPagination(prev => ({ ...prev, currentPage: pg }))
+  }, [searchParams])
+
+  // Scroll to top on URL change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [searchParams])
+
+  // Debounce search (Updates URL)
   useEffect(() => {
     setIsSearching(true)
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm)
       setIsSearching(false)
+      if (searchTerm !== initialSearch) {
+        updateURL({ q: searchTerm, page: 1 })
+      }
     }, 500)
     return () => clearTimeout(handler)
-  }, [searchTerm])
+  }, [searchTerm, initialSearch, updateURL])
+
+  // Disciplines update URL
+  useEffect(() => {
+    const currentDiscsStr = selectedDisciplines.join(',')
+    if (currentDiscsStr !== (searchParams.get('disciplines') || '')) {
+      updateURL({ disciplines: currentDiscsStr, page: 1 })
+    }
+  }, [selectedDisciplines, searchParams, updateURL])
 
   const fetchDisciplinesList = useCallback(async (q = '') => {
     setIsDisciplinesLoading(true)
@@ -147,23 +198,18 @@ const DegreePage = () => {
     }
   }, [])
 
-  // Reset to page 1 when search or filters change
-  useLayoutEffect(() => {
-    setPagination((prev) => ({ ...prev, currentPage: 1 }))
-  }, [debouncedSearch, selectedDisciplines])
-
-  // Fetch when page, search or filters change
+  // Fetch when searchParams change
   useEffect(() => {
-    loadDegrees(pagination.currentPage, debouncedSearch, selectedDisciplines)
-  }, [debouncedSearch, pagination.currentPage, selectedDisciplines])
+    const q = searchParams.get('q') || ''
+    const discs = searchParams.get('disciplines')?.split(',').map(Number).filter(Boolean) || []
+    const pg = parseInt(searchParams.get('page')) || 1
+    loadDegrees(pg, q, discs)
+  }, [searchParams, loadDegrees])
 
   // Handle page change
   const handlePageChange = (page) => {
     if (page > 0 && page <= pagination.totalPages) {
-      setIsScrolling(true)
-      setPagination((prev) => ({ ...prev, currentPage: page }))
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-      setTimeout(() => setIsScrolling(false), 500)
+      updateURL({ page })
     }
   }
 
@@ -187,30 +233,47 @@ const DegreePage = () => {
       <Navbar />
       <div className='min-h-screen bg-gray-50/50 py-12 px-6 font-sans'>
         <div className='max-w-7xl mx-auto'>
-          {/* Header Section */}
-          <div className='flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12'>
-            <div>
-              <div className='relative inline-block mb-3'>
-                <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight'>
-                  Explore <span className='text-[#0A6FA7]'>Degrees</span>
-                </h1>
-                <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
+
+          {/* Search Bar Section */}
+          <div className='flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-8 border-b border-gray-100 pb-12'>
+            <div className='flex-1 space-y-6 w-full'>
+              <div className='flex items-center gap-4 mb-2'>
+                <h2 className='text-3xl font-extrabold text-gray-900 tracking-tight'>
+                  Degrees
+                </h2>
+                <span className='bg-blue-50 text-[#0A6FA7] px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider'>
+                  {pagination.totalCount || '0'} Results
+                </span>
+              </div>
+
+              <div className='flex bg-white items-center rounded-2xl border border-gray-300 shadow-sm focus-within:ring-2 focus-within:ring-[#0A6FA7] focus-within:border-[#0A6FA7] transition-all px-5 py-2.5 relative w-full group'>
+                <Search className='w-5 h-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors' />
+                <input
+                  type='text'
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder='Degree title or short name...'
+                  className='w-full px-4 py-2 bg-transparent text-base font-medium outline-none placeholder:text-gray-400'
+                />
+                <div className='absolute right-5 top-1/2 -translate-y-1/2 flex items-center gap-3'>
+                  {isSearching && (
+                    <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-[#0A6FA7]'></div>
+                  )}
+                  {searchTerm && (
+                    <button
+                      onClick={clearFilters}
+                      className='p-1 hover:bg-gray-100 rounded-full text-gray-400 hover:text-red-500 transition-all'
+                      title='Clear search'
+                    >
+                      <X className='w-5 h-5' />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-
-            {/* Clear Search Button */}
-            {searchTerm && (
-              <button
-                onClick={clearFilters}
-                className='flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors'
-              >
-                <X className='w-4 h-4' />
-                Clear Search
-              </button>
-            )}
           </div>
 
-          {/* Results Summary & Search Bar joined */}
+          {/* Sidebar & Content Section */}
           <div className='flex flex-col lg:flex-row gap-12'>
             {/* Sidebar */}
             <div className='lg:w-[320px] space-y-8 shrink-0 hidden lg:block sticky top-24 self-start max-h-[calc(100vh-160px)] overflow-y-auto pr-2 sidebar-scrollbar'>
@@ -240,29 +303,6 @@ const DegreePage = () => {
 
             {/* Main Content */}
             <div className='flex-1'>
-              <div className='bg-white rounded-[32px] p-8 shadow-[0_2px_15px_rgba(0,0,0,0.02)] border border-gray-100 mb-12'>
-                <div className='max-w-2xl'>
-                  <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
-                    Search Degrees
-                  </label>
-                  <div className='relative group'>
-                    <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors' />
-                    <input
-                      type='text'
-                      placeholder='Degree title or short name...'
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      value={searchTerm}
-                      className='w-full px-5 py-3.5 pl-12 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#0A6FA7]/10 focus:border-[#0A6FA7] focus:bg-white transition-all text-sm font-semibold text-gray-900 placeholder-gray-400'
-                    />
-                    {isSearching && (
-                      <div className='absolute right-4 top-1/2 -translate-y-1/2'>
-                        <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-[#0A6FA7]'></div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
               {!loading && !isScrolling && (
                 <div className='mb-8 px-2'>
                   <p className='text-sm text-gray-500 font-semibold'>

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { debounce } from 'lodash'
 import { Search, Building2, School } from 'lucide-react'
 import { FaExpandAlt } from 'react-icons/fa'
@@ -22,7 +23,7 @@ const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
     })
 
     const body = {
-      program_id: filters.degree || [],
+      degree_ids: filters.degree || [],
       state: filters.state || [],
       university: filters.uni || [],
       type: filters.type || []
@@ -102,36 +103,36 @@ const searchColleges = async (query) => {
 
     return {
       colleges,
-      pagination: data.pagination || {
+      pagination: {
         currentPage: 1,
-        totalPages: 0,
-        totalCount: 0
+        totalPages: 1,
+        totalCount: colleges.length
       }
     }
   } catch (error) {
     console.error('Failed to search colleges:', error)
     return {
       colleges: [],
-      pagination: { currentPage: 1, totalPages: 0, totalCount: 0 }
+      pagination: { currentPage: 1, totalPages: 1, totalCount: 0 }
     }
   }
 }
 
-const getPrograms = async (searchQuery = '') => {
+const getDegrees = async (searchQuery = '') => {
   try {
     const queryParams = new URLSearchParams()
     if (searchQuery) queryParams.append('q', searchQuery)
-    const url = `${process.env.baseUrl}/program?${queryParams.toString()}`
+    const url = `${process.env.baseUrl}/degree?${queryParams.toString()}`
     const response = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       cache: 'no-store'
     })
-    if (!response.ok) throw new Error('Failed to fetch programs')
+    if (!response.ok) throw new Error('Failed to fetch degrees')
     const data = await response.json()
     return data.items || []
   } catch (error) {
-    console.error('Error fetching programs:', error)
+    console.error('Error fetching degrees:', error)
     return []
   }
 }
@@ -236,23 +237,31 @@ const FilterSection = React.memo(function FilterSection({
 
 
 const CollegeFinder = () => {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+
+  // Initial values from URL
+  const initialSearch = searchParams.get('q') || ''
+  const initialPage = parseInt(searchParams.get('page')) || 1
+
   const [universities, setUniversities] = useState([])
   const [pagination, setPagination] = useState({
     totalPages: 1,
-    currentPage: 1,
+    currentPage: initialPage,
     totalCount: 0
   })
   const [isLoading, setIsLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState(initialSearch)
   const [isSearching, setIsSearching] = useState(false)
 
   const [filterInputs, setFilterInputs] = useState({
-    program: '',
+    degree: '',
     affiliation: '',
     district: '',
     instituteType: ''
   })
-  const [filteredPrograms, setFilteredPrograms] = useState([])
+  const [filteredDegrees, setFilteredDegrees] = useState([])
   const [filteredAffiliations, setFilteredAffiliations] = useState([])
   const [selectedFilters, setSelectedFilters] = useState({
     degree: [],
@@ -261,11 +270,24 @@ const CollegeFinder = () => {
     type: []
   })
 
-  const [isProgramsLoading, setIsProgramsLoading] = useState(false)
+  const [isDegreesLoading, setIsDegreesLoading] = useState(false)
   const [isAffiliationLoading, setIsAffiliationLoading] = useState(false)
 
   const user = useSelector((state) => state.user.data)
   const [wishlistCollegeIds, setWishlistCollegeIds] = useState(new Set())
+
+  // URL Sync Helper
+  const updateURL = useCallback((params) => {
+    const newParams = new URLSearchParams(searchParams.toString())
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        newParams.set(key, value)
+      } else {
+        newParams.delete(key)
+      }
+    })
+    router.push(`${pathname}?${newParams.toString()}`, { scroll: false })
+  }, [searchParams, pathname, router])
 
   useEffect(() => {
     const fetchWishlist = async () => {
@@ -289,11 +311,11 @@ const CollegeFinder = () => {
     fetchWishlist()
   }, [user?.id])
 
-  const fetchDisciplines = useCallback(async (q = '') => {
-    setIsDisciplineLoading(true)
-    const disciplines = await getDiscipline(q)
-    setFilteredDisciplines(disciplines.map((d) => ({ id: d.id, name: d.title })))
-    setIsDisciplineLoading(false)
+  const fetchDegrees = useCallback(async (q = '') => {
+    setIsDegreesLoading(true)
+    const degrees = await getDegrees(q)
+    setFilteredDegrees(degrees.map((p) => ({ id: p.id, name: p.title })))
+    setIsDegreesLoading(false)
   }, [])
 
   const fetchAffiliations = useCallback(async (q = '') => {
@@ -305,8 +327,8 @@ const CollegeFinder = () => {
 
   useEffect(() => {
     const init = async () => {
-      const programs = await getPrograms()
-      setFilteredPrograms(programs.map((p) => ({ id: p.id, name: p.title })))
+      const degrees = await getDegrees()
+      setFilteredDegrees(degrees.map((p) => ({ id: p.id, name: p.title })))
 
       const unis = await getUniversity()
       setFilteredAffiliations(unis.map((u) => ({ name: u.fullname })))
@@ -315,28 +337,75 @@ const CollegeFinder = () => {
   }, [])
 
   const fetchCollegesData = useCallback(
-    async (page = 1) => {
+    async () => { // Removed page parameter
+      // This function is now primarily for fetching based on selectedFilters when no search query is active
+      // The actual page number will be read from searchParams within the useEffect that calls this.
+      // It's kept for clarity, but its direct usage for pagination is now via the main data fetching useEffect.
+      // The page parameter will be passed from the useEffect that calls this.
+      // This function will be called by the main data fetching useEffect, which will get the page from searchParams.
+    },
+    [selectedFilters]
+  )
+
+  // Sync state on URL change (e.g. Back button)
+  useEffect(() => {
+    const q = searchParams.get('q') || ''
+    const pg = parseInt(searchParams.get('page')) || 1
+    setSearchQuery(q)
+    setPagination(prev => ({ ...prev, currentPage: pg }))
+  }, [searchParams])
+
+  // Scroll to top on URL change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [searchParams])
+
+  const debouncedCollegeSearch = useMemo(
+    () =>
+      debounce(async (query) => {
+        updateURL({ q: query, page: 1 })
+      }, 500),
+    [updateURL]
+  )
+
+  useEffect(() => {
+    if (searchQuery !== initialSearch) {
+      debouncedCollegeSearch(searchQuery)
+      return () => debouncedCollegeSearch.cancel()
+    }
+  }, [searchQuery, initialSearch, debouncedCollegeSearch])
+
+  // Fetch data when URL changes
+  useEffect(() => {
+    const fetchData = async () => {
+      const q = searchParams.get('q') || ''
+      const pg = parseInt(searchParams.get('page')) || 1
+
       setIsLoading(true)
       try {
-        const data = await fetchCollegesFromAPI(page, selectedFilters)
-        setUniversities(data.colleges)
-        setPagination(data.pagination)
+        if (q) {
+          setIsSearching(true)
+          const results = await searchColleges(q)
+          setUniversities(results.colleges)
+          setPagination(results.pagination)
+          setIsSearching(false)
+        } else {
+          const data = await fetchCollegesFromAPI(pg, selectedFilters)
+          setUniversities(data.colleges)
+          setPagination(data.pagination)
+        }
       } catch (err) {
         setUniversities([])
       } finally {
         setIsLoading(false)
       }
-    },
-    [selectedFilters]
-  )
-
-  useEffect(() => {
-    fetchCollegesData(1)
-  }, [fetchCollegesData])
+    }
+    fetchData()
+  }, [searchParams, selectedFilters])
 
   const handleFilterSearchChange = (field, value) => {
     setFilterInputs((prev) => ({ ...prev, [field]: value }))
-    if (field === 'program') fetchPrograms(value)
+    if (field === 'degree') fetchDegrees(value)
     if (field === 'affiliation') fetchAffiliations(value)
   }
 
@@ -351,27 +420,6 @@ const CollegeFinder = () => {
       }
     })
   }
-
-  const debouncedCollegeSearch = useMemo(
-    () =>
-      debounce(async (query) => {
-        setIsSearching(true)
-        const results = await searchColleges(query)
-        setUniversities(results.colleges)
-        setPagination(results.pagination)
-        setIsSearching(false)
-      }, 500),
-    []
-  )
-
-  useEffect(() => {
-    if (searchQuery) {
-      debouncedCollegeSearch(searchQuery)
-      return () => debouncedCollegeSearch.cancel()
-    } else {
-      fetchCollegesData(1)
-    }
-  }, [searchQuery, fetchCollegesData])
 
   const filteredDistricts = useMemo(
     () =>
@@ -393,9 +441,7 @@ const CollegeFinder = () => {
 
   const handlePageChange = (page) => {
     if (page > 0 && page <= pagination.totalPages) {
-      setPagination((prev) => ({ ...prev, currentPage: page }))
-      fetchCollegesData(page)
-      window.scrollTo({ top: 300, behavior: 'smooth' })
+      updateURL({ page })
     }
   }
 
@@ -421,11 +467,20 @@ const CollegeFinder = () => {
               placeholder='Search by college name, city or state...'
               className='w-full px-4 py-2 bg-transparent text-base font-medium outline-none placeholder:text-gray-400'
             />
-            {isSearching && (
-              <div className='absolute right-5 top-1/2 -translate-y-1/2'>
+            <div className='absolute right-5 top-1/2 -translate-y-1/2 flex items-center gap-3'>
+              {isSearching && (
                 <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-[#0A70A7]'></div>
-              </div>
-            )}
+              )}
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className='p-1 hover:bg-gray-100 rounded-full text-gray-400 hover:text-red-500 transition-all'
+                  title='Clear search'
+                >
+                  <X className='w-5 h-5' />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -440,7 +495,7 @@ const CollegeFinder = () => {
                 setSearchQuery('')
                 setSelectedFilters({ state: [], degree: [], uni: [], type: [] })
                 setFilterInputs({
-                  program: '',
+                  degree: '',
                   affiliation: '',
                   district: '',
                   instituteType: ''
@@ -451,14 +506,14 @@ const CollegeFinder = () => {
             </button>
           </div>
           <FilterSection
-            title='Program'
-            inputField='program'
-            options={filteredPrograms}
+            title='Degree'
+            inputField='degree'
+            options={filteredDegrees}
             selectedValues={selectedFilters.degree}
             onCheckboxChange={(val) => handleFilterChange('degree', val)}
-            defaultValue={filterInputs.program}
+            defaultValue={filterInputs.degree}
             onSearchChange={handleFilterSearchChange}
-            isLoading={isProgramsLoading}
+            isLoading={isDegreesLoading}
           />
           <FilterSection
             title='District'

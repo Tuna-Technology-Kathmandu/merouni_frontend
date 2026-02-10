@@ -11,7 +11,8 @@ import {
   FaGraduationCap,
   FaHandshake,
   FaTags,
-  FaUniversity
+  FaUniversity,
+  FaGlobe
 } from 'react-icons/fa'
 import { HiOutlineUsers } from 'react-icons/hi'
 import { IoSchoolSharp, IoSettingsOutline } from 'react-icons/io5'
@@ -35,6 +36,38 @@ export const menuItems = [
         label: 'Home',
         href: '/dashboard',
         visible: ['admin', 'editor', 'student', 'institution', 'consultancy']
+      },
+      {
+        icon: <FaGlobe className='text-xl' />,
+        label: 'MeroUni',
+        href: null,
+        visible: ['admin', 'editor'],
+        submenus: [
+          {
+            icon: <MdPermContactCalendar className='text-lg' />,
+            label: 'Messages',
+            href: '/dashboard/contactus',
+            visible: ['admin']
+          },
+          {
+            icon: <FaBriefcase className='text-lg' />,
+            label: 'Careers',
+            href: '/dashboard/career',
+            visible: ['admin', 'editor']
+          },
+          {
+            icon: <PlayCircle className='text-lg' />,
+            label: 'Videos',
+            href: '/dashboard/videos',
+            visible: ['admin', 'editor']
+          },
+          {
+            icon: <FaBuilding className='text-lg' />,
+            label: 'Banner',
+            href: '/dashboard/banner',
+            visible: ['admin', 'editor']
+          }
+        ]
       },
       {
         icon: <VscReferences />,
@@ -80,12 +113,7 @@ export const menuItems = [
         href: '/dashboard/scholarship',
         visible: ['admin', 'editor']
       },
-      {
-        icon: <FaBuilding className='text-xl' />,
-        label: 'Banner',
-        href: '/dashboard/banner',
-        visible: ['admin', 'editor']
-      },
+
 
       {
         icon: <IoSchoolSharp className='text-xl' />,
@@ -132,12 +160,7 @@ export const menuItems = [
         visible: ['admin', 'editor']
       },
 
-      {
-        icon: <PlayCircle className='text-xl' />,
-        label: 'Videos',
-        href: '/dashboard/videos',
-        visible: ['admin', 'editor']
-      },
+
       {
         icon: <MdOutlineDescription className='text-xl' />,
         label: 'Material',
@@ -186,24 +209,14 @@ export const menuItems = [
         href: '/dashboard/consultancy',
         visible: ['consultancy']
       },
-      {
-        icon: <MdPermContactCalendar className='text-xl' />,
-        label: 'Contact Us',
-        href: '/dashboard/contactus',
-        visible: ['admin']
-      },
+
       {
         icon: <HiOutlineUsers className='text-xl' />,
         label: 'Users',
         href: '/dashboard/users',
         visible: ['admin']
       },
-      {
-        icon: <FaBriefcase className='text-xl' />,
-        label: 'MeroUni Careers',
-        href: '/dashboard/career',
-        visible: ['admin', 'editor']
-      },
+
       {
         icon: <Lightbulb className='text-xl' />,
         label: 'Skill Based Courses',

@@ -12,7 +12,7 @@ import Colleges from '../../components/Frontpage/Colleges'
 import CollegeRankings from '../../components/Frontpage/CollegeRankings'
 import Degree from '../../components/Frontpage/Degree'
 import Event from '../../components/Frontpage/Event'
-import ScrollToTop from '../../ui/molecules/ScrollToTop'
+import ScrollToTop from '../../ui/molecules/common/ScrollToTop'
 import SideBanner from '../../components/Frontpage/SideBanner'
 
 const Page = () => {

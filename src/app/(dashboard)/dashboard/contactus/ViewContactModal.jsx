@@ -1,6 +1,6 @@
 'use client'
 
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 
 export default function ViewContactModal({ isOpen, onClose, contact }) {
@@ -18,12 +18,16 @@ export default function ViewContactModal({ isOpen, onClose, contact }) {
     const status = contact.status || 'new'
 
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title="Contact Details"
             className="max-w-2xl"
         >
+            <DialogHeader>
+                <DialogTitle>Contact Details</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
             <div className="space-y-6">
                 {/* Header Info */}
                 <div className="grid grid-cols-2 gap-4 border-b pb-4">
@@ -63,6 +67,7 @@ export default function ViewContactModal({ isOpen, onClose, contact }) {
                     <Button onClick={onClose} variant="outline">Close</Button>
                 </div>
             </div>
-        </Modal>
+            </DialogContent>
+        </Dialog>
     )
 }

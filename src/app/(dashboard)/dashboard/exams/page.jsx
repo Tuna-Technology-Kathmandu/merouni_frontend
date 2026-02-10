@@ -12,7 +12,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import { useDebounce } from 'use-debounce'
 import { fetchUniversities, fetchLevel } from './actions'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Modal } from '../../../../ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { Button } from '../../../../ui/shadcn/button'
@@ -600,13 +600,17 @@ export default function ExamManager() {
         </div>
       </div>
 
-      {/* Form Modal */}
-      <Modal
+      {/* Form Dialog */}
+      <Dialog
         isOpen={isOpen}
         onClose={handleModalClose}
-        title={editingId ? 'Edit Exam' : 'Add Exam'}
         className='max-w-5xl'
       >
+        <DialogHeader>
+          <DialogTitle>{editingId ? 'Edit Exam' : 'Add Exam'}</DialogTitle>
+          <DialogClose onClick={handleModalClose} />
+        </DialogHeader>
+        <DialogContent className='max-h-[90vh] overflow-y-auto'>
         <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
           <form
             onSubmit={handleSubmit}
@@ -1057,7 +1061,8 @@ export default function ExamManager() {
             </div>
           </form>
         </div>
-      </Modal>
+        </DialogContent>
+      </Dialog>
 
       <ConfirmationDialog
         open={isDialogOpen}

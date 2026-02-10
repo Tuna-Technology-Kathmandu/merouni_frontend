@@ -79,11 +79,11 @@ const ConsultancyCard = ({ consultancy }) => {
                     key={i}
                     className='inline-flex px-2 py-0.5 rounded-md bg-gray-50 text-xs font-medium text-gray-600'
                   >
-                    {d.country}
+                    {typeof d === 'string' ? d : d.country}
                   </span>
                 ))}
                 {destinations.length > 3 && (
-                  <span className='text-xs text-gray-400'>
+                  <span className='inline-flex px-2 py-0.5 rounded-md bg-blue-50 text-xs font-medium text-[#0A6FA7]'>
                     +{destinations.length - 3}
                   </span>
                 )}

@@ -7,6 +7,7 @@ import { useDebounce } from 'use-debounce'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import Pagination from '../blogs/components/Pagination'
 import {
   fetchFaculties,
@@ -19,6 +20,10 @@ import SingleExam from './components/SingleExam'
 import { formatDate } from '@/utils/date.util'
 
 export default function ExamsPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+
   const [exams, setExams] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -101,6 +106,11 @@ export default function ExamsPage() {
   useEffect(() => {
     fetchExams()
   }, [fetchExams])
+
+  // Scroll to top on URL or pagination change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [searchParams, pagination.currentPage])
 
   // Reset to page 1 whenever filters change
   useEffect(() => {

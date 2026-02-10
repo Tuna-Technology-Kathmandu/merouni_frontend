@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
-import dynamic from 'next/dynamic'
-import { Modal } from '@/ui/molecules/Modal'
+import { useForm, useFieldArray, Controller } from 'react-hook-form'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
@@ -13,9 +12,7 @@ import { fetchAllCourse, fetchLevel } from '../actions'
 import { useDebounce } from 'use-debounce'
 import { authFetch } from '@/app/utils/authFetch'
 
-const CKUni = dynamic(() => import('../../component/CKUni'), {
-    ssr: false
-})
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 
 const RequiredLabel = ({ children, htmlFor }) => (
     <Label htmlFor={htmlFor}>
@@ -275,12 +272,16 @@ const UniversityFormModal = ({
     }
 
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title={isEditing ? 'Edit University' : 'Add University'}
             className='max-w-5xl'
         >
+            <DialogHeader>
+                <DialogTitle>{isEditing ? 'Edit University' : 'Add University'}</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
             <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
                 <form
                     onSubmit={handleSubmit(handleFormSubmit)}
@@ -344,10 +345,16 @@ const UniversityFormModal = ({
                             </div>
                             <div className='mt-4'>
                                 <Label>Description</Label>
-                                <CKUni
-                                    id='editor-content'
-                                    initialData={getValues('description')}
-                                    onChange={(data) => setValue('description', data)}
+                                <Controller
+                                    name='description'
+                                    control={control}
+                                    render={({ field }) => (
+                                        <TipTapEditor
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            placeholder='Enter university description...'
+                                        />
+                                    )}
                                 />
                             </div>
                         </div>
@@ -658,7 +665,8 @@ const UniversityFormModal = ({
                     </div>
                 </form>
             </div>
-        </Modal>
+            </DialogContent>
+        </Dialog>
     )
 }
 

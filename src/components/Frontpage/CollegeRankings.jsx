@@ -158,16 +158,16 @@ const CollegeRankings = () => {
                                 {ranking.rank}
                               </span>
                               {college.college_logo ? (
-                                <div className='relative w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100'>
+                                <div className='relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-50'>
                                   <Image
                                     src={college.college_logo}
                                     alt=''
                                     fill
-                                    className='object-cover'
+                                    className='object-contain'
                                   />
                                 </div>
                               ) : (
-                                <div className='w-8 h-8 rounded-lg bg-gray-100 flex-shrink-0 flex items-center justify-center text-xs font-medium text-gray-400'>
+                                <div className='w-12 h-12 rounded-lg bg-gray-50 flex-shrink-0 flex items-center justify-center text-xs font-medium text-gray-400'>
                                   {college.name?.charAt(0) || '?'}
                                 </div>
                               )}

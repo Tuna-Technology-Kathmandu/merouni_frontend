@@ -12,11 +12,13 @@ import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Search } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
-import { Modal } from '../../../../ui/molecules/Modal'
-import Loading from '../../../../ui/molecules/Loading'
-import Table from '../../../../ui/molecules/Table'
-import { createColumns } from './columns'
 import ExportModal from './ExportModal'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import SearchInput from '@/ui/molecules/SearchInput'
 
@@ -412,7 +414,7 @@ export default function UsersManager() {
         </div>
       </div>
 
-      <Modal
+      <Dialog
         isOpen={isFormOpen}
         onClose={() => {
           setIsFormOpen(false)
@@ -436,9 +438,11 @@ export default function UsersManager() {
             }
           })
         }}
-        title={editingId ? 'Edit User' : 'Add User'}
-        className='max-w-xl'
       >
+        <DialogContent className='max-w-xl'>
+          <DialogHeader>
+            <DialogTitle>{editingId ? 'Edit User' : 'Add User'}</DialogTitle>
+          </DialogHeader>
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div className='grid grid-cols-2 gap-4'>
             <div>
@@ -588,7 +592,8 @@ export default function UsersManager() {
             </Button>
           </div>
         </form>
-      </Modal>
+        </DialogContent>
+      </Dialog>
 
       <ExportModal
         isOpen={isExportModalOpen}

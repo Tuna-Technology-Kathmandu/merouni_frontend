@@ -1,6 +1,6 @@
 'use client'
 
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import { formatDate } from '@/utils/date.util'
 
@@ -10,12 +10,16 @@ export default function ViewDegree({ isOpen, onClose, degree }) {
     
     return (
 
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title="Degree Details"
             className="max-w-2xl"
         >
+            <DialogHeader>
+                <DialogTitle>Degree Details</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
             <div className="p-1 space-y-6">
                 {/* Cover Image */}
                 {degree.featured_image && (
@@ -43,6 +47,16 @@ export default function ViewDegree({ isOpen, onClose, degree }) {
                         </div>
                     </div>
 
+                    {degree.content && (
+                        <div className="md:col-span-2">
+                            <h3 className="text-sm font-medium text-gray-500">Content</h3>
+                            <div 
+                                className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100 prose max-w-none"
+                                dangerouslySetInnerHTML={{ __html: degree.content }}
+                            />
+                        </div>
+                    )}
+
                     <div>
                         <h3 className="text-sm font-medium text-gray-500">Created At</h3>
                         <p className="mt-1 text-gray-900">{degree.createdAt ? formatDate(degree.createdAt) : 'N/A'}</p>
@@ -57,6 +71,7 @@ export default function ViewDegree({ isOpen, onClose, degree }) {
                     </Button>
                 </div>
             </div>
-        </Modal>
+            </DialogContent>
+        </Dialog>
     )
 }

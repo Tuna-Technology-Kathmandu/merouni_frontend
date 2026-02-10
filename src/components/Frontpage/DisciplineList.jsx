@@ -1,15 +1,15 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import services from '../../app/apiService'
-import { Modal } from '@/ui/molecules/Modal'
-import { BookOpen, User } from 'lucide-react'
+import { BookOpen } from 'lucide-react'
 import { THEME_BLUE } from '@/constants/constants'
 
 const DisciplineList = () => {
+  const router = useRouter()
   const [disciplines, setDisciplines] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [selectedDiscipline, setSelectedDiscipline] = useState(null)
 
   useEffect(() => {
     fetchDisciplineList()
@@ -64,16 +64,10 @@ const DisciplineList = () => {
             disciplines.map((item) => (
               <div
                 key={item.id}
-                onClick={() =>
-                  setSelectedDiscipline({
-                    title: item?.title || '',
-                    description: item?.description || '',
-                    image: item?.featured_image
-                  })
-                }
+                onClick={() => router.push(`/disciplines/${item.slug}`)}
                 className='group cursor-pointer bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 transform hover:-translate-y-1'
               >
-                <div className='relative h-48 overflow-hidden bg-gray-100'>
+                <div className='relative aspect-[16/10] overflow-hidden bg-gray-100'>
                   {item.featured_image ? (
                     <img
                       src={item.featured_image}
@@ -88,9 +82,6 @@ const DisciplineList = () => {
                   <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300'></div>
 
                   <div className='absolute bottom-4 left-4 right-4'>
-                    <span className='inline-block px-2 py-1 bg-white/20 backdrop-blur-md rounded-lg text-xs font-medium text-white mb-2 border border-white/10'>
-                      Discipline
-                    </span>
                     <h3 className='text-lg font-bold text-white leading-tight group-hover:text-[#387cae] transition-colors'>
                       {item.title}
                     </h3>
@@ -99,11 +90,11 @@ const DisciplineList = () => {
 
                 <div className='p-4'>
                   <p className='text-sm text-gray-500 line-clamp-2'>
-                    {item.description || 'No description available for this discipline.'}
+                    {item.description || `${item.title} discipline`}
                   </p>
                   <div className='mt-4 pt-3 border-t border-gray-50 flex items-center justify-between'>
                     <span className='text-xs font-semibold group-hover:underline' style={{ color: THEME_BLUE }}>
-                      Read More
+                      View Degrees
                     </span>
                     <div className='w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-[#387cae] transition-colors'>
                       <svg className="w-3 h-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,36 +113,6 @@ const DisciplineList = () => {
           )}
         </div>
       </div>
-
-      <Modal
-        isOpen={!!selectedDiscipline}
-        onClose={() => setSelectedDiscipline(null)}
-        title={selectedDiscipline?.title}
-        className='max-w-xl'
-      >
-        <div className='space-y-4'>
-          {selectedDiscipline?.image && (
-            <div className='w-full h-56 rounded-xl overflow-hidden mb-4 bg-gray-100'>
-              <img
-                src={selectedDiscipline.image}
-                alt={selectedDiscipline.title}
-                className='w-full h-full object-cover'
-              />
-            </div>
-          )}
-          <div className='prose prose-sm max-w-none text-gray-600 leading-relaxed'>
-            <p>{selectedDiscipline?.description || "No specific details available."}</p>
-          </div>
-          <div className='flex justify-end pt-4 border-t border-gray-100'>
-            <button
-              onClick={() => setSelectedDiscipline(null)}
-              className='px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors'
-            >
-              Close Details
-            </button>
-          </div>
-        </div>
-      </Modal>
     </div>
   )
 }

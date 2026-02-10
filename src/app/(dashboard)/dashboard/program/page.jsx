@@ -8,8 +8,8 @@ import { useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 import Table from '../../../../ui/molecules/Table'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import CreateUpdateProgram from '@/ui/molecules/modals/CreateUpdateProgram'
-import ViewProgram from '@/ui/molecules/modals/ViewProgram'
+import CreateUpdateProgram from '@/ui/molecules/dialogs/CreateUpdateProgram'
+import ViewProgram from '@/ui/molecules/dialogs/ViewProgram'
 import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function ProgramForm() {

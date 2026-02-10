@@ -1,31 +1,29 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { fetchUniversities } from '../../actions'
 import Link from 'next/link'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const RelatedUniversities = ({ university }) => {
   const [universities, setUniversities] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const scrollContainerRef = useRef(null)
 
   useEffect(() => {
     if (university) {
-      // Only fetch if degree prop exists
       getUniversities()
     }
-  }, [university]) // Add degree as dependency
+  }, [university])
 
   const getUniversities = async () => {
     setIsLoading(true)
     try {
       const response = await fetchUniversities()
-      const data = response.items
+      const data = response.items || []
 
       const filteredUniversities = data.filter((d) => {
-        // Convert both IDs to strings for comparison
-        const currentId = String(d.id)
-        const universityId = String(university?.id)
-        return currentId !== universityId
+        return String(d.id) !== String(university?.id)
       })
 
       setUniversities(filteredUniversities)
@@ -36,52 +34,96 @@ const RelatedUniversities = ({ university }) => {
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className='flex justify-center items-center h-64'>
-        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500'></div>
-      </div>
-    )
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: -400,
+        behavior: 'smooth'
+      })
+    }
   }
 
-  if (!universities.length){
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: 400,
+        behavior: 'smooth'
+      })
+    }
+  }
+
+  if (!isLoading && !universities.length) {
     return null
   }
 
   return (
-    <div className='flex flex-col w-full max-w-[1150px] mx-auto mb-20 px-4 mt-10'>
-      <h2 className='font-bold text-3xl leading-10 mb-4'>
-        Other Universities you might like
+    <div className='flex flex-col max-w-[1600px] mx-auto mb-10 sm:mb-20 px-4 sm:px-8 md:px-16 lg:px-24'>
+      <h2 className='text-lg font-semibold text-gray-900 m-2 sm:m-4 text-center sm:text-left'>
+        Universities you may like
       </h2>
+      <div className='relative'>
+        {/* Left Arrow */}
+        <button
+          onClick={scrollLeft}
+          className='absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-1.5 sm:p-2 shadow-lg hover:bg-gray-100 transition-colors hidden sm:block'
+          aria-label='Scroll left'
+        >
+          <ChevronLeft className='w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-gray-700' />
+        </button>
 
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-        {universities.map((university, index) => (
-          <Link href={`/universities/${university?.slugs}`} key={index}>
-            <div className='cursor-pointer p-4 w-full'>
-              <div className='flex justify-center border-2 rounded-3xl items-center overflow-hidden mb-2 p-4'>
-                <img
-                  src={
-                    university?.assets?.featured_image ||
-                    `https://placehold.co/600x400?text=${university.fullname}`
-                  }
-                  alt={university.fullname}
-                  className='w-full h-48 object-cover rounded-2xl'
-                />
-              </div>
-              <div className='px-4 pb-4 flex flex-col'>
-                <h3 className='text-lg font-bold text-center'>
-                  {university.fullname}
-                </h3>
-                <p className='text-xs text-gray-700 text-center'>
-                  {university.city}, {university.state}, {university.country}
-                </p>
-              </div>
+        {/* Scrollable Container */}
+        <div
+          ref={scrollContainerRef}
+          className='flex overflow-x-auto gap-3 sm:gap-4 px-8 sm:px-12 scroll-smooth no-scrollbar'
+        >
+          {isLoading ? (
+            <div className='flex justify-center items-center w-full py-8'>
+              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900'></div>
             </div>
-          </Link>
-        ))}
+          ) : (
+            universities.map((uni, index) => (
+              <Link
+                href={`/universities/${uni?.slugs}`}
+                key={index}
+                className='flex-shrink-0'
+              >
+                <div className='cursor-pointer p-2 sm:p-4 w-48 sm:w-56 md:w-64'>
+                  <div className='flex justify-center border-2 rounded-2xl sm:rounded-3xl items-center overflow-hidden mb-2 p-2 sm:p-4'>
+                    <img
+                      src={
+                        uni?.assets?.featured_image ||
+                        `https://placehold.co/600x400?text=${uni.fullname}`
+                      }
+                      alt={uni.fullname}
+                      className='w-36 h-36 sm:w-40 sm:h-40 md:w-48 md:h-48 object-cover'
+                    />
+                  </div>
+                  <div className='px-2 sm:px-4 pb-2 sm:pb-4 flex flex-col'>
+                    <h3 className='text-sm font-medium text-center line-clamp-2 text-gray-900'>
+                      {uni.fullname}
+                    </h3>
+                    <p className='text-xs text-gray-500 text-center line-clamp-1 mt-1'>
+                      {uni.city && uni.state ? `${uni.city}, ${uni.state}` : uni.city || uni.state || ''}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))
+          )}
+        </div>
+
+        {/* Right Arrow */}
+        <button
+          onClick={scrollRight}
+          className='absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-1.5 sm:p-2 shadow-lg hover:bg-gray-100 transition-colors hidden sm:block'
+          aria-label='Scroll right'
+        >
+          <ChevronRight className='w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-gray-700' />
+        </button>
       </div>
     </div>
   )
 }
 
 export default RelatedUniversities
+

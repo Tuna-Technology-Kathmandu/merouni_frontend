@@ -1,22 +1,26 @@
 import React from 'react'
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import { formatDate } from '@/utils/date.util'
 
 const BlogViewModal = ({ isOpen, onClose, data, loading }) => {
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title='Blog Details'
             className='max-w-3xl'
         >
+            <DialogHeader>
+                <DialogTitle>Blog Details</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
             {loading ? (
                 <div className='flex justify-center items-center h-48'>
                     Loading...
                 </div>
             ) : data ? (
-                <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
+                <div className='space-y-4 overflow-y-auto p-2'>
                     {data.featuredImage && (
                         <div className='w-full h-64 rounded-lg overflow-hidden'>
                             <img
@@ -139,7 +143,8 @@ const BlogViewModal = ({ isOpen, onClose, data, loading }) => {
                     Close
                 </Button>
             </div>
-        </Modal>
+            </DialogContent>
+        </Dialog>
     )
 }
 

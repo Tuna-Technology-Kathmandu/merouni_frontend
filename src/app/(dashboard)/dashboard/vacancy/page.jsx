@@ -2,16 +2,23 @@
 
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 import Table from '../../../../ui/molecules/Table'
 import FileUpload from '../addCollege/FileUpload'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose
+} from '@/ui/shadcn/dialog'
 import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { Modal } from '../../../../ui/molecules/Modal'
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Search, Eye } from 'lucide-react'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
@@ -33,6 +40,7 @@ const VacancyManager = () => {
     handleSubmit,
     reset,
     setValue,
+    control,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -404,7 +412,7 @@ const VacancyManager = () => {
         </div>
         <ToastContainer />
 
-        <Modal
+        <Dialog
           isOpen={isOpen}
           onClose={() => {
             setIsOpen(false)
@@ -413,9 +421,23 @@ const VacancyManager = () => {
             reset()
             setUploadedFiles({ featuredImage: '' })
           }}
-          title={editing ? 'Edit Vacancy' : 'Add Vacancy'}
           className='max-w-5xl'
         >
+          <DialogHeader>
+            <div className='flex items-center justify-between'>
+              <DialogTitle>{editing ? 'Edit Vacancy' : 'Add Vacancy'}</DialogTitle>
+              <DialogClose
+                onClick={() => {
+                  setIsOpen(false)
+                  setEditing(false)
+                  setEditingId(null)
+                  reset()
+                  setUploadedFiles({ featuredImage: '' })
+                }}
+              />
+            </div>
+          </DialogHeader>
+          <DialogContent>
           <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
             <form
               onSubmit={handleSubmit(onSubmit)}
@@ -474,11 +496,16 @@ const VacancyManager = () => {
 
                   <div className='space-y-2 mt-4'>
                     <Label htmlFor='content'>Content</Label>
-                    <Textarea
-                      id='content'
-                      placeholder='Enter detailed content'
-                      {...register('content')}
-                      className='min-h-[200px]'
+                    <Controller
+                      name='content'
+                      control={control}
+                      render={({ field }) => (
+                        <TipTapEditor
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder='Enter detailed content'
+                        />
+                      )}
                     />
                   </div>
                 </div>
@@ -512,7 +539,8 @@ const VacancyManager = () => {
               </div>
             </form>
           </div>
-        </Modal>
+          </DialogContent>
+        </Dialog>
 
         {/* Table Section */}
         <div className='mt-8'>
@@ -537,12 +565,18 @@ const VacancyManager = () => {
       />
 
       {/* View Vacancy Details Modal */}
-      <Modal
+      <Dialog
         isOpen={viewModalOpen}
         onClose={handleCloseViewModal}
-        title='Vacancy Details'
         className='max-w-3xl'
       >
+        <DialogHeader>
+          <div className='flex items-center justify-between'>
+            <DialogTitle>Vacancy Details</DialogTitle>
+            <DialogClose onClick={handleCloseViewModal} />
+          </div>
+        </DialogHeader>
+        <DialogContent>
         {loadingView ? (
           <div className='flex justify-center items-center h-48'>
             Loading...
@@ -599,7 +633,8 @@ const VacancyManager = () => {
             No vacancy data available.
           </p>
         )}
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

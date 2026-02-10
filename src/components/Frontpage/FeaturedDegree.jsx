@@ -38,59 +38,85 @@ const FeaturedDegree = () => {
         <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5'>
           {loading
             ? Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className='h-72 rounded-lg bg-gray-200 animate-pulse'
-                />
+                <div key={i} className='flex flex-col gap-3'>
+                  <div className='aspect-[16/10] rounded-xl bg-gray-200 animate-pulse' />
+                  <div className='h-6 w-3/4 bg-gray-200 rounded animate-pulse' />
+                  <div className='h-4 w-1/2 bg-gray-200 rounded animate-pulse' />
+                </div>
               ))
             : degrees?.map((item) => (
                 <Link
                   key={item.id}
                   href={`/degree/${encodeURIComponent(item.slug || '')}`}
-                  className='h-72 block bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl relative'
+                  className='group block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl'
                 >
-                  <div className='w-full h-full bg-gray-100'>
-                    {item.cover_image ? (
+                  <div className='aspect-[16/10] w-full overflow-hidden bg-gray-100 relative'>
+                    {item.featured_image ? (
                       <img
-                        src={item.cover_image}
+                        src={item.featured_image}
                         alt={item.title}
-                        className='w-full h-full object-cover'
+                        className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-110'
                       />
                     ) : (
-                      <div className='w-full h-full flex items-center justify-center bg-[#0A6FA7]/10 text-[#0A6FA7] text-4xl font-bold'>
+                      <div className='w-full h-full flex items-center justify-center bg-gradient-to-br from-[#0A6FA7]/10 to-[#31AD8F]/10 text-[#0A6FA7] text-4xl font-bold'>
                         {item.short_name?.charAt(0) ||
                           item.title?.charAt(0) ||
                           'D'}
                       </div>
                     )}
                   </div>
-                  <div className='absolute bottom-0 left-0 right-0 bg-black/70 p-4'>
-                    <h2 className='text-lg font-semibold text-white'>
-                      {item.title}
-                    </h2>
-                    {item.short_name && (
-                      <p className='text-sm text-white/80'>{item.short_name}</p>
-                    )}
+                  <div className='p-4 h-[100px] flex flex-col justify-between'>
+                    <div>
+                      <h2 className='text-md font-bold text-gray-800 line-clamp-2 leading-tight group-hover:text-[#0A6FA7] transition-colors'>
+                        {item.title}
+                      </h2>
+                      {item.short_name && (
+                        <p className='text-xs text-gray-500 mt-1.5 font-medium'>
+                          {item.short_name}
+                        </p>
+                      )}
+                    </div>
+                    {/* View Details Hint */}
+                    <div className='mt-2 flex items-center text-xs font-semibold text-[#0A6FA7] opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-1 group-hover:translate-y-0'>
+                      View Details
+                      <svg
+                        className='w-3 h-3 ml-1'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth='2'
+                          d='M9 5l7 7-7 7'
+                        />
+                      </svg>
+                    </div>
                   </div>
                 </Link>
               ))}
           {/* Explore All Button Card */}
           <Link
             href='/degree'
-            className='h-72 flex bg-gradient-to-br from-[#0870A8] to-[#31AD8F] rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl relative items-center justify-center'
+            className='group flex flex-col bg-gradient-to-br from-[#0870A8] to-[#31AD8F] rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl relative'
           >
-            <div className='text-center p-6'>
-              <h2 className='text-2xl font-bold text-white mb-4'>
-                Explore All
-              </h2>
-              <p className='text-white/90 text-sm mb-6'>
-                Discover all available degrees and programs
+            <div className='aspect-[16/10] flex items-center justify-center p-6 text-center text-white'>
+              <div className='transform transition-transform duration-500 group-hover:scale-110'>
+                <h2 className='text-2xl font-bold mb-2'>Explore All</h2>
+                <div className='h-1 w-12 bg-white/40 mx-auto rounded-full'></div>
+              </div>
+            </div>
+            <div className='p-4 bg-white/10 backdrop-blur-sm flex-grow flex flex-col justify-center items-center text-center'>
+              <p className='text-white text-xs mb-4 line-clamp-2'>
+                Discover all available degrees and programs that fit your career
+                goals
               </p>
-              <div className='inline-flex items-center gap-2 bg-white text-[#0870A8] px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors'>
-                <span>View All</span>
+              <div className='inline-flex items-center gap-2 bg-white text-[#0870A8] px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-100 transition-colors shadow-sm'>
+                <span>View All Degrees</span>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
-                  className='h-5 w-5'
+                  className='h-4 w-4'
                   fill='none'
                   viewBox='0 0 24 24'
                   stroke='currentColor'

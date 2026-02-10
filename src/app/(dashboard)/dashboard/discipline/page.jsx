@@ -1,6 +1,6 @@
 'use client'
 
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import { Edit2, Eye, Search, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -9,7 +9,7 @@ import { fetchDisciplines } from './action'
 
 import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import CreateUpdateDiscipline from '@/ui/molecules/modals/CreateUpdateDiscipline'
+import CreateUpdateDiscipline from '@/ui/molecules/dialogs/CreateUpdateDiscipline'
 import { formatDate } from '@/utils/date.util'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
@@ -276,16 +276,24 @@ export default function DisciplineManager() {
             </div>
 
             {/* View Modal */}
-            <Modal
+            {/* View Modal */}
+            <Dialog
                 isOpen={isViewModalOpen}
                 onClose={() => {
                     setIsViewModalOpen(false)
                     setViewingDiscipline(null)
                 }}
-                title="Discipline Details"
                 className="max-w-2xl"
             >
-                <div className="p-6 space-y-6">
+                <DialogHeader>
+                    <DialogTitle>Discipline Details</DialogTitle>
+                    <DialogClose onClick={() => {
+                        setIsViewModalOpen(false)
+                        setViewingDiscipline(null)
+                    }} />
+                </DialogHeader>
+                <DialogContent>
+                <div className="space-y-6">
                     {/* Image */}
                     {viewingDiscipline?.featured_image && (
                         <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-100 mb-6 border border-gray-200">
@@ -325,7 +333,8 @@ export default function DisciplineManager() {
                         </Button>
                     </div>
                 </div>
-            </Modal>
+                </DialogContent>
+            </Dialog>
 
             <ConfirmationDialog
                 open={isDialogOpen}

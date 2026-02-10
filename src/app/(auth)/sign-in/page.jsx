@@ -10,7 +10,13 @@ import { jwtDecode } from 'jwt-decode'
 import Link from 'next/link'
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
-import { Modal } from '../../../ui/molecules/Modal'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose
+} from '@/ui/shadcn/dialog'
 
 const SignInPage = ({ defaultMode = 'login' }) => {
   const dispatch = useDispatch()
@@ -288,12 +294,18 @@ const SignInPage = ({ defaultMode = 'login' }) => {
         </div>
       </div>
 
-      <Modal
+      <Dialog
         isOpen={isForgotPasswordOpen}
         onClose={() => setIsForgotPasswordOpen(false)}
-        title='Reset Password'
         className='max-w-md'
       >
+        <DialogHeader>
+          <div className='flex items-center justify-between'>
+            <DialogTitle>Reset Password</DialogTitle>
+            <DialogClose onClick={() => setIsForgotPasswordOpen(false)} />
+          </div>
+        </DialogHeader>
+        <DialogContent>
         <div className='p-6 text-center'>
           <div className='mb-4 flex justify-center'>
             <div className='w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center'>
@@ -308,7 +320,8 @@ const SignInPage = ({ defaultMode = 'login' }) => {
           </p>
          
         </div>
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

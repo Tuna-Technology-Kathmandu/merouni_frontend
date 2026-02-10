@@ -4,18 +4,30 @@ import { cn } from '@/app/lib/utils'
 
 const Dialog = React.forwardRef(
   ({ isOpen, onClose, children, className, ...props }, ref) => {
+    React.useEffect(() => {
+      if (isOpen) {
+        document.body.style.overflow = 'hidden'
+      } else {
+        document.body.style.overflow = 'unset'
+      }
+      
+      return () => {
+        document.body.style.overflow = 'unset'
+      }
+    }, [isOpen])
+
     if (!isOpen) return null
 
     return (
       <div
-        className='fixed inset-0 z-50 flex items-center justify-center'
+        className='fixed inset-0 z-50 flex items-center justify-center p-4'
         {...props}
       >
         <div className='fixed inset-0 bg-black/50' onClick={onClose} />
         <div
           ref={ref}
           className={cn(
-            'relative z-50 w-full max-w-lg rounded-lg border bg-background p-6 shadow-lg',
+            'relative z-50 w-full max-w-lg rounded-lg border bg-background shadow-lg max-h-[90vh] flex flex-col',
             className
           )}
         >
@@ -30,7 +42,7 @@ Dialog.displayName = 'Dialog'
 const DialogHeader = ({ className, ...props }) => (
   <div
     className={cn(
-      'flex flex-col space-y-1.5 text-center sm:text-left mb-4',
+      'flex flex-col space-y-1.5 text-center sm:text-left px-6 pt-6 pb-4 border-b border-gray-100',
       className
     )}
     {...props}
@@ -61,7 +73,23 @@ DialogDescription.displayName = 'DialogDescription'
 
 const DialogContent = React.forwardRef(
   ({ className, children, ...props }, ref) => (
-    <div ref={ref} className={cn('', className)} {...props}>
+    <div 
+      ref={ref} 
+      className={cn(
+        'overflow-y-auto px-6 py-4',
+        'scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent',
+        'hover:scrollbar-thumb-gray-400',
+        '[&::-webkit-scrollbar]:w-2',
+        '[&::-webkit-scrollbar-track]:bg-transparent',
+        '[&::-webkit-scrollbar-thumb]:bg-gray-300',
+        '[&::-webkit-scrollbar-thumb]:rounded-full',
+        '[&::-webkit-scrollbar-thumb]:opacity-0',
+        'hover:[&::-webkit-scrollbar-thumb]:opacity-100',
+        '[&::-webkit-scrollbar-thumb]:transition-opacity',
+        className
+      )} 
+      {...props}
+    >
       {children}
     </div>
   )

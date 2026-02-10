@@ -72,7 +72,9 @@ const SubMenu = ({
   const handleMainClick = () => {
     // For specific parent menus (Referrals, Colleges), navigate to first submenu only when expanding (not collapsing)
     const shouldAutoNavigate =
-      (item.label === 'Referrals' || item.label === 'Colleges') &&
+      (item.label === 'Referrals' ||
+        item.label === 'Colleges' ||
+        item.label === 'MeroUni') &&
       !isExpanded &&
       firstSubmenu
 
@@ -86,7 +88,8 @@ const SubMenu = ({
       isCollapsed &&
       firstSubmenu &&
       item.label !== 'Referrals' &&
-      item.label !== 'Colleges'
+      item.label !== 'Colleges' &&
+      item.label !== 'MeroUni'
     ) {
       // Preserve previous behavior for other menus when collapsed
       router.push(firstSubmenu.href)

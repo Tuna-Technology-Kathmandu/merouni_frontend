@@ -3,7 +3,12 @@
 import React, { useEffect, useState } from 'react'
 import { authFetch } from '@/app/utils/authFetch'
 import { FaEdit, FaTrashAlt } from 'react-icons/fa'
-import { Modal } from '../../../../ui/molecules/Modal'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/ui/shadcn/dialog'
 import ShimmerEffect from '../../../../ui/molecules/ShimmerEffect'
 
 import { useSelector } from 'react-redux'
@@ -246,12 +251,14 @@ const ApplicationsPage = () => {
       </div>
 
       {/* Update Status Modal */}
-      <Modal
+      <Dialog
         isOpen={statusModalOpen}
         onClose={handleCloseStatusModal}
-        title='Update Application Status'
-        className='max-w-md'
       >
+        <DialogContent className='max-w-md'>
+          <DialogHeader>
+            <DialogTitle>Update Application Status</DialogTitle>
+          </DialogHeader>
         <form onSubmit={handleStatusSubmit} className='space-y-4'>
           <div>
             <label className='block text-sm font-medium text-gray-700 mb-1'>
@@ -307,7 +314,8 @@ const ApplicationsPage = () => {
             </button>
           </div>
         </form>
-      </Modal>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

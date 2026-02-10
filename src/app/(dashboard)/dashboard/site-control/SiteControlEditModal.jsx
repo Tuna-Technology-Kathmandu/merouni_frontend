@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { Modal } from '../../../../ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { useForm, Controller } from 'react-hook-form'
 import { Button } from '@/ui/shadcn/button'
 import { Label } from '@/ui/shadcn/label'
@@ -70,80 +70,85 @@ export default function SiteControlEditModal({ isOpen, onClose, onSuccess, confi
     }
 
     return (
-        <Modal
+        <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title='Edit Configuration'
             className='max-w-4xl'
         >
-            <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-                <div className="space-y-4">
-                    <div className="space-y-2">
-                        <Label>Configuration Type <span className="text-red-500">*</span></Label>
-                        <Controller
-                            name="type"
-                            control={control}
-                            rules={{ required: 'Configuration type is required' }}
-                            render={({ field }) => (
-                                <Select
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    disabled={true} // Always disabled in Edit mode
-                                >
-                                    <option value="" disabled>Select a type...</option>
-                                    {CONFIG_TYPES.map((type) => (
-                                        <option key={type.value} value={type.value}>
-                                            {type.label}
-                                        </option>
-                                    ))}
-                                </Select>
-                            )}
-                        />
-                        {/* Hidden input to ensure value is submitted if disabled select doesn't submit */}
-                        <input type="hidden" {...register('type')} />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label>Value <span className="text-red-500">*</span></Label>
-                        {selectedTypeConfig?.inputType === 'richtext' ? (
+            <DialogHeader>
+                <DialogTitle>Edit Configuration</DialogTitle>
+                <DialogClose onClick={onClose} />
+            </DialogHeader>
+            <DialogContent>
+                <form onSubmit={handleSubmit(onSubmit)} className='space-y-6 mt-4'>
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label>Configuration Type <span className="text-red-500">*</span></Label>
                             <Controller
-                                name="value"
+                                name="type"
                                 control={control}
-                                rules={{ required: 'Value is required' }}
+                                rules={{ required: 'Configuration type is required' }}
                                 render={({ field }) => (
-                                    <CKSiteControl
-                                        // Using specific key for EDIT to ensure separation from Create
-                                        key={`edit-editor-${config?.type || 'unknown'}-${isOpen ? 'open' : 'closed'}`}
+                                    <Select
                                         value={field.value}
-                                        onChange={(data) => field.onChange(data)}
-                                        id={`site-control-edit-editor-${config?.type || 'generic'}`}
-                                    />
+                                        onChange={field.onChange}
+                                        disabled={true} // Always disabled in Edit mode
+                                    >
+                                        <option value="" disabled>Select a type...</option>
+                                        {CONFIG_TYPES.map((type) => (
+                                            <option key={type.value} value={type.value}>
+                                                {type.label}
+                                            </option>
+                                        ))}
+                                    </Select>
                                 )}
                             />
-                        ) : (
-                            <Input
-                                type={selectedTypeConfig?.inputType || 'text'}
-                                placeholder={selectedTypeConfig ? `Enter ${selectedTypeConfig.label.toLowerCase()}...` : 'Enter value...'}
-                                {...register('value', { required: 'Value is required' })}
-                            />
-                        )}
-                        {errors.value && <span className="text-sm text-red-500">{errors.value.message}</span>}
-                    </div>
-                </div>
+                            {/* Hidden input to ensure value is submitted if disabled select doesn't submit */}
+                            <input type="hidden" {...register('type')} />
+                        </div>
 
-                <div className='flex justify-end gap-2'>
-                    <button
-                        type='button'
-                        onClick={onClose}
-                        className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors'
-                    >
-                        Cancel
-                    </button>
-                    <Button type="submit" disabled={saving}>
-                        {saving ? 'Saving...' : 'Save Configuration'}
-                    </Button>
-                </div>
-            </form>
-        </Modal>
+                        <div className="space-y-2">
+                            <Label>Value <span className="text-red-500">*</span></Label>
+                            {selectedTypeConfig?.inputType === 'richtext' ? (
+                                <Controller
+                                    name="value"
+                                    control={control}
+                                    rules={{ required: 'Value is required' }}
+                                    render={({ field }) => (
+                                        <CKSiteControl
+                                            // Using specific key for EDIT to ensure separation from Create
+                                            key={`edit-editor-${config?.type || 'unknown'}-${isOpen ? 'open' : 'closed'}`}
+                                            value={field.value}
+                                            onChange={(data) => field.onChange(data)}
+                                            id={`site-control-edit-editor-${config?.type || 'generic'}`}
+                                        />
+                                    )}
+                                />
+                            ) : (
+                                <Input
+                                    type={selectedTypeConfig?.inputType || 'text'}
+                                    placeholder={selectedTypeConfig ? `Enter ${selectedTypeConfig.label.toLowerCase()}...` : 'Enter value...'}
+                                    {...register('value', { required: 'Value is required' })}
+                                />
+                            )}
+                            {errors.value && <span className="text-sm text-red-500">{errors.value.message}</span>}
+                        </div>
+                    </div>
+
+                    <div className='flex justify-end gap-2'>
+                        <button
+                            type='button'
+                            onClick={onClose}
+                            className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors'
+                        >
+                            Cancel
+                        </button>
+                        <Button type="submit" disabled={saving}>
+                            {saving ? 'Saving...' : 'Save Configuration'}
+                        </Button>
+                    </div>
+                </form>
+            </DialogContent>
+        </Dialog>
     )
 }

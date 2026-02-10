@@ -31,7 +31,7 @@ const OverviewSection = ({ college }) => {
 
       {/* Plain description text */}
       {college?.description && (
-        <div className='bg-white/50 rounded-3xl p-6 md:p-8 border border-gray-100/50 shadow-[0_2px_15px_rgba(0,0,0,0.01)]'>
+        <div className=''>
           {/* Mobile view - with truncation */}
           <p className='md:hidden text-gray-600 leading-relaxed text-justify text-sm'>
             {isExpanded ? fullDescription : truncatedDescription}

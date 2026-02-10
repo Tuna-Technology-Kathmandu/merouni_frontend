@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
+import DOMPurify from 'dompurify'
 import { fetchSkillsCourses } from './action'
 import Loader from '../../../../ui/molecules/Loading'
 import Table from '../../../../ui/molecules/Table'
@@ -11,7 +13,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
-import { Modal } from '@/ui/molecules/Modal'
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '@/ui/shadcn/button'
 import FileUpload from '../addCollege/FileUpload'
@@ -31,6 +33,7 @@ export default function SkillsCoursesManager() {
         handleSubmit,
         reset,
         setValue,
+        control,
         formState: { errors }
     } = useForm({
         defaultValues: {
@@ -40,8 +43,10 @@ export default function SkillsCoursesManager() {
             price: '',
             duration: '',
             is_featured: false,
-            status: 'inactive',
-            author: author_id
+            is_featured: false,
+            author: author_id,
+            institution_name: '',
+            content: ''
         }
     })
 
@@ -98,20 +103,7 @@ export default function SkillsCoursesManager() {
                     </span>
                 )
             },
-            {
-                header: 'Status',
-                accessorKey: 'status',
-                cell: ({ getValue }) => (
-                    <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getValue() === 'active'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}
-                    >
-                        {getValue() ? getValue().charAt(0).toUpperCase() + getValue().slice(1) : 'Inactive'}
-                    </span>
-                )
-            },
+
             {
                 header: 'Created At',
                 accessorKey: 'createdAt',
@@ -275,7 +267,8 @@ export default function SkillsCoursesManager() {
         setValue('price', course.price || '')
         setValue('duration', course.duration || '')
         setValue('is_featured', course.is_featured || false)
-        setValue('status', course.status || 'inactive')
+        setValue('institution_name', course.institution_name || '')
+        setValue('content', course.content || '')
         setUploadedFiles({ thumbnail_image: course.thumbnail_image || '' })
     }
 
@@ -390,13 +383,13 @@ export default function SkillsCoursesManager() {
                                 setUploadedFiles({ thumbnail_image: '' })
                             }}
                         >
-                            Add Course
+                            Add Skill Based Course
                         </Button>
                     </div>
                 </div>
                 <ToastContainer />
 
-                <Modal
+                <Dialog
                     isOpen={isOpen}
                     onClose={() => {
                         setIsOpen(false)
@@ -405,9 +398,19 @@ export default function SkillsCoursesManager() {
                         reset()
                         setUploadedFiles({ thumbnail_image: '' })
                     }}
-                    title={editing ? 'Edit Course' : 'Add Course'}
                     className='max-w-2xl'
                 >
+                    <DialogHeader>
+                        <DialogTitle>{editing ? 'Edit Skill Based Course' : 'Add Skill Based Course'}</DialogTitle>
+                        <DialogClose onClick={() => {
+                            setIsOpen(false)
+                            setEditing(false)
+                            setEditingId(null)
+                            reset()
+                            setUploadedFiles({ thumbnail_image: '' })
+                        }} />
+                    </DialogHeader>
+                    <DialogContent>
                     <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
                         <form
                             onSubmit={handleSubmit(onSubmit)}
@@ -415,9 +418,7 @@ export default function SkillsCoursesManager() {
                         >
                             <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
                                 <div className='bg-white p-6 rounded-lg shadow-md'>
-                                    <h2 className='text-xl font-semibold mb-4'>
-                                        Course Information
-                                    </h2>
+                                   
                                     <div className='space-y-4'>
                                         <div>
                                             <Label>
@@ -438,6 +439,15 @@ export default function SkillsCoursesManager() {
                                             )}
                                         </div>
                                         <div>
+                                            <Label>Institution Name</Label>
+                                            <Input
+                                                type='text'
+                                                placeholder='Institution/Provider Name'
+                                                {...register('institution_name')}
+                                                className='w-full p-2 border rounded'
+                                            />
+                                        </div>
+                                        <div>
                                             <Label>Price (Rs.)</Label>
                                             <Input
                                                 type='number'
@@ -456,16 +466,7 @@ export default function SkillsCoursesManager() {
                                                 className='w-full p-2 border rounded'
                                             />
                                         </div>
-                                        <div>
-                                            <Label>Status</Label>
-                                            <Select
-                                                {...register('status')}
-                                                className='w-full p-2 border rounded'
-                                            >
-                                                <option value="inactive">Inactive</option>
-                                                <option value="active">Active</option>
-                                            </Select>
-                                        </div>
+
                                         <div>
                                             <Label>Featured</Label>
                                             <Select
@@ -483,6 +484,20 @@ export default function SkillsCoursesManager() {
                                                 {...register('description')}
                                                 className='w-full p-2 border rounded min-h-[100px]'
                                                 rows={4}
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label>Detailed Content</Label>
+                                            <Controller
+                                                name='content'
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <TipTapEditor
+                                                        value={field.value}
+                                                        onChange={field.onChange}
+                                                        placeholder='Enter detailed course content, curriculum, etc.'
+                                                    />
+                                                )}
                                             />
                                         </div>
                                         <div>
@@ -523,7 +538,8 @@ export default function SkillsCoursesManager() {
                             </div>
                         </form>
                     </div>
-                </Modal>
+                    </DialogContent>
+                </Dialog>
 
                 {/* Table */}
                 <div className='mt-8'>
@@ -539,15 +555,22 @@ export default function SkillsCoursesManager() {
             </div>
 
             {/* View Modal */}
-            <Modal
+            <Dialog
                 isOpen={isViewModalOpen}
                 onClose={() => {
                     setIsViewModalOpen(false)
                     setViewingCourse(null)
                 }}
-                title="Course Details"
                 className="max-w-2xl"
             >
+                <DialogHeader>
+                    <DialogTitle>Course Details</DialogTitle>
+                    <DialogClose onClick={() => {
+                        setIsViewModalOpen(false)
+                        setViewingCourse(null)
+                    }} />
+                </DialogHeader>
+                <DialogContent>
                 <div className="p-6 space-y-6">
                     {/* Thumbnail Image */}
                     {viewingCourse?.thumbnail_image && (
@@ -566,6 +589,13 @@ export default function SkillsCoursesManager() {
                             <h3 className="text-sm font-medium text-gray-500">Title</h3>
                             <p className="mt-1 text-lg font-semibold text-gray-900">{viewingCourse?.title}</p>
                         </div>
+
+                        {viewingCourse?.institution_name && (
+                            <div className="md:col-span-2">
+                                <h3 className="text-sm font-medium text-gray-500">Institution Name</h3>
+                                <p className="mt-1 text-gray-900 font-medium">{viewingCourse.institution_name}</p>
+                            </div>
+                        )}
 
                         <div>
                             <h3 className="text-sm font-medium text-gray-500">Price</h3>
@@ -591,23 +621,23 @@ export default function SkillsCoursesManager() {
                             </span>
                         </div>
 
-                        <div>
-                            <h3 className="text-sm font-medium text-gray-500">Status</h3>
-                            <span
-                                className={`inline-flex mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${viewingCourse?.status === 'active'
-                                        ? 'bg-green-100 text-green-800'
-                                        : 'bg-gray-100 text-gray-800'
-                                    }`}
-                            >
-                                {viewingCourse?.status ? viewingCourse.status.charAt(0).toUpperCase() + viewingCourse.status.slice(1) : 'Inactive'}
-                            </span>
-                        </div>
+
 
                         <div className="md:col-span-2">
                             <h3 className="text-sm font-medium text-gray-500">Description</h3>
                             <div className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100">
                                 {viewingCourse?.description || "No description provided."}
                             </div>
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <h3 className="text-sm font-medium text-gray-500">Detailed Content</h3>
+                            <div 
+                                className="mt-1 prose prose-sm max-w-none text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100 min-h-[200px]"
+                                dangerouslySetInnerHTML={{ 
+                                    __html: viewingCourse?.content ? DOMPurify.sanitize(viewingCourse.content) : "No content provided." 
+                                }}
+                            />
                         </div>
 
                         <div className="md:col-span-2">
@@ -622,7 +652,8 @@ export default function SkillsCoursesManager() {
                         </Button>
                     </div>
                 </div>
-            </Modal>
+                </DialogContent>
+            </Dialog>
 
             <ConfirmationDialog
                 open={isDialogOpen}
