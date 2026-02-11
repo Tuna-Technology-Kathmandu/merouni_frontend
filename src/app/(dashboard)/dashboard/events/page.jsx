@@ -14,7 +14,7 @@ import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import Table from '../../../../ui/molecules/Table'
+import Table from '@/ui/shadcn/Table'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import FileUpload from '../addCollege/FileUpload'
@@ -586,35 +586,31 @@ export default function EventManager() {
   }
 
   return (
-    <>
-      <div className='p-4 w-full'>
-        <div className='flex justify-between items-center mb-4'>
-          {/* Search Bar */}
+    <div className='w-full space-y-2'>
+      <div className='px-4 space-y-4'>
+        <div className='flex justify-between items-center pt-4'>
           <SearchInput
             value={searchQuery}
             onChange={(e) => handleSearchInput(e.target.value)}
             placeholder='Search events...'
             className='max-w-md'
           />
-
-          {/* Button */}
-          <div className='flex gap-2'>
-            <Button
-              onClick={() => {
-                setIsOpen(true)
-                setEditing(false)
-                setEditingEventId(null)
-                reset()
-                setUploadedFiles({ image: '' })
-                setCollegeSearch('')
-                setSelectedColleges([])
-                setEditorContent('')
-              }}
-            >
-              Add Event
-            </Button>
-          </div>
+          <Button
+            onClick={() => {
+              setIsOpen(true)
+              setEditing(false)
+              setEditingEventId(null)
+              reset()
+              setUploadedFiles({ image: '' })
+              setCollegeSearch('')
+              setSelectedColleges([])
+              setEditorContent('')
+            }}
+          >
+            Add Event
+          </Button>
         </div>
+
         <Table
           columns={columns}
           data={events}
@@ -622,269 +618,268 @@ export default function EventManager() {
           onPageChange={(page) => loadEvents(page)}
           onSearch={handleSearchInput}
           loading={loading}
+          showSearch={false}
         />
+      </div>
 
-        <Dialog
-          isOpen={isOpen}
-          onClose={handleCloseModal}
-          className='max-w-5xl'
-        >
-          <DialogHeader>
-            <DialogTitle>{editing ? 'Edit Event' : 'Add Event'}</DialogTitle>
-            <DialogClose onClick={handleCloseModal} />
-          </DialogHeader>
-          <DialogContent className='max-h-[90vh] overflow-y-auto'>
-            <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className='flex flex-col flex-1 overflow-hidden'
-              >
-                <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                  {/* Basic Information */}
-                  <div className='bg-white p-6 rounded-lg shadow-md'>
-                    <div className='space-y-4'>
-                      <div>
-                        <Label htmlFor='title' className='block mb-2'>
-                          Event Title <span className='text-red-500'>*</span>
-                        </Label>
-                        <Input
-                          id='title'
-                          {...register('title', {
-                            required: 'Title is required'
-                          })}
-                          placeholder='Event Title'
-                        />
-                        {errors.title && (
-                          <span className='text-red-500 text-sm'>
-                            {errors.title.message}
-                          </span>
-                        )}
-                      </div>
+      <Dialog
+        isOpen={isOpen}
+        onClose={handleCloseModal}
+        className='max-w-5xl'
+      >
+        <DialogHeader>
+          <DialogTitle>{editing ? 'Edit Event' : 'Add Event'}</DialogTitle>
+          <DialogClose onClick={handleCloseModal} />
+        </DialogHeader>
+        <DialogContent className='max-h-[90vh] overflow-y-auto'>
+          <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className='flex flex-col flex-1 overflow-hidden'
+            >
+              <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+                {/* Basic Information */}
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <div className='space-y-4'>
+                    <div>
+                      <Label htmlFor='title' className='block mb-2'>
+                        Event Title <span className='text-red-500'>*</span>
+                      </Label>
+                      <Input
+                        id='title'
+                        {...register('title', {
+                          required: 'Title is required'
+                        })}
+                        placeholder='Event Title'
+                      />
+                      {errors.title && (
+                        <span className='text-red-500 text-sm'>
+                          {errors.title.message}
+                        </span>
+                      )}
+                    </div>
 
-                      <div>
-                        <Label htmlFor='category_id' className='block mb-2'>
-                          Categories <span className='text-red-500'>*</span>
-                        </Label>
-                        <Select
-                          className='w-full'
-                          id='category_id'
-                          {...register('category_id', { required: true })}
-                        >
-                          <option value=''>Select Category</option>
-                          {categories.map((category) => (
-                            <option value={category.id} key={category.id}>
-                              {category.title}
-                            </option>
-                          ))}
-                        </Select>
-                      </div>
+                    <div>
+                      <Label htmlFor='category_id' className='block mb-2'>
+                        Categories <span className='text-red-500'>*</span>
+                      </Label>
+                      <Select
+                        className='w-full'
+                        id='category_id'
+                        {...register('category_id', { required: true })}
+                      >
+                        <option value=''>Select Category</option>
+                        {categories.map((category) => (
+                          <option value={category.id} key={category.id}>
+                            {category.title}
+                          </option>
+                        ))}
+                      </Select>
+                    </div>
 
-                      <div>
-                        <label className='block mb-2'>College</label>
-                        <div className='flex flex-wrap gap-2 mb-2'>
-                          {selectedColleges.map((college) => (
-                            <div
-                              key={college.id}
-                              className='flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full'
+                    <div>
+                      <label className='block mb-2'>College</label>
+                      <div className='flex flex-wrap gap-2 mb-2'>
+                        {selectedColleges.map((college) => (
+                          <div
+                            key={college.id}
+                            className='flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full'
+                          >
+                            <span>{college.name}</span>
+                            <button
+                              type='button'
+                              onClick={() => removeCollege(college.id)}
+                              className='text-blue-600 hover:text-blue-800'
                             >
-                              <span>{college.name}</span>
-                              <button
-                                type='button'
-                                onClick={() => removeCollege(college.id)}
-                                className='text-blue-600 hover:text-blue-800'
+                              <X className='w-4 h-4' />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className='relative'>
+                        <Input
+                          type='text'
+                          disabled={selectedColleges.length > 0}
+                          value={collegeSearch}
+                          onChange={searchCollege}
+                          placeholder='Search college...'
+                        />
+
+                        {searchResults.length > 0 && (
+                          <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto'>
+                            {searchResults.map((college) => (
+                              <div
+                                key={college.id}
+                                onClick={() => addCollege(college)}
+                                className='p-2 hover:bg-gray-100 cursor-pointer'
                               >
-                                <X className='w-4 h-4' />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-
-                        <div className='relative'>
-                          <Input
-                            type='text'
-                            disabled={selectedColleges.length > 0}
-                            value={collegeSearch}
-                            onChange={searchCollege}
-                            placeholder='Search college...'
-                          />
-
-                          {searchResults.length > 0 && (
-                            <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto'>
-                              {searchResults.map((college) => (
-                                <div
-                                  key={college.id}
-                                  onClick={() => addCollege(college)}
-                                  className='p-2 hover:bg-gray-100 cursor-pointer'
-                                >
-                                  {college.name}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
+                                {college.name}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Event Host Information */}
-                  <div className='bg-white p-6 rounded-lg shadow-md'>
-                    <h2 className='text-xl font-semibold mb-4'>
-                      Event Host Information
-                    </h2>
-                    <div className='space-y-4'>
+                {/* Event Host Information */}
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <h2 className='text-xl font-semibold mb-4'>
+                    Event Host Information
+                  </h2>
+                  <div className='space-y-4'>
+                    <div>
+                      <Label htmlFor='host' className='block mb-2'>
+                        Host <span className='text-red-500'>*</span>
+                      </Label>
+                      <Input
+                        id='host'
+                        {...register('event_host.host', {
+                          required: 'Host is required'
+                        })}
+                        placeholder='Event Host'
+                      />
+                      {errors.event_host?.host && (
+                        <span className='text-red-500 text-sm'>
+                          {errors.event_host.host.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                       <div>
-                        <Label htmlFor='host' className='block mb-2'>
-                          Host <span className='text-red-500'>*</span>
+                        <Label htmlFor='start_date' className='block mb-2'>
+                          Start Date <span className='text-red-500'>*</span>
                         </Label>
                         <Input
-                          id='host'
-                          {...register('event_host.host', {
-                            required: 'Host is required'
+                          id='start_date'
+                          type='date'
+                          {...register('event_host.start_date', {
+                            required: 'Start date is required'
                           })}
-                          placeholder='Event Host'
                         />
-                        {errors.event_host?.host && (
+                        {errors.event_host?.start_date && (
                           <span className='text-red-500 text-sm'>
-                            {errors.event_host.host.message}
+                            {errors.event_host.start_date.message}
                           </span>
                         )}
                       </div>
-
-                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                        <div>
-                          <Label htmlFor='start_date' className='block mb-2'>
-                            Start Date <span className='text-red-500'>*</span>
-                          </Label>
-                          <Input
-                            id='start_date'
-                            type='date'
-                            {...register('event_host.start_date', {
-                              required: 'Start date is required'
-                            })}
-                          />
-                          {errors.event_host?.start_date && (
-                            <span className='text-red-500 text-sm'>
-                              {errors.event_host.start_date.message}
-                            </span>
-                          )}
-                        </div>
-                        <div>
-                          <Label htmlFor='end_date' className='block mb-2'>
-                            End Date <span className='text-red-500'>*</span>
-                          </Label>
-                          <Input
-                            id='end_date'
-                            type='date'
-                            {...register('event_host.end_date', {
-                              required: 'End date is required'
-                            })}
-                          />
-                          {errors.event_host?.end_date && (
-                            <span className='text-red-500 text-sm'>
-                              {errors.event_host.end_date.message}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                        <div>
-                          <Label htmlFor='time' className='block mb-2'>
-                            Time <span className='text-red-500'>*</span>
-                          </Label>
-                          <Input
-                            id='time'
-                            type='time'
-                            {...register('event_host.time', {
-                              required: 'Time is required'
-                            })}
-                            placeholder='Time'
-                          />
-                          {errors.event_host?.time && (
-                            <span className='text-red-500 text-sm'>
-                              {errors.event_host.time.message}
-                            </span>
-                          )}
-                        </div>
-                        <div>
-                          <Label htmlFor='map_url' className='block mb-2'>
-                            Map Location
-                          </Label>
-                          <Input
-                            id='map_url'
-                            {...register('event_host.map_url')}
-                            placeholder='Google Maps URL'
-                          />
-                        </div>
+                      <div>
+                        <Label htmlFor='end_date' className='block mb-2'>
+                          End Date <span className='text-red-500'>*</span>
+                        </Label>
+                        <Input
+                          id='end_date'
+                          type='date'
+                          {...register('event_host.end_date', {
+                            required: 'End date is required'
+                          })}
+                        />
+                        {errors.event_host?.end_date && (
+                          <span className='text-red-500 text-sm'>
+                            {errors.event_host.end_date.message}
+                          </span>
+                        )}
                       </div>
                     </div>
-                  </div>
 
-                  <div className='bg-white p-6 rounded-lg shadow-md'>
-                    <h2 className='text-xl font-semibold mb-4'>Details</h2>
-                    <div className='space-y-4'>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                       <div>
-                        <Label className='block mb-2'>Description</Label>
-                        <EditorMemo
-                          initialData={getValues('description')}
-                          onChange={(data) => {
-                            setValue('description', data)
-                          }}
+                        <Label htmlFor='time' className='block mb-2'>
+                          Time <span className='text-red-500'>*</span>
+                        </Label>
+                        <Input
+                          id='time'
+                          type='time'
+                          {...register('event_host.time', {
+                            required: 'Time is required'
+                          })}
+                          placeholder='Time'
                         />
+                        {errors.event_host?.time && (
+                          <span className='text-red-500 text-sm'>
+                            {errors.event_host.time.message}
+                          </span>
+                        )}
                       </div>
                       <div>
-                        <Label className='block mb-2'>Featured Image</Label>
-                        <FileUpload
-                          onUploadComplete={(url) => {
-                            setUploadedFiles((prev) => ({
-                              ...prev,
-                              image: url
-                            }))
-                            setValue('image', url)
-                          }}
-                          defaultPreview={uploadedFiles.image}
+                        <Label htmlFor='map_url' className='block mb-2'>
+                          Map Location
+                        </Label>
+                        <Input
+                          id='map_url'
+                          {...register('event_host.map_url')}
+                          placeholder='Google Maps URL'
                         />
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <input
-                          type='checkbox'
-                          id='is_featured'
-                          {...register('is_featured')}
-                        />
-                        <Label htmlFor='is_featured'>Featured Event</Label>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className='flex justify-end gap-2 pt-4 border-t mt-4'>
-                  <Button
-                    type='button'
-                    variant='outline'
-                    onClick={handleCloseModal}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type='submit'>
-                    {editing ? 'Update Event' : 'Create Event'}
-                  </Button>
+                <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <h2 className='text-xl font-semibold mb-4'>Details</h2>
+                  <div className='space-y-4'>
+                    <div>
+                      <Label className='block mb-2'>Description</Label>
+                      <EditorMemo
+                        initialData={getValues('description')}
+                        onChange={(data) => {
+                          setValue('description', data)
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <Label className='block mb-2'>Featured Image</Label>
+                      <FileUpload
+                        onUploadComplete={(url) => {
+                          setUploadedFiles((prev) => ({
+                            ...prev,
+                            image: url
+                          }))
+                          setValue('image', url)
+                        }}
+                        defaultPreview={uploadedFiles.image}
+                      />
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <input
+                        type='checkbox'
+                        id='is_featured'
+                        {...register('is_featured')}
+                      />
+                      <Label htmlFor='is_featured'>Featured Event</Label>
+                    </div>
+                  </div>
                 </div>
-              </form>
-            </div>
-          </DialogContent>
-        </Dialog>
+              </div>
 
-        <ConfirmationDialog
-          open={isDialogOpen}
-          onClose={handleDialogClose}
-          onConfirm={handleDeleteConfirm}
-          title='Confirm Deletion'
-          message='Are you sure you want to delete this event? This action cannot be undone.'
-        />
+              <div className='flex justify-end gap-2 pt-4 border-t mt-4'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  onClick={handleCloseModal}
+                >
+                  Cancel
+                </Button>
+                <Button type='submit'>
+                  {editing ? 'Update Event' : 'Create Event'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </DialogContent>
+      </Dialog>
 
+      <ConfirmationDialog
+        open={isDialogOpen}
+        onClose={handleDialogClose}
+        onConfirm={handleDeleteConfirm}
+        title='Confirm Deletion'
+        message='Are you sure you want to delete this event? This action cannot be undone.'
+      />
 
-
-      {/* View Event Details Dialog */}
       <Dialog
         isOpen={viewModalOpen}
         onClose={handleCloseViewModal}
@@ -895,140 +890,140 @@ export default function EventManager() {
           <DialogClose onClick={handleCloseViewModal} />
         </DialogHeader>
         <DialogContent className='max-h-[80vh] overflow-y-auto'>
-        {loadingView ? (
-          <div className='flex justify-center items-center h-48'>
-            Loading...
-          </div>
-        ) : viewEventData ? (
-          <div className='space-y-4 p-2'>
-            {viewEventData.image && (
-              <div className='w-full h-64 rounded-lg overflow-hidden'>
-                <img
-                  src={viewEventData.image}
-                  alt={viewEventData.title}
-                  className='w-full h-full object-cover'
-                />
-              </div>
-            )}
+          {loadingView ? (
+            <div className='flex justify-center items-center h-48'>
+              Loading...
+            </div>
+          ) : viewEventData ? (
+            <div className='space-y-4 p-2'>
+              {viewEventData.image && (
+                <div className='w-full h-64 rounded-lg overflow-hidden'>
+                  <img
+                    src={viewEventData.image}
+                    alt={viewEventData.title}
+                    className='w-full h-full object-cover'
+                  />
+                </div>
+              )}
 
-            <div>
-              <h2 className='text-2xl font-bold text-gray-800'>
-                {viewEventData.title}
-              </h2>
-              {viewEventData.is_featured === 1 && (
-                <span className='px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 mt-2 inline-block'>
-                  Featured
-                </span>
+              <div>
+                <h2 className='text-2xl font-bold text-gray-800'>
+                  {viewEventData.title}
+                </h2>
+                {viewEventData.is_featured === 1 && (
+                  <span className='px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 mt-2 inline-block'>
+                    Featured
+                  </span>
+                )}
+              </div>
+
+              {viewEventData.category && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Category</h3>
+                  <p className='text-gray-700'>{viewEventData.category.title}</p>
+                </div>
+              )}
+
+              {viewEventData.college && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>College</h3>
+                  <p className='text-gray-700'>{viewEventData.college.name}</p>
+                </div>
+              )}
+
+              {viewEventData.author && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Author</h3>
+                  <p className='text-gray-700'>
+                    {viewEventData.author.firstName}{' '}
+                    {viewEventData.author.middleName}{' '}
+                    {viewEventData.author.lastName}
+                  </p>
+                </div>
+              )}
+
+              {viewEventData.event_host && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Event Details</h3>
+                  <div className='space-y-2'>
+                    {(() => {
+                      const eventHost = viewEventData.event_host
+                      return (
+                        <>
+                          {eventHost.host && (
+                            <p className='text-gray-700'>
+                              <span className='font-medium'>Host:</span>{' '}
+                              {eventHost.host}
+                            </p>
+                          )}
+                          {eventHost.start_date && (
+                            <p className='text-gray-700'>
+                              <span className='font-medium'>Start Date:</span>{' '}
+                              {formatDate(eventHost.start_date)}
+                            </p>
+                          )}
+                          {eventHost.end_date && (
+                            <p className='text-gray-700'>
+                              <span className='font-medium'>End Date:</span>{' '}
+                              {formatDate(eventHost.end_date)}
+                            </p>
+                          )}
+                          {eventHost.time && (
+                            <p className='text-gray-700'>
+                              <span className='font-medium'>Time:</span>{' '}
+                              {eventHost.time}
+                            </p>
+                          )}
+                          {eventHost.map_url && (
+                            <p className='text-gray-700'>
+                              <span className='font-medium'>Location:</span>{' '}
+                              <a
+                                href={eventHost.map_url}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='text-blue-600 hover:underline inline-flex items-center gap-1'
+                              >
+                                <MapPin className='inline w-4 h-4' /> View Map
+                              </a>
+                            </p>
+                          )}
+                        </>
+                      )
+                    })()}
+                  </div>
+                </div>
+              )}
+
+              {viewEventData.description && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Description</h3>
+                  <div
+                    className='text-gray-700 prose max-w-none'
+                    dangerouslySetInnerHTML={{
+                      __html: viewEventData.description
+                    }}
+                  />
+                </div>
+              )}
+
+              {viewEventData.content && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Content</h3>
+                  <div
+                    className='text-gray-700 prose max-w-none'
+                    dangerouslySetInnerHTML={{
+                      __html: viewEventData.content
+                    }}
+                  />
+                </div>
               )}
             </div>
-
-            {viewEventData.category && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Category</h3>
-                <p className='text-gray-700'>{viewEventData.category.title}</p>
-              </div>
-            )}
-
-            {viewEventData.college && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>College</h3>
-                <p className='text-gray-700'>{viewEventData.college.name}</p>
-              </div>
-            )}
-
-            {viewEventData.author && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Author</h3>
-                <p className='text-gray-700'>
-                  {viewEventData.author.firstName}{' '}
-                  {viewEventData.author.middleName}{' '}
-                  {viewEventData.author.lastName}
-                </p>
-              </div>
-            )}
-
-            {viewEventData.event_host && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Event Details</h3>
-                <div className='space-y-2'>
-                  {(() => {
-                    const eventHost = viewEventData.event_host
-                    return (
-                      <>
-                        {eventHost.host && (
-                          <p className='text-gray-700'>
-                            <span className='font-medium'>Host:</span>{' '}
-                            {eventHost.host}
-                          </p>
-                        )}
-                        {eventHost.start_date && (
-                          <p className='text-gray-700'>
-                            <span className='font-medium'>Start Date:</span>{' '}
-                            {formatDate(eventHost.start_date)}
-                          </p>
-                        )}
-                        {eventHost.end_date && (
-                          <p className='text-gray-700'>
-                            <span className='font-medium'>End Date:</span>{' '}
-                            {formatDate(eventHost.end_date)}
-                          </p>
-                        )}
-                        {eventHost.time && (
-                          <p className='text-gray-700'>
-                            <span className='font-medium'>Time:</span>{' '}
-                            {eventHost.time}
-                          </p>
-                        )}
-                        {eventHost.map_url && (
-                          <p className='text-gray-700'>
-                            <span className='font-medium'>Location:</span>{' '}
-                            <a
-                              href={eventHost.map_url}
-                              target='_blank'
-                              rel='noopener noreferrer'
-                              className='text-blue-600 hover:underline inline-flex items-center gap-1'
-                            >
-                              <MapPin className='inline w-4 h-4' /> View Map
-                            </a>
-                          </p>
-                        )}
-                      </>
-                    )
-                  })()}
-                </div>
-              </div>
-            )}
-
-            {viewEventData.description && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Description</h3>
-                <div
-                  className='text-gray-700 prose max-w-none'
-                  dangerouslySetInnerHTML={{
-                    __html: viewEventData.description
-                  }}
-                />
-              </div>
-            )}
-
-            {viewEventData.content && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Content</h3>
-                <div
-                  className='text-gray-700 prose max-w-none'
-                  dangerouslySetInnerHTML={{
-                    __html: viewEventData.content
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        ) : (
-          <p className='text-center text-gray-500'>No event data available.</p>
-        )}
+          ) : (
+            <p className='text-center text-gray-500'>No event data available.</p>
+          )}
         </DialogContent>
-        </Dialog>
-      </div>
-    </>
+      </Dialog>
+      <ToastContainer position='top-right' autoClose={3000} />
+    </div>
   )
 }

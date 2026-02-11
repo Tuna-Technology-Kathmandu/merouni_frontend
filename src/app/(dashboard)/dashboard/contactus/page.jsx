@@ -5,7 +5,7 @@ import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { toast } from 'react-toastify'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import Loading from '@/ui/molecules/Loading'
-import Table from '@/ui/molecules/Table'
+import Table from '@/ui/shadcn/Table'
 import { Search } from 'lucide-react'
 import { getContacts, deleteContact, updateContact } from '../../../actions/contactActions'
 import { createColumns } from './columns'
@@ -153,7 +153,7 @@ export default function ContactUsManager() {
                 <SearchInput
                     value={searchQuery}
                     onChange={(e) => handleSearch(e)}
-                    placeholder='Search contact us messages...'
+                    placeholder='Search messages...'
                     className='max-w-md'
                 />
 

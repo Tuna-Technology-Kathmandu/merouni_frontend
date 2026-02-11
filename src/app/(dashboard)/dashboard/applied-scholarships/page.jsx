@@ -18,7 +18,7 @@ import {
 import Loading from '@/ui/molecules/Loading'
 import EmptyState from '@/ui/shadcn/EmptyState'
 import { Select } from '@/ui/shadcn/select'
-import Table from '@/ui/molecules/Table'
+import Table from '@/ui/shadcn/Table'
 import { Button } from '@/ui/shadcn/button'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -241,66 +241,62 @@ const AppliedScholarshipsPage = () => {
   }
 
   return (
-    <div className='p-4 w-full'>
-      {/* Filter */}
-      <div className='mb-6'>
-        <div className='flex gap-4 items-center'>
-          <div className='w-64'>
-            <label className='block text-sm font-medium text-gray-700 mb-2'>
-              Filter by Status
-            </label>
-            <Select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value)
-                setPagination((prev) => ({ ...prev, currentPage: 1 }))
-              }}
-            >
-              <option value=''>All Status</option>
-              <option value='PENDING'>Pending</option>
-              <option value='APPROVED'>Approved</option>
-              <option value='REJECTED'>Rejected</option>
-            </Select>
+    <div className='w-full space-y-2'>
+      <div className='px-4 pt-4'>
+        <div className='mb-4'>
+          <div className='flex gap-4 items-center'>
+            <div className='w-64'>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>
+                Filter by Status
+              </label>
+              <Select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value)
+                  setPagination((prev) => ({ ...prev, currentPage: 1 }))
+                }}
+              >
+                <option value=''>All Status</option>
+                <option value='PENDING'>Pending</option>
+                <option value='APPROVED'>Approved</option>
+                <option value='REJECTED'>Rejected</option>
+              </Select>
+            </div>
           </div>
         </div>
-      </div>
 
-      {error && (
-        <div className='bg-red-50 border border-red-200 rounded-lg p-4 mb-6'>
-          <p className='text-sm text-red-600'>Error: {error}</p>
-        </div>
-      )}
+        {error && (
+          <div className='bg-red-50 border border-red-200 rounded-lg p-4 mb-6'>
+            <p className='text-sm text-red-600'>Error: {error}</p>
+          </div>
+        )}
 
-      {applications.length === 0 && !loading ? (
-        <div className='bg-white rounded-lg border border-gray-200 p-12'>
-          <EmptyState
-            icon={Award}
-            title='No Applications Found'
-            description={
-              statusFilter
-                ? `No ${statusFilter.toLowerCase()} applications found.`
-                : "You haven't applied for any scholarships yet."
-            }
-          />
-        </div>
-      ) : (
-        <>
-          <div className='bg-white rounded-lg border border-gray-200 overflow-hidden'>
-            <Table
-              loading={loading}
-              data={applications}
-              columns={columns}
-              pagination={pagination}
-              onPageChange={(newPage) =>
-                setPagination((prev) => ({ ...prev, currentPage: newPage }))
+        {applications.length === 0 && !loading ? (
+          <div className='bg-white rounded-lg border border-gray-200 p-12'>
+            <EmptyState
+              icon={Award}
+              title='No Applications Found'
+              description={
+                statusFilter
+                  ? `No ${statusFilter.toLowerCase()} applications found.`
+                  : "You haven't applied for any scholarships yet."
               }
-              showSearch={false}
             />
           </div>
-        </>
-      )}
+        ) : (
+          <Table
+            loading={loading}
+            data={applications}
+            columns={columns}
+            pagination={pagination}
+            onPageChange={(newPage) =>
+              setPagination((prev) => ({ ...prev, currentPage: newPage }))
+            }
+            showSearch={false}
+          />
+        )}
+      </div>
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmationDialog
         open={isDialogOpen}
         onClose={handleDialogClose}

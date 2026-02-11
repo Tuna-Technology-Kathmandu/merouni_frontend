@@ -14,7 +14,7 @@ import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { Button } from '@/ui/shadcn/button'
 import { Search, X, ChevronDown } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
-import Table from '../../../../ui/molecules/Table'
+import Table from '@/ui/shadcn/Table'
 import SearchInput from '@/ui/molecules/SearchInput'
 
 function useDebounce(value, delay) {

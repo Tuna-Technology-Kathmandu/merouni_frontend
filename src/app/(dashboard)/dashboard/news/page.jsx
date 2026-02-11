@@ -10,7 +10,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import Table from '../../../../ui/molecules/Table'
+import Table from '@/ui/shadcn/Table'
 import {
   Dialog,
   DialogContent,
@@ -341,11 +341,9 @@ export default function NewsManager() {
 
   return (
     <>
-      <div className='p-4 w-full'>
-        <ToastContainer position='top-right' />
-
-        {/* Header: search and Add News in same row */}
-        <div className='flex justify-between items-center gap-4 mb-6'>
+      <div className='w-full space-y-2'>
+        <div className='px-4 space-y-4'>
+        <div className='flex justify-between items-center pt-4'>
           <SearchInput
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
@@ -380,17 +378,17 @@ export default function NewsManager() {
         />
 
         {/* Table Section */}
-        <div className='mt-8'>
-          <Table
-            data={news}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => loadData(newPage, searchQuery)}
-            onSearch={handleSearch}
-            showSearch={false}
-          />
-        </div>
+        <Table
+          data={news}
+          columns={columns}
+          pagination={pagination}
+          onPageChange={(newPage) => loadData(newPage, searchQuery)}
+          onSearch={handleSearch}
+          showSearch={false}
+        />
       </div>
+      </div>
+      <ToastContainer position='top-right' />
 
       {/* Delete Confirmation Dialog */}
       <ConfirmationDialog

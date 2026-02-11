@@ -4,7 +4,7 @@ import { fetchBlogs, fetchTags } from './action'
 import { getCategories } from '@/app/action'
 import { authFetch } from '@/app/utils/authFetch'
 import Loader from '@/ui/molecules/Loading'
-import Table from '@/ui/molecules/Table'
+import Table from '@/ui/shadcn/Table'
 import { Select } from '@/ui/shadcn/select'
 import { Edit2, Trash2, Eye } from 'lucide-react'
 import SearchInput from '@/ui/molecules/SearchInput'
@@ -432,8 +432,9 @@ export default function BlogsManager() {
 
   return (
     <>
-      <div className='p-4 w-full'>
-        <div className='flex justify-between items-center mb-4'>
+      <div className='w-full space-y-2'>
+        <div className='px-4 space-y-4'>
+        <div className='flex justify-between items-center pt-4'>
           {/* Search Bar */}
           <SearchInput
             value={searchQuery}
@@ -470,17 +471,16 @@ export default function BlogsManager() {
         />
 
         {/* Table Section */}
-        <div className='mt-8'>
-          <Table
-            data={blogs}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => loadData(newPage)}
-            onSearch={handleSearch}
-            showSearch={false}
-          />
-        </div>
+        <Table
+          data={blogs}
+          columns={columns}
+          pagination={pagination}
+          onPageChange={(newPage) => loadData(newPage)}
+          onSearch={handleSearch}
+          showSearch={false}
+        />
       </div>
+    </div>
 
       <ConfirmationDialog
         open={isDialogOpen}

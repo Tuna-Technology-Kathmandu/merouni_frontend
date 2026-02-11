@@ -108,6 +108,12 @@ export const menuItems = [
         visible: ['admin', 'editor']
       },
       {
+        icon: <BsLayers className='text-xl' />,
+        label: 'Admission',
+        href: '/dashboard/admission',
+        visible: ['admin', 'editor']
+      },
+      {
         icon: <MdSchool className='text-xl' />,
         label: 'Scholarship',
         href: '/dashboard/scholarship',

@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-import Table from '../../../../ui/molecules/Table'
+import Table from '@/ui/shadcn/Table'
 import FileUpload from '../addCollege/FileUpload'
 import {
   Dialog,
@@ -386,31 +386,32 @@ const VacancyManager = () => {
 
   return (
     <>
-      <div className='p-4 w-full'>
-        <div className='flex justify-between items-center mb-4'>
-          {/* Search Bar */}
-          <SearchInput
-            value={searchQuery}
-            onChange={(e) => handleSearchInput(e.target.value)}
-            placeholder='Search vacancies...'
-            className='max-w-md'
-          />
-          {/* Button */}
-          <div className='flex gap-2'>
-            <Button
-              onClick={() => {
-                setIsOpen(true)
-                setEditing(false)
-                setEditingId(null)
-                reset()
-                setUploadedFiles({ featuredImage: '' })
-              }}
-            >
-              Add Vacancy
-            </Button>
+      <div className='w-full space-y-2'>
+        <div className='px-4 space-y-4'>
+          <div className='flex justify-between items-center pt-4'>
+            {/* Search Bar */}
+            <SearchInput
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              placeholder='Search vacancies...'
+              className='max-w-md'
+            />
+            {/* Button */}
+            <div className='flex gap-2'>
+              <Button
+                onClick={() => {
+                  setIsOpen(true)
+                  setEditing(false)
+                  setEditingId(null)
+                  reset()
+                  setUploadedFiles({ featuredImage: '' })
+                }}
+              >
+                Add Vacancy
+              </Button>
+            </div>
           </div>
-        </div>
-        <ToastContainer />
+          <ToastContainer />
 
         <Dialog
           isOpen={isOpen}
@@ -543,18 +544,17 @@ const VacancyManager = () => {
         </Dialog>
 
         {/* Table Section */}
-        <div className='mt-8'>
-          <Table
-            loading={tableLoading}
-            data={vacancies}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => loadVacancies(newPage)}
-            onSearch={handleSearch}
-            showSearch={false}
-          />
-        </div>
+        <Table
+          loading={tableLoading}
+          data={vacancies}
+          columns={columns}
+          pagination={pagination}
+          onPageChange={(newPage) => loadVacancies(newPage)}
+          onSearch={handleSearch}
+          showSearch={false}
+        />
       </div>
+    </div>
 
       <ConfirmationDialog
         open={isDialogOpen}

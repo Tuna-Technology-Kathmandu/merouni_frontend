@@ -13,7 +13,7 @@ import {
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 import FileUpload from './FileUpload'
-import Table from '../../../../ui/molecules/Table'
+import Table from '@/ui/shadcn/Table'
 import {
   Edit2,
   Trash2,
@@ -27,7 +27,7 @@ import {
 } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
-import AdmissionItem from './AdmissionItem'
+
 import ConfirmationDialog from './ConfirmationDialog'
 import {
   Dialog,
@@ -256,15 +256,7 @@ export default function CollegeForm() {
       },
       contacts: ['', ''],
       members: [],
-      admissions: [
-        {
-          course_id: '',
-          eligibility_criteria: '',
-          admission_process: '',
-          fee_details: '',
-          description: ''
-        }
-      ]
+
     }
   })
 
@@ -274,11 +266,7 @@ export default function CollegeForm() {
     remove: removeMember
   } = useFieldArray({ control, name: 'members' })
 
-  const {
-    fields: admissionFields,
-    append: appendAdmission,
-    remove: removeAdmission
-  } = useFieldArray({ control, name: 'admissions' })
+
 
   const {
     fields: facilityFields,
@@ -294,13 +282,7 @@ export default function CollegeForm() {
     try {
       setSubmitting(true)
 
-      //   this makes empty [] when all clear is done
-      data.admissions = data.admissions.filter((admission) => {
-        return Object.values(admission).some((val) => {
-          if (typeof val === 'string') return val.trim() !== ''
-          return val !== null && val !== undefined
-        })
-      })
+
 
       // Filter out empty members
       const filteredMembers = (data.members || []).filter((member) => {
@@ -837,30 +819,7 @@ export default function CollegeForm() {
           ]
       setValue('facilities', facilityData)
 
-      // Admissions
-      const admissionData = collegeData.collegeAdmissions?.length
-        ? collegeData.collegeAdmissions.map((admission) => {
-            const courseId = courses.find(
-              (c) => c.title === admission.program.title
-            )?.id
-            return {
-              course_id: courseId || '',
-              eligibility_criteria: admission.eligibility_criteria || '',
-              admission_process: admission.admission_process || '',
-              fee_details: admission.fee_details || '',
-              description: admission.description || ''
-            }
-          })
-        : [
-            {
-              course_id: '',
-              eligibility_criteria: '',
-              admission_process: '',
-              fee_details: '',
-              description: ''
-            }
-          ]
-      setValue('admissions', admissionData)
+
     } catch (error) {
       console.error('Error fetching college data:', error)
       toast.error('Failed to fetch college data')
@@ -1018,8 +977,8 @@ export default function CollegeForm() {
 
   return (
     <>
-      <div className='p-4 w-full'>
-        <div className='flex justify-between items-center mb-4'>
+      <div className='w-full space-y-2'>
+        <div className='flex justify-between items-center px-4 pt-4'>
           {/* Search Bar */}
           <SearchInput
             value={searchQuery}
@@ -1527,46 +1486,6 @@ export default function CollegeForm() {
                   ))}
                 </div>
 
-                {/* Admissions Section */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <div className='flex justify-between items-center mb-4'>
-                    <h2 className='text-xl font-semibold'>Admissions</h2>
-                    <Button
-                      type='button'
-                      onClick={() =>
-                        appendAdmission({
-                          course_id: '',
-                          eligibility_criteria: '',
-                          admission_process: '',
-                          fee_details: '',
-                          description: ''
-                        })
-                      }
-                      variant='default'
-                      size='sm'
-                    >
-                      Add Admission
-                    </Button>
-                  </div>
-
-                  {admissionFields.map((field, index) => {
-                    const courseId = getValues(`admissions.${index}.course_id`)
-                    const courseTitle =
-                      courses.find((c) => c.id === courseId)?.title || ''
-                    return (
-                      <AdmissionItem
-                        key={field.id}
-                        index={index}
-                        remove={removeAdmission}
-                        register={register}
-                        setValue={setValue}
-                        getValues={getValues}
-                        admissionFields={admissionFields}
-                        initialCourseTitle={courseTitle}
-                      />
-                    )
-                  })}
-                </div>
 
                 {/* Address Section */}
                 <div className='bg-white p-6 rounded-lg shadow-md'>
@@ -1835,166 +1754,151 @@ export default function CollegeForm() {
         </Dialog>
 
         {/*table*/}
-        <Table
-          loading={tableloading}
-          data={colleges}
-          columns={columns}
-          pagination={pagination}
-          onPageChange={(newPage) => loadColleges(newPage)}
-          onSearch={handleSearch}
-          showSearch={false}
-        />
-      </div>
-
+        <div className='w-full space-y-2'>
+          {/* Assuming a search row would go here if showSearch was true */}
+          {/* <div className='px-4 pt-4'>
+            <Input placeholder='Search colleges...' />
+          </div> */}
+          <Table
+            loading={tableloading}
+            data={colleges}
+            columns={columns}
+            pagination={pagination}
+            onPageChange={(newPage) => loadColleges(newPage)}
+            onSearch={handleSearch}
+            showSearch={false}
+          />
+        </div>
       {/* Create Credentials Modal */}
       <Dialog
         isOpen={credentialsModalOpen}
         onClose={handleCloseCredentialsModal}
+        className='max-w-md'
       >
-        <DialogContent className='max-w-md'>
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Create College Credentials</DialogTitle>
+            <DialogClose onClick={handleCloseCredentialsModal} />
           </DialogHeader>
-        <form onSubmit={handleCreateCredentials} className='space-y-4'>
-          <div className='space-y-2'>
-            <Label htmlFor='first-name'>First Name</Label>
-            <Input
-              id='first-name'
-              type='text'
-              placeholder='First Name'
-              value={credentialsForm.firstName}
-              onChange={(e) =>
-                setCredentialsForm({
-                  ...credentialsForm,
-                  firstName: e.target.value
-                })
-              }
-              required
-            />
-          </div>
-
-          <div className='space-y-2'>
-            <Label htmlFor='last-name'>Last Name</Label>
-            <Input
-              id='last-name'
-              type='text'
-              placeholder='Last Name'
-              value={credentialsForm.lastName}
-              onChange={(e) =>
-                setCredentialsForm({
-                  ...credentialsForm,
-                  lastName: e.target.value
-                })
-              }
-              required
-            />
-          </div>
-
-          <div className='space-y-2'>
-            <Label htmlFor='email'>Email</Label>
-            <div className='flex gap-2'>
-              <Input
-                id='email'
-                type='text'
-                className='flex-1'
-                placeholder='username'
-                value={credentialsForm.emailName}
-                onChange={(e) =>
-                  setCredentialsForm({
-                    ...credentialsForm,
-                    emailName: e.target.value
-                  })
-                }
-                required
-              />
-              <div className='flex-none px-3 py-2 border border-input rounded-md bg-muted flex items-center text-muted-foreground text-sm'>
-                @merouni.com
+          <form onSubmit={handleCreateCredentials} className='space-y-4 pt-4'>
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='space-y-2'>
+                <Label htmlFor='cred-first-name'>First Name</Label>
+                <Input
+                  id='cred-first-name'
+                  placeholder='First Name'
+                  value={credentialsForm.firstName}
+                  onChange={(e) =>
+                    setCredentialsForm({
+                      ...credentialsForm,
+                      firstName: e.target.value
+                    })
+                  }
+                  required
+                />
+              </div>
+              <div className='space-y-2'>
+                <Label htmlFor='cred-last-name'>Last Name</Label>
+                <Input
+                  id='cred-last-name'
+                  placeholder='Last Name'
+                  value={credentialsForm.lastName}
+                  onChange={(e) =>
+                    setCredentialsForm({
+                      ...credentialsForm,
+                      lastName: e.target.value
+                    })
+                  }
+                  required
+                />
               </div>
             </div>
-          </div>
 
-          <div className='space-y-2'>
-            <Label htmlFor='password'>Password</Label>
-            <div className='relative'>
+            <div className='space-y-2'>
+              <Label htmlFor='cred-email'>Email Address</Label>
+              <div className='flex items-center gap-2'>
+                <Input
+                  id='cred-email'
+                  placeholder='username'
+                  value={credentialsForm.emailName}
+                  onChange={(e) =>
+                    setCredentialsForm({
+                      ...credentialsForm,
+                      emailName: e.target.value
+                    })
+                  }
+                  required
+                />
+                <span className='text-muted-foreground'>@merouni.com</span>
+              </div>
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='cred-password'>Password</Label>
+              <div className='relative'>
+                <Input
+                  id='cred-password'
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder='••••••••'
+                  value={credentialsForm.password}
+                  onChange={(e) =>
+                    setCredentialsForm({
+                      ...credentialsForm,
+                      password: e.target.value
+                    })
+                  }
+                  required
+                />
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='sm'
+                  className='absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent'
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className='h-4 w-4' />
+                  ) : (
+                    <Eye className='h-4 w-4' />
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='cred-phone'>Phone Number</Label>
               <Input
-                id='password'
-                type={showPassword ? 'text' : 'password'}
-                placeholder='Password (min 6 characters)'
-                value={credentialsForm.password}
+                id='cred-phone'
+                placeholder='98XXXXXXXX'
+                value={credentialsForm.phoneNo}
                 onChange={(e) =>
                   setCredentialsForm({
                     ...credentialsForm,
-                    password: e.target.value
+                    phoneNo: e.target.value
                   })
                 }
                 required
-                minLength={6}
-                className='pr-10'
               />
-              <button
-                type='button'
-                onClick={() => setShowPassword(!showPassword)}
-                className='absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'
-              >
-                {showPassword ? (
-                  <EyeOff className='w-4 h-4' />
-                ) : (
-                  <Eye className='w-4 h-4' />
-                )}
-              </button>
             </div>
-          </div>
-          {/* <div className='space-y-2'>
-            <Label htmlFor='last-name'>Last Name</Label>
-            <Input
-              id='last-name'
-              type='text'
-              placeholder='Last Name'
-              value={credentialsForm.lastName}
-              onChange={(e) =>
-                setCredentialsForm({
-                  ...credentialsForm,
-                  lastName: e.target.value
-                })
-              }
-              required
-            />
-          </div>
- */}
 
-          <div className='space-y-2'>
-            <Label htmlFor='cred-phone-number'>Phone Number </Label>
-            <Input
-              id='cred-phone-number'
-              type='tel'
-              placeholder='Phone Number'
-              value={credentialsForm.phoneNo}
-              onChange={(e) =>
-                setCredentialsForm({
-                  ...credentialsForm,
-                  phoneNo: e.target.value
-                })
-              }
-              required
-            />
-          </div>
-
-          <div className='flex justify-end gap-2 pt-4'>
-            <Button
-              type='button'
-              onClick={handleCloseCredentialsModal}
-              variant='outline'
-              size='sm'
-            >
-              Cancel
-            </Button>
-            <Button type='submit' disabled={creatingCredentials} size='sm'>
-              {creatingCredentials ? 'Creating...' : 'Create'}
-            </Button>
-          </div>
-        </form>
+            <div className='flex justify-end gap-2 pt-4'>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={handleCloseCredentialsModal}
+              >
+                Cancel
+              </Button>
+              <Button type='submit' disabled={creatingCredentials}>
+                {creatingCredentials ? 'Creating...' : 'Create Credentials'}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
+
+
+    </div>
     </>
   )
 }

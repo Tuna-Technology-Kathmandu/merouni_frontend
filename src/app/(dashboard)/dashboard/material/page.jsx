@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
-import Table from '../../../../ui/molecules/Table'
+import Table from '@/ui/shadcn/Table'
 import { Edit2, Trash2, Search } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
@@ -486,9 +486,9 @@ export default function MaterialForm() {
   }
 
   return (
-    <>
+    <div className='w-full space-y-2'>
       {/* Header Section */}
-      <div className='sticky top-0 z-30 bg-[#F7F8FA] flex items-center justify-between p-4'>
+      <div className='sticky top-0 z-30 bg-[#F7F8FA] flex items-center justify-between px-4 pt-4'>
         {/* Search Bar */}
           <SearchInput
             value={searchQuery}
@@ -730,8 +730,7 @@ export default function MaterialForm() {
         </DialogContent>
       </Dialog>
 
-      {/* Table */}
-      <div className='p-4'>
+      <div className='px-4 pt-4'>
         <Table
           loading={tableLoading}
           data={materials}
@@ -742,7 +741,6 @@ export default function MaterialForm() {
           showSearch={false}
         />
       </div>
-
       <ConfirmationDialog
         open={isDialogOpen}
         onClose={handleDialogClose}
@@ -752,6 +750,6 @@ export default function MaterialForm() {
         confirmText='Delete'
         cancelText='Cancel'
       />
-    </>
+    </div>
   )
 }

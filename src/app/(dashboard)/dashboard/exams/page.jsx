@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { getAllExams, createExam, updateExam, deleteExam } from './actions'
 import Loading from '../../../../ui/molecules/Loading'
-import Table from '../../../../ui/molecules/Table'
+import Table from '@/ui/shadcn/Table'
 import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
@@ -550,8 +550,8 @@ export default function ExamManager() {
 
   return (
     <>
-      <div className='p-4 w-full'>
-        <div className='flex justify-between items-center mb-4'>
+      <div className='w-full space-y-2'>
+        <div className='flex justify-between items-center px-4 pt-4'>
           {/* Search Bar */}
           <SearchInput
             value={searchQuery}
@@ -607,7 +607,6 @@ export default function ExamManager() {
         <ToastContainer />
 
         {/* Table */}
-        <div className='mt-8'>
           <Table
             loading={tableLoading}
             data={exams}
@@ -617,7 +616,6 @@ export default function ExamManager() {
             onSearch={handleSearch}
             showSearch={false}
           />
-        </div>
       </div>
 
       {/* Form Dialog */}

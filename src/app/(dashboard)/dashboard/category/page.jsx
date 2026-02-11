@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { fetchCategories, deleteCategory } from './action'
 import Loader from '../../../../ui/molecules/Loading'
-import Table from '../../../../ui/molecules/Table'
+import Table from '@/ui/shadcn/Table'
 import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -470,16 +470,14 @@ export default function CategoryManager() {
       </Dialog>
 
         {/* Table */}
-        <div className='mt-8'>
-          <Table
-            data={categories}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => loadCategories(newPage)}
-            onSearch={handleSearch}
-            showSearch={false}
-          />
-        </div>
+        <Table
+          data={categories}
+          columns={columns}
+          pagination={pagination}
+          onPageChange={(newPage) => loadCategories(newPage)}
+          onSearch={handleSearch}
+          showSearch={false}
+        />
       </div>
 
       <ConfirmationDialog

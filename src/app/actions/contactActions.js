@@ -78,7 +78,7 @@ export async function deleteContact(id) {
         if (!token) throw new Error('No authentication token provided')
 
         const response = await authFetch(
-            `${process.env.baseUrl}/contact-us/${id}`,
+            `${process.env.baseUrl}/contact-us?id=${id}`,
             {
                 method: 'DELETE',
                 headers: {

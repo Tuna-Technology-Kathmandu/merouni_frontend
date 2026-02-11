@@ -1,93 +1,213 @@
-import * as React from 'react'
-
-import { cn } from '@/app/lib/utils'
-
-const Table = React.forwardRef(({ className, ...props }, ref) => (
-  <div className='relative w-full overflow-auto'>
-    <table
-      ref={ref}
-      className={cn('w-full caption-bottom text-sm', className)}
-      {...props}
-    />
-  </div>
-))
-Table.displayName = 'Table'
-
-const TableHeader = React.forwardRef(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn('[&_tr]:border-b', className)} {...props} />
-))
-TableHeader.displayName = 'TableHeader'
-
-const TableBody = React.forwardRef(({ className, ...props }, ref) => (
-  <tbody
-    ref={ref}
-    className={cn('[&_tr:last-child]:border-0', className)}
-    {...props}
-  />
-))
-TableBody.displayName = 'TableBody'
-
-const TableFooter = React.forwardRef(({ className, ...props }, ref) => (
-  <tfoot
-    ref={ref}
-    className={cn(
-      'border-t bg-muted/50 font-medium [&>tr]:last:border-b-0',
-      className
-    )}
-    {...props}
-  />
-))
-TableFooter.displayName = 'TableFooter'
-
-const TableRow = React.forwardRef(({ className, ...props }, ref) => (
-  <tr
-    ref={ref}
-    className={cn(
-      'border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted',
-      className
-    )}
-    {...props}
-  />
-))
-TableRow.displayName = 'TableRow'
-
-const TableHead = React.forwardRef(({ className, ...props }, ref) => (
-  <th
-    ref={ref}
-    className={cn(
-      'h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0',
-      className
-    )}
-    {...props}
-  />
-))
-TableHead.displayName = 'TableHead'
-
-const TableCell = React.forwardRef(({ className, ...props }, ref) => (
-  <td
-    ref={ref}
-    className={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)}
-    {...props}
-  />
-))
-TableCell.displayName = 'TableCell'
-
-const TableCaption = React.forwardRef(({ className, ...props }, ref) => (
-  <caption
-    ref={ref}
-    className={cn('mt-4 text-sm text-muted-foreground', className)}
-    {...props}
-  />
-))
-TableCaption.displayName = 'TableCaption'
-
-export {
-  Table,
-  TableHeader,
+'use client'
+import React, { useEffect, useState } from 'react'
+import {
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+  getSortedRowModel,
+  getFilteredRowModel
+} from '@tanstack/react-table'
+import { ChevronUp, ChevronDown } from 'lucide-react'
+import SearchInput from '../molecules/SearchInput'
+import ShimmerEffect from '../molecules/ShimmerEffect'
+import {
+  Table as ShadcnTable,
   TableBody,
-  TableFooter,
-  TableHead,
-  TableRow,
   TableCell,
-  TableCaption
+  TableHead,
+  TableHeader,
+  TableRow
+} from './table-primitives'
+import { Button } from '@/ui/shadcn/button'
+
+const Table = ({
+  data,
+  columns,
+  pagination,
+  onPageChange,
+  onSearch,
+  loading = false,
+  showSearch = true,
+  emptyContent = null
+}) => {
+  const [sorting, setSorting] = useState([])
+  const [filtering, setFiltering] = useState('')
+  const [searchTimeout, setSearchTimeout] = useState(null)
+
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    manualPagination: true,
+    pageCount: pagination?.totalPages,
+    state: {
+      sorting: sorting,
+      pagination: {
+        pageIndex: pagination?.currentPage - 1,
+        pageSize: 10
+      }
+    },
+    onSortingChange: setSorting,
+    onPaginationChange: (updater) => {
+      if (typeof updater === 'function') {
+        const newPageIndex = updater(table.getState().pagination).pageIndex
+        onPageChange(newPageIndex + 1)
+      }
+    }
+  })
+
+  const handleSearch = (value) => {
+    setFiltering(value)
+
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    if (value === '') {
+      onSearch('')
+    } else {
+      const timeoutId = setTimeout(() => {
+        onSearch(value)
+      }, 300)
+      setSearchTimeout(timeoutId)
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout)
+      }
+    }
+  }, [searchTimeout])
+
+  return (
+    <div className='w-full space-y-4'>
+      {/* Search Input */}
+      {showSearch && (
+        <div>
+          <SearchInput
+            className='max-w-md'
+            value={filtering}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder='Search...'
+          />
+        </div>
+      )}
+
+      {/* Table Container */}
+      {loading ? (
+        <div className='px-4'>
+          <ShimmerEffect />
+        </div>
+      ) : (
+        <div className='rounded-md border bg-white'>
+          <ShadcnTable>
+            <TableHeader className='bg-white'>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className='hover:bg-white'>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      onClick={header.column.getToggleSortingHandler()}
+                      className={header.column.getCanSort() ? 'cursor-pointer select-none' : ''}
+                    >
+                      <div className='flex items-center space-x-1'>
+                        <span>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                        </span>
+                        {header.column.getCanSort() && (
+                          <span className='inline-block w-4'>
+                            {header.column.getIsSorted() === 'asc' ? (
+                              <ChevronUp className='w-4 h-4' />
+                            ) : header.column.getIsSorted() === 'desc' ? (
+                              <ChevronDown className='w-4 h-4' />
+                            ) : null}
+                          </span>
+                        )}
+                      </div>
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody className='bg-white'>
+              {table.getRowModel().rows.length > 0 ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id} className='hover:bg-gray-50'>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow className='hover:bg-white'>
+                  <TableCell
+                    colSpan={columns.length}
+                    className='py-24 text-center text-muted-foreground'
+                  >
+                    {emptyContent || 'No results found.'}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </ShadcnTable>
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      <div className='flex items-center justify-between px-4 py-2 border-t bg-white rounded-b-md'>
+        <div className='text-sm text-gray-600'>
+          Page {pagination?.currentPage} of {pagination?.totalPages}
+          {' '}({pagination?.total || 0} total items)
+        </div>
+        <div className='flex items-center space-x-2'>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() => onPageChange(1)}
+            disabled={pagination?.currentPage === 1 || !pagination?.total}
+          >
+            First
+          </Button>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() => onPageChange(pagination?.currentPage - 1)}
+            disabled={pagination?.currentPage === 1 || !pagination?.total}
+          >
+            Previous
+          </Button>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() => onPageChange(pagination?.currentPage + 1)}
+            disabled={pagination?.currentPage === pagination?.totalPages || !pagination?.total}
+          >
+            Next
+          </Button>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() => onPageChange(pagination?.totalPages)}
+            disabled={pagination?.currentPage === pagination?.totalPages || !pagination?.total}
+          >
+            Last
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
 }
+
+export default Table

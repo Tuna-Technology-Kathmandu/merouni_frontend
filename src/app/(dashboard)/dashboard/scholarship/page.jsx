@@ -17,7 +17,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import Loading from '../../../../ui/molecules/Loading'
-import Table from '../../../../ui/molecules/Table'
+import Table from '@/ui/shadcn/Table'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import ScholarshipFormDialog from '@/ui/organisms/admin-dashboard/ScholarshipFormDialog'
 import {
@@ -353,8 +353,8 @@ export default function ScholarshipManager() {
 
   return (
     <>
-      <div className='p-4 w-full'>
-        <div className='flex justify-between items-center mb-4'>
+      <div className='w-full space-y-2'>
+        <div className='flex justify-between items-center px-4 pt-4'>
           {/* Search Bar */}
 
           <SearchInput
@@ -379,7 +379,6 @@ export default function ScholarshipManager() {
         <ToastContainer />
 
         {/* Table */}
-        <div className='mt-8'>
           <Table
             loading={tableLoading}
             data={scholarships}
@@ -389,7 +388,6 @@ export default function ScholarshipManager() {
             onSearch={handleSearch}
             showSearch={false}
           />
-        </div>
       </div>
 
       {/* Form Dialog */}

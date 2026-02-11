@@ -20,7 +20,7 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '@/ui/shadcn/table'
+} from '@/ui/shadcn/table-primitives'
 import { Button } from '@/ui/shadcn/button'
 import { Search, X, Filter, ChevronDown } from 'lucide-react'
 import CollegesDropdown from '@/ui/molecules/dropdown/CollegesDropdown'

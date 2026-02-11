@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Table from '../../../../ui/molecules/Table'
+import Table from '@/ui/shadcn/Table'
 import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'

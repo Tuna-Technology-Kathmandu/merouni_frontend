@@ -2,7 +2,7 @@
 
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import Loading from '@/ui/molecules/Loading'
-import Table from '@/ui/molecules/Table'
+import Table from '@/ui/shadcn/Table'
 import { Button } from '@/ui/shadcn/button'
 import EmptyState from '@/ui/shadcn/EmptyState'
 import { formatDate } from '@/utils/date.util'
@@ -249,30 +249,30 @@ const AppliedConsultanciesPage = () => {
   }
 
   return (
-    <div className='p-4 w-full'>
-      {error && (
-        <div className='bg-red-50 border border-red-200 rounded-lg p-4 mb-6'>
-          <p className='text-sm text-red-600'>Error: {error}</p>
-        </div>
-      )} 
-
-      {applications.length === 0 && !loading ? (
-        <div className='bg-white rounded-lg border border-gray-200 p-12'>
-          <EmptyState
-            icon={Handshake}
-            title='No Applications Found'
-            description="You haven't applied for any consultations yet."
-          />
-          <div className='mt-6 text-center'>
-            <Link href='/consultancy'>
-              <Button className='bg-[#0A6FA7] hover:bg-[#085e8a]'>
-                Explore Consultancies
-              </Button>
-            </Link>
+    <div className='w-full space-y-2'>
+      <div className='px-4 pt-4'>
+        {error && (
+          <div className='bg-red-50 border border-red-200 rounded-lg p-4 mb-6'>
+            <p className='text-sm text-red-600'>Error: {error}</p>
           </div>
-        </div>
-      ) : (
-        <div className='bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm'>
+        )}
+
+        {applications.length === 0 && !loading ? (
+          <div className='bg-white rounded-lg border border-gray-200 p-12'>
+            <EmptyState
+              icon={Handshake}
+              title='No Applications Found'
+              description="You haven't applied for any consultations yet."
+            />
+            <div className='mt-6 text-center'>
+              <Link href='/consultancy'>
+                <Button className='bg-[#0A6FA7] hover:bg-[#085e8a]'>
+                  Explore Consultancies
+                </Button>
+              </Link>
+            </div>
+          </div>
+        ) : (
           <Table
             loading={loading}
             data={applications}
@@ -281,9 +281,8 @@ const AppliedConsultanciesPage = () => {
             onPageChange={handlePageChange}
             showSearch={false}
           />
-        </div>
-      )}
-
+        )}
+      </div>
     </div>
   )
 }

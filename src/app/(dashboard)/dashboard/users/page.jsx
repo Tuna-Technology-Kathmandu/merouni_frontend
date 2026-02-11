@@ -21,6 +21,8 @@ import {
 } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import SearchInput from '@/ui/molecules/SearchInput'
+import { createColumns } from './columns'
+import Table from '@/ui/shadcn/Table'
 
 export default function UsersManager() {
   const { setHeading } = usePageHeading()
@@ -359,16 +361,10 @@ export default function UsersManager() {
     [handleEdit, handleDelete]
   )
 
-  if (loading)
-    return (
-      <div className='mx-auto'>
-        <Loading />
-      </div>
-    )
-
   return (
-    <div className='p-4 w-full'>
-      <div className='flex justify-between items-center mb-4 gap-4'>
+    <div className='w-full space-y-2'>
+      <div className='px-4 space-y-4'>
+        <div className='flex justify-between items-center pt-4 gap-4'>
         {/* Search Bar and Filter */}
         
                      <SearchInput
@@ -605,6 +601,7 @@ export default function UsersManager() {
 
       {/* Table */}
       <Table
+        loading={loading}
         data={users}
         columns={columns}
         pagination={pagination}
@@ -613,5 +610,6 @@ export default function UsersManager() {
         showSearch={false}
       />
     </div>
+  </div>
   )
 }
