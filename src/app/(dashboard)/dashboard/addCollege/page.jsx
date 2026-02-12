@@ -13,7 +13,7 @@ import {
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 import FileUpload from './FileUpload'
-import Table from '@/ui/shadcn/Table'
+import Table from '@/ui/shadcn/DataTable'
 import {
   Edit2,
   Trash2,
