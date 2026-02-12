@@ -8,7 +8,7 @@ import {
 } from './action'
 import { useSelector } from 'react-redux'
 import Loader from '../../../../ui/molecules/Loading'
-import Table from '@/ui/shadcn/Table'
+import Table from '@/ui/shadcn/DataTable'
 import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'

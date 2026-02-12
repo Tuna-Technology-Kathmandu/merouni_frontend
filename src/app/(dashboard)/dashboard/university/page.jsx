@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import Table from '@/ui/shadcn/Table'
+import Table from '@/ui/shadcn/DataTable'
 import { Search } from 'lucide-react'
 import { createColumns } from './columns'
 import { authFetch } from '@/app/utils/authFetch'

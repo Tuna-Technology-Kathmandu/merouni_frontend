@@ -17,7 +17,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import Loading from '../../../../ui/molecules/Loading'
-import Table from '@/ui/shadcn/Table'
+import Table from '@/ui/shadcn/DataTable'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import ScholarshipFormDialog from '@/ui/organisms/admin-dashboard/ScholarshipFormDialog'
 import {

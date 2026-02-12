@@ -4,7 +4,7 @@ import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@
 import { Button } from '@/ui/shadcn/button'
 import { Edit2, Eye, Search, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import Table from '@/ui/shadcn/Table'
+import Table from '@/ui/shadcn/DataTable'
 import { fetchDisciplines } from './action'
 
 import { authFetch } from '@/app/utils/authFetch'

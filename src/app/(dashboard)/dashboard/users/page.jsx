@@ -22,7 +22,7 @@ import {
 import { Button } from '@/ui/shadcn/button'
 import SearchInput from '@/ui/molecules/SearchInput'
 import { createColumns } from './columns'
-import Table from '@/ui/shadcn/Table'
+import Table from '@/ui/shadcn/DataTable'
 
 export default function UsersManager() {
   const { setHeading } = usePageHeading()

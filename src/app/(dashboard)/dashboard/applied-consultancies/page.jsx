@@ -2,7 +2,7 @@
 
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import Loading from '@/ui/molecules/Loading'
-import Table from '@/ui/shadcn/Table'
+import Table from '@/ui/shadcn/DataTable'
 import { Button } from '@/ui/shadcn/button'
 import EmptyState from '@/ui/shadcn/EmptyState'
 import { formatDate } from '@/utils/date.util'

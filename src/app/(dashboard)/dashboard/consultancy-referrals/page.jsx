@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react'
-import { fetchConsultancyApplications, fetchAllConsultancies, updateConsultancyApplicationStatus, deleteConsultancyApplication } from './action'
+import { fetchConsultancyApplications, updateConsultancyApplicationStatus, deleteConsultancyApplication } from './action'
 import { FaTrashAlt, FaEdit } from 'react-icons/fa'
 import {
   Dialog,
@@ -14,8 +14,9 @@ import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import { Button } from '@/ui/shadcn/button'
 import { Search, X, ChevronDown } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
-import Table from '@/ui/shadcn/Table'
+import Table from '@/ui/shadcn/DataTable'
 import SearchInput from '@/ui/molecules/SearchInput'
+import ConsultancyDropdown from '@/ui/molecules/dropdown/ConsultancyDropdown'
 
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -35,7 +36,6 @@ const ConsultancyReferralsPage = () => {
 
   // Data State
   const [applications, setApplications] = useState([])
-  const [consultancies, setConsultancies] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -57,9 +57,7 @@ const ConsultancyReferralsPage = () => {
 
   // UI States
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false)
-  const [consultancyDropdownOpen, setConsultancyDropdownOpen] = useState(false)
   const statusDropdownRef = useRef(null)
-  const consultancyDropdownRef = useRef(null)
 
   // Pagination State
   const [pagination, setPagination] = useState({
@@ -73,10 +71,7 @@ const ConsultancyReferralsPage = () => {
     return () => setHeading(null)
   }, [setHeading])
 
-  // Initial Load (Consultancies list only needs to load once)
-  useEffect(() => {
-    loadConsultancies()
-  }, [])
+
 
   // Main Data Load Trigger
   useEffect(() => {
@@ -84,15 +79,7 @@ const ConsultancyReferralsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch, statusFilter, consultancyFilter, pagination.currentPage])
 
-  const loadConsultancies = async () => {
-    try {
-      const consulData = await fetchAllConsultancies()
-      const consulList = Array.isArray(consulData) ? consulData : (consulData.items || [])
-      setConsultancies(consulList)
-    } catch (err) {
-      console.error("Failed to load consultancies", err)
-    }
-  }
+
 
   const loadData = async () => {
     try {
@@ -198,9 +185,8 @@ const ConsultancyReferralsPage = () => {
     setPagination(prev => ({ ...prev, currentPage: 1 }))
   }
 
-  const handleConsultancySelect = (id) => {
+  const handleConsultancySelect = (id, consultancy) => {
     setConsultancyFilter(id)
-    setConsultancyDropdownOpen(false)
     setPagination(prev => ({ ...prev, currentPage: 1 }))
   }
 
@@ -217,8 +203,8 @@ const ConsultancyReferralsPage = () => {
       if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target)) {
         setStatusDropdownOpen(false)
       }
-      if (consultancyDropdownRef.current && !consultancyDropdownRef.current.contains(event.target)) {
-        setConsultancyDropdownOpen(false)
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target)) {
+        setStatusDropdownOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -347,31 +333,12 @@ const ConsultancyReferralsPage = () => {
         </div>
 
         {/* Consultancy Filter Dropdown */}
-        <div className='relative' ref={consultancyDropdownRef}>
-          <button
-            type='button'
-            onClick={() => setConsultancyDropdownOpen(!consultancyDropdownOpen)}
-            className='w-full md:w-64 pl-4 pr-10 py-2 text-left border border-gray-300 rounded-lg bg-white hover:bg-gray-50'
-          >
-            <span className={consultancyFilter ? 'text-gray-900' : 'text-gray-500 truncate block'}>
-              {consultancyFilter
-                ? (consultancies.find(c => c.id === parseInt(consultancyFilter))?.title || 'Selected')
-                : 'All Consultancies'}
-            </span>
-            <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${consultancyDropdownOpen ? 'rotate-180' : ''}`} />
-          </button>
-
-          {consultancyDropdownOpen && (
-            <div className='absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto'>
-              <button onClick={() => handleConsultancySelect('')} className='w-full text-left px-4 py-2 hover:bg-gray-50 text-sm'>All Consultancies</button>
-              {consultancies.map(c => (
-                <button key={c.id} onClick={() => handleConsultancySelect(c.id.toString())} className={`w-full text-left px-4 py-2 hover:bg-blue-50 text-sm ${consultancyFilter === c.id.toString() ? 'bg-blue-50 text-blue-600' : ''}`}>
-                  {c.title || 'Unknown Consultancy'}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <ConsultancyDropdown 
+          value={consultancyFilter}
+          onChange={handleConsultancySelect}
+          placeholder="All Consultancies"
+          className="w-full md:w-64"
+        />
 
         {hasActiveFilters && (
           <Button variant="outline" onClick={handleClearFilters}>

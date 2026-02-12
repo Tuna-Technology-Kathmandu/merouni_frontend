@@ -18,7 +18,7 @@ import {
 import Loading from '@/ui/molecules/Loading'
 import EmptyState from '@/ui/shadcn/EmptyState'
 import { Select } from '@/ui/shadcn/select'
-import Table from '@/ui/shadcn/Table'
+import Table from '@/ui/shadcn/DataTable'
 import { Button } from '@/ui/shadcn/button'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'

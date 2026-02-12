@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import Table from '@/ui/shadcn/Table'
+import Table from '@/ui/shadcn/DataTable'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { authFetch } from '@/app/utils/authFetch'
 
