@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
-import dynamic from 'next/dynamic'
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
@@ -9,10 +9,6 @@ import FileUpload from '../../addCollege/FileUpload'
 import { authFetch } from '@/app/utils/authFetch'
 import { Search } from 'lucide-react'
 import { toast } from 'react-toastify'
-
-const CKBlogs = dynamic(() => import('../../component/CKBlogs'), {
-    ssr: false
-})
 
 const RequiredLabel = ({ children, htmlFor }) => (
     <Label htmlFor={htmlFor}>
@@ -317,10 +313,10 @@ const BlogFormModal = ({
                                     <label htmlFor='content' className='block mb-2 font-medium text-sm'>
                                         Content
                                     </label>
-                                    <CKBlogs
-                                        initialData={getValues('content')}
+                                    <TipTapEditor
+                                        value={getValues('content')}
                                         onChange={(data) => setValue('content', data)}
-                                        id='editor1'
+                                        placeholder='Write your blog content here...'
                                     />
                                 </div>
                             </div>

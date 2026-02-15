@@ -421,6 +421,7 @@ export default function CategoryManager() {
                         <option value='BLOG'>BLOG</option>
                         <option value='EVENT'>EVENT</option>
                         <option value='NEWS'>NEWS</option>
+                        <option value='MATERIAL'>MATERIAL</option>
                       </select>
                     </div>
                   </div>

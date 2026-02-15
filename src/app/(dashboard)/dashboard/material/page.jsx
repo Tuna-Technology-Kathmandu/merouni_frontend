@@ -27,10 +27,6 @@ export default function MaterialForm() {
   const [materials, setMaterials] = useState([])
   const [tags, setTags] = useState([])
   const [categories, setCategories] = useState([])
-  const [showAddCategory, setShowAddCategory] = useState(false)
-  const [newCategoryName, setNewCategoryName] = useState('')
-  const [newCategoryDescription, setNewCategoryDescription] = useState('')
-  const [addingCategory, setAddingCategory] = useState(false)
   const [tableLoading, setTableLoading] = useState(false)
   const [loading, setLoading] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -50,7 +46,7 @@ export default function MaterialForm() {
     totalPages: 1,
     total: 0
   })
-  const visibilityOptions = ['public', 'private']
+
 
   const searchCollege = async (e) => {
     const query = e.target.value
@@ -105,7 +101,7 @@ export default function MaterialForm() {
       tags: [],
       file: '',
       image: '',
-      visibility: 'public',
+
       category_id: ''
     }
   })
@@ -151,7 +147,7 @@ export default function MaterialForm() {
   const fetchCategories = async () => {
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}/material-category?limit=100`
+        `${process.env.baseUrl}/category?type=MATERIAL&limit=100`
       )
       const data = await response.json()
       setCategories(data.items || [])
@@ -160,52 +156,7 @@ export default function MaterialForm() {
     }
   }
 
-  const handleAddNewCategory = async () => {
-    if (!newCategoryName.trim()) {
-      toast.error('Category name is required')
-      return
-    }
 
-    setAddingCategory(true)
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/material-category`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            name: newCategoryName.trim(),
-            description: newCategoryDescription.trim() || null
-          })
-        }
-      )
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Failed to create category')
-      }
-
-      const data = await response.json()
-      toast.success('Category created successfully!')
-
-      // Refresh categories list
-      await fetchCategories()
-
-      // Set the newly created category as selected
-      setValue('category_id', data.category.id)
-
-      // Reset form
-      setNewCategoryName('')
-      setNewCategoryDescription('')
-      setShowAddCategory(false)
-    } catch (error) {
-      toast.error(error.message || 'Failed to create category')
-    } finally {
-      setAddingCategory(false)
-    }
-  }
 
   const fetchMaterials = async (page = 1) => {
     try {
@@ -392,22 +343,15 @@ export default function MaterialForm() {
         const category = row.original.category
         return category ? (
           <span className='px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm'>
-            {category.name}
+            {category.title}
           </span>
         ) : (
           <span className='text-gray-400 text-sm'>-</span>
         )
       }
     },
-    {
-      header: 'Visibility',
-      accessorKey: 'visibility'
-    },
-    {
-      header: 'Created At',
-      accessorKey: 'createdAt',
-      cell: ({ getValue }) => formatDate(getValue())
-    },
+
+
     {
       header: 'Actions',
       id: 'actions',
@@ -474,9 +418,6 @@ export default function MaterialForm() {
     setUploadedFiles({ image: '', file: '' })
     setSelectedColleges([])
     setSearchResults([])
-    setShowAddCategory(false)
-    setNewCategoryName('')
-    setNewCategoryDescription('')
   }
 
   const handleAddClick = () => {
@@ -592,88 +533,21 @@ export default function MaterialForm() {
                   </div>
                 </div>
                 <div>
-                  <div className='flex items-center justify-between mb-2'>
-                    <label className='block'>Category</label>
-                    <button
-                      type='button'
-                      onClick={() => setShowAddCategory(!showAddCategory)}
-                      className='text-sm text-blue-600 hover:text-blue-800 font-medium'
-                    >
-                      {showAddCategory ? 'Cancel' : '+ Add New Category'}
-                    </button>
-                  </div>
-
-                  {showAddCategory ? (
-                    <div className='mb-4 p-4 border border-gray-300 rounded-lg bg-gray-50'>
-                      <div className='space-y-3'>
-                        <div>
-                          <label className='block mb-1 text-sm font-medium'>
-                            Category Name{' '}
-                            <span className='text-red-500'>*</span>
-                          </label>
-                          <input
-                            type='text'
-                            value={newCategoryName}
-                            onChange={(e) => setNewCategoryName(e.target.value)}
-                            className='w-full p-2 border rounded text-sm'
-                            placeholder='Enter category name'
-                            disabled={addingCategory}
-                          />
-                        </div>
-                        <div>
-                          <label className='block mb-1 text-sm font-medium'>
-                            Description
-                          </label>
-                          <textarea
-                            value={newCategoryDescription}
-                            onChange={(e) =>
-                              setNewCategoryDescription(e.target.value)
-                            }
-                            className='w-full p-2 border rounded text-sm'
-                            placeholder='Enter category description'
-                            rows={2}
-                            disabled={addingCategory}
-                          />
-                        </div>
-                        <button
-                          type='button'
-                          onClick={handleAddNewCategory}
-                          disabled={addingCategory || !newCategoryName.trim()}
-                          className='w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300 text-sm font-medium'
-                        >
-                          {addingCategory ? 'Creating...' : 'Create Category'}
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <select
-                      {...register('category_id')}
-                      className='w-full p-2 border rounded'
-                    >
-                      <option value=''>No Category</option>
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.id}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                </div>
-
-                <div>
-                  <label className='block mb-2'>Visibility</label>
+                  <label className='block mb-2'>Category</label>
                   <select
-                    {...register('visibility')}
+                    {...register('category_id')}
                     className='w-full p-2 border rounded'
                   >
-                    {visibilityOptions.map((visibility) => (
-                      <option key={visibility} value={visibility}>
-                        {visibility.charAt(0).toUpperCase() +
-                          visibility.slice(1)}
+                    <option value=''>No Category</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.title}
                       </option>
                     ))}
                   </select>
                 </div>
+
+
 
                 <div>
                   <FileUpload

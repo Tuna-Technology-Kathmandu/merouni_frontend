@@ -364,14 +364,25 @@ export default function EventManager() {
       setValue('image', eventData.image)
       setUploadedFiles((prev) => ({ ...prev, image: eventData.image }))
 
-      const eventHost = eventData.event_host
+      // Parse event_host if it's a JSON string
+      let eventHost = eventData.event_host
+      if (typeof eventHost === 'string') {
+        try {
+          eventHost = JSON.parse(eventHost)
+        } catch (e) {
+          console.error('Failed to parse event_host:', e)
+          eventHost = {}
+        }
+      }
 
       // Populate event_host fields
-      setValue('event_host.start_date', eventHost.start_date)
-      setValue('event_host.end_date', eventHost.end_date)
-      setValue('event_host.time', eventHost.time)
-      setValue('event_host.host', eventHost.host)
-      setValue('event_host.map_url', eventHost.map_url)
+      if (eventHost) {
+        setValue('event_host.start_date', eventHost.start_date || '')
+        setValue('event_host.end_date', eventHost.end_date || '')
+        setValue('event_host.time', eventHost.time || '')
+        setValue('event_host.host', eventHost.host || '')
+        setValue('event_host.map_url', eventHost.map_url || '')
+      }
 
       // Set is_featured checkbox
       setValue('is_featured', eventData.is_featured === 1)
@@ -816,14 +827,12 @@ export default function EventManager() {
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                       <div>
                         <Label htmlFor='time' className='block mb-2'>
-                          Time <span className='text-red-500'>*</span>
+                          Time
                         </Label>
                         <Input
                           id='time'
                           type='time'
-                          {...register('event_host.time', {
-                            required: 'Time is required'
-                          })}
+                          {...register('event_host.time')}
                           placeholder='Time'
                         />
                         {errors.event_host?.time && (
