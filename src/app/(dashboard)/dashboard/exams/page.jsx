@@ -168,14 +168,16 @@ export default function ExamManager() {
       {
         header: 'Description',
         accessorKey: 'description',
-        cell: ({ getValue }) => (
-          <div
-            className='max-w-xs truncate text-sm'
-            dangerouslySetInnerHTML={{
-              __html: getValue() || ''
-            }}
-          />
-        )
+        cell: ({ getValue }) => {
+          const html = getValue() || ''
+          const text = html.replace(/<[^>]+>/g, '') // Strip HTML tags
+          const truncated = text.length > 50 ? text.substring(0, 50) + '...' : text
+          return (
+            <div className='max-w-xs text-sm text-gray-600' title={text}>
+              {truncated}
+            </div>
+          )
+        }
       },
       {
         header: 'Syllabus',
