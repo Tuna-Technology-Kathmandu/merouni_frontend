@@ -4,9 +4,13 @@
 
 let url = `${process.env.baseUrl}/category`
 
-export async function fetchCategories(page = 1, limit = 1000) {
+export async function fetchCategories(page = 1, limit = 1000, type = "") {
   try {
-    const response = await fetch(`${url}?page=${page}&limit=${limit}`, {
+    let fetchUrl = `${url}?page=${page}&limit=${limit}`;
+    if (type) {
+      fetchUrl += `&type=${type}`;
+    }
+    const response = await fetch(fetchUrl, {
       cache: 'no-store'
     })
 

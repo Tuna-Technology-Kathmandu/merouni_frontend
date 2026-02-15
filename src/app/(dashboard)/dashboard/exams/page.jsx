@@ -1,6 +1,5 @@
 'use client'
-import dynamic from 'next/dynamic'
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { getAllExams, createExam, updateExam, deleteExam } from './actions'
@@ -21,9 +20,7 @@ import { Label } from '../../../../ui/shadcn/label'
 import { Select } from '../../../../ui/shadcn/select'
 import SearchInput from '@/ui/molecules/SearchInput'
 import { formatDate } from '@/utils/date.util'
-const CKExam = dynamic(() => import('../component/CKExam'), {
-  ssr: false
-})
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 import ExamViewModal from './ExamViewModal'
 
 // Helper component for required label
@@ -98,8 +95,6 @@ export default function ExamManager() {
       closing_date: ''
     }
   })
-
-  const editorRef = useRef(null)
 
 
   const { requireAdmin } = useAdminPermission()
@@ -656,10 +651,10 @@ export default function ExamManager() {
                 </div>
                 <div>
                   <Label htmlFor='exam-description'>Description</Label>
-                  <CKExam
-                    id='exam-description'
-                    initialData={formData.description}
+                  <TipTapEditor
+                    value={formData.description}
                     onChange={handleDescriptionChange}
+                    placeholder='Enter exam description...'
                   />
                 </div>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>

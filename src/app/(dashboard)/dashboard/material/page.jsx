@@ -12,7 +12,7 @@ import { X } from 'lucide-react'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/ui/shadcn/button'
 import SearchInput from '@/ui/molecules/SearchInput'
 import { formatDate } from '@/utils/date.util'
@@ -22,6 +22,7 @@ export default function MaterialForm() {
   const author_id = useSelector((state) => state.user.data.id)
   const searchParams = useSearchParams()
   const router = useRouter()
+  const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [materials, setMaterials] = useState([])
   const [tags, setTags] = useState([])
@@ -45,7 +46,7 @@ export default function MaterialForm() {
   const [searchResults, setSearchResults] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [pagination, setPagination] = useState({
-    currentPage: 1,
+    currentPage: parseInt(searchParams.get('page')) || 1,
     totalPages: 1,
     total: 0
   })
@@ -114,9 +115,8 @@ export default function MaterialForm() {
     fetchMaterials()
     fetchTags()
     fetchCategories()
-    return () => setHeading(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setHeading])
+  }, [setHeading, searchParams])
 
   // Check for 'add' query parameter and open modal
   useEffect(() => {
@@ -208,8 +208,12 @@ export default function MaterialForm() {
   }
 
   const fetchMaterials = async (page = 1) => {
-    setTableLoading(true)
     try {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set('page', page)
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
+      setTableLoading(true)
       const response = await authFetch(
         `${process.env.baseUrl}/material?page=${page}`
       )
@@ -367,7 +371,7 @@ export default function MaterialForm() {
       )
       const res = await response.json()
       toast.success(res.message)
-      await fetchMaterials()
+      await fetchMaterials(pagination.currentPage)
     } catch (err) {
       toast.error(err.message)
     } finally {

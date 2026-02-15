@@ -3,7 +3,6 @@
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
-import Featured from './components/Featured'
 import Body from './components/Body'
 import AdLayout from '../../components/Frontpage/AdLayout'
 import { useEffect, useState } from 'react'
@@ -19,8 +18,6 @@ const page = () => {
 
     async function fetchData() {
       try {
-        // The instruction "use getBanners action" is already fulfilled by the line below.
-        // The comment about "direct fetch" might be misleading, as getBanners is imported from '@/app/action'.
         const response = await getBanners()
         if (response && response.items) {
           setBanners(response.items)
@@ -37,14 +34,13 @@ const page = () => {
     }
     fetchData()
   }, [])
+
   return (
     <>
       <Header />
       <Navbar />
       <AdLayout banners={banners} size='medium' loading={loading} />
-      <Featured />
       <Body />
-
       <Footer />
     </>
   )

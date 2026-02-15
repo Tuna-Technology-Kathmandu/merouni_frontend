@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux'
 import ConfirmationDialog from '../addCollege/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/ui/shadcn/button'
 import { formatDate } from '@/utils/date.util'
 import BlogFormModal from './components/BlogFormModal'
@@ -25,6 +25,7 @@ export default function BlogsManager() {
   const author_id = useSelector((state) => state.user.data.id)
   const searchParams = useSearchParams()
   const router = useRouter()
+  const pathname = usePathname()
 
   const [blogs, setBlogs] = useState([])
   const [categories, setCategories] = useState([])
@@ -36,7 +37,7 @@ export default function BlogsManager() {
   const [selectedBlog, setSelectedBlog] = useState(null) // To pass to Modal
 
   const [pagination, setPagination] = useState({
-    currentPage: 1,
+    currentPage: parseInt(searchParams.get('page')) || 1,
     totalPages: 1,
     total: 0
   })
@@ -59,7 +60,7 @@ export default function BlogsManager() {
         header: 'Title',
         accessorKey: 'title',
         cell: ({ row }) => {
-          const { title, status, visibility } = row.original
+          const { title, status, visibility, featuredImage } = row.original
           const statusLabel = status || 'draft'
           const visibilityLabel = visibility || 'private'
 
@@ -74,23 +75,38 @@ export default function BlogsManager() {
               : 'bg-gray-100 text-gray-800'
 
           return (
-            <div className='max-w-xs overflow-hidden'>
-              <div className='truncate'>{title}</div>
-              <div className='flex flex-wrap gap-2 mt-1'>
-                {status && (
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusClasses}`}
-                  >
-                    {statusLabel}
-                  </span>
-                )}
-                {visibility && (
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${visibilityClasses}`}
-                  >
-                    {visibilityLabel}
-                  </span>
-                )}
+            <div className='flex items-center gap-3 max-w-xs overflow-hidden'>
+              {featuredImage ? (
+                <div className='w-20 h-20 rounded shrink-0 overflow-hidden bg-gray-100'>
+                  <img
+                    src={featuredImage}
+                    alt='Blog'
+                    className='w-full h-full object-cover'
+                  />
+                </div>
+              ) : (
+                <div className='w-20 h-20 rounded shrink-0 bg-gray-100 border border-dashed flex items-center justify-center text-xs text-gray-400'>
+                  No img
+                </div>
+              )}
+              <div className='flex-1 overflow-hidden'>
+                <div className='truncate font-medium text-gray-900'>{title}</div>
+                <div className='flex flex-wrap gap-2 mt-1'>
+                  {status && (
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusClasses}`}
+                    >
+                      {statusLabel}
+                    </span>
+                  )}
+                  {visibility && (
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${visibilityClasses}`}
+                    >
+                      {visibilityLabel}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           )
@@ -150,7 +166,7 @@ export default function BlogsManager() {
     const limit = 1000
     const loadCategories = async () => {
       try {
-        const categoriesList = await getCategories({ limit })
+        const categoriesList = await getCategories({ limit, type: 'BLOG' })
         setCategories(categoriesList.items)
       } catch (error) {
         console.error('Failed to fetch categories')
@@ -164,7 +180,7 @@ export default function BlogsManager() {
     setHeading('Blogs Management')
     loadData()
     return () => setHeading(null)
-  }, [setHeading])
+  }, [setHeading, searchParams])
 
   // Check for 'add' query parameter and open modal
   useEffect(() => {
@@ -189,6 +205,10 @@ export default function BlogsManager() {
 
   const loadData = async (page = 1, status = statusFilter) => {
     try {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set('page', page)
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
       const response = await fetchBlogs(page, 10, status)
       setBlogs(response.items)
       setPagination({

@@ -5,7 +5,7 @@ import { Button } from '@/ui/shadcn/button'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Edit2, Eye, Trash2 } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
@@ -36,6 +36,7 @@ export default function NewsManager() {
   const author_id = useSelector((state) => state.user.data.id)
   const searchParams = useSearchParams()
   const router = useRouter()
+  const pathname = usePathname()
 
   const [news, setNews] = useState([])
   const [loading, setLoading] = useState(false)
@@ -44,7 +45,7 @@ export default function NewsManager() {
   const [isOpen, setIsOpen] = useState(false)
   const [initialData, setInitialData] = useState(null)
   const [pagination, setPagination] = useState({
-    currentPage: 1,
+    currentPage: parseInt(searchParams.get('page')) || 1,
     totalPages: 1,
     total: 0
   })
@@ -66,7 +67,7 @@ export default function NewsManager() {
         header: 'Title',
         accessorKey: 'title',
         cell: ({ row }) => {
-          const { title, status, visibility } = row.original
+          const { title, status, visibility, featuredImage } = row.original
           const statusLabel = status || 'draft'
           const visibilityLabel = visibility || 'private'
 
@@ -81,23 +82,38 @@ export default function NewsManager() {
               : 'bg-gray-100 text-gray-800'
 
           return (
-            <div className='max-w-xs overflow-hidden'>
-              <div className='truncate'>{title}</div>
-              <div className='flex flex-wrap gap-2 mt-1'>
-                {status && (
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusClasses}`}
-                  >
-                    {statusLabel}
-                  </span>
-                )}
-                {visibility && (
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${visibilityClasses}`}
-                  >
-                    {visibilityLabel}
-                  </span>
-                )}
+            <div className='flex items-center gap-3 max-w-xs overflow-hidden'>
+              {featuredImage ? (
+                <div className='w-20 h-20 rounded shrink-0 overflow-hidden bg-gray-100'>
+                  <img
+                    src={featuredImage}
+                    alt='News'
+                    className='w-full h-full object-cover'
+                  />
+                </div>
+              ) : (
+                <div className='w-20 h-20 rounded shrink-0 bg-gray-100 border border-dashed flex items-center justify-center text-xs text-gray-400'>
+                  No img
+                </div>
+              )}
+              <div className='flex-1 overflow-hidden'>
+                <div className='truncate font-medium text-gray-900'>{title}</div>
+                <div className='flex flex-wrap gap-2 mt-1'>
+                  {status && (
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusClasses}`}
+                    >
+                      {statusLabel}
+                    </span>
+                  )}
+                  {visibility && (
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${visibilityClasses}`}
+                    >
+                      {visibilityLabel}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           )
@@ -166,9 +182,10 @@ export default function NewsManager() {
 
   useEffect(() => {
     setHeading('News Management')
-    loadData()
+    const page = parseInt(searchParams.get('page')) || 1
+    loadData(page)
     return () => setHeading(null)
-  }, [setHeading])
+  }, [setHeading, searchParams])
 
   // Check for 'add' query parameter
   useEffect(() => {
@@ -207,7 +224,7 @@ export default function NewsManager() {
     if (categories.length > 0 && !force) return
     try {
       setLoadingCategories(true)
-      const response = await fetchCategories(1, 1000)
+      const response = await fetchCategories(1, 1000, 'NEWS')
       setCategories(response.items || [])
     } catch (err) {
       console.error('Error loading categories:', err)
@@ -218,6 +235,10 @@ export default function NewsManager() {
 
   const loadData = async (page = 1, search = '') => {
     try {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set('page', page)
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
       setLoading(true)
       const response = await fetchNews(page, search)
 

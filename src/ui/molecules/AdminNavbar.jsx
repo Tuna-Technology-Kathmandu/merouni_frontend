@@ -10,16 +10,19 @@ import { apiAuth } from '../../app/utils/agentverify'
 import { usePageHeading } from '../../contexts/PageHeadingContext'
 import { FaUserCircle, FaUser, FaSignOutAlt } from 'react-icons/fa'
 import { removeUser } from '../../app/utils/userSlice'
-import { ChevronDown } from 'lucide-react'
-import {THEME_BLUE} from "@/constants/constants"
+import { ChevronDown, Search } from 'lucide-react'
+import { THEME_BLUE } from "@/constants/constants"
+import SearchInput from '../molecules/SearchInput'
+import { menuItems } from '@/constants/menuList'
 
-const AdminNavbar = ({ onMenuClick }) => {
+const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
   const { heading, subheading } = usePageHeading()
   const [loading, setLoading] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef(null)
   const router = useRouter()
   const dispatch = useDispatch()
+  const [inputValue, setInputValue] = useState(searchQuery)
 
   // Get user data from Redux store
   let userData = useSelector((state) => state.user.data)
@@ -50,6 +53,20 @@ const AdminNavbar = ({ onMenuClick }) => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
+  // Debounce search query update
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(inputValue)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [inputValue, setSearchQuery])
+
+  // Sync local input with global query (e.g. on clear)
+  useEffect(() => {
+    setInputValue(searchQuery)
+  }, [searchQuery])
 
   const handleAgentVerification = async () => {
     if (!userData?.id) {
@@ -148,12 +165,103 @@ const AdminNavbar = ({ onMenuClick }) => {
           </svg>
         </button>
         <div>
-          {heading && <h1 className='text-xl md:text-2xl font-bold'>{heading}</h1>}
+          {heading && <h1 className='text-xl md:text-2xl font-bold whitespace-nowrap'>{heading}</h1>}
           {subheading && (
-            <p className='text-xs md:text-sm text-gray-500 mt-1'>{subheading}</p>
+            <p className='text-xs md:text-sm text-gray-500 mt-1 whitespace-nowrap'>{subheading}</p>
           )}
         </div>
       </div>
+
+      {/* CENTERED SEARCH WITH SUGGESTIONS */}
+      {userRoles?.admin && (
+        <div className='hidden lg:flex flex-1 max-w-xl mx-8 relative'>
+          <div className='w-full'>
+            <SearchInput
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onClear={() => {
+                setInputValue('')
+                setSearchQuery('')
+              }}
+              placeholder='Search menus...'
+              className='w-full'
+            />
+          </div>
+
+          {/* Suggestions Dropdown */}
+          {searchQuery.trim() !== '' && (
+            <div className='absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200'>
+              <div className='max-h-[70vh] overflow-y-auto p-1.5 custom-scrollbar'>
+                {menuItems.map((section) => {
+                  const items = section.items.filter(item => {
+                    const hasAccess = item.visible.some(r => userRoles[r])
+                    if (!hasAccess) return false
+
+                    const query = searchQuery.toLowerCase().trim()
+                    const matchesLabel = item.label.toLowerCase().includes(query)
+                    const matchesSubmenu = item.submenus?.some(sub => 
+                      sub.label.toLowerCase().includes(query) && sub.visible.some(r => userRoles[r])
+                    )
+                    return matchesLabel || matchesSubmenu
+                  })
+
+                  if (items.length === 0) return null
+
+                  return (
+                    <div key={section.title || 'Other'}>
+                      <div className='px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest'>
+                        {section.title || 'General'}
+                      </div>
+                      {items.map(item => (
+                        <div key={item.label}>
+                          {item.submenus ? (
+                            item.submenus
+                              .filter(sub => 
+                                (sub.label.toLowerCase().includes(searchQuery.toLowerCase()) || item.label.toLowerCase().includes(searchQuery.toLowerCase())) &&
+                                sub.visible.some(r => userRoles[r])
+                              )
+                              .map(sub => (
+                                <button
+                                  key={sub.label}
+                                  onClick={() => {
+                                    router.push(sub.href)
+                                    setSearchQuery('')
+                                  }}
+                                  className='w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors'
+                                >
+                                  <div className='w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md group-hover:bg-indigo-100 group-hover:text-indigo-600'>
+                                    {item.icon}
+                                  </div>
+                                  <div className='flex flex-col items-start'>
+                                    <span className='font-medium'>{sub.label}</span>
+                                    <span className='text-[10px] text-gray-400'>{item.label}</span>
+                                  </div>
+                                </button>
+                              ))
+                          ) : (
+                            <button
+                              onClick={() => {
+                                router.push(item.href)
+                                setSearchQuery('')
+                              }}
+                              className='w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors'
+                            >
+                              <div className='w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md group-hover:bg-indigo-100 group-hover:text-indigo-600'>
+                                {item.icon}
+                              </div>
+                              <span className='font-medium'>{item.label}</span>
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
       {/* ICONS AND USER */}
       <div className='flex items-center gap-4 justify-end'>
         {/* Only show verification button if user doesn't have agent role */}

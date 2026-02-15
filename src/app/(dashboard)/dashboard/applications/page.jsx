@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { authFetch } from '@/app/utils/authFetch'
 import { FaEdit, FaTrashAlt } from 'react-icons/fa'
 import {
@@ -10,11 +10,13 @@ import {
   DialogTitle,
 } from '@/ui/shadcn/dialog'
 import ShimmerEffect from '../../../../ui/molecules/ShimmerEffect'
-
+import Table from '@/ui/shadcn/Table'
 import { useSelector } from 'react-redux'
 import { destr } from 'destr'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
 
 const ApplicationsPage = () => {
+  const { setHeading } = usePageHeading()
   const [applications, setApplications] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -24,6 +26,7 @@ const ApplicationsPage = () => {
   const rawRole = useSelector((state) => state.user?.data?.roles || state.user?.data?.role)
   const role = typeof rawRole === 'string' ? destr(rawRole) || {} : rawRole || {}
   const isConsultancy = role?.consultancy
+  const isInstitution = role?.institution
   const [statusModalOpen, setStatusModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState(null)
   const [statusForm, setStatusForm] = useState({
@@ -32,6 +35,7 @@ const ApplicationsPage = () => {
   })
 
   useEffect(() => {
+    setHeading('Applications')
     loadApplications()
   }, [])
 
@@ -90,7 +94,7 @@ const ApplicationsPage = () => {
         : `${process.env.baseUrl}/referral/${selectedApplication.id}/status`
 
       const response = await authFetch(endpoint, {
-        method: isConsultancy ? 'PATCH' : 'PATCH', // Both use PATCH
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -142,7 +146,112 @@ const ApplicationsPage = () => {
     }
   }
 
-  if (loading) return <ShimmerEffect />
+  const columns = useMemo(() => {
+    const cols = [
+      {
+        header: 'Student Name',
+        accessorKey: 'student_name',
+        cell: ({ row }) => row.original.student_name || 'N/A'
+      },
+      {
+        header: 'Email',
+        accessorKey: 'student_email',
+        cell: ({ row }) => row.original.student_email || 'N/A'
+      },
+      {
+        header: 'Phone',
+        accessorKey: 'student_phone_no',
+        cell: ({ row }) => row.original.student_phone_no || 'N/A'
+      }
+    ]
+
+    if (!isConsultancy) {
+      cols.push({
+        header: 'Course',
+        accessorKey: 'course.title',
+        cell: ({ row }) => row.original?.course?.title || 'N/A'
+      })
+    }
+
+    cols.push(
+      {
+        header: 'Description',
+        accessorKey: 'student_description',
+        cell: ({ row }) => (
+          <span className='text-sm text-gray-600'>
+            {row.original.student_description
+              ? row.original.student_description.length > 50
+                ? `${row.original.student_description.substring(0, 50)}...`
+                : row.original.student_description
+              : 'N/A'}
+          </span>
+        )
+      },
+      {
+        header: 'Status',
+        accessorKey: 'status',
+        cell: ({ row }) => {
+          const status = row.original.status || 'IN_PROGRESS'
+          return (
+            <span
+              className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                status === 'ACCEPTED'
+                  ? 'bg-green-100 text-green-800'
+                  : status === 'REJECTED'
+                  ? 'bg-red-100 text-red-800'
+                  : 'bg-yellow-100 text-yellow-800'
+              }`}
+            >
+              {status}
+            </span>
+          )
+        }
+      },
+      {
+        header: 'Remarks',
+        accessorKey: 'remarks',
+        cell: ({ row }) => (
+          <span className='text-sm text-gray-600'>
+            {row.original.remarks
+              ? row.original.remarks.length > 30
+                ? `${row.original.remarks.substring(0, 30)}...`
+                : row.original.remarks
+              : 'N/A'}
+          </span>
+        )
+      },
+      {
+        header: 'Actions',
+        id: 'actions',
+        cell: ({ row }) => (
+          <div className='flex items-center justify-center gap-2'>
+            <button
+              onClick={() => handleOpenStatusModal(row.original)}
+              disabled={updatingId === row.original.id}
+              className='text-blue-600 hover:text-blue-800 disabled:opacity-50'
+              title='Update Status'
+            >
+              <FaEdit className='inline w-4 h-4' />
+            </button>
+            {!isInstitution && (
+              <button
+                onClick={() => handleDelete(row.original.id)}
+                disabled={deletingId === row.original.id}
+                className='text-red-600 hover:text-red-800 disabled:opacity-50'
+                title='Delete'
+              >
+                <FaTrashAlt className='inline w-4 h-4' />
+              </button>
+            )}
+          </div>
+        )
+      }
+    )
+
+    return cols
+  }, [isConsultancy, isInstitution, updatingId, deletingId])
+
+  if (loading && applications.length === 0) return <ShimmerEffect />
   if (error && applications.length === 0)
     return (
       <div className='p-4'>
@@ -154,101 +263,14 @@ const ApplicationsPage = () => {
 
   return (
     <div className='p-4'>
-      <h2 className='text-2xl font-bold mb-4'>Applications</h2>
-      <div className='overflow-x-auto'>
-        <table className='min-w-full bg-white border border-gray-200 shadow-md'>
-          <thead>
-            <tr className='bg-gray-100 border-b'>
-              <th className='px-4 py-2 border text-left'>Student Name</th>
-              <th className='px-4 py-2 border text-left'>Email</th>
-              <th className='px-4 py-2 border text-left'>Phone</th>
-              {!isConsultancy && <th className='px-4 py-2 border text-left'>Course</th>}
-              <th className='px-4 py-2 border text-left'>Description</th>
-              <th className='px-4 py-2 border text-left'>Status</th>
-              <th className='px-4 py-2 border text-left'>Remarks</th>
-              <th className='px-4 py-2 border text-center'>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {applications.length === 0 ? (
-              <tr>
-                <td colSpan={8} className='px-4 py-8 text-center text-gray-500'>
-                  No applications found.
-                </td>
-              </tr>
-            ) : (
-              applications.map((app) => (
-                <tr key={app.id} className='border-b'>
-                  <td className='px-4 py-2 border'>
-                    {app.student_name || 'N/A'}
-                  </td>
-                  <td className='px-4 py-2 border'>
-                    {app.student_email || 'N/A'}
-                  </td>
-                  <td className='px-4 py-2 border'>
-                    {app.student_phone_no || 'N/A'}
-                  </td>
-                  {!isConsultancy && (
-                    <td className='px-4 py-2 border'>
-                      {app?.course?.title || 'N/A'}
-                    </td>
-                  )}
-                  <td className='px-4 py-2 border'>
-                    <span className='text-sm text-gray-600'>
-                      {app.student_description
-                        ? app.student_description.length > 50
-                          ? `${app.student_description.substring(0, 50)}...`
-                          : app.student_description
-                        : 'N/A'}
-                    </span>
-                  </td>
-                  <td className='px-4 py-2 border'>
-                    <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${app.status === 'ACCEPTED'
-                          ? 'bg-green-100 text-green-800'
-                          : app.status === 'REJECTED'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}
-                    >
-                      {app.status || 'IN_PROGRESS'}
-                    </span>
-                  </td>
-                  <td className='px-4 py-2 border'>
-                    <span className='text-sm text-gray-600'>
-                      {app.remarks
-                        ? app.remarks.length > 30
-                          ? `${app.remarks.substring(0, 30)}...`
-                          : app.remarks
-                        : 'N/A'}
-                    </span>
-                  </td>
-                  <td className='px-4 py-2 border text-center'>
-                    <div className='flex items-center justify-center gap-2'>
-                      <button
-                        onClick={() => handleOpenStatusModal(app)}
-                        disabled={updatingId === app.id}
-                        className='text-blue-600 hover:text-blue-800 disabled:opacity-50'
-                        title='Update Status'
-                      >
-                        <FaEdit className='inline w-4 h-4' />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(app.id)}
-                        disabled={deletingId === app.id}
-                        className='text-red-600 hover:text-red-800 disabled:opacity-50'
-                        title='Delete'
-                      >
-                        <FaTrashAlt className='inline w-4 h-4' />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      
+      <Table
+        data={applications}
+        columns={columns}
+        loading={loading}
+        showSearch={true}
+        emptyContent='No applications found.'
+      />
 
       {/* Update Status Modal */}
       <Dialog

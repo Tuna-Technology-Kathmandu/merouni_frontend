@@ -8,7 +8,7 @@ import { Select } from '@/ui/shadcn/select'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Edit2, Eye, MapPin, Search, Trash2, X } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
@@ -31,6 +31,7 @@ export default function EventManager() {
   const author_id = useSelector((state) => state.user.data.id)
   const searchParams = useSearchParams()
   const router = useRouter()
+  const pathname = usePathname()
   const {
     register,
     handleSubmit,
@@ -66,7 +67,7 @@ export default function EventManager() {
     image: ''
   })
   const [pagination, setPagination] = useState({
-    currentPage: 1,
+    currentPage: parseInt(searchParams.get('page')) || 1,
     totalPages: 1,
     total: 0
   })
@@ -87,7 +88,7 @@ export default function EventManager() {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const categoriesList = await fetchCategories()
+        const categoriesList = await fetchCategories(1, 1000, 'EVENT')
         setCategories(categoriesList.items)
       } catch (error) { }
     }
@@ -98,7 +99,7 @@ export default function EventManager() {
     setHeading('Events Management')
     loadEvents()
     return () => setHeading(null)
-  }, [setHeading])
+  }, [setHeading, searchParams])
 
   // Check for 'add' query parameter and open modal
   useEffect(() => {
@@ -113,7 +114,7 @@ export default function EventManager() {
       setSelectedColleges([])
       setEditorContent('')
       // Remove query parameter from URL
-      router.replace('/dashboard/events', { scroll: false })
+      router.replace(pathname, { scroll: false })
     }
   }, [searchParams, router, reset])
 
@@ -220,6 +221,10 @@ export default function EventManager() {
 
   const loadEvents = async (page = 1) => {
     try {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set('page', page)
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
       const response = await getEvents(page)
       setEvents(response.items)
       setPagination({
@@ -449,7 +454,30 @@ export default function EventManager() {
     () => [
       {
         header: 'Title',
-        accessorKey: 'title'
+        accessorKey: 'title',
+        cell: ({ row }) => {
+          const { title, image } = row.original
+          return (
+            <div className='flex items-center gap-3 max-w-xs overflow-hidden'>
+              {image ? (
+                <div className='w-20 h-20 rounded shrink-0 overflow-hidden bg-gray-100'>
+                  <img
+                    src={image}
+                    alt='Event'
+                    className='w-full h-full object-cover'
+                  />
+                </div>
+              ) : (
+                <div className='w-20 h-20 rounded shrink-0 bg-gray-100 border border-dashed flex items-center justify-center text-xs text-gray-400'>
+                  No img
+                </div>
+              )}
+              <div className='flex-1 overflow-hidden'>
+                <div className='truncate font-medium text-gray-900'>{title}</div>
+              </div>
+            </div>
+          )
+        }
       },
       {
         header: 'Host',

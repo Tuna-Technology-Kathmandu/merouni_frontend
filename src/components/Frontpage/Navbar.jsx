@@ -9,6 +9,7 @@ import { ChevronDown, Search, X } from 'lucide-react'
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/colleges', label: 'Colleges' },
+  { href: '/schools', label: 'Schools' },
   { href: '/degree', label: 'Degrees' },
   { href: '/admission', label: 'Admission' },
   { href: '/scholarship', label: 'Scholarship' },
@@ -21,7 +22,6 @@ const navLinks = [
 const moreLinks = [
   { href: '/exams', label: 'Exams' },
   { href: '/vacancies', label: 'Vacancies' },
-  { href: '/schools', label: 'Schools' },
   { href: '/news', label: 'News' },
   { href: '/universities', label: 'Universities' },
   { href: '/career', label: 'Careers at MeroUni' },

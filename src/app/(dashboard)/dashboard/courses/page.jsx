@@ -23,7 +23,7 @@ import {
   DialogTitle,
 } from '@/ui/shadcn/dialog'
 import SearchInput from '@/ui/molecules/SearchInput'
-const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
+const TipTapEditor = dynamic(() => import('@/ui/shadcn/tiptap-editor'), {
   ssr: false
 })
 
@@ -448,8 +448,9 @@ export default function CourseForm() {
       <Dialog
         isOpen={isOpen}
         onClose={handleModalClose}
+        className='max-w-5xl'
       >
-        <DialogContent className='max-w-4xl max-h-[90vh] flex flex-col p-6'>
+        <DialogContent className='max-h-[90vh] flex flex-col p-6'>
           <DialogHeader>
             <DialogTitle>{editing ? 'Edit Course' : 'Add Course'}</DialogTitle>
           </DialogHeader>
@@ -460,11 +461,8 @@ export default function CourseForm() {
         >
           <div className='flex-1 overflow-y-auto px-6 space-y-6'>
             <div className='space-y-4'>
-              <h3 className='text-lg font-semibold text-gray-900'>
-                Course Information
-              </h3>
-
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <br/>
+                           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 {/* Title Field */}
                 <div className='space-y-2'>
                   <RequiredLabel htmlFor='title'>Course Title</RequiredLabel>
@@ -539,14 +537,14 @@ export default function CourseForm() {
 
                 {/* Credits Field */}
                 <div className='space-y-2'>
-                  <RequiredLabel htmlFor='credits'>Credits</RequiredLabel>
+                  <Label htmlFor='credits'>Credits</Label>
                   <Input
                     id='credits'
                     type='number'
                     placeholder='e.g., 3.0'
                     step='0.1'
                     {...register('credits', {
-                      required: 'Credits is required',
+                      required: false,
                       valueAsNumber: true,
                       min: { value: 0, message: 'Credits must be positive' }
                     })}
@@ -566,9 +564,9 @@ export default function CourseForm() {
 
                 {/* Faculty Field */}
                 <div className='relative md:col-span-2 space-y-2'>
-                  <RequiredLabel htmlFor='faculty-search'>
+                  <Label htmlFor='faculty-search'>
                     Faculty
-                  </RequiredLabel>
+                  </Label>
                   <div className='relative'>
                     <Input
                       id='faculty-search'
@@ -591,7 +589,7 @@ export default function CourseForm() {
                     <input
                       type='hidden'
                       {...register('facultyId', {
-                        required: 'Faculty is required'
+                        required: false
                       })}
                     />
 
@@ -655,10 +653,10 @@ export default function CourseForm() {
             <div className='md:col-span-2 space-y-2 pt-2'>
               <Label>Description</Label>
               <div className='border border-input rounded-md overflow-hidden'>
-                <CKBlogs
-                  initialData={getValues('description')}
+                <TipTapEditor
+                  value={getValues('description')}
                   onChange={(data) => setValue('description', data)}
-                  id='editor1'
+                  placeholder='Enter course description...'
                 />
               </div>
             </div>

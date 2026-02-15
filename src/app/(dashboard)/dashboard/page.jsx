@@ -24,7 +24,7 @@ const AdminDashboard = () => {
   const [isAgentsModalOpen, setAgentsModalOpen] = useState(false)
 
   useEffect(() => {
-    setHeading('Admin Dashboard')
+    setHeading('Dashboard')
     return () => setHeading(null)
   }, [setHeading])
 
@@ -147,6 +147,7 @@ const AdminDashboard = () => {
 }
 
 const StudentDashboard = () => {
+  const { setHeading } = usePageHeading()
   const user = useSelector((state) => state.user?.data)
   const [applications, setApplications] = useState([])
   const [loading, setLoading] = useState(true)
@@ -157,6 +158,10 @@ const StudentDashboard = () => {
   const [consultancyApplications, setConsultancyApplications] = useState([])
   const [consultancyLoading, setConsultancyLoading] = useState(true)
   const [consultancyError, setConsultancyError] = useState(null)
+
+  useEffect(() => {
+    setHeading('Dashboard')
+  }, [setHeading])
 
   useEffect(() => {
     let isMounted = true
@@ -598,10 +603,15 @@ const StudentDashboard = () => {
 }
 
 const InstitutionDashboard = () => {
+  const { setHeading } = usePageHeading()
   const user = useSelector((state) => state.user?.data)
   const [applicationsCount, setApplicationsCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  useEffect(() => {
+    setHeading('Dashboard')
+  }, [setHeading])
 
   useEffect(() => {
     let isMounted = true
@@ -673,10 +683,15 @@ const InstitutionDashboard = () => {
 }
 
 const ConsultancyDashboard = () => {
+  const { setHeading } = usePageHeading()
   const user = useSelector((state) => state.user?.data)
   const [applicationsCount, setApplicationsCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  useEffect(() => {
+    setHeading('Dashboard')
+  }, [setHeading])
 
   useEffect(() => {
     let isMounted = true

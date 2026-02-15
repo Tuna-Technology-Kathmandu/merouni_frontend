@@ -300,7 +300,7 @@ const FormSection = ({ id, college }) => {
           </div>
 
           <div className='space-y-2'>
-            <Label htmlFor='student_description'>Description (Optional)</Label>
+            <Label htmlFor='student_description'>Description </Label>
             <textarea
               id='student_description'
               name='student_description'

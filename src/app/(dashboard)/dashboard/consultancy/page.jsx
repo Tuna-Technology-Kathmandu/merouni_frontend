@@ -7,7 +7,7 @@ import CreateUpdateConsultancy from '@/ui/molecules/dialogs/CreateUpdateConsulta
 import ViewConsultancy from '@/ui/molecules/dialogs/ViewConsultancy'
 import { Button } from '@/ui/shadcn/button'
 import { Search } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
@@ -29,6 +29,7 @@ export default function ConsultancyForm() {
   const author_id = useSelector((state) => state.user.data.id)
   const searchParams = useSearchParams()
   const router = useRouter()
+  const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [consultancies, setConsultancies] = useState([])
   const [tableLoading, setTableLoading] = useState(false)
@@ -37,7 +38,7 @@ export default function ConsultancyForm() {
   const [viewModalOpen, setViewModalOpen] = useState(false)
   const [viewSlug, setViewSlug] = useState(null)
   const [pagination, setPagination] = useState({
-    currentPage: 1,
+    currentPage: parseInt(searchParams.get('page')) || 1,
     totalPages: 1,
     total: 0
   })
@@ -54,7 +55,7 @@ export default function ConsultancyForm() {
     setHeading('Consultancy Management')
     fetchConsultancies()
     return () => setHeading(null)
-  }, [setHeading])
+  }, [setHeading, searchParams])
 
   // Check for 'add' query parameter and open modal
   useEffect(() => {
@@ -78,8 +79,12 @@ export default function ConsultancyForm() {
   const { requireAdmin } = useAdminPermission()
 
   const fetchConsultancies = async (page = 1) => {
-    setTableLoading(true)
     try {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set('page', page)
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
+      setTableLoading(true)
       const response = await authFetch(
         `${process.env.baseUrl}/consultancy?page=${page}`
       )
@@ -124,7 +129,7 @@ export default function ConsultancyForm() {
       )
       const res = await response.json()
       toast.success(res.message)
-      await fetchConsultancies()
+      await fetchConsultancies(pagination.currentPage)
     } catch (err) {
       toast.error(err.message)
     } finally {
@@ -265,7 +270,7 @@ export default function ConsultancyForm() {
             data={consultancies}
             columns={columns}
             pagination={pagination}
-            onPageChange={(newPage) => loadData(newPage)}
+            onPageChange={(newPage) => fetchConsultancies(newPage)}
             onSearch={handleSearch}
             showSearch={false}
           />

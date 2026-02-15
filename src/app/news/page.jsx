@@ -62,7 +62,7 @@ const News = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await getCategories()
+            const response = await getCategories({ type: 'NEWS' })
             if (response && response.items) {
                 setCategories([{ id: 'all', title: 'All' }, ...response.items])
             }

@@ -27,6 +27,8 @@ import {
 import AdmissionViewModal from './AdmissionViewModal'
 import { authFetch } from '@/app/utils/authFetch'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
+import { Controller } from 'react-hook-form'
+import ProgramDropdown from '@/ui/molecules/dropdown/ProgramDropdown'
 
 export default function AdmissionManager() {
   const { setHeading } = usePageHeading()
@@ -39,6 +41,7 @@ export default function AdmissionManager() {
     reset,
     setValue,
     getValues,
+    control,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -71,7 +74,6 @@ export default function AdmissionManager() {
   const [viewData, setViewData] = useState(null)
 
   const [colleges, setColleges] = useState([])
-  const [programs, setPrograms] = useState([])
   const [collegeSearch, setCollegeSearch] = useState('')
   const [collegeSearchResults, setCollegeSearchResults] = useState([])
   const [selectedCollege, setSelectedCollege] = useState(null)
@@ -79,18 +81,9 @@ export default function AdmissionManager() {
   useEffect(() => {
     setHeading('Admission Management')
     loadAdmissions()
-    loadAuxData()
     return () => setHeading(null)
   }, [setHeading])
 
-  const loadAuxData = async () => {
-    try {
-      const progData = await fetchPrograms()
-      setPrograms(progData)
-    } catch (error) {
-      console.error('Failed to load aux data:', error)
-    }
-  }
 
   const loadAdmissions = async (page = 1, search = searchQuery) => {
     setLoading(true)
@@ -306,13 +299,18 @@ export default function AdmissionManager() {
                 {/* Program Selection */}
                 <div className='space-y-2'>
                     <Label>Program <span className='text-red-500'>*</span></Label>
-                    <select 
-                        {...register('course_id', { required: true })}
-                        className='w-full p-2 border rounded-md text-sm'
-                    >
-                        <option value="">Select Program</option>
-                        {programs.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
-                    </select>
+                    <Controller
+                        name="course_id"
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                            <ProgramDropdown
+                                value={field.value}
+                                onChange={field.onChange}
+                                className="w-full"
+                            />
+                        )}
+                    />
                     {errors.course_id && <span className='text-red-500 text-xs'>Program is required</span>}
                 </div>
 

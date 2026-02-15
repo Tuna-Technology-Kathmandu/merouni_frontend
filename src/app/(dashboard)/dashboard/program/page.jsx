@@ -184,8 +184,14 @@ export default function ProgramForm() {
       accessorKey: 'duration'
     },
     {
-      header: 'Fee',
-      accessorKey: 'fee'
+      header: 'Degree',
+      accessorKey: 'programdegree.title',
+      cell: ({ row }) => row.original.programdegree?.title || '—'
+    },
+    {
+      header: 'Level',
+      accessorKey: 'programlevel.title',
+      cell: ({ row }) => row.original.programlevel?.title || '—'
     },
     {
       header: 'Actions',

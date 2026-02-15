@@ -7,28 +7,31 @@ export const createColumns = ({
   handleOpenCredentialsModal
 }) => [
     {
-      header: '',
-      accessorKey: 'logo',
-      cell: ({ getValue }) => {
-        const logoUrl = getValue()
-        return logoUrl ? (
-          <div className='flex items-center justify-center'>
-            <img
-              src={logoUrl}
-              alt='Consultancy Logo'
-              className='w-12 h-12 object-contain rounded'
-            />
-          </div>
-        ) : (
-          <div className='flex items-center justify-center w-12 h-12 bg-gray-100 rounded'>
-            <span className='text-gray-400 text-xs'>No Logo</span>
+      header: 'Consultancy Name',
+      accessorKey: 'title',
+      cell: ({ row }) => {
+        const { title, logo } = row.original
+        return (
+          <div className='flex items-center gap-3 max-w-xs overflow-hidden'>
+            {logo ? (
+              <div className='w-20 h-20 rounded shrink-0 overflow-hidden bg-gray-100'>
+                <img
+                  src={logo}
+                  alt='Consultancy'
+                  className='w-full h-full object-contain'
+                />
+              </div>
+            ) : (
+              <div className='w-20 h-20 rounded shrink-0 bg-gray-100 border border-dashed flex items-center justify-center text-xs text-gray-400'>
+                No Logo
+              </div>
+            )}
+            <div className='flex-1 overflow-hidden'>
+              <div className='truncate font-medium text-gray-900'>{title}</div>
+            </div>
           </div>
         )
       }
-    },
-    {
-      header: 'Consultancy Name',
-      accessorKey: 'title'
     },
     {
       header: 'Destinations',

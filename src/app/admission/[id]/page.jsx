@@ -132,7 +132,7 @@ const AdmissionDetailPage = () => {
                   Admission Open
                 </div>
 
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight mb-6 max-w-3xl">
+                <h1 className="text-2xl md:text-1xl lg:text-2xl font-extrabold text-gray-900 leading-tight mb-6 max-w-3xl">
                   {admission.program?.title}
                 </h1>
 
@@ -169,35 +169,9 @@ const AdmissionDetailPage = () => {
 
             {/* Quick Stats Bar */}
             <div className="bg-gray-50/80 border-t border-gray-100 px-8 py-6 md:px-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center text-[#0A6FA7] shadow-sm border border-gray-100">
-                  <Wallet size={18} />
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-tight">Fee Details</p>
-                  <p className="text-sm font-bold text-gray-900">{admission.fee_details || 'Contact for Fees'}</p>
-                </div>
-              </div>
+             
 
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center text-[#0A6FA7] shadow-sm border border-gray-100">
-                  <Info size={18} />
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-tight">Process</p>
-                  <p className="text-sm font-bold text-gray-900">{admission.admission_process || 'General'}</p>
-                </div>
-              </div>
-
-              <div className="hidden lg:flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center text-[#0A6FA7] shadow-sm border border-gray-100">
-                  <Calendar size={18} />
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-tight">Academic Year</p>
-                  <p className="text-sm font-bold text-gray-900">2024-2025</p>
-                </div>
-              </div>
+                           
             </div>
           </div>
 
@@ -213,7 +187,7 @@ const AdmissionDetailPage = () => {
                 </div>
                 <div className="prose prose-blue max-w-none text-gray-600 leading-relaxed font-medium">
                   {admission.description ? (
-                    <p>{admission.description}</p>
+                    <div dangerouslySetInnerHTML={{ __html: admission.description }} />
                   ) : (
                     <p>No detailed description provided for this program's admission. Please contact the college for more comprehensive information regarding the course structure and curriculum.</p>
                   )}
@@ -249,21 +223,7 @@ const AdmissionDetailPage = () => {
                      {admission.admission_process || 'Applicants must follow the standard application procedure conducted by the college.'}
                    </p>
                    
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     {[
-                       'Online Application Submission',
-                       'Entrance Examination',
-                       'Personal Interview',
-                       'Document Verification'
-                     ].map((step, idx) => (
-                       <div key={idx} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                         <div className="h-8 w-8 rounded-full bg-[#0A6FA7] flex items-center justify-center text-white text-xs font-bold">
-                           {idx + 1}
-                         </div>
-                         <span className="text-sm font-bold text-gray-700">{step}</span>
-                       </div>
-                     ))}
-                   </div>
+                 
                 </div>
               </section>
             </div>

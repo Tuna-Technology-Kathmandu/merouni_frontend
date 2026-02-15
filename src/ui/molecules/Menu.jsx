@@ -175,7 +175,7 @@ const SubMenu = ({
 
 // --- Main Component ---
 
-const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
+const Menu = ({ isCollapsed = false }) => {
   const pathname = usePathname()
   const dispatch = useDispatch()
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
@@ -192,10 +192,9 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
     }, {})
   })
 
-  // Filter Items Logic (Access + Search)
+  // Filter Items Logic (Access)
   const filteredMenuItems = useMemo(() => {
     const hasAccess = (item) => item.visible.some((r) => role[r])
-    const query = searchQuery.toLowerCase().trim()
 
     return menuItems
       .map((section) => {
@@ -204,21 +203,13 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
           // 1. Check Access
           if (!hasAccess(item)) return false
 
-          // 2. Check Search (if any)
-          if (!query) return true
-
-          const matchesLabel = item.label.toLowerCase().includes(query)
-          const matchesSubmenu = item.submenus?.some((sub) =>
-            sub.label.toLowerCase().includes(query)
-          )
-
-          return matchesLabel || matchesSubmenu
+          return true
         })
 
         return { ...section, items }
       })
       .filter((section) => section.items.length > 0)
-  }, [role, searchQuery])
+  }, [role])
 
   // State Handlers
   const toggleMenu = (label) => {
@@ -305,12 +296,7 @@ const Menu = ({ isCollapsed = false, searchQuery = '' }) => {
                 )
                 // Auto-expand if active or search matched
                 const isExpanded =
-                  expandedMenus[item.label] ??
-                  (isActive ||
-                    (searchQuery &&
-                      item.label
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase())))
+                  expandedMenus[item.label] ?? isActive
 
                 return (
                   <SubMenu

@@ -78,9 +78,9 @@ export default function DashboardLayout({ children }) {
                 <Image
                   src='/images/logo.png'
                   alt='logo'
-                  width={isCollapsed ? 40 : 140}
-                  height={isCollapsed ? 40 : 50}
-                  className='object-contain transition-all duration-300'
+                  width={isCollapsed ? 50 : 200}
+                  height={isCollapsed ? 50 : 80}
+                  className='object-contain transition-all duration-300 scale-110'
                   priority
                 />
               </Link>
@@ -104,29 +104,22 @@ export default function DashboardLayout({ children }) {
               </button>
             </div>
 
-            {/* Search Bar - Only for admin & when Expanded */}
-            {isAdmin && !isCollapsed && (
-              <div className="px-4 pb-4 animate-in fade-in zoom-in duration-200">
-                <SearchInput
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onClear={() => setSearchQuery('')}
-                  placeholder='Search menus...'
-                />
-              </div>
-            )}
           </div>
 
           {/* Scrollable Menu */}
           <div className='flex-1 overflow-y-auto sidebar-scrollbar custom-scrollbar'>
-            <Menu isCollapsed={isCollapsed} searchQuery={searchQuery} />
+            <Menu isCollapsed={isCollapsed} />
           </div>
         </div>
 
         {/* RIGHT CONTENT */}
         <div className='flex-1 flex flex-col min-w-0 transition-all duration-300'>
 
-          <AdminNavbar onMenuClick={() => setIsCollapsed(false)} />
+          <AdminNavbar 
+            onMenuClick={() => setIsCollapsed(false)} 
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
 
           {/* Main Content Area */}
           <main className='flex-1 p-4 md:p-6 overflow-y-auto overflow-x-hidden'>

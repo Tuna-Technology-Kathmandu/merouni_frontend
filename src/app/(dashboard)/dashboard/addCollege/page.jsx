@@ -1,6 +1,6 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { useForm, useFieldArray } from 'react-hook-form'
 import {
@@ -185,6 +185,9 @@ const FileUploadWithPreview = ({
   )
 }
 export default function CollegeForm() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
   const { setHeading } = usePageHeading()
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
@@ -212,7 +215,7 @@ export default function CollegeForm() {
   const [tableloading, setTableLoading] = useState(false)
   const [loading, setLoading] = useState(false)
   const [pagination, setPagination] = useState({
-    currentPage: 1,
+    currentPage: parseInt(searchParams.get('page')) || 1,
     totalPages: 1,
     total: 0
   })
@@ -368,7 +371,7 @@ export default function CollegeForm() {
         videos: []
       })
       setIsOpen(false)
-      loadColleges()
+      loadColleges(pagination.currentPage)
     } catch (error) {
       // Extract error message from different error formats
 
@@ -454,13 +457,14 @@ export default function CollegeForm() {
     if (typeof window === 'undefined') return
 
     setHeading('College Management')
-    const loadColleges = async () => {
+    const loadInitialColleges = async () => {
+      const page = parseInt(searchParams.get('page')) || 1
       setLoading(true)
       setTableLoading(true)
       try {
         // Use authFetch directly instead of server action to avoid SSR issues
         const response = await authFetch(
-          `${process.env.baseUrl}/college?limit=10&page=1`
+          `${process.env.baseUrl}/college?limit=10&page=${page}`
         )
         if (response.ok) {
           const data = await response.json()
@@ -489,9 +493,9 @@ export default function CollegeForm() {
         setTableLoading(false)
       }
     }
-    loadColleges()
+    loadInitialColleges()
     return () => setHeading(null)
-  }, [setHeading])
+  }, [setHeading, searchParams])
 
   useEffect(() => {
     return () => {
@@ -830,6 +834,11 @@ export default function CollegeForm() {
 
   const loadColleges = async (page = 1) => {
     try {
+      // Sync with URL
+      const params = new URLSearchParams(searchParams.toString())
+      params.set('page', page)
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
       // Use authFetch directly instead of server action to avoid SSR issues
       const response = await authFetch(
         `${process.env.baseUrl}/college?limit=10&page=${page}`

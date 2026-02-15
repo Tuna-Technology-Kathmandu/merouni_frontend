@@ -37,7 +37,8 @@ export default function CategoryManager() {
     defaultValues: {
       title: '',
       description: '',
-      author: author_id
+      author: author_id,
+      type: ''
     }
   })
 
@@ -74,6 +75,11 @@ export default function CategoryManager() {
             ? `${description.substring(0, 60)}...`
             : description
         }
+      },
+      {
+        header: 'Type',
+        accessorKey: 'type',
+        cell: ({ getValue }) => getValue() || '-'
       },
 
       {
@@ -217,6 +223,7 @@ export default function CategoryManager() {
     setIsOpen(true)
     setValue('title', category.title)
     setValue('description', category.description || '')
+    setValue('type', category.type || '')
   }
 
   const handleView = (category) => {
@@ -402,6 +409,20 @@ export default function CategoryManager() {
                         rows={4}
                       />
                     </div>
+                    <div>
+                      <label className='block mb-2'>
+                        Category Type
+                      </label>
+                      <select
+                        {...register('type')}
+                        className='w-full p-2 border rounded'
+                      >
+                        <option value=''>Select Type </option>
+                        <option value='BLOG'>BLOG</option>
+                        <option value='EVENT'>EVENT</option>
+                        <option value='NEWS'>NEWS</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -447,6 +468,10 @@ export default function CategoryManager() {
               <p className='text-gray-700 leading-relaxed whitespace-pre-wrap'>
                 {viewingCategory?.description || 'No description provided.'}
               </p>
+            </div>
+            <div>
+              <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Type</h3>
+              <p className='text-gray-900 font-semibold'>{viewingCategory?.type || '-'}</p>
             </div>
             <div className='grid grid-cols-2 gap-4'>
               <div>

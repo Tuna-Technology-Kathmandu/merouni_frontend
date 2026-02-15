@@ -257,19 +257,7 @@ const ScholarshipDetailsPage = ({ params }) => {
                   </div>
                 )}
 
-                {scholarship.scholarshipAuthor && (
-                  <div className='flex flex-col'>
-                    <span className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-2'>
-                      <FaUser className='w-3 h-3' />
-                      Author
-                    </span>
-                    <span className='text-base font-medium text-gray-900'>
-                      {scholarship.scholarshipAuthor.firstName}{' '}
-                      {scholarship.scholarshipAuthor.middleName || ''}{' '}
-                      {scholarship.scholarshipAuthor.lastName}
-                    </span>
-                  </div>
-                )}
+               
               </div>
             </div>
           </div>

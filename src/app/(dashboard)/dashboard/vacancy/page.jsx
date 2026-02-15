@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
@@ -32,6 +32,7 @@ const VacancyManager = () => {
   const { setHeading } = usePageHeading()
   const searchParams = useSearchParams()
   const router = useRouter()
+  const pathname = usePathname()
   const author_id = useSelector((state) => state.user.data.id)
   const { requireAdmin } = useAdminPermission()
 
@@ -55,7 +56,7 @@ const VacancyManager = () => {
 
   const [vacancies, setVacancies] = useState([])
   const [pagination, setPagination] = useState({
-    currentPage: 1,
+    currentPage: parseInt(searchParams.get('page')) || 1,
     totalPages: 1,
     total: 0
   })
@@ -76,8 +77,12 @@ const VacancyManager = () => {
   const [loadingView, setLoadingView] = useState(false)
 
   const loadVacancies = async (page = 1) => {
-    setTableLoading(true)
     try {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set('page', page)
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
+      setTableLoading(true)
       const response = await authFetch(
         `${process.env.baseUrl}/vacancy?page=${page}`
       )
@@ -102,7 +107,7 @@ const VacancyManager = () => {
     setHeading('Vacancy Management')
     loadVacancies()
     return () => setHeading(null)
-  }, [setHeading])
+  }, [setHeading, searchParams])
 
   // Open add vacancy dialog when navigating from dashboard quick action (?add=true)
   useEffect(() => {
@@ -112,7 +117,7 @@ const VacancyManager = () => {
       setEditingId(null)
       reset()
       setUploadedFiles({ featuredImage: '' })
-      router.replace('/dashboard/vacancy', { scroll: false })
+      router.replace(pathname, { scroll: false })
     }
   }, [searchParams])
 
@@ -267,7 +272,7 @@ const VacancyManager = () => {
 
   const handleSearch = async (query) => {
     if (!query) {
-      loadVacancies()
+      loadVacancies(pagination.currentPage)
       return
     }
     try {

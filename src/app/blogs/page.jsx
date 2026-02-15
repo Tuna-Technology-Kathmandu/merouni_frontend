@@ -63,7 +63,7 @@ const Blogs = () => {
       const catParam = category === 'all' ? '' : category
       const params = {
         page,
-        category_title: catParam,
+        category_id: catParam,
         status: 'published',
         q: search
       }
@@ -92,7 +92,7 @@ const Blogs = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await services.category.getAll()
+      const response = await services.category.getAll({ type: 'BLOG' })
       if (response && response.items) {
         setCategories([{ id: 'all', title: 'All' }, ...response.items])
       }

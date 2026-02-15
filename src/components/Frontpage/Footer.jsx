@@ -32,7 +32,7 @@ const Footer = () => {
             ...prev.Exams,
             list: items.slice(0, 5).map(item => ({
               title: item.title || item.name,
-              href: `/exams/${item.slugs || item.id}`
+              href: `/exam/${item.slugs || item.id}`
             }))
           }
         }))

@@ -7,9 +7,9 @@ import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
-import AdmissionItem from '../addCollege/AdmissionItem'
 import GallerySection from '../addCollege/GallerySection'
 import VideoSection from '../addCollege/VideoSection'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
 import {
   fetchAllCourse,
   fetchAllUniversity,
@@ -151,6 +151,7 @@ const FileUploadWithPreview = ({
 }
 
 const EditCollegePage = () => {
+  const { setHeading } = usePageHeading()
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [courses, setCourses] = useState([])
@@ -217,15 +218,6 @@ const EditCollegePage = () => {
           role: '',
           description: ''
         }
-      ],
-      admissions: [
-        {
-          course_id: '',
-          eligibility_criteria: '',
-          admission_process: '',
-          fee_details: '',
-          description: ''
-        }
       ]
     }
   })
@@ -237,18 +229,13 @@ const EditCollegePage = () => {
   } = useFieldArray({ control, name: 'members' })
 
   const {
-    fields: admissionFields,
-    append: appendAdmission,
-    remove: removeAdmission
-  } = useFieldArray({ control, name: 'admissions' })
-
-  const {
     fields: facilityFields,
     append: appendFacility,
     remove: removeFacility
   } = useFieldArray({ control, name: 'facilities' })
 
   useEffect(() => {
+    setHeading('Edit College Information')
     loadCollegeData()
     loadCourses()
     loadUniversities()
@@ -428,30 +415,7 @@ const EditCollegePage = () => {
         ]
       setValue('facilities', facilityData)
 
-      // Admissions
-      const admissionData = collegeData.collegeAdmissions?.length
-        ? collegeData.collegeAdmissions.map((admission) => {
-          const courseId = courses.find(
-            (c) => c.title === admission.program.title
-          )?.id
-          return {
-            course_id: courseId || '',
-            eligibility_criteria: admission.eligibility_criteria || '',
-            admission_process: admission.admission_process || '',
-            fee_details: admission.fee_details || '',
-            description: admission.description || ''
-          }
-        })
-        : [
-          {
-            course_id: '',
-            eligibility_criteria: '',
-            admission_process: '',
-            fee_details: '',
-            description: ''
-          }
-        ]
-      setValue('admissions', admissionData)
+      setValue('facilities', facilityData)
 
       // College brochure
       if (collegeData.college_broucher) {
@@ -486,14 +450,6 @@ const EditCollegePage = () => {
   const onSubmit = async (data) => {
     try {
       setSubmitting(true)
-
-      // Filter empty admissions
-      data.admissions = data.admissions.filter((admission) => {
-        return Object.values(admission).some((val) => {
-          if (typeof val === 'string') return val.trim() !== ''
-          return val !== null && val !== undefined
-        })
-      })
 
       // Filter out empty members
       const filteredMembers = (data.members || []).filter((member) => {
@@ -595,7 +551,6 @@ const EditCollegePage = () => {
 
   return (
     <div className='p-4 flex flex-col h-[calc(100vh-120px)]'>
-      <h1 className='text-2xl font-bold mb-4'>Edit College Information</h1>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -866,12 +821,10 @@ const EditCollegePage = () => {
               >
                 <div>
                   <label className='block mb-2'>
-                    Title <span className='text-red-500'>*</span>
+                    Title
                   </label>
                   <input
-                    {...register(`facilities.${index}.title`, {
-                      required: true
-                    })}
+                    {...register(`facilities.${index}.title`)}
                     className='w-full p-2 border rounded'
                   />
                   {errors.facilities?.[index]?.title && (
@@ -997,46 +950,6 @@ const EditCollegePage = () => {
                 </button>
               </div>
             ))}
-          </div>
-
-          {/* Admissions Section */}
-          <div className='bg-white p-6 rounded-lg shadow-md'>
-            <div className='flex justify-between items-center mb-4'>
-              <h2 className='text-xl font-semibold'>Admissions</h2>
-              <button
-                type='button'
-                onClick={() =>
-                  appendAdmission({
-                    course_id: '',
-                    eligibility_criteria: '',
-                    admission_process: '',
-                    fee_details: '',
-                    description: ''
-                  })
-                }
-                className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600'
-              >
-                Add Admission
-              </button>
-            </div>
-
-            {admissionFields.map((field, index) => {
-              const courseId = getValues(`admissions.${index}.course_id`)
-              const courseTitle =
-                courses.find((c) => c.id === courseId)?.title || ''
-              return (
-                <AdmissionItem
-                  key={field.id}
-                  index={index}
-                  remove={removeAdmission}
-                  register={register}
-                  setValue={setValue}
-                  getValues={getValues}
-                  admissionFields={admissionFields}
-                  initialCourseTitle={courseTitle}
-                />
-              )
-            })}
           </div>
 
           {/* Address Section */}

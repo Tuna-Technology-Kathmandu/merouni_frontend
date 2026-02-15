@@ -4,17 +4,17 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import {
   Search,
   Clipboard,
-  Filter,
   X,
   ChevronRight,
   GraduationCap
 } from 'lucide-react'
 import EmptyState from '@/ui/shadcn/EmptyState'
-import { getAdmission, fetchPrograms } from '../actions'
+import { getAdmission } from '../actions'
 import Link from 'next/link'
 import Pagination from '../../blogs/components/Pagination'
 import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 import AdmissionCard from '@/ui/molecules/cards/AdmissionCard'
+import ProgramDropdown from '@/ui/molecules/dropdown/ProgramDropdown'
 
 const AdmissionPage = () => {
   const router = useRouter()
@@ -25,27 +25,12 @@ const AdmissionPage = () => {
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [programs, setPrograms] = useState([])
   const [selectedProgram, setSelectedProgram] = useState('')
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
     totalCount: 0
   })
-  const [isScrolling, setIsScrolling] = useState(false)
-
-  // Fetch filter options
-  useEffect(() => {
-    const fetchOptions = async () => {
-      try {
-        const progData = await fetchPrograms()
-        setPrograms(progData)
-      } catch (error) {
-        console.error('Error fetching filter options:', error)
-      }
-    }
-    fetchOptions()
-  }, [])
 
   // Debounce search input
   useEffect(() => {
@@ -100,10 +85,8 @@ const AdmissionPage = () => {
 
   const handlePageChange = (page) => {
     if (page > 0 && page <= pagination.totalPages) {
-      setIsScrolling(true)
       setPagination((prev) => ({ ...prev, currentPage: page }))
       window.scrollTo({ top: 0, behavior: 'smooth' })
-      setTimeout(() => setIsScrolling(false), 500)
     }
   }
 
@@ -164,27 +147,19 @@ const AdmissionPage = () => {
               <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
                 Program / Course
               </label>
-              <div className='relative group'>
-                <Filter className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors z-10' />
-                <select
-                  value={selectedProgram}
-                  onChange={(e) => setSelectedProgram(e.target.value)}
-                  className='w-full px-12 py-3.5 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#0A6FA7]/10 focus:border-[#0A6FA7] focus:bg-white transition-all text-sm font-semibold text-gray-900 appearance-none cursor-pointer'
-                >
-                  <option value=''>All Programs</option>
-                  {programs.map((prog) => (
-                    <option key={prog.id} value={prog.slugs}>
-                      {prog.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <ProgramDropdown
+                value={selectedProgram}
+                onChange={setSelectedProgram}
+                valueKey="slugs"
+                className="w-full"
+                placeholder="All Programs"
+              />
             </div>
           </div>
         </div>
 
         {/* Results Info */}
-        {!loading && !isScrolling && (
+        {!loading && (
           <div className='flex items-center justify-between mb-8 px-2'>
             <p className='text-sm font-semibold text-gray-500'>
               Showing <span className='text-gray-900'>{admission.length}</span>{' '}
@@ -195,7 +170,7 @@ const AdmissionPage = () => {
         )}
 
         {/* Admissions Grid */}
-        {loading || isScrolling ? (
+        {loading ? (
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
             {Array(6)
               .fill('')
