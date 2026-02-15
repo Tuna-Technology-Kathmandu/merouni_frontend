@@ -1,21 +1,21 @@
 'use server'
 
 
-export async function getMaterialsByCategory(
+export async function getMaterials(
   page = 1,
   search = '',
   categoryId = null
 ) {
   try {
-    let url = `${process.env.baseUrl}/material/category?page=${page}&limit=12`
+    let url = `${process.env.baseUrl}/material?page=${page}&limit=12`
     if (search) {
       url += `&q=${encodeURIComponent(search)}`
     }
-    // Always include category_id filter when categoryId is provided
-    if (categoryId !== null && categoryId !== undefined) {
+    // Include category_id filter if provided and not 'all'
+    if (categoryId && categoryId !== 'all') {
       // Handle unlisted category (materials without category)
       if (categoryId === 'unlisted') {
-        url += `&category_id=null`
+        url += `&category_id=unlisted`
       } else {
         // Ensure categoryId is a valid number
         url += `&category_id=${categoryId}`
@@ -40,10 +40,15 @@ export async function getMaterialsByCategory(
   }
 }
 
+// Kept for backward compatibility if needed, but getMaterials covers it
+export async function getMaterialsByCategory(page, search, categoryId) {
+  return getMaterials(page, search, categoryId)
+}
+
 export async function getMaterialCategories() {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}/material-category?page=1&limit=100`,
+      `${process.env.baseUrl}/category?type=MATERIAL&limit=100`,
       {
         method: 'GET',
         headers: {

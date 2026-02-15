@@ -1,56 +1,169 @@
 'use client'
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import Header from '../../components/Frontpage/Header'
 import Navbar from '../../components/Frontpage/Navbar'
 import Footer from '../../components/Frontpage/Footer'
-import { getMaterialCategories } from './action'
-import CategoryGrid from './components/CategoryGrid'
+import { getMaterials, getMaterialCategories } from './action'
+import MaterialFilters from './components/MaterialFilters'
+import MaterialsGrid from './components/MaterialsGrid'
+import Pagination from '../blogs/components/Pagination'
 
 const Materials = () => {
   const router = useRouter()
-  const [categories, setCategories] = useState([])
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+
+  // State
+  const [materials, setMaterials] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  // Initialization from search params
+  const initialSearch = searchParams.get('q') || ''
+  const initialCategory = searchParams.get('category') || 'all'
+  const initialPage = parseInt(searchParams.get('page')) || 1
+
+  // Filters
+  const [searchQuery, setSearchQuery] = useState(initialSearch)
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory)
+
+  // Pagination
+  const [pagination, setPagination] = useState({
+    currentPage: initialPage,
+    totalPages: 1,
+    totalCount: 0
+  })
+
+  const debounceRef = useRef(null)
+
+  // Categories
+  const [categories, setCategories] = useState([
+    { id: 'all', title: 'All' }
+  ])
+
+  // URL Sync Helper
+  const updateURL = useCallback((params) => {
+    const newParams = new URLSearchParams(searchParams.toString())
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        newParams.set(key, value)
+      } else {
+        newParams.delete(key)
+      }
+    })
+    router.push(`${pathname}?${newParams.toString()}`, { scroll: false })
+  }, [searchParams, pathname, router])
+
+  // Data Fetching
+  const fetchMaterialsData = async (page = 1, search = '', category = '') => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await getMaterials(page, search, category)
+
+      if (response && response.materials) {
+        setMaterials(response.materials)
+        if (response.pagination) {
+          setPagination({
+            currentPage: response.pagination.currentPage,
+            totalPages: response.pagination.totalPages,
+            totalCount: response.pagination.totalCount
+          })
+        }
+      } else {
+        setMaterials([])
+        setPagination(prev => ({ ...prev, totalCount: 0, currentPage: page }))
+      }
+    } catch (error) {
+      console.error('Error fetching materials:', error)
+      setError('Failed to load materials')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const cats = await getMaterialCategories()
+      if (cats) {
+        setCategories([{ id: 'all', title: 'All' }, ...cats])
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+    }
+  }
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const cats = await getMaterialCategories()
-        setCategories(cats)
-      } catch (error) {
-        console.error('Failed to load categories:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchCategories()
   }, [])
 
-  const handleCategoryClick = (category) => {
-    const categoryId = category.id === 'unlisted' ? 'unlisted' : category.id
-    router.push(`/materials/category/${categoryId}`)
+  // Sync state when URL params change (e.g. browser back/forward)
+  useEffect(() => {
+    const q = searchParams.get('q') || ''
+    const cat = searchParams.get('category') || 'all'
+    const pg = parseInt(searchParams.get('page')) || 1
+
+    setSearchQuery(q)
+    setSelectedCategory(cat)
+    setPagination(prev => ({ ...prev, currentPage: pg }))
+    
+    fetchMaterialsData(pg, q, cat)
+  }, [searchParams])
+
+  // Effect: Debounced Search & Filter Change (Updates URL only)
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+
+    // Skip initial sync to avoid double fetch on mount
+    if (searchQuery === initialSearch && selectedCategory === initialCategory) return
+
+    debounceRef.current = setTimeout(() => {
+      updateURL({ 
+        q: searchQuery, 
+        category: selectedCategory, 
+        page: 1 // Reset to page 1 on search/filter
+      })
+    }, 500)
+
+    return () => clearTimeout(debounceRef.current)
+  }, [searchQuery, selectedCategory, updateURL, initialSearch, initialCategory])
+
+  // Handle page change
+  const handlePageChange = (page) => {
+    if (page > 0 && page <= pagination.totalPages) {
+      updateURL({ page })
+    }
   }
+
+  // Scroll to top on any URL parameter change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [searchParams])
 
   return (
     <>
       <Header />
       <Navbar />
-      <div className='flex flex-col max-w-[1600px] mx-auto px-8 mt-12'>
-        <div className='text-center mb-16'>
-          <h1 className='text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight'>
-            Academic <span className='text-[#0A70A7]'>Library</span>
-          </h1>
-          <div className='w-20 h-1.5 bg-[#0A70A7] mx-auto mt-4 rounded-full'></div>
-          <p className='mt-6 text-gray-600 max-w-2xl mx-auto text-base md:text-lg leading-relaxed'>
-            Access a comprehensive collection of curated study materials, guides, and resources designed to accelerate your learning journey.
-          </p>
-        </div>
-
-        <CategoryGrid
+      <div className='flex flex-col max-w-[1600px] mx-auto px-8 mt-12 mb-20'>
+        <MaterialFilters
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
           categories={categories}
-          onCategoryClick={handleCategoryClick}
+        />
+
+        <MaterialsGrid
+          materials={materials}
           loading={loading}
         />
+
+        {!loading && materials.length > 0 && (
+          <div className='mt-10'>
+             <Pagination pagination={pagination} onPageChange={handlePageChange} />
+          </div>
+        )}
       </div>
       <Footer />
     </>
