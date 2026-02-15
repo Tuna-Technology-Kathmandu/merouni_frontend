@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from '@/ui/shadcn/dialog'
 import ShimmerEffect from '../../../../ui/molecules/ShimmerEffect'
-import Table from '@/ui/shadcn/Table'
+import Table from '@/ui/shadcn/DataTable'
 import { useSelector } from 'react-redux'
 import { destr } from 'destr'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
