@@ -48,6 +48,7 @@ export default function BlogsManager() {
   const [submitting, setSubmitting] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [newsSearchTimeout, setNewsSearchTimeout] = useState(null)
+  const abortControllerRef = useRef(null)
 
   // View Modal State
   const [viewModalOpen, setViewModalOpen] = useState(false)
@@ -178,9 +179,11 @@ export default function BlogsManager() {
 
   useEffect(() => {
     setHeading('Blogs Management')
-    loadData()
+    const page = searchParams.get('page') || 1
+    loadData(page)
     return () => setHeading(null)
-  }, [setHeading, searchParams])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setHeading])
 
   // Check for 'add' query parameter and open modal
   useEffect(() => {
@@ -205,11 +208,22 @@ export default function BlogsManager() {
 
   const loadData = async (page = 1, status = statusFilter) => {
     try {
-      const params = new URLSearchParams(searchParams.toString())
-      params.set('page', page)
-      router.push(`${pathname}?${params.toString()}`, { scroll: false })
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+      abortControllerRef.current = new AbortController()
 
-      const response = await fetchBlogs(page, 10, status)
+      const params = new URLSearchParams(searchParams.toString())
+      const currentPage = params.get('page') || '1'
+
+      if (currentPage !== String(page)) {
+        params.set('page', page)
+        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+      }
+
+      const response = await fetchBlogs(page, 10, status, {
+        signal: abortControllerRef.current.signal
+      })
       setBlogs(response.items)
       setPagination({
         currentPage: response.pagination.currentPage,
@@ -217,10 +231,13 @@ export default function BlogsManager() {
         total: response.pagination.totalCount
       })
     } catch (err) {
+      if (err.name === 'AbortError') return
       toast.error('Failed to load blogs')
       console.error('Error loading blogs data:', err)
     } finally {
-      setLoading(false)
+      if (abortControllerRef.current?.signal?.aborted === false) {
+        setLoading(false)
+      }
     }
   }
 

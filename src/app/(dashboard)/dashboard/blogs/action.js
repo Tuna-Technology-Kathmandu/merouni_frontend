@@ -2,14 +2,15 @@ import { authFetch } from '@/app/utils/authFetch'
 
 let url = `${process.env.baseUrl}/blogs`
 
-export async function fetchBlogs(page = 1, limit = 10, status = '') {
+export async function fetchBlogs(page = 1, limit = 10, status = '', options = {}) {
   try {
     let query = `${url}?limit=${limit}&page=${page}`
     if (status && status !== 'all') {
       query += `&status=${status}`
     }
     const response = await fetch(query, {
-      cache: 'no-store'
+      cache: 'no-store',
+      ...options
     })
     if (!response.ok) {
       throw new Error('Failed to fetch events')
