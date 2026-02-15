@@ -11,6 +11,8 @@ import useAdminPermission from '@/hooks/useAdminPermission'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '@/ui/shadcn/button'
+import { Input } from '@/ui/shadcn/input'
+import { Label } from '@/ui/shadcn/label'
 import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function LevelForm() {
@@ -336,8 +338,8 @@ export default function LevelForm() {
               >
                 Cancel
               </Button>
-              <Button type='submit' disabled={isSubmitting}>
-                {isSubmitting ? 'Saving...' : 'Save'}
+              <Button type='submit' disabled={submitting}>
+                {submitting ? 'Saving...' : 'Save'}
               </Button>
             </div>
           </form>

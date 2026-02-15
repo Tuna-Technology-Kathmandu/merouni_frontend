@@ -11,6 +11,8 @@ import useAdminPermission from '@/hooks/useAdminPermission'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '@/ui/shadcn/button'
+import { Input } from '@/ui/shadcn/input'
+import { Label } from '@/ui/shadcn/label'
 import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function TagForm() {
@@ -336,12 +338,12 @@ export default function TagForm() {
 
       {/* Form Dialog */}
       <Dialog
-        isOpen={isModalOpen}
+        isOpen={isOpen}
         onClose={handleModalClose}
         className='max-w-md'
       >
         <DialogHeader>
-          <DialogTitle>{editingTag ? 'Edit Tag' : 'Add Tag'}</DialogTitle>
+          <DialogTitle>{editing ? 'Edit Tag' : 'Add Tag'}</DialogTitle>
           <DialogClose onClick={handleModalClose} />
         </DialogHeader>
         <DialogContent>
@@ -367,8 +369,8 @@ export default function TagForm() {
               >
                 Cancel
               </Button>
-              <Button type='submit' disabled={isSubmitting}>
-                {isSubmitting ? 'Saving...' : editingTag ? 'Save Changes' : 'Add Tag'}
+              <Button type='submit' disabled={submitting}>
+                {submitting ? 'Saving...' : editing ? 'Save Changes' : 'Add Tag'}
               </Button>
             </div>
           </form>
