@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { useSelector } from 'react-redux'
@@ -75,16 +75,27 @@ const VacancyManager = () => {
   const [viewModalOpen, setViewModalOpen] = useState(false)
   const [viewVacancyData, setViewVacancyData] = useState(null)
   const [loadingView, setLoadingView] = useState(false)
+  const abortControllerRef = useRef(null)
 
   const loadVacancies = async (page = 1) => {
     try {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+      abortControllerRef.current = new AbortController()
+
       const params = new URLSearchParams(searchParams.toString())
-      params.set('page', page)
-      router.push(`${pathname}?${params.toString()}`, { scroll: false })
+      const currentPage = params.get('page') || '1'
+
+      if (currentPage !== String(page)) {
+        params.set('page', page)
+        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+      }
 
       setTableLoading(true)
       const response = await authFetch(
-        `${process.env.baseUrl}/vacancy?page=${page}`
+        `${process.env.baseUrl}/vacancy?page=${page}`,
+        { signal: abortControllerRef.current.signal }
       )
       const data = await response.json()
       setVacancies(data.items || [])
@@ -96,18 +107,23 @@ const VacancyManager = () => {
         })
       }
     } catch (err) {
+      if (err.name === 'AbortError') return
       toast.error('Failed to load vacancies')
       console.error('Error loading vacancies:', err)
     } finally {
-      setTableLoading(false)
+      if (abortControllerRef.current?.signal?.aborted === false) {
+        setTableLoading(false)
+      }
     }
   }
 
   useEffect(() => {
     setHeading('Vacancy Management')
-    loadVacancies()
+    const page = searchParams.get('page') || 1
+    loadVacancies(page)
     return () => setHeading(null)
-  }, [setHeading, searchParams])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setHeading])
 
   // Open add vacancy dialog when navigating from dashboard quick action (?add=true)
   useEffect(() => {

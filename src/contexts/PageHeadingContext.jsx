@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useCallback } from 'react'
 
 const PageHeadingContext = createContext({
   heading: null,
@@ -22,7 +22,7 @@ export const PageHeadingProvider = ({ children }) => {
   const [subheading, setSubheading] = useState(null)
 
   // Support both string (backward compatibility) and object format
-  const handleSetHeading = (value) => {
+  const handleSetHeading = useCallback((value) => {
     if (typeof value === 'string') {
       setHeading(value)
       setSubheading(null)
@@ -33,7 +33,7 @@ export const PageHeadingProvider = ({ children }) => {
       setHeading(null)
       setSubheading(null)
     }
-  }
+  }, [])
 
   return (
     <PageHeadingContext.Provider

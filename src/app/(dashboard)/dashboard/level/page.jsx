@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import Table from '@/ui/shadcn/DataTable'
@@ -34,6 +34,7 @@ export default function LevelForm() {
     totalPages: 1,
     total: 0
   })
+  const abortControllerRef = useRef(null)
   const {
     register,
     handleSubmit,
@@ -64,10 +65,16 @@ export default function LevelForm() {
   }, [searchTimeout])
 
   const fetchLevels = async (page = 1) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    abortControllerRef.current = new AbortController()
+
     setTableLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}/level?page=${page}`
+        `${process.env.baseUrl}/level?page=${page}`,
+        { signal: abortControllerRef.current.signal }
       )
       const data = await response.json()
       setLevels(data.items)
@@ -77,9 +84,12 @@ export default function LevelForm() {
         total: data.pagination.totalCount
       })
     } catch (error) {
+      if (error.name === 'AbortError') return
       toast.error('Failed to fetch levels')
     } finally {
-      setTableLoading(false)
+      if (abortControllerRef.current?.signal?.aborted === false) {
+        setTableLoading(false)
+      }
     }
   }
 
@@ -317,19 +327,7 @@ export default function LevelForm() {
                 </p>
               )}
             </div>
-            <div>
-              <Label htmlFor='author'>Author</Label>
-              <Input
-                id='author'
-                {...register('author', { required: 'Author is required' })}
-                className='mt-1'
-              />
-              {errors.author && (
-                <p className='text-red-500 text-sm mt-1'>
-                  {errors.author.message}
-                </p>
-              )}
-            </div>
+            <input type="hidden" {...register('author', { required: 'Author is required' })} />
             <div className='flex justify-end gap-2'>
               <Button
                 type='button'

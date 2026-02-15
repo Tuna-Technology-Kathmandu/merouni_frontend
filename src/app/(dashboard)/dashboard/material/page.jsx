@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
@@ -25,7 +25,7 @@ export default function MaterialForm() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [materials, setMaterials] = useState([])
-  const [tags, setTags] = useState([])
+
   const [categories, setCategories] = useState([])
   const [tableLoading, setTableLoading] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -41,6 +41,8 @@ export default function MaterialForm() {
   const [selectedColleges, setSelectedColleges] = useState([])
   const [searchResults, setSearchResults] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchTimeout, setSearchTimeout] = useState(null)
+  const abortControllerRef = useRef(null)
   const [pagination, setPagination] = useState({
     currentPage: parseInt(searchParams.get('page')) || 1,
     totalPages: 1,
@@ -108,11 +110,11 @@ export default function MaterialForm() {
 
   useEffect(() => {
     setHeading('Material Management')
-    fetchMaterials()
-    fetchTags()
-    fetchCategories()
+    const page = searchParams.get('page') || 1
+    fetchMaterials(page)
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setHeading, searchParams])
+  }, [setHeading])
 
   // Check for 'add' query parameter and open modal
   useEffect(() => {
@@ -125,6 +127,7 @@ export default function MaterialForm() {
       setUploadedFiles({ image: '', file: '' })
       setSelectedColleges([])
       setSearchResults([])
+      fetchCategories()
       // Remove query parameter from URL
       router.replace('/dashboard/material', { scroll: false })
     }
@@ -132,17 +135,7 @@ export default function MaterialForm() {
 
   const { requireAdmin } = useAdminPermission()
 
-  const fetchTags = async () => {
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/tag`
-      )
-      const data = await response.json()
-      setTags(data.items)
-    } catch (error) {
-      toast.error('Failed to fetch tags')
-    }
-  }
+
 
   const fetchCategories = async () => {
     try {
@@ -161,12 +154,22 @@ export default function MaterialForm() {
   const fetchMaterials = async (page = 1) => {
     try {
       const params = new URLSearchParams(searchParams.toString())
-      params.set('page', page)
-      router.push(`${pathname}?${params.toString()}`, { scroll: false })
+      const currentPage = params.get('page') || '1'
+
+      if (currentPage !== String(page)) {
+        params.set('page', page)
+        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+      }
+
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+      abortControllerRef.current = new AbortController()
 
       setTableLoading(true)
       const response = await authFetch(
-        `${process.env.baseUrl}/material?page=${page}`
+        `${process.env.baseUrl}/material?page=${page}`,
+        { signal: abortControllerRef.current.signal }
       )
       const data = await response.json()
       setPagination({
@@ -176,9 +179,12 @@ export default function MaterialForm() {
       })
       setMaterials(data.materials)
     } catch (error) {
+      if (error.name === 'AbortError') return
       toast.error('Failed to fetch materials')
     } finally {
-      setTableLoading(false)
+      if (abortControllerRef.current?.signal?.aborted === false) {
+        setTableLoading(false)
+      }
     }
   }
 
@@ -245,7 +251,12 @@ export default function MaterialForm() {
       setSelectedColleges([])
       setSearchResults([])
       setValue('category_id', '')
-      fetchMaterials()
+      setValue('category_id', '')
+      if (editing) {
+        fetchMaterials(pagination.currentPage)
+      } else {
+        fetchMaterials()
+      }
       setIsOpen(false)
       setEditingId(null)
     } catch (error) {
@@ -258,6 +269,7 @@ export default function MaterialForm() {
       setEditing(true)
       setLoading(true)
       setIsOpen(true)
+      fetchCategories()
       const response = await authFetch(
         `${process.env.baseUrl}/material/${editdata.id}`
       )
@@ -407,7 +419,20 @@ export default function MaterialForm() {
   }
 
   const handleSearchInput = (value) => {
-    handleSearch(value)
+    setSearchQuery(value)
+
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    if (value === '') {
+      handleSearch('')
+    } else {
+      const timeoutId = setTimeout(() => {
+        handleSearch(value)
+      }, 300)
+      setSearchTimeout(timeoutId)
+    }
   }
 
   const handleCloseModal = () => {
@@ -428,6 +453,7 @@ export default function MaterialForm() {
     setUploadedFiles({ image: '', file: '' })
     setSelectedColleges([])
     setSearchResults([])
+    fetchCategories()
   }
 
   return (
@@ -437,7 +463,7 @@ export default function MaterialForm() {
         {/* Search Bar */}
           <SearchInput
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleSearchInput(e.target.value)}
             placeholder='Search materials...'
             className='max-w-md'
           />
