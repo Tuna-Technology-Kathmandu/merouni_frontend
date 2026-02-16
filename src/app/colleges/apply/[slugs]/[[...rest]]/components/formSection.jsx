@@ -1,18 +1,22 @@
 'use client'
 
+import { THEME_BLUE } from '@/constants/constants'
+import ActionCard from '@/ui/molecules/ActionCard'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { SearchableSelect } from '@/ui/shadcn/SearchableSelect'
+import { Textarea } from '@/ui/shadcn/textarea'
 import { useMutation } from '@tanstack/react-query'
 import { destr } from 'destr'
-import { GraduationCap } from 'lucide-react'
+import { CheckCircle2, GraduationCap } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { FaSpinner as FaSpinnerIcon } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { applyToCollege } from '../query/applyCollege.query'
+
 
 const FormSection = ({ id, college }) => {
   const user = useSelector((state) => state.user?.data)
@@ -48,20 +52,22 @@ const FormSection = ({ id, college }) => {
       college_id: college?.id || 0,
       ...(isLoggedIn &&
         user && {
-          student_name:
-            `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim(),
-          student_email: user?.email || '',
-          student_phone_no: user?.phoneNo || ''
-        })
+        student_name:
+          `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim(),
+        student_email: user?.email || '',
+        student_phone_no: user?.phoneNo || ''
+      })
     }))
   }, [college?.id, isLoggedIn, user])
 
   const [errors, setErrors] = useState({})
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
   const applyMutation = useMutation({
     mutationFn: applyToCollege,
     onSuccess: (data) => {
-      toast.success(data.message || 'College Applied Successfully')
+      // toast.success(data.message || 'College Applied Successfully')
+      setIsSubmitted(true)
       setFormData({
         college_id: college?.id || 0,
         student_name: isLoggedIn
@@ -106,20 +112,20 @@ const FormSection = ({ id, college }) => {
 
     const payload = isStudent
       ? {
-          student_id: user?.id,
-          referral_type: 'self',
-          college_id: formData.college_id,
-          course_id: formData.course || null,
-          description: formData.student_description
-        }
+        student_id: user?.id,
+        referral_type: 'self',
+        college_id: formData.college_id,
+        course_id: formData.course || null,
+        description: formData.student_description
+      }
       : {
-          college_id: formData.college_id,
-          student_name: formData.student_name,
-          student_phone_no: formData.student_phone_no,
-          student_email: formData.student_email,
-          student_description: formData.student_description,
-          course: formData.course
-        }
+        college_id: formData.college_id,
+        student_name: formData.student_name,
+        student_phone_no: formData.student_phone_no,
+        student_email: formData.student_email,
+        student_description: formData.student_description,
+        course: formData.course
+      }
 
     applyMutation.mutate({ payload, isStudent })
   }
@@ -137,81 +143,96 @@ const FormSection = ({ id, college }) => {
     return college.collegeCourses
   }, [id, college?.collegeCourses])
 
+  if (isSubmitted) {
+    return (
+      <ActionCard
+        variant='centered'
+        icon={<CheckCircle2 className='w-full h-full' />}
+        title='Application Submitted!'
+        description={
+          <>
+            Thank you for applying. Your application has been successfully
+            submitted to the college. We will get back to you soon.
+          </>
+        }
+      >
+        <Link href='/'>
+          <Button
+            variant='outline'
+            className='min-w-[160px] h-12 text-base font-medium'
+          >
+            Go Home
+          </Button>
+        </Link>
+        <Link href='/dashboard'>
+          <Button
+            className='min-w-[160px] h-12 text-base font-medium text-white shadow-md transition-all hover:-translate-y-0.5'
+            style={{ backgroundColor: THEME_BLUE }}
+          >
+            Go to Dashboard
+          </Button>
+        </Link>
+      </ActionCard>
+    )
+  }
+
   if (isLoggedIn && isAgent) {
     return (
-      <div className='w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden text-center'>
-        <div className='bg-gradient-to-r from-[#30ad8f] to-[#2c9a7f] p-8 text-white relative overflow-hidden mb-6'>
-          <div className='relative z-10'>
-            <div className='flex items-center justify-center gap-3 mb-2'>
-              <GraduationCap className='w-8 h-8' />
-              <h2 className='text-3xl font-bold'>Apply For College</h2>
-            </div>
-            <p className='text-teal-50/80'>
-              Manage applications from your dashboard
-            </p>
-          </div>
-          <div className='absolute -right-8 -bottom-8 opacity-10'>
-            <GraduationCap size={160} />
-          </div>
-        </div>
-        <div className='p-8 pt-0'>
-          <p className='text-gray-600 mb-8'>
-            As an agent, please visit your dashboard to manage student
-            applications and tracking.
-          </p>
-          <Link href='/dashboard'>
-            <Button className='min-w-[200px] h-12 text-lg font-semibold bg-[#30ad8f] hover:bg-[#2c9a7f] transition-all'>
-              Go to Dashboard
-            </Button>
-          </Link>
-        </div>
-      </div>
+      <ActionCard
+        icon={<GraduationCap className='w-full h-full' />}
+        title='Apply For College'
+        subtitle='Manage applications from your dashboard'
+        description='As an agent, please visit your dashboard to manage student applications and tracking.'
+      >
+        <Link href='/dashboard'>
+          <Button
+            className='min-w-[200px] h-12 text-lg font-semibold text-white transition-all'
+            style={{ backgroundColor: THEME_BLUE }}
+          >
+            Go to Dashboard
+          </Button>
+        </Link>
+      </ActionCard>
     )
   }
 
   if (!isLoggedIn) {
     return (
-      <div className='w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden text-center'>
-        <div className='bg-gradient-to-r from-[#30ad8f] to-[#2c9a7f] p-8 text-white relative overflow-hidden mb-6'>
-          <div className='relative z-10'>
-            <div className='flex items-center justify-center gap-3 mb-2'>
-              <GraduationCap className='w-8 h-8' />
-              <h2 className='text-3xl font-bold'>Apply For College</h2>
-            </div>
-            <p className='text-teal-50/80'>Login to begin your application</p>
-          </div>
-          <div className='absolute -right-8 -bottom-8 opacity-10'>
-            <GraduationCap size={160} />
-          </div>
-        </div>
-        <div className='p-8 pt-0'>
-          <p className='text-gray-600 mb-8'>
-            Join our community to apply for top colleges and track your progress
-            in real-time.
-          </p>
-          <div className='flex flex-col sm:flex-row items-center justify-center gap-4'>
-            <Link href='/sign-in' className='w-full sm:w-auto'>
-              <Button className='w-full min-w-[160px] h-12 text-lg font-semibold bg-[#30ad8f] hover:bg-[#2c9a7f] transition-all'>
-                Login Now
-              </Button>
-            </Link>
-            <Link href='/sign-in?mode=signup' className='w-full sm:w-auto'>
-              <Button
-                variant='outline'
-                className='w-full min-w-[160px] h-12 text-lg font-semibold border-2 border-[#30ad8f] text-[#30ad8f] hover:bg-[#30ad8f]/10 transition-all'
-              >
-                Create Account
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
+      <ActionCard
+        icon={<GraduationCap className='w-full h-full' />}
+        title='Apply For College'
+        subtitle='Login to begin your application'
+        description='Join our community to apply for top colleges and track your progress in real-time.'
+      >
+        <Link href='/sign-in' className='w-full sm:w-auto'>
+          <Button
+            className='w-full min-w-[160px] h-12 text-lg font-semibold text-white transition-all'
+            style={{ backgroundColor: THEME_BLUE }}
+          >
+            Login Now
+          </Button>
+        </Link>
+        <Link href='/sign-in?mode=signup' className='w-full sm:w-auto'>
+          <Button
+            variant='outline'
+            className='w-full min-w-[160px] h-12 text-lg font-semibold border-2 transition-all hover:bg-opacity-10'
+            style={{ borderColor: THEME_BLUE, color: THEME_BLUE }}
+          >
+            Create Account
+          </Button>
+        </Link>
+      </ActionCard>
     )
   }
 
   return (
     <div className='w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden'>
-      <div className='bg-gradient-to-r from-[#30ad8f] to-[#2c9a7f] p-8 text-white relative overflow-hidden'>
+      <div
+        className='p-8 text-white relative overflow-hidden'
+        style={{
+          background: `linear-gradient(to right, ${THEME_BLUE}, #2c7a9a)`
+        }}
+      >
         <div className='relative z-10 text-left'>
           <div className='flex items-center gap-3 mb-2'>
             <GraduationCap className='w-8 h-8' />
@@ -219,7 +240,7 @@ const FormSection = ({ id, college }) => {
               Apply For College
             </h2>
           </div>
-          <p className='text-teal-50/80'>Begin your academic journey today</p>
+          <p className='text-white/80'>Begin your academic journey today</p>
         </div>
         <div className='absolute -right-8 -bottom-8 opacity-10'>
           <GraduationCap size={160} />
@@ -301,7 +322,7 @@ const FormSection = ({ id, college }) => {
 
           <div className='space-y-2'>
             <Label htmlFor='student_description'>Description </Label>
-            <textarea
+            <Textarea
               id='student_description'
               name='student_description'
               placeholder='Additional information...'
@@ -315,7 +336,8 @@ const FormSection = ({ id, college }) => {
           <Button
             type='submit'
             disabled={applyMutation.isPending}
-            className='w-full py-6 text-lg font-semibold h-12 bg-[#30ad8f] hover:bg-[#2c9a7f] transition-all shadow-md active:scale-[0.98]'
+            className='w-full py-6 text-lg font-semibold h-12 text-white transition-all shadow-md active:scale-[0.98]'
+            style={{ backgroundColor: THEME_BLUE }}
           >
             {applyMutation.isPending ? (
               <div className='flex items-center gap-2'>

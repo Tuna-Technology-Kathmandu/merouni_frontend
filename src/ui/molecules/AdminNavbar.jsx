@@ -14,11 +14,13 @@ import { ChevronDown, Search } from 'lucide-react'
 import { THEME_BLUE } from "@/constants/constants"
 import SearchInput from '../molecules/SearchInput'
 import { menuItems } from '@/constants/menuList'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 
 const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
   const { heading, subheading } = usePageHeading()
   const [loading, setLoading] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
   const dropdownRef = useRef(null)
   const router = useRouter()
   const dispatch = useDispatch()
@@ -109,8 +111,13 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
     }
   }
 
-  const handleLogout = async () => {
+  const handleLogoutClick = () => {
     setIsDropdownOpen(false)
+    setIsLogoutDialogOpen(true)
+  }
+
+  const handleLogoutConfirm = async () => {
+    setIsLogoutDialogOpen(false)
 
     // Always clear local storage and redirect, even if API call fails
     const performLogout = () => {
@@ -199,7 +206,7 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
 
                     const query = searchQuery.toLowerCase().trim()
                     const matchesLabel = item.label.toLowerCase().includes(query)
-                    const matchesSubmenu = item.submenus?.some(sub => 
+                    const matchesSubmenu = item.submenus?.some(sub =>
                       sub.label.toLowerCase().includes(query) && sub.visible.some(r => userRoles[r])
                     )
                     return matchesLabel || matchesSubmenu
@@ -216,7 +223,7 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
                         <div key={item.label}>
                           {item.submenus ? (
                             item.submenus
-                              .filter(sub => 
+                              .filter(sub =>
                                 (sub.label.toLowerCase().includes(searchQuery.toLowerCase()) || item.label.toLowerCase().includes(searchQuery.toLowerCase())) &&
                                 sub.visible.some(r => userRoles[r])
                               )
@@ -333,7 +340,7 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
                 <div className='h-px bg-gray-100 my-1 mx-2'></div>
 
                 <button
-                  onClick={handleLogout}
+                  onClick={handleLogoutClick}
                   className='w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-all duration-200 group'
                 >
                   <FaSignOutAlt className='w-4 h-4 text-gray-500 group-hover:text-red-500 transition-colors' />
@@ -344,6 +351,15 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
           )}
         </div>
       </div>
+      <ConfirmationDialog
+        open={isLogoutDialogOpen}
+        onClose={() => setIsLogoutDialogOpen(false)}
+        onConfirm={handleLogoutConfirm}
+        title="Logout Confirmation"
+        message="Are you sure you want to logout?"
+        confirmText="Logout"
+        cancelText="Cancel"
+      />
     </div>
   )
 }

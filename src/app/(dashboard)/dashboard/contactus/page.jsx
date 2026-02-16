@@ -13,7 +13,7 @@ import ViewContactModal from './ViewContactModal'
 import { Button } from '@/ui/shadcn/button'
 import { Label } from '@/ui/shadcn/label'
 
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function ContactUsManager() {
@@ -209,36 +209,36 @@ export default function ContactUsManager() {
                     <DialogClose onClick={() => setStatusModalOpen(false)} />
                 </DialogHeader>
                 <DialogContent>
-                <div className="space-y-4">
-                    <div>
-                        <Label className="block text-sm font-medium text-gray-700 mb-1">
-                            Status <span className="text-red-500">*</span>
-                        </Label>
-                        <select
-                            value={newStatus}
-                            onChange={(e) => setNewStatus(e.target.value)}
-                            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="new">New</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="resolved">Resolved</option>
-                        </select>
+                    <div className="space-y-4">
+                        <div>
+                            <Label className="block text-sm font-medium text-gray-700 mb-1">
+                                Status <span className="text-red-500">*</span>
+                            </Label>
+                            <select
+                                value={newStatus}
+                                onChange={(e) => setNewStatus(e.target.value)}
+                                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="new">New</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="resolved">Resolved</option>
+                            </select>
+                        </div>
+                        <div className="flex justify-end gap-2 pt-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => setStatusModalOpen(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={confirmStatusUpdate}
+                                disabled={updatingStatusId}
+                            >
+                                {updatingStatusId ? 'Updating...' : 'Update Status'}
+                            </Button>
+                        </div>
                     </div>
-                    <div className="flex justify-end gap-2 pt-2">
-                        <Button
-                            variant="outline"
-                            onClick={() => setStatusModalOpen(false)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            onClick={confirmStatusUpdate}
-                            disabled={updatingStatusId}
-                        >
-                            {updatingStatusId ? 'Updating...' : 'Update Status'}
-                        </Button>
-                    </div>
-                </div>
                 </DialogContent>
             </Dialog>
 

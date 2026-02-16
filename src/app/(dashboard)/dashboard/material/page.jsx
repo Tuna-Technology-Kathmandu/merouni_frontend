@@ -7,7 +7,8 @@ import Table from '@/ui/shadcn/DataTable'
 import { Edit2, Trash2, Search } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+
+
 import { X } from 'lucide-react'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
@@ -16,6 +17,7 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/ui/shadcn/button'
 import SearchInput from '@/ui/molecules/SearchInput'
 import { formatDate } from '@/utils/date.util'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 
 export default function MaterialForm() {
   const { setHeading } = usePageHeading()

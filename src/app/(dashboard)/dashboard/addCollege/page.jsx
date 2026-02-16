@@ -28,7 +28,7 @@ import {
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 
-import ConfirmationDialog from './ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import {
   Dialog,
   DialogContent,
@@ -305,7 +305,7 @@ export default function CollegeForm() {
       // Convert boolean values to numbers
       // Convert IDs to numbers
       data.university_id = parseInt(data.university_id)
-      
+
       // Convert degree IDs to numbers
       data.degrees = (data.degrees || [])
         .map((id) => parseInt(id))
@@ -793,13 +793,13 @@ export default function CollegeForm() {
       const memberData = collegeData.collegeMembers?.length
         ? collegeData.collegeMembers
         : [
-            {
-              name: '',
-              contact_number: '',
-              role: '',
-              description: ''
-            }
-          ]
+          {
+            name: '',
+            contact_number: '',
+            role: '',
+            description: ''
+          }
+        ]
       setValue('members', memberData)
 
       //college_broucher
@@ -810,17 +810,17 @@ export default function CollegeForm() {
       // Set facilities
       const facilityData = collegeData.collegeFacility?.length
         ? collegeData.collegeFacility.map((facility) => ({
-            title: facility.title || '',
-            description: facility.description || '',
-            icon: facility.icon || ''
-          }))
+          title: facility.title || '',
+          description: facility.description || '',
+          icon: facility.icon || ''
+        }))
         : [
-            {
-              title: '',
-              description: '',
-              icon: ''
-            }
-          ]
+          {
+            title: '',
+            description: '',
+            icon: ''
+          }
+        ]
       setValue('facilities', facilityData)
 
 
@@ -915,7 +915,7 @@ export default function CollegeForm() {
   //watch form data
   const formData = watch()
 
-  useEffect(() => {}, [formData])
+  useEffect(() => { }, [formData])
 
   const fetchUniversityDetails = async (slugs) => {
     if (!slugs) {
@@ -1021,373 +1021,467 @@ export default function CollegeForm() {
             <DialogHeader>
               <DialogTitle>{editing ? 'Edit College' : 'Add College'}</DialogTitle>
             </DialogHeader>
-          <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className='flex flex-col flex-1 overflow-hidden'
-            >
-              <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                {/* Basic Information */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Basic Information
-                  </h2>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <div className='space-y-2'>
-                      <Label htmlFor='name'>
-                        College Name <span className='text-red-500'>*</span>
-                      </Label>
-                      <Input
-                        id='name'
-                        placeholder='Enter college name'
-                        {...register('name', { required: true })}
-                        className={errors.name ? 'border-destructive' : ''}
-                      />
-                      {errors.name && (
-                        <span className='text-sm font-medium text-destructive'>
-                          This field is required
-                        </span>
-                      )}
-                    </div>
-
-                    <div className='space-y-2'>
-                      <Label htmlFor='institute_type'>
-                        Institute Type <span className='text-red-500'>*</span>
-                      </Label>
-                      <Select
-                        className={`w-full ${errors.institute_type ? 'border-destructive' : ''}`}
-                        {...register('institute_type', { required: true })}
-                        id='institute_type'
-                        aria-invalid={errors.institute_type ? 'true' : 'false'}
-                      >
-                        <option value='Private'>Private</option>
-                        <option value='Public'>Public</option>
-                      </Select>
-                      {errors.institute_type && (
-                        <span className='text-sm font-medium text-destructive'>
-                          This field is required
-                        </span>
-                      )}
-                    </div>
-
-                    <div className='space-y-2'>
-                      <Label>Institute Level</Label>
-                      <div className='flex items-center gap-6 pt-2'>
-                        {['School', 'College'].map((level) => (
-                          <label
-                            key={level}
-                            className='flex items-center gap-2 cursor-pointer'
-                          >
-                            <input
-                              type='checkbox'
-                              {...register('institute_level')}
-                              value={level}
-                              className='rounded border-input'
-                            />
-                            <span className='text-sm'>{level}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-
-                    <div className='md:col-span-2 space-y-2'>
-                      <Label htmlFor='description'>Description</Label>
-                      <Textarea
-                        id='description'
-                        placeholder='Enter college description'
-                        {...register('description')}
-                        className='min-h-[100px]'
-                      />
-                    </div>
-
-                    <div className='md:col-span-2 space-y-2'>
-                      <Label htmlFor='content'>Content</Label>
-
-                      <div className='border border-input rounded-md overflow-hidden'>
-                        <CKUni
-                          id='editor-content'
-                          initialData={getValues('content')}
-                          onChange={(data) => setValue('content', data)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {editing ? <input type='hidden' {...register('id')} /> : <></>}
-                {/* Courses Section */}
-
-                <div className='bg-white p-6 rounded-lg shadow-md mb-6'>
-                  <Label className='mb-2 block'>University <span className='text-red-500'>*</span></Label>
-                  <UniversityDropdown
-                    value={watch('university_id')}
-                    onChange={(id, selectedUni) => {
-                      if (id) {
-                        setValue('university_id', Number(id), {
-                          shouldValidate: true,
-                          shouldDirty: true
-                        })
-                        setUniSlug(selectedUni?.slugs || '')
-                      } else {
-                        setValue('university_id', '', {
-                          shouldValidate: true
-                        })
-                        setUniSlug('')
-                      }
-                    }}
-                    error={errors.university_id ? 'This field is required' : ''}
-                  />
-                </div>
-
-                {/* Programs Section */}
-                {/* Programs Section */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <div className='flex justify-between items-center mb-4'>
-                    <h2 className='text-xl font-semibold'>Programs</h2>
-                  </div>
-
-                  {!uniSlug ? (
-                    <p className='text-gray-500'>
-                      Please select a university first to see available programs
-                    </p>
-                  ) : loadingPrograms ? (
-                    <p>Loading programs...</p>
-                  ) : (
-                    <div>
-                      <label className='block mb-2'>
-                        Select Programs{' '}
-                        {universityPrograms.length > 0 && (
-                          <span className='text-gray-500 text-sm font-normal'>
-                            ({universityPrograms.length} programs available from
-                            selected university)
-                          </span>
-                        )}
-                      </label>
-                      <div className='border rounded p-4 max-h-96 overflow-y-auto'>
-                        {universityPrograms.length === 0 ? (
-                          <p className='text-gray-500'>
-                            {!uniSlug
-                              ? 'Please select a university first'
-                              : universityPrograms.length === 0
-                                ? 'No programs available for the selected university'
-                                : 'No programs available'}
-                          </p>
-                        ) : (
-                          <div className='space-y-2'>
-                            {universityPrograms.map((course) => {
-                              const isChecked = (
-                                getValues('courses') || []
-                              ).includes(course.program_id)
-                              return (
-                                <div key={course.program_id}>
-                                  <input
-                                    type='checkbox'
-                                    checked={isChecked}
-                                    value={course.program_id}
-                                    onChange={(e) => {
-                                      const currentCourses =
-                                        getValues('courses') || []
-                                      if (e.target.checked) {
-                                        setValue(
-                                          'courses',
-                                          [
-                                            ...currentCourses,
-                                            course.program_id
-                                          ],
-                                          {
-                                            shouldValidate: true,
-                                            shouldDirty: true
-                                          }
-                                        )
-                                      } else {
-                                        setValue(
-                                          'courses',
-                                          currentCourses.filter(
-                                            (id) => id !== course.program_id
-                                          ),
-                                          {
-                                            shouldValidate: true,
-                                            shouldDirty: true
-                                          }
-                                        )
-                                      }
-                                    }}
-                                    className='mr-3 h-4 w-4'
-                                  />
-                                  <span>{course.program?.title}</span>
-                                </div>
-                              )
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>Degrees Offered</h2>
-                  <div className='grid grid-cols-2 lg:grid-cols-3 gap-2 border rounded p-4 max-h-60 overflow-y-auto'>
-                    {allDegrees.map((degree) => (
-                      <label 
-                        key={degree.id} 
-                        className='flex items-center gap-2 cursor-pointer p-1 hover:bg-gray-50 rounded select-none'
-                      >
-                        <input
-                          type='checkbox'
-                          {...register('degrees')}
-                          value={String(degree.id)}
-                          className='rounded border-gray-300 text-blue-600 focus:ring-blue-500'
-                        />
-                        <span className='text-sm text-gray-700 font-medium'>
-                          {degree.title} {degree.short_name ? `(${degree.short_name})` : ''}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>Media</h2>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <div>
-                      <FileUpload
-                        label='College Logo'
-                        onUploadComplete={(url) => {
-                          setUploadedFiles((prev) => ({ ...prev, logo: url }))
-                          setValue('college_logo', url)
-                        }}
-                        defaultPreview={uploadedFiles.logo}
-                      />
-                    </div>
-                    <div>
-                      <FileUpload
-                        label='Featured Image'
-                        onUploadComplete={(url) => {
-                          setUploadedFiles((prev) => ({
-                            ...prev,
-                            featured: url
-                          }))
-                          setValue('featured_img', url)
-                        }}
-                        defaultPreview={uploadedFiles.featured}
-                      />
-                    </div>
-                  </div>
-
-                  {/* for image only */}
-                  <GallerySection
-                    control={control}
-                    setValue={setValue}
-                    uploadedFiles={uploadedFiles}
-                    setUploadedFiles={setUploadedFiles}
-                    getValues={getValues}
-                  />
-
-                  {/* for videos only */}
-
-                  <VideoSection
-                    control={control}
-                    setValue={setValue}
-                    uploadedFiles={uploadedFiles}
-                    setUploadedFiles={setUploadedFiles}
-                    getValues={getValues}
-                  />
-
-                  {/* brochure */}
-                  <div className='md:col-span-2'>
-                    <FileUploadWithPreview
-                      label='College Brochure (PDF)'
-                      onUploadComplete={(url) => {
-                        setValue('college_broucher', url)
-                      }}
-                      onClear={() => {
-                        setValue('college_broucher', '')
-                      }}
-                      defaultPreview={getValues('college_broucher')}
-                      accept='application/pdf'
-                    />
-                  </div>
-                </div>
-
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <div className='flex justify-between items-center mb-4'>
-                    <h2 className='text-xl font-semibold'>Facilities</h2>
-                    <Button
-                      type='button'
-                      onClick={() =>
-                        appendFacility({
-                          title: '',
-                          description: '',
-                          icon: ''
-                        })
-                      }
-                      variant='default'
-                      size='sm'
-                    >
-                      Add Facility
-                    </Button>
-                  </div>
-
-                  {facilityFields.map((field, index) => (
-                    <div
-                      key={field.id}
-                      className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border rounded'
-                    >
+            <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className='flex flex-col flex-1 overflow-hidden'
+              >
+                <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+                  {/* Basic Information */}
+                  <div className='bg-white p-6 rounded-lg shadow-md'>
+                    <h2 className='text-xl font-semibold mb-4'>
+                      Basic Information
+                    </h2>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                       <div className='space-y-2'>
-                        <Label htmlFor={`facility-title-${index}`}>
-                          Title
+                        <Label htmlFor='name'>
+                          College Name <span className='text-red-500'>*</span>
                         </Label>
                         <Input
-                          id={`facility-title-${index}`}
-                          placeholder='Facility Title'
-                          {...register(`facilities.${index}.title`)}
-                          aria-invalid={
-                            errors.facilities?.[index]?.title ? 'true' : 'false'
-                          }
-                          className={
-                            errors.facilities?.[index]?.title
-                              ? 'border-destructive'
-                              : ''
-                          }
+                          id='name'
+                          placeholder='Enter college name'
+                          {...register('name', { required: true })}
+                          className={errors.name ? 'border-destructive' : ''}
                         />
-                        {errors.facilities?.[index]?.title && (
+                        {errors.name && (
                           <span className='text-sm font-medium text-destructive'>
                             This field is required
                           </span>
                         )}
                       </div>
+
                       <div className='space-y-2'>
-                        <Label htmlFor={`facility-description-${index}`}>
-                          Description
+                        <Label htmlFor='institute_type'>
+                          Institute Type <span className='text-red-500'>*</span>
                         </Label>
+                        <Select
+                          className={`w-full ${errors.institute_type ? 'border-destructive' : ''}`}
+                          {...register('institute_type', { required: true })}
+                          id='institute_type'
+                          aria-invalid={errors.institute_type ? 'true' : 'false'}
+                        >
+                          <option value='Private'>Private</option>
+                          <option value='Public'>Public</option>
+                        </Select>
+                        {errors.institute_type && (
+                          <span className='text-sm font-medium text-destructive'>
+                            This field is required
+                          </span>
+                        )}
+                      </div>
+
+                      <div className='space-y-2'>
+                        <Label>Institute Level</Label>
+                        <div className='flex items-center gap-6 pt-2'>
+                          {['School', 'College'].map((level) => (
+                            <label
+                              key={level}
+                              className='flex items-center gap-2 cursor-pointer'
+                            >
+                              <input
+                                type='checkbox'
+                                {...register('institute_level')}
+                                value={level}
+                                className='rounded border-input'
+                              />
+                              <span className='text-sm'>{level}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+
+                      <div className='md:col-span-2 space-y-2'>
+                        <Label htmlFor='description'>Description</Label>
                         <Textarea
-                          id={`facility-description-${index}`}
-                          placeholder='Facility Description'
-                          {...register(`facilities.${index}.description`)}
-                          className='min-h-[80px]'
+                          id='description'
+                          placeholder='Enter college description'
+                          {...register('description')}
+                          className='min-h-[100px]'
+                        />
+                      </div>
+
+                      <div className='md:col-span-2 space-y-2'>
+                        <Label htmlFor='content'>Content</Label>
+
+                        <div className='border border-input rounded-md overflow-hidden'>
+                          <CKUni
+                            id='editor-content'
+                            initialData={getValues('content')}
+                            onChange={(data) => setValue('content', data)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {editing ? <input type='hidden' {...register('id')} /> : <></>}
+                  {/* Courses Section */}
+
+                  <div className='bg-white p-6 rounded-lg shadow-md mb-6'>
+                    <Label className='mb-2 block'>University <span className='text-red-500'>*</span></Label>
+                    <UniversityDropdown
+                      value={watch('university_id')}
+                      onChange={(id, selectedUni) => {
+                        if (id) {
+                          setValue('university_id', Number(id), {
+                            shouldValidate: true,
+                            shouldDirty: true
+                          })
+                          setUniSlug(selectedUni?.slugs || '')
+                        } else {
+                          setValue('university_id', '', {
+                            shouldValidate: true
+                          })
+                          setUniSlug('')
+                        }
+                      }}
+                      error={errors.university_id ? 'This field is required' : ''}
+                    />
+                  </div>
+
+                  {/* Programs Section */}
+                  {/* Programs Section */}
+                  <div className='bg-white p-6 rounded-lg shadow-md'>
+                    <div className='flex justify-between items-center mb-4'>
+                      <h2 className='text-xl font-semibold'>Programs</h2>
+                    </div>
+
+                    {!uniSlug ? (
+                      <p className='text-gray-500'>
+                        Please select a university first to see available programs
+                      </p>
+                    ) : loadingPrograms ? (
+                      <p>Loading programs...</p>
+                    ) : (
+                      <div>
+                        <label className='block mb-2'>
+                          Select Programs{' '}
+                          {universityPrograms.length > 0 && (
+                            <span className='text-gray-500 text-sm font-normal'>
+                              ({universityPrograms.length} programs available from
+                              selected university)
+                            </span>
+                          )}
+                        </label>
+                        <div className='border rounded p-4 max-h-96 overflow-y-auto'>
+                          {universityPrograms.length === 0 ? (
+                            <p className='text-gray-500'>
+                              {!uniSlug
+                                ? 'Please select a university first'
+                                : universityPrograms.length === 0
+                                  ? 'No programs available for the selected university'
+                                  : 'No programs available'}
+                            </p>
+                          ) : (
+                            <div className='space-y-2'>
+                              {universityPrograms.map((course) => {
+                                const isChecked = (
+                                  getValues('courses') || []
+                                ).includes(course.program_id)
+                                return (
+                                  <div key={course.program_id}>
+                                    <input
+                                      type='checkbox'
+                                      checked={isChecked}
+                                      value={course.program_id}
+                                      onChange={(e) => {
+                                        const currentCourses =
+                                          getValues('courses') || []
+                                        if (e.target.checked) {
+                                          setValue(
+                                            'courses',
+                                            [
+                                              ...currentCourses,
+                                              course.program_id
+                                            ],
+                                            {
+                                              shouldValidate: true,
+                                              shouldDirty: true
+                                            }
+                                          )
+                                        } else {
+                                          setValue(
+                                            'courses',
+                                            currentCourses.filter(
+                                              (id) => id !== course.program_id
+                                            ),
+                                            {
+                                              shouldValidate: true,
+                                              shouldDirty: true
+                                            }
+                                          )
+                                        }
+                                      }}
+                                      className='mr-3 h-4 w-4'
+                                    />
+                                    <span>{course.program?.title}</span>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className='bg-white p-6 rounded-lg shadow-md'>
+                    <h2 className='text-xl font-semibold mb-4'>Degrees Offered</h2>
+                    <div className='grid grid-cols-2 lg:grid-cols-3 gap-2 border rounded p-4 max-h-60 overflow-y-auto'>
+                      {allDegrees.map((degree) => (
+                        <label
+                          key={degree.id}
+                          className='flex items-center gap-2 cursor-pointer p-1 hover:bg-gray-50 rounded select-none'
+                        >
+                          <input
+                            type='checkbox'
+                            {...register('degrees')}
+                            value={String(degree.id)}
+                            className='rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+                          />
+                          <span className='text-sm text-gray-700 font-medium'>
+                            {degree.title} {degree.short_name ? `(${degree.short_name})` : ''}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className='bg-white p-6 rounded-lg shadow-md'>
+                    <h2 className='text-xl font-semibold mb-4'>Media</h2>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                      <div>
+                        <FileUpload
+                          label='College Logo'
+                          onUploadComplete={(url) => {
+                            setUploadedFiles((prev) => ({ ...prev, logo: url }))
+                            setValue('college_logo', url)
+                          }}
+                          defaultPreview={uploadedFiles.logo}
                         />
                       </div>
                       <div>
-                        <label className='block mb-2'>Icon Image</label>
-                        <FileUploadWithPreview
+                        <FileUpload
+                          label='Featured Image'
                           onUploadComplete={(url) => {
-                            setValue(`facilities.${index}.icon`, url)
+                            setUploadedFiles((prev) => ({
+                              ...prev,
+                              featured: url
+                            }))
+                            setValue('featured_img', url)
                           }}
-                          defaultPreview={getValues(`facilities.${index}.icon`)}
+                          defaultPreview={uploadedFiles.featured}
                         />
                       </div>
-                      <div className='flex items-end'>
+                    </div>
+
+                    {/* for image only */}
+                    <GallerySection
+                      control={control}
+                      setValue={setValue}
+                      uploadedFiles={uploadedFiles}
+                      setUploadedFiles={setUploadedFiles}
+                      getValues={getValues}
+                    />
+
+                    {/* for videos only */}
+
+                    <VideoSection
+                      control={control}
+                      setValue={setValue}
+                      uploadedFiles={uploadedFiles}
+                      setUploadedFiles={setUploadedFiles}
+                      getValues={getValues}
+                    />
+
+                    {/* brochure */}
+                    <div className='md:col-span-2'>
+                      <FileUploadWithPreview
+                        label='College Brochure (PDF)'
+                        onUploadComplete={(url) => {
+                          setValue('college_broucher', url)
+                        }}
+                        onClear={() => {
+                          setValue('college_broucher', '')
+                        }}
+                        defaultPreview={getValues('college_broucher')}
+                        accept='application/pdf'
+                      />
+                    </div>
+                  </div>
+
+                  <div className='bg-white p-6 rounded-lg shadow-md'>
+                    <div className='flex justify-between items-center mb-4'>
+                      <h2 className='text-xl font-semibold'>Facilities</h2>
+                      <Button
+                        type='button'
+                        onClick={() =>
+                          appendFacility({
+                            title: '',
+                            description: '',
+                            icon: ''
+                          })
+                        }
+                        variant='default'
+                        size='sm'
+                      >
+                        Add Facility
+                      </Button>
+                    </div>
+
+                    {facilityFields.map((field, index) => (
+                      <div
+                        key={field.id}
+                        className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border rounded'
+                      >
+                        <div className='space-y-2'>
+                          <Label htmlFor={`facility-title-${index}`}>
+                            Title
+                          </Label>
+                          <Input
+                            id={`facility-title-${index}`}
+                            placeholder='Facility Title'
+                            {...register(`facilities.${index}.title`)}
+                            aria-invalid={
+                              errors.facilities?.[index]?.title ? 'true' : 'false'
+                            }
+                            className={
+                              errors.facilities?.[index]?.title
+                                ? 'border-destructive'
+                                : ''
+                            }
+                          />
+                          {errors.facilities?.[index]?.title && (
+                            <span className='text-sm font-medium text-destructive'>
+                              This field is required
+                            </span>
+                          )}
+                        </div>
+                        <div className='space-y-2'>
+                          <Label htmlFor={`facility-description-${index}`}>
+                            Description
+                          </Label>
+                          <Textarea
+                            id={`facility-description-${index}`}
+                            placeholder='Facility Description'
+                            {...register(`facilities.${index}.description`)}
+                            className='min-h-[80px]'
+                          />
+                        </div>
+                        <div>
+                          <label className='block mb-2'>Icon Image</label>
+                          <FileUploadWithPreview
+                            onUploadComplete={(url) => {
+                              setValue(`facilities.${index}.icon`, url)
+                            }}
+                            defaultPreview={getValues(`facilities.${index}.icon`)}
+                          />
+                        </div>
+                        <div className='flex items-end'>
+                          <Button
+                            type='button'
+                            onClick={() => {
+                              if (facilityFields.length > 1) {
+                                removeFacility(index)
+                              } else {
+                                setValue(`facilities.${index}`, {
+                                  title: '',
+                                  description: '',
+                                  icon: ''
+                                })
+                              }
+                            }}
+                            variant='destructive'
+                            size='sm'
+                            className='w-full'
+                          >
+                            {facilityFields.length > 1 ? 'Remove' : 'Clear'}
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Members Section */}
+                  <div className='bg-white p-6 rounded-lg shadow-md'>
+                    <div className='flex justify-between items-center mb-4'>
+                      <h2 className='text-xl font-semibold'>Members</h2>
+                      <Button
+                        type='button'
+                        onClick={() =>
+                          appendMember({
+                            name: '',
+                            contact_number: '',
+                            role: '',
+                            description: ''
+                          })
+                        }
+                        variant='default'
+                        size='sm'
+                      >
+                        Add Member
+                      </Button>
+                    </div>
+
+                    {memberFields.map((field, index) => (
+                      <div
+                        key={field.id}
+                        className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border rounded'
+                      >
+                        <div className='space-y-2'>
+                          <Label htmlFor={`member-name-${index}`}>Name</Label>
+                          <Input
+                            id={`member-name-${index}`}
+                            placeholder='Member Name'
+                            {...register(`members.${index}.name`)}
+                          />
+                        </div>
+                        <div className='space-y-2'>
+                          <Label htmlFor={`member-role-${index}`}>Role</Label>
+                          <Select
+                            className='w-full'
+                            id={`member-role-${index}`}
+                            {...register(`members.${index}.role`)}
+                          >
+                            <option value=''>Select Role</option>
+                            <option value='Principal'>Principal</option>
+                            <option value='Professor'>Professor</option>
+                            <option value='Lecturer'>Lecturer</option>
+                            <option value='Admin'>Admin</option>
+                            <option value='Staff'>Staff</option>
+                          </Select>
+                        </div>
+                        <div className='space-y-2'>
+                          <Label htmlFor={`member-contact-${index}`}>
+                            Contact Number
+                          </Label>
+                          <Input
+                            id={`member-contact-${index}`}
+                            placeholder='Contact Number'
+                            {...register(`members.${index}.contact_number`)}
+                          />
+                        </div>
+                        <div className='space-y-2'>
+                          <Label htmlFor={`member-description-${index}`}>
+                            Description
+                          </Label>
+                          <textarea
+                            id={`member-description-${index}`}
+                            placeholder='Member Description'
+                            {...register(`members.${index}.description`)}
+                            className='w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                          />
+                        </div>
                         <Button
                           type='button'
                           onClick={() => {
-                            if (facilityFields.length > 1) {
-                              removeFacility(index)
+                            if (memberFields.length > 1) {
+                              removeMember(index)
                             } else {
-                              setValue(`facilities.${index}`, {
-                                title: '',
-                                description: '',
-                                icon: ''
+                              setValue(`members.${index}`, {
+                                name: '',
+                                contact_number: '',
+                                role: '',
+                                description: ''
                               })
                             }
                           }}
@@ -1395,211 +1489,117 @@ export default function CollegeForm() {
                           size='sm'
                           className='w-full'
                         >
-                          {facilityFields.length > 1 ? 'Remove' : 'Clear'}
+                          {memberFields.length > 1 ? 'Remove' : 'Clear'}
                         </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {/* Members Section */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <div className='flex justify-between items-center mb-4'>
-                    <h2 className='text-xl font-semibold'>Members</h2>
-                    <Button
-                      type='button'
-                      onClick={() =>
-                        appendMember({
-                          name: '',
-                          contact_number: '',
-                          role: '',
-                          description: ''
-                        })
-                      }
-                      variant='default'
-                      size='sm'
-                    >
-                      Add Member
-                    </Button>
-                  </div>
-
-                  {memberFields.map((field, index) => (
-                    <div
-                      key={field.id}
-                      className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 p-4 border rounded'
-                    >
-                      <div className='space-y-2'>
-                        <Label htmlFor={`member-name-${index}`}>Name</Label>
-                        <Input
-                          id={`member-name-${index}`}
-                          placeholder='Member Name'
-                          {...register(`members.${index}.name`)}
-                        />
-                      </div>
-                      <div className='space-y-2'>
-                        <Label htmlFor={`member-role-${index}`}>Role</Label>
-                        <Select
-                          className='w-full'
-                          id={`member-role-${index}`}
-                          {...register(`members.${index}.role`)}
-                        >
-                          <option value=''>Select Role</option>
-                          <option value='Principal'>Principal</option>
-                          <option value='Professor'>Professor</option>
-                          <option value='Lecturer'>Lecturer</option>
-                          <option value='Admin'>Admin</option>
-                          <option value='Staff'>Staff</option>
-                        </Select>
-                      </div>
-                      <div className='space-y-2'>
-                        <Label htmlFor={`member-contact-${index}`}>
-                          Contact Number
-                        </Label>
-                        <Input
-                          id={`member-contact-${index}`}
-                          placeholder='Contact Number'
-                          {...register(`members.${index}.contact_number`)}
-                        />
-                      </div>
-                      <div className='space-y-2'>
-                        <Label htmlFor={`member-description-${index}`}>
-                          Description
-                        </Label>
-                        <textarea
-                          id={`member-description-${index}`}
-                          placeholder='Member Description'
-                          {...register(`members.${index}.description`)}
-                          className='w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-                        />
-                      </div>
-                      <Button
-                        type='button'
-                        onClick={() => {
-                          if (memberFields.length > 1) {
-                            removeMember(index)
-                          } else {
-                            setValue(`members.${index}`, {
-                              name: '',
-                              contact_number: '',
-                              role: '',
-                              description: ''
-                            })
-                          }
-                        }}
-                        variant='destructive'
-                        size='sm'
-                        className='w-full'
-                      >
-                        {memberFields.length > 1 ? 'Remove' : 'Clear'}
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-
-
-                {/* Address Section */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>Address</h2>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    {['country', 'state', 'city', 'street', 'postal_code'].map(
-                      (field) => (
-                        <div key={field} className='space-y-2'>
-                          <Label htmlFor={field} className='capitalize'>
-                            {field !== 'state' ? (
-                              <>
-                                {field.replace('_', ' ')}{' '}
-                                <span className='text-red-500'>*</span>
-                              </>
-                            ) : (
-                              'District'
-                            )}
-                          </Label>
-                          <Input
-                            id={field}
-                            placeholder={field.replace('_', ' ')}
-                            {...register(`address.${field}`)}
-                            aria-invalid={
-                              errors.address?.[field] ? 'true' : 'false'
-                            }
-                            className={
-                              errors.address?.[field]
-                                ? 'border-destructive'
-                                : ''
-                            }
-                          />
-                          {errors.address?.[field] && (
-                            <p className='text-sm font-medium text-destructive'>
-                              This field is required
-                            </p>
-                          )}
-                        </div>
-                      )
-                    )}
-                    <div className='space-y-2'>
-                      <Label htmlFor='map-url'>Google Map Iframe Tag</Label>
-                      <Input
-                        id='map-url'
-                        type='text'
-                        placeholder='https://maps.google.com/...'
-                        {...register('google_map_url')}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contact Information */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Contact Information
-                  </h2>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <div className='space-y-2'>
-                      <Label htmlFor='website-url'>Website URL</Label>
-                      <Input
-                        id='website-url'
-                        type='url'
-                        placeholder='https://example.com'
-                        {...register('website_url')}
-                      />
-                    </div>
-                    {[0, 1].map((index) => (
-                      <div key={index} className='space-y-2'>
-                        <Label htmlFor={`contact-${index}`}>
-                          Contact {index + 1}
-                        </Label>
-                        <Input
-                          id={`contact-${index}`}
-                          placeholder='Phone or Email'
-                          {...register(`contact_info[${index}]`)}
-                        />
                       </div>
                     ))}
                   </div>
+
+
+                  {/* Address Section */}
+                  <div className='bg-white p-6 rounded-lg shadow-md'>
+                    <h2 className='text-xl font-semibold mb-4'>Address</h2>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                      {['country', 'state', 'city', 'street', 'postal_code'].map(
+                        (field) => (
+                          <div key={field} className='space-y-2'>
+                            <Label htmlFor={field} className='capitalize'>
+                              {field !== 'state' ? (
+                                <>
+                                  {field.replace('_', ' ')}{' '}
+                                  <span className='text-red-500'>*</span>
+                                </>
+                              ) : (
+                                'District'
+                              )}
+                            </Label>
+                            <Input
+                              id={field}
+                              placeholder={field.replace('_', ' ')}
+                              {...register(`address.${field}`)}
+                              aria-invalid={
+                                errors.address?.[field] ? 'true' : 'false'
+                              }
+                              className={
+                                errors.address?.[field]
+                                  ? 'border-destructive'
+                                  : ''
+                              }
+                            />
+                            {errors.address?.[field] && (
+                              <p className='text-sm font-medium text-destructive'>
+                                This field is required
+                              </p>
+                            )}
+                          </div>
+                        )
+                      )}
+                      <div className='space-y-2'>
+                        <Label htmlFor='map-url'>Google Map Iframe Tag</Label>
+                        <Input
+                          id='map-url'
+                          type='text'
+                          placeholder='https://maps.google.com/...'
+                          {...register('google_map_url')}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Contact Information */}
+                  <div className='bg-white p-6 rounded-lg shadow-md'>
+                    <h2 className='text-xl font-semibold mb-4'>
+                      Contact Information
+                    </h2>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                      <div className='space-y-2'>
+                        <Label htmlFor='website-url'>Website URL</Label>
+                        <Input
+                          id='website-url'
+                          type='url'
+                          placeholder='https://example.com'
+                          {...register('website_url')}
+                        />
+                      </div>
+                      {[0, 1].map((index) => (
+                        <div key={index} className='space-y-2'>
+                          <Label htmlFor={`contact-${index}`}>
+                            Contact {index + 1}
+                          </Label>
+                          <Input
+                            id={`contact-${index}`}
+                            placeholder='Phone or Email'
+                            {...register(`contact_info[${index}]`)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                 </div>
 
-              </div>
-
-              {/* Submit Button - Sticky Footer */}
-              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
-                <Button
-                  type='button'
-                  onClick={handleCloseModal}
-                  variant='outline'
-                  size='sm'
-                >
-                  Cancel
-                </Button>
-                <Button type='submit' disabled={submitting} size='sm'>
-                  {submitting
-                    ? editing
-                      ? 'Updating...'
-                      : 'Creating...'
-                    : editing
-                      ? 'Update College'
-                      : 'Create College'}
-                </Button>
-              </div>
-            </form>
-          </div>
+                {/* Submit Button - Sticky Footer */}
+                <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
+                  <Button
+                    type='button'
+                    onClick={handleCloseModal}
+                    variant='outline'
+                    size='sm'
+                  >
+                    Cancel
+                  </Button>
+                  <Button type='submit' disabled={submitting} size='sm'>
+                    {submitting
+                      ? editing
+                        ? 'Updating...'
+                        : 'Creating...'
+                      : editing
+                        ? 'Update College'
+                        : 'Create College'}
+                  </Button>
+                </div>
+              </form>
+            </div>
           </DialogContent>
         </Dialog>
         <ConfirmationDialog
@@ -1621,144 +1621,144 @@ export default function CollegeForm() {
               <DialogTitle>College Details</DialogTitle>
               <DialogClose onClick={handleCloseViewModal} />
             </DialogHeader>
-          {loadingView ? (
-            <div className='flex items-center justify-center py-8'>
-              <div className='text-gray-500'>Loading...</div>
-            </div>
-          ) : viewCollegeData ? (
-            <div className='space-y-6'>
-              {/* Logo and Basic Info */}
-              <div className='flex items-start gap-4 border-b pb-4 mt-4'>
-                {viewCollegeData.college_logo && (
-                  <img
-                    src={viewCollegeData.college_logo}
-                    alt={viewCollegeData.name}
-                    className='w-20 h-20 object-contain rounded-lg border'
-                  />
-                )}
-                <div className='flex-1'>
-                  <h2 className='text-2xl font-bold text-gray-800'>
-                    {viewCollegeData.name}
-                  </h2>
-                  {viewCollegeData.institute_type && (
-                    <span className='inline-block mt-2 px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800'>
-                      {viewCollegeData.institute_type}
-                    </span>
-                  )}
-                  {viewCollegeData.website_url && (
-                    <div className='mt-2'>
-                      <a
-                        href={
-                          viewCollegeData.website_url.startsWith('http')
-                            ? viewCollegeData.website_url
-                            : `https://${viewCollegeData.website_url}`
-                        }
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='text-blue-600 hover:underline inline-flex items-center gap-1'
-                      >
-                        <Globe className='w-4 h-4' />{' '}
-                        {viewCollegeData.website_url}
-                      </a>
-                    </div>
-                  )}
-                </div>
+            {loadingView ? (
+              <div className='flex items-center justify-center py-8'>
+                <div className='text-gray-500'>Loading...</div>
               </div>
-
-              {/* Address */}
-              {viewCollegeData.collegeAddress && (
-                <div>
-                  <h3 className='text-lg font-semibold mb-2'>Address</h3>
-                  <div className='text-gray-700 space-y-1'>
-                    {viewCollegeData.collegeAddress.street && (
-                      <p>{viewCollegeData.collegeAddress.street}</p>
+            ) : viewCollegeData ? (
+              <div className='space-y-6'>
+                {/* Logo and Basic Info */}
+                <div className='flex items-start gap-4 border-b pb-4 mt-4'>
+                  {viewCollegeData.college_logo && (
+                    <img
+                      src={viewCollegeData.college_logo}
+                      alt={viewCollegeData.name}
+                      className='w-20 h-20 object-contain rounded-lg border'
+                    />
+                  )}
+                  <div className='flex-1'>
+                    <h2 className='text-2xl font-bold text-gray-800'>
+                      {viewCollegeData.name}
+                    </h2>
+                    {viewCollegeData.institute_type && (
+                      <span className='inline-block mt-2 px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800'>
+                        {viewCollegeData.institute_type}
+                      </span>
                     )}
-                    <p>
-                      {[
-                        viewCollegeData.collegeAddress.city,
-                        viewCollegeData.collegeAddress.state,
-                        viewCollegeData.collegeAddress.country
-                      ]
-                        .filter(Boolean)
-                        .join(', ')}
-                    </p>
-                    {viewCollegeData.collegeAddress.postal_code && (
-                      <p>
-                        Postal Code:{' '}
-                        {viewCollegeData.collegeAddress.postal_code}
-                      </p>
-                    )}
-                    {viewCollegeData.google_map_url && (
-                      <a
-                        href={viewCollegeData.google_map_url}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='text-blue-600 hover:underline inline-flex items-center gap-1 mt-2'
-                      >
-                        <MapPin className='w-4 h-4' /> View on Map
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Contacts */}
-              {viewCollegeData.collegeContacts &&
-                viewCollegeData.collegeContacts.length > 0 && (
-                  <div>
-                    <h3 className='text-lg font-semibold mb-2'>
-                      Contact Numbers
-                    </h3>
-                    <div className='space-y-1'>
-                      {viewCollegeData.collegeContacts.map((contact, index) => (
-                        <p key={index} className='text-gray-700'>
-                          {contact.contact_number}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-              {/* University */}
-              {viewCollegeData.university && (
-                <div>
-                  <h3 className='text-lg font-semibold mb-2'>University</h3>
-                  <p className='text-gray-700'>
-                    {viewCollegeData.university.fullname}
-                  </p>
-                </div>
-              )}
-
-              {/* Programs */}
-              {viewCollegeData.collegeCourses &&
-                viewCollegeData.collegeCourses.length > 0 && (
-                  <div>
-                    <h3 className='text-lg font-semibold mb-2'>Programs</h3>
-                    <div className='flex flex-wrap gap-2'>
-                      {viewCollegeData.collegeCourses.map((course, index) => (
-                        <span
-                          key={index}
-                          className='px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm'
+                    {viewCollegeData.website_url && (
+                      <div className='mt-2'>
+                        <a
+                          href={
+                            viewCollegeData.website_url.startsWith('http')
+                              ? viewCollegeData.website_url
+                              : `https://${viewCollegeData.website_url}`
+                          }
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className='text-blue-600 hover:underline inline-flex items-center gap-1'
                         >
-                          {course.program?.title || 'N/A'}
-                        </span>
-                      ))}
+                          <Globe className='w-4 h-4' />{' '}
+                          {viewCollegeData.website_url}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Address */}
+                {viewCollegeData.collegeAddress && (
+                  <div>
+                    <h3 className='text-lg font-semibold mb-2'>Address</h3>
+                    <div className='text-gray-700 space-y-1'>
+                      {viewCollegeData.collegeAddress.street && (
+                        <p>{viewCollegeData.collegeAddress.street}</p>
+                      )}
+                      <p>
+                        {[
+                          viewCollegeData.collegeAddress.city,
+                          viewCollegeData.collegeAddress.state,
+                          viewCollegeData.collegeAddress.country
+                        ]
+                          .filter(Boolean)
+                          .join(', ')}
+                      </p>
+                      {viewCollegeData.collegeAddress.postal_code && (
+                        <p>
+                          Postal Code:{' '}
+                          {viewCollegeData.collegeAddress.postal_code}
+                        </p>
+                      )}
+                      {viewCollegeData.google_map_url && (
+                        <a
+                          href={viewCollegeData.google_map_url}
+                          target='_blank'
+                          rel='noopener noreferrer'
+                          className='text-blue-600 hover:underline inline-flex items-center gap-1 mt-2'
+                        >
+                          <MapPin className='w-4 h-4' /> View on Map
+                        </a>
+                      )}
                     </div>
                   </div>
                 )}
 
-              {/* Description */}
-              {viewCollegeData.description && (
-                <div>
-                  <h3 className='text-lg font-semibold mb-2'>Description</h3>
-                  <p className='text-gray-700 whitespace-pre-wrap'>
-                    {viewCollegeData.description}
-                  </p>
-                </div>
-              )}
+                {/* Contacts */}
+                {viewCollegeData.collegeContacts &&
+                  viewCollegeData.collegeContacts.length > 0 && (
+                    <div>
+                      <h3 className='text-lg font-semibold mb-2'>
+                        Contact Numbers
+                      </h3>
+                      <div className='space-y-1'>
+                        {viewCollegeData.collegeContacts.map((contact, index) => (
+                          <p key={index} className='text-gray-700'>
+                            {contact.contact_number}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-            </div>
-          ) : null}
+                {/* University */}
+                {viewCollegeData.university && (
+                  <div>
+                    <h3 className='text-lg font-semibold mb-2'>University</h3>
+                    <p className='text-gray-700'>
+                      {viewCollegeData.university.fullname}
+                    </p>
+                  </div>
+                )}
+
+                {/* Programs */}
+                {viewCollegeData.collegeCourses &&
+                  viewCollegeData.collegeCourses.length > 0 && (
+                    <div>
+                      <h3 className='text-lg font-semibold mb-2'>Programs</h3>
+                      <div className='flex flex-wrap gap-2'>
+                        {viewCollegeData.collegeCourses.map((course, index) => (
+                          <span
+                            key={index}
+                            className='px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm'
+                          >
+                            {course.program?.title || 'N/A'}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                {/* Description */}
+                {viewCollegeData.description && (
+                  <div>
+                    <h3 className='text-lg font-semibold mb-2'>Description</h3>
+                    <p className='text-gray-700 whitespace-pre-wrap'>
+                      {viewCollegeData.description}
+                    </p>
+                  </div>
+                )}
+
+              </div>
+            ) : null}
           </DialogContent>
         </Dialog>
 
@@ -1778,136 +1778,136 @@ export default function CollegeForm() {
             showSearch={false}
           />
         </div>
-      {/* Create Credentials Modal */}
-      <Dialog
-        isOpen={credentialsModalOpen}
-        onClose={handleCloseCredentialsModal}
-        className='max-w-md'
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create College Credentials</DialogTitle>
-            <DialogClose onClick={handleCloseCredentialsModal} />
-          </DialogHeader>
-          <form onSubmit={handleCreateCredentials} className='space-y-4 pt-4'>
-            <div className='grid grid-cols-2 gap-4'>
-              <div className='space-y-2'>
-                <Label htmlFor='cred-first-name'>First Name</Label>
-                <Input
-                  id='cred-first-name'
-                  placeholder='First Name'
-                  value={credentialsForm.firstName}
-                  onChange={(e) =>
-                    setCredentialsForm({
-                      ...credentialsForm,
-                      firstName: e.target.value
-                    })
-                  }
-                  required
-                />
+        {/* Create Credentials Modal */}
+        <Dialog
+          isOpen={credentialsModalOpen}
+          onClose={handleCloseCredentialsModal}
+          className='max-w-md'
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create College Credentials</DialogTitle>
+              <DialogClose onClick={handleCloseCredentialsModal} />
+            </DialogHeader>
+            <form onSubmit={handleCreateCredentials} className='space-y-4 pt-4'>
+              <div className='grid grid-cols-2 gap-4'>
+                <div className='space-y-2'>
+                  <Label htmlFor='cred-first-name'>First Name</Label>
+                  <Input
+                    id='cred-first-name'
+                    placeholder='First Name'
+                    value={credentialsForm.firstName}
+                    onChange={(e) =>
+                      setCredentialsForm({
+                        ...credentialsForm,
+                        firstName: e.target.value
+                      })
+                    }
+                    required
+                  />
+                </div>
+                <div className='space-y-2'>
+                  <Label htmlFor='cred-last-name'>Last Name</Label>
+                  <Input
+                    id='cred-last-name'
+                    placeholder='Last Name'
+                    value={credentialsForm.lastName}
+                    onChange={(e) =>
+                      setCredentialsForm({
+                        ...credentialsForm,
+                        lastName: e.target.value
+                      })
+                    }
+                    required
+                  />
+                </div>
               </div>
-              <div className='space-y-2'>
-                <Label htmlFor='cred-last-name'>Last Name</Label>
-                <Input
-                  id='cred-last-name'
-                  placeholder='Last Name'
-                  value={credentialsForm.lastName}
-                  onChange={(e) =>
-                    setCredentialsForm({
-                      ...credentialsForm,
-                      lastName: e.target.value
-                    })
-                  }
-                  required
-                />
-              </div>
-            </div>
 
-            <div className='space-y-2'>
-              <Label htmlFor='cred-email'>Email Address</Label>
-              <div className='flex items-center gap-2'>
-                <Input
-                  id='cred-email'
-                  placeholder='username'
-                  value={credentialsForm.emailName}
-                  onChange={(e) =>
-                    setCredentialsForm({
-                      ...credentialsForm,
-                      emailName: e.target.value
-                    })
-                  }
-                  required
-                />
-                <span className='text-muted-foreground'>@merouni.com</span>
+              <div className='space-y-2'>
+                <Label htmlFor='cred-email'>Email Address</Label>
+                <div className='flex items-center gap-2'>
+                  <Input
+                    id='cred-email'
+                    placeholder='username'
+                    value={credentialsForm.emailName}
+                    onChange={(e) =>
+                      setCredentialsForm({
+                        ...credentialsForm,
+                        emailName: e.target.value
+                      })
+                    }
+                    required
+                  />
+                  <span className='text-muted-foreground'>@merouni.com</span>
+                </div>
               </div>
-            </div>
 
-            <div className='space-y-2'>
-              <Label htmlFor='cred-password'>Password</Label>
-              <div className='relative'>
+              <div className='space-y-2'>
+                <Label htmlFor='cred-password'>Password</Label>
+                <div className='relative'>
+                  <Input
+                    id='cred-password'
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder='••••••••'
+                    value={credentialsForm.password}
+                    onChange={(e) =>
+                      setCredentialsForm({
+                        ...credentialsForm,
+                        password: e.target.value
+                      })
+                    }
+                    required
+                  />
+                  <Button
+                    type='button'
+                    variant='ghost'
+                    size='sm'
+                    className='absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent'
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className='h-4 w-4' />
+                    ) : (
+                      <Eye className='h-4 w-4' />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <div className='space-y-2'>
+                <Label htmlFor='cred-phone'>Phone Number</Label>
                 <Input
-                  id='cred-password'
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder='••••••••'
-                  value={credentialsForm.password}
+                  id='cred-phone'
+                  placeholder='98XXXXXXXX'
+                  value={credentialsForm.phoneNo}
                   onChange={(e) =>
                     setCredentialsForm({
                       ...credentialsForm,
-                      password: e.target.value
+                      phoneNo: e.target.value
                     })
                   }
                   required
                 />
+              </div>
+
+              <div className='flex justify-end gap-2 pt-4'>
                 <Button
                   type='button'
-                  variant='ghost'
-                  size='sm'
-                  className='absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent'
-                  onClick={() => setShowPassword(!showPassword)}
+                  variant='outline'
+                  onClick={handleCloseCredentialsModal}
                 >
-                  {showPassword ? (
-                    <EyeOff className='h-4 w-4' />
-                  ) : (
-                    <Eye className='h-4 w-4' />
-                  )}
+                  Cancel
+                </Button>
+                <Button type='submit' disabled={creatingCredentials}>
+                  {creatingCredentials ? 'Creating...' : 'Create Credentials'}
                 </Button>
               </div>
-            </div>
-
-            <div className='space-y-2'>
-              <Label htmlFor='cred-phone'>Phone Number</Label>
-              <Input
-                id='cred-phone'
-                placeholder='98XXXXXXXX'
-                value={credentialsForm.phoneNo}
-                onChange={(e) =>
-                  setCredentialsForm({
-                    ...credentialsForm,
-                    phoneNo: e.target.value
-                  })
-                }
-                required
-              />
-            </div>
-
-            <div className='flex justify-end gap-2 pt-4'>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={handleCloseCredentialsModal}
-              >
-                Cancel
-              </Button>
-              <Button type='submit' disabled={creatingCredentials}>
-                {creatingCredentials ? 'Creating...' : 'Create Credentials'}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+            </form>
+          </DialogContent>
+        </Dialog>
 
 
-    </div>
+      </div>
     </>
   )
 }

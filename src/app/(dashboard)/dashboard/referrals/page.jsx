@@ -27,7 +27,7 @@ import CollegesDropdown from '@/ui/molecules/dropdown/CollegesDropdown'
 import { Select } from '@/ui/shadcn/select'
 import { Label } from '@/ui/shadcn/label'
 import { toast } from 'react-toastify'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import SearchInput from '@/ui/molecules/SearchInput'
 
 const ReferralsPage = () => {
@@ -538,58 +538,58 @@ const ReferralsPage = () => {
           <DialogHeader>
             <DialogTitle>Update Referral Status</DialogTitle>
           </DialogHeader>
-        <form onSubmit={handleStatusSubmit} className='space-y-4'>
-          <div>
-            <Label className='block text-sm font-medium text-gray-700 mb-1'>
-              Status <span className='text-red-500'>*</span>
-            </Label>
-            <Select
-              className='w-full p-2 border rounded'
-              value={statusForm.status}
-              onChange={(e) =>
-                setStatusForm({ ...statusForm, status: e.target.value })
-              }
-              required
-            >
-              <option value='IN_PROGRESS'>IN_PROGRESS</option>
-              <option value='ACCEPTED'>ACCEPTED</option>
-              <option value='REJECTED'>REJECTED</option>
-            </Select>
-          </div>
+          <form onSubmit={handleStatusSubmit} className='space-y-4'>
+            <div>
+              <Label className='block text-sm font-medium text-gray-700 mb-1'>
+                Status <span className='text-red-500'>*</span>
+              </Label>
+              <Select
+                className='w-full p-2 border rounded'
+                value={statusForm.status}
+                onChange={(e) =>
+                  setStatusForm({ ...statusForm, status: e.target.value })
+                }
+                required
+              >
+                <option value='IN_PROGRESS'>IN_PROGRESS</option>
+                <option value='ACCEPTED'>ACCEPTED</option>
+                <option value='REJECTED'>REJECTED</option>
+              </Select>
+            </div>
 
-          <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Remarks
-            </label>
-            <textarea
-              className='w-full p-2 border rounded'
-              rows={4}
-              value={statusForm.remarks}
-              onChange={(e) =>
-                setStatusForm({ ...statusForm, remarks: e.target.value })
-              }
-              placeholder='Enter remarks (optional)'
-            />
-          </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-1'>
+                Remarks
+              </label>
+              <textarea
+                className='w-full p-2 border rounded'
+                rows={4}
+                value={statusForm.remarks}
+                onChange={(e) =>
+                  setStatusForm({ ...statusForm, remarks: e.target.value })
+                }
+                placeholder='Enter remarks (optional)'
+              />
+            </div>
 
-          {error && <div className='text-red-500 text-sm'>{error}</div>}
+            {error && <div className='text-red-500 text-sm'>{error}</div>}
 
-          <div className='flex justify-end gap-2 pt-2'>
-            <Button
-              type='button'
-              onClick={handleCloseStatusModal}
-              variant='outline'
-            >
-              Cancel
-            </Button>
-            <Button
-              type='submit'
-              disabled={updatingId === selectedReferral?.id}
-            >
-              {updatingId === selectedReferral?.id ? 'Updating...' : 'Update'}
-            </Button>
-          </div>
-        </form>
+            <div className='flex justify-end gap-2 pt-2'>
+              <Button
+                type='button'
+                onClick={handleCloseStatusModal}
+                variant='outline'
+              >
+                Cancel
+              </Button>
+              <Button
+                type='submit'
+                disabled={updatingId === selectedReferral?.id}
+              >
+                {updatingId === selectedReferral?.id ? 'Updating...' : 'Update'}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
       <ConfirmationDialog

@@ -15,7 +15,7 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loader from '../../../../ui/molecules/Loading'
 import Table from '@/ui/shadcn/DataTable'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import FileUpload from '../addCollege/FileUpload'
 import { fetchVideos } from './action'
 import SearchInput from '@/ui/molecules/SearchInput'
@@ -389,110 +389,110 @@ export default function VideoManager() {
           <DialogHeader>
             <DialogTitle>{editing ? 'Edit Video' : 'Add Video'}</DialogTitle>
             <DialogClose onClick={() => {
-                setIsOpen(false)
-                setEditing(false)
-                setEditingId(null)
-                reset()
-                setUploadedFiles({ featured_image: '' })
-              }} 
+              setIsOpen(false)
+              setEditing(false)
+              setEditingId(null)
+              reset()
+              setUploadedFiles({ featured_image: '' })
+            }}
             />
           </DialogHeader>
           <DialogContent>
-          <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className='flex flex-col flex-1 overflow-hidden'
-            >
-              <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Video Information
-                  </h2>
-                  <div className='space-y-4'>
-                    <div>
-                      <Label>
-                        Title <span className='text-red-500'>*</span>
-                      </Label>
-                      <Input
-                        type='text'
-                        placeholder='Video Title'
-                        {...register('title', {
-                          required: 'Title is required'
-                        })}
-                        className='w-full p-2 border rounded'
-                      />
-                      {errors.title && (
-                        <span className='text-red-500 text-sm'>
-                          {errors.title.message}
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <Label>
-                        Youtube Link <span className='text-red-500'>*</span>
-                      </Label>
-                      <Input
-                        type='url'
-                        placeholder='https://youtube.com/...'
-                        {...register('yt_video_link', {
-                          required: 'Youtube link is required'
-                        })}
-                        className='w-full p-2 border rounded'
-                      />
-                      {errors.yt_video_link && (
-                        <span className='text-red-500 text-sm'>
-                          {errors.yt_video_link.message}
-                        </span>
-                      )}
-                    </div>
+            <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className='flex flex-col flex-1 overflow-hidden'
+              >
+                <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+                  <div className='bg-white p-6 rounded-lg shadow-md'>
+                    <h2 className='text-xl font-semibold mb-4'>
+                      Video Information
+                    </h2>
+                    <div className='space-y-4'>
+                      <div>
+                        <Label>
+                          Title <span className='text-red-500'>*</span>
+                        </Label>
+                        <Input
+                          type='text'
+                          placeholder='Video Title'
+                          {...register('title', {
+                            required: 'Title is required'
+                          })}
+                          className='w-full p-2 border rounded'
+                        />
+                        {errors.title && (
+                          <span className='text-red-500 text-sm'>
+                            {errors.title.message}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <Label>
+                          Youtube Link <span className='text-red-500'>*</span>
+                        </Label>
+                        <Input
+                          type='url'
+                          placeholder='https://youtube.com/...'
+                          {...register('yt_video_link', {
+                            required: 'Youtube link is required'
+                          })}
+                          className='w-full p-2 border rounded'
+                        />
+                        {errors.yt_video_link && (
+                          <span className='text-red-500 text-sm'>
+                            {errors.yt_video_link.message}
+                          </span>
+                        )}
+                      </div>
 
-                    <div>
-                      <Label>Description</Label>
-                      <textarea
-                        placeholder='Video Description'
-                        {...register('description')}
-                        className='w-full p-2 border rounded min-h-[100px]'
-                        rows={4}
-                      />
-                    </div>
-                    <div>
-                      <Label>Featured Image (Optional)</Label>
-                      <FileUpload
-                        defaultPreview={uploadedFiles.featured_image}
-                        onUploadComplete={(url) => {
-                          setUploadedFiles((prev) => ({
-                            ...prev,
-                            featured_image: url
-                          }))
-                          setValue('featured_image', url)
-                        }}
-                      />
+                      <div>
+                        <Label>Description</Label>
+                        <textarea
+                          placeholder='Video Description'
+                          {...register('description')}
+                          className='w-full p-2 border rounded min-h-[100px]'
+                          rows={4}
+                        />
+                      </div>
+                      <div>
+                        <Label>Featured Image (Optional)</Label>
+                        <FileUpload
+                          defaultPreview={uploadedFiles.featured_image}
+                          onUploadComplete={(url) => {
+                            setUploadedFiles((prev) => ({
+                              ...prev,
+                              featured_image: url
+                            }))
+                            setValue('featured_image', url)
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Submit Button - Sticky Footer */}
-              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
-                <Button
-                  type='button'
-                  variant='outline'
-                  onClick={() => {
-                    setIsOpen(false)
-                    setEditing(false)
-                    setEditingId(null)
-                    reset()
-                    setUploadedFiles({ featured_image: '' })
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button type='submit'>
-                  {editing ? 'Update Video' : 'Create Video'}
-                </Button>
-              </div>
-            </form>
-          </div>
+                {/* Submit Button - Sticky Footer */}
+                <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    onClick={() => {
+                      setIsOpen(false)
+                      setEditing(false)
+                      setEditingId(null)
+                      reset()
+                      setUploadedFiles({ featured_image: '' })
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type='submit'>
+                    {editing ? 'Update Video' : 'Create Video'}
+                  </Button>
+                </div>
+              </form>
+            </div>
           </DialogContent>
         </Dialog>
 
@@ -519,66 +519,66 @@ export default function VideoManager() {
         className="max-w-2xl"
       >
         <DialogHeader>
-            <DialogTitle>Video Details</DialogTitle>
-            <DialogClose onClick={() => {
-                setIsViewModalOpen(false)
-                setViewingVideo(null)
-              }} 
-            />
+          <DialogTitle>Video Details</DialogTitle>
+          <DialogClose onClick={() => {
+            setIsViewModalOpen(false)
+            setViewingVideo(null)
+          }}
+          />
         </DialogHeader>
         <DialogContent>
-        <div className="p-6 space-y-6">
-          {/* Featured Image */}
-          {viewingVideo?.featured_image && (
-            <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-100 mb-6 border border-gray-200">
-              <img
-                src={viewingVideo.featured_image}
-                alt={viewingVideo.title}
-                className="w-full h-full object-contain"
-              />
-            </div>
-          )}
+          <div className="p-6 space-y-6">
+            {/* Featured Image */}
+            {viewingVideo?.featured_image && (
+              <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-100 mb-6 border border-gray-200">
+                <img
+                  src={viewingVideo.featured_image}
+                  alt={viewingVideo.title}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            )}
 
-          {/* Details Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
-              <h3 className="text-sm font-medium text-gray-500">Title</h3>
-              <p className="mt-1 text-lg font-semibold text-gray-900">{viewingVideo?.title}</p>
-            </div>
+            {/* Details Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="md:col-span-2">
+                <h3 className="text-sm font-medium text-gray-500">Title</h3>
+                <p className="mt-1 text-lg font-semibold text-gray-900">{viewingVideo?.title}</p>
+              </div>
 
-            <div className="md:col-span-2">
-              <h3 className="text-sm font-medium text-gray-500">YouTube Link</h3>
-              <a
-                href={viewingVideo?.yt_video_link}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='mt-1 text-blue-600 hover:underline flex items-center gap-1'
-              >
-                {viewingVideo?.yt_video_link} <ExternalLink className='w-3 h-3' />
-              </a>
-            </div>
+              <div className="md:col-span-2">
+                <h3 className="text-sm font-medium text-gray-500">YouTube Link</h3>
+                <a
+                  href={viewingVideo?.yt_video_link}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='mt-1 text-blue-600 hover:underline flex items-center gap-1'
+                >
+                  {viewingVideo?.yt_video_link} <ExternalLink className='w-3 h-3' />
+                </a>
+              </div>
 
 
 
-            <div className="md:col-span-2">
-              <h3 className="text-sm font-medium text-gray-500">Description</h3>
-              <div className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100">
-                {viewingVideo?.description || "No description provided."}
+              <div className="md:col-span-2">
+                <h3 className="text-sm font-medium text-gray-500">Description</h3>
+                <div className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                  {viewingVideo?.description || "No description provided."}
+                </div>
+              </div>
+
+              <div className="md:col-span-2">
+                <h3 className="text-sm font-medium text-gray-500">Created At</h3>
+                <p className="mt-1 text-gray-900">{viewingVideo?.createdAt ? formatDate(viewingVideo.createdAt) : 'N/A'}</p>
               </div>
             </div>
 
-            <div className="md:col-span-2">
-              <h3 className="text-sm font-medium text-gray-500">Created At</h3>
-              <p className="mt-1 text-gray-900">{viewingVideo?.createdAt ? formatDate(viewingVideo.createdAt) : 'N/A'}</p>
+            <div className="flex justify-end pt-4 border-t mt-6">
+              <Button onClick={() => setIsViewModalOpen(false)}>
+                Close
+              </Button>
             </div>
           </div>
-
-          <div className="flex justify-end pt-4 border-t mt-6">
-            <Button onClick={() => setIsViewModalOpen(false)}>
-              Close
-            </Button>
-          </div>
-        </div>
         </DialogContent>
       </Dialog>
 

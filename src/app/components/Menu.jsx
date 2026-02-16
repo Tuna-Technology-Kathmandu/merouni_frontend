@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useSelector, useDispatch } from 'react-redux'
 import { removeUser } from '@/app/utils/userSlice'
 import { destr } from 'destr'
-import ConfirmationDialog from '@/app/(dashboard)/dashboard/addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 
 // Icons
 import {

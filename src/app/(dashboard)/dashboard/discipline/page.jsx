@@ -13,7 +13,7 @@ import CreateUpdateDiscipline from '@/ui/molecules/dialogs/CreateUpdateDisciplin
 import { formatDate } from '@/utils/date.util'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function DisciplineManager() {
@@ -293,46 +293,46 @@ export default function DisciplineManager() {
                     }} />
                 </DialogHeader>
                 <DialogContent>
-                <div className="space-y-6">
-                    {/* Image */}
-                    {viewingDiscipline?.featured_image && (
-                        <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-100 mb-6 border border-gray-200">
-                            <img
-                                src={viewingDiscipline.featured_image}
-                                alt={viewingDiscipline.title}
-                                className="w-full h-full object-contain"
-                            />
-                        </div>
-                    )}
+                    <div className="space-y-6">
+                        {/* Image */}
+                        {viewingDiscipline?.featured_image && (
+                            <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-100 mb-6 border border-gray-200">
+                                <img
+                                    src={viewingDiscipline.featured_image}
+                                    alt={viewingDiscipline.title}
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
+                        )}
 
-                    {/* Details Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <h3 className="text-sm font-medium text-gray-500">Title</h3>
-                            <p className="mt-1 text-lg font-semibold text-gray-900">{viewingDiscipline?.title}</p>
-                        </div>
+                        {/* Details Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 className="text-sm font-medium text-gray-500">Title</h3>
+                                <p className="mt-1 text-lg font-semibold text-gray-900">{viewingDiscipline?.title}</p>
+                            </div>
 
 
 
-                        <div className="md:col-span-2">
-                            <h3 className="text-sm font-medium text-gray-500">Description</h3>
-                            <div className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                {viewingDiscipline?.description || "No description provided."}
+                            <div className="md:col-span-2">
+                                <h3 className="text-sm font-medium text-gray-500">Description</h3>
+                                <div className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                                    {viewingDiscipline?.description || "No description provided."}
+                                </div>
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <h3 className="text-sm font-medium text-gray-500">Created At</h3>
+                                <p className="mt-1 text-gray-900">{viewingDiscipline?.createdAt ? formatDate(viewingDiscipline.createdAt) : 'N/A'}</p>
                             </div>
                         </div>
 
-                        <div className="md:col-span-2">
-                            <h3 className="text-sm font-medium text-gray-500">Created At</h3>
-                            <p className="mt-1 text-gray-900">{viewingDiscipline?.createdAt ? formatDate(viewingDiscipline.createdAt) : 'N/A'}</p>
+                        <div className="flex justify-end pt-4 border-t mt-6">
+                            <Button onClick={() => setIsViewModalOpen(false)}>
+                                Close
+                            </Button>
                         </div>
                     </div>
-
-                    <div className="flex justify-end pt-4 border-t mt-6">
-                        <Button onClick={() => setIsViewModalOpen(false)}>
-                            Close
-                        </Button>
-                    </div>
-                </div>
                 </DialogContent>
             </Dialog>
 

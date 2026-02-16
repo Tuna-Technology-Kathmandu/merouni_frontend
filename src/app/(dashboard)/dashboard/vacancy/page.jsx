@@ -17,7 +17,7 @@ import {
   DialogClose
 } from '@/ui/shadcn/dialog'
 import { authFetch } from '@/app/utils/authFetch'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Search, Eye } from 'lucide-react'
@@ -434,148 +434,148 @@ const VacancyManager = () => {
           </div>
           <ToastContainer />
 
-        <Dialog
-          isOpen={isOpen}
-          onClose={() => {
-            setIsOpen(false)
-            setEditing(false)
-            setEditingId(null)
-            reset()
-            setUploadedFiles({ featuredImage: '' })
-          }}
-          className='max-w-5xl'
-        >
-          <DialogHeader>
-            <div className='flex items-center justify-between'>
-              <DialogTitle>{editing ? 'Edit Vacancy' : 'Add Vacancy'}</DialogTitle>
-              <DialogClose
-                onClick={() => {
-                  setIsOpen(false)
-                  setEditing(false)
-                  setEditingId(null)
-                  reset()
-                  setUploadedFiles({ featuredImage: '' })
-                }}
-              />
-            </div>
-          </DialogHeader>
-          <DialogContent>
-          <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className='flex flex-col flex-1 overflow-hidden'
-            >
-              <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                {/* Basic Information */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Vacancy Information
-                  </h2>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <div className='space-y-2'>
-                      <Label
-                        htmlFor='title'
-                        className="after:content-['*'] after:ml-0.5 after:text-red-500"
-                      >
-                        Vacancy Title
-                      </Label>
-                      <Input
-                        id='title'
-                        placeholder='Enter vacancy title'
-                        {...register('title', {
-                          required: 'Title is required'
-                        })}
-                        className={errors.title ? 'border-destructive' : ''}
-                      />
-                      {errors.title && (
-                        <span className='text-sm font-medium text-destructive'>
-                          {errors.title.message}
-                        </span>
-                      )}
-                    </div>
+          <Dialog
+            isOpen={isOpen}
+            onClose={() => {
+              setIsOpen(false)
+              setEditing(false)
+              setEditingId(null)
+              reset()
+              setUploadedFiles({ featuredImage: '' })
+            }}
+            className='max-w-5xl'
+          >
+            <DialogHeader>
+              <div className='flex items-center justify-between'>
+                <DialogTitle>{editing ? 'Edit Vacancy' : 'Add Vacancy'}</DialogTitle>
+                <DialogClose
+                  onClick={() => {
+                    setIsOpen(false)
+                    setEditing(false)
+                    setEditingId(null)
+                    reset()
+                    setUploadedFiles({ featuredImage: '' })
+                  }}
+                />
+              </div>
+            </DialogHeader>
+            <DialogContent>
+              <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className='flex flex-col flex-1 overflow-hidden'
+                >
+                  <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+                    {/* Basic Information */}
+                    <div className='bg-white p-6 rounded-lg shadow-md'>
+                      <h2 className='text-xl font-semibold mb-4'>
+                        Vacancy Information
+                      </h2>
+                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                        <div className='space-y-2'>
+                          <Label
+                            htmlFor='title'
+                            className="after:content-['*'] after:ml-0.5 after:text-red-500"
+                          >
+                            Vacancy Title
+                          </Label>
+                          <Input
+                            id='title'
+                            placeholder='Enter vacancy title'
+                            {...register('title', {
+                              required: 'Title is required'
+                            })}
+                            className={errors.title ? 'border-destructive' : ''}
+                          />
+                          {errors.title && (
+                            <span className='text-sm font-medium text-destructive'>
+                              {errors.title.message}
+                            </span>
+                          )}
+                        </div>
 
-                    <div className='space-y-2'>
-                      <Label htmlFor='associated_organization_name'>
-                        Associated Organization / Institution Name
-                      </Label>
-                      <Input
-                        id='associated_organization_name'
-                        placeholder='Enter organization or institution name'
-                        {...register('associated_organization_name')}
-                      />
-                    </div>
-                  </div>
+                        <div className='space-y-2'>
+                          <Label htmlFor='associated_organization_name'>
+                            Associated Organization / Institution Name
+                          </Label>
+                          <Input
+                            id='associated_organization_name'
+                            placeholder='Enter organization or institution name'
+                            {...register('associated_organization_name')}
+                          />
+                        </div>
+                      </div>
 
-                  <div className='space-y-2 mt-4'>
-                    <Label htmlFor='description'>Short Description</Label>
-                    <Textarea
-                      id='description'
-                      placeholder='Enter short description'
-                      {...register('description')}
-                      className='min-h-[100px]'
-                    />
-                  </div>
-
-                  <div className='space-y-2 mt-4'>
-                    <Label htmlFor='content'>Content</Label>
-                    <Controller
-                      name='content'
-                      control={control}
-                      render={({ field }) => (
-                        <TipTapEditor
-                          value={field.value}
-                          onChange={field.onChange}
-                          placeholder='Enter detailed content'
+                      <div className='space-y-2 mt-4'>
+                        <Label htmlFor='description'>Short Description</Label>
+                        <Textarea
+                          id='description'
+                          placeholder='Enter short description'
+                          {...register('description')}
+                          className='min-h-[100px]'
                         />
-                      )}
-                    />
+                      </div>
+
+                      <div className='space-y-2 mt-4'>
+                        <Label htmlFor='content'>Content</Label>
+                        <Controller
+                          name='content'
+                          control={control}
+                          render={({ field }) => (
+                            <TipTapEditor
+                              value={field.value}
+                              onChange={field.onChange}
+                              placeholder='Enter detailed content'
+                            />
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Media */}
+                    <div className='bg-white p-6 rounded-lg shadow-md'>
+                      <h2 className='text-xl font-semibold mb-4'>Media</h2>
+                      <FileUpload
+                        label='Featured Image'
+                        onUploadComplete={(url) => {
+                          setUploadedFiles((prev) => ({
+                            ...prev,
+                            featuredImage: url
+                          }))
+                          setValue('featuredImage', url)
+                        }}
+                        defaultPreview={uploadedFiles.featuredImage}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                {/* Media */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>Media</h2>
-                  <FileUpload
-                    label='Featured Image'
-                    onUploadComplete={(url) => {
-                      setUploadedFiles((prev) => ({
-                        ...prev,
-                        featuredImage: url
-                      }))
-                      setValue('featuredImage', url)
-                    }}
-                    defaultPreview={uploadedFiles.featuredImage}
-                  />
-                </div>
+                  {/* Submit Button - Sticky Footer */}
+                  <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
+                    <Button type='submit' disabled={loading}>
+                      {loading
+                        ? 'Processing...'
+                        : editing
+                          ? 'Update Vacancy'
+                          : 'Create Vacancy'}
+                    </Button>
+                  </div>
+                </form>
               </div>
+            </DialogContent>
+          </Dialog>
 
-              {/* Submit Button - Sticky Footer */}
-              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <Button type='submit' disabled={loading}>
-                  {loading
-                    ? 'Processing...'
-                    : editing
-                      ? 'Update Vacancy'
-                      : 'Create Vacancy'}
-                </Button>
-              </div>
-            </form>
-          </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Table Section */}
-        <Table
-          loading={tableLoading}
-          data={vacancies}
-          columns={columns}
-          pagination={pagination}
-          onPageChange={(newPage) => loadVacancies(newPage)}
-          onSearch={handleSearch}
-          showSearch={false}
-        />
+          {/* Table Section */}
+          <Table
+            loading={tableLoading}
+            data={vacancies}
+            columns={columns}
+            pagination={pagination}
+            onPageChange={(newPage) => loadVacancies(newPage)}
+            onSearch={handleSearch}
+            showSearch={false}
+          />
+        </div>
       </div>
-    </div>
 
       <ConfirmationDialog
         open={isDialogOpen}
@@ -598,62 +598,62 @@ const VacancyManager = () => {
           </div>
         </DialogHeader>
         <DialogContent>
-        {loadingView ? (
-          <div className='flex justify-center items-center h-48'>
-            Loading...
-          </div>
-        ) : viewVacancyData ? (
-          <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
-            {viewVacancyData.featuredImage && (
-              <div className='w-full h-64 rounded-lg overflow-hidden'>
-                <img
-                  src={viewVacancyData.featuredImage}
-                  alt={viewVacancyData.title}
-                  className='w-full h-full object-cover'
-                />
-              </div>
-            )}
+          {loadingView ? (
+            <div className='flex justify-center items-center h-48'>
+              Loading...
+            </div>
+          ) : viewVacancyData ? (
+            <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
+              {viewVacancyData.featuredImage && (
+                <div className='w-full h-64 rounded-lg overflow-hidden'>
+                  <img
+                    src={viewVacancyData.featuredImage}
+                    alt={viewVacancyData.title}
+                    className='w-full h-full object-cover'
+                  />
+                </div>
+              )}
 
-            <div>
-              <h2 className='text-2xl font-bold text-gray-800'>
-                {viewVacancyData.title}
-              </h2>
-              {viewVacancyData.associated_organization_name && (
-                <p className='text-sm text-gray-500 mt-1'>
-                  {viewVacancyData.associated_organization_name}
-                </p>
+              <div>
+                <h2 className='text-2xl font-bold text-gray-800'>
+                  {viewVacancyData.title}
+                </h2>
+                {viewVacancyData.associated_organization_name && (
+                  <p className='text-sm text-gray-500 mt-1'>
+                    {viewVacancyData.associated_organization_name}
+                  </p>
+                )}
+              </div>
+
+              {viewVacancyData.description && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Description</h3>
+                  <div
+                    className='text-gray-700 prose max-w-none'
+                    dangerouslySetInnerHTML={{
+                      __html: viewVacancyData.description
+                    }}
+                  />
+                </div>
+              )}
+
+              {viewVacancyData.content && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Content</h3>
+                  <div
+                    className='text-gray-700 prose max-w-none'
+                    dangerouslySetInnerHTML={{
+                      __html: viewVacancyData.content
+                    }}
+                  />
+                </div>
               )}
             </div>
-
-            {viewVacancyData.description && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Description</h3>
-                <div
-                  className='text-gray-700 prose max-w-none'
-                  dangerouslySetInnerHTML={{
-                    __html: viewVacancyData.description
-                  }}
-                />
-              </div>
-            )}
-
-            {viewVacancyData.content && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Content</h3>
-                <div
-                  className='text-gray-700 prose max-w-none'
-                  dangerouslySetInnerHTML={{
-                    __html: viewVacancyData.content
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        ) : (
-          <p className='text-center text-gray-500'>
-            No vacancy data available.
-          </p>
-        )}
+          ) : (
+            <p className='text-center text-gray-500'>
+              No vacancy data available.
+            </p>
+          )}
         </DialogContent>
       </Dialog>
     </>

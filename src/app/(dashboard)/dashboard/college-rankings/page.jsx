@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/ui/shadcn/dialog'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import Image from 'next/image'
 import { Button } from '@/ui/shadcn/button'
 
@@ -494,209 +494,209 @@ export default function CollegeRankingsPage() {
                 : 'Select Program to Add Rankings'}
             </DialogTitle>
           </DialogHeader>
-        <div className='p-6 space-y-6'>
-          {/* Program Selection */}
-          <div className='relative' ref={programDropdownRef}>
-            <label className='block mb-2 font-medium'>
-              Program <span className='text-red-500'>*</span>
-            </label>
-            <div className='relative'>
+          <div className='p-6 space-y-6'>
+            {/* Program Selection */}
+            <div className='relative' ref={programDropdownRef}>
+              <label className='block mb-2 font-medium'>
+                Program <span className='text-red-500'>*</span>
+              </label>
+              <div className='relative'>
+                <input
+                  type='text'
+                  value={programSearch}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    setProgramSearch(value)
+                    setShowProgramDropdown(true)
+                    // Clear selection if user is typing something different from selected program
+                    if (selectedProgram && value !== selectedProgram.title) {
+                      setSelectedProgram(null)
+                    }
+                    if (!value) {
+                      setSelectedProgram(null)
+                    }
+                  }}
+                  onFocus={() => {
+                    if (!editingProgramId) {
+                      setShowProgramDropdown(true)
+                    }
+                  }}
+                  placeholder='Search programs...'
+                  className='w-full p-2 pr-10 border rounded'
+                  disabled={!!editingProgramId}
+                />
+                <button
+                  type='button'
+                  onClick={() => {
+                    if (!editingProgramId) {
+                      setShowProgramDropdown(!showProgramDropdown)
+                    }
+                  }}
+                  disabled={!!editingProgramId}
+                  className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:opacity-50'
+                >
+                  <ChevronDown
+                    size={20}
+                    className={`transition-transform ${showProgramDropdown ? 'rotate-180' : ''
+                      }`}
+                  />
+                </button>
+              </div>
+              {showProgramDropdown && !editingProgramId && (
+                <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto'>
+                  {(() => {
+                    // Get program IDs that already have rankings (only when not editing)
+                    const programsWithRankings = editingProgramId
+                      ? []
+                      : rankings.map((group) => group.program?.id).filter(Boolean)
+
+                    // Filter programs: exclude those with rankings (unless editing that program)
+                    const availablePrograms = programs.filter((program) => {
+                      const hasRanking = programsWithRankings.includes(program.id)
+                      // When editing, show the current program even if it has rankings
+                      if (editingProgramId && program.id === editingProgramId) {
+                        return true
+                      }
+                      // When not editing, exclude programs that already have rankings
+                      return !hasRanking
+                    })
+
+                    // Apply search filter and exclude selected program
+                    const filteredPrograms = availablePrograms.filter(
+                      (program) => {
+                        const matchesSearch = program.title
+                          ?.toLowerCase()
+                          .includes(programSearch.toLowerCase())
+                        // Exclude the selected program from the dropdown list
+                        const isNotSelected =
+                          !selectedProgram || program.id !== selectedProgram.id
+                        return matchesSearch && isNotSelected
+                      }
+                    )
+
+                    if (filteredPrograms.length === 0) {
+                      return (
+                        <div className='p-3 text-gray-500 text-sm text-center'>
+                          {programSearch
+                            ? 'No programs found'
+                            : 'Start typing to search programs...'}
+                        </div>
+                      )
+                    }
+
+                    return filteredPrograms.map((program) => (
+                      <div
+                        key={program.id}
+                        onClick={() => {
+                          setSelectedProgram(program)
+                          setProgramSearch(program.title || '')
+                          setShowProgramDropdown(false)
+                        }}
+                        className='p-3 cursor-pointer hover:bg-gray-100 transition-colors'
+                      >
+                        <span className='text-sm'>{program.title}</span>
+                      </div>
+                    ))
+                  })()}
+                </div>
+              )}
+            </div>
+
+            {/* College Selection */}
+            <div>
+              <label className='block mb-2 font-medium'>
+                College <span className='text-red-500'>*</span>{' '}
+                {selectedProgram && (
+                  <span className='text-gray-500 text-sm font-normal'>
+                    (Select colleges to rank for this program)
+                  </span>
+                )}
+              </label>
               <input
                 type='text'
-                value={programSearch}
-                onChange={(e) => {
-                  const value = e.target.value
-                  setProgramSearch(value)
-                  setShowProgramDropdown(true)
-                  // Clear selection if user is typing something different from selected program
-                  if (selectedProgram && value !== selectedProgram.title) {
-                    setSelectedProgram(null)
-                  }
-                  if (!value) {
-                    setSelectedProgram(null)
-                  }
-                }}
-                onFocus={() => {
-                  if (!editingProgramId) {
-                    setShowProgramDropdown(true)
-                  }
-                }}
-                placeholder='Search programs...'
-                className='w-full p-2 pr-10 border rounded'
-                disabled={!!editingProgramId}
+                value={collegeSearch}
+                onChange={(e) => setCollegeSearch(e.target.value)}
+                placeholder={
+                  selectedProgram
+                    ? 'Search colleges to add...'
+                    : 'Please select a program first'
+                }
+                className='w-full p-2 border rounded mb-2'
+                disabled={!selectedProgram}
               />
-              <button
-                type='button'
-                onClick={() => {
-                  if (!editingProgramId) {
-                    setShowProgramDropdown(!showProgramDropdown)
-                  }
-                }}
-                disabled={!!editingProgramId}
-                className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:opacity-50'
-              >
-                <ChevronDown
-                  size={20}
-                  className={`transition-transform ${showProgramDropdown ? 'rotate-180' : ''
-                    }`}
-                />
-              </button>
-            </div>
-            {showProgramDropdown && !editingProgramId && (
-              <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto'>
-                {(() => {
-                  // Get program IDs that already have rankings (only when not editing)
-                  const programsWithRankings = editingProgramId
-                    ? []
-                    : rankings.map((group) => group.program?.id).filter(Boolean)
-
-                  // Filter programs: exclude those with rankings (unless editing that program)
-                  const availablePrograms = programs.filter((program) => {
-                    const hasRanking = programsWithRankings.includes(program.id)
-                    // When editing, show the current program even if it has rankings
-                    if (editingProgramId && program.id === editingProgramId) {
-                      return true
-                    }
-                    // When not editing, exclude programs that already have rankings
-                    return !hasRanking
-                  })
-
-                  // Apply search filter and exclude selected program
-                  const filteredPrograms = availablePrograms.filter(
-                    (program) => {
-                      const matchesSearch = program.title
-                        ?.toLowerCase()
-                        .includes(programSearch.toLowerCase())
-                      // Exclude the selected program from the dropdown list
-                      const isNotSelected =
-                        !selectedProgram || program.id !== selectedProgram.id
-                      return matchesSearch && isNotSelected
-                    }
-                  )
-
-                  if (filteredPrograms.length === 0) {
-                    return (
-                      <div className='p-3 text-gray-500 text-sm text-center'>
-                        {programSearch
-                          ? 'No programs found'
-                          : 'Start typing to search programs...'}
-                      </div>
-                    )
-                  }
-
-                  return filteredPrograms.map((program) => (
-                    <div
-                      key={program.id}
-                      onClick={() => {
-                        setSelectedProgram(program)
-                        setProgramSearch(program.title || '')
-                        setShowProgramDropdown(false)
-                      }}
-                      className='p-3 cursor-pointer hover:bg-gray-100 transition-colors'
-                    >
-                      <span className='text-sm'>{program.title}</span>
-                    </div>
-                  ))
-                })()}
-              </div>
-            )}
-          </div>
-
-          {/* College Selection */}
-          <div>
-            <label className='block mb-2 font-medium'>
-              College <span className='text-red-500'>*</span>{' '}
               {selectedProgram && (
-                <span className='text-gray-500 text-sm font-normal'>
-                  (Select colleges to rank for this program)
-                </span>
-              )}
-            </label>
-            <input
-              type='text'
-              value={collegeSearch}
-              onChange={(e) => setCollegeSearch(e.target.value)}
-              placeholder={
-                selectedProgram
-                  ? 'Search colleges to add...'
-                  : 'Please select a program first'
-              }
-              className='w-full p-2 border rounded mb-2'
-              disabled={!selectedProgram}
-            />
-            {selectedProgram && (
-              <div className='max-h-60 overflow-y-auto border rounded'>
-                {(() => {
-                  // Filter out colleges that are already ranked for this program
-                  const programRankings = rankings.find(
-                    (r) => r.program?.id === selectedProgram.id
-                  )
-                  const rankedCollegeIds =
-                    programRankings?.rankings?.map((r) => r.college?.id) || []
-                  const availableColleges = colleges.filter(
-                    (college) => !rankedCollegeIds.includes(college.id)
-                  )
-
-                  if (availableColleges.length === 0) {
-                    return (
-                      <div className='p-3 text-gray-500 text-sm text-center'>
-                        {collegeSearch
-                          ? 'No available colleges found'
-                          : rankedCollegeIds.length > 0
-                            ? 'All colleges are already ranked for this program'
-                            : 'Type to search colleges...'}
-                      </div>
+                <div className='max-h-60 overflow-y-auto border rounded'>
+                  {(() => {
+                    // Filter out colleges that are already ranked for this program
+                    const programRankings = rankings.find(
+                      (r) => r.program?.id === selectedProgram.id
                     )
-                  }
+                    const rankedCollegeIds =
+                      programRankings?.rankings?.map((r) => r.college?.id) || []
+                    const availableColleges = colleges.filter(
+                      (college) => !rankedCollegeIds.includes(college.id)
+                    )
 
-                  return availableColleges.map((college) => (
-                    <div
-                      key={college.id}
-                      onClick={() => setSelectedCollege(college)}
-                      className={`p-3 cursor-pointer hover:bg-gray-100 flex items-center gap-3 ${selectedCollege?.id === college.id ? 'bg-blue-50' : ''
-                        }`}
-                    >
-                      {college.college_logo && (
-                        <div className='relative w-10 h-10 rounded-full overflow-hidden'>
-                          <Image
-                            src={college.college_logo}
-                            alt={college.name}
-                            fill
-                            className='object-cover'
-                          />
+                    if (availableColleges.length === 0) {
+                      return (
+                        <div className='p-3 text-gray-500 text-sm text-center'>
+                          {collegeSearch
+                            ? 'No available colleges found'
+                            : rankedCollegeIds.length > 0
+                              ? 'All colleges are already ranked for this program'
+                              : 'Type to search colleges...'}
                         </div>
-                      )}
-                      <span className='text-sm'>{college.name}</span>
-                    </div>
-                  ))
-                })()}
-              </div>
-            )}
-          </div>
+                      )
+                    }
 
-          <div className='flex justify-end gap-3 pt-4 border-t'>
-            <button
-              onClick={() => {
-                setIsEditModalOpen(false)
-                setEditingProgramId(null)
-                setSelectedProgram(null)
-                setSelectedCollege(null)
-                setCollegeSearch('')
-                setProgramSearch('')
-                setShowProgramDropdown(false)
-              }}
-              className='px-4 py-2 border rounded hover:bg-gray-50'
-            >
-              Close
-            </button>
-            <Button
-              onClick={handleAddRanking}
-              disabled={!selectedProgram || !selectedCollege}
-            >
-              Add College
-            </Button>
+                    return availableColleges.map((college) => (
+                      <div
+                        key={college.id}
+                        onClick={() => setSelectedCollege(college)}
+                        className={`p-3 cursor-pointer hover:bg-gray-100 flex items-center gap-3 ${selectedCollege?.id === college.id ? 'bg-blue-50' : ''
+                          }`}
+                      >
+                        {college.college_logo && (
+                          <div className='relative w-10 h-10 rounded-full overflow-hidden'>
+                            <Image
+                              src={college.college_logo}
+                              alt={college.name}
+                              fill
+                              className='object-cover'
+                            />
+                          </div>
+                        )}
+                        <span className='text-sm'>{college.name}</span>
+                      </div>
+                    ))
+                  })()}
+                </div>
+              )}
+            </div>
+
+            <div className='flex justify-end gap-3 pt-4 border-t'>
+              <button
+                onClick={() => {
+                  setIsEditModalOpen(false)
+                  setEditingProgramId(null)
+                  setSelectedProgram(null)
+                  setSelectedCollege(null)
+                  setCollegeSearch('')
+                  setProgramSearch('')
+                  setShowProgramDropdown(false)
+                }}
+                className='px-4 py-2 border rounded hover:bg-gray-50'
+              >
+                Close
+              </button>
+              <Button
+                onClick={handleAddRanking}
+                disabled={!selectedProgram || !selectedCollege}
+              >
+                Add College
+              </Button>
+            </div>
           </div>
-        </div>
         </DialogContent>
       </Dialog>
 

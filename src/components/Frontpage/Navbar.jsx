@@ -39,12 +39,10 @@ const NavLink = ({ href, label, isActive, mobile, onClick }) => (
     className={`
       relative transition-colors whitespace-nowrap
       ${mobile
-        ? `block py-3.5 px-4 text-base font-medium border-b border-gray-100 last:border-0 ${
-            isActive ? 'text-[#0A6FA7] bg-[#0A6FA7]/5' : 'text-gray-700 active:bg-gray-50'
-          }`
-        : `py-3 px-1 text-sm font-medium ${
-            isActive ? 'text-[#0A6FA7]' : 'text-gray-600 hover:text-gray-900'
-          }`
+        ? `block py-3.5 px-4 text-base font-medium border-b border-gray-100 last:border-0 ${isActive ? 'text-[#0A6FA7] bg-[#0A6FA7]/5' : 'text-gray-700 active:bg-gray-50'
+        }`
+        : `py-3 px-1 text-sm font-medium ${isActive ? 'text-[#0A6FA7]' : 'text-gray-600 hover:text-gray-900'
+        }`
       }
     `}
   >
@@ -164,7 +162,7 @@ const Navbar = () => {
         className={`
           w-full bg-white border-b border-gray-200/80
           transition-all duration-300
-          ${isScrolled ? 'fixed top-[80px] left-0 right-0 z-50 shadow-sm' : 'sticky top-[80px] z-30'}
+          ${isScrolled ? 'fixed top-[80px] left-0 right-0 z-40 shadow-sm' : 'sticky top-[80px] z-30'}
         `}
       >
         <div className='max-w-7xl mx-auto px-4 sm:px-6'>
@@ -286,10 +284,9 @@ const Navbar = () => {
                   onClick={() => setIsMoreOpen(false)}
                   className={`
                     block px-4 py-2.5 text-sm font-medium transition-colors
-                    ${
-                      active
-                        ? 'text-[#0A6FA7] bg-[#0A6FA7]/5'
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                    ${active
+                      ? 'text-[#0A6FA7] bg-[#0A6FA7]/5'
+                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                     }
                   `}
                 >

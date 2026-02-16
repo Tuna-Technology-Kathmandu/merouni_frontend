@@ -5,8 +5,13 @@ import { useRouter } from 'next/navigation'
 import Header from '../../../../components/Frontpage/Header'
 import Navbar from '../../../../components/Frontpage/Navbar'
 import FormSection from './components/formSection'
-import { getConsultancyBySlug } from '../../actions'
-import { ArrowLeft } from 'lucide-react'
+import { getConsultancyBySlug, checkIfConsultancyApplied } from '../../actions'
+import { ArrowLeft, CheckCircle2 } from 'lucide-react'
+import ActionCard from '@/ui/molecules/ActionCard'
+import { useSelector } from 'react-redux'
+import Link from 'next/link'
+import { Button } from '@/ui/shadcn/button'
+import { THEME_BLUE } from '@/constants/constants'
 
 const ApplyPage = ({ params }) => {
   const router = useRouter()
@@ -16,6 +21,8 @@ const ApplyPage = ({ params }) => {
   const [error, setError] = useState(null)
 
   const { slugs } = use(params)
+  const user = useSelector((state) => state.user?.data)
+  const [hasApplied, setHasApplied] = useState(false)
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -23,6 +30,12 @@ const ApplyPage = ({ params }) => {
         const data = await getConsultancyBySlug(slugs)
         if (data) {
           setConsultancy(data)
+          if (user?.id && data.id) {
+            const status = await checkIfConsultancyApplied(data.id, user.id)
+            if (status.hasApplied) {
+              setHasApplied(true)
+            }
+          }
         } else {
           setError('No data found')
         }
@@ -37,7 +50,7 @@ const ApplyPage = ({ params }) => {
     if (slugs) {
       fetchDetails()
     }
-  }, [slugs])
+  }, [slugs, user?.id])
 
   return (
     <>
@@ -62,7 +75,41 @@ const ApplyPage = ({ params }) => {
 
             {/* Form Section - Centered */}
             <div className='flex justify-center'>
-              <FormSection consultancy={consultancy} />
+              {hasApplied ? (
+                <ActionCard
+                  variant='centered'
+                  icon={<CheckCircle2 className='w-full h-full' />}
+                  title='Already Applied!'
+                  description={
+                    <>
+                      You have already submitted an application for{' '}
+                      <span className='font-semibold text-gray-900'>
+                        {consultancy?.name}
+                      </span>
+                      . You can track your application status in your dashboard.
+                    </>
+                  }
+                >
+                  <Link href='/'>
+                    <Button
+                      variant='outline'
+                      className='min-w-[160px] h-12 text-base font-medium'
+                    >
+                      Go Home
+                    </Button>
+                  </Link>
+                  <Link href='/dashboard'>
+                    <Button
+                      className='min-w-[160px] h-12 text-base font-medium text-white shadow-md transition-all hover:-translate-y-0.5'
+                      style={{ backgroundColor: THEME_BLUE }}
+                    >
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                </ActionCard>
+              ) : (
+                <FormSection consultancy={consultancy} />
+              )}
             </div>
           </div>
         </div>

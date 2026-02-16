@@ -1,17 +1,25 @@
 'use client'
 
-import React, { useState, useEffect, use, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { use, useEffect, useRef, useState } from 'react'
 import Header from '../../../../../components/Frontpage/Header'
 import Navbar from '../../../../../components/Frontpage/Navbar'
-import FormSection from './components/formSection'
 import { getCollegeBySlug } from '../../../actions'
-import { FaArrowLeft } from 'react-icons/fa'
+import FormSection from './components/formSection'
+import ActionCard from '@/ui/molecules/ActionCard'
 
-import { ArrowLeft } from 'lucide-react'
+import { THEME_BLUE } from '@/constants/constants'
+import { Button } from '@/ui/shadcn/button'
+import { ArrowLeft, CheckCircle2 } from 'lucide-react'
+import Link from 'next/link'
+import { useSelector } from 'react-redux'
+import { checkIfApplied } from '../../../actions'
+
+
 
 const ApplyPage = ({ params }) => {
   const router = useRouter()
+  const user = useSelector((state) => state.user?.data)
   const headerRef = useRef(null)
   const [college, setCollege] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -20,12 +28,25 @@ const ApplyPage = ({ params }) => {
   const { slugs, rest } = use(params)
   const id = rest?.[0]
 
+
+  const [hasApplied, setHasApplied] = useState(false)
+
   useEffect(() => {
     const fetchCollegeDetails = async () => {
       try {
         const collegeData = await getCollegeBySlug(slugs)
         if (collegeData) {
           setCollege(collegeData)
+          // Check if already applied
+          console.log(user?.id && collegeData.id, "user?.id && collegeData.id")
+          if (user?.id && collegeData.id) {
+            console.log("hi hi","RNNING",collegeData.id, user.id)
+            const status = await checkIfApplied(collegeData.id, user.id)
+            console.log(status, "TANKS")
+            if ( status.hasApplied) {
+              setHasApplied(true)
+            }
+          }
         } else {
           setError('No data found')
         }
@@ -40,7 +61,7 @@ const ApplyPage = ({ params }) => {
     if (slugs) {
       fetchCollegeDetails()
     }
-  }, [slugs])
+  }, [slugs, user?.id])
 
   return (
     <>
@@ -75,7 +96,41 @@ const ApplyPage = ({ params }) => {
 
             {/* Form Section - Centered */}
             <div className='flex justify-center'>
-              <FormSection college={college} id={id} />
+              {hasApplied ? (
+                <ActionCard
+                  variant='centered'
+                  icon={<CheckCircle2 className='w-full h-full' />}
+                  title='Already Applied!'
+                  description={
+                    <>
+                      You have already submitted an application for{' '}
+                      <span className='font-semibold text-gray-900'>
+                        {college?.name}
+                      </span>
+                      . You can track your application status in your dashboard.
+                    </>
+                  }
+                >
+                  <Link href='/'>
+                    <Button
+                      variant='outline'
+                      className='min-w-[160px] h-12 text-base font-medium'
+                    >
+                      Go Home
+                    </Button>
+                  </Link>
+                  <Link href='/dashboard'>
+                    <Button
+                      className='min-w-[160px] h-12 text-base font-medium text-white shadow-md transition-all hover:-translate-y-0.5'
+                      style={{ backgroundColor: THEME_BLUE }}
+                    >
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                </ActionCard>
+              ) : (
+                <FormSection college={college} id={id} />
+              )}
             </div>
           </div>
         </div>
@@ -83,5 +138,6 @@ const ApplyPage = ({ params }) => {
     </>
   )
 }
+
 
 export default ApplyPage

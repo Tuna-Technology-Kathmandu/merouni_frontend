@@ -1,5 +1,5 @@
 'use client'
-import ConfirmationDialog from '@/app/(dashboard)/dashboard/addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import { removeUser } from '@/app/utils/userSlice'
 import { destr } from 'destr'
 import Link from 'next/link'
@@ -21,10 +21,9 @@ const MenuItem = ({ item, isCollapsed, isActive, onClick }) => {
         relative flex items-center w-full p-3 my-1
         rounded-xl transition-all duration-200 ease-in-out
         group overflow-hidden
-        ${
-          isActive
-            ? 'bg-[#0A6FA7]/10 text-[#0A6FA7] font-semibold'
-            : 'text-gray-600 hover:bg-gray-50 hover:text-[#0A6FA7]'
+        ${isActive
+          ? 'bg-[#0A6FA7]/10 text-[#0A6FA7] font-semibold'
+          : 'text-gray-600 hover:bg-gray-50 hover:text-[#0A6FA7]'
         }
         ${isCollapsed ? 'justify-center' : ''}
       `}
@@ -100,10 +99,9 @@ const SubMenu = ({
     relative flex items-center w-full p-3 my-1
     rounded-xl transition-all duration-200 ease-in-out
     group cursor-pointer select-none
-    ${
-      isActive || isExpanded
-        ? 'text-[#0A6FA7] font-semibold'
-        : 'text-gray-600 hover:bg-gray-50 hover:text-[#0A6FA7]'
+    ${isActive || isExpanded
+      ? 'text-[#0A6FA7] font-semibold'
+      : 'text-gray-600 hover:bg-gray-50 hover:text-[#0A6FA7]'
     }
     ${isCollapsed ? 'justify-center' : ''}
   `
@@ -153,10 +151,9 @@ const SubMenu = ({
                 href={submenu.href}
                 className={`
                   flex items-center w-full py-2 px-3 text-sm rounded-lg transition-colors
-                  ${
-                    isSubActive
-                      ? 'bg-[#0A6FA7]/5 text-[#0A6FA7] font-medium'
-                      : 'text-gray-500 hover:text-[#0A6FA7] hover:bg-gray-50'
+                  ${isSubActive
+                    ? 'bg-[#0A6FA7]/5 text-[#0A6FA7] font-medium'
+                    : 'text-gray-500 hover:text-[#0A6FA7] hover:bg-gray-50'
                   }
                 `}
               >
@@ -317,8 +314,8 @@ const Menu = ({ isCollapsed = false }) => {
               // Special rename logic from original code? "Applied Colleges"
               const displayLabel =
                 item.href === '/dashboard/referrals' &&
-                role.student &&
-                !role.admin
+                  role.student &&
+                  !role.admin
                   ? 'Applied Colleges'
                   : item.label
 

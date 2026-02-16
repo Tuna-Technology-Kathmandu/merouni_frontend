@@ -11,7 +11,7 @@ import Table from '@/ui/shadcn/DataTable'
 import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import dynamic from 'next/dynamic'
 import {
@@ -308,8 +308,8 @@ export default function CareerForm() {
         return (
           <span
             className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${status === 'active'
-                ? 'bg-green-100 text-green-800'
-                : 'bg-gray-100 text-gray-800'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-gray-100 text-gray-800'
               }`}
           >
             {status === 'active' ? 'Active' : 'Inactive'}
@@ -404,94 +404,94 @@ export default function CareerForm() {
                 }}
               />
             </DialogHeader>
-          <div className='flex-1 overflow-y-auto p-6'>
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className='flex flex-col flex-1 overflow-hidden'
-            >
-              <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                {/* Basic Information */}
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <div className='grid grid-cols-1 gap-4'>
-                    <div>
-                      <label className='block mb-2'>
-                        Job Title <span className='text-red-500'>*</span>
-                      </label>
-                      <input
-                        {...register('title', {
-                          required: 'Job title is required',
-                          minLength: {
-                            value: 3,
-                            message: 'Title must be at least 3 characters long'
-                          }
-                        })}
-                        className='w-full p-2 border rounded'
-                      />
-                      {errors.title && (
-                        <span className='text-red-500'>
-                          {errors.title.message}
-                        </span>
-                      )}
-                    </div>
+            <div className='flex-1 overflow-y-auto p-6'>
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className='flex flex-col flex-1 overflow-hidden'
+              >
+                <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+                  {/* Basic Information */}
+                  <div className='bg-white p-6 rounded-lg shadow-md'>
+                    <div className='grid grid-cols-1 gap-4'>
+                      <div>
+                        <label className='block mb-2'>
+                          Job Title <span className='text-red-500'>*</span>
+                        </label>
+                        <input
+                          {...register('title', {
+                            required: 'Job title is required',
+                            minLength: {
+                              value: 3,
+                              message: 'Title must be at least 3 characters long'
+                            }
+                          })}
+                          className='w-full p-2 border rounded'
+                        />
+                        {errors.title && (
+                          <span className='text-red-500'>
+                            {errors.title.message}
+                          </span>
+                        )}
+                      </div>
 
-                    <div>
-                      <label className='block mb-2'>Status</label>
-                      <select
-                        {...register('status')}
-                        className='w-full p-2 border rounded bg-white'
-                      >
-                        <option value='active'>Active</option>
-                        <option value='inactive'>Inactive</option>
-                      </select>
-                    </div>
+                      <div>
+                        <label className='block mb-2'>Status</label>
+                        <select
+                          {...register('status')}
+                          className='w-full p-2 border rounded bg-white'
+                        >
+                          <option value='active'>Active</option>
+                          <option value='inactive'>Inactive</option>
+                        </select>
+                      </div>
 
-                    <div>
-                      <label className='block mb-2'>Description</label>
-                      <textarea
-                        {...register('description')}
-                        className='w-full p-2 border rounded'
-                        rows='3'
-                      />
-                    </div>
+                      <div>
+                        <label className='block mb-2'>Description</label>
+                        <textarea
+                          {...register('description')}
+                          className='w-full p-2 border rounded'
+                          rows='3'
+                        />
+                      </div>
 
-                    <div>
-                      <label className='block mb-2'>Content</label>
-                      <CKBlogs
-                        initialData={getValues('content')}
-                        onChange={(data) => setValue('content', data)}
-                        id='editor1'
-                      />
-                    </div>
+                      <div>
+                        <label className='block mb-2'>Content</label>
+                        <CKBlogs
+                          initialData={getValues('content')}
+                          onChange={(data) => setValue('content', data)}
+                          id='editor1'
+                        />
+                      </div>
 
-                    <div>
-                      <FileUpload
-                        label='Featured Image'
-                        onUploadComplete={(url) => {
-                          setUploadedFiles((prev) => ({
-                            ...prev,
-                            featured: url
-                          }))
-                          setValue('featuredImage', url)
-                        }}
-                        defaultPreview={uploadedFiles.featured}
-                      />
+                      <div>
+                        <FileUpload
+                          label='Featured Image'
+                          onUploadComplete={(url) => {
+                            setUploadedFiles((prev) => ({
+                              ...prev,
+                              featured: url
+                            }))
+                            setValue('featuredImage', url)
+                          }}
+                          defaultPreview={uploadedFiles.featured}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Submit Button - Sticky Footer */}
-              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <Button type='submit' disabled={loading}>
-                  {loading
-                    ? 'Processing...'
-                    : editing
-                      ? 'Update Career'
-                      : 'Create Career'}
-                </Button>
-              </div>
-            </form>
-          </div>
+                {/* Submit Button - Sticky Footer */}
+                <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
+                  <Button type='submit' disabled={loading}>
+                    {loading
+                      ? 'Processing...'
+                      : editing
+                        ? 'Update Career'
+                        : 'Create Career'}
+                  </Button>
+                </div>
+              </form>
+            </div>
           </DialogContent>
         </Dialog>
 
@@ -530,60 +530,60 @@ export default function CareerForm() {
             <DialogTitle>Career Details</DialogTitle>
             <DialogClose onClick={handleCloseViewModal} />
           </DialogHeader>
-        {loadingView ? (
-          <div className='flex justify-center items-center h-48'>
-            Loading...
-          </div>
-        ) : viewCareerData ? (
-          <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
-            {viewCareerData.featuredImage && (
-              <div className='w-full h-64 rounded-lg overflow-hidden'>
-                <img
-                  src={viewCareerData.featuredImage}
-                  alt={viewCareerData.title}
-                  className='w-full h-full object-cover'
-                />
-              </div>
-            )}
+          {loadingView ? (
+            <div className='flex justify-center items-center h-48'>
+              Loading...
+            </div>
+          ) : viewCareerData ? (
+            <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
+              {viewCareerData.featuredImage && (
+                <div className='w-full h-64 rounded-lg overflow-hidden'>
+                  <img
+                    src={viewCareerData.featuredImage}
+                    alt={viewCareerData.title}
+                    className='w-full h-full object-cover'
+                  />
+                </div>
+              )}
 
-            <div>
-              <h2 className='text-2xl font-bold text-gray-800'>
-                {viewCareerData.title}
-              </h2>
-              {viewCareerData.status && (
-                <span
-                  className={`inline-flex mt-2 px-2 py-1 text-xs font-semibold rounded-full ${viewCareerData.status === 'active'
+              <div>
+                <h2 className='text-2xl font-bold text-gray-800'>
+                  {viewCareerData.title}
+                </h2>
+                {viewCareerData.status && (
+                  <span
+                    className={`inline-flex mt-2 px-2 py-1 text-xs font-semibold rounded-full ${viewCareerData.status === 'active'
                       ? 'bg-green-100 text-green-800'
                       : 'bg-gray-100 text-gray-800'
-                    }`}
-                >
-                  {viewCareerData.status === 'active' ? 'Active' : 'Inactive'}
-                </span>
+                      }`}
+                  >
+                    {viewCareerData.status === 'active' ? 'Active' : 'Inactive'}
+                  </span>
+                )}
+              </div>
+
+              {viewCareerData.description && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Description</h3>
+                  <p className='text-gray-700 whitespace-pre-wrap'>
+                    {viewCareerData.description}
+                  </p>
+                </div>
+              )}
+
+              {viewCareerData.content && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Content</h3>
+                  <div
+                    className='text-gray-700 prose max-w-none'
+                    dangerouslySetInnerHTML={{ __html: viewCareerData.content }}
+                  />
+                </div>
               )}
             </div>
-
-            {viewCareerData.description && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Description</h3>
-                <p className='text-gray-700 whitespace-pre-wrap'>
-                  {viewCareerData.description}
-                </p>
-              </div>
-            )}
-
-            {viewCareerData.content && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Content</h3>
-                <div
-                  className='text-gray-700 prose max-w-none'
-                  dangerouslySetInnerHTML={{ __html: viewCareerData.content }}
-                />
-              </div>
-            )}
-          </div>
-        ) : (
-          <p className='text-center text-gray-500'>No career data available.</p>
-        )}
+          ) : (
+            <p className='text-center text-gray-500'>No career data available.</p>
+          )}
         </DialogContent>
       </Dialog>
     </>
