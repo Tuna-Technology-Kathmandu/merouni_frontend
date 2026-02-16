@@ -36,7 +36,6 @@ const ScholarshipPage = () => {
   const [filters, setFilters] = useState({
     category: initialCategory
   })
-  const [isScrolling, setIsScrolling] = useState(false)
   const [applyingIds, setApplyingIds] = useState(new Set())
 
   // URL Sync Helper
