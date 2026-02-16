@@ -20,6 +20,7 @@ export async function fetchBlogs(page = 1, limit = 10, status = '', options = {}
   } catch (error) {
     console.error('Error fetching events:', error)
     throw error
+    
   }
 }
 

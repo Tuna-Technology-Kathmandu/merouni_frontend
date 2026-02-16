@@ -148,6 +148,26 @@ export const menuItems = [
         ]
       },
       {
+        icon: <FaUniversity className='text-xl' />,
+        label: 'University',
+        href: null,
+        visible: ['admin', 'editor'],
+        submenus: [
+          {
+            icon: <FaUniversity className='text-lg' />,
+            label: 'Manage Universities',
+            href: '/dashboard/university',
+            visible: ['admin', 'editor']
+          },
+          {
+            icon: <SortAsc className='text-lg' />,
+            label: 'University Orderings',
+            href: '/dashboard/university-orderings',
+            visible: ['admin', 'editor']
+          }
+        ]
+      },
+      {
         icon: <FaHandshake className='text-xl' />,
         label: 'Consultancy',
         href: '/dashboard/consultancy',
@@ -276,12 +296,7 @@ export const menuItems = [
         href: '/dashboard/degrees',
         visible: ['admin', 'editor']
       },
-      {
-        icon: <FaUniversity className='text-xl' />,
-        label: 'University',
-        href: '/dashboard/university',
-        visible: ['admin', 'editor']
-      },
+
       // {
       //   icon: <FaChalkboardTeacher className='text-xl' />,
       //   label: 'Faculty',
