@@ -45,8 +45,8 @@ const CreateUpdateCollegeModal = ({
     const [universityPrograms, setUniversityPrograms] = useState([])
     const [loadingPrograms, setLoadingPrograms] = useState(false)
     const [uploadedFiles, setUploadedFiles] = useState({
-        logo: '',
-        featured: '',
+        college_logo: '',
+        featured_img: '',
         images: [],
         videos: []
     })
@@ -115,8 +115,8 @@ const CreateUpdateCollegeModal = ({
         if (!isOpen) {
             reset()
             setUploadedFiles({
-                logo: '',
-                featured: '',
+                college_logo: '',
+                featured_img: '',
                 images: [],
                 videos: []
             })
@@ -197,8 +197,8 @@ const CreateUpdateCollegeModal = ({
                         .map((vid) => ({ url: vid.file_url, file_type: 'video' }))
 
                     setUploadedFiles({
-                        logo: collegeData.college_logo || '',
-                        featured: collegeData.featured_img || '',
+                        college_logo: collegeData.college_logo || '',
+                        featured_img: collegeData.featured_img || '',
                         images: images.length === 1 && !images[0].url ? [] : images,
                         videos
                     })
@@ -223,8 +223,8 @@ const CreateUpdateCollegeModal = ({
                         : []
                     setValue('facilities', facilityData)
 
-                    const faqData = collegeData.collegeFaq?.length
-                        ? collegeData.collegeFaq.map((f) => ({
+                    const faqData = collegeData.faqs?.length
+                        ? collegeData.faqs.map((f) => ({
                             question: f.question || '',
                             answer: f.answer || ''
                         }))
@@ -386,9 +386,9 @@ const CreateUpdateCollegeModal = ({
                                 <div className='grid grid-cols-2 gap-4'>
                                     <FileUploadWithPreview
                                         label='College Logo'
-                                        onUploadComplete={(url) => setUploadedFiles(prev => ({ ...prev, logo: url }))}
-                                        defaultPreview={uploadedFiles.logo}
-                                        onClear={() => setUploadedFiles(prev => ({ ...prev, logo: '' }))}
+                                        onUploadComplete={(url) => setUploadedFiles(prev => ({ ...prev, college_logo: url }))}
+                                        defaultPreview={uploadedFiles.college_logo}
+                                        onClear={() => setUploadedFiles(prev => ({ ...prev, college_logo: '' }))}
                                     />
                                     <FileUploadWithPreview
                                         label='Featured Image'
@@ -483,13 +483,13 @@ const CreateUpdateCollegeModal = ({
                                                     <div key={course.id} className='flex items-center space-x-2'>
                                                         <input
                                                             type='checkbox'
-                                                            id={`course-${course.id}`}
-                                                            value={course.id}
+                                                            id={`course-${course.program_id}`}
+                                                            value={course.program_id}
                                                             {...register('courses')}
                                                             className='h-4 w-4 rounded border-gray-300'
                                                         />
                                                         <label
-                                                            htmlFor={`course-${course.id}`}
+                                                            htmlFor={`course-${course.program_id}`}
                                                             className='text-sm text-gray-700'
                                                         >
                                                             {course.program.title}

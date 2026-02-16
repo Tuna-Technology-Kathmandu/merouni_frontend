@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { notFound } from 'next/navigation'
 import Navbar from '../../../components/Frontpage/Navbar'
 import Header from '../../../components/Frontpage/Header'
 import Footer from '../../../components/Frontpage/Footer'
@@ -153,11 +154,13 @@ const CollegeDetailPage = ({ params }) => {
   }
 
   if (error) {
-    return <div>Error: {error}</div>
+    notFound()
+    return null
   }
 
   if (!college) {
-    return <div>No college data available.</div>
+    notFound()
+    return null
   }
 
   return (

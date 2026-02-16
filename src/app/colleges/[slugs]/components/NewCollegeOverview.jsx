@@ -5,6 +5,7 @@ import MemberSection from './sections/MemberSection'
 import GoogleMap from './GoogleMap'
 import GallerySection from './sections/GallerySection'
 import FacilitySection from './sections/FacilitySection'
+import FaqSection from './sections/FaqSection'
 
 const CollegeOverview = ({ college }) => {
   const overviewRef = useRef(null)
@@ -12,6 +13,7 @@ const CollegeOverview = ({ college }) => {
   const membersRef = useRef(null)
   const galleryRef = useRef(null)
   const facilityRef = useRef(null)
+  const faqsRef = useRef(null)
   const [activeSection, setActiveSection] = useState(0)
 
   const validMembers = (college.collegeMembers || []).filter(
@@ -63,8 +65,15 @@ const CollegeOverview = ({ college }) => {
       visible: college?.collegeGallery?.length > 0,
       ref: galleryRef,
       component: <GallerySection college={college} />
+    },
+    {
+      name: 'FAQs',
+      visible: college?.faqs?.length > 0,
+      ref: faqsRef,
+      component: <FaqSection faqs={college.faqs || []} />
     }
   ]
+  
 
   const visibleSections = allSections.filter((section) => section.visible)
 
@@ -152,6 +161,9 @@ const CollegeOverview = ({ college }) => {
           </div>
         ))}
       </div>
+
+      {/* Now List the FAQS */}
+      
     </section>
   )
 }

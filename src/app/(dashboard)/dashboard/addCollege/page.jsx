@@ -326,10 +326,6 @@ export default function CollegeForm() {
     }
   }
 
-  // No longer duplicate state here
-
-
-
   const handleView = async (slug) => {
     try {
       setLoadingView(true)

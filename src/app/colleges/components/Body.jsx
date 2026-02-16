@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { debounce } from 'lodash'
-import { Search, Building2, School } from 'lucide-react'
+import { Search, Building2, School, X } from 'lucide-react'
 import { FaExpandAlt } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
 import { motion, AnimatePresence } from 'framer-motion'
