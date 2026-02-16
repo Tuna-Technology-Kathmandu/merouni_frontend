@@ -5,10 +5,8 @@ import Navbar from '../../../components/Frontpage/Navbar'
 import Header from '../../../components/Frontpage/Header'
 import Footer from '../../../components/Frontpage/Footer'
 import ImageSection from './components/upperSection'
-// import CollegeOverview from "./components/collegeOverview";
 import { getUniversityBySlug } from '../actions'
 import Gallery from './components/Gallery'
-// import ApplyNow from "./components/applyNow";
 import RelatedUniversities from './components/RelatedUniversities'
 import Loading from '../../../ui/molecules/Loading'
 

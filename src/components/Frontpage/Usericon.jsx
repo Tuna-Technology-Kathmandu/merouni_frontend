@@ -15,7 +15,6 @@ export default function UserDropdown() {
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
   const dropdownRef = useRef(null)
   const pathname = usePathname()
-  const router = useRouter()
   const dispatch = useDispatch()
 
   const user = useSelector((state) => state.user?.data)

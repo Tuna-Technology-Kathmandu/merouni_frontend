@@ -39,7 +39,7 @@ const UniversityPage = () => {
         setUniversities(response.items)
         setPagination((prev) => ({
           ...prev,
-          totalPages: response.pagination ? response.pagination.totalPages : 1, // Handle potential missing pagination
+          totalPages: response.pagination ? response.pagination.totalPages : 1,
           totalCount: response.pagination
             ? response.pagination.totalCount
             : response.items.length
@@ -140,7 +140,6 @@ const UniversityPage = () => {
           ) : (
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
               {universities
-                // Filter is handled by API usually, but keeping simplistic client-side check if needed, mostly redundant if API handles 'q'
                 .map((uni, index) => (
                   <UniversityCard key={index} university={uni} />
                 ))}

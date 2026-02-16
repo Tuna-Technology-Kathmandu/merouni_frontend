@@ -30,7 +30,7 @@ const ImageSection = ({ university }) => {
           <div className='flex items-center justify-center rounded-full bg-white -translate-y-8 overflow-hidden w-24 h-24 md:w-32 md:h-32'>
             <img
               src={
-                university?.featured_image ||
+                university?.logo ||
                 `https://avatar.iran.liara.run/username?username=${university?.fullname}`
               }
               alt='uni logo'

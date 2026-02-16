@@ -64,6 +64,7 @@ const UniversityFormModal = ({
             postal_code: '',
             date_of_establish: '',
             type_of_institute: 'Public',
+            logo: '',
             description: '',
             contact: {
                 faxes: '',
@@ -86,7 +87,6 @@ const UniversityFormModal = ({
                 featured_image: '',
                 videos: ''
             },
-            featured_img: '',
             gallery: ['']
         }
     })
@@ -99,7 +99,6 @@ const UniversityFormModal = ({
 
     const formData = watch()
 
-    // Fetch courses on mount
     useEffect(() => {
         const getCourses = async () => {
             try {
@@ -131,7 +130,6 @@ const UniversityFormModal = ({
     useEffect(() => {
         if (isOpen) {
             if (isEditing && initialData) {
-                // Set basic fields
                 setValue('id', initialData.id)
                 setValue('fullname', initialData.fullname)
                 setValue('country', initialData.country)
@@ -142,51 +140,25 @@ const UniversityFormModal = ({
                 setValue('date_of_establish', initialData.date_of_establish)
                 setValue('type_of_institute', initialData.type_of_institute)
                 setValue('description', initialData.description)
+                setValue('logo', initialData.logo)
 
-                // Set contact information
                 setValue('contact', initialData.contact)
 
-                // Set levels
                 setValue('levels', initialData.levels || [])
-                // Force check level boxes via DOM (legacy logic from page.jsx, kept for consistency if needed, though react-hook-form state should drive it)
-                // The original code used DOM manipulation to check boxes, which is not ideal in React.
-                // Since we are setting 'levels' value in form, checking `formData.levels?.includes` in render should work.
-
-                // Map program names/objects to IDs
                 const programIds = initialData.programs?.map((programName) => {
-                    // Similar logic to page.jsx: find ID by title if string, or use object logic
-                    // The logic in page.jsx was complex because programs might be strings or objects.
-                    // Let's safe guard.
                     if (typeof programName === 'string') {
                         const matchingCourse = courses.find(course => course.title === programName)
                         return matchingCourse ? matchingCourse.id : null
                     } else if (typeof programName === 'object' && programName.id) {
-                        return programName.id // or programName.program.id?
+                        return programName.id
                     }
                     return null
                 }).filter(id => id !== null) || []
 
-                // If logic in page.jsx was "find by title", we rely on courses being loaded. 
-                // But courses might not be loaded yet if this useEffect runs before courses fetch.
-                // However, since we fetch courses on mount, it might race. 
-                // A better approach is to handle program mapping when courses are available AND initialData is available.
-                // For now, we'll try best effort or rely on the fact courses usually load fast.
-
-                // Actually, page.jsx logic:
-                // const matchingCourse = courses.find((course) => course.title === programName)
-                // return matchingCourse ? matchingCourse.id : null
-
-                // We need to wait for courses.
-
                 setValue('programs', programIds)
 
-                // Set members
                 setValue('members', initialData.members)
 
-                //set featured_image that means logo
-                setValue('featured_img', initialData.featured_img || '')
-
-                // Set assets and gallery
                 setUploadedFiles({
                     featured: initialData.assets?.featured_image || '',
                     gallery: initialData.gallery || ['']
@@ -210,7 +182,7 @@ const UniversityFormModal = ({
                     programs: [],
                     members: [{ role: '', salutation: '', name: '', phone: '', email: '' }],
                     assets: { featured_image: '', videos: '' },
-                    featured_img: '',
+                    logo: '',
                     gallery: ['']
                 })
                 setUploadedFiles({ featured: '', gallery: [] })
@@ -226,11 +198,7 @@ const UniversityFormModal = ({
                 const matchingCourse = courses.find(course => course.title === programName)
                 return matchingCourse ? String(matchingCourse.id) : null
             }).filter(id => id !== null) || []
-            // Combine with any existing potentially if needed, but for edit generally we overwrite
-            // ONLY overwrite if form value is empty or we suspect it hasn't been set correctly
-            // For simplicity, we can just set it if we found matches.
             if (programIds.length > 0) {
-                // Only set if we haven't touched it? Or just force set.
                 setValue('programs', programIds)
             }
         }
@@ -503,9 +471,9 @@ const UniversityFormModal = ({
                                     <FileUpload
                                         label='Logo'
                                         onUploadComplete={(url) => {
-                                            setValue('featured_img', url)
+                                            setValue('logo', url)
                                         }}
-                                        defaultPreview={getValues('featured_img')}
+                                        defaultPreview={getValues('logo')}
                                     />
                                 </div>
                                 {/* Featured Image Upload */}

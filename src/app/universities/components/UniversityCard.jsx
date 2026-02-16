@@ -23,7 +23,7 @@ const UniversityCard = ({ university }) => {
                 <div className='w-16 h-16 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0'>
                     <img
                         src={
-                            university?.featured_image ||
+                            university?.logo ||
                             `https://avatar.iran.liara.run/username?username=${university?.fullname}`
                         }
                         alt={`${university.fullname} Logo`}

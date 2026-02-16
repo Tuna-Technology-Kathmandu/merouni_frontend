@@ -34,7 +34,7 @@ const Header = () => {
       )}
 
       {/* Main Header */}
-      <div className='sticky top-0 z-40 bg-white'>
+      <div className='sticky top-0 z-50 bg-white'>
         <div className='flex justify-between items-center md:w-[85%] max-w-[1600px] md:mx-auto px-2 md:px-0'>
           {/* Desktop: logo left */}
           <Link href='/' className='flex-shrink-0 hidden md:block'>

@@ -7,7 +7,7 @@ export const createColumns = ({
 }) => [
   {
     header: '',
-    accessorKey: 'featured_image',
+    accessorKey: 'logo',
     cell: ({ getValue }) => {
       const logoUrl = getValue()
       return logoUrl ? (
