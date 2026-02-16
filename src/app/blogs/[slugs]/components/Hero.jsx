@@ -1,7 +1,7 @@
 import { formatDate } from '@/utils/date.util'
 import React from 'react'
 
-const Hero = ({ news }) => {
+const Hero = ({ blog }) => {
   // Get current page URL to share
   const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
   const shareTitle = `Check out blogs on our platform`
@@ -39,29 +39,33 @@ const Hero = ({ news }) => {
     <div className='relative px-16 pt-14  max-sm:px-9 max-w-[1600px] mx-auto'>
       <div className='w-full'>
         <h1 className='font-bold text-[28px] max-md:text-[26px] leading-[44px] max-md:leading-[34px]  max-sm:text-[20px] max-sm:leading-[27px] '>
-          {news?.title}
+          {blog?.title}
         </h1>
 
         <div className='mt-2'>
           <p className='font-medium text-[12px] text-black/70'>
-            <span>{formatDate(news?.createdAt)}</span>
+            <span>{formatDate(blog?.createdAt)}</span>
           </p>
         </div>
-        <div className='font-medium text-[12px] my-2 text-black/70'>
-          By {news?.newsAuthor?.firstName} {news?.newsAuthor?.middleName || ''}{' '}
-          {news?.newsAuthor?.lastName}
-        </div>
+        {blog?.newsAuthor && (
+          <div className='font-medium text-[12px] my-2 text-black/70'>
+            By {blog?.newsAuthor?.firstName} {blog?.newsAuthor?.middleName || ''}{' '}
+            {blog?.newsAuthor?.lastName}
+          </div>
+        )}
 
-        {news?.featuredImage && (
+        {blog?.featured_image && (
           <div className='w-full my-12 max-1xl:my-8 max-md:my-5'>
             <img
-              src={news.featuredImage}
-              alt={news?.title || 'Blog featured image'}
+              src={blog.featured_image}
+              alt={blog?.title || 'Blog featured image'}
               className='w-full h-auto max-h-[456px] max-1xl:max-h-[380px] max-sm:max-h-[300px] object-contain rounded-xl'
             />
           </div>
         )}
       </div>
+
+      
 
       {/* Social share icons remain the same */}
       <div className='space-y-4 z-10 text-[#b0b2c3] fixed right-4 top-[30%] lg:block md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col'>

@@ -1,31 +1,30 @@
 'use client'
-import React, { useState, useEffect } from 'react'
 import services from '@/app/apiService'
-import Navbar from '../../../components/Frontpage/Navbar'
+import { useEffect, useState } from 'react'
 import Footer from '../../../components/Frontpage/Footer'
 import Header from '../../../components/Frontpage/Header'
-import Hero from './components/Hero'
-import Description from './components/Description'
-import Cardlist from './components/Cardlist'
+import Navbar from '../../../components/Frontpage/Navbar'
 import Loading from '../../../ui/molecules/Loading'
-import SmallCardList from './components/SmallCardList'
 import Banner from './components/Banner'
+import Description from './components/Description'
+import Hero from './components/Hero'
+import SmallCardList from './components/SmallCardList'
 
 const NewsDetailsPage = ({ params }) => {
-  const [news, setNews] = useState(null)
-  const [relatedNews, setRelatedNews] = useState([])
+  const [blog, setBlog] = useState(null)
+  const [relatedBlogs, setRelatedBlogs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    const fetchNewsDetails = async () => {
+    const fetchBlogDetails = async () => {
       try {
         const resolvedParams = await params
         const slugs = resolvedParams.slugs
         const newsData = await services.blogs.getBySlug(slugs)
 
-        setNews(newsData.blog || null) // Set eventData directly
-        setRelatedNews(newsData.similarBlogs || [])
+        setBlog(newsData.blog || null) 
+        setRelatedBlogs(newsData.similarBlogs || [])
       } catch (err) {
         setError(err.message)
       } finally {
@@ -33,12 +32,10 @@ const NewsDetailsPage = ({ params }) => {
       }
     }
 
-    fetchNewsDetails()
-  }, [params]) // Add params.slugs to dependency array
+    fetchBlogDetails()
+  }, [params]) 
 
-  // if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>
-  // if (!event) return <div>No event found</div>;
 
   return (
     <div>
@@ -48,17 +45,27 @@ const NewsDetailsPage = ({ params }) => {
         <Loading />
       ) : (
         <>
-          <Hero news={news} />
+          <Hero blog={blog} />
           <div className='px-16 max-sm:px-9 pt-10 max-w-[1600px] mx-auto'>
             <Banner />
           </div>
           <div className=' px-16 max-sm:px-9 max-w-[1600px] mx-auto mt-12'>
-            <Description news={news} />
-            {/* <Cardlist news={relatedNews} /> */}
+            <Description blog={blog} />
           </div>
+          <div className='px-16 max-sm:px-9 max-w-[1600px] mx-auto mt-12'>
+            {
+              blog?.pdf_file && (
+                  <a href={blog.pdf_file} target='_blank' rel='noopener noreferrer' className='bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded'>
+                      View PDF
+                  </a>
+              )
+            }
+          </div>  
 
+{/* BIG BREAK LINE  */}
+<div className='h-[1px] bg-gray-200 my-12'></div>
           <div className=' px-16 max-sm:px-9 my-14 max-w-[1600px] mx-auto'>
-            <SmallCardList news={relatedNews} />
+            <SmallCardList blogs={relatedBlogs} />
           </div>
         </>
       )}

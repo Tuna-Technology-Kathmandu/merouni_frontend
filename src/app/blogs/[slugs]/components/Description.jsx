@@ -1,10 +1,6 @@
 import React from 'react'
-// import { FaRegFaceLaugh } from 'react-icons/fa6'
-// import { FaRegFaceAngry } from 'react-icons/fa6'
-// import { FaRegSadCry } from 'react-icons/fa'
-// import { AiOutlineLike } from 'react-icons/ai'
 
-const Description = ({ news }) => {
+const Description = ({ blog }) => {
   // Function to wrap tables in a scrollable container
   const processContent = (html) => {
     if (!html) return ''
@@ -19,7 +15,7 @@ const Description = ({ news }) => {
       <div className='w-full'>
         <div
           className='text-[13px] mt-4 leading-7 max-md:leading-5 md:text-sm lg:text-base text-justify'
-          dangerouslySetInnerHTML={{ __html: news?.description }}
+          dangerouslySetInnerHTML={{ __html: blog?.description }}
         />
 
         <div
@@ -51,7 +47,7 @@ const Description = ({ news }) => {
           [&_td]:border
           [&_td]:border-gray-300
           [&_tr:nth-child(even)]:bg-gray-50'
-          dangerouslySetInnerHTML={{ __html: processContent(news?.content) }}
+          dangerouslySetInnerHTML={{ __html: processContent(blog?.content) }}
         />
       </div>
     </>

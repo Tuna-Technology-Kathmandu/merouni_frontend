@@ -1,413 +1,252 @@
 'use client'
 
-import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react'
-import { fetchConsultancyApplications, updateConsultancyApplicationStatus, deleteConsultancyApplication } from './action'
-import { FaTrashAlt, FaEdit } from 'react-icons/fa'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/ui/shadcn/dialog'
+import React, { useEffect, useState } from 'react'
+import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
-import { Button } from '@/ui/shadcn/button'
-import { Search, X, ChevronDown } from 'lucide-react'
-import { toast, ToastContainer } from 'react-toastify'
-import Table from '@/ui/shadcn/DataTable'
-import SearchInput from '@/ui/molecules/SearchInput'
-import ConsultancyDropdown from '@/ui/molecules/dropdown/ConsultancyDropdown'
-
-function useDebounce(value, delay) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-  return debouncedValue;
-}
+import ShimmerEffect from '@/ui/molecules/ShimmerEffect'
+import {
+  Building2,
+  Mail,
+  Phone,
+  MapPin,
+  FileText,
+  AlertCircle
+} from 'lucide-react'
 
 const ConsultancyReferralsPage = () => {
   const { setHeading } = usePageHeading()
-
-  // Data State
-  const [applications, setApplications] = useState([])
+  const [referrals, setReferrals] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
-  // Action States
-  const [updatingId, setUpdatingId] = useState(null)
-  const [deletingId, setDeletingId] = useState(null)
-  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false)
-  const [applicationToDelete, setApplicationToDelete] = useState(null)
-  const [statusModalOpen, setStatusModalOpen] = useState(false)
-  const [selectedApp, setSelectedApp] = useState(null)
-  const [statusForm, setStatusForm] = useState({ status: 'PENDING', remarks: '' })
-
-  // Filter States
-  const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
-  const [consultancyFilter, setConsultancyFilter] = useState('') // IDs as string
-
-  const debouncedSearch = useDebounce(searchQuery, 500)
-
-  // UI States
-  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false)
-  const statusDropdownRef = useRef(null)
-
-  // Pagination State
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    total: 0
-  })
 
   useEffect(() => {
     setHeading('Consultancy Referrals')
     return () => setHeading(null)
   }, [setHeading])
 
-
-
-  // Main Data Load Trigger
   useEffect(() => {
-    loadData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, statusFilter, consultancyFilter, pagination.currentPage])
+    let isMounted = true
 
+    const loadReferrals = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const response = await authFetch(
+          `${process.env.baseUrl}/consultancy-referral/user/referrals`,
+          { cache: 'no-store' }
+        )
 
+        if (!response.ok) {
+          throw new Error('Failed to load consultancy referrals')
+        }
 
-  const loadData = async () => {
-    try {
-      setLoading(true)
-      const params = {
-        page: pagination.currentPage,
-        ...(debouncedSearch && { search: debouncedSearch }),
-        ...(statusFilter && { status: statusFilter }),
-        ...(consultancyFilter && { consultancy_id: consultancyFilter })
-      }
-
-      const response = await fetchConsultancyApplications(params)
-
-      const appList = response.data || []
-      const meta = response.pagination || {}
-
-      setApplications(appList)
-
-      setPagination(prev => ({
-        ...prev,
-        totalPages: meta.totalPages || (meta.totalPages) || Math.ceil((meta.totalItems || appList.length) / 10) || 1,
-        total: meta.totalItems || (meta.total) || appList.length
-      }))
-
-    } catch (err) {
-      console.error(err)
-      toast.error('Failed to load data')
-      setApplications([])
-      setPagination(prev => ({ ...prev, total: 0, totalPages: 1 }))
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Handlers for Actions
-  const handleOpenStatusModal = (app) => {
-    setSelectedApp(app)
-    setStatusForm({
-      status: app.status || 'IN_PROGRESS',
-      remarks: app.remarks || ''
-    })
-    setStatusModalOpen(true)
-  }
-
-  const handleStatusSubmit = async (e) => {
-    e.preventDefault()
-    if (!selectedApp) return
-
-    try {
-      setUpdatingId(selectedApp.id)
-      await updateConsultancyApplicationStatus(selectedApp.id, statusForm.status, statusForm.remarks)
-
-      // Optimistic Update locally to avoid full reload
-      setApplications(prev => prev.map(app =>
-        app.id === selectedApp.id ? { ...app, status: statusForm.status, remarks: statusForm.remarks } : app
-      ))
-
-      toast.success('Status updated successfully')
-      setStatusModalOpen(false)
-    } catch (err) {
-      toast.error('Failed to update status')
-    } finally {
-      setUpdatingId(null)
-    }
-  }
-
-  const handleDeleteClick = (id) => {
-    setApplicationToDelete(id)
-    setDeleteConfirmationOpen(true)
-  }
-
-  const handleDeleteConfirm = async () => {
-    if (!applicationToDelete) return
-
-    try {
-      setDeletingId(applicationToDelete)
-      await deleteConsultancyApplication(applicationToDelete)
-      setApplications((prev) => prev.filter((app) => app.id !== applicationToDelete))
-      toast.success('Deleted successfully')
-    } catch (err) {
-      toast.error('Failed to delete')
-    } finally {
-      setDeletingId(null)
-      setDeleteConfirmationOpen(false)
-      setApplicationToDelete(null)
-    }
-  }
-
-  const handleDeleteCancel = () => {
-    setDeleteConfirmationOpen(false)
-    setApplicationToDelete(null)
-  }
-
-  // Handlers for Filters
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value)
-    setPagination(prev => ({ ...prev, currentPage: 1 })) // Reset page on search
-  }
-
-  const handleStatusSelect = (status) => {
-    setStatusFilter(status)
-    setStatusDropdownOpen(false)
-    setPagination(prev => ({ ...prev, currentPage: 1 }))
-  }
-
-  const handleConsultancySelect = (id, consultancy) => {
-    setConsultancyFilter(id)
-    setPagination(prev => ({ ...prev, currentPage: 1 }))
-  }
-
-  const handleClearFilters = () => {
-    setSearchQuery('')
-    setStatusFilter('')
-    setConsultancyFilter('')
-    setPagination(prev => ({ ...prev, currentPage: 1 }))
-  }
-
-  // Click Outside for dropdowns
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target)) {
-        setStatusDropdownOpen(false)
-      }
-      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target)) {
-        setStatusDropdownOpen(false)
+        const data = await response.json()
+        if (!isMounted) return
+        setReferrals(Array.isArray(data) ? data : [])
+      } catch (err) {
+        console.error('Error loading consultancy referrals:', err)
+        if (isMounted) {
+          setError(err.message || 'Failed to load consultancy referrals')
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+
+    loadReferrals()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
-
-  const statusOptions = ['IN_PROGRESS', 'ACCEPTED', 'REJECTED']
-  const hasActiveFilters = searchQuery || statusFilter || consultancyFilter
-
-  // Columns
-  const columns = useMemo(() => [
-    {
-      header: 'ID',
-      accessorKey: 'id',
-    },
-    {
-      header: 'Student Info',
-      accessorKey: 'student_name',
-      cell: ({ row }) => {
-        const app = row.original;
-        return (
-          <div className="flex flex-col">
-            <span className="font-medium">{app.student_name}</span>
-            <span className="text-xs text-gray-500">{app.student_email}</span>
-            <span className="text-xs text-gray-500">{app.student_phone_no}</span>
-          </div>
-        )
-      }
-    },
-    {
-      header: 'Consultancy',
-      accessorKey: 'consultancy.title',
-      cell: ({ row }) => row.original.consultancy?.title || row.original.consultancy?.consultany_details?.name || 'N/A'
-    },
-    {
-      header: 'Description',
-      accessorKey: 'student_description',
-      cell: ({ row }) => (
-        <div className="max-w-xs truncate" title={row.original.student_description}>
-          {row.original.student_description || '-'}
+  if (loading) return <ShimmerEffect />
+  if (error)
+    return (
+      <div className='flex items-center justify-center p-8'>
+        <div className='text-center'>
+          <AlertCircle className='w-12 h-12 text-red-500 mx-auto mb-4' />
+          <p className='text-red-600'>Error: {error}</p>
         </div>
-      )
-    },
-    {
-      header: 'Status',
-      accessorKey: 'status',
-      cell: ({ row }) => {
-        const status = row.original.status;
-        return (
-          <span className={`px-2 py-1 rounded-full text-xs font-semibold
-                    ${status === 'ACCEPTED' ? 'bg-green-100 text-green-800' :
-              status === 'REJECTED' ? 'bg-red-100 text-red-800' :
-                'bg-yellow-100 text-yellow-800'}
-                `}>
-            {status || 'IN_PROGRESS'}
-          </span>
-        )
-      }
-    },
-    {
-      header: 'Remarks',
-      accessorKey: 'remarks',
-      cell: ({ row }) => (
-        <div className="max-w-xs truncate" title={row.original.remarks}>
-          {row.original.remarks || '-'}
-        </div>
-      )
-    },
-    {
-      header: 'Actions',
-      id: 'actions',
-      cell: ({ row }) => (
-        <div className="flex gap-2">
-          <Button size="icon" variant="ghost" onClick={() => handleOpenStatusModal(row.original)}>
-            <FaEdit className="w-4 h-4 text-blue-600" />
-          </Button>
-          <Button size="icon" variant="ghost" onClick={() => handleDeleteClick(row.original.id)}>
-            <FaTrashAlt className="w-4 h-4 text-red-600" />
-          </Button>
-        </div>
-      )
-    }
-  ], [])
-
-  if (error) {
-    // Just log or toast, don't block
-    console.error(error)
-  }
+      </div>
+    )
 
   return (
-    <div className='p-4 bg-white min-h-screen'>
-
-      <div className='flex flex-col md:flex-row gap-4 mb-6'>
-        {/* Search Filter */}
-        <SearchInput
-          value={searchQuery}
-          onChange={(e) => handleSearchChange(e)}
-          placeholder='Search consultancy referrals...'
-          className='max-w-md'
-        />
-
-        {/* Status Filter Dropdown */}
-        <div className='relative' ref={statusDropdownRef}>
-          <button
-            type='button'
-            onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
-            className='w-full md:w-48 pl-4 pr-10 py-2 text-left border border-gray-300 rounded-lg bg-white hover:bg-gray-50'
-          >
-            <span className={statusFilter ? 'text-gray-900' : 'text-gray-500'}>
-              {statusFilter || 'All Status'}
-            </span>
-            <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${statusDropdownOpen ? 'rotate-180' : ''}`} />
-          </button>
-
-          {statusDropdownOpen && (
-            <div className='absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden'>
-              <button onClick={() => handleStatusSelect('')} className='w-full text-left px-4 py-2 hover:bg-gray-50 text-sm'>All Status</button>
-              {statusOptions.map(option => (
-                <button key={option} onClick={() => handleStatusSelect(option)} className={`w-full text-left px-4 py-2 hover:bg-blue-50 text-sm ${statusFilter === option ? 'bg-blue-50 text-blue-600' : ''}`}>
-                  {option}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Consultancy Filter Dropdown */}
-        <ConsultancyDropdown
-          value={consultancyFilter}
-          onChange={handleConsultancySelect}
-          placeholder="All Consultancies"
-          className="w-full md:w-64"
-        />
-
-        {hasActiveFilters && (
-          <Button variant="outline" onClick={handleClearFilters}>
-            <X className="w-4 h-4 mr-2" /> Clear
-          </Button>
-        )}
+    <div className='p-6 bg-white'>
+      <div className='mb-6'>
+        <p className='text-gray-600'>
+          View all students you have referred to consultancies
+        </p>
       </div>
 
-      {/* Table Component */}
-      <Table
-        data={applications}
-        columns={columns}
-        loading={loading}
-        pagination={pagination}
-        onPageChange={(page) => setPagination(prev => ({ ...prev, currentPage: page }))}
-        showSearch={false}
-        emptyContent="No applications found."
-      />
+      {referrals.length === 0 ? (
+        <div className='text-center py-12 border border-gray-200 rounded-lg bg-gray-50'>
+          <FileText className='w-16 h-16 text-gray-400 mx-auto mb-4' />
+          <p className='text-lg text-gray-600 mb-2'>No consultancy referrals yet</p>
+          <p className='text-sm text-gray-500'>
+            Start referring students from the "Refer Student" page
+          </p>
+        </div>
+      ) : (
+        <div className='space-y-6'>
+          {referrals.map((referral) => {
+            const consultancy = referral.referralConsultancy || {}
+            const consultancyDetails = consultancy.consultany_details || {}
+            const address = consultancyDetails.address || {}
+            const location = [address.city, address.state, address.country]
+              .filter(Boolean)
+              .join(', ')
 
-      {/* Status Modal */}
-      <Dialog
-        isOpen={statusModalOpen}
-        onClose={() => setStatusModalOpen(false)}
-      >
-        <DialogContent className='max-w-md'>
-          <DialogHeader>
-            <DialogTitle>Update Status</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleStatusSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Status</label>
-              <select
-                className="w-full border rounded p-2"
-                value={statusForm.status}
-                onChange={(e) => setStatusForm({ ...statusForm, status: e.target.value })}
+            return (
+              <div
+                key={referral.id}
+                className='border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow bg-white'
               >
-                {statusOptions.map(opt => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Remarks</label>
-              <textarea
-                className="w-full border rounded p-2"
-                rows={3}
-                value={statusForm.remarks}
-                onChange={(e) => setStatusForm({ ...statusForm, remarks: e.target.value })}
-                placeholder="Add remarks..."
-              />
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <Button type="button" variant="outline" onClick={() => setStatusModalOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={!!updatingId}>
-                {updatingId ? 'Updating...' : 'Update'}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+                <div className='p-6'>
+                  {/* Consultancy Info */}
+                  <div className='flex items-start gap-4 mb-6 pb-4 border-b border-gray-200'>
+                    <div className='flex-shrink-0'>
+                      {consultancyDetails.logo ? (
+                        <img
+                          src={consultancyDetails.logo}
+                          alt={consultancyDetails.name || consultancy.title}
+                          className='w-16 h-16 object-contain rounded-lg border border-gray-200'
+                        />
+                      ) : (
+                        <div className='w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200'>
+                          <Building2 className='w-8 h-8 text-gray-400' />
+                        </div>
+                      )}
+                    </div>
+                    <div className='flex-1 min-w-0'>
+                      <h3 className='text-lg font-semibold text-gray-800 mb-1'>
+                        {consultancyDetails.name || consultancy.title || 'N/A'}
+                      </h3>
+                      {location && (
+                        <div className='flex items-center gap-2 text-sm text-gray-600'>
+                          <MapPin className='w-4 h-4 text-gray-400' />
+                          <span>{location}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className='flex-shrink-0'>
+                      <span
+                        className={`px-3 py-1 text-xs font-semibold rounded-full ${referral.status === 'ACCEPTED'
+                            ? 'bg-green-100 text-green-800'
+                            : referral.status === 'REJECTED'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}
+                      >
+                        {referral.status || 'IN_PROGRESS'}
+                      </span>
+                    </div>
+                  </div>
 
-      <ConfirmationDialog
-        open={deleteConfirmationOpen}
-        onClose={handleDeleteCancel}
-        onConfirm={handleDeleteConfirm}
-        title='Confirm Deletion'
-        message='Are you sure you want to delete this application? This action cannot be undone.'
-      />
-    </div >
+                  {/* Student Info */}
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div>
+                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                        Student Name
+                      </label>
+                      <p className='text-gray-900'>
+                        {referral.student_name || 'N/A'}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                        Email
+                      </label>
+                      <div className='flex items-center gap-2 text-gray-900'>
+                        <Mail className='w-4 h-4 text-gray-400' />
+                        <a
+                          href={`mailto:${referral.student_email}`}
+                          className='hover:text-blue-600 hover:underline'
+                        >
+                          {referral.student_email || 'N/A'}
+                        </a>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                        Phone Number
+                      </label>
+                      <div className='flex items-center gap-2 text-gray-900'>
+                        <Phone className='w-4 h-4 text-gray-400' />
+                        {referral.student_phone_no ? (
+                          <a
+                            href={`tel:${referral.student_phone_no}`}
+                            className='hover:text-blue-600 hover:underline'
+                          >
+                            {referral.student_phone_no}
+                          </a>
+                        ) : (
+                          <span>N/A</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                        Service
+                      </label>
+                      <p className='text-gray-900'>
+                        {consultancy.service || 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  {referral.student_description && (
+                    <div className='mt-4 pt-4 border-t border-gray-200'>
+                      <label className='block text-sm font-medium text-gray-700 mb-2'>
+                        Description
+                      </label>
+                      <p className='text-gray-700 whitespace-pre-wrap'>
+                        {referral.student_description}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Remarks */}
+                  {referral.remarks && (
+                    <div className='mt-4 pt-4 border-t border-gray-200'>
+                      <label className='block text-sm font-medium text-gray-700 mb-2'>
+                        Remarks
+                      </label>
+                      <p className='text-gray-700 whitespace-pre-wrap'>
+                        {referral.remarks}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Submitted Date */}
+                  <div className='mt-4 pt-4 border-t border-gray-200'>
+                    <p className='text-xs text-gray-500'>
+                      Referred on:{' '}
+                      {new Date(referral.createdAt).toLocaleDateString(
+                        'en-US',
+                        {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        }
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
   )
 }
 

@@ -21,10 +21,10 @@ const BlogViewModal = ({ isOpen, onClose, data, loading }) => {
                 </div>
             ) : data ? (
                 <div className='space-y-4 overflow-y-auto p-2'>
-                    {data.featuredImage && (
+                    {data.featured_image && (
                         <div className='w-full h-64 rounded-lg overflow-hidden'>
                             <img
-                                src={data.featuredImage}
+                                src={data.featured_image}
                                 alt={data.title}
                                 className='w-full h-full object-cover'
                             />
@@ -120,6 +120,22 @@ const BlogViewModal = ({ isOpen, onClose, data, loading }) => {
                             />
                         </div>
                     )}
+
+{
+    data.pdf_file && (
+        <div>
+            <h3 className='text-lg font-semibold mb-2'>PDF File</h3>
+            <a
+                href={data.pdf_file}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-blue-600 hover:underline'
+            >
+                View PDF
+            </a>
+        </div>
+    )
+}
 
                     {data.createdAt && (
                         <div className='pt-4 border-t'>

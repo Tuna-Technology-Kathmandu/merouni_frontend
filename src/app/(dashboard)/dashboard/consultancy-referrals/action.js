@@ -1,5 +1,27 @@
 import { authFetch } from '@/app/utils/authFetch'
 
+/**
+ * Fetch user's own consultancy referrals (for agents)
+ */
+export async function fetchUserConsultancyReferrals() {
+  try {
+    const response = await authFetch(
+      `${process.env.baseUrl}/consultancy-referral/user/referrals`,
+      { cache: 'no-store' }
+    )
+    if (!response.ok) {
+      throw new Error('Failed to fetch consultancy referrals')
+    }
+    return await response.json()
+  } catch (error) {
+    console.error('Error fetching consultancy referrals:', error)
+    throw error
+  }
+}
+
+/**
+ * Fetch all consultancy applications (for admin)
+ */
 export async function fetchConsultancyApplications(params = {}) {
   try {
     const query = new URLSearchParams(params).toString()

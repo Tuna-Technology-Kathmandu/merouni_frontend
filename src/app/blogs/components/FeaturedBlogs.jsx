@@ -37,7 +37,7 @@ const FeaturedBlogs = ({ blogs, loading, pagination, onPageChange, searchQuery }
               <BlogCard
                 date={formatDate(blog.createdAt)}
                 description={truncateString(blog.description, 100)}
-                image={blog.featuredImage || 'https://placehold.co/600x400'}
+                image={blog.featured_image || 'https://placehold.co/600x400'}
                 title={truncateString(blog.title, 60)}
                 slug={blog.slug}
               />

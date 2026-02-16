@@ -61,7 +61,7 @@ export default function BlogsManager() {
         header: 'Title',
         accessorKey: 'title',
         cell: ({ row }) => {
-          const { title, status, visibility, featuredImage } = row.original
+          const { title, status, visibility, featured_image } = row.original
           const statusLabel = status || 'draft'
           const visibilityLabel = visibility || 'private'
 
@@ -77,10 +77,10 @@ export default function BlogsManager() {
 
           return (
             <div className='flex items-center gap-3 max-w-xs overflow-hidden'>
-              {featuredImage ? (
+              {featured_image ? (
                 <div className='w-20 h-20 rounded shrink-0 overflow-hidden bg-gray-100'>
                   <img
-                    src={featuredImage}
+                    src={featured_image}
                     alt='Blog'
                     className='w-full h-full object-cover'
                   />

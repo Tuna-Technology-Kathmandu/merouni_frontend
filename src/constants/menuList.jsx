@@ -205,11 +205,26 @@ export const menuItems = [
         href: '/dashboard/news',
         visible: ['admin', 'editor']
       },
+     
       {
         icon: <MdBackHand />,
-        label: 'Refer Student',
+        label: 'Refer Students',
         href: '/dashboard/referStudent',
-        visible: ['agent']
+        visible: ['agent'],
+        submenus: [
+          {
+            icon: <MdBackHand />,
+            label: 'Collages',
+            href: '/dashboard/college-referrals',
+            visible: ['agent']
+          },
+          {
+            icon: <HiOutlineUsers />,
+            label: 'Consultencies',
+            href: '/dashboard/consultancy-referrals',
+            visible: ['agent']
+          }
+        ]
       },
       {
         icon: <HiOutlineUsers />,
