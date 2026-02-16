@@ -1,5 +1,6 @@
 import UniversityDropdown from '@/ui/molecules/dropdown/UniversityDropdown'
 import { Button } from '@/ui/shadcn/button'
+import { Plus, Trash2 } from 'lucide-react'
 import {
     Dialog,
     DialogClose,
@@ -52,6 +53,8 @@ const CreateUpdateCollegeModal = ({
 
     const author_id = useSelector((state) => state.user.data.id)
 
+
+    console.log(universityPrograms,"universityProgramsuniversityProgramsuniversityPrograms")
     const {
         register,
         control,
@@ -72,7 +75,6 @@ const CreateUpdateCollegeModal = ({
             description: '',
             content: '',
             website_url: '',
-            google_map_url: '',
             college_logo: '',
             featured_img: '',
             images: [],
@@ -87,9 +89,15 @@ const CreateUpdateCollegeModal = ({
             },
             contacts: ['', ''],
             members: [],
-            map_type: ''
+            faqs: [{ question: '', answer: '' }]
         }
     })
+
+    const {
+        fields: faqFields,
+        append: appendFaq,
+        remove: removeFaq
+    } = useFieldArray({ control, name: 'faqs' })
 
     const {
         fields: memberFields,
@@ -147,8 +155,6 @@ const CreateUpdateCollegeModal = ({
                     setValue('description', collegeData.description)
                     setValue('content', collegeData.content)
                     setValue('website_url', collegeData.website_url)
-                    setValue('google_map_url', collegeData.google_map_url)
-                    setValue('map_type', collegeData.map_type || '')
 
                     if (collegeData.university_id) {
                         setValue('university_id', Number(collegeData.university_id))
@@ -215,8 +221,16 @@ const CreateUpdateCollegeModal = ({
                             description: f.description || '',
                             icon: f.icon || ''
                         }))
-                        : [{ title: '', description: '', icon: '' }]
+                        : []
                     setValue('facilities', facilityData)
+
+                    const faqData = collegeData.collegeFaq?.length
+                        ? collegeData.collegeFaq.map((f) => ({
+                            question: f.question || '',
+                            answer: f.answer || ''
+                        }))
+                        : [{ question: '', answer: '' }]
+                    setValue('faqs', faqData)
 
                 } catch (error) {
                     console.error('Error fetching college data:', error)
@@ -271,6 +285,9 @@ const CreateUpdateCollegeModal = ({
             data.facilities = (data.facilities || []).filter(f => f.title.trim() !== '' || f.description.trim() !== '' || f.icon.trim() !== '')
             if (data.facilities.length === 0) delete data.facilities
 
+            data.faqs = (data.faqs || []).filter(f => f.question.trim() !== '' || f.answer.trim() !== '')
+            if (data.faqs.length === 0) delete data.faqs
+
             if (editSlug && data.images.length === 0) {
                 data.images = [{ file_type: '', url: '' }]
             }
@@ -296,7 +313,6 @@ const CreateUpdateCollegeModal = ({
                 </DialogHeader>
                 <div className='flex-1 overflow-y-auto px-1'>
                     <form onSubmit={handleSubmit(onSubmit)} className='space-y-6 pb-20'>
-                        {/* Form Fields - Directly copied JSX */}
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                             {/* Basic Information */}
                             <div className='space-y-4'>
@@ -337,33 +353,6 @@ const CreateUpdateCollegeModal = ({
                                             placeholder='https://example.com'
                                         />
                                     </div>
-                                </div>
-
-                                <div className='space-y-2'>
-                                    <Label htmlFor='google_map_url'>
-                                        {watch('map_type') === 'embed_map_url' ? 'Embed Map URL' : 'Google Map URL'}
-                                    </Label>
-                                    <Input
-                                        id='google_map_url'
-                                        {...register('google_map_url')}
-                                        placeholder={
-                                            watch('map_type') === 'embed_map_url'
-                                                ? 'Paste the iframe src URL'
-                                                : 'Paste Google Maps embed iframe code or URL'
-                                        }
-                                    />
-                                </div>
-
-                                <div className='space-y-2'>
-                                    <Label htmlFor='map_type'>Map Type</Label>
-                                    <Select
-                                        id='map_type'
-                                        {...register('map_type')}
-                                    >
-                                        <option value=''>Select Map Type</option>
-                                        <option value='embed_map_url'>Embed Map URL</option>
-                                        <option value='google_map_url'>Google Map URL</option>
-                                    </Select>
                                 </div>
 
                                 <div className='space-y-2'>
@@ -421,28 +410,26 @@ const CreateUpdateCollegeModal = ({
                             </div>
                         </div>
 
-                        <div className='grid grid-cols-1 md:grid-cols-1 gap-6'>
-                            {/* Description & Editor */}
-                            <div className='space-y-4'>
-                                <h3 className='text-lg font-semibold border-b pb-2'>
-                                    About College
-                                </h3>
-                                <div className='space-y-2'>
-                                    <Label htmlFor='description'>Short Description</Label>
-                                    <Textarea
-                                        id='description'
-                                        {...register('description')}
-                                        placeholder='Brief overview of the college...'
-                                        rows={4}
-                                    />
-                                </div>
-                                <div className='space-y-2'>
-                                    <Label>Full Content</Label>
-                                    <CKUni
-                                        onChange={(data) => setValue('content', data)}
-                                        data={watch('content')}
-                                    />
-                                </div>
+                        {/* Description & Editor */}
+                        <div className='space-y-4'>
+                            <h3 className='text-lg font-semibold border-b pb-2'>
+                                About College
+                            </h3>
+                            <div className='space-y-2'>
+                                <Label htmlFor='description'>Short Description</Label>
+                                <Textarea
+                                    id='description'
+                                    {...register('description')}
+                                    placeholder='Brief overview of the college...'
+                                    rows={4}
+                                />
+                            </div>
+                            <div className='space-y-2'>
+                                <Label>Full Content</Label>
+                                <CKUni
+                                    onChange={(data) => setValue('content', data)}
+                                    data={watch('content')}
+                                />
                             </div>
                         </div>
 
@@ -506,7 +493,7 @@ const CreateUpdateCollegeModal = ({
                                                             htmlFor={`course-${course.id}`}
                                                             className='text-sm text-gray-700'
                                                         >
-                                                            {course.title}
+                                                            {course.program.title}
                                                         </label>
                                                     </div>
                                                 ))
@@ -593,95 +580,200 @@ const CreateUpdateCollegeModal = ({
                         />
 
                         <div className='space-y-6 pt-6'>
-                            <div className='p-4 border rounded-lg bg-gray-50'>
-                                <div className='flex justify-between items-center mb-4'>
-                                    <h3 className='text-lg font-semibold'>Facilities</h3>
+                            <div className='p-6 border rounded-xl bg-gray-50/50 shadow-sm space-y-4'>
+                                <div className='flex justify-between items-center bg-white p-4 rounded-lg border border-gray-100 shadow-sm'>
+                                    <div>
+                                        <h3 className='text-lg font-bold text-gray-900'>Facilities</h3>
+                                        <p className='text-xs text-gray-500'>List the amenities and services available</p>
+                                    </div>
                                     <Button
                                         type='button'
                                         variant='outline'
                                         size='sm'
+                                        className='h-9 px-4 border-gray-200 hover:bg-gray-50'
                                         onClick={() => appendFacility({ title: '', description: '', icon: '' })}
                                     >
+                                        <Plus className='w-4 h-4 mr-2' />
                                         Add Facility
                                     </Button>
                                 </div>
-                                <div className='space-y-4'>
+                                <div className='space-y-3'>
+                                    {facilityFields.length === 0 && (
+                                        <div className='text-center py-6 border-2 border-dashed rounded-xl bg-white/30 border-gray-200'>
+                                            <p className='text-sm text-gray-400'>No facilities added yet.</p>
+                                        </div>
+                                    )}
                                     {facilityFields.map((field, index) => (
-                                        <div key={field.id} className='grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded bg-white'>
-                                            <div className='space-y-1'>
-                                                <Label>Title</Label>
-                                                <Input {...register(`facilities[${index}].title`)} placeholder='e.g. WiFi' />
-                                            </div>
-                                            <div className='space-y-1 md:col-span-2'>
-                                                <Label>Description</Label>
-                                                <Input {...register(`facilities[${index}].description`)} placeholder='Details...' />
-                                            </div>
-                                            <div className='flex items-end gap-2'>
-                                                <div className='flex-1 space-y-1'>
-                                                    <Label>Icon</Label>
-                                                    <Input {...register(`facilities[${index}].icon`)} placeholder='lucide icon name' />
+                                        <div key={field.id} className='group relative p-5 bg-white border border-gray-200 rounded-xl transition-all hover:shadow-md'>
+                                            <div className='grid grid-cols-1 md:grid-cols-3 gap-4 pr-10'>
+                                                <div className='space-y-1.5'>
+                                                    <Label className='text-xs text-gray-400'>Title</Label>
+                                                    <Input
+                                                        {...register(`facilities[${index}].title`)}
+                                                        placeholder='e.g. WiFi'
+                                                        className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
+                                                    />
                                                 </div>
-                                                <Button
-                                                    type='button'
-                                                    variant='ghost'
-                                                    size='sm'
-                                                    className='text-red-500 hover:text-red-700 hover:bg-red-50'
-                                                    onClick={() => removeFacility(index)}
-                                                >
-                                                    Remove
-                                                </Button>
+                                                <div className='space-y-1.5'>
+                                                    <Label className='text-xs text-gray-400'>Description</Label>
+                                                    <Input
+                                                        {...register(`facilities[${index}].description`)}
+                                                        placeholder='Details...'
+                                                        className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
+                                                    />
+                                                </div>
+                                                <div className='space-y-1.5'>
+                                                    <Label className='text-xs text-gray-400'>Icon Name</Label>
+                                                    <Input
+                                                        {...register(`facilities[${index}].icon`)}
+                                                        placeholder='lucide name'
+                                                        className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
+                                                    />
+                                                </div>
                                             </div>
+                                            <Button
+                                                type='button'
+                                                variant='ghost'
+                                                size='icon'
+                                                className='absolute top-4 right-4 h-8 w-8 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors rounded-full'
+                                                onClick={() => removeFacility(index)}
+                                            >
+                                                <Trash2 className='w-4 h-4' />
+                                            </Button>
                                         </div>
                                     ))}
                                 </div>
                             </div>
 
-                            <div className='p-4 border rounded-lg bg-gray-50'>
-                                <div className='flex justify-between items-center mb-4'>
-                                    <h3 className='text-lg font-semibold'>Team Members</h3>
+                            <div className='p-6 border rounded-xl bg-gray-50/50 shadow-sm space-y-4'>
+                                <div className='flex justify-between items-center bg-white p-4 rounded-lg border border-gray-100 shadow-sm'>
+                                    <div>
+                                        <h3 className='text-lg font-bold text-gray-900'>Team Members</h3>
+                                        <p className='text-xs text-gray-500'>Manage the faculty and staff directory</p>
+                                    </div>
                                     <Button
                                         type='button'
                                         variant='outline'
                                         size='sm'
+                                        className='h-9 px-4 border-gray-200 hover:bg-gray-50'
                                         onClick={() => appendMember({ name: '', position: '', image_url: '', bio: '', contact_info: '' })}
                                     >
+                                        <Plus className='w-4 h-4 mr-2' />
                                         Add Member
                                     </Button>
                                 </div>
-                                <div className='space-y-4'>
+                                <div className='space-y-3'>
+                                    {memberFields.length === 0 && (
+                                        <div className='text-center py-6 border-2 border-dashed rounded-xl bg-white/30 border-gray-200'>
+                                            <p className='text-sm text-gray-400'>No members added yet.</p>
+                                        </div>
+                                    )}
                                     {memberFields.map((field, index) => (
-                                        <div key={field.id} className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 border rounded bg-white'>
-                                            <div className='space-y-1'>
-                                                <Label>Name</Label>
-                                                <Input {...register(`members[${index}].name`)} />
-                                            </div>
-                                            <div className='space-y-1'>
-                                                <Label>Position</Label>
-                                                <Input {...register(`members[${index}].position`)} />
-                                            </div>
-                                            <div className='space-y-1'>
-                                                <Label>Member Image URL</Label>
-                                                <Input {...register(`members[${index}].image_url`)} />
-                                            </div>
-                                            <div className='space-y-1 lg:col-span-2'>
-                                                <Label>Bio</Label>
-                                                <Textarea {...register(`members[${index}].bio`)} rows={2} />
-                                            </div>
-                                            <div className='space-y-1 flex flex-col justify-end'>
-                                                <Label>Contact Info</Label>
-                                                <div className='flex gap-2'>
-                                                    <Input {...register(`members[${index}].contact_info`)} className='flex-1' />
-                                                    <Button
-                                                        type='button'
-                                                        variant='ghost'
-                                                        size='sm'
-                                                        className='text-red-500 hover:text-red-700 hover:bg-red-50'
-                                                        onClick={() => removeMember(index)}
-                                                    >
-                                                        Remove
-                                                    </Button>
+                                        <div key={field.id} className='group relative p-5 bg-white border border-gray-200 rounded-xl transition-all hover:shadow-md'>
+                                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pr-10'>
+                                                <div className='space-y-1.5'>
+                                                    <Label className='text-xs text-gray-400'>Name</Label>
+                                                    <Input
+                                                        {...register(`members[${index}].name`)}
+                                                        className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
+                                                    />
+                                                </div>
+                                                <div className='space-y-1.5'>
+                                                    <Label className='text-xs text-gray-400'>Position</Label>
+                                                    <Input
+                                                        {...register(`members[${index}].position`)}
+                                                        className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
+                                                    />
+                                                </div>
+                                                <div className='space-y-1.5'>
+                                                    <Label className='text-xs text-gray-400'>Image URL</Label>
+                                                    <Input
+                                                        {...register(`members[${index}].image_url`)}
+                                                        className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
+                                                    />
+                                                </div>
+                                                <div className='space-y-1.5 lg:col-span-2'>
+                                                    <Label className='text-xs text-gray-400'>Bio</Label>
+                                                    <Textarea
+                                                        {...register(`members[${index}].bio`)}
+                                                        rows={2}
+                                                        className='text-sm bg-gray-50/30 border-gray-100 focus-visible:ring-1 resize-none'
+                                                    />
+                                                </div>
+                                                <div className='space-y-1.5'>
+                                                    <Label className='text-xs text-gray-400'>Contact Info</Label>
+                                                    <Input
+                                                        {...register(`members[${index}].contact_info`)}
+                                                        className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
+                                                    />
                                                 </div>
                                             </div>
+                                            <Button
+                                                type='button'
+                                                variant='ghost'
+                                                size='icon'
+                                                className='absolute top-4 right-4 h-8 w-8 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors rounded-full'
+                                                onClick={() => removeMember(index)}
+                                            >
+                                                <Trash2 className='w-4 h-4' />
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className='p-6 border rounded-xl bg-gray-50/50 shadow-sm space-y-4'>
+                                <div className='flex justify-between items-center bg-white p-4 rounded-lg border border-gray-100 shadow-sm'>
+                                    <div>
+                                        <h3 className='text-lg font-bold text-gray-900'>FAQs</h3>
+                                        <p className='text-xs text-gray-500'>Manage frequently asked questions</p>
+                                    </div>
+                                    <Button
+                                        type='button'
+                                        variant='outline'
+                                        size='sm'
+                                        className='h-9 px-4 border-gray-200 hover:bg-gray-50'
+                                        onClick={() => appendFaq({ question: '', answer: '' })}
+                                    >
+                                        <Plus className='w-4 h-4 mr-2' />
+                                        Add FAQ
+                                    </Button>
+                                </div>
+
+                                <div className='space-y-3'>
+                                    {faqFields.length === 0 && (
+                                        <div className='text-center py-6 border-2 border-dashed rounded-xl bg-white/30 border-gray-200'>
+                                            <p className='text-sm text-gray-400'>No FAQs added yet.</p>
+                                        </div>
+                                    )}
+                                    {faqFields.map((field, index) => (
+                                        <div key={field.id} className='group relative p-5 bg-white border border-gray-200 rounded-xl transition-all hover:shadow-md'>
+                                            <div className='grid grid-cols-1 gap-4 pr-10'>
+                                                <div className='space-y-1.5'>
+                                                    <Input
+                                                        {...register(`faqs[${index}].question`)}
+                                                        placeholder='Enter the question...'
+                                                        className='font-medium text-gray-900 focus-visible:ring-1 border-gray-100 bg-gray-50/30'
+                                                    />
+                                                </div>
+                                                <div className='space-y-1.5'>
+                                                    <Textarea
+                                                        {...register(`faqs[${index}].answer`)}
+                                                        placeholder='Enter the answer...'
+                                                        rows={2}
+                                                        className='text-sm text-gray-600 focus-visible:ring-1 border-gray-100 bg-gray-50/30 resize-none min-h-[80px]'
+                                                    />
+                                                </div>
+                                            </div>
+                                            <Button
+                                                type='button'
+                                                variant='ghost'
+                                                size='icon'
+                                                className='absolute top-4 right-4 h-8 w-8 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors rounded-full'
+                                                onClick={() => removeFaq(index)}
+                                            >
+                                                <Trash2 className='w-4 h-4' />
+                                            </Button>
                                         </div>
                                     ))}
                                 </div>
@@ -715,3 +807,4 @@ const CreateUpdateCollegeModal = ({
 }
 
 export default CreateUpdateCollegeModal
+

@@ -1,5 +1,7 @@
 'use server'
 
+import { authFetch } from "../utils/authFetch"
+
 
 export async function getColleges(page = 1, filters = {}) {
   try {
@@ -215,15 +217,9 @@ export async function getUniversity(searchQuery = '') {
   }
 }
 // check if already applied
-export async function checkIfApplied(collegeId, studentId) {
+export async function checkIfApplied(collegeId, token) {
   try {
-    const response = await fetch(
-      `${process.env.baseUrl}/referral/check-if-already-applied-for-collage?college_id=${collegeId}&student_id=${studentId}`,
-      {
-        method: 'GET',
-        cache: 'no-store'
-      }
-    )
+
 
     if (!response.ok) {
       

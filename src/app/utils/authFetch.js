@@ -5,7 +5,7 @@ export const authFetch = async (url, options = {}) => {
 
     // If no refresh token, likely logged out - don't make the request
     if (!refreshToken) {
-      // Silently fail - don't throw error or redirect if already on sign-in page
+      // Silently fail - don't throw error or redirect if already on sign-\in page
       // let window.location.href = '/sign-in' if you want it to be automatic
       // but it causes loops in some cases where session is partial.
       // Return a response-like object that won't break calling code

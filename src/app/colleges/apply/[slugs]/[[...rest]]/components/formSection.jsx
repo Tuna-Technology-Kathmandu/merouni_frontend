@@ -66,7 +66,6 @@ const FormSection = ({ id, college }) => {
   const applyMutation = useMutation({
     mutationFn: applyToCollege,
     onSuccess: (data) => {
-      // toast.success(data.message || 'College Applied Successfully')
       setIsSubmitted(true)
       setFormData({
         college_id: college?.id || 0,
@@ -105,6 +104,7 @@ const FormSection = ({ id, college }) => {
       setErrors((prev) => ({ ...prev, [name]: '' }))
     }
   }
+  const token = localStorage.getItem('access_token')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -127,7 +127,7 @@ const FormSection = ({ id, college }) => {
         course: formData.course
       }
 
-    applyMutation.mutate({ payload, isStudent })
+    applyMutation.mutate({ payload, isStudent , token} )
   }
 
   const courseOptions = useMemo(() => {
