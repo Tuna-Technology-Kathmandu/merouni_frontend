@@ -54,7 +54,6 @@ const CreateUpdateCollegeModal = ({
     const author_id = useSelector((state) => state.user.data.id)
 
 
-    console.log(universityPrograms,"universityProgramsuniversityProgramsuniversityPrograms")
     const {
         register,
         control,

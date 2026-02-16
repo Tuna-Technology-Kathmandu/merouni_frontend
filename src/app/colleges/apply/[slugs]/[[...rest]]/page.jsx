@@ -58,7 +58,6 @@ const ApplyPage = ({ params }) => {
               )
               const data = await response.json()
 
-              console.log(data, "data")
               if (data && data.hasApplied) {
                 setHasApplied(true)
               }

@@ -35,13 +35,11 @@ const ApplyPage = ({ params }) => {
                 if (token) {
                     setIsAuthenticated(true)
                     const data = await getScholarshipBySlug(slugs)
-                    console.log(data,"datadatadatadata")
                     if (data) {
                         setScholarship(data)
                         // Check if already applied
                         if (data.id) {
                             const status = await checkIfScholarshipApplied(data.id)
-                            console.log(status,"statusstatus")
                             if (status && status.hasApplied) {
                                 setHasApplied(true)
                             }
