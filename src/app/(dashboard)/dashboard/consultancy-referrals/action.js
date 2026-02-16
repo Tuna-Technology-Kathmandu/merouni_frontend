@@ -6,7 +6,7 @@ import { authFetch } from '@/app/utils/authFetch'
 export async function fetchUserConsultancyReferrals() {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}/consultancy-referral/user/referrals`,
+      `${process.env.baseUrl}/consultancy-referral/user/applications`,
       { cache: 'no-store' }
     )
     if (!response.ok) {

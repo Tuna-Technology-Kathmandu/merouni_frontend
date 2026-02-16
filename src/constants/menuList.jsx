@@ -214,7 +214,27 @@ export const menuItems = [
         submenus: [
           {
             icon: <MdBackHand />,
-            label: 'Collages',
+            label: 'Colleges',
+            href: '/dashboard/referStudent',
+            visible: ['agent']
+          },
+          {
+            icon: <HiOutlineUsers />,
+            label: 'Consultencies',
+            href: '/dashboard/referConsultancy',
+            visible: ['agent']
+          }
+        ]
+      },
+           {
+        icon: <MdBackHand />,
+        label: 'Refered Students',
+        href: '/dashboard/referedStudent',
+        visible: ['agent'],
+        submenus: [
+          {
+            icon: <MdBackHand />,
+            label: 'Colleges',
             href: '/dashboard/college-referrals',
             visible: ['agent']
           },
@@ -226,12 +246,12 @@ export const menuItems = [
           }
         ]
       },
-      {
-        icon: <HiOutlineUsers />,
-        label: 'Refered Students',
-        href: '/dashboard/referedStudents',
-        visible: ['agent']
-      },
+      // {
+      //   icon: <HiOutlineUsers />,
+      //   label: 'Refered Students',
+      //   href: '/dashboard/referedStudents',
+      //   visible: ['agent']
+      // },
       {
         icon: <VscReferences />,
         label: 'View Applications',

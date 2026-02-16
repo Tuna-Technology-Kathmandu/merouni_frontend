@@ -7,8 +7,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { removeUser } from '@/app/utils/userSlice'
 import { destr } from 'destr'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
-
-// Icons
 import {
   FaHome,
   FaRegUserCircle,
@@ -139,6 +137,12 @@ const menuItems = [
         icon: <MdBackHand />,
         label: 'Refer Student',
         href: '/dashboard/referStudent',
+        visible: ['agent']
+      },
+      {
+        icon: <FaHandshake />,
+        label: 'Refer Consultancy',
+        href: '/dashboard/referConsultancy',
         visible: ['agent']
       },
       {

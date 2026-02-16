@@ -32,8 +32,8 @@ const ConsultancyReferralsPage = () => {
         setLoading(true)
         setError(null)
         const response = await authFetch(
-          `${process.env.baseUrl}/consultancy-referral/user/referrals`,
-          { cache: 'no-store' }
+          `${process.env.baseUrl}/consultancy-application/user/applications`,
+          { cache: 'no-store', method: 'GET' }
         )
 
         if (!response.ok) {
@@ -92,12 +92,13 @@ const ConsultancyReferralsPage = () => {
       ) : (
         <div className='space-y-6'>
           {referrals.map((referral) => {
-            const consultancy = referral.referralConsultancy || {}
-            const consultancyDetails = consultancy.consultany_details || {}
-            const address = consultancyDetails.address || {}
+            const consultancy = referral.consultancy || {}
+            const address = consultancy.address || {}
             const location = [address.city, address.state, address.country]
               .filter(Boolean)
               .join(', ')
+
+              console.log(consultancy,"DONE DONE")
 
             return (
               <div
@@ -108,10 +109,10 @@ const ConsultancyReferralsPage = () => {
                   {/* Consultancy Info */}
                   <div className='flex items-start gap-4 mb-6 pb-4 border-b border-gray-200'>
                     <div className='flex-shrink-0'>
-                      {consultancyDetails.logo ? (
+                      {consultancy.logo ? (
                         <img
-                          src={consultancyDetails.logo}
-                          alt={consultancyDetails.name || consultancy.title}
+                          src={consultancy.logo}
+                          alt={consultancy.name || consultancy.title}
                           className='w-16 h-16 object-contain rounded-lg border border-gray-200'
                         />
                       ) : (
@@ -122,7 +123,7 @@ const ConsultancyReferralsPage = () => {
                     </div>
                     <div className='flex-1 min-w-0'>
                       <h3 className='text-lg font-semibold text-gray-800 mb-1'>
-                        {consultancyDetails.name || consultancy.title || 'N/A'}
+                        {consultancy.name || consultancy.title || 'N/A'}
                       </h3>
                       {location && (
                         <div className='flex items-center gap-2 text-sm text-gray-600'>
