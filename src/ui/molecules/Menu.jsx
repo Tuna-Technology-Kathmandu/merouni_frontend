@@ -73,6 +73,7 @@ const SubMenu = ({
     const shouldAutoNavigate =
       (item.label === 'Referrals' ||
         item.label === 'Colleges' ||
+        item.label === 'University' ||
         item.label === 'MeroUni') &&
       !isExpanded &&
       firstSubmenu
@@ -88,6 +89,7 @@ const SubMenu = ({
       firstSubmenu &&
       item.label !== 'Referrals' &&
       item.label !== 'Colleges' &&
+      item.label !== 'University' &&
       item.label !== 'MeroUni'
     ) {
       // Preserve previous behavior for other menus when collapsed
