@@ -515,29 +515,44 @@ export default function CreateUpdateConsultancy({
                                     />
                                 </div>
                                 <div className='space-y-2'>
-                                    <Label htmlFor='google_map_url'>Google Map URL</Label>
+                                    <Label htmlFor='google_map_url'>
+                                        {watch('map_type') === 'embed_map_url' ? 'Embed Map URL' : 'Google Map URL'}
+                                    </Label>
                                     <Textarea
                                         id='google_map_url'
                                         {...register('google_map_url')}
-                                        placeholder='Paste Google Maps embed iframe code'
+                                        placeholder={
+                                            watch('map_type') === 'embed_map_url'
+                                                ? 'Paste the iframe src URL'
+                                                : 'Paste Google Maps embed iframe code or URL'
+                                        }
                                         rows={3}
                                         className='resize-none'
                                     />
                                     <p className='text-xs text-muted-foreground'>
-                                        Paste the iframe code from Google Maps embed
+                                        {watch('map_type') === 'embed_map_url'
+                                            ? 'Enter the src attribute from the Google Maps embed code'
+                                            : 'Paste the iframe code from Google Maps embed'}
                                     </p>
                                 </div>
-                                {/* Dropdown selct for map_Type */}
+                                {/* Dropdown select for map_type */}
                                 <div className='space-y-2'>
                                     <Label htmlFor='map_type'>Map Type</Label>
-                                    <Select
-                                        id='map_type'
-                                        {...register('map_type')}
-                                    >
-                                        <option value=''>Select Map Type</option>
-                                        <option value='embed_map_url'>Embed Map URL</option>
-                                        <option value='google_map_url'>Google Map URL</option>
-                                    </Select>
+                                    <Controller
+                                        name='map_type'
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                id='map_type'
+                                                value={field.value}
+                                                onChange={(e) => field.onChange(e.target.value)}
+                                            >
+                                                <option value=''>Select Map Type</option>
+                                                <option value='embed_map_url'>Embed Map URL</option>
+                                                <option value='google_map_url'>Google Map URL</option>
+                                            </Select>
+                                        )}
+                                    />
                                 </div>
                                 <div className='space-y-2'>
                                     <Label htmlFor='video_url'>YouTube Video URL</Label>

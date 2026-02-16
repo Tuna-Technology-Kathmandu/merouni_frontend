@@ -87,6 +87,7 @@ const CreateUpdateCollegeModal = ({
             },
             contacts: ['', ''],
             members: [],
+            map_type: ''
         }
     })
 
@@ -147,6 +148,7 @@ const CreateUpdateCollegeModal = ({
                     setValue('content', collegeData.content)
                     setValue('website_url', collegeData.website_url)
                     setValue('google_map_url', collegeData.google_map_url)
+                    setValue('map_type', collegeData.map_type || '')
 
                     if (collegeData.university_id) {
                         setValue('university_id', Number(collegeData.university_id))
@@ -338,12 +340,30 @@ const CreateUpdateCollegeModal = ({
                                 </div>
 
                                 <div className='space-y-2'>
-                                    <Label htmlFor='google_map_url'>Google Maps URL</Label>
+                                    <Label htmlFor='google_map_url'>
+                                        {watch('map_type') === 'embed_map_url' ? 'Embed Map URL' : 'Google Map URL'}
+                                    </Label>
                                     <Input
                                         id='google_map_url'
                                         {...register('google_map_url')}
-                                        placeholder='https://goo.gl/maps/...'
+                                        placeholder={
+                                            watch('map_type') === 'embed_map_url'
+                                                ? 'Paste the iframe src URL'
+                                                : 'Paste Google Maps embed iframe code or URL'
+                                        }
                                     />
+                                </div>
+
+                                <div className='space-y-2'>
+                                    <Label htmlFor='map_type'>Map Type</Label>
+                                    <Select
+                                        id='map_type'
+                                        {...register('map_type')}
+                                    >
+                                        <option value=''>Select Map Type</option>
+                                        <option value='embed_map_url'>Embed Map URL</option>
+                                        <option value='google_map_url'>Google Map URL</option>
+                                    </Select>
                                 </div>
 
                                 <div className='space-y-2'>
