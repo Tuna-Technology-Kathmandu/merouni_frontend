@@ -23,7 +23,7 @@ import SearchInput from '@/ui/molecules/SearchInput'
 import { formatDate } from '@/utils/date.util'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 
-const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
+const CKBlogs = dynamic(() => import('../../../../ui/molecules/ck-editor/CKBlogs'), {
   ssr: false
 })
 

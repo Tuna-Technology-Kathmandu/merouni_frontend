@@ -17,7 +17,7 @@ import dynamic from 'next/dynamic'
 import { formatDate } from '@/utils/date.util'
 
 const CKEditor = dynamic(
-  () => import('@/app/(dashboard)/dashboard/component/CKStable'),
+  () => import('@/ui/molecules/ck-editor/CKStable'),
   {
     ssr: false
   }

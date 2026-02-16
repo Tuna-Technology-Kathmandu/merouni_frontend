@@ -26,7 +26,7 @@ import { Button } from '@/ui/shadcn/button'
 import SearchInput from '@/ui/molecules/SearchInput'
 
 // Dynamically import CKEditor to avoid SSR issues
-const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
+const CKBlogs = dynamic(() => import('../../../../ui/molecules/ck-editor/CKBlogs'), {
   ssr: false
 })
 

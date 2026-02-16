@@ -14,7 +14,7 @@ import dynamic from 'next/dynamic'
 import { useSelector } from 'react-redux'
 
 const CKEditor = dynamic(
-  () => import('@/app/(dashboard)/dashboard/component/CKStable'),
+  () => import('@/ui/molecules/ck-editor/CKStable'),
   {
     ssr: false
   }
@@ -77,7 +77,7 @@ export default function EditConsultancyPage() {
       const response = await authFetch(
         `${process.env.baseUrl}/consultancy/me`
       )
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch consultancy data')
       }
@@ -102,12 +102,12 @@ export default function EditConsultancyPage() {
         ? consultancy.destination
         : typeof consultancy.destination === 'string'
           ? (() => {
-              try {
-                return JSON.parse(consultancy.destination)
-              } catch {
-                return []
-              }
-            })()
+            try {
+              return JSON.parse(consultancy.destination)
+            } catch {
+              return []
+            }
+          })()
           : []
       const destinationForForm = (
         Array.isArray(parsedDestination) ? parsedDestination : []
@@ -139,8 +139,8 @@ export default function EditConsultancyPage() {
       setValue(
         'contact',
         parsedContact.length >= 2
-            ? parsedContact
-            : [...parsedContact, ...Array(2 - parsedContact.length).fill('')]
+          ? parsedContact
+          : [...parsedContact, ...Array(2 - parsedContact.length).fill('')]
       )
 
       setValue('pinned', consultancy.pinned)
@@ -220,8 +220,8 @@ export default function EditConsultancyPage() {
         title: data.title?.trim() || '',
         destination: Array.isArray(data.destination)
           ? data.destination
-              .map((d) => (typeof d === 'string' ? d : d?.country ?? ''))
-              .filter(Boolean)
+            .map((d) => (typeof d === 'string' ? d : d?.country ?? ''))
+            .filter(Boolean)
           : [],
         address: data.address || {},
         featured_image: uploadedFiles.featured || '',
@@ -260,16 +260,16 @@ export default function EditConsultancyPage() {
       if (data.id) {
         payload.id = data.id
       }
-      
+
       // If no ID but we have author_id, we might need it for creation? 
       // Typically backend handles this based on auth token.
-      
+
       // Use my-consultancy endpoint for update as well if possible, 
       // otherwise fallback to general endpoint with ID.
       // Assuming PUT to /consultancy/my-consultancy updates the user's consultancy.
-      
+
       const url = `${process.env.baseUrl}/consultancy`
-      
+
       const response = await authFetch(url, {
         method: 'POST',
         headers: {
@@ -285,7 +285,7 @@ export default function EditConsultancyPage() {
 
       await response.json()
       toast.success('Consultancy info updated successfully!')
-      
+
     } catch (error) {
       console.error('Submit Error:', error)
       toast.error(error.message || 'Failed to save consultancy')

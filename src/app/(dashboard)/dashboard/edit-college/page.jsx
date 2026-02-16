@@ -17,7 +17,7 @@ import {
 } from '../addCollege/actions'
 import { Upload } from 'lucide-react'
 
-const CKUni = dynamic(() => import('../component/CKUni'), {
+const CKUni = dynamic(() => import('../../../../ui/molecules/ck-editor/CKUni'), {
   ssr: false
 })
 

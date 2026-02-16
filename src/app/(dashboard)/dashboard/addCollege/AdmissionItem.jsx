@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic'
 import { useDebounce } from 'use-debounce'
 import { fetchCourse } from './actions'
 
-const CKUni = dynamic(() => import('../component/CKUni'), {
+const CKUni = dynamic(() => import('../../../../ui/molecules/ck-editor/CKUni'), {
   ssr: false
 })
 

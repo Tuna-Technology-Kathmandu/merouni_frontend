@@ -2,20 +2,19 @@
 import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import CreateConsultencyUser from '@/ui/molecules/dialogs/CreateConsultencyUser'
 import CreateUpdateConsultancy from '@/ui/molecules/dialogs/CreateUpdateConsultancy'
 import ViewConsultancy from '@/ui/molecules/dialogs/ViewConsultancy'
+import SearchInput from '@/ui/molecules/SearchInput'
 import { Button } from '@/ui/shadcn/button'
-import { Search } from 'lucide-react'
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import Table from '@/ui/shadcn/DataTable'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
-import Table from '@/ui/shadcn/DataTable'
-import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import { createColumns } from './columns'
 import EditConsultancyPage from './EditConsultancyPage'
-import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function ConsultancyForm() {
   const { role } = useAdminPermission()
@@ -222,19 +221,7 @@ export default function ConsultancyForm() {
       <div className='w-full space-y-2'>
         <div className='px-4 space-y-4'>
           <div className='flex justify-between items-center pt-4'>
-            {/* Search Bar */}
-            {/* <div className='relative w-full max-w-md'>
-              <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-                <Search className='w-4 h-4 text-gray-500' />
-              </div>
-              <input
-                type='text'
-                value={searchQuery}
-                onChange={(e) => handleSearchInput(e.target.value)}
-                className='w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-                placeholder='Search consultancies...'
-              />
-            </div> */}
+          
             <SearchInput
               value={searchQuery}
               onChange={(e) => handleSearchInput(e.target.value)}
