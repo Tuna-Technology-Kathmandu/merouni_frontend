@@ -1,3 +1,4 @@
+import { authFetch } from "../utils/authFetch"
 
 export async function getConsultancies(page = 1, searchQuery = '', courseId = '') {
   try {
@@ -75,10 +76,10 @@ export async function getCourses() {
 }
 
 // check if already applied for consultancy
-export async function checkIfConsultancyApplied(consultancyId, studentId) {
+export async function checkIfConsultancyApplied(consultancyId) {
   try {
-    const response = await fetch(
-      `${process.env.baseUrl}/referral/check-if-already-applied-for-consultancy?consultancy_id=${consultancyId}&student_id=${studentId}`,
+    const response = await authFetch(
+      `${process.env.baseUrl}/consultancy-application/check/${consultancyId}`,
       {
         method: 'GET',
         cache: 'no-store'

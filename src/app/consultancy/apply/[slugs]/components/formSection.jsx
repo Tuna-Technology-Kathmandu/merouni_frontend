@@ -16,14 +16,13 @@ import { THEME_BLUE } from '@/constants/constants'
 
 const FormSection = ({ consultancy }) => {
   const user = useSelector((state) => state.user?.data)
-  const isLoggedIn = !!user
   const [isSubmitted, setIsSubmitted] = useState(false)
 
   const [formData, setFormData] = useState({
     consultancy_id: consultancy?.id || 0,
-    student_name: '',
-    student_phone_no: '',
-    student_email: '',
+    student_name: `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim(),
+    student_phone_no: user?.phoneNo || '',
+    student_email: user?.email || '',
     student_description: ''
   })
 
@@ -31,7 +30,7 @@ const FormSection = ({ consultancy }) => {
     if (consultancy?.id) {
       setFormData((prev) => ({ ...prev, consultancy_id: consultancy.id }))
     }
-    if (isLoggedIn && user) {
+    if (user) {
       setFormData((prev) => ({
         ...prev,
         student_name: `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim(),
@@ -39,12 +38,11 @@ const FormSection = ({ consultancy }) => {
         student_phone_no: user?.phoneNo || ''
       }))
     }
-  }, [consultancy?.id, isLoggedIn, user])
+  }, [consultancy?.id, user])
 
   const applyMutation = useMutation({
     mutationFn: applyToConsultancy,
     onSuccess: (data) => {
-      // toast.success(data.message || 'Application Submitted Successfully')
       setIsSubmitted(true)
       setFormData((prev) => ({
         ...prev,
@@ -63,11 +61,6 @@ const FormSection = ({ consultancy }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-
-    if (!isLoggedIn) {
-      toast.error('Please login to apply')
-      return
-    }
 
     const payload = {
       consultancy_id: formData.consultancy_id,
@@ -110,35 +103,14 @@ const FormSection = ({ consultancy }) => {
     )
   }
 
-  if (!isLoggedIn) {
-    return (
-      <ActionCard
-        icon={<Handshake className='w-full h-full' />}
-        title='Apply For Consultation'
-        subtitle='Login to begin your journey'
-        description='Join our community to connect with top consultancies and track your progress in real-time.'
-        headerClassName='from-[#0A6FA7] to-[#30AD8F] bg-gradient-to-r'
-      >
-        <Link href='/sign-in' className='w-full sm:w-auto'>
-          <Button className='w-full min-w-[160px] h-12 text-lg font-semibold bg-[#0A6FA7] hover:bg-[#085e8a] transition-all'>
-            Login Now
-          </Button>
-        </Link>
-        <Link href='/sign-in?mode=signup' className='w-full sm:w-auto'>
-          <Button
-            variant='outline'
-            className='w-full min-w-[160px] h-12 text-lg font-semibold border-2 border-[#0A6FA7] text-[#0A6FA7] hover:bg-[#0A6FA7]/10 transition-all'
-          >
-            Create Account
-          </Button>
-        </Link>
-      </ActionCard>
-    )
-  }
-
   return (
     <div className='w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden'>
-      <div className='bg-gradient-to-r from-[#0A6FA7] to-[#30AD8F] p-8 text-white relative overflow-hidden'>
+      <div
+        className='p-8 text-white relative overflow-hidden'
+        style={{
+          background: `linear-gradient(to right, ${THEME_BLUE}, #2c7a9a)`
+        }}
+      >
         <div className='relative z-10 text-left'>
           <div className='flex items-center gap-3 mb-2'>
             <Handshake className='w-8 h-8' />
@@ -146,7 +118,10 @@ const FormSection = ({ consultancy }) => {
               Apply For Consultation
             </h2>
           </div>
-          <p className='text-blue-50/80'>Expert guidance for your career</p>
+          <p className='text-white/80'>Expert guidance for your career</p>
+        </div>
+        <div className='absolute -right-8 -bottom-8 opacity-10'>
+          <Handshake size={160} />
         </div>
       </div>
 
@@ -204,7 +179,8 @@ const FormSection = ({ consultancy }) => {
           <Button
             type='submit'
             disabled={applyMutation.isPending}
-            className='w-full py-6 text-lg font-semibold h-12 bg-[#0A6FA7] hover:bg-[#085e8a] transition-all shadow-md active:scale-[0.98]'
+            className='w-full py-6 text-lg font-semibold h-12 text-white transition-all shadow-md active:scale-[0.98]'
+            style={{ backgroundColor: THEME_BLUE }}
           >
             {applyMutation.isPending ? (
               <div className='flex items-center gap-2'>
