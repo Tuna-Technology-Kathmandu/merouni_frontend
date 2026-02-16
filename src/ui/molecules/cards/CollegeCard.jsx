@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react'
 import { Heart, Info, GraduationCap, MapPin } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
-import { authFetch } from '@/app/utils/authFetch'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@bprogress/next/app'
 
 /**
  * Reusable college card. Accepts either a `college` object or flat props.
@@ -42,8 +41,8 @@ const CollegeCard = ({
     locationProp ??
     (collegeProp?.address
       ? [collegeProp.address.city, collegeProp.address.state, collegeProp.address.country]
-          .filter(Boolean)
-          .join(', ')
+        .filter(Boolean)
+        .join(', ')
       : '')
 
   const isParentControlledWishlist =
@@ -130,17 +129,23 @@ const CollegeCard = ({
   }
 
   const handleCardClick = () => {
-    if (slug) router.push(`/colleges/${slug}`)
+    if (slug) {
+      router.push(`/colleges/${slug}`)
+    }
   }
 
   const handleDetails = (e) => {
     e.stopPropagation()
-    if (slug) router.push(`/colleges/${slug}`)
+    if (slug) {
+      router.push(`/colleges/${slug}`)
+    }
   }
 
   const handleApply = (e) => {
     e.stopPropagation()
-    if (slug) router.push(`/colleges/apply/${slug}`)
+    if (slug) {
+      router.push(`/colleges/apply/${slug}`)
+    }
   }
 
   return (
@@ -174,11 +179,10 @@ const CollegeCard = ({
               className='p-2 bg-white/80 hover:bg-white rounded-full transition-all shadow-sm'
             >
               <Heart
-                className={`w-4 h-4 transition-all ${
-                  isInWishlist
-                    ? 'fill-red-500 text-red-500'
-                    : 'text-gray-600'
-                } ${isLoading ? 'opacity-50' : ''}`}
+                className={`w-4 h-4 transition-all ${isInWishlist
+                  ? 'fill-red-500 text-red-500'
+                  : 'text-gray-600'
+                  } ${isLoading ? 'opacity-50' : ''}`}
               />
             </button>
           )}
