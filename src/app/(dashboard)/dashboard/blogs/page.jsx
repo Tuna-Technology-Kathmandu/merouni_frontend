@@ -11,7 +11,7 @@ import SearchInput from '@/ui/molecules/SearchInput'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
@@ -471,53 +471,53 @@ export default function BlogsManager() {
     <>
       <div className='w-full space-y-2'>
         <div className='px-4 space-y-4'>
-        <div className='flex justify-between items-center pt-4'>
-          {/* Search Bar */}
-          <SearchInput
-            value={searchQuery}
-            onChange={(e) => handleSearchInput(e.target.value)}
-            placeholder='Search blogs...'
-            className='max-w-md'
-          />
-          {/* Filters & Button */}
-          <div className='flex gap-4 items-center'>
-            <Select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className='min-w-[150px]'
-            >
-              <option value='all'>All Status</option>
-              <option value='published'>Published</option>
-              <option value='draft'>Draft</option>
-              <option value='archived'>Archived</option>
-            </Select>
-            <Button onClick={handleAddBlog}>
-              Add Blog
-            </Button>
+          <div className='flex justify-between items-center pt-4'>
+            {/* Search Bar */}
+            <SearchInput
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              placeholder='Search blogs...'
+              className='max-w-md'
+            />
+            {/* Filters & Button */}
+            <div className='flex gap-4 items-center'>
+              <Select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className='min-w-[150px]'
+              >
+                <option value='all'>All Status</option>
+                <option value='published'>Published</option>
+                <option value='draft'>Draft</option>
+                <option value='archived'>Archived</option>
+              </Select>
+              <Button onClick={handleAddBlog}>
+                Add Blog
+              </Button>
+            </div>
           </div>
+
+          <BlogFormModal
+            isOpen={isOpen}
+            onClose={handleCloseModal}
+            isEditing={editing}
+            initialData={selectedBlog}
+            categories={categories}
+            onSave={handleSave}
+            submitting={submitting}
+          />
+
+          {/* Table Section */}
+          <Table
+            data={blogs}
+            columns={columns}
+            pagination={pagination}
+            onPageChange={(newPage) => loadData(newPage)}
+            onSearch={handleSearch}
+            showSearch={false}
+          />
         </div>
-
-        <BlogFormModal
-          isOpen={isOpen}
-          onClose={handleCloseModal}
-          isEditing={editing}
-          initialData={selectedBlog}
-          categories={categories}
-          onSave={handleSave}
-          submitting={submitting}
-        />
-
-        {/* Table Section */}
-        <Table
-          data={blogs}
-          columns={columns}
-          pagination={pagination}
-          onPageChange={(newPage) => loadData(newPage)}
-          onSearch={handleSearch}
-          showSearch={false}
-        />
       </div>
-    </div>
 
       <ConfirmationDialog
         open={isDialogOpen}

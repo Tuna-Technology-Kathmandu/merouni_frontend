@@ -12,7 +12,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '@/ui/shadcn/button'
@@ -95,8 +95,8 @@ export default function SkillsCoursesManager() {
                 cell: ({ getValue }) => (
                     <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${getValue()
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-gray-100 text-gray-600'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-600'
                             }`}
                     >
                         {getValue() ? 'Yes' : 'No'}
@@ -411,133 +411,133 @@ export default function SkillsCoursesManager() {
                         }} />
                     </DialogHeader>
                     <DialogContent>
-                    <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
-                        <form
-                            onSubmit={handleSubmit(onSubmit)}
-                            className='flex flex-col flex-1 overflow-hidden'
-                        >
-                            <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                                <div className='bg-white p-6 rounded-lg shadow-md'>
-                                   
-                                    <div className='space-y-4'>
-                                        <div>
-                                            <Label>
-                                                Title <span className='text-red-500'>*</span>
-                                            </Label>
-                                            <Input
-                                                type='text'
-                                                placeholder='Course Title'
-                                                {...register('title', {
-                                                    required: 'Title is required'
-                                                })}
-                                                className='w-full p-2 border rounded'
-                                            />
-                                            {errors.title && (
-                                                <span className='text-red-500 text-sm'>
-                                                    {errors.title.message}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <Label>Institution Name</Label>
-                                            <Input
-                                                type='text'
-                                                placeholder='Institution/Provider Name'
-                                                {...register('institution_name')}
-                                                className='w-full p-2 border rounded'
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Price (Rs.)</Label>
-                                            <Input
-                                                type='number'
-                                                step='0.01'
-                                                placeholder='0 for Free'
-                                                {...register('price')}
-                                                className='w-full p-2 border rounded'
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Duration</Label>
-                                            <Input
-                                                type='text'
-                                                placeholder='e.g., 3 months, 6 weeks'
-                                                {...register('duration')}
-                                                className='w-full p-2 border rounded'
-                                            />
-                                        </div>
+                        <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
+                            <form
+                                onSubmit={handleSubmit(onSubmit)}
+                                className='flex flex-col flex-1 overflow-hidden'
+                            >
+                                <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+                                    <div className='bg-white p-6 rounded-lg shadow-md'>
 
-                                        <div>
-                                            <Label>Featured</Label>
-                                            <Select
-                                                {...register('is_featured')}
-                                                className='w-full p-2 border rounded'
-                                            >
-                                                <option value={false}>No</option>
-                                                <option value={true}>Yes</option>
-                                            </Select>
-                                        </div>
-                                        <div>
-                                            <Label>Description</Label>
-                                            <textarea
-                                                placeholder='Course Description'
-                                                {...register('description')}
-                                                className='w-full p-2 border rounded min-h-[100px]'
-                                                rows={4}
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Detailed Content</Label>
-                                            <Controller
-                                                name='content'
-                                                control={control}
-                                                render={({ field }) => (
-                                                    <TipTapEditor
-                                                        value={field.value}
-                                                        onChange={field.onChange}
-                                                        placeholder='Enter detailed course content, curriculum, etc.'
-                                                    />
+                                        <div className='space-y-4'>
+                                            <div>
+                                                <Label>
+                                                    Title <span className='text-red-500'>*</span>
+                                                </Label>
+                                                <Input
+                                                    type='text'
+                                                    placeholder='Course Title'
+                                                    {...register('title', {
+                                                        required: 'Title is required'
+                                                    })}
+                                                    className='w-full p-2 border rounded'
+                                                />
+                                                {errors.title && (
+                                                    <span className='text-red-500 text-sm'>
+                                                        {errors.title.message}
+                                                    </span>
                                                 )}
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label>Thumbnail Image (Optional)</Label>
-                                            <FileUpload
-                                                defaultPreview={uploadedFiles.thumbnail_image}
-                                                onUploadComplete={(url) => {
-                                                    setUploadedFiles((prev) => ({
-                                                        ...prev,
-                                                        thumbnail_image: url
-                                                    }))
-                                                    setValue('thumbnail_image', url)
-                                                }}
-                                            />
+                                            </div>
+                                            <div>
+                                                <Label>Institution Name</Label>
+                                                <Input
+                                                    type='text'
+                                                    placeholder='Institution/Provider Name'
+                                                    {...register('institution_name')}
+                                                    className='w-full p-2 border rounded'
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>Price (Rs.)</Label>
+                                                <Input
+                                                    type='number'
+                                                    step='0.01'
+                                                    placeholder='0 for Free'
+                                                    {...register('price')}
+                                                    className='w-full p-2 border rounded'
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>Duration</Label>
+                                                <Input
+                                                    type='text'
+                                                    placeholder='e.g., 3 months, 6 weeks'
+                                                    {...register('duration')}
+                                                    className='w-full p-2 border rounded'
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <Label>Featured</Label>
+                                                <Select
+                                                    {...register('is_featured')}
+                                                    className='w-full p-2 border rounded'
+                                                >
+                                                    <option value={false}>No</option>
+                                                    <option value={true}>Yes</option>
+                                                </Select>
+                                            </div>
+                                            <div>
+                                                <Label>Description</Label>
+                                                <textarea
+                                                    placeholder='Course Description'
+                                                    {...register('description')}
+                                                    className='w-full p-2 border rounded min-h-[100px]'
+                                                    rows={4}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>Detailed Content</Label>
+                                                <Controller
+                                                    name='content'
+                                                    control={control}
+                                                    render={({ field }) => (
+                                                        <TipTapEditor
+                                                            value={field.value}
+                                                            onChange={field.onChange}
+                                                            placeholder='Enter detailed course content, curriculum, etc.'
+                                                        />
+                                                    )}
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label>Thumbnail Image (Optional)</Label>
+                                                <FileUpload
+                                                    defaultPreview={uploadedFiles.thumbnail_image}
+                                                    onUploadComplete={(url) => {
+                                                        setUploadedFiles((prev) => ({
+                                                            ...prev,
+                                                            thumbnail_image: url
+                                                        }))
+                                                        setValue('thumbnail_image', url)
+                                                    }}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Submit Button - Sticky Footer */}
-                            <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
-                                <Button
-                                    type='button'
-                                    variant='outline'
-                                    onClick={() => {
-                                        setIsOpen(false)
-                                        setEditing(false)
-                                        setEditingId(null)
-                                        reset()
-                                        setUploadedFiles({ thumbnail_image: '' })
-                                    }}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button type='submit'>
-                                    {editing ? 'Update Course' : 'Create Course'}
-                                </Button>
-                            </div>
-                        </form>
-                    </div>
+                                {/* Submit Button - Sticky Footer */}
+                                <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
+                                    <Button
+                                        type='button'
+                                        variant='outline'
+                                        onClick={() => {
+                                            setIsOpen(false)
+                                            setEditing(false)
+                                            setEditingId(null)
+                                            reset()
+                                            setUploadedFiles({ thumbnail_image: '' })
+                                        }}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button type='submit'>
+                                        {editing ? 'Update Course' : 'Create Course'}
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
                     </DialogContent>
                 </Dialog>
 
@@ -571,87 +571,87 @@ export default function SkillsCoursesManager() {
                     }} />
                 </DialogHeader>
                 <DialogContent>
-                <div className="p-6 space-y-6">
-                    {/* Thumbnail Image */}
-                    {viewingCourse?.thumbnail_image && (
-                        <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-100 mb-6 border border-gray-200">
-                            <img
-                                src={viewingCourse.thumbnail_image}
-                                alt={viewingCourse.title}
-                                className="w-full h-full object-contain"
-                            />
-                        </div>
-                    )}
-
-                    {/* Details Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="md:col-span-2">
-                            <h3 className="text-sm font-medium text-gray-500">Title</h3>
-                            <p className="mt-1 text-lg font-semibold text-gray-900">{viewingCourse?.title}</p>
-                        </div>
-
-                        {viewingCourse?.institution_name && (
-                            <div className="md:col-span-2">
-                                <h3 className="text-sm font-medium text-gray-500">Institution Name</h3>
-                                <p className="mt-1 text-gray-900 font-medium">{viewingCourse.institution_name}</p>
+                    <div className="p-6 space-y-6">
+                        {/* Thumbnail Image */}
+                        {viewingCourse?.thumbnail_image && (
+                            <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-100 mb-6 border border-gray-200">
+                                <img
+                                    src={viewingCourse.thumbnail_image}
+                                    alt={viewingCourse.title}
+                                    className="w-full h-full object-contain"
+                                />
                             </div>
                         )}
 
-                        <div>
-                            <h3 className="text-sm font-medium text-gray-500">Price</h3>
-                            <p className="mt-1 text-gray-900 font-semibold">
-                                {viewingCourse?.price ? `Rs. ${parseFloat(viewingCourse.price).toLocaleString()}` : 'Free'}
-                            </p>
-                        </div>
+                        {/* Details Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="md:col-span-2">
+                                <h3 className="text-sm font-medium text-gray-500">Title</h3>
+                                <p className="mt-1 text-lg font-semibold text-gray-900">{viewingCourse?.title}</p>
+                            </div>
 
-                        <div>
-                            <h3 className="text-sm font-medium text-gray-500">Duration</h3>
-                            <p className="mt-1 text-gray-900">{viewingCourse?.duration || 'Flexible'}</p>
-                        </div>
+                            {viewingCourse?.institution_name && (
+                                <div className="md:col-span-2">
+                                    <h3 className="text-sm font-medium text-gray-500">Institution Name</h3>
+                                    <p className="mt-1 text-gray-900 font-medium">{viewingCourse.institution_name}</p>
+                                </div>
+                            )}
 
-                        <div>
-                            <h3 className="text-sm font-medium text-gray-500">Featured</h3>
-                            <span
-                                className={`inline-flex mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${viewingCourse?.is_featured
+                            <div>
+                                <h3 className="text-sm font-medium text-gray-500">Price</h3>
+                                <p className="mt-1 text-gray-900 font-semibold">
+                                    {viewingCourse?.price ? `Rs. ${parseFloat(viewingCourse.price).toLocaleString()}` : 'Free'}
+                                </p>
+                            </div>
+
+                            <div>
+                                <h3 className="text-sm font-medium text-gray-500">Duration</h3>
+                                <p className="mt-1 text-gray-900">{viewingCourse?.duration || 'Flexible'}</p>
+                            </div>
+
+                            <div>
+                                <h3 className="text-sm font-medium text-gray-500">Featured</h3>
+                                <span
+                                    className={`inline-flex mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${viewingCourse?.is_featured
                                         ? 'bg-yellow-100 text-yellow-800'
                                         : 'bg-gray-100 text-gray-600'
-                                    }`}
-                            >
-                                {viewingCourse?.is_featured ? 'Yes' : 'No'}
-                            </span>
-                        </div>
+                                        }`}
+                                >
+                                    {viewingCourse?.is_featured ? 'Yes' : 'No'}
+                                </span>
+                            </div>
 
 
 
-                        <div className="md:col-span-2">
-                            <h3 className="text-sm font-medium text-gray-500">Description</h3>
-                            <div className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                {viewingCourse?.description || "No description provided."}
+                            <div className="md:col-span-2">
+                                <h3 className="text-sm font-medium text-gray-500">Description</h3>
+                                <div className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                                    {viewingCourse?.description || "No description provided."}
+                                </div>
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <h3 className="text-sm font-medium text-gray-500">Detailed Content</h3>
+                                <div
+                                    className="mt-1 prose prose-sm max-w-none text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100 min-h-[200px]"
+                                    dangerouslySetInnerHTML={{
+                                        __html: viewingCourse?.content ? DOMPurify.sanitize(viewingCourse.content) : "No content provided."
+                                    }}
+                                />
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <h3 className="text-sm font-medium text-gray-500">Created At</h3>
+                                <p className="mt-1 text-gray-900">{viewingCourse?.createdAt ? formatDate(viewingCourse.createdAt) : 'N/A'}</p>
                             </div>
                         </div>
 
-                        <div className="md:col-span-2">
-                            <h3 className="text-sm font-medium text-gray-500">Detailed Content</h3>
-                            <div 
-                                className="mt-1 prose prose-sm max-w-none text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100 min-h-[200px]"
-                                dangerouslySetInnerHTML={{ 
-                                    __html: viewingCourse?.content ? DOMPurify.sanitize(viewingCourse.content) : "No content provided." 
-                                }}
-                            />
-                        </div>
-
-                        <div className="md:col-span-2">
-                            <h3 className="text-sm font-medium text-gray-500">Created At</h3>
-                            <p className="mt-1 text-gray-900">{viewingCourse?.createdAt ? formatDate(viewingCourse.createdAt) : 'N/A'}</p>
+                        <div className="flex justify-end pt-4 border-t mt-6">
+                            <Button onClick={() => setIsViewModalOpen(false)}>
+                                Close
+                            </Button>
                         </div>
                     </div>
-
-                    <div className="flex justify-end pt-4 border-t mt-6">
-                        <Button onClick={() => setIsViewModalOpen(false)}>
-                            Close
-                        </Button>
-                    </div>
-                </div>
                 </DialogContent>
             </Dialog>
 

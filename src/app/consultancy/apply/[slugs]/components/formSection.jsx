@@ -1,20 +1,23 @@
 'use client'
 
+import ActionCard from '@/ui/molecules/ActionCard'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { useMutation } from '@tanstack/react-query'
-import { Handshake } from 'lucide-react'
+import { CheckCircle2, Handshake } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { FaSpinner as FaSpinnerIcon } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { applyToConsultancy } from '../query/applyConsultancy.query'
+import { THEME_BLUE } from '@/constants/constants'
 
 const FormSection = ({ consultancy }) => {
   const user = useSelector((state) => state.user?.data)
   const isLoggedIn = !!user
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
   const [formData, setFormData] = useState({
     consultancy_id: consultancy?.id || 0,
@@ -41,7 +44,8 @@ const FormSection = ({ consultancy }) => {
   const applyMutation = useMutation({
     mutationFn: applyToConsultancy,
     onSuccess: (data) => {
-      toast.success(data.message || 'Application Submitted Successfully')
+      // toast.success(data.message || 'Application Submitted Successfully')
+      setIsSubmitted(true)
       setFormData((prev) => ({
         ...prev,
         student_description: ''
@@ -59,7 +63,7 @@ const FormSection = ({ consultancy }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    
+
     if (!isLoggedIn) {
       toast.error('Please login to apply')
       return
@@ -73,39 +77,62 @@ const FormSection = ({ consultancy }) => {
     applyMutation.mutate({ payload })
   }
 
+  if (isSubmitted) {
+    return (
+      <ActionCard
+        variant='centered'
+        icon={<CheckCircle2 className='w-full h-full' />}
+        title='Application Submitted!'
+        description={
+          <>
+            Thank you for applying. Your application has been successfully
+            submitted to the consultancy. We will get back to you soon.
+          </>
+        }
+      >
+        <Link href='/'>
+          <Button
+            variant='outline'
+            className='min-w-[160px] h-12 text-base font-medium'
+          >
+            Go Home
+          </Button>
+        </Link>
+        <Link href='/dashboard'>
+          <Button
+            className='min-w-[160px] h-12 text-base font-medium text-white shadow-md transition-all hover:-translate-y-0.5'
+            style={{ backgroundColor: THEME_BLUE }}
+          >
+            Go to Dashboard
+          </Button>
+        </Link>
+      </ActionCard>
+    )
+  }
+
   if (!isLoggedIn) {
     return (
-      <div className='w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden text-center'>
-        <div className='bg-gradient-to-r from-[#0A6FA7] to-[#30AD8F] p-8 text-white relative overflow-hidden mb-6'>
-          <div className='relative z-10'>
-            <div className='flex items-center justify-center gap-3 mb-2'>
-              <Handshake className='w-8 h-8' />
-              <h2 className='text-3xl font-bold'>Apply For Consultation</h2>
-            </div>
-            <p className='text-blue-50/80'>Login to begin your journey</p>
-          </div>
-        </div>
-        <div className='p-8 pt-0'>
-          <p className='text-gray-600 mb-8'>
-            Join our community to connect with top consultancies and track your progress in real-time.
-          </p>
-          <div className='flex flex-col sm:flex-row items-center justify-center gap-4'>
-            <Link href='/sign-in' className='w-full sm:w-auto'>
-              <Button className='w-full min-w-[160px] h-12 text-lg font-semibold bg-[#0A6FA7] hover:bg-[#085e8a] transition-all'>
-                Login Now
-              </Button>
-            </Link>
-            <Link href='/sign-in?mode=signup' className='w-full sm:w-auto'>
-              <Button
-                variant='outline'
-                className='w-full min-w-[160px] h-12 text-lg font-semibold border-2 border-[#0A6FA7] text-[#0A6FA7] hover:bg-[#0A6FA7]/10 transition-all'
-              >
-                Create Account
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
+      <ActionCard
+        icon={<Handshake className='w-full h-full' />}
+        title='Apply For Consultation'
+        subtitle='Login to begin your journey'
+        description='Join our community to connect with top consultancies and track your progress in real-time.'
+        headerClassName='from-[#0A6FA7] to-[#30AD8F] bg-gradient-to-r'
+      >
+        <Link href='/sign-in' className='w-full sm:w-auto'>
+          <Button className='w-full min-w-[160px] h-12 text-lg font-semibold bg-[#0A6FA7] hover:bg-[#085e8a] transition-all'>
+            Login Now
+          </Button>
+        </Link>
+        <Link href='/sign-in?mode=signup' className='w-full sm:w-auto'>
+          <Button
+            variant='outline'
+            className='w-full min-w-[160px] h-12 text-lg font-semibold border-2 border-[#0A6FA7] text-[#0A6FA7] hover:bg-[#0A6FA7]/10 transition-all'
+          >
+            Create Account
+          </Button>
+        </Link>
+      </ActionCard>
     )
   }
 

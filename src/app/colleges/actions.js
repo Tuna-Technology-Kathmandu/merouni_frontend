@@ -214,3 +214,27 @@ export async function getUniversity(searchQuery = '') {
     return []
   }
 }
+// check if already applied
+export async function checkIfApplied(collegeId, studentId) {
+  try {
+    const response = await fetch(
+      `${process.env.baseUrl}/referral/check-if-already-applied-for-collage?college_id=${collegeId}&student_id=${studentId}`,
+      {
+        method: 'GET',
+        cache: 'no-store'
+      }
+    )
+
+    if (!response.ok) {
+      
+      const errorData = await response.json()
+      return { error: errorData.error || errorData.message || 'Failed to check status' }
+    }
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('Error checking application status:', error)
+    return { error: error.message }
+  }
+}

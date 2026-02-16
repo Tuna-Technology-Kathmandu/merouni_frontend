@@ -22,7 +22,7 @@ import Table from '@/ui/shadcn/DataTable'
 import { Button } from '@/ui/shadcn/button'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import { formatDate } from '@/utils/date.util'
 
 const AppliedScholarshipsPage = () => {

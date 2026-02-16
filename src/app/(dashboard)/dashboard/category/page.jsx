@@ -10,7 +10,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import {
   Dialog,
   DialogContent,
@@ -371,71 +371,71 @@ export default function CategoryManager() {
             </div>
           </DialogHeader>
           <DialogContent>
-          <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className='flex flex-col flex-1 overflow-hidden'
-            >
-              <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                <div className='bg-white p-6 rounded-lg shadow-md'>
-                  <h2 className='text-xl font-semibold mb-4'>
-                    Category Information
-                  </h2>
-                  <div className='space-y-4'>
-                    <div>
-                      <label className='block mb-2'>
-                        Category Title <span className='text-red-500'>*</span>
-                      </label>
-                      <input
-                        type='text'
-                        placeholder='Category Title'
-                        {...register('title', {
-                          required: 'Title is required'
-                        })}
-                        className='w-full p-2 border rounded'
-                      />
-                      {errors.title && (
-                        <span className='text-red-500 text-sm'>
-                          {errors.title.message}
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <label className='block mb-2'>Description</label>
-                      <textarea
-                        placeholder='Description'
-                        {...register('description')}
-                        className='w-full p-2 border rounded'
-                        rows={4}
-                      />
-                    </div>
-                    <div>
-                      <label className='block mb-2'>
-                        Category Type
-                      </label>
-                      <select
-                        {...register('type')}
-                        className='w-full p-2 border rounded'
-                      >
-                        <option value=''>Select Type </option>
-                        <option value='BLOG'>BLOG</option>
-                        <option value='EVENT'>EVENT</option>
-                        <option value='NEWS'>NEWS</option>
-                        <option value='MATERIAL'>MATERIAL</option>
-                      </select>
+            <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className='flex flex-col flex-1 overflow-hidden'
+              >
+                <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+                  <div className='bg-white p-6 rounded-lg shadow-md'>
+                    <h2 className='text-xl font-semibold mb-4'>
+                      Category Information
+                    </h2>
+                    <div className='space-y-4'>
+                      <div>
+                        <label className='block mb-2'>
+                          Category Title <span className='text-red-500'>*</span>
+                        </label>
+                        <input
+                          type='text'
+                          placeholder='Category Title'
+                          {...register('title', {
+                            required: 'Title is required'
+                          })}
+                          className='w-full p-2 border rounded'
+                        />
+                        {errors.title && (
+                          <span className='text-red-500 text-sm'>
+                            {errors.title.message}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <label className='block mb-2'>Description</label>
+                        <textarea
+                          placeholder='Description'
+                          {...register('description')}
+                          className='w-full p-2 border rounded'
+                          rows={4}
+                        />
+                      </div>
+                      <div>
+                        <label className='block mb-2'>
+                          Category Type
+                        </label>
+                        <select
+                          {...register('type')}
+                          className='w-full p-2 border rounded'
+                        >
+                          <option value=''>Select Type </option>
+                          <option value='BLOG'>BLOG</option>
+                          <option value='EVENT'>EVENT</option>
+                          <option value='NEWS'>NEWS</option>
+                          <option value='MATERIAL'>MATERIAL</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Submit Button - Sticky Footer */}
-              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                <Button type='submit'>
-                  {editing ? 'Update Category' : 'Create Category'}
-                </Button>
-              </div>
-            </form>
-          </div>
+                {/* Submit Button - Sticky Footer */}
+                <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
+                  <Button type='submit'>
+                    {editing ? 'Update Category' : 'Create Category'}
+                  </Button>
+                </div>
+              </form>
+            </div>
           </DialogContent>
         </Dialog>
 
@@ -459,41 +459,41 @@ export default function CategoryManager() {
             </div>
           </DialogHeader>
           <DialogContent>
-          <div className='p-6 space-y-6'>
-            <div>
-              <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Title</h3>
-              <p className='text-lg font-semibold text-gray-900'>{viewingCategory?.title}</p>
-            </div>
-            <div>
-              <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Description</h3>
-              <p className='text-gray-700 leading-relaxed whitespace-pre-wrap'>
-                {viewingCategory?.description || 'No description provided.'}
-              </p>
-            </div>
-            <div>
-              <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Type</h3>
-              <p className='text-gray-900 font-semibold'>{viewingCategory?.type || '-'}</p>
-            </div>
-            <div className='grid grid-cols-2 gap-4'>
+            <div className='p-6 space-y-6'>
               <div>
-                <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Created At</h3>
-                <p className='text-sm text-gray-600'>
-                  {viewingCategory?.createdAt ? new Date(viewingCategory.createdAt).toLocaleDateString() : '-'}
+                <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Title</h3>
+                <p className='text-lg font-semibold text-gray-900'>{viewingCategory?.title}</p>
+              </div>
+              <div>
+                <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Description</h3>
+                <p className='text-gray-700 leading-relaxed whitespace-pre-wrap'>
+                  {viewingCategory?.description || 'No description provided.'}
                 </p>
               </div>
               <div>
-                <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Updated At</h3>
-                <p className='text-sm text-gray-600'>
-                  {viewingCategory?.updatedAt ? new Date(viewingCategory.updatedAt).toLocaleDateString() : '-'}
-                </p>
+                <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Type</h3>
+                <p className='text-gray-900 font-semibold'>{viewingCategory?.type || '-'}</p>
+              </div>
+              <div className='grid grid-cols-2 gap-4'>
+                <div>
+                  <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Created At</h3>
+                  <p className='text-sm text-gray-600'>
+                    {viewingCategory?.createdAt ? new Date(viewingCategory.createdAt).toLocaleDateString() : '-'}
+                  </p>
+                </div>
+                <div>
+                  <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-1'>Updated At</h3>
+                  <p className='text-sm text-gray-600'>
+                    {viewingCategory?.updatedAt ? new Date(viewingCategory.updatedAt).toLocaleDateString() : '-'}
+                  </p>
+                </div>
+              </div>
+              <div className='flex justify-end pt-4'>
+                <Button onClick={() => setIsViewOpen(false)}>Close</Button>
               </div>
             </div>
-            <div className='flex justify-end pt-4'>
-              <Button onClick={() => setIsViewOpen(false)}>Close</Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
 
         {/* Table */}
         <Table

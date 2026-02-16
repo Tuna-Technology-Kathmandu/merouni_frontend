@@ -7,7 +7,7 @@ import Table from '@/ui/shadcn/DataTable'
 import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 // import { getCourses } from '@/app/action'
 import { fetchFaculties } from './action'
 import { useDebounce } from 'use-debounce'
@@ -455,232 +455,232 @@ export default function CourseForm() {
             <DialogTitle>{editing ? 'Edit Course' : 'Add Course'}</DialogTitle>
           </DialogHeader>
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className='flex flex-col flex-1 min-h-0 overflow-hidden'
-        >
-          <div className='flex-1 overflow-y-auto px-6 space-y-6'>
-            <div className='space-y-4'>
-              <br/>
-                           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                {/* Title Field */}
-                <div className='space-y-2'>
-                  <RequiredLabel htmlFor='title'>Course Title</RequiredLabel>
-                  <Input
-                    id='title'
-                    placeholder='Enter course title'
-                    {...register('title', { required: 'Title is required' })}
-                    aria-invalid={errors.title ? 'true' : 'false'}
-                    className={
-                      errors.title
-                        ? 'border-destructive focus-visible:ring-destructive'
-                        : ''
-                    }
-                  />
-                  {errors.title && (
-                    <p className='text-sm font-medium text-destructive'>
-                      {errors.title.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Code Field */}
-                <div className='space-y-2'>
-                  <RequiredLabel htmlFor='code'>Course Code</RequiredLabel>
-                  <Input
-                    id='code'
-                    placeholder='e.g., CS101'
-                    {...register('code', { required: 'Code is required' })}
-                    aria-invalid={errors.code ? 'true' : 'false'}
-                    className={
-                      errors.code
-                        ? 'border-destructive focus-visible:ring-destructive'
-                        : ''
-                    }
-                  />
-                  {errors.code && (
-                    <p className='text-sm font-medium text-destructive'>
-                      {errors.code.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Duration Field */}
-                <div className='space-y-2'>
-                  <RequiredLabel htmlFor='duration'>
-                    Duration (months)
-                  </RequiredLabel>
-                  <Input
-                    id='duration'
-                    type='number'
-                    placeholder='e.g., 6'
-                    {...register('duration', {
-                      required: 'Duration is required',
-                      min: {
-                        value: 1,
-                        message: 'Duration must be at least 1 month'
-                      }
-                    })}
-                    aria-invalid={errors.duration ? 'true' : 'false'}
-                    className={
-                      errors.duration
-                        ? 'border-destructive focus-visible:ring-destructive'
-                        : ''
-                    }
-                  />
-                  {errors.duration && (
-                    <p className='text-sm font-medium text-destructive'>
-                      {errors.duration.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Credits Field */}
-                <div className='space-y-2'>
-                  <Label htmlFor='credits'>Credits</Label>
-                  <Input
-                    id='credits'
-                    type='number'
-                    placeholder='e.g., 3.0'
-                    step='0.1'
-                    {...register('credits', {
-                      required: false,
-                      valueAsNumber: true,
-                      min: { value: 0, message: 'Credits must be positive' }
-                    })}
-                    aria-invalid={errors.credits ? 'true' : 'false'}
-                    className={
-                      errors.credits
-                        ? 'border-destructive focus-visible:ring-destructive'
-                        : ''
-                    }
-                  />
-                  {errors.credits && (
-                    <p className='text-sm font-medium text-destructive'>
-                      {errors.credits.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Faculty Field */}
-                <div className='relative md:col-span-2 space-y-2'>
-                  <Label htmlFor='faculty-search'>
-                    Faculty
-                  </Label>
-                  <div className='relative'>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className='flex flex-col flex-1 min-h-0 overflow-hidden'
+          >
+            <div className='flex-1 overflow-y-auto px-6 space-y-6'>
+              <div className='space-y-4'>
+                <br />
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  {/* Title Field */}
+                  <div className='space-y-2'>
+                    <RequiredLabel htmlFor='title'>Course Title</RequiredLabel>
                     <Input
-                      id='faculty-search'
-                      type='text'
-                      value={facSearch}
-                      onChange={(e) => {
-                        setFacSearch(e.target.value)
-                        setHasSelectedFac(false)
-                      }}
-                      placeholder='Search and select faculty'
-                      aria-invalid={errors.facultyId ? 'true' : 'false'}
+                      id='title'
+                      placeholder='Enter course title'
+                      {...register('title', { required: 'Title is required' })}
+                      aria-invalid={errors.title ? 'true' : 'false'}
                       className={
-                        errors.facultyId
+                        errors.title
                           ? 'border-destructive focus-visible:ring-destructive'
                           : ''
                       }
                     />
-
-                    {/* Hidden input for react-hook-form binding */}
-                    <input
-                      type='hidden'
-                      {...register('facultyId', {
-                        required: false
-                      })}
-                    />
-
-                    {/* Dropdown */}
-                    {loadFac ? (
-                      <div className='absolute z-10 w-full top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg p-2'>
-                        <p className='text-muted-foreground text-sm'>
-                          Loading...
-                        </p>
-                      </div>
-                    ) : showFacDrop ? (
-                      faculties.length > 0 ? (
-                        <ul className='absolute z-10 w-full top-full mt-1 bg-white border border-gray-200 rounded-md max-h-60 overflow-y-auto shadow-lg'>
-                          {faculties.map((fac) => (
-                            <li
-                              key={fac.id}
-                              className='px-3 py-2 cursor-pointer hover:bg-blue-50 hover:text-blue-600 transition-colors'
-                              onClick={() => {
-                                setValue('facultyId', Number(fac.id))
-                                setFacSearch(fac.title)
-                                setShowFacDrop(false)
-                                setHasSelectedFac(true)
-                              }}
-                            >
-                              {fac.title}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <div className='absolute z-10 w-full top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg p-2 text-muted-foreground text-sm'>
-                          No faculty found
-                        </div>
-                      )
-                    ) : null}
+                    {errors.title && (
+                      <p className='text-sm font-medium text-destructive'>
+                        {errors.title.message}
+                      </p>
+                    )}
                   </div>
-                  {errors.facultyId && (
-                    <p className='text-sm font-medium text-destructive'>
-                      {errors.facultyId.message}
+
+                  {/* Code Field */}
+                  <div className='space-y-2'>
+                    <RequiredLabel htmlFor='code'>Course Code</RequiredLabel>
+                    <Input
+                      id='code'
+                      placeholder='e.g., CS101'
+                      {...register('code', { required: 'Code is required' })}
+                      aria-invalid={errors.code ? 'true' : 'false'}
+                      className={
+                        errors.code
+                          ? 'border-destructive focus-visible:ring-destructive'
+                          : ''
+                      }
+                    />
+                    {errors.code && (
+                      <p className='text-sm font-medium text-destructive'>
+                        {errors.code.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Duration Field */}
+                  <div className='space-y-2'>
+                    <RequiredLabel htmlFor='duration'>
+                      Duration (months)
+                    </RequiredLabel>
+                    <Input
+                      id='duration'
+                      type='number'
+                      placeholder='e.g., 6'
+                      {...register('duration', {
+                        required: 'Duration is required',
+                        min: {
+                          value: 1,
+                          message: 'Duration must be at least 1 month'
+                        }
+                      })}
+                      aria-invalid={errors.duration ? 'true' : 'false'}
+                      className={
+                        errors.duration
+                          ? 'border-destructive focus-visible:ring-destructive'
+                          : ''
+                      }
+                    />
+                    {errors.duration && (
+                      <p className='text-sm font-medium text-destructive'>
+                        {errors.duration.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Credits Field */}
+                  <div className='space-y-2'>
+                    <Label htmlFor='credits'>Credits</Label>
+                    <Input
+                      id='credits'
+                      type='number'
+                      placeholder='e.g., 3.0'
+                      step='0.1'
+                      {...register('credits', {
+                        required: false,
+                        valueAsNumber: true,
+                        min: { value: 0, message: 'Credits must be positive' }
+                      })}
+                      aria-invalid={errors.credits ? 'true' : 'false'}
+                      className={
+                        errors.credits
+                          ? 'border-destructive focus-visible:ring-destructive'
+                          : ''
+                      }
+                    />
+                    {errors.credits && (
+                      <p className='text-sm font-medium text-destructive'>
+                        {errors.credits.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Faculty Field */}
+                  <div className='relative md:col-span-2 space-y-2'>
+                    <Label htmlFor='faculty-search'>
+                      Faculty
+                    </Label>
+                    <div className='relative'>
+                      <Input
+                        id='faculty-search'
+                        type='text'
+                        value={facSearch}
+                        onChange={(e) => {
+                          setFacSearch(e.target.value)
+                          setHasSelectedFac(false)
+                        }}
+                        placeholder='Search and select faculty'
+                        aria-invalid={errors.facultyId ? 'true' : 'false'}
+                        className={
+                          errors.facultyId
+                            ? 'border-destructive focus-visible:ring-destructive'
+                            : ''
+                        }
+                      />
+
+                      {/* Hidden input for react-hook-form binding */}
+                      <input
+                        type='hidden'
+                        {...register('facultyId', {
+                          required: false
+                        })}
+                      />
+
+                      {/* Dropdown */}
+                      {loadFac ? (
+                        <div className='absolute z-10 w-full top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg p-2'>
+                          <p className='text-muted-foreground text-sm'>
+                            Loading...
+                          </p>
+                        </div>
+                      ) : showFacDrop ? (
+                        faculties.length > 0 ? (
+                          <ul className='absolute z-10 w-full top-full mt-1 bg-white border border-gray-200 rounded-md max-h-60 overflow-y-auto shadow-lg'>
+                            {faculties.map((fac) => (
+                              <li
+                                key={fac.id}
+                                className='px-3 py-2 cursor-pointer hover:bg-blue-50 hover:text-blue-600 transition-colors'
+                                onClick={() => {
+                                  setValue('facultyId', Number(fac.id))
+                                  setFacSearch(fac.title)
+                                  setShowFacDrop(false)
+                                  setHasSelectedFac(true)
+                                }}
+                              >
+                                {fac.title}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <div className='absolute z-10 w-full top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg p-2 text-muted-foreground text-sm'>
+                            No faculty found
+                          </div>
+                        )
+                      ) : null}
+                    </div>
+                    {errors.facultyId && (
+                      <p className='text-sm font-medium text-destructive'>
+                        {errors.facultyId.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Syllabus Topics Field */}
+                  <div className='md:col-span-2 space-y-2'>
+                    <Label htmlFor='syllabus'>Syllabus Topics</Label>
+                    <textarea
+                      id='syllabus'
+                      {...register('syllabus')}
+                      className='flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                      rows='3'
+                      placeholder='Enter topics separated by commas (e.g., Introduction, Fundamentals, Advanced Topics)'
+                    />
+                    <p className='text-xs text-muted-foreground'>
+                      Enter topics separated by commas
                     </p>
-                  )}
+                  </div>
                 </div>
+              </div>
 
-                {/* Syllabus Topics Field */}
-                <div className='md:col-span-2 space-y-2'>
-                  <Label htmlFor='syllabus'>Syllabus Topics</Label>
-                  <textarea
-                    id='syllabus'
-                    {...register('syllabus')}
-                    className='flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                    rows='3'
-                    placeholder='Enter topics separated by commas (e.g., Introduction, Fundamentals, Advanced Topics)'
+              {/* Description Editor */}
+              <div className='md:col-span-2 space-y-2 pt-2'>
+                <Label>Description</Label>
+                <div className='border border-input rounded-md overflow-hidden'>
+                  <TipTapEditor
+                    value={getValues('description')}
+                    onChange={(data) => setValue('description', data)}
+                    placeholder='Enter course description...'
                   />
-                  <p className='text-xs text-muted-foreground'>
-                    Enter topics separated by commas
-                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Description Editor */}
-            <div className='md:col-span-2 space-y-2 pt-2'>
-              <Label>Description</Label>
-              <div className='border border-input rounded-md overflow-hidden'>
-                <TipTapEditor
-                  value={getValues('description')}
-                  onChange={(data) => setValue('description', data)}
-                  placeholder='Enter course description...'
-                />
-              </div>
+            {/* Action Buttons - Sticky Footer */}
+            <div className='sticky bottom-0 bg-white border-t pt-4 pb-4 px-6 mt-4 flex justify-end gap-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]'>
+              <Button
+                type='button'
+                onClick={handleModalClose}
+                variant='outline'
+                size='sm'
+              >
+                Cancel
+              </Button>
+              <Button type='submit' disabled={submitting} size='sm'>
+                {submitting
+                  ? 'Processing...'
+                  : editing
+                    ? 'Update Course'
+                    : 'Create Course'}
+              </Button>
             </div>
-          </div>
-
-          {/* Action Buttons - Sticky Footer */}
-          <div className='sticky bottom-0 bg-white border-t pt-4 pb-4 px-6 mt-4 flex justify-end gap-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]'>
-            <Button
-              type='button'
-              onClick={handleModalClose}
-              variant='outline'
-              size='sm'
-            >
-              Cancel
-            </Button>
-            <Button type='submit' disabled={submitting} size='sm'>
-              {submitting
-                ? 'Processing...'
-                : editing
-                  ? 'Update Course'
-                  : 'Create Course'}
-            </Button>
-          </div>
-        </form>
+          </form>
         </DialogContent>
       </Dialog>
 
@@ -705,106 +705,106 @@ export default function CourseForm() {
           <DialogHeader>
             <DialogTitle>Course Details</DialogTitle>
           </DialogHeader>
-        {loadingView ? (
-          <div className='flex justify-center items-center h-48'>
-            Loading...
-          </div>
-        ) : viewCourseData ? (
-          <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
-            <div>
-              <h2 className='text-2xl font-bold text-gray-800'>
-                {viewCourseData.title}
-              </h2>
+          {loadingView ? (
+            <div className='flex justify-center items-center h-48'>
+              Loading...
             </div>
-
-            <div className='grid grid-cols-2 gap-4'>
+          ) : viewCourseData ? (
+            <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
               <div>
-                <h3 className='text-lg font-semibold mb-2'>Course Code</h3>
-                <p className='text-gray-700'>{viewCourseData.code || 'N/A'}</p>
+                <h2 className='text-2xl font-bold text-gray-800'>
+                  {viewCourseData.title}
+                </h2>
               </div>
 
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Duration</h3>
-                <p className='text-gray-700'>
-                  {viewCourseData.duration
-                    ? `${viewCourseData.duration} months`
-                    : 'N/A'}
-                </p>
-              </div>
-
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Credits</h3>
-                <p className='text-gray-700'>
-                  {viewCourseData.credits || 'N/A'}
-                </p>
-              </div>
-
-              {viewCourseData.coursefaculty && (
+              <div className='grid grid-cols-2 gap-4'>
                 <div>
-                  <h3 className='text-lg font-semibold mb-2'>Faculty</h3>
+                  <h3 className='text-lg font-semibold mb-2'>Course Code</h3>
+                  <p className='text-gray-700'>{viewCourseData.code || 'N/A'}</p>
+                </div>
+
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Duration</h3>
                   <p className='text-gray-700'>
-                    {viewCourseData.coursefaculty.title || 'N/A'}
+                    {viewCourseData.duration
+                      ? `${viewCourseData.duration} months`
+                      : 'N/A'}
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Credits</h3>
+                  <p className='text-gray-700'>
+                    {viewCourseData.credits || 'N/A'}
+                  </p>
+                </div>
+
+                {viewCourseData.coursefaculty && (
+                  <div>
+                    <h3 className='text-lg font-semibold mb-2'>Faculty</h3>
+                    <p className='text-gray-700'>
+                      {viewCourseData.coursefaculty.title || 'N/A'}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {viewCourseData.description && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Description</h3>
+                  <div
+                    className='text-gray-700 prose max-w-none'
+                    dangerouslySetInnerHTML={{
+                      __html: viewCourseData.description
+                    }}
+                  />
+                </div>
+              )}
+
+              {viewCourseData.syllabus && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Syllabus Topics</h3>
+                  <div className='text-gray-700'>
+                    {(() => {
+                      try {
+                        const syllabus =
+                          typeof viewCourseData.syllabus === 'string'
+                            ? JSON.parse(viewCourseData.syllabus)
+                            : viewCourseData.syllabus
+                        if (Array.isArray(syllabus) && syllabus.length > 0) {
+                          return (
+                            <ul className='list-disc list-inside space-y-1'>
+                              {syllabus.map((topic, index) => (
+                                <li key={index}>{topic}</li>
+                              ))}
+                            </ul>
+                          )
+                        }
+                        return <p>No syllabus topics available</p>
+                      } catch (error) {
+                        return <p>Unable to parse syllabus</p>
+                      }
+                    })()}
+                  </div>
+                </div>
+              )}
+
+              {viewCourseData.author && (
+                <div>
+                  <h3 className='text-lg font-semibold mb-2'>Author</h3>
+                  <p className='text-gray-700'>
+                    {viewCourseData.author.firstName}{' '}
+                    {viewCourseData.author.middleName}{' '}
+                    {viewCourseData.author.lastName}
                   </p>
                 </div>
               )}
             </div>
-
-            {viewCourseData.description && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Description</h3>
-                <div
-                  className='text-gray-700 prose max-w-none'
-                  dangerouslySetInnerHTML={{
-                    __html: viewCourseData.description
-                  }}
-                />
-              </div>
-            )}
-
-            {viewCourseData.syllabus && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Syllabus Topics</h3>
-                <div className='text-gray-700'>
-                  {(() => {
-                    try {
-                      const syllabus =
-                        typeof viewCourseData.syllabus === 'string'
-                          ? JSON.parse(viewCourseData.syllabus)
-                          : viewCourseData.syllabus
-                      if (Array.isArray(syllabus) && syllabus.length > 0) {
-                        return (
-                          <ul className='list-disc list-inside space-y-1'>
-                            {syllabus.map((topic, index) => (
-                              <li key={index}>{topic}</li>
-                            ))}
-                          </ul>
-                        )
-                      }
-                      return <p>No syllabus topics available</p>
-                    } catch (error) {
-                      return <p>Unable to parse syllabus</p>
-                    }
-                  })()}
-                </div>
-              </div>
-            )}
-
-            {viewCourseData.author && (
-              <div>
-                <h3 className='text-lg font-semibold mb-2'>Author</h3>
-                <p className='text-gray-700'>
-                  {viewCourseData.author.firstName}{' '}
-                  {viewCourseData.author.middleName}{' '}
-                  {viewCourseData.author.lastName}
-                </p>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className='flex justify-center items-center h-48'>
-            <p className='text-gray-500'>No course data available</p>
-          </div>
-        )}
+          ) : (
+            <div className='flex justify-center items-center h-48'>
+              <p className='text-gray-500'>No course data available</p>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </>

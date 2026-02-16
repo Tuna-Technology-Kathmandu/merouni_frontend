@@ -21,7 +21,7 @@ import {
   DialogClose
 } from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import { Button } from '@/ui/shadcn/button'
 import ViewFaculty from '@/ui/molecules/dialogs/ViewFaculty'
 import SearchInput from '@/ui/molecules/SearchInput'
@@ -324,57 +324,57 @@ export default function FacultyManager() {
           </div>
         </DialogHeader>
         <DialogContent>
-        <form onSubmit={handleSubmit} className='space-y-6'>
-          <div className='space-y-4'>
-            <div>
-              <label className='block mb-2'>
-                Faculty Title <span className='text-red-500'>*</span>
-              </label>
-              <input
-                type='text'
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                className='w-full p-2 border rounded'
-                placeholder='Enter faculty title'
-                required
-              />
+          <form onSubmit={handleSubmit} className='space-y-6'>
+            <div className='space-y-4'>
+              <div>
+                <label className='block mb-2'>
+                  Faculty Title <span className='text-red-500'>*</span>
+                </label>
+                <input
+                  type='text'
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                  className='w-full p-2 border rounded'
+                  placeholder='Enter faculty title'
+                  required
+                />
+              </div>
+              <div>
+                <label className='block mb-2'>Description</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  className='w-full p-2 border rounded min-h-[150px]'
+                  rows={6}
+                  placeholder='Enter faculty description'
+                />
+              </div>
             </div>
-            <div>
-              <label className='block mb-2'>Description</label>
-              <textarea
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                className='w-full p-2 border rounded min-h-[150px]'
-                rows={6}
-                placeholder='Enter faculty description'
-              />
-            </div>
-          </div>
 
-          <div className='flex justify-end gap-2'>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={handleModalClose}
-            >
-              Cancel
-            </Button>
-            <Button
-              type='submit'
-              disabled={submitting}
-            >
-              {submitting
-                ? 'Processing...'
-                : editingId
-                  ? 'Update Faculty'
-                  : 'Create Faculty'}
-            </Button>
-          </div>
-        </form>
+            <div className='flex justify-end gap-2'>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={handleModalClose}
+              >
+                Cancel
+              </Button>
+              <Button
+                type='submit'
+                disabled={submitting}
+              >
+                {submitting
+                  ? 'Processing...'
+                  : editingId
+                    ? 'Update Faculty'
+                    : 'Create Faculty'}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
 

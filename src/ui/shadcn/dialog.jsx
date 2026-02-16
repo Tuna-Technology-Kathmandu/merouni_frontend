@@ -5,14 +5,18 @@ import { cn } from '@/app/lib/utils'
 const Dialog = React.forwardRef(
   ({ isOpen, onClose, children, className, ...props }, ref) => {
     React.useEffect(() => {
+      const originalStyle = window.getComputedStyle(document.body).overflow
+      const originalPaddingRight = document.body.style.paddingRight
+
       if (isOpen) {
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+        document.body.style.paddingRight = `${scrollbarWidth}px`
         document.body.style.overflow = 'hidden'
-      } else {
-        document.body.style.overflow = 'unset'
       }
-      
+
       return () => {
-        document.body.style.overflow = 'unset'
+        document.body.style.overflow = originalStyle
+        document.body.style.paddingRight = originalPaddingRight
       }
     }, [isOpen])
 
@@ -73,8 +77,8 @@ DialogDescription.displayName = 'DialogDescription'
 
 const DialogContent = React.forwardRef(
   ({ className, children, ...props }, ref) => (
-    <div 
-      ref={ref} 
+    <div
+      ref={ref}
       className={cn(
         'overflow-y-auto px-6 py-4',
         'scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent',
@@ -87,7 +91,7 @@ const DialogContent = React.forwardRef(
         'hover:[&::-webkit-scrollbar-thumb]:opacity-100',
         '[&::-webkit-scrollbar-thumb]:transition-opacity',
         className
-      )} 
+      )}
       {...props}
     >
       {children}

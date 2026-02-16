@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import { Button } from '@/ui/shadcn/button'
 import { Search, X, ChevronDown } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
@@ -333,7 +333,7 @@ const ConsultancyReferralsPage = () => {
         </div>
 
         {/* Consultancy Filter Dropdown */}
-        <ConsultancyDropdown 
+        <ConsultancyDropdown
           value={consultancyFilter}
           onChange={handleConsultancySelect}
           placeholder="All Consultancies"
@@ -367,36 +367,36 @@ const ConsultancyReferralsPage = () => {
           <DialogHeader>
             <DialogTitle>Update Status</DialogTitle>
           </DialogHeader>
-        <form onSubmit={handleStatusSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Status</label>
-            <select
-              className="w-full border rounded p-2"
-              value={statusForm.status}
-              onChange={(e) => setStatusForm({ ...statusForm, status: e.target.value })}
-            >
-              {statusOptions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Remarks</label>
-            <textarea
-              className="w-full border rounded p-2"
-              rows={3}
-              value={statusForm.remarks}
-              onChange={(e) => setStatusForm({ ...statusForm, remarks: e.target.value })}
-              placeholder="Add remarks..."
-            />
-          </div>
-          <div className="flex justify-end gap-2 mt-4">
-            <Button type="button" variant="outline" onClick={() => setStatusModalOpen(false)}>Cancel</Button>
-            <Button type="submit" disabled={!!updatingId}>
-              {updatingId ? 'Updating...' : 'Update'}
-            </Button>
-          </div>
-        </form>
+          <form onSubmit={handleStatusSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Status</label>
+              <select
+                className="w-full border rounded p-2"
+                value={statusForm.status}
+                onChange={(e) => setStatusForm({ ...statusForm, status: e.target.value })}
+              >
+                {statusOptions.map(opt => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Remarks</label>
+              <textarea
+                className="w-full border rounded p-2"
+                rows={3}
+                value={statusForm.remarks}
+                onChange={(e) => setStatusForm({ ...statusForm, remarks: e.target.value })}
+                placeholder="Add remarks..."
+              />
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <Button type="button" variant="outline" onClick={() => setStatusModalOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={!!updatingId}>
+                {updatingId ? 'Updating...' : 'Update'}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
 

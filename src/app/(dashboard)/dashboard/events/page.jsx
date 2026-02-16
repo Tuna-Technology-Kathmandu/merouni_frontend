@@ -16,11 +16,12 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Table from '@/ui/shadcn/DataTable'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+
 import FileUpload from '../addCollege/FileUpload'
 import { fetchCategories } from '../category/action'
 import SearchInput from '@/ui/molecules/SearchInput'
 import { formatDate } from '@/utils/date.util'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 
 const CKBlogs = dynamic(() => import('../component/CKBlogs'), {
   ssr: false

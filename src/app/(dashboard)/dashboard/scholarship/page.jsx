@@ -18,7 +18,7 @@ import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import Loading from '../../../../ui/molecules/Loading'
 import Table from '@/ui/shadcn/DataTable'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import ScholarshipFormDialog from '@/ui/organisms/admin-dashboard/ScholarshipFormDialog'
 import {
   createScholarship,
@@ -379,15 +379,15 @@ export default function ScholarshipManager() {
         <ToastContainer />
 
         {/* Table */}
-          <Table
-            loading={tableLoading}
-            data={scholarships}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => loadScholarships(newPage)}
-            onSearch={handleSearch}
-            showSearch={false}
-          />
+        <Table
+          loading={tableLoading}
+          data={scholarships}
+          columns={columns}
+          pagination={pagination}
+          onPageChange={(newPage) => loadScholarships(newPage)}
+          onSearch={handleSearch}
+          showSearch={false}
+        />
       </div>
 
       {/* Form Dialog */}
@@ -482,10 +482,10 @@ export default function ScholarshipManager() {
                       <div className='ml-4'>
                         <span
                           className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${application.status === 'APPROVED'
-                              ? 'bg-green-50 text-green-700 border border-green-200'
-                              : application.status === 'REJECTED'
-                                ? 'bg-red-50 text-red-700 border border-red-200'
-                                : 'bg-yellow-50 text-yellow-700 border border-yellow-200'
+                            ? 'bg-green-50 text-green-700 border border-green-200'
+                            : application.status === 'REJECTED'
+                              ? 'bg-red-50 text-red-700 border border-red-200'
+                              : 'bg-yellow-50 text-yellow-700 border border-yellow-200'
                             }`}
                         >
                           {application.status}

@@ -5,7 +5,7 @@ import FileUpload from '../addCollege/FileUpload'
 import { Edit, Trash2, Plus, X } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '@/ui/shadcn/button'
@@ -465,7 +465,7 @@ export default function BannerForm() {
                         style={{ color: THEME_BLUE }}
                       >
                         {banner.website_url}
-                      </a> 
+                      </a>
                     )}
 
                     {banner.date_of_expiry && (

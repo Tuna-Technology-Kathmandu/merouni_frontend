@@ -34,6 +34,7 @@ const UniversityPage = () => {
     setLoading(true)
     try {
       const response = await fetchUniversities(search, page)
+      console.log(response.items,"response.items")
       if (response && response.items) {
         setUniversities(response.items)
         setPagination((prev) => ({

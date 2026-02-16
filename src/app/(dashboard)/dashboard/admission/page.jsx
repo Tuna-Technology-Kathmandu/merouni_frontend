@@ -13,16 +13,16 @@ import { Label } from '@/ui/shadcn/label'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import Table from '@/ui/shadcn/DataTable'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
-import ConfirmationDialog from '../addCollege/ConfirmationDialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import SearchInput from '@/ui/molecules/SearchInput'
 
-import { 
-    getAdmissions, 
-    getAdmissionDetail, 
-    createOrUpdateAdmission, 
-    deleteAdmission,
-    fetchColleges,
-    fetchPrograms
+import {
+  getAdmissions,
+  getAdmissionDetail,
+  createOrUpdateAdmission,
+  deleteAdmission,
+  fetchColleges,
+  fetchPrograms
 } from './action'
 import AdmissionViewModal from './AdmissionViewModal'
 import { authFetch } from '@/app/utils/authFetch'
@@ -66,10 +66,10 @@ export default function AdmissionManager() {
   const [deleteId, setDeleteId] = useState(null)
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
-  
+
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
-  
+
   const [viewModalOpen, setViewModalOpen] = useState(false)
   const [viewData, setViewData] = useState(null)
 
@@ -101,7 +101,7 @@ export default function AdmissionManager() {
   const handleSearchInput = (value) => {
     setSearchQuery(value)
     if (searchTimeout) clearTimeout(searchTimeout)
-    
+
     const timeoutId = setTimeout(() => {
       loadAdmissions(1, value)
     }, 300)
@@ -156,7 +156,7 @@ export default function AdmissionManager() {
     setEditing(true)
     setEditingId(item.id)
     setIsOpen(true)
-    
+
     // Set form values
     setValue('college_id', item.collegeAdmissionCollege?.id)
     setValue('course_id', item.program?.id)
@@ -166,8 +166,8 @@ export default function AdmissionManager() {
     setValue('description', item.description)
 
     setSelectedCollege({
-        id: item.collegeAdmissionCollege?.id,
-        name: item.collegeAdmissionCollege?.name
+      id: item.collegeAdmissionCollege?.id,
+      name: item.collegeAdmissionCollege?.name
     })
   }
 
@@ -261,109 +261,109 @@ export default function AdmissionManager() {
         <DialogContent className='max-h-[90vh] overflow-y-auto'>
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-6 pt-2'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                {/* College Selection */}
-                <div className='space-y-2'>
-                    <Label>College <span className='text-red-500'>*</span></Label>
-                    {selectedCollege ? (
-                        <div className='flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded-md'>
-                            <span className='text-sm font-medium text-blue-800'>{selectedCollege.name}</span>
-                            <button type='button' onClick={clearSelectedCollege} className='text-blue-600 hover:text-blue-800'>
-                                <X className='w-4 h-4' />
-                            </button>
-                        </div>
-                    ) : (
-                        <div className='relative'>
-                            <Input
-                                placeholder='Search college...'
-                                value={collegeSearch}
-                                onChange={searchCollegesHandler}
-                            />
-                            {collegeSearchResults.length > 0 && (
-                                <div className='absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-y-auto'>
-                                    {collegeSearchResults.map(c => (
-                                        <div 
-                                            key={c.id} 
-                                            className='p-2 hover:bg-gray-100 cursor-pointer text-sm'
-                                            onClick={() => selectCollege(c)}
-                                        >
-                                            {c.name}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+              {/* College Selection */}
+              <div className='space-y-2'>
+                <Label>College <span className='text-red-500'>*</span></Label>
+                {selectedCollege ? (
+                  <div className='flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded-md'>
+                    <span className='text-sm font-medium text-blue-800'>{selectedCollege.name}</span>
+                    <button type='button' onClick={clearSelectedCollege} className='text-blue-600 hover:text-blue-800'>
+                      <X className='w-4 h-4' />
+                    </button>
+                  </div>
+                ) : (
+                  <div className='relative'>
+                    <Input
+                      placeholder='Search college...'
+                      value={collegeSearch}
+                      onChange={searchCollegesHandler}
+                    />
+                    {collegeSearchResults.length > 0 && (
+                      <div className='absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-y-auto'>
+                        {collegeSearchResults.map(c => (
+                          <div
+                            key={c.id}
+                            className='p-2 hover:bg-gray-100 cursor-pointer text-sm'
+                            onClick={() => selectCollege(c)}
+                          >
+                            {c.name}
+                          </div>
+                        ))}
+                      </div>
                     )}
-                    {errors.college_id && <span className='text-red-500 text-xs'>College is required</span>}
-                </div>
+                  </div>
+                )}
+                {errors.college_id && <span className='text-red-500 text-xs'>College is required</span>}
+              </div>
 
-                {/* Program Selection */}
-                <div className='space-y-2'>
-                    <Label>Program <span className='text-red-500'>*</span></Label>
-                    <Controller
-                        name="course_id"
-                        control={control}
-                        rules={{ required: true }}
-                        render={({ field }) => (
-                            <ProgramDropdown
-                                value={field.value}
-                                onChange={field.onChange}
-                                className="w-full"
-                            />
-                        )}
+              {/* Program Selection */}
+              <div className='space-y-2'>
+                <Label>Program <span className='text-red-500'>*</span></Label>
+                <Controller
+                  name="course_id"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <ProgramDropdown
+                      value={field.value}
+                      onChange={field.onChange}
+                      className="w-full"
                     />
-                    {errors.course_id && <span className='text-red-500 text-xs'>Program is required</span>}
-                </div>
+                  )}
+                />
+                {errors.course_id && <span className='text-red-500 text-xs'>Program is required</span>}
+              </div>
 
-                <div className='col-span-2 space-y-2'>
-                    <Label>Eligibility Criteria</Label>
-                    <textarea 
-                        {...register('eligibility_criteria')}
-                        className='w-full p-2 border rounded-md text-sm min-h-[80px]'
-                        placeholder='Eligibility criteria details...'
-                    />
-                </div>
+              <div className='col-span-2 space-y-2'>
+                <Label>Eligibility Criteria</Label>
+                <textarea
+                  {...register('eligibility_criteria')}
+                  className='w-full p-2 border rounded-md text-sm min-h-[80px]'
+                  placeholder='Eligibility criteria details...'
+                />
+              </div>
 
-                <div className='col-span-2 space-y-2'>
-                    <Label>Admission Process</Label>
-                    <textarea 
-                        {...register('admission_process')}
-                        className='w-full p-2 border rounded-md text-sm min-h-[80px]'
-                        placeholder='Admission process steps...'
-                    />
-                </div>
+              <div className='col-span-2 space-y-2'>
+                <Label>Admission Process</Label>
+                <textarea
+                  {...register('admission_process')}
+                  className='w-full p-2 border rounded-md text-sm min-h-[80px]'
+                  placeholder='Admission process steps...'
+                />
+              </div>
 
-                <div className='col-span-2 space-y-2'>
-                    <Label>Fee Details</Label>
-                    <textarea 
-                        {...register('fee_details')}
-                        className='w-full p-2 border rounded-md text-sm min-h-[80px]'
-                        placeholder='Fee structure details...'
-                    />
-                </div>
+              <div className='col-span-2 space-y-2'>
+                <Label>Fee Details</Label>
+                <textarea
+                  {...register('fee_details')}
+                  className='w-full p-2 border rounded-md text-sm min-h-[80px]'
+                  placeholder='Fee structure details...'
+                />
+              </div>
 
 
-                <div className='col-span-2 space-y-2'>
-                    <Label>Description</Label>
-                    <TipTapEditor
-                        content={getValues('description') || ''}
-                        onChange={(html) => setValue('description', html)}
-                        placeholder='Enter description...'
-                    />
-                </div>
+              <div className='col-span-2 space-y-2'>
+                <Label>Description</Label>
+                <TipTapEditor
+                  content={getValues('description') || ''}
+                  onChange={(html) => setValue('description', html)}
+                  placeholder='Enter description...'
+                />
+              </div>
             </div>
 
             <div className='flex justify-end gap-3 pt-4 border-t'>
-                <Button type='button' variant='outline' onClick={handleCloseModal}>Cancel</Button>
-                <Button type='submit'>{editing ? 'Update' : 'Create'}</Button>
+              <Button type='button' variant='outline' onClick={handleCloseModal}>Cancel</Button>
+              <Button type='submit'>{editing ? 'Update' : 'Create'}</Button>
             </div>
           </form>
         </DialogContent>
       </Dialog>
 
-      <AdmissionViewModal 
-        isOpen={viewModalOpen} 
-        onClose={() => setViewModalOpen(false)} 
-        admission={viewData} 
+      <AdmissionViewModal
+        isOpen={viewModalOpen}
+        onClose={() => setViewModalOpen(false)}
+        admission={viewData}
       />
 
       <ConfirmationDialog
