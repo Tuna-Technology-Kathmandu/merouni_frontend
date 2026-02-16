@@ -392,9 +392,9 @@ const CreateUpdateCollegeModal = ({
                                     />
                                     <FileUploadWithPreview
                                         label='Featured Image'
-                                        onUploadComplete={(url) => setUploadedFiles(prev => ({ ...prev, featured: url }))}
-                                        defaultPreview={uploadedFiles.featured}
-                                        onClear={() => setUploadedFiles(prev => ({ ...prev, featured: '' }))}
+                                        onUploadComplete={(url) => setUploadedFiles(prev => ({ ...prev, featured_img: url }))}
+                                        defaultPreview={uploadedFiles.featured_img}
+                                        onClear={() => setUploadedFiles(prev => ({ ...prev, featured_img: '' }))}
                                     />
                                 </div>
 
@@ -426,6 +426,7 @@ const CreateUpdateCollegeModal = ({
                             <div className='space-y-2'>
                                 <Label>Full Content</Label>
                                 <CKUni
+                                initialData={watch('content')}
                                     onChange={(data) => setValue('content', data)}
                                     data={watch('content')}
                                 />
