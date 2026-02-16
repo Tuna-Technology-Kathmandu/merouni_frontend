@@ -11,7 +11,7 @@ const SmallCardList = ({ blogs }) => {
   }
 
 
-
+console.log(blogs,"blog.featured_image")
   return (
     <div className=''>
       <h1 className='text-2xl text-center font-bold mb-7'>Related Blogs</h1>
