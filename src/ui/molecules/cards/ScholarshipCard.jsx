@@ -52,17 +52,13 @@ const ScholarshipCard = ({ scholarship, onApply, isApplying }) => {
         >
           View
         </Link>
-        <button
-          onClick={(e) => {
-            e.preventDefault()
-            onApply?.(scholarship.id)
-          }}
-          disabled={isApplying || isExpired}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isExpired ? 'bg-gray-300' : 'bg-[#0A6FA7] hover:bg-[#085a86]'
+        <Link
+          href={`/scholarship/apply/${scholarship.slugs || scholarship.id}`}
+          className={`flex-1 py-2 rounded-lg text-center text-sm font-medium text-white transition-colors ${isExpired ? 'bg-gray-300 pointer-events-none' : 'bg-[#0A6FA7] hover:bg-[#085a86]'
             }`}
         >
-          {isApplying ? 'Applying...' : isExpired ? 'Expired' : 'Apply'}
-        </button>
+          {isExpired ? 'Expired' : 'Apply'}
+        </Link>
       </div>
     </article>
   )

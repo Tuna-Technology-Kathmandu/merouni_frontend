@@ -6,8 +6,7 @@ import { Select } from '@/ui/shadcn/select'
 import EmptyState from '@/ui/shadcn/EmptyState'
 import {
   fetchScholarships,
-  fetchCategories,
-  applyForScholarship
+  fetchCategories
 } from './actions'
 import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 import Navbar from '../../components/Frontpage/Navbar'
@@ -36,7 +35,6 @@ const ScholarshipPage = () => {
   const [filters, setFilters] = useState({
     category: initialCategory
   })
-  const [applyingIds, setApplyingIds] = useState(new Set())
 
   // URL Sync Helper
   const updateURL = useCallback((params) => {
@@ -119,36 +117,6 @@ const ScholarshipPage = () => {
   const clearFilters = () => {
     setSearchTerm('')
     setFilters({ category: '' })
-  }
-
-  const handleApply = async (scholarshipId) => {
-    // Check if user is logged in
-    if (!user || !user.id) {
-      toast.error('Please login to apply for scholarships')
-      router.push('/sign-in')
-      return
-    }
-
-    // Check if already applying
-    if (applyingIds.has(scholarshipId)) {
-      return
-    }
-
-    try {
-      setApplyingIds((prev) => new Set(prev).add(scholarshipId))
-
-      await applyForScholarship(scholarshipId)
-
-      toast.success('Application submitted successfully!')
-    } catch (error) {
-      toast.error(error.message || 'Failed to apply for scholarship')
-    } finally {
-      setApplyingIds((prev) => {
-        const newSet = new Set(prev)
-        newSet.delete(scholarshipId)
-        return newSet
-      })
-    }
   }
 
   return (
@@ -262,9 +230,9 @@ const ScholarshipPage = () => {
                 action={
                   searchTerm || filters.category
                     ? {
-                        label: 'Clear All Filters',
-                        onClick: clearFilters
-                      }
+                      label: 'Clear All Filters',
+                      onClick: clearFilters
+                    }
                     : null
                 }
               />
@@ -275,8 +243,6 @@ const ScholarshipPage = () => {
                 <ScholarshipCard
                   key={scholarship.id}
                   scholarship={scholarship}
-                  onApply={handleApply}
-                  isApplying={applyingIds.has(scholarship.id)}
                 />
               ))}
             </div>

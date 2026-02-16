@@ -18,6 +18,8 @@ import Loading from '../../../ui/molecules/Loading'
 import EmptyState from '@/ui/shadcn/EmptyState'
 import { getScholarshipBySlug } from '../actions'
 import { formatDate } from '@/utils/date.util'
+import { Button } from '@/ui/shadcn/button'
+import { THEME_BLUE } from '@/constants/constants'
 
 const ScholarshipDetailsPage = ({ params }) => {
   const router = useRouter()
@@ -257,7 +259,16 @@ const ScholarshipDetailsPage = ({ params }) => {
                   </div>
                 )}
 
-               
+                <div className='pt-2'>
+                  <Link href={`/scholarship/apply/${scholarship.slugs || scholarship.id}`} className='w-full'>
+                    <Button
+                      className='w-full py-6 text-lg font-semibold text-white shadow-md transition-all hover:-translate-y-0.5'
+                      style={{ backgroundColor: THEME_BLUE }}
+                    >
+                      Apply Now
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

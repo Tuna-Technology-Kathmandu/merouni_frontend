@@ -1,4 +1,5 @@
 // actions.js
+import { authFetch } from "../utils/authFetch"
 
 
 export const fetchScholarships = async (filters = {}) => {
@@ -58,9 +59,29 @@ export const getScholarshipBySlug = async (slug) => {
   }
 }
 
-export const applyForScholarship = async (scholarshipId) => {
+// check if already applied for scholarship
+export async function checkIfScholarshipApplied(scholarshipId) {
   try {
-    const { authFetch } = await import('../utils/authFetch')
+    const response = await authFetch(
+      `${process.env.baseUrl}/scholarship-application/check/${scholarshipId}`,
+      {
+        method: 'GET',
+        cache: 'no-store'
+      }
+    )
+    if (!response.ok) {
+      return { hasApplied: false }
+    }
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('Error checking scholarship application status:', error)
+    return { hasApplied: false }
+  }
+}
+
+export const applyForScholarship = async (scholarshipId, description) => {
+  try {
     const response = await authFetch(
       `${process.env.baseUrl}/scholarship-application/apply`,
       {
@@ -69,7 +90,7 @@ export const applyForScholarship = async (scholarshipId) => {
           'Content-Type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify({ scholarshipId })
+        body: JSON.stringify({ scholarshipId, description })
       }
     )
 
