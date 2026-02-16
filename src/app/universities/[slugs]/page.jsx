@@ -9,6 +9,7 @@ import { getUniversityBySlug } from '../actions'
 import Gallery from './components/Gallery'
 import RelatedUniversities from './components/RelatedUniversities'
 import Loading from '../../../ui/molecules/Loading'
+import ShareSection from './components/ShareSection'
 
 const UniversityDetailPage = ({ params }) => {
   // const { slugs } = params; // Use `slugs` directly from `params`
@@ -65,6 +66,7 @@ const UniversityDetailPage = ({ params }) => {
       <Navbar />
       <ImageSection university={university} />
       <RelatedUniversities university={university} />
+      <ShareSection university={university} />
       <Footer />
     </div>
   )
