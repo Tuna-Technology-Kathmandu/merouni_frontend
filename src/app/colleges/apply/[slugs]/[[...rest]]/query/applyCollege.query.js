@@ -1,6 +1,6 @@
 import { authFetch } from "@/app/utils/authFetch"
 
-export async function applyToCollege({ payload ,token}) {
+export async function applyToCollege({ payload, token }) {
   const response = await authFetch(
     `${process.env.baseUrl}/referral/self-apply`,
     {

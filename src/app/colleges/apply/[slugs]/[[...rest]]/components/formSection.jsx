@@ -7,7 +7,7 @@ import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { SearchableSelect } from '@/ui/shadcn/SearchableSelect'
 import { Textarea } from '@/ui/shadcn/textarea'
-import { useMutation } from '@tanstack/react-query'
+import { authFetch } from '@/app/utils/authFetch'
 import { destr } from 'destr'
 import { CheckCircle2, GraduationCap } from 'lucide-react'
 import Link from 'next/link'
@@ -15,7 +15,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { FaSpinner as FaSpinnerIcon } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
-import { applyToCollege } from '../query/applyCollege.query'
 
 
 const FormSection = ({ id, college }) => {
@@ -43,7 +42,7 @@ const FormSection = ({ id, college }) => {
     student_phone_no: '',
     student_email: '',
     student_description: '',
-    course: ''
+    course_id: '',
   })
 
   useEffect(() => {
@@ -62,26 +61,7 @@ const FormSection = ({ id, college }) => {
 
   const [errors, setErrors] = useState({})
   const [isSubmitted, setIsSubmitted] = useState(false)
-
-  const applyMutation = useMutation({
-    mutationFn: applyToCollege,
-    onSuccess: (data) => {
-      setIsSubmitted(true)
-      setFormData({
-        college_id: college?.id || 0,
-        student_name: isLoggedIn
-          ? `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim()
-          : '',
-        student_phone_no: isLoggedIn ? user?.phoneNo || '' : '',
-        student_email: isLoggedIn ? user?.email || '' : '',
-        student_description: '',
-        course: ''
-      })
-    },
-    onError: (error) => {
-      toast.error(error.message || 'Something went wrong. Please try again.')
-    }
-  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const validateForm = () => {
     const newErrors = {}
@@ -91,7 +71,7 @@ const FormSection = ({ id, college }) => {
       newErrors.student_email = 'Email is required'
     if (!formData.student_phone_no && !isLoggedIn)
       newErrors.student_phone_no = 'Phone number is required'
-    if (!formData.course) newErrors.course = 'Please select a course'
+    if (!formData.course_id) newErrors.course_id = 'Please select a course'
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -104,30 +84,81 @@ const FormSection = ({ id, college }) => {
       setErrors((prev) => ({ ...prev, [name]: '' }))
     }
   }
-  const token = localStorage.getItem('access_token')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
 
-    const payload = isStudent
-      ? {
-        student_id: user?.id,
-        referral_type: 'self',
-        college_id: formData.college_id,
-        course_id: formData.course || null,
-        description: formData.student_description
-      }
-      : {
-        college_id: formData.college_id,
-        student_name: formData.student_name,
-        student_phone_no: formData.student_phone_no,
-        student_email: formData.student_email,
-        student_description: formData.student_description,
-        course: formData.course
+    setIsSubmitting(true)
+
+    try {
+      const payload = isStudent
+        ? {
+          student_id: user?.id,
+          referral_type: 'self',
+          college_id: formData.college_id,
+          course_id: formData.course_id || null,
+          description: formData.student_description
+        }
+        : {
+          college_id: formData.college_id,
+          student_name: formData.student_name,
+          student_phone_no: formData.student_phone_no,
+          student_email: formData.student_email,
+          student_description: formData.student_description,
+          course_id: formData.course_id
+        }
+
+      const response = await authFetch(
+        `${process.env.baseUrl}/referral/self-apply`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        }
+      )
+
+      const data = await response.json()
+      console.log(data, "data")
+
+      if (!response.ok) {
+        const errorMessage = data?.error || data?.message || 'Failed to submit application. Please try again.'
+        console.error('Application submission error:', errorMessage)
+        toast.error(errorMessage)
+        setIsSubmitting(false)
+        return
       }
 
-    applyMutation.mutate({ payload, isStudent , token} )
+      if (data?.result?.hasApplied) {
+        toast.error('You have already applied for this college.')
+        setIsSubmitting(false)
+        return
+      }
+
+      // Success: Show success message and reset form
+      toast.success('Application submitted successfully!')
+      setIsSubmitted(true)
+
+      // Reset form data
+      setFormData({
+        college_id: college?.id || 0,
+        student_name: isLoggedIn
+          ? `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim()
+          : '',
+        student_phone_no: isLoggedIn ? user?.phoneNo || '' : '',
+        student_email: isLoggedIn ? user?.email || '' : '',
+        student_description: '',
+        course_id: ''
+      })
+      setIsSubmitting(false)
+
+    } catch (error) {
+      console.error('Application submission error:', error)
+      toast.error(error.message || 'Something went wrong. Please try again.')
+      setIsSubmitting(false)
+    }
   }
 
   const courseOptions = useMemo(() => {
@@ -137,7 +168,7 @@ const FormSection = ({ id, college }) => {
         (item) => String(item.id) === String(id)
       )
       if (option) {
-        setFormData((prev) => ({ ...prev, course: option?.id }))
+        setFormData((prev) => ({ ...prev, course_id: option?.id }))
       }
     }
     return college.collegeCourses
@@ -308,14 +339,14 @@ const FormSection = ({ id, college }) => {
               label='Select Program'
               options={courseOptions}
               displayKey={(opt) => opt?.program?.title || 'Unknown Program'}
-              value={formData.course}
+              value={formData.course_id}
               onChange={(option) => {
-                setFormData((prev) => ({ ...prev, course: option?.id || '' }))
-                if (errors.course)
-                  setErrors((prev) => ({ ...prev, course: '' }))
+                setFormData((prev) => ({ ...prev, course_id: option?.id || '' }))
+                if (errors.course_id)
+                  setErrors((prev) => ({ ...prev, course_id: '' }))
               }}
               placeholder='Search and select a program'
-              error={errors.course}
+              error={errors.course_id}
               required
             />
           </div>
@@ -335,11 +366,11 @@ const FormSection = ({ id, college }) => {
 
           <Button
             type='submit'
-            disabled={applyMutation.isPending}
-            className='w-full py-6 text-lg font-semibold h-12 text-white transition-all shadow-md active:scale-[0.98]'
+            disabled={isSubmitting}
+            className='w-full py-6 text-lg font-semibold h-12 text-white transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed'
             style={{ backgroundColor: THEME_BLUE }}
           >
-            {applyMutation.isPending ? (
+            {isSubmitting ? (
               <div className='flex items-center gap-2'>
                 <FaSpinnerIcon className='animate-spin' />
                 <span>Submitting...</span>

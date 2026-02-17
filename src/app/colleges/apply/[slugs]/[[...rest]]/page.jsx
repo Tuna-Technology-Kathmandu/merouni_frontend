@@ -13,8 +13,6 @@ import { Button } from '@/ui/shadcn/button'
 import { ArrowLeft, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 import { useSelector } from 'react-redux'
-import { checkIfApplied } from '../../../actions'
-import { authFetch } from '@/app/utils/authFetch'
 
 
 
@@ -29,8 +27,6 @@ const ApplyPage = ({ params }) => {
   const { slugs, rest } = use(params)
   const id = rest?.[0]
 
-  const [hasApplied, setHasApplied] = useState(false)
-
   // Parse user role
   const userRole = user?.role ? (typeof user.role === 'string' ? JSON.parse(user.role) : user.role) : {}
 
@@ -43,29 +39,9 @@ const ApplyPage = ({ params }) => {
           const collegeData = await getCollegeBySlug(slugs)
           if (collegeData) {
             setCollege(collegeData)
-            // Check if already applied
-            if (collegeData.id) {
-              const response = await authFetch(
-                `${process.env.baseUrl}/referral/check-if-already-applied-for-collage?college_id=${collegeData.id}`,
-                {
-                  headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                  },
-                  method: 'GET',
-                  cache: 'no-store'
-                }
-              )
-              const data = await response.json()
-
-              if (data && data.hasApplied) {
-                setHasApplied(true)
-              }
-            }
           }
         } else {
           setIsAuthenticated(false)
-          // Still fetch college details to show the name in ActionCard if needed
           const collegeData = await getCollegeBySlug(slugs)
           if (collegeData) {
             setCollege(collegeData)
@@ -160,40 +136,6 @@ const ApplyPage = ({ params }) => {
           <Link href='/dashboard'>
             <Button
               className='min-w-[160px] h-12 text-base font-medium text-white shadow-md'
-              style={{ backgroundColor: THEME_BLUE }}
-            >
-              Go to Dashboard
-            </Button>
-          </Link>
-        </ActionCard>
-      )
-    }
-
-    if (hasApplied) {
-      return (
-        <ActionCard
-          variant='centered'
-          icon={<CheckCircle2 className='w-full h-full' />}
-          title='Already Applied!'
-          description={
-            <>
-              You have already submitted an application for{' '}
-              <span className='font-semibold text-gray-900'>{college?.name}</span>
-              . You can track your application status in your dashboard.
-            </>
-          }
-        >
-          <Link href='/'>
-            <Button
-              variant='outline'
-              className='min-w-[160px] h-12 text-base font-medium'
-            >
-              Go Home
-            </Button>
-          </Link>
-          <Link href='/dashboard'>
-            <Button
-              className='min-w-[160px] h-12 text-base font-medium text-white shadow-md transition-all hover:-translate-y-0.5'
               style={{ backgroundColor: THEME_BLUE }}
             >
               Go to Dashboard

@@ -7,11 +7,7 @@ import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
 import { useRouter } from 'next/navigation'
 
-/**
- * Reusable college card. Accepts either a `college` object or flat props.
- * When wishlistCollegeIds + onWishlistUpdate are provided (e.g. colleges page),
- * wishlist is controlled by parent. Otherwise the card manages wishlist internally.
- */
+
 const CollegeCard = ({
   college: collegeProp,
   name: nameProp,
