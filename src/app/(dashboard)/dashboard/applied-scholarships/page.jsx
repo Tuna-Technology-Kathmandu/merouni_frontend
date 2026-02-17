@@ -1,29 +1,27 @@
 'use client'
 
-import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import {
-  fetchStudentScholarshipApplications,
-  deleteScholarshipApplication
-} from './actions'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
+import Loading from '@/ui/molecules/Loading'
+import Table from '@/ui/shadcn/DataTable'
+import EmptyState from '@/ui/shadcn/EmptyState'
+import { Button } from '@/ui/shadcn/button'
+import { Select } from '@/ui/shadcn/select'
+import { formatDate } from '@/utils/date.util'
 import {
   Award,
-  Calendar,
-  DollarSign,
   CheckCircle,
-  XCircle,
   Clock,
-  Trash2
+  Trash2,
+  XCircle
 } from 'lucide-react'
-import Loading from '@/ui/molecules/Loading'
-import EmptyState from '@/ui/shadcn/EmptyState'
-import { Select } from '@/ui/shadcn/select'
-import Table from '@/ui/shadcn/DataTable'
-import { Button } from '@/ui/shadcn/button'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
-import { formatDate } from '@/utils/date.util'
+import {
+  deleteScholarshipApplication,
+  fetchStudentScholarshipApplications
+} from './actions'
 
 const AppliedScholarshipsPage = () => {
   const { setHeading, setSubheading } = usePageHeading()

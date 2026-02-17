@@ -33,7 +33,6 @@ import FileUpload from '../addCollege/FileUpload'
 
 const ProfileUpdate = () => {
   const { setHeading } = usePageHeading()
-  const userData = useSelector((state) => state.user.data)
 
   useEffect(() => {
     setHeading('Profile Settings')
@@ -43,38 +42,26 @@ const ProfileUpdate = () => {
   const [showNameModal, setShowNameModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [showOldPassword, setShowOldPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const userData = useSelector((state) => state.user.data)
 
   const [nameForm, setNameForm] = useState({
-    firstName: userData?.firstName || '',
-    middleName: userData?.middleName || '',
-    lastName: userData?.lastName || '',
-    email: userData?.email || '',
-    phoneNo: userData?.phoneNo || '',
-    profileImageUrl: userData?.profileImageUrl || '',
-    cvUrl: userData?.cvUrl || ''
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    email: '',
+    phoneNo: '',
+    profileImageUrl: '',
+    cvUrl: ''
   })
 
   const [passwordForm, setPasswordForm] = useState({
+    oldPassword: '',
     newPassword: '',
     confirmPassword: ''
   })
-
-  // Update form when userData changes
-  useEffect(() => {
-    if (userData) {
-      setNameForm({
-        firstName: userData.firstName || '',
-        middleName: userData.middleName || '',
-        lastName: userData.lastName || '',
-        email: userData.email || '',
-        phoneNo: userData.phoneNo || '',
-        profileImageUrl: userData.profileImageUrl || '',
-        cvUrl: userData.cvUrl || ''
-      })
-    }
-  }, [userData])
 
   const validateName = (name) => {
     return name.length >= 2 && /^[a-zA-Z\s]*$/.test(name)
@@ -101,14 +88,14 @@ const ProfileUpdate = () => {
       throw new Error('Failed to fetch profile')
     }
     const data = await response.json()
-    console.log(data,"data")
-    const user  = data.user
+    console.log(data, "data")
+    const user = data.user
     setNameForm({
       firstName: user.firstName || '',
       middleName: user.middleName || '',
       lastName: user.lastName || '',
       email: user.email || '',
-      phoneNo:  user.phoneNo || '',
+      phoneNo: user.phoneNo || '',
       profileImageUrl: user.profileImageUrl || '',
       cvUrl: user.cvUrl || ''
     })
@@ -116,7 +103,7 @@ const ProfileUpdate = () => {
 
   useEffect(() => {
     fetchUserProfile()
-  }, [userData?.id])
+  }, [])
 
   const handleNameSubmit = async (e) => {
     e.preventDefault()
@@ -130,7 +117,7 @@ const ProfileUpdate = () => {
     setIsLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}/users/edit-profile?user_id=${userData.id}`,
+        `${process.env.baseUrl}/users/edit-userdetails`,
         {
           method: 'PUT',
           body: JSON.stringify({
@@ -154,6 +141,8 @@ const ProfileUpdate = () => {
 
       toast.success('Profile updated successfully')
       setShowNameModal(false)
+      fetchUserProfile()
+
     } catch (error) {
       console.error('Update error:', error)
       toast.error(error.message || 'Failed to update profile')
@@ -178,11 +167,14 @@ const ProfileUpdate = () => {
     setIsLoading(true)
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}/users/edit-profile?user_id=${userData.id}`,
+        `${process.env.baseUrl}/users/change-password`,
         {
           method: 'PUT',
           body: JSON.stringify({
-            password: passwordForm.newPassword
+            oldPassword: passwordForm.oldPassword,
+            newPassword: passwordForm.newPassword,
+            confirmPassword: passwordForm.confirmPassword
+
           }),
           headers: {
             'Content-Type': 'application/json'
@@ -198,6 +190,7 @@ const ProfileUpdate = () => {
       toast.success('Password updated successfully')
       setShowPasswordModal(false)
       setPasswordForm({
+        oldPassword: '',
         newPassword: '',
         confirmPassword: ''
       })
@@ -227,8 +220,8 @@ const ProfileUpdate = () => {
     : false
 
   const getInitials = () => {
-    if (userData?.firstName && userData?.lastName) {
-      return `${userData.firstName.charAt(0)}${userData.lastName.charAt(0)}`.toUpperCase()
+    if (nameForm?.firstName && nameForm?.lastName) {
+      return `${nameForm.firstName.charAt(0)}${nameForm.lastName.charAt(0)}`.toUpperCase()
     }
     return 'U'
   }
@@ -260,8 +253,8 @@ const ProfileUpdate = () => {
           </div>
           <div className='flex-1 min-w-0'>
             <h1 className='text-xl font-semibold text-gray-900 mb-1 truncate'>
-              {userData?.firstName && userData?.lastName
-                ? `${userData.firstName} ${userData.middleName || ''} ${userData.lastName}`.trim()
+              {nameForm?.firstName && nameForm?.lastName
+                ? `${nameForm.firstName} ${nameForm.middleName || ''} ${nameForm.lastName}`.trim()
                 : 'User Profile'}
             </h1>
             <p className='text-sm text-gray-600'>{roles}</p>
@@ -280,8 +273,8 @@ const ProfileUpdate = () => {
               Full Name
             </Label>
             <p className='text-sm text-gray-900'>
-              {userData?.firstName} {userData?.middleName || ''}{' '}
-              {userData?.lastName}
+              {nameForm?.firstName} {nameForm?.middleName || ''}{' '}
+              {nameForm?.lastName}
             </p>
           </div>
           <div className='space-y-1.5'>
@@ -290,7 +283,7 @@ const ProfileUpdate = () => {
               Email Address
             </Label>
             <p className='text-sm text-gray-900'>
-              {userData?.email || 'Not provided'}
+              {nameForm?.email || 'Not provided'}
             </p>
           </div>
           <div className='space-y-1.5'>
@@ -299,7 +292,7 @@ const ProfileUpdate = () => {
               Phone Number
             </Label>
             <p className='text-sm text-gray-900'>
-              {userData?.phoneNo || 'Not provided'}
+              {nameForm?.phoneNo || 'Not provided'}
             </p>
           </div>
           <div className='space-y-1.5'>
@@ -447,9 +440,10 @@ const ProfileUpdate = () => {
                 </div>
                 <div className='space-y-1.5'>
                   <Label htmlFor='email' className='text-sm font-medium text-gray-700'>
-                    Email Address <span className='text-red-500'>*</span>
+                    Email Address
                   </Label>
                   <Input
+                    disabled
                     id='email'
                     type='email'
                     placeholder='Enter email'
@@ -551,6 +545,41 @@ const ProfileUpdate = () => {
           </DialogHeader>
           <form onSubmit={handlePasswordSubmit} className='mt-4'>
             <div className='space-y-5'>
+              <div className='grid grid-cols-1 gap-4'>
+                <div className='space-y-1.5'>
+                  <Label htmlFor='oldPassword' className='text-sm font-medium text-gray-700'>
+                    Old Password <span className='text-red-500'>*</span>
+                  </Label>
+                  <div className='relative'>
+                    <Input
+                      id='oldPassword'
+                      type={showOldPassword ? 'text' : 'password'}
+                      placeholder='••••••••'
+                      value={passwordForm.oldPassword}
+                      onChange={(e) =>
+                        setPasswordForm({
+                          ...passwordForm,
+                          oldPassword: e.target.value.trim()
+                        })
+                      }
+                      className='h-10 pr-10'
+                      required
+                    />
+                    <button
+                      type='button'
+                      className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 p-1 rounded-md transition-colors'
+                      onClick={() => setShowOldPassword(!showOldPassword)}
+                    >
+                      {showOldPassword ? (
+                        <FaEyeSlash className='h-4 w-4' />
+                      ) : (
+                        <FaEye className='h-4 w-4' />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div className='space-y-1.5'>
                   <Label htmlFor='newPassword' className='text-sm font-medium text-gray-700'>
