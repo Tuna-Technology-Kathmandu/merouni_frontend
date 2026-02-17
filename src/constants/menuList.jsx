@@ -35,7 +35,7 @@ export const menuItems = [
         icon: <FaHome className='text-xl' />,
         label: 'Home',
         href: '/dashboard',
-        visible: ['admin', 'editor', 'student', 'institution', 'consultancy']
+        visible: ['admin', 'editor', 'student', 'institution', 'consultancy',"agent"]
       },
       {
         icon: <FaGlobe className='text-xl' />,
