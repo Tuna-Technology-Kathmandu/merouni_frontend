@@ -1,3 +1,9 @@
+
+Production Branch : main [auto deploys on Vercel]
+Development Branch : develop
+
+
+
 # 🏫 Merouni.com — Frontend
 
 This is the frontend codebase for [Merouni](https://merouni.com/), an education discovery platform connecting students with colleges, universities, and academic resources in Nepal.
