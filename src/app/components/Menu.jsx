@@ -43,6 +43,12 @@ const menuItems = [
         visible: ['admin', 'editor', 'student']
       },
       {
+        icon: <IoSchoolSharp className='text-xl' />,
+        label: 'Applied Colleges',
+        href: '/dashboard/applied-colleges',
+        visible: ['student']
+      },
+      {
         icon: <VscReferences />,
         label: 'Referrals',
         href: '/dashboard/referrals',
@@ -235,13 +241,7 @@ const Menu = ({ isCollapsed = false }) => {
                 if (!hasAccess) return null
 
                 const isActive = pathname === item.href
-                const displayLabel =
-                  item.href === '/dashboard/referrals' &&
-                    role.student &&
-                    !role.admin &&
-                    !role['admin']
-                    ? 'Applied Colleges'
-                    : item.label
+                const displayLabel = item.label
                 const itemClasses = `
                   flex items-center w-full p-2 text-gray-600 transition-colors rounded-lg
                   hover:bg-gray-100 hover:text-blue-600

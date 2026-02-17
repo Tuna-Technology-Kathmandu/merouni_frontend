@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { Heart, Info, GraduationCap, MapPin } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
-import { useRouter } from '@bprogress/next/app'
+import { authFetch } from '@/app/utils/authFetch'
+import { useRouter } from 'next/navigation'
 
 /**
  * Reusable college card. Accepts either a `college` object or flat props.
@@ -162,15 +163,15 @@ const CollegeCard = ({
           alt={name || 'College'}
           className='w-full h-full aspect-auto object-cover group-hover:scale-105 transition-transform duration-500'
         />
-        <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent' />
+        <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none' />
 
-        <div className='absolute top-3 left-3 flex gap-2'>
+        <div className='absolute top-3 left-3 flex gap-2 z-10'>
           <span className='bg-white px-2.5 py-1 rounded-lg text-xs font-medium text-[#0A70A7] uppercase tracking-wider shadow-sm'>
             {instituteType || 'College'}
           </span>
         </div>
 
-        <div className='absolute top-3 right-3'>
+        <div className='absolute top-3 right-3 z-10'>
           {user && (
             <button
               type='button'
@@ -189,7 +190,7 @@ const CollegeCard = ({
         </div>
 
         {location && (
-          <div className='absolute bottom-3 left-4 right-4'>
+          <div className='absolute bottom-3 left-4 right-4 z-10'>
             <div className='flex items-center gap-1 text-white/90 text-xs font-medium'>
               <MapPin className='w-3 h-3 text-blue-400 flex-shrink-0' />
               <span className='line-clamp-1'>{location}</span>

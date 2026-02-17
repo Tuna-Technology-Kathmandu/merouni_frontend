@@ -31,6 +31,8 @@ const UserCard = ({ type, value, loading }) => {
         return '/dashboard/blogs'
       case 'applications':
         return '/dashboard/applications'
+      case 'wishlist':
+        return '/dashboard/wishlist'
       default:
         return '/dashboard'
     }
@@ -81,6 +83,13 @@ const UserCard = ({ type, value, loading }) => {
           iconColor: 'text-teal-600',
           borderColor: 'border-teal-100'
         }
+      case 'applied-colleges':
+        return {
+          icon: <IoSchoolSharp className='w-5 h-5' />,
+          bgColor: 'bg-blue-50',
+          iconColor: 'text-blue-600',
+          borderColor: 'border-blue-100'
+        }
       case 'university':
         return {
           icon: <FaUniversity className='w-5 h-5' />,
@@ -94,6 +103,13 @@ const UserCard = ({ type, value, loading }) => {
           bgColor: 'bg-cyan-50',
           iconColor: 'text-cyan-600',
           borderColor: 'border-cyan-100'
+        }
+      case 'wishlist':
+        return {
+          icon: <IoSchoolSharp className='w-5 h-5' />,
+          bgColor: 'bg-pink-50',
+          iconColor: 'text-pink-600',
+          borderColor: 'border-pink-100'
         }
       case 'blogs':
         return {

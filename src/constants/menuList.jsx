@@ -89,6 +89,19 @@ export const menuItems = [
           }
         ]
       },
+        {
+        icon: <HandCoins className='text-xl' />,
+        label: 'Wishlist',
+        href: '/dashboard/wishlist',
+        visible: ['student']
+      },
+      {
+        label:"Applied Colleges",
+        icon: <IoSchoolSharp className='text-xl' />,
+        href: '/dashboard/applied-colleges',
+        visible: ['student']
+      },
+
       {
         icon: <HandCoins className='text-xl' />,
         label: 'Applied Scholarships',

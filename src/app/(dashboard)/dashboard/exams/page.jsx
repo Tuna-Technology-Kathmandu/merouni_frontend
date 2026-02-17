@@ -77,23 +77,17 @@ export default function ExamManager() {
     affiliation: '',
     syllabus: '',
     pastQuestion: '',
-    examDetails: [
-      {
-        exam_type: 'Written',
-        full_marks: '',
-        pass_marks: '',
-        number_of_question: '',
-        question_type: 'MCQ',
-        duration: ''
-      }
-    ],
-    applicationDetails: {
-      normal_fee: '',
-      late_fee: '',
-      exam_date: '',
-      opening_date: '',
-      closing_date: ''
-    }
+    exam_type: 'Written',
+    full_marks: '',
+    pass_marks: '',
+    questions_count: '',
+    question_type: 'MCQ',
+    duration: '',
+    normal_fee: '',
+    late_fee: '',
+    exam_date: '',
+    opening_date: '',
+    closing_date: ''
   })
 
 
@@ -145,15 +139,15 @@ export default function ExamManager() {
 
   // Validate dates
   const validateDates = () => {
-    const examDate = new Date(formData.applicationDetails.exam_date)
-    const openingDate = new Date(formData.applicationDetails.opening_date)
-    const closingDate = new Date(formData.applicationDetails.closing_date)
+    const examDate = new Date(formData.exam_date)
+    const openingDate = new Date(formData.opening_date)
+    const closingDate = new Date(formData.closing_date)
 
-    if (openingDate >= closingDate) {
+    if (formData.opening_date && formData.closing_date && openingDate >= closingDate) {
       setError('Opening date must be before closing date')
       return false
     }
-    if (closingDate >= examDate) {
+    if (formData.closing_date && formData.exam_date && closingDate >= examDate) {
       setError('Closing date must be before exam date')
       return false
     }
@@ -183,7 +177,7 @@ export default function ExamManager() {
         header: 'Syllabus',
         accessorKey: 'syllabus',
         cell: ({ getValue }) => {
-          const value = getValue()
+          const value = getValue() || ''
 
           const getFirst20text = value.slice(0, 20)
           if (value.length > 20) {
@@ -251,23 +245,17 @@ export default function ExamManager() {
         affiliation: '',
         syllabus: '',
         pastQuestion: '',
-        examDetails: [
-          {
-            exam_type: 'Written',
-            full_marks: '',
-            pass_marks: '',
-            number_of_question: '',
-            question_type: 'MCQ',
-            duration: ''
-          }
-        ],
-        applicationDetails: {
-          normal_fee: '',
-          late_fee: '',
-          exam_date: '',
-          opening_date: '',
-          closing_date: ''
-        }
+        exam_type: 'Written',
+        full_marks: '',
+        pass_marks: '',
+        questions_count: '',
+        question_type: 'MCQ',
+        duration: '',
+        normal_fee: '',
+        late_fee: '',
+        exam_date: '',
+        opening_date: '',
+        closing_date: ''
       })
       setError(null)
       // Remove query parameter from URL
@@ -341,21 +329,11 @@ export default function ExamManager() {
       const formattedData = {
         ...formData,
         author: author_id,
-        examDetails: [
-          {
-            ...(formData.examDetails?.[0] || {}),
-            full_marks: Number(formData.examDetails?.[0]?.full_marks || 0),
-            pass_marks: Number(formData.examDetails?.[0]?.pass_marks || 0),
-            number_of_question: Number(
-              formData.examDetails?.[0]?.number_of_question || 0
-            )
-          }
-        ],
-        applicationDetails: {
-          ...formData.applicationDetails,
-          normal_fee: Number(formData.applicationDetails.normal_fee),
-          late_fee: Number(formData.applicationDetails.late_fee)
-        },
+        full_marks: Number(formData.full_marks || 0),
+        pass_marks: Number(formData.pass_marks || 0),
+        questions_count: Number(formData.questions_count || 0),
+        normal_fee: Number(formData.normal_fee || 0),
+        late_fee: Number(formData.late_fee || 0),
         ...(editingId && { id: editingId })
       }
       await createExam(formattedData)
@@ -367,23 +345,17 @@ export default function ExamManager() {
         affiliation: '',
         syllabus: '',
         pastQuestion: '',
-        examDetails: [
-          {
-            exam_type: 'Written',
-            full_marks: '',
-            pass_marks: '',
-            number_of_question: '',
-            question_type: 'MCQ',
-            duration: ''
-          }
-        ],
-        applicationDetails: {
-          normal_fee: '',
-          late_fee: '',
-          exam_date: '',
-          opening_date: '',
-          closing_date: ''
-        }
+        exam_type: 'Written',
+        full_marks: '',
+        pass_marks: '',
+        questions_count: '',
+        question_type: 'MCQ',
+        duration: '',
+        normal_fee: '',
+        late_fee: '',
+        exam_date: '',
+        opening_date: '',
+        closing_date: ''
       })
       setLoading(false)
       setEditingId(null)
@@ -405,6 +377,8 @@ export default function ExamManager() {
   }
 
   const handleEdit = (exam) => {
+    // Determine data source (flat or nested for backward compatibility if needed, though we moved to flat)
+    // Assume API returns flat structure now based on service update
     setFormData({
       title: exam.title,
       description: exam.description,
@@ -412,26 +386,17 @@ export default function ExamManager() {
       affiliation: exam.affiliation,
       syllabus: exam.syllabus,
       pastQuestion: exam.pastQuestion,
-      examDetails:
-        exam.exam_details && exam.exam_details.length > 0
-          ? exam.exam_details
-          : [
-            {
-              exam_type: 'Written',
-              full_marks: '',
-              pass_marks: '',
-              number_of_question: '',
-              question_type: 'MCQ',
-              duration: ''
-            }
-          ],
-      applicationDetails: exam.application_details[0] || {
-        normal_fee: '',
-        late_fee: '',
-        exam_date: '',
-        opening_date: '',
-        closing_date: ''
-      }
+      exam_type: exam.exam_type || 'Written',
+      full_marks: exam.full_marks || '',
+      pass_marks: exam.pass_marks || '',
+      questions_count: exam.questions_count || '',
+      question_type: exam.question_type || 'MCQ',
+      duration: exam.duration || '',
+      normal_fee: exam.normal_fee || '',
+      late_fee: exam.late_fee || '',
+      exam_date: exam.exam_date || '',
+      opening_date: exam.opening_date || '',
+      closing_date: exam.closing_date || ''
     })
     setEditingId(exam.id)
     setError(null)
@@ -449,23 +414,17 @@ export default function ExamManager() {
       affiliation: '',
       syllabus: '',
       pastQuestion: '',
-      examDetails: [
-        {
-          exam_type: 'Written',
-          full_marks: '',
-          pass_marks: '',
-          number_of_question: '',
-          question_type: 'MCQ',
-          duration: ''
-        }
-      ],
-      applicationDetails: {
-        normal_fee: '',
-        late_fee: '',
-        exam_date: '',
-        opening_date: '',
-        closing_date: ''
-      }
+      exam_type: 'Written',
+      full_marks: '',
+      pass_marks: '',
+      questions_count: '',
+      question_type: 'MCQ',
+      duration: '',
+      normal_fee: '',
+      late_fee: '',
+      exam_date: '',
+      opening_date: '',
+      closing_date: ''
     })
     setLevelSearch('')
     setUniSearch('')
@@ -573,23 +532,17 @@ export default function ExamManager() {
                   affiliation: '',
                   syllabus: '',
                   pastQuestion: '',
-                  examDetails: [
-                    {
-                      exam_type: 'Written',
-                      full_marks: '',
-                      pass_marks: '',
-                      number_of_question: '',
-                      question_type: 'MCQ',
-                      duration: ''
-                    }
-                  ],
-                  applicationDetails: {
-                    normal_fee: '',
-                    late_fee: '',
-                    exam_date: '',
-                    opening_date: '',
-                    closing_date: ''
-                  }
+                  exam_type: 'Written',
+                  full_marks: '',
+                  pass_marks: '',
+                  questions_count: '',
+                  question_type: 'MCQ',
+                  duration: '',
+                  normal_fee: '',
+                  late_fee: '',
+                  exam_date: '',
+                  opening_date: '',
+                  closing_date: ''
                 })
                 setLevelSearch('')
                 setUniSearch('')
@@ -633,37 +586,43 @@ export default function ExamManager() {
             >
               <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
                 {/* Basic Information */}
-                <div className='space-y-4'>
-                  <h2 className='text-xl font-semibold'>Basic Information</h2>
-                  <div>
-                    <RequiredLabel htmlFor='exam-title'>Exam Title</RequiredLabel>
-                    <Input
-                      id='exam-title'
-                      type='text'
-                      placeholder='Enter exam title'
-                      value={formData.title}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          title: e.target.value
-                        }))
-                      }
-                      required
-                    />
+                <div>
+                  <h2 className='text-lg font-semibold mb-4 text-gray-800 border-b pb-1'>Basic Information</h2>
+                  <div className='grid grid-cols-1 gap-4 mb-4'>
+                    <div>
+                      <RequiredLabel htmlFor='exam-title'>Exam Title</RequiredLabel>
+                      <Input
+                        id='exam-title'
+                        type='text'
+                        placeholder='Enter exam title'
+                        value={formData.title}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            title: e.target.value
+                          }))
+                        }
+                        required
+                        className='mt-1'
+                      />
+                    </div>
+                     <div>
+                      <Label htmlFor='exam-description'>Description</Label>
+                      <div className='mt-1'>
+                        <TipTapEditor
+                          value={formData.description}
+                          onChange={handleDescriptionChange}
+                          placeholder='Enter exam description...'
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <Label htmlFor='exam-description'>Description</Label>
-                    <TipTapEditor
-                      value={formData.description}
-                      onChange={handleDescriptionChange}
-                      placeholder='Enter exam description...'
-                    />
-                  </div>
+                  
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     {/* level search box */}
                     <div>
                       <RequiredLabel htmlFor='level-search'>Level</RequiredLabel>
-                      <div className='relative'>
+                      <div className='relative mt-1'>
                         <Input
                           id='level-search'
                           type='text'
@@ -714,7 +673,7 @@ export default function ExamManager() {
                       <Label htmlFor='university-search'>
                         University/Affiliation
                       </Label>
-                      <div className='relative'>
+                      <div className='relative mt-1'>
                         <Input
                           id='university-search'
                           type='text'
@@ -759,320 +718,189 @@ export default function ExamManager() {
                       </div>
                     </div>
                   </div>
-                  <div>
-                    <RequiredLabel htmlFor='syllabus'>Syllabus</RequiredLabel>
-                    <textarea
-                      id='syllabus'
-                      placeholder='Enter exam syllabus'
-                      value={formData.syllabus}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          syllabus: e.target.value
-                        }))
-                      }
-                      className='flex h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor='past-question'>Past Question URL</Label>
-                    <Input
-                      id='past-question'
-                      type='text'
-                      placeholder='Enter past question URL'
-                      value={formData.pastQuestion}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          pastQuestion: e.target.value
-                        }))
-                      }
-                    />
-                  </div>
                 </div>
 
-                {/* Exam Details */}
-                <div className='space-y-4'>
-                  <h2 className='text-xl font-semibold'>Exam Details</h2>
-                  <div>
-                    <RequiredLabel htmlFor='exam-type'>Exam Type</RequiredLabel>
-                    <Select
-                      className='w-full'
-                      id='exam-type'
-                      value={formData.examDetails?.[0]?.exam_type || 'Written'}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          examDetails: [
-                            {
-                              ...(prev.examDetails?.[0] || {}),
-                              exam_type: e.target.value
-                            }
-                          ]
-                        }))
-                      }
-                      required
-                    >
-                      <option value='Written'>Written</option>
-                      <option value='Practical'>Practical</option>
-                      <option value='Oral'>Oral</option>
-                    </Select>
-                  </div>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <div>
-                      <RequiredLabel htmlFor='full-marks'>
-                        Full Marks
-                      </RequiredLabel>
-                      <Input
-                        id='full-marks'
-                        type='number'
-                        placeholder='e.g., 100'
-                        value={formData.examDetails?.[0]?.full_marks || ''}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            examDetails: [
-                              {
-                                ...(prev.examDetails?.[0] || {}),
-                                full_marks: e.target.value
-                              }
-                            ]
-                          }))
-                        }
-                        required
-                      />
-                    </div>
-                    <div>
-                      <RequiredLabel htmlFor='pass-marks'>
-                        Pass Marks
-                      </RequiredLabel>
-                      <Input
-                        id='pass-marks'
-                        type='number'
-                        placeholder='e.g., 40'
-                        value={formData.examDetails?.[0]?.pass_marks || ''}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            examDetails: [
-                              {
-                                ...(prev.examDetails?.[0] || {}),
-                                pass_marks: e.target.value
-                              }
-                            ]
-                          }))
-                        }
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <RequiredLabel htmlFor='num-questions'>
-                      Number of Questions
-                    </RequiredLabel>
-                    <Input
-                      id='num-questions'
-                      type='number'
-                      placeholder='e.g., 50'
-                      value={formData.examDetails?.[0]?.number_of_question || ''}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          examDetails: [
-                            {
-                              ...(prev.examDetails?.[0] || {}),
-                              number_of_question: e.target.value
-                            }
-                          ]
-                        }))
-                      }
-                      required
-                    />
-                  </div>
-                  <div>
-                    <RequiredLabel htmlFor='question-type'>
-                      Question Type
-                    </RequiredLabel>
-                    <Select
-                      id='question-type'
-                      value={formData.examDetails?.[0]?.question_type || 'MCQ'}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          examDetails: [
-                            {
-                              ...(prev.examDetails?.[0] || {}),
-                              question_type: e.target.value
-                            }
-                          ]
-                        }))
-                      }
-                      required
-                    >
-                      <option value='MCQ'>MCQ</option>
-                      <option value='Written'>Written</option>
-                      <option value='Mixed'>Mixed</option>
-                    </Select>
-                  </div>
-                  <div>
-                    <RequiredLabel htmlFor='duration'>Duration</RequiredLabel>
-                    <Input
-                      id='duration'
-                      type='text'
-                      placeholder='e.g., 2 hours'
-                      value={formData.examDetails?.[0]?.duration || ''}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          examDetails: [
-                            {
-                              ...(prev.examDetails?.[0] || {}),
-                              duration: e.target.value
-                            }
-                          ]
-                        }))
-                      }
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Application Details */}
-                <div className='space-y-4'>
-                  <h2 className='text-xl font-semibold'>Application Details</h2>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <div>
-                      <RequiredLabel htmlFor='normal-fee'>
-                        Normal Fee
-                      </RequiredLabel>
-                      <Input
-                        id='normal-fee'
-                        type='text'
-                        placeholder='e.g., 2000'
-                        value={formData.applicationDetails.normal_fee}
-                        onChange={(e) =>
-                          setFormData((prevFormData) => ({
-                            ...prevFormData,
-                            applicationDetails: {
-                              ...prevFormData.applicationDetails,
-                              normal_fee: e.target.value
-                            }
-                          }))
-                        }
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <RequiredLabel htmlFor='late-fee'>Late Fee</RequiredLabel>
-                      <Input
-                        id='late-fee'
-                        type='text'
-                        placeholder='e.g., 2500'
-                        value={formData.applicationDetails.late_fee}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            applicationDetails: {
-                              ...prev.applicationDetails,
-                              late_fee: e.target.value
-                            }
-                          }))
-                        }
-                        required
-                      />
-                    </div>
-                  </div>
+                {/* Exam Details - Clean Grid */}
+                <div>
+                  <h2 className='text-lg font-semibold mb-4 text-gray-800 border-b pb-1'>Exam Structure</h2>
                   <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                     <div>
-                      <RequiredLabel htmlFor='exam-date'>Exam Date</RequiredLabel>
-                      <Input
-                        id='exam-date'
-                        type='date'
-                        value={formData.applicationDetails.exam_date}
-                        min={
-                          formData.applicationDetails.closing_date || undefined
-                        }
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            applicationDetails: {
-                              ...prev.applicationDetails,
-                              exam_date: e.target.value
-                            }
-                          }))
-                        }
-                        required
-                      />
+                        <Label htmlFor='full_marks'>Full Marks</Label>
+                        <Input
+                            id='full_marks'
+                            type='number'
+                            placeholder='100'
+                            value={formData.full_marks}
+                            onChange={(e) => setFormData(prev => ({ ...prev, full_marks: e.target.value }))}
+                            className='mt-1'
+                        />
                     </div>
                     <div>
-                      <RequiredLabel htmlFor='opening-date'>
-                        Opening Date
-                      </RequiredLabel>
-                      <Input
-                        id='opening-date'
-                        type='date'
-                        value={formData.applicationDetails.opening_date}
-                        max={
-                          formData.applicationDetails.closing_date || undefined
-                        }
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            applicationDetails: {
-                              ...prev.applicationDetails,
-                              opening_date: e.target.value
-                            }
-                          }))
-                        }
-                        required
-                      />
+                        <Label htmlFor='pass_marks'>Pass Marks</Label>
+                        <Input
+                            id='pass_marks'
+                            type='number'
+                            placeholder='40'
+                            value={formData.pass_marks}
+                            onChange={(e) => setFormData(prev => ({ ...prev, pass_marks: e.target.value }))}
+                            className='mt-1'
+                        />
+                    </div>
+                     <div>
+                        <Label htmlFor='duration'>Duration</Label>
+                        <Input
+                            id='duration'
+                            type='text'
+                            placeholder='e.g. 2 Hours'
+                            value={formData.duration}
+                            onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
+                            className='mt-1'
+                        />
+                    </div>
+                     <div>
+                        <Label htmlFor='question_type'>Question Type</Label>
+                        <Select
+                            id='question_type'
+                            value={formData.question_type}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, question_type: value }))}
+                        >
+                             <option value="MCQ">MCQ</option>
+                             <option value="Written">Written</option>
+                             <option value="Practical">Practical</option>
+                             <option value="Mixed">Mixed</option>
+                        </Select>
                     </div>
                     <div>
-                      <RequiredLabel htmlFor='closing-date'>
-                        Closing Date
-                      </RequiredLabel>
-                      <Input
-                        id='closing-date'
-                        type='date'
-                        value={formData.applicationDetails.closing_date}
-                        // min={formData.applicationDetails.opening_date || undefined}
-                        // max={formData.applicationDetails.exam_date || undefined}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            applicationDetails: {
-                              ...prev.applicationDetails,
-                              closing_date: e.target.value
-                            }
-                          }))
-                        }
-                        required
-                      />
-                    </div>
+                         <Label htmlFor='exam_type'>Exam Type</Label>
+                         <Select
+                             id='exam_type'
+                             value={formData.exam_type}
+                             onValueChange={(value) => setFormData(prev => ({ ...prev, exam_type: value }))}
+                         >
+                            <option value="Written">Written</option>
+                            <option value="Online">Online</option>
+                         </Select>
+                     </div>
                   </div>
                 </div>
 
-                {error && <div className='text-red-500 text-sm'>{error}</div>}
-              </div>
+                {/* Application Details - Clean Grid */}
+                <div>
+                   <h2 className='text-lg font-semibold mb-4 text-gray-800 border-b pb-1'>Dates & Fees</h2>
+                   <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                        <div>
+                            <Label htmlFor='normal_fee'>Normal Fee</Label>
+                            <Input
+                                id='normal_fee'
+                                type='number'
+                                placeholder='Rs.'
+                                value={formData.normal_fee}
+                                onChange={(e) => setFormData(prev => ({ ...prev, normal_fee: e.target.value }))}
+                                className='mt-1'
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor='late_fee'>Late Fee</Label>
+                            <Input
+                                id='late_fee'
+                                type='number'
+                                placeholder='Rs.'
+                                value={formData.late_fee}
+                                onChange={(e) => setFormData(prev => ({ ...prev, late_fee: e.target.value }))}
+                                className='mt-1'
+                            />
+                        </div>
+                   </div>
+                   <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4'>
+                       <div>
+                            <Label htmlFor='opening_date'>Opening Date</Label>
+                            <Input
+                                id='opening_date'
+                                type='date'
+                                value={formData.opening_date ? formatDate(formData.opening_date, 'YYYY-MM-DD') : ''} // Need to handle date format for input type='date'
+                                onChange={(e) => setFormData(prev => ({ ...prev, opening_date: e.target.value }))}
+                                className='mt-1'
+                            />
+                        </div>
+                         <div>
+                            <Label htmlFor='closing_date'>Closing Date</Label>
+                            <Input
+                                id='closing_date'
+                                type='date'
+                                value={formData.closing_date ? formatDate(formData.closing_date, 'YYYY-MM-DD') : ''}
+                                onChange={(e) => setFormData(prev => ({ ...prev, closing_date: e.target.value }))}
+                                className='mt-1'
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor='exam_date'>Exam Date</Label>
+                            <Input
+                                id='exam_date'
+                                type='date'
+                                value={formData.exam_date ? formatDate(formData.exam_date, 'YYYY-MM-DD') : ''}
+                                onChange={(e) => setFormData(prev => ({ ...prev, exam_date: e.target.value }))}
+                                className='mt-1'
+                            />
+                        </div>
+                   </div>
+                </div>
 
-              {/* Submit Button - Sticky Footer */}
-              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
-                <Button
-                  type='button'
-                  onClick={handleModalClose}
-                  variant='outline'
-                >
-                  Cancel
-                </Button>
-                <Button type='submit' disabled={loading}>
-                  {loading
-                    ? 'Processing...'
-                    : editingId
-                      ? 'Update Exam'
-                      : 'Create Exam'}
-                </Button>
+                {/* Additional Info */}
+                 <div>
+                    <h2 className='text-lg font-semibold mb-4 text-gray-800 border-b pb-1'>Additional Information</h2>
+                    <div className='grid grid-cols-1 gap-4'>
+                        <div>
+                            <Label htmlFor='syllabus'>Syllabus</Label>
+                            <textarea
+                              id='syllabus'
+                              placeholder='Enter exam syllabus'
+                              value={formData.syllabus}
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  syllabus: e.target.value
+                                }))
+                              }
+                              className='flex h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1'
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor='past-question'>Past Question URL</Label>
+                            <Input
+                              id='past-question'
+                              type='text'
+                              placeholder='Enter past question URL'
+                              value={formData.pastQuestion}
+                              onChange={(e) =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  pastQuestion: e.target.value
+                                }))
+                              }
+                              className='mt-1'
+                            />
+                        </div>
+                    </div>
+                 </div>
+
+              </div>
+                {error && <div className='text-red-500 text-sm mt-2'>{error}</div>}
+
+
+              {/* Submit Button */}
+              <div className='p-4 border-t mt-auto'>
+                <div className='flex justify-end gap-2'>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    onClick={handleModalClose}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type='submit' disabled={loading}>
+                    {loading ? 'Saving...' : editingId ? 'Update Exam' : 'Create Exam'}
+                  </Button>
+                </div>
               </div>
             </form>
           </div>
