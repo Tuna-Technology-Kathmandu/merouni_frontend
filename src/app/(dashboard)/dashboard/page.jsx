@@ -159,6 +159,8 @@ const StudentDashboard = () => {
   const [consultancyLoading, setConsultancyLoading] = useState(true)
   const [consultancyError, setConsultancyError] = useState(null)
 
+
+  console.log("HI hELLO", user)
   useEffect(() => {
     setHeading('Dashboard')
   }, [setHeading])

@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
 
 // Dynamically import charts with SSR disabled to fix ResponsiveContainer issues
 const StudentEnrollmentGrowthChart = dynamic(
@@ -20,7 +20,6 @@ const DashboardCharts = ({
   onYearsChange
 }) => {
   const [mounted, setMounted] = useState(false)
-
   useEffect(() => {
     setMounted(true)
   }, [])

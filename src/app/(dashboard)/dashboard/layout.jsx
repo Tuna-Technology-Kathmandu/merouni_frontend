@@ -1,15 +1,14 @@
 'use client'
-import AdminNavbar from '../../../ui/molecules/AdminNavbar'
-import Menu from '../../../ui/molecules/Menu'
+import { PageHeadingProvider } from '@/contexts/PageHeadingContext'
+import useAuthGuard from '@/hooks/useAuthGuard'
+import { destr } from 'destr'
 import Image from 'next/image'
 import Link from 'next/link'
-import useAuthGuard from '@/hooks/useAuthGuard'
-import { useState, useMemo } from 'react'
-import { useSelector } from 'react-redux'
-import { destr } from 'destr'
+import { useMemo, useState } from 'react'
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
-import SearchInput from '../../../ui/molecules/SearchInput'
-import { PageHeadingProvider } from '@/contexts/PageHeadingContext'
+import { useSelector } from 'react-redux'
+import AdminNavbar from '../../../ui/molecules/AdminNavbar'
+import Menu from '../../../ui/molecules/Menu'
 
 export default function DashboardLayout({ children }) {
   const { isBooted, isAuthenticated } = useAuthGuard()
@@ -22,6 +21,12 @@ export default function DashboardLayout({ children }) {
     const parsed = typeof rawRole === 'string' ? destr(rawRole) : rawRole || {}
     return parsed
   }, [rawRole])
+
+  // if ( role is empty, logout ), dleete all the localStorage and cookies
+  if (Object.keys(role).length === 0) {
+    localStorage.clear()
+    return null // Will redirect via useAuthGuard
+  }
 
   const isAdmin = !!role?.admin
 
