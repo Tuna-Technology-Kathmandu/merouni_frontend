@@ -78,6 +78,7 @@ export default function CreateUpdateDiscipline({
             if (!response.ok) {
                 throw new Error('Failed to create discipline')
             }
+            
             return await response.json()
         } catch (error) {
             console.error('Error creating discipline:', error)

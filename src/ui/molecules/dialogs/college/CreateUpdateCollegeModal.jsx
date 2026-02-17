@@ -214,8 +214,8 @@ const CreateUpdateCollegeModal = ({
                         setValue('college_broucher', collegeData.college_broucher)
                     }
 
-                    const facilityData = collegeData.collegeFacility?.length
-                        ? collegeData.collegeFacility.map((f) => ({
+                    const facilityData = collegeData.facilities?.length
+                        ? collegeData.facilities.map((f) => ({
                             title: f.title || '',
                             description: f.description || '',
                             icon: f.icon || ''
@@ -277,8 +277,8 @@ const CreateUpdateCollegeModal = ({
             if (coursesArray.length > 0) data.courses = coursesArray
             else delete data.courses
 
-            data.college_logo = uploadedFiles.logo
-            data.featured_img = uploadedFiles.featured
+            data.college_logo = uploadedFiles.college_logo
+            data.featured_img = uploadedFiles.featured_img
             data.images = [...uploadedFiles.images, ...uploadedFiles.videos]
 
             data.facilities = (data.facilities || []).filter(f => f.title.trim() !== '' || f.description.trim() !== '' || f.icon.trim() !== '')
@@ -426,7 +426,7 @@ const CreateUpdateCollegeModal = ({
                             <div className='space-y-2'>
                                 <Label>Full Content</Label>
                                 <CKUni
-                                initialData={watch('content')}
+                                    initialData={watch('content')}
                                     onChange={(data) => setValue('content', data)}
                                     data={watch('content')}
                                 />
@@ -656,7 +656,7 @@ const CreateUpdateCollegeModal = ({
                                         variant='outline'
                                         size='sm'
                                         className='h-9 px-4 border-gray-200 hover:bg-gray-50'
-                                        onClick={() => appendMember({ name: '', position: '', image_url: '', bio: '', contact_info: '' })}
+                                        onClick={() => appendMember({ name: '', role: '', image_url: '', bio: '', contact_info: '' })}
                                     >
                                         <Plus className='w-4 h-4 mr-2' />
                                         Add Member
@@ -679,11 +679,18 @@ const CreateUpdateCollegeModal = ({
                                                     />
                                                 </div>
                                                 <div className='space-y-1.5'>
-                                                    <Label className='text-xs text-gray-400'>Position</Label>
-                                                    <Input
-                                                        {...register(`members[${index}].position`)}
+                                                    <Label className='text-xs text-gray-400'>Role</Label>
+                                                    <Select
+                                                        {...register(`members[${index}].role`)}
                                                         className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
-                                                    />
+                                                    >
+                                                        <option value="">Select Role</option>
+                                                        <option value="Principal">Principal</option>
+                                                        <option value="Professor">Professor</option>
+                                                        <option value="Lecturer">Lecturer</option>
+                                                        <option value="Admin">Admin</option>
+                                                        <option value="Staff">Staff</option>
+                                                    </Select>
                                                 </div>
                                                 <div className='space-y-1.5'>
                                                     <Label className='text-xs text-gray-400'>Image URL</Label>
