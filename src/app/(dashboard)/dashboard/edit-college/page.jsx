@@ -7,8 +7,7 @@ import { useSelector } from 'react-redux'
 import FileUpload from '../addCollege/FileUpload'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
-import GallerySection from '../addCollege/GallerySection'
-import VideoSection from '../addCollege/VideoSection'
+
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import {
   fetchAllCourse,
@@ -16,6 +15,9 @@ import {
   getUniversityBySlug
 } from '../addCollege/actions'
 import { Upload } from 'lucide-react'
+import GallerySection from '@/ui/molecules/dialogs/college/components/GallerySection'
+import VideoSection from '@/ui/molecules/dialogs/college/components/VideoSection'
+
 
 const CKUni = dynamic(() => import('../../../../ui/molecules/ck-editor/CKUni'), {
   ssr: false
