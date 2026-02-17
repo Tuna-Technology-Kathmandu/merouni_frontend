@@ -25,7 +25,7 @@ import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function SkillsCoursesManager() {
     const { setHeading } = usePageHeading()
-    const author_id = useSelector((state) => state.user.data.id)
+    const author_id = useSelector((state) => state.user.data?.id)
 
     // Initialize react-hook-form
     const {

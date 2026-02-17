@@ -17,7 +17,7 @@ import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function TagForm() {
   const { setHeading } = usePageHeading()
-  const author_id = useSelector((state) => state.user.data.id)
+  const author_id = useSelector((state) => state.user.data?.id)
   const [isOpen, setIsOpen] = useState(false)
   const [tags, setTags] = useState([])
   const [tableLoading, setTableLoading] = useState(false)

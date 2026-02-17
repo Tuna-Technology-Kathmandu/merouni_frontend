@@ -22,7 +22,7 @@ import BlogViewModal from './components/BlogViewModal'
 
 export default function BlogsManager() {
   const { setHeading } = usePageHeading()
-  const author_id = useSelector((state) => state.user.data.id)
+  const author_id = useSelector((state) => state.user.data?.id)
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()

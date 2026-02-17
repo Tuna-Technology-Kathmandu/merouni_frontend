@@ -51,7 +51,7 @@ const CreateUpdateCollegeModal = ({
         videos: []
     })
 
-    const author_id = useSelector((state) => state.user.data.id)
+    const author_id = useSelector((state) => state.user.data?.id)
 
 
     const {

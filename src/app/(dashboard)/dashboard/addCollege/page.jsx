@@ -43,7 +43,7 @@ export default function CollegeForm() {
   const [isOpen, setIsOpen] = useState(false)
   const [allDegrees, setAllDegrees] = useState([])
 
-  const author_id = useSelector((state) => state.user.data.id)
+  const author_id = useSelector((state) => state.user.data?.id)
 
   const { requireAdmin } = useAdminPermission()
   // No longer needed: onSubmit, memberFields, facilityFields, etc.

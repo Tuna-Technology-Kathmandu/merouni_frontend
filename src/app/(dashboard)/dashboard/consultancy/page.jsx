@@ -25,7 +25,7 @@ export default function ConsultancyForm() {
   }
 
   const { setHeading } = usePageHeading()
-  const author_id = useSelector((state) => state.user.data.id)
+  const author_id = useSelector((state) => state.user.data?.id)
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
@@ -221,7 +221,7 @@ export default function ConsultancyForm() {
       <div className='w-full space-y-2'>
         <div className='px-4 space-y-4'>
           <div className='flex justify-between items-center pt-4'>
-          
+
             <SearchInput
               value={searchQuery}
               onChange={(e) => handleSearchInput(e.target.value)}

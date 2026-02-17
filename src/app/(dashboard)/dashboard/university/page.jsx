@@ -17,7 +17,7 @@ import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function UniversityForm() {
   const { setHeading } = usePageHeading()
-  const author_id = useSelector((state) => state.user.data.id)
+  const author_id = useSelector((state) => state.user.data?.id)
   const [isOpen, setIsOpen] = useState(false)
   const [universities, setUniversities] = useState([])
   const [tableLoading, setTableLoading] = useState(false)

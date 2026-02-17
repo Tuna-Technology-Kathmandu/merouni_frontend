@@ -47,7 +47,7 @@ export default function FacultyManager() {
   const [viewingFaculty, setViewingFaculty] = useState(null)
   const [isViewOpen, setIsViewOpen] = useState(false)
 
-  const author_id = useSelector((state) => state.user.data.id)
+  const author_id = useSelector((state) => state.user.data?.id)
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,

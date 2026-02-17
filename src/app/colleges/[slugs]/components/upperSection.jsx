@@ -15,7 +15,6 @@ const ImageSection = ({ college }) => {
     college?.collegeContacts && college.collegeContacts.length > 0
   const hasWebsite = !!college?.website_url
   const hasUniversity = !!college?.university?.fullname
-  const hasInstituteType = !!college?.institute_type
   const instituteLevels = JSON.parse(college?.institute_level || '[]')
   const hasInstituteLevel = instituteLevels.length > 0
 

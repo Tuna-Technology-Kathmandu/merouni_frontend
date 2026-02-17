@@ -55,7 +55,7 @@ export default function CourseForm() {
   const [showFacDrop, setShowFacDrop] = useState(false)
   const [hasSelectedFac, setHasSelectedFac] = useState(false)
 
-  const author_id = useSelector((state) => state.user.data.id)
+  const author_id = useSelector((state) => state.user.data?.id)
   const [isOpen, setIsOpen] = useState(false)
   const [courses, setCourses] = useState([])
   const [tableLoading, setTableLoading] = useState(false)

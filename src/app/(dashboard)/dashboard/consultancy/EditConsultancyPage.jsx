@@ -30,7 +30,7 @@ export default function EditConsultancyPage() {
   const [collegeSearch, setCollegeSearch] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [selectedColleges, setSelectedColleges] = useState([])
-  const author_id = useSelector((state) => state.user.data.id)
+  const author_id = useSelector((state) => state.user.data?.id)
 
   const {
     register,

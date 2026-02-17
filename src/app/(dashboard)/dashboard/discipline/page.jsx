@@ -18,7 +18,7 @@ import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function DisciplineManager() {
     const { setHeading } = usePageHeading()
-    const author_id = useSelector((state) => state.user.data.id)
+    const author_id = useSelector((state) => state.user.data?.id)
 
     const [disciplines, setDisciplines] = useState([])
     const [loading, setLoading] = useState(true)

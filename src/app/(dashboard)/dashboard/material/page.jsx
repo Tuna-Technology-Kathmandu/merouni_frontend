@@ -21,7 +21,7 @@ import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 
 export default function MaterialForm() {
   const { setHeading } = usePageHeading()
-  const author_id = useSelector((state) => state.user.data.id)
+  const author_id = useSelector((state) => state.user.data?.id)
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
@@ -463,12 +463,12 @@ export default function MaterialForm() {
       {/* Header Section */}
       <div className='sticky top-0 z-30 bg-[#F7F8FA] flex items-center justify-between px-4 pt-4'>
         {/* Search Bar */}
-          <SearchInput
-            value={searchQuery}
-            onChange={(e) => handleSearchInput(e.target.value)}
-            placeholder='Search materials...'
-            className='max-w-md'
-          />
+        <SearchInput
+          value={searchQuery}
+          onChange={(e) => handleSearchInput(e.target.value)}
+          placeholder='Search materials...'
+          className='max-w-md'
+        />
 
         {/* Button */}
         <div className='flex items-center gap-4'>
@@ -487,152 +487,152 @@ export default function MaterialForm() {
           <DialogClose onClick={handleCloseModal} />
         </DialogHeader>
         <DialogContent className='max-h-[90vh] overflow-y-auto'>
-        <div className='container mx-auto p-1 flex flex-col'>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className='flex flex-col space-y-6'
-          >
-            <div className='bg-white p-6 rounded-lg shadow-md'>
-              <h2 className='text-xl font-semibold mb-4'>
-                Material Information
-              </h2>
-              <div className='grid grid-cols-1 gap-4'>
-                <div>
-                  <label className='block mb-2'>
-                    Title <span className='text-red-500'>*</span>
-                  </label>
-                  <input
-                    {...register('title', {
-                      required: 'Title is required',
-                      minLength: {
-                        value: 3,
-                        message: 'Title must be at least 3 characters long'
-                      }
-                    })}
-                    className='w-full p-2 border rounded'
-                  />
-                  {errors.title && (
-                    <span className='text-red-500'>{errors.title.message}</span>
-                  )}
-                </div>
-
-                <div className='mb-4'>
-                  <label className='block mb-2'>Tags</label>
-                  <div className='flex flex-wrap gap-2 mb-2'>
-                    {selectedColleges.map((college) => (
-                      <div
-                        key={college.id}
-                        className='flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full'
-                      >
-                        <span>{college.title}</span>
-                        <button
-                          type='button'
-                          onClick={() => removeCollege(college.id)}
-                          className='text-blue-600 hover:text-blue-800'
-                        >
-                          <X className='w-4 h-4' />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className='relative'>
+          <div className='container mx-auto p-1 flex flex-col'>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className='flex flex-col space-y-6'
+            >
+              <div className='bg-white p-6 rounded-lg shadow-md'>
+                <h2 className='text-xl font-semibold mb-4'>
+                  Material Information
+                </h2>
+                <div className='grid grid-cols-1 gap-4'>
+                  <div>
+                    <label className='block mb-2'>
+                      Title <span className='text-red-500'>*</span>
+                    </label>
                     <input
-                      type='text'
-                      value={collegeSearch}
-                      onChange={searchCollege}
+                      {...register('title', {
+                        required: 'Title is required',
+                        minLength: {
+                          value: 3,
+                          message: 'Title must be at least 3 characters long'
+                        }
+                      })}
                       className='w-full p-2 border rounded'
-                      placeholder='Search tags...'
                     />
-
-                    {searchResults.length > 0 && (
-                      <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto'>
-                        {searchResults.map((college) => (
-                          <div
-                            key={college.id}
-                            onClick={() => addCollege(college)}
-                            className='p-2 hover:bg-gray-100 cursor-pointer'
-                          >
-                            {college.title}
-                          </div>
-                        ))}
-                      </div>
+                    {errors.title && (
+                      <span className='text-red-500'>{errors.title.message}</span>
                     )}
                   </div>
-                </div>
-                <div>
-                  <label className='block mb-2'>Category</label>
-                  <select
-                    {...register('category_id')}
-                    className='w-full p-2 border rounded'
-                  >
-                    <option value=''>No Category</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+
+                  <div className='mb-4'>
+                    <label className='block mb-2'>Tags</label>
+                    <div className='flex flex-wrap gap-2 mb-2'>
+                      {selectedColleges.map((college) => (
+                        <div
+                          key={college.id}
+                          className='flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full'
+                        >
+                          <span>{college.title}</span>
+                          <button
+                            type='button'
+                            onClick={() => removeCollege(college.id)}
+                            className='text-blue-600 hover:text-blue-800'
+                          >
+                            <X className='w-4 h-4' />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className='relative'>
+                      <input
+                        type='text'
+                        value={collegeSearch}
+                        onChange={searchCollege}
+                        className='w-full p-2 border rounded'
+                        placeholder='Search tags...'
+                      />
+
+                      {searchResults.length > 0 && (
+                        <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto'>
+                          {searchResults.map((college) => (
+                            <div
+                              key={college.id}
+                              onClick={() => addCollege(college)}
+                              className='p-2 hover:bg-gray-100 cursor-pointer'
+                            >
+                              {college.title}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <label className='block mb-2'>Category</label>
+                    <select
+                      {...register('category_id')}
+                      className='w-full p-2 border rounded'
+                    >
+                      <option value=''>No Category</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
 
 
-                <div>
-                  <FileUpload
-                    label={
-                      <>
-                        Material File <span className='text-red-500'>*</span>
-                      </>
-                    }
-                    accept='application/pdf,image/*'
-                    onUploadComplete={(url) => {
-                      setUploadedFiles((prev) => ({ ...prev, file: url }))
-                      setValue('file', url)
-                    }}
-                    defaultPreview={uploadedFiles.file}
-                  />
-                  {!uploadedFiles.file && (
-                    <p className='text-red-500 text-sm mt-1'>
-                      Material file is required
-                    </p>
-                  )}
-                </div>
+                  <div>
+                    <FileUpload
+                      label={
+                        <>
+                          Material File <span className='text-red-500'>*</span>
+                        </>
+                      }
+                      accept='application/pdf,image/*'
+                      onUploadComplete={(url) => {
+                        setUploadedFiles((prev) => ({ ...prev, file: url }))
+                        setValue('file', url)
+                      }}
+                      defaultPreview={uploadedFiles.file}
+                    />
+                    {!uploadedFiles.file && (
+                      <p className='text-red-500 text-sm mt-1'>
+                        Material file is required
+                      </p>
+                    )}
+                  </div>
 
-                <div>
-                  <FileUpload
-                    label={
-                      <>
-                        Material Image{' '}
-                        <span className='text-gray-500 text-sm'>
-                          (Optional)
-                        </span>
-                      </>
-                    }
-                    onUploadComplete={(url) => {
-                      setUploadedFiles((prev) => ({ ...prev, image: url }))
-                      setValue('image', url)
-                    }}
-                    defaultPreview={uploadedFiles.image}
-                  />
+                  <div>
+                    <FileUpload
+                      label={
+                        <>
+                          Material Image{' '}
+                          <span className='text-gray-500 text-sm'>
+                            (Optional)
+                          </span>
+                        </>
+                      }
+                      onUploadComplete={(url) => {
+                        setUploadedFiles((prev) => ({ ...prev, image: url }))
+                        setValue('image', url)
+                      }}
+                      defaultPreview={uploadedFiles.image}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className='flex justify-end'>
-              <Button
-                type='submit'
-                disabled={loading}
-                className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
-              >
-                {loading
-                  ? 'Processing...'
-                  : editing
-                    ? 'Update Material'
-                    : 'Create Material'}
-              </Button>
-            </div>
-          </form>
-        </div>
+              <div className='flex justify-end'>
+                <Button
+                  type='submit'
+                  disabled={loading}
+                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
+                >
+                  {loading
+                    ? 'Processing...'
+                    : editing
+                      ? 'Update Material'
+                      : 'Create Material'}
+                </Button>
+              </div>
+            </form>
+          </div>
         </DialogContent>
       </Dialog>
 

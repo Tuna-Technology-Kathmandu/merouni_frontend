@@ -32,7 +32,7 @@ const CKBlogs = dynamic(() => import('../../../../ui/molecules/ck-editor/CKBlogs
 
 export default function CareerForm() {
   const { setHeading } = usePageHeading()
-  const author_id = useSelector((state) => state.user.data.id)
+  const author_id = useSelector((state) => state.user.data?.id)
   const [isOpen, setIsOpen] = useState(false)
   const [careers, setCareers] = useState([])
   const [tableLoading, setTableLoading] = useState(false)

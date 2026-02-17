@@ -33,7 +33,7 @@ import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function NewsManager() {
   const { setHeading } = usePageHeading()
-  const author_id = useSelector((state) => state.user.data.id)
+  const author_id = useSelector((state) => state.user.data?.id)
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
@@ -364,50 +364,50 @@ export default function NewsManager() {
     <>
       <div className='w-full space-y-2'>
         <div className='px-4 space-y-4'>
-        <div className='flex justify-between items-center pt-4'>
-          <SearchInput
-            value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
-            placeholder='Search news...'
-            className='max-w-md'
+          <div className='flex justify-between items-center pt-4'>
+            <SearchInput
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder='Search news...'
+              className='max-w-md'
+            />
+            <Button
+              onClick={() => {
+                setIsOpen(true)
+                setEditing(false)
+                setInitialData(null)
+                fetchAllColleges()
+                fetchAllCategories()
+              }}
+            >
+              Add News
+            </Button>
+          </div>
+
+          {/* News Form Modal */}
+          <NewsForm
+            isOpen={isOpen}
+            onClose={handleModalClose}
+            editing={editing}
+            initialData={initialData}
+            onSubmit={handleSubmit}
+            submitting={submitting}
+            colleges={colleges}
+            categories={categories}
+            loadingColleges={loadingColleges}
+            loadingCategories={loadingCategories}
           />
-          <Button
-            onClick={() => {
-              setIsOpen(true)
-              setEditing(false)
-              setInitialData(null)
-              fetchAllColleges()
-              fetchAllCategories()
-            }}
-          >
-            Add News
-          </Button>
+
+          {/* Table Section */}
+          <Table
+            data={news}
+            columns={columns}
+            pagination={pagination}
+            onPageChange={(newPage) => loadData(newPage, searchQuery)}
+            onSearch={handleSearch}
+            showSearch={false}
+          />
         </div>
-
-        {/* News Form Modal */}
-        <NewsForm
-          isOpen={isOpen}
-          onClose={handleModalClose}
-          editing={editing}
-          initialData={initialData}
-          onSubmit={handleSubmit}
-          submitting={submitting}
-          colleges={colleges}
-          categories={categories}
-          loadingColleges={loadingColleges}
-          loadingCategories={loadingCategories}
-        />
-
-        {/* Table Section */}
-        <Table
-          data={news}
-          columns={columns}
-          pagination={pagination}
-          onPageChange={(newPage) => loadData(newPage, searchQuery)}
-          onSearch={handleSearch}
-          showSearch={false}
-        />
-      </div>
       </div>
       <ToastContainer position='top-right' />
 
@@ -429,77 +429,77 @@ export default function NewsManager() {
           <DialogHeader>
             <DialogTitle>News Details</DialogTitle>
           </DialogHeader>
-        {loadingView ? (
-          <div className='flex justify-center items-center h-48'>
-            Loading...
-          </div>
-        ) : viewNewsData ? (
-          <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
-            {viewNewsData.featuredImage && (
-              <div className='w-full h-64 rounded-lg overflow-hidden'>
-                <img
-                  src={viewNewsData.featuredImage}
-                  alt={viewNewsData.title}
-                  className='w-full h-full object-cover'
-                />
-              </div>
-            )}
-            <div>
-              <h2 className='text-2xl font-bold mb-2'>{viewNewsData.title}</h2>
-              <div className='flex gap-2 mb-4'>
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${viewNewsData.status === 'published'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-yellow-100 text-yellow-800'
-                    }`}
-                >
-                  {viewNewsData.status}
-                </span>
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${viewNewsData.visibility === 'public'
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-100 text-gray-800'
-                    }`}
-                >
-                  {viewNewsData.visibility}
-                </span>
-              </div>
+          {loadingView ? (
+            <div className='flex justify-center items-center h-48'>
+              Loading...
             </div>
-            {viewNewsData.description && (
+          ) : viewNewsData ? (
+            <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
+              {viewNewsData.featuredImage && (
+                <div className='w-full h-64 rounded-lg overflow-hidden'>
+                  <img
+                    src={viewNewsData.featuredImage}
+                    alt={viewNewsData.title}
+                    className='w-full h-full object-cover'
+                  />
+                </div>
+              )}
               <div>
-                <h3 className='font-semibold mb-2'>Description</h3>
-                <p className='text-gray-700'>{viewNewsData.description}</p>
+                <h2 className='text-2xl font-bold mb-2'>{viewNewsData.title}</h2>
+                <div className='flex gap-2 mb-4'>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${viewNewsData.status === 'published'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-yellow-100 text-yellow-800'
+                      }`}
+                  >
+                    {viewNewsData.status}
+                  </span>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${viewNewsData.visibility === 'public'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-gray-100 text-gray-800'
+                      }`}
+                  >
+                    {viewNewsData.visibility}
+                  </span>
+                </div>
               </div>
-            )}
-            <div className='grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg'>
-              <div>
-                <h3 className='text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1'>
-                  Associated College
-                </h3>
-                <p className='text-sm font-medium'>
-                  {viewNewsData.newsCollege?.name || 'N/A'}
-                </p>
+              {viewNewsData.description && (
+                <div>
+                  <h3 className='font-semibold mb-2'>Description</h3>
+                  <p className='text-gray-700'>{viewNewsData.description}</p>
+                </div>
+              )}
+              <div className='grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg'>
+                <div>
+                  <h3 className='text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1'>
+                    Associated College
+                  </h3>
+                  <p className='text-sm font-medium'>
+                    {viewNewsData.newsCollege?.name || 'N/A'}
+                  </p>
+                </div>
+                <div>
+                  <h3 className='text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1'>
+                    Category
+                  </h3>
+                  <p className='text-sm font-medium'>
+                    {viewNewsData.newsCategory?.title || 'N/A'}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className='text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1'>
-                  Category
-                </h3>
-                <p className='text-sm font-medium'>
-                  {viewNewsData.newsCategory?.title || 'N/A'}
-                </p>
-              </div>
+              {viewNewsData.createdAt && (
+                <div className='text-sm text-gray-500'>
+                  Created: {formatDate(viewNewsData.createdAt)}
+                </div>
+              )}
             </div>
-            {viewNewsData.createdAt && (
-              <div className='text-sm text-gray-500'>
-                Created: {formatDate(viewNewsData.createdAt)}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className='text-center py-8 text-gray-500'>
-            No data available
-          </div>
-        )}
+          ) : (
+            <div className='text-center py-8 text-gray-500'>
+              No data available
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </>

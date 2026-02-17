@@ -29,7 +29,7 @@ const CKBlogs = dynamic(() => import('../../../../ui/molecules/ck-editor/CKBlogs
 
 export default function EventManager() {
   const { setHeading } = usePageHeading()
-  const author_id = useSelector((state) => state.user.data.id)
+  const author_id = useSelector((state) => state.user.data?.id)
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()

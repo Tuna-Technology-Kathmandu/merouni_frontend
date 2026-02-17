@@ -33,7 +33,7 @@ const VacancyManager = () => {
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
-  const author_id = useSelector((state) => state.user.data.id)
+  const author_id = useSelector((state) => state.user.data?.id)
   const { requireAdmin } = useAdminPermission()
 
   const {

@@ -27,7 +27,7 @@ const CKUni = dynamic(() => import('@/ui/molecules/ck-editor/CKUni'), {
 })
 
 const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
-    const author_id = useSelector((state) => state.user.data.id)
+    const author_id = useSelector((state) => state.user.data?.id)
     const [loading, setLoading] = useState(false)
     const [submitting, setSubmitting] = useState(false)
 
