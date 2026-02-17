@@ -89,7 +89,7 @@ const ApplyPage = ({ params }) => {
             </>
           }
         >
-          <Link href='/login'>
+          <Link href='/sign-in'>
             <Button
               variant='outline'
               className='min-w-[160px] h-12 text-base font-medium'
