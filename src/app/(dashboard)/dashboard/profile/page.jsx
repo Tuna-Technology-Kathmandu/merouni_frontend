@@ -101,14 +101,16 @@ const ProfileUpdate = () => {
       throw new Error('Failed to fetch profile')
     }
     const data = await response.json()
+    console.log(data,"data")
+    const user  = data.user
     setNameForm({
-      firstName: data.firstName || '',
-      middleName: data.middleName || '',
-      lastName: data.lastName || '',
-      email: data.email || '',
-      phoneNo: data.phoneNo || '',
-      profileImageUrl: data.profileImageUrl || '',
-      cvUrl: data.cvUrl || ''
+      firstName: user.firstName || '',
+      middleName: user.middleName || '',
+      lastName: user.lastName || '',
+      email: user.email || '',
+      phoneNo:  user.phoneNo || '',
+      profileImageUrl: user.profileImageUrl || '',
+      cvUrl: user.cvUrl || ''
     })
   }
 
