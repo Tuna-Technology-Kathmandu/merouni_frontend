@@ -1,6 +1,8 @@
 import { fetchVideos } from '../(dashboard)/dashboard/videos/action'
 import VideoList from './VideoList'
 
+export const dynamic = 'force-dynamic'
+
 export default async function WatchPage() {
     const data = await fetchVideos(1, 100)
 
