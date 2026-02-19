@@ -582,7 +582,7 @@ export const AgentDashboard = () => {
 }
 
 const DashboardPage = () => {
-  const rawRole = useSelector((state) => state.user?.data?.roles || state.user?.data?.role)
+  const rawRole = useSelector((state) => state.user?.data?.role)
   const role =
     typeof rawRole === 'string' ? destr(rawRole) || {} : rawRole || {}
 

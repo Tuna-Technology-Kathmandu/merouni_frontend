@@ -182,7 +182,7 @@ const Menu = ({ isCollapsed = false }) => {
 
   // Parse Role
   const role = useSelector((state) => {
-    const roleData = state.user?.data?.roles || state.user?.data?.role
+    const roleData = state.user?.data?.role
     const parsedRole = typeof roleData === 'string' ? destr(roleData) : roleData
     if (!parsedRole || typeof parsedRole !== 'object') return {}
     return Object.entries(parsedRole).reduce((acc, [key, value]) => {

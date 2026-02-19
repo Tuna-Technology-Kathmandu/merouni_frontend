@@ -33,7 +33,7 @@ const AppliedConsultanciesPage = () => {
     total: 0
   })
 
-  const rawRole = useSelector((state) => state.user?.data?.roles || state.user?.data?.role)
+  const rawRole = useSelector((state) => state.user?.data?.role)
   const role =
     typeof rawRole === 'string' ? destr(rawRole) || {} : rawRole || {}
 
@@ -104,7 +104,7 @@ const AppliedConsultanciesPage = () => {
 
   const renderAddress = (address) => {
     if (!address) return 'N/A'
-    
+
     let addrObj = address
     if (typeof address === 'string') {
       try {
