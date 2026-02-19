@@ -25,9 +25,14 @@ const OverviewSection = ({ college }) => {
   const truncatedDescription = truncateDescription(fullDescription, 30)
   const shouldTruncate = fullDescription.split(' ').length > 30
 
+  // If no description and no content, return null to avoid empty card
+  if (!college?.description && !college?.content) {
+    return null
+  }
+
   return (
-    <div className='max-w-4xl'>
-      <h2 className='text-lg font-semibold text-gray-900 mb-6'>Description</h2>
+    <div className='bg-white rounded-xl border p-6'>
+      <h2 className='text-xl font-bold text-gray-900 mb-6'>Description</h2>
 
       {/* Plain description text */}
       {college?.description && (
@@ -38,7 +43,7 @@ const OverviewSection = ({ college }) => {
           </p>
 
           {/* Desktop view - full description */}
-          <p className='hidden md:block text-gray-600 leading-relaxed text-justify text-sm md:text-base'>
+          <p className='hidden md:block text-gray-600 leading-relaxed text-left text-sm md:text-base'>
             {fullDescription}
           </p>
 
