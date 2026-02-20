@@ -33,7 +33,7 @@ const SideBanner = ({ banners = [], loading = false }) => {
           >
             <img
               src={
-                banner.banner_galleries?.[0]?.url || '/images/meroUniSmall.gif'
+                banner.banner_image || '/images/meroUniSmall.gif'
               }
               onError={(e) => {
                 e.target.onerror = null

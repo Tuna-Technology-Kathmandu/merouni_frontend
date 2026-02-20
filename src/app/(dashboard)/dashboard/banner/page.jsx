@@ -1,16 +1,16 @@
 'use client'
-import React, { useState, useEffect, useRef } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
-import FileUpload from '../addCollege/FileUpload'
-import { Edit, Trash2, Plus, X } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast, ToastContainer } from 'react-toastify'
-import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
-import useAdminPermission from '@/hooks/useAdminPermission'
-import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { Button } from '@/ui/shadcn/button'
 import { THEME_BLUE } from '@/constants/constants'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+import useAdminPermission from '@/hooks/useAdminPermission'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
+import { Button } from '@/ui/shadcn/button'
 import { formatDate } from '@/utils/date.util'
+import { Edit, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast, ToastContainer } from 'react-toastify'
+import FileUpload from '../addCollege/FileUpload'
 
 export default function BannerForm() {
   const { setHeading } = usePageHeading()
@@ -22,14 +22,7 @@ export default function BannerForm() {
   const [deleteId, setDeleteId] = useState(null)
   const [editId, setEditingId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [searchResults, setSearchResults] = useState([])
-  const [selectedCollege, setSelectedCollege] = useState(null)
-  const [searchLoading, setSearchLoading] = useState(false)
-  const [showDropdown, setShowDropdown] = useState(false)
   const [bannersByPosition, setBannersByPosition] = useState({})
-
-  const searchTimeoutRef = useRef(null)
-  const dropdownRef = useRef(null)
 
   const {
     register,
@@ -41,38 +34,19 @@ export default function BannerForm() {
     formState: { errors }
   } = useForm({
     defaultValues: {
-      collegeSearch: '',
-      collegeId: '',
+      title: '',
       website_url: '',
       date_of_expiry: '',
       display_position: 1,
-      bannerImages: [
-        {
-          title: '',
-          gallery: { small: '', medium: '', large: '' },
-          is_featured: 1
-        }
-      ]
+      banner_image: ''
     }
-  })
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'bannerImages'
   })
 
   useEffect(() => {
     setHeading('Banner Management')
     fetchBannersByPosition()
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
     return () => {
       setHeading(null)
-      document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [setHeading])
 
@@ -108,73 +82,15 @@ export default function BannerForm() {
   }
 
   const { requireAdmin } = useAdminPermission()
-  const searchCollege = async (query) => {
-    setValue('collegeSearch', query)
-
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current)
-    }
-
-    if (!query) {
-      setSearchResults([])
-      setShowDropdown(false)
-      return
-    }
-
-    setSearchLoading(true)
-    setShowDropdown(true)
-
-    searchTimeoutRef.current = setTimeout(async () => {
-      try {
-        const response = await authFetch(
-          `${process.env.baseUrl}/college?q=${query}`
-        )
-        const data = await response.json()
-        setSearchResults(data.items || [])
-      } catch (error) {
-        toast.error('Failed to search colleges')
-      } finally {
-        setSearchLoading(false)
-      }
-    }, 300)
-  }
-
-  const handleCollegeSelect = (college) => {
-    setSelectedCollege(college)
-    setValue('collegeId', college.id)
-    setValue('collegeSearch', college.name)
-    setShowDropdown(false)
-  }
-
   const onSubmit = async (data) => {
-    if (!selectedCollege) {
-      toast.error('Please select a college first')
-      return
-    }
-
+    setLoading(true)
     try {
       const bannerData = {
-        collegeId: selectedCollege.id,
+        title: data.title,
         website_url: data.website_url,
         date_of_expiry: data.date_of_expiry,
-        display_position: activePosition,
-        bannerImage: data.bannerImages.map((image) => {
-          // Use the same URL for all sizes if only small is provided
-          const imageUrl =
-            image.gallery.small ||
-            image.gallery.medium ||
-            image.gallery.large ||
-            ''
-          return {
-            title: image.title,
-            gallery: {
-              small: image.gallery.small || imageUrl,
-              medium: image.gallery.medium || imageUrl,
-              large: image.gallery.large || imageUrl
-            },
-            is_featured: image.is_featured
-          }
-        })
+        display_position: Number(data.display_position || activePosition),
+        banner_image: data.banner_image,
       }
 
       const url = `${process.env.baseUrl}/banner`
@@ -194,13 +110,15 @@ export default function BannerForm() {
 
       setEditing(false)
       resetFormForPosition(activePosition)
-      setSelectedCollege(null)
       fetchBannersByPosition()
       setIsOpen(false)
     } catch (error) {
       toast.error(error.message || 'Failed to save banner')
+    } finally {
+      setLoading(false)
     }
   }
+
 
   const handleEdit = async (banner) => {
     try {
@@ -210,86 +128,22 @@ export default function BannerForm() {
       setEditingId(banner.id)
       setActivePosition(banner.display_position)
 
-      // Handle both banner structures: direct banner_galleries or nested Banners
-      let bannerImages = []
-
-      if (banner.Banners && banner.Banners.length > 0) {
-        // Nested structure: banner.Banners[0].banner_galleries
-        bannerImages = banner.Banners.map((b) => ({
-          title: b.title,
-          website_url: b.website_url,
-          gallery: {
-            small:
-              b.banner_galleries?.find((g) => g.size === 'small')?.url || '',
-            medium:
-              b.banner_galleries?.find((g) => g.size === 'medium')?.url || '',
-            large:
-              b.banner_galleries?.find((g) => g.size === 'large')?.url || ''
-          },
-          is_featured: b.is_featured
-        }))
-      } else if (
-        banner.banner_galleries &&
-        banner.banner_galleries.length > 0
-      ) {
-        // Direct structure: banner.banner_galleries
-        bannerImages = [
-          {
-            title: banner.title || '',
-            website_url: banner.website_url || '',
-            gallery: {
-              small:
-                banner.banner_galleries.find((g) => g.size === 'small')?.url ||
-                banner.banner_galleries[0]?.url ||
-                '',
-              medium:
-                banner.banner_galleries.find((g) => g.size === 'medium')?.url ||
-                banner.banner_galleries[0]?.url ||
-                '',
-              large:
-                banner.banner_galleries.find((g) => g.size === 'large')?.url ||
-                banner.banner_galleries[0]?.url ||
-                ''
-            },
-            is_featured: banner.is_featured || 1
-          }
-        ]
-      }
-
-      // Fallback if no images found
-      if (bannerImages.length === 0) {
-        bannerImages = [
-          {
-            title: banner.title || '',
-            gallery: { small: '', medium: '', large: '' },
-            is_featured: 0
-          }
-        ]
-      }
-
       reset({
-        collegeSearch: banner.College?.name || '',
-        collegeId: banner.college_id || '',
-        website_url: banner.website_url || '',
+        title: banner.title || banner.Banners?.[0]?.title || '',
+        website_url: banner.website_url || banner.Banners?.[0]?.website_url || '',
         date_of_expiry: banner.date_of_expiry
           ? new Date(banner.date_of_expiry).toISOString().split('T')[0]
           : '',
         display_position: banner.display_position || activePosition,
-        bannerImages
+        banner_image: banner.banner_image
       })
-
-      if (banner.College) {
-        setSelectedCollege({
-          id: banner.College.id,
-          name: banner.College.name
-        })
-      }
     } catch (error) {
       toast.error('Failed to fetch banner details')
     } finally {
       setLoading(false)
     }
   }
+
 
   const handleDeleteConfirm = async () => {
     if (!deleteId) return
@@ -309,29 +163,14 @@ export default function BannerForm() {
     }
   }
 
-  const handleDeleteClick = (id) => {
-    requireAdmin(() => {
-      setDeleteId(id)
-      setIsDialogOpen(true)
-    })
-  }
-
   const resetFormForPosition = (position) => {
     reset({
-      collegeSearch: '',
-      collegeId: '',
+      title: '',
       website_url: '',
       date_of_expiry: '',
       display_position: position,
-      bannerImages: [
-        {
-          title: '',
-          gallery: { small: '', medium: '', large: '' },
-          is_featured: 1
-        }
-      ]
+      banner_image: ''
     })
-    setSelectedCollege(null)
     setEditing(false)
     setEditingId(null)
   }
@@ -416,27 +255,12 @@ export default function BannerForm() {
                   {/* Banner Image */}
                   <div className='mb-4 rounded-lg overflow-hidden border border-gray-200 bg-gray-50'>
                     <img
-                      src={
-                        banner.banner_galleries?.find((g) => g.size === 'small')
-                          ?.url ||
-                        banner.Banners?.[0]?.banner_galleries?.find(
-                          (g) => g.size === 'small'
-                        )?.url ||
-                        banner.banner_galleries?.[0]?.url ||
-                        banner.Banners?.[0]?.banner_galleries?.[0]?.url ||
-                        '/images/meroUniLarge.gif'
-                      }
-                      onError={(e) => {
-                        e.target.src = '/images/meroUniLarge.gif'
-                      }}
-                      alt={
-                        banner.title || banner.Banners?.[0]?.title || 'Banner'
-                      }
+                      src={banner.banner_image}
+                      alt={banner.title}
                       className='w-full h-32 object-cover'
                     />
                   </div>
 
-                  {/* Status indicator (only if expired/expiring) */}
                   {showAlert && (
                     <span
                       className={`inline-block self-start text-xs font-medium px-2 py-1 rounded-full mb-3 ${status === 'Expired!'
@@ -505,7 +329,6 @@ export default function BannerForm() {
                   setEditing(false)
                   setEditingId(null)
                   resetFormForPosition(activePosition)
-                  setSelectedCollege(null)
                 }}
                 className='text-gray-500 hover:text-gray-700'
               >
@@ -514,54 +337,6 @@ export default function BannerForm() {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-              {!editing && (
-                <>
-                  <div className='relative mb-6' ref={dropdownRef}>
-                    <label className='block mb-2'>
-                      Search College <span className='text-red-500'>*</span>
-                    </label>
-                    <input
-                      type='text'
-                      {...register('collegeSearch', {
-                        required: 'College selection is required'
-                      })}
-                      onChange={(e) => searchCollege(e.target.value)}
-                      className='w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-opacity-50'
-                      style={{ '--tw-ring-color': THEME_BLUE }}
-                      placeholder='Search for a college...'
-                    />
-                    {errors.collegeSearch && (
-                      <span className='text-red-500'>
-                        {errors.collegeSearch.message}
-                      </span>
-                    )}
-
-                    {showDropdown && (
-                      <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto'>
-                        {searchLoading ? (
-                          <div className='p-2 text-center text-gray-500'>
-                            Loading...
-                          </div>
-                        ) : searchResults.length > 0 ? (
-                          searchResults.map((college) => (
-                            <div
-                              key={college.id}
-                              className='p-2 hover:bg-gray-100 cursor-pointer'
-                              onClick={() => handleCollegeSelect(college)}
-                            >
-                              {college.name}
-                            </div>
-                          ))
-                        ) : (
-                          <div className='p-2 text-center text-gray-500'>
-                            No colleges found
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
 
               <div className='mb-4'>
                 <label className='block mb-2'>Website URL</label>
@@ -619,61 +394,37 @@ export default function BannerForm() {
               />
 
               <div className='space-y-6'>
-                {fields.map((field, index) => (
-                  <div
-                    key={field.id}
-                    className='p-4 border rounded-lg relative'
-                  >
-                    {!editing && (
-                      <button
-                        type='button'
-                        onClick={() => remove(index)}
-                        className='absolute top-2 right-2 text-red-500 hover:text-red-700'
-                        disabled={fields.length === 1}
-                      >
-                        <X className='w-4 h-4' />
-                      </button>
+                <div className='p-4 border rounded-lg space-y-4'>
+                  <div>
+                    <label className='block mb-2'>
+                      Banner Title <span className='text-red-500'>*</span>
+                    </label>
+                    <input
+                      {...register('title', {
+                        required: 'Banner title is required'
+                      })}
+                      className='w-full p-2 border rounded'
+                      placeholder='Enter banner title'
+                    />
+                    {errors.title && (
+                      <span className='text-red-500'>
+                        {errors.title.message}
+                      </span>
                     )}
-
-                    <div className='mb-4'>
-                      <label className='block mb-2'>
-                        Banner Title <span className='text-red-500'>*</span>
-                      </label>
-                      <input
-                        {...register(`bannerImages.${index}.title`, {
-                          required: 'Banner title is required'
-                        })}
-                        className='w-full p-2 border rounded'
-                        placeholder='Enter banner title'
-                      />
-                      {errors.bannerImages?.[index]?.title && (
-                        <span className='text-red-500'>
-                          {errors.bannerImages[index].title.message}
-                        </span>
-                      )}
-                    </div>
-
-
-                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                      <div>
-                        <FileUpload
-                          label={
-                            editing
-                              ? 'Banner Image (Change Image)'
-                              : 'Banner Image'
-                          }
-                          onUploadComplete={(url) => {
-                            setValue(`bannerImages.${index}.gallery.small`, url)
-                          }}
-                          defaultPreview={watch(
-                            `bannerImages.${index}.gallery.small`
-                          )}
-                        />
-                      </div>
-
-                    </div>
                   </div>
-                ))}
+
+                  <FileUpload
+                    label={
+                      editing
+                        ? 'Banner Image (Change Image)'
+                        : 'Banner Image'
+                    }
+                    onUploadComplete={(url) => {
+                      setValue('banner_image', url)
+                    }}
+                    defaultPreview={watch('banner_image')}
+                  />
+                </div>
 
               </div>
 
@@ -685,7 +436,6 @@ export default function BannerForm() {
                     setEditing(false)
                     setEditingId(null)
                     resetFormForPosition(activePosition)
-                    setSelectedCollege(null)
                   }}
                   variant="outline"
                 >
@@ -693,7 +443,7 @@ export default function BannerForm() {
                 </Button>
                 <Button
                   type='submit'
-                  disabled={loading || (!editing && !selectedCollege)}
+                  disabled={loading}
                   className='text-white hover:opacity-90 px-6 py-2 transition-all shadow-md'
                   style={{ backgroundColor: THEME_BLUE }}
                 >

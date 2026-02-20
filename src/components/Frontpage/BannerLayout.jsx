@@ -34,8 +34,7 @@ const BannerLayout = ({ banners = [], loading = false }) => {
             >
               <img
                 src={
-                  banner.banner_galleries.find((g) => g.size === 'small')
-                    ?.url || '/images/meroUniLarge.gif'
+                  banner.banner_image|| '/images/meroUniLarge.gif'
                 }
                 onError={(e) => {
                   e.target.src = '/images/meroUniLarge.gif'
