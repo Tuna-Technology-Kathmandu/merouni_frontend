@@ -9,7 +9,7 @@ import { useRouter } from '@bprogress/next/app'
 import Link from 'next/link'
 
 
-const CollegeCard = ({
+const SchoolCard = ({
   college: collegeProp,
   name: nameProp,
   location: locationProp,
@@ -128,21 +128,7 @@ const CollegeCard = ({
 
   const handleCardClick = () => {
     if (slug) {
-      router.push(`/colleges/${slug}`)
-    }
-  }
-
-  const handleDetails = (e) => {
-    e.stopPropagation()
-    if (slug) {
-      router.push(`/colleges/${slug}`)
-    }
-  }
-
-  const handleApply = (e) => {
-    e.stopPropagation()
-    if (slug) {
-      router.push(`/colleges/apply/${slug}`)
+      router.push(`/schools/${slug}`)
     }
   }
 
@@ -208,7 +194,7 @@ const CollegeCard = ({
 
         <div className='mt-auto pt-5 flex items-center gap-3 border-t border-gray-100'>
           <Link
-            href={slug ? `/colleges/${slug}` : '#'}
+            href={slug ? `/schools/${slug}` : '#'}
             onClick={(e) => e.stopPropagation()}
             className='flex-1 py-2.5 px-3 bg-gray-50 text-gray-700 rounded-xl hover:bg-gray-100 transition-colors text-xs font-medium flex items-center justify-center gap-1.5 uppercase tracking-wider'
           >
@@ -216,7 +202,7 @@ const CollegeCard = ({
             Details
           </Link>
           <Link
-            href={slug ? `/colleges/apply/${slug}` : '#'}
+            href={slug ? `/schools/apply/${slug}` : '#'}
             onClick={(e) => e.stopPropagation()}
             className='flex-1 py-2.5 px-3 bg-[#0A70A7] text-white rounded-xl hover:bg-[#085a86] transition-all text-xs font-medium flex items-center justify-center gap-1.5 shadow-sm uppercase tracking-wider'
           >
@@ -229,4 +215,4 @@ const CollegeCard = ({
   )
 }
 
-export default CollegeCard
+export default SchoolCard

@@ -121,10 +121,10 @@ const ConsultancyCard = ({ consultancy }) => {
             sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
           />
           <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none' />
-          
+
           {/* Wishlist Button */}
           <div className='absolute top-3 right-3 z-10'>
-             {user && (
+            {user && (
               <button
                 type='button'
                 onClick={(e) => {

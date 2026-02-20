@@ -1,32 +1,47 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { debounce } from 'lodash'
-import { Search, Building2, X } from 'lucide-react'
-import { useSelector } from 'react-redux'
-import EmptyState from '@/ui/shadcn/EmptyState'
-import { ShimmerCard } from './ShimmerCard'
 import Pagination from '@/app/blogs/components/Pagination'
-import CollegeCard from '@/ui/molecules/cards/CollegeCard'
-import FilterSection from './FilterSection'
 import { authFetch } from '@/app/utils/authFetch'
+import SchoolCard from '@/ui/molecules/cards/SchoolCard'
+import EmptyState from '@/ui/shadcn/EmptyState'
+import { useRouter } from '@bprogress/next/app'
+import { debounce } from 'lodash'
+import { Building2, Search, X } from 'lucide-react'
+import { usePathname, useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useSelector } from 'react-redux'
+import FilterSection from './FilterSection'
+import { ShimmerCard } from './ShimmerCard'
 
 // Helper to construct School filter params
-const buildSchoolQueryParams = (page, filters = {}) => {
-  return {
-    page: page.toString(),
-    limit: '24',
-    affiliation: filters.affiliation?.join(',') || '',
-    type: filters.type?.join(',') || ''
+const buildSchoolQueryParams = (page, filters = {}, q = '') => {
+  const params = new URLSearchParams()
+  params.append('page', page.toString())
+  params.append('limit', '24')
+
+  if (q) params.append('q', q)
+
+  if (filters.affiliation && filters.affiliation.length > 0) {
+    const affiliationValue = Array.isArray(filters.affiliation)
+      ? filters.affiliation.join(',')
+      : filters.affiliation
+    params.append('affiliation', affiliationValue)
   }
+
+  if (filters.type && filters.type.length > 0) {
+    const typeValue = Array.isArray(filters.type)
+      ? filters.type.join(',')
+      : filters.type
+    params.append('type', typeValue)
+  }
+
+  return params
 }
 
 // Client-side fetch functions
-const fetchSchoolsFromAPI = async (page = 1, filters = {}) => {
+const fetchSchoolsFromAPI = async (page = 1, filters = {}, q = '') => {
   try {
-    const params = buildSchoolQueryParams(page, filters)
-    const queryParams = new URLSearchParams(params)
+    const queryParams = buildSchoolQueryParams(page, filters, q)
     const url = `${process.env.baseUrl}/school?${queryParams.toString()}`
 
     const response = await fetch(url, {
@@ -44,13 +59,13 @@ const fetchSchoolsFromAPI = async (page = 1, filters = {}) => {
         data.items?.map((school) => ({
           name: school.name,
           location: `${school.address?.city || ''}, ${school.address?.state || ''}`,
-          description: school.description,
+          description: school.description || 'No description available.',
           googleMapUrl: school.google_map_url,
-          instituteType: school.institute_type,
+          instituteType: school.institute_type || 'Unknown',
           slug: school.slugs,
           collegeId: school.id,
           collegeImage: school.featured_img || school.image,
-          logo: school.logo
+          logo: school.logo || 'default_logo.png'
         })) || [],
       pagination: data.pagination || {
         currentPage: 1,
@@ -67,55 +82,6 @@ const fetchSchoolsFromAPI = async (page = 1, filters = {}) => {
   }
 }
 
-const searchSchools = async (query) => {
-  try {
-    const response = await fetch(
-      `${process.env.baseUrl}/school?q=${encodeURIComponent(query)}`,
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        cache: 'no-store'
-      }
-    )
-
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
-
-    const data = await response.json()
-    if (!data.items || data.items.length === 0) {
-      return {
-        schools: [],
-        pagination: { currentPage: 1, totalPages: 0, totalCount: 0 }
-      }
-    }
-
-    const schools = data.items.map((school) => ({
-      collegeId: school.id,
-      name: school.name,
-      slug: school.slugs,
-      collegeImage: school.featured_img || school.image,
-      location: `${school.address?.city || ''}, ${school.address?.state || ''}`,
-      description: school.description || 'No description available.',
-      logo: school.logo || 'default_logo.png',
-      instituteType: school.institute_type || 'Unknown'
-    }))
-
-    return {
-      schools,
-      pagination: {
-        currentPage: 1,
-        totalPages: 1,
-        totalCount: schools.length
-      }
-    }
-  } catch (error) {
-    console.error('Failed to search schools:', error)
-    return {
-      schools: [],
-      pagination: { currentPage: 1, totalPages: 1, totalCount: 0 }
-    }
-  }
-}
-
 const SchoolFinder = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -124,6 +90,8 @@ const SchoolFinder = () => {
   // Initial values from URL
   const initialSearch = searchParams.get('q') || ''
   const initialPage = parseInt(searchParams.get('page')) || 1
+  const initialAffiliation = searchParams.get('affiliation')?.split(',').filter(Boolean) || []
+  const initialType = searchParams.get('type')?.split(',').filter(Boolean) || []
 
   const [schools, setSchools] = useState([])
   const [pagination, setPagination] = useState({
@@ -143,8 +111,8 @@ const SchoolFinder = () => {
 
   // Selected Filter Values
   const [selectedFilters, setSelectedFilters] = useState({
-    affiliation: [],
-    type: []
+    affiliation: initialAffiliation,
+    type: initialType
   })
 
   const user = useSelector((state) => state.user.data)
@@ -205,16 +173,18 @@ const SchoolFinder = () => {
   useEffect(() => {
     const q = searchParams.get('q') || ''
     const pg = parseInt(searchParams.get('page')) || 1
+    const aff = searchParams.get('affiliation')?.split(',').filter(Boolean) || []
+    const t = searchParams.get('type')?.split(',').filter(Boolean) || []
+
     setSearchQuery(q)
     setPagination(prev => ({ ...prev, currentPage: pg }))
+    setSelectedFilters({ affiliation: aff, type: t })
   }, [searchParams])
 
-  // Scroll to top on URL change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }, [searchParams])
 
-  // Debounced Search Query URL Update
   const debouncedSearchUpdate = useMemo(
     () =>
       debounce(async (query) => {
@@ -235,28 +205,25 @@ const SchoolFinder = () => {
     const fetchData = async () => {
       const q = searchParams.get('q') || ''
       const pg = parseInt(searchParams.get('page')) || 1
+      const aff = searchParams.get('affiliation')?.split(',').filter(Boolean) || []
+      const t = searchParams.get('type')?.split(',').filter(Boolean) || []
 
       setIsLoading(true)
+      if (q) setIsSearching(true)
+
       try {
-        if (q) {
-          setIsSearching(true)
-          const results = await searchSchools(q)
-          setSchools(results.schools)
-          setPagination(results.pagination)
-          setIsSearching(false)
-        } else {
-          const data = await fetchSchoolsFromAPI(pg, selectedFilters)
-          setSchools(data.schools)
-          setPagination(data.pagination)
-        }
+        const data = await fetchSchoolsFromAPI(pg, { affiliation: aff, type: t }, q)
+        setSchools(data.schools)
+        setPagination(data.pagination)
       } catch (err) {
         setSchools([])
       } finally {
         setIsLoading(false)
+        setIsSearching(false)
       }
     }
     fetchData()
-  }, [searchParams, selectedFilters])
+  }, [searchParams])
 
   const handleFilterSearchChange = (field, value) => {
     setFilterInputs((prev) => ({ ...prev, [field]: value }))
@@ -265,11 +232,19 @@ const SchoolFinder = () => {
   const handleFilterChange = (filterType, value) => {
     setSelectedFilters((prev) => {
       const arr = prev[filterType]
+      const nextArr = arr.includes(value)
+        ? arr.filter((v) => v !== value)
+        : [...arr, value]
+
+      // Update URL with selected filters
+      updateURL({
+        [filterType]: nextArr.join(','),
+        page: 1 // Reset to first page on filter change
+      })
+
       return {
         ...prev,
-        [filterType]: arr.includes(value)
-          ? arr.filter((v) => v !== value)
-          : [...arr, value]
+        [filterType]: nextArr
       }
     })
   }
@@ -344,8 +319,8 @@ const SchoolFinder = () => {
               className='text-gray-400 hover:text-red-500 font-bold text-[10px] uppercase tracking-wider transition-colors'
               onClick={() => {
                 setSearchQuery('')
-                setSelectedFilters({ affiliation: [], type: [] })
                 setFilterInputs({ type: '', affiliation: '' })
+                router.push(pathname, { scroll: false })
               }}
             >
               Clear All
@@ -381,7 +356,7 @@ const SchoolFinder = () => {
           ) : schools.length > 0 ? (
             <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10'>
               {schools.map((s, idx) => (
-                <CollegeCard
+                <SchoolCard
                   key={s.collegeId ?? idx}
                   name={s.name}
                   location={s.location}
@@ -403,20 +378,14 @@ const SchoolFinder = () => {
                 label: 'Clear All Filters',
                 onClick: () => {
                   setSearchQuery('')
-                  setSelectedFilters({
-                    affiliation: [],
-                    type: []
-                  })
-                  setFilterInputs({
-                    type: ''
-                  })
+                  setFilterInputs({ type: '', affiliation: '' })
+                  router.push(pathname, { scroll: false })
                 }
               }}
             />
           )}
 
-          {!searchQuery &&
-            schools.length > 0 &&
+          {schools.length > 0 &&
             pagination.totalPages > 1 && (
               <div className='mt-16 flex justify-center'>
                 <Pagination
