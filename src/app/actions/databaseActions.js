@@ -24,14 +24,15 @@ export async function exportDatabase() {
 
         // Suggest a filename
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-        link.setAttribute('download', `merouni-backup-${timestamp}.sql`)
+        const fileName = `merouni-backup-${timestamp}.sql`
+        link.setAttribute('download', fileName)
 
         document.body.appendChild(link)
         link.click()
         link.remove()
         window.URL.revokeObjectURL(downloadUrl)
 
-        return { success: true }
+        return { success: true, fileName }
     } catch (error) {
         console.error('Error exporting database:', error)
         throw error
