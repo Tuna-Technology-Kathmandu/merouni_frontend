@@ -1,6 +1,9 @@
 import { useRef, useState } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { Trash2, Image as ImageIcon, Plus, Loader2, X, AlertCircle } from 'lucide-react'
+import { Button } from '@/ui/shadcn/button'
+import { cn } from '@/app/lib/utils'
 
 const GallerySection = ({
   control,
@@ -12,7 +15,6 @@ const GallerySection = ({
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef(null)
 
-  
   const handleBulkUpload = async (event) => {
     const files = Array.from(event.target.files)
     if (files.length === 0) return
@@ -43,65 +45,57 @@ const GallerySection = ({
         }
       }
 
-      // Update only images array
       setUploadedFiles((prev) => ({
         ...prev,
-        images: [...prev.images, ...newImages]
+        images: [...(prev.images || []), ...newImages]
       }))
 
-      // Update react-hook-form values by combining images and videos
-      const currentImages = getValues('images') || []
-      const currentVideos = getValues('videos') || []
-      setValue('images', [...currentImages, ...newImages])
-      // If you need to maintain a combined array in form state:
-      // setValue('media', [...currentImages, ...currentVideos, ...newImages]);
+      const currentMedia = getValues('images') || []
+      setValue('images', [...currentMedia, ...newImages], { shouldDirty: true })
 
-      toast.success(`Uploaded ${newImages.length} images successfully!`)
+      toast.success(`Successfully uploaded ${newImages.length} images`)
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Upload failed')
+      console.error('Upload error:', error)
+      toast.error('Failed to upload some images. Please try again.')
     } finally {
       setIsUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
 
   const removeImage = (imageUrl) => {
-    // Remove from images array
     setUploadedFiles((prev) => ({
       ...prev,
       images: prev.images.filter((img) => img.url !== imageUrl)
     }))
 
-    // Update form values
-    const currentImages = getValues('images') || []
+    const currentMedia = getValues('images') || []
     setValue(
       'images',
-      currentImages.filter((img) => img.url !== imageUrl)
+      currentMedia.filter((img) => img.url !== imageUrl),
+      { shouldDirty: true }
     )
-
-    // If you're maintaining a combined media array:
-    // const currentMedia = getValues('media') || [];
-    // setValue('media', currentMedia.filter(item => item.url !== imageUrl));
   }
 
-  // Now we can directly use uploadedFiles.images instead of filtering
-  const showGallery =
-    uploadedFiles.images && uploadedFiles.images.length === 1
-      ? uploadedFiles.images[0]?.url
-        ? uploadedFiles.images
-        : []
-      : uploadedFiles.images
+  const showGallery = uploadedFiles.images || []
+
   return (
-    <div className='mt-7'>
-      <div className='flex justify-between items-center mb-4'>
-        <label className='block text-xl font-semibold'>Images</label>
-        <button
+    <div className='space-y-6'>
+      <div className='flex justify-end'>
+        <Button
           type='button'
           onClick={() => fileInputRef.current.click()}
           disabled={isUploading}
-          className='bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-green-300'
+          className='h-11 px-6 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold gap-2 shadow-lg shadow-green-600/10 transition-all active:scale-95 disabled:opacity-50'
         >
-          {isUploading ? 'Uploading...' : 'Add Images'}
-        </button>
+          {isUploading ? (
+            <Loader2 size={18} className='animate-spin' />
+          ) : (
+            <Plus size={18} />
+          )}
+          <span>{isUploading ? 'Uploading...' : 'Add Photos'}</span>
+        </Button>
+
         <input
           type='file'
           ref={fileInputRef}
@@ -113,43 +107,52 @@ const GallerySection = ({
         />
       </div>
 
-      <div className='w-full grid grid-cols-3 gap-7'>
+      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
         {showGallery.map((image, index) => (
-          <div key={image.url} className='mb-4 group relative'>
-            <div className='border-2 border-dashed border-gray-300 rounded-lg p-4 h-48'>
-              {image?.url ? (
-                <img
-                  src={image.url}
-                  alt={`Uploaded ${index}`}
-                  className='w-full h-full object-cover rounded'
-                  onError={(e) => {
-                    e.target.onerror = null
-                    e.target.src =
-                      'https://via.placeholder.com/300x200?text=Image+Not+Found'
-                  }}
-                />
-              ) : (
-                <div className='w-full h-full flex items-center justify-center bg-gray-100 rounded'>
-                  <span className='text-gray-500'>No image available</span>
-                </div>
-              )}
+          <div key={image.url || index} className='group relative aspect-square'>
+            <div className='w-full h-full rounded-2xl overflow-hidden border border-gray-100 bg-gray-50 shadow-sm transition-all duration-300 group-hover:shadow-xl group-hover:shadow-[#387cae]/5 group-hover:-translate-y-1'>
+              <img
+                src={image.url}
+                alt={`Gallery ${index}`}
+                className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-110'
+                onError={(e) => {
+                  e.target.onerror = null
+                  e.target.src = 'https://via.placeholder.com/300?text=Error'
+                }}
+              />
+
+              <div className='absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300' />
+
+              <button
+                type='button'
+                onClick={() => removeImage(image.url)}
+                className='absolute top-2 right-2 w-8 h-8 rounded-lg bg-white/90 backdrop-blur-md text-red-500 shadow-sm border border-red-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white transform scale-90 group-hover:scale-100'
+              >
+                <Trash2 size={14} />
+              </button>
             </div>
-            <button
-              type='button'
-              onClick={() => removeImage(image.url)}
-              className='mt-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full'
-            >
-              Remove
-            </button>
           </div>
         ))}
-      </div>
 
-      {isUploading && (
-        <div className='mt-4 p-4 bg-blue-50 rounded-lg'>
-          <p>Uploading {fileInputRef.current?.files?.length} images...</p>
-        </div>
-      )}
+        {showGallery.length === 0 && !isUploading && (
+          <div className='col-span-full py-16 border-2 border-dashed border-gray-100 rounded-3xl flex flex-col items-center justify-center gap-4 bg-gray-50/50'>
+            <div className='w-16 h-16 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-gray-400'>
+              <ImageIcon size={28} />
+            </div>
+            <div className='text-center'>
+              <h4 className='text-sm font-bold text-gray-900'>Your gallery is empty</h4>
+              <p className='text-xs text-gray-500 mt-1 max-w-[200px]'>Upload high-quality images of the campus and facilities</p>
+            </div>
+          </div>
+        )}
+
+        {isUploading && (
+          <div className='aspect-square rounded-2xl border-2 border-dashed border-[#387cae]/20 bg-[#387cae]/5 flex flex-col items-center justify-center gap-2 animate-pulse'>
+            <Loader2 size={24} className='text-[#387cae] animate-spin' />
+            <span className='text-[10px] font-bold text-[#387cae] uppercase'>Uploading...</span>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

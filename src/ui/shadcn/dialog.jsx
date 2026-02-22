@@ -3,7 +3,7 @@ import { X } from 'lucide-react'
 import { cn } from '@/app/lib/utils'
 
 const Dialog = React.forwardRef(
-  ({ isOpen, onClose, children, className, ...props }, ref) => {
+  ({ isOpen, onClose, children, className, closeOnOutsideClick = true, ...props }, ref) => {
     React.useEffect(() => {
       const originalStyle = window.getComputedStyle(document.body).overflow
       const originalPaddingRight = document.body.style.paddingRight
@@ -27,7 +27,7 @@ const Dialog = React.forwardRef(
         className='fixed inset-0 z-50 flex items-center justify-center p-4'
         {...props}
       >
-        <div className='fixed inset-0 bg-black/50' onClick={onClose} />
+        <div className='fixed inset-0 bg-black/50' onClick={closeOnOutsideClick ? onClose : undefined} />
         <div
           ref={ref}
           className={cn(

@@ -1,7 +1,6 @@
 'use client'
 import { authFetch } from '@/app/utils/authFetch'
 import Table from '@/ui/shadcn/DataTable'
-import dynamic from 'next/dynamic'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -11,7 +10,6 @@ import {
 } from './actions'
 
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
-// Dialog components are now moved to modal files
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import SearchInput from '@/ui/molecules/SearchInput'
@@ -43,14 +41,18 @@ export default function CollegeForm() {
   const [isOpen, setIsOpen] = useState(false)
   const [allDegrees, setAllDegrees] = useState([])
 
+  const [deleteId, setDeleteId] = useState(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [credentialsModalOpen, setCredentialsModalOpen] = useState(false)
+  const [selectedCollege, setSelectedCollege] = useState(null)
+  const [viewModalOpen, setViewModalOpen] = useState(false)
+  const [viewCollegeData, setViewCollegeData] = useState(null)
+  const [loadingView, setLoadingView] = useState(false)
+
+
   const author_id = useSelector((state) => state.user.data?.id)
 
   const { requireAdmin } = useAdminPermission()
-  // No longer needed: onSubmit, memberFields, facilityFields, etc.
-  // Moved to CreateUpdateCollegeModal
-
-
-  // No longer fetching courses here, modal handles university-specific programs
 
 
   //for all fetching of degrees
@@ -72,7 +74,6 @@ export default function CollegeForm() {
     setEditSlug('')
   }
 
-  // Handle query parameter to open add form
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search)
     if (searchParams.get('add') === 'true') {
@@ -91,7 +92,7 @@ export default function CollegeForm() {
       setLoading(true)
       setTableLoading(true)
       try {
-        // Use authFetch directly instead of server action to avoid SSR issues
+
         const response = await authFetch(
           `${process.env.baseUrl}/college?limit=10&page=${page}`
         )
@@ -110,7 +111,6 @@ export default function CollegeForm() {
         }
       } catch (err) {
         console.error('Error loading colleges:', err)
-        // Set empty state on error instead of showing error
         setColleges([])
         setPagination({
           currentPage: 1,
@@ -134,22 +134,6 @@ export default function CollegeForm() {
     }
   }, [searchTimeout])
 
-  const [deleteId, setDeleteId] = useState(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [credentialsModalOpen, setCredentialsModalOpen] = useState(false)
-  const [selectedCollege, setSelectedCollege] = useState(null)
-  const [viewModalOpen, setViewModalOpen] = useState(false)
-  const [viewCollegeData, setViewCollegeData] = useState(null)
-  const [loadingView, setLoadingView] = useState(false)
-  const [credentialsForm, setCredentialsForm] = useState({
-    firstName: '',
-    lastName: '',
-    emailName: '',
-    password: '',
-    phoneNo: ''
-  })
-  const [creatingCredentials, setCreatingCredentials] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
 
   const handleDeleteClick = (id) => {
     requireAdmin(() => {
@@ -198,45 +182,12 @@ export default function CollegeForm() {
   }
 
   const handleDialogClose = () => {
-    setIsDialogOpen(false) // Close the dialog without deleting
-    setDeleteId(null) // Reset the delete ID
+    setIsDialogOpen(false)
+    setDeleteId(null)
   }
 
   const handleOpenCredentialsModal = async (college) => {
     setSelectedCollege(college)
-
-    // Set first name to college name
-    let firstName = college.name || ''
-    let lastName = ''
-    let emailName = ''
-    let phoneNo = ''
-
-    // If college has members, use the first member's data for other fields
-    if (college.members && college.members.length > 0) {
-      const firstMember = college.members[0]
-      const nameParts = (firstMember.name || '').split(' ')
-      lastName = nameParts.slice(1).join(' ') || nameParts[0] || ''
-      phoneNo = firstMember.contact_number || ''
-    }
-
-    // If college has contacts, use the first contact as phone
-    if (!phoneNo && college.contacts && college.contacts.length > 0) {
-      phoneNo = college.contacts[0]?.contact_number || college.contacts[0] || ''
-    }
-
-    // Extract email name if email exists (remove @merouni.com or any domain)
-    if (college.email) {
-      const emailParts = college.email.split('@')
-      emailName = emailParts[0] || ''
-    }
-
-    setCredentialsForm({
-      firstName,
-      lastName,
-      emailName,
-      password: '',
-      phoneNo
-    })
     setCredentialsModalOpen(true)
   }
 
@@ -249,12 +200,10 @@ export default function CollegeForm() {
 
   const loadColleges = async (page = 1) => {
     try {
-      // Sync with URL
       const params = new URLSearchParams(searchParams.toString())
       params.set('page', page)
       router.push(`${pathname}?${params.toString()}`, { scroll: false })
 
-      // Use authFetch directly instead of server action to avoid SSR issues
       const response = await authFetch(
         `${process.env.baseUrl}/college?limit=10&page=${page}`
       )
@@ -355,7 +304,6 @@ export default function CollegeForm() {
     setViewCollegeData(null)
   }
 
-  // Create columns with handlers (must be after handlers are defined)
   const columns = createColumns({
     handleView,
     handleEdit,

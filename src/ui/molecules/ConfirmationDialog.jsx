@@ -26,6 +26,12 @@ const ConfirmationDialog = ({
         setMounted(true)
     }, [])
 
+    useEffect(() => {
+        if (open) {
+            setIsLoading(false)
+        }
+    }, [open])
+
     const handleConfirm = async () => {
         try {
             setIsLoading(true)
@@ -65,7 +71,7 @@ const ConfirmationDialog = ({
                     className={cn(
                         'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background',
                         'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-                        'bg-red-600 text-white hover:bg-red-700', 
+                        'bg-red-600 text-white hover:bg-red-700',
                         'h-10 py-2 px-4'
                     )}
                 >

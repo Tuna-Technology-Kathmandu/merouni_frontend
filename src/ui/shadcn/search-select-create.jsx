@@ -35,11 +35,15 @@ export default function SearchSelectCreate({
     valueKey = 'id',
     className = '',
     isMulti = true,
-    allowCreate = false
+    allowCreate = false,
+    isLoading: externalLoading = false
 }) {
     const [query, setQuery] = useState('')
     const [results, setResults] = useState([])
     const [isSearching, setIsSearching] = useState(false)
+
+    // Combine internal and external loading states
+    const loading = isSearching || externalLoading
     const [showDropdown, setShowDropdown] = useState(false)
     const dropdownRef = useRef(null)
     const searchTimeout = useRef(null)
@@ -127,7 +131,7 @@ export default function SearchSelectCreate({
                 />
 
                 <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                    {isSearching ? (
+                    {loading ? (
                         <Loader2 className="h-4 w-4 animate-spin text-[#387cae]" />
                     ) : !isMulti && currentSelected.length > 0 && query.length === 0 ? (
                         <button
@@ -171,7 +175,7 @@ export default function SearchSelectCreate({
                                     </div>
                                 )
                             })
-                        ) : !isSearching && query.length > 0 ? (
+                        ) : !loading && query.length > 0 ? (
                             <div className="px-4 py-3 text-sm text-gray-500 text-center italic">
                                 No results found
                             </div>
