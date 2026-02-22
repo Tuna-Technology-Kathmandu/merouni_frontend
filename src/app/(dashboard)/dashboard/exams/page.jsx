@@ -22,6 +22,7 @@ import SearchInput from '@/ui/molecules/SearchInput'
 import { formatDate } from '@/utils/date.util'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 import ExamViewModal from './ExamViewModal'
+import { Textarea } from '@/ui/shadcn/textarea'
 
 // Helper component for required label
 const RequiredLabel = ({ children, htmlFor }) => (
@@ -584,7 +585,7 @@ export default function ExamManager() {
               onSubmit={handleSubmit}
               className='flex flex-col flex-1 overflow-hidden'
             >
-              <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+              <div className='flex-1 overflow-y-auto space-y-6 pr-2 p-2'>
                 {/* Basic Information */}
                 <div>
                   <h2 className='text-lg font-semibold mb-4 text-gray-800 border-b pb-1'>Basic Information</h2>
@@ -851,7 +852,7 @@ export default function ExamManager() {
                     <div className='grid grid-cols-1 gap-4'>
                         <div>
                             <Label htmlFor='syllabus'>Syllabus</Label>
-                            <textarea
+                            <Textarea
                               id='syllabus'
                               placeholder='Enter exam syllabus'
                               value={formData.syllabus}
@@ -861,7 +862,7 @@ export default function ExamManager() {
                                   syllabus: e.target.value
                                 }))
                               }
-                              className='flex h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1'
+                              className='mt-1'
                             />
                         </div>
                         <div>
