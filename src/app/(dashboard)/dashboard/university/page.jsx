@@ -52,18 +52,22 @@ export default function UniversityForm() {
 
   const { requireAdmin } = useAdminPermission()
 
-  const fetchUniversities = async (page = 1) => {
+  const fetchUniversities = async (page = 1, query = searchQuery) => {
     setTableLoading(true)
     try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/university?page=${page}&limit=10`
-      )
+      let url = `${process.env.baseUrl}/university?page=${page}`
+      if (query) {
+        url += `&q=${encodeURIComponent(query)}`
+      }
+
+      const response = await authFetch(url)
       const data = await response.json()
+
       setUniversities(data.items || [])
       setPagination({
         currentPage: data.pagination?.currentPage || 1,
-        totalPages: data.pagination?.totalPages || 1,
-        total: data.pagination?.totalItems || data.totalItems || 0
+        totalPages: data.pagination?.totalPages,
+        total:  data.pagination?.totalItems
       })
     } catch (error) {
       toast.error('Failed to fetch universities')
@@ -153,37 +157,8 @@ export default function UniversityForm() {
     handleDeleteClick
   })
 
-  const handleSearch = async (query) => {
-    if (!query) {
-      fetchUniversities()
-      return
-    }
-
-    try {
-      setTableLoading(true)
-      const response = await authFetch(
-        `${process.env.baseUrl}/university?q=${query}`
-      )
-      if (response.ok) {
-        const data = await response.json()
-        setUniversities(data.items || [])
-
-        if (data.pagination) {
-          setPagination({
-            currentPage: data.pagination.currentPage,
-            totalPages: data.pagination.totalPages,
-            total: data.totalItems
-          })
-        }
-      } else {
-        setUniversities([])
-      }
-    } catch (error) {
-      console.error('Error fetching university search results:', error.message)
-      setUniversities([])
-    } finally {
-      setTableLoading(false)
-    }
+  const handleSearch = (query) => {
+    fetchUniversities(1, query)
   }
 
   const handleSearchInput = (value) => {
@@ -246,6 +221,7 @@ export default function UniversityForm() {
             onPageChange={(newPage) => fetchUniversities(newPage)}
             onSearch={handleSearch}
             showSearch={false}
+            
           />
         </div>
       </div>

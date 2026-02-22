@@ -47,7 +47,7 @@ const SectionHeader = ({ icon: Icon, title, subtitle }) => (
         </div>
         <div>
             <h3 className="text-lg font-bold text-gray-900 leading-tight">{title}</h3>
-            {subtitle && <p className="text-xs text-gray-400 mt-0.5 font-medium">{subtitle}</p>}
+            {subtitle && <p className="text-[11px] text-slate-500 mt-0.5 font-semibold leading-relaxed uppercase tracking-wider">{subtitle}</p>}
         </div>
     </div>
 )
@@ -68,7 +68,7 @@ const CreateUpdateUniversityModal = ({
 
     const [uploadedFiles, setUploadedFiles] = useState({
         logo: '',
-        featured_img: '',
+        featured_image: '',
         images: [],
         videos: []
     })
@@ -226,10 +226,13 @@ const CreateUpdateUniversityModal = ({
 
                     setUploadedFiles({
                         logo,
-                        featured_img: featuredImg,
+                        featured_image: featuredImg,
                         images,
                         videos
                     })
+
+                    setValue('logo', logo)
+                    setValue('assets.featured_image', featuredImg)
 
                 } catch (error) {
                     console.error('Error fetching university data:', error)
@@ -261,7 +264,7 @@ const CreateUpdateUniversityModal = ({
             })
             setUploadedFiles({
                 logo: '',
-                featured_img: '',
+                featured_image: '',
                 images: [],
                 videos: []
             })
@@ -321,10 +324,7 @@ const CreateUpdateUniversityModal = ({
             data.members = (data.members || []).filter(m => Object.values(m).some(v => v && v.toString().trim() !== ''))
 
             data.logo = uploadedFiles.logo
-            data.assets = {
-                featured_image: uploadedFiles.featured_img,
-                videos: uploadedFiles.videos.length > 0 ? uploadedFiles.videos[0].url : ''
-            }
+            data.featured_image = uploadedFiles.featured_image
             data.gallery = uploadedFiles.images.map(img => img.url).filter(Boolean)
 
             data.levels = (data.levels || []).map(id => parseInt(id)).filter(id => !isNaN(id))
@@ -381,6 +381,31 @@ const CreateUpdateUniversityModal = ({
     const selectedPrograms = allCourses
         .filter(c => watch('programs')?.includes(String(c.id)))
         .map(c => ({ id: c.id, title: c.title }))
+
+    const onSearchLevels = async (query) => {
+        if (!allLevels) return []
+        return query
+            ? allLevels.filter(l => l.title?.toLowerCase().includes(query.toLowerCase()))
+            : allLevels
+    }
+
+    const handleSelectLevel = (level) => {
+        const current = watch('levels') || []
+        const id = String(level.id || level)
+        if (!current.includes(id)) {
+            setValue('levels', [...current, id], { shouldDirty: true, shouldValidate: true })
+        }
+    }
+
+    const handleRemoveLevel = (level) => {
+        const current = watch('levels') || []
+        const id = String(level.id || level)
+        setValue('levels', current.filter(i => i !== id), { shouldDirty: true, shouldValidate: true })
+    }
+
+    const selectedLevels = allLevels
+        .filter(l => watch('levels')?.includes(String(l.id)))
+        .map(l => ({ id: l.id, title: l.title }))
 
     return (
         <Dialog isOpen={isOpen} onClose={handleCloseAttempt} closeOnOutsideClick={false} className='max-w-7xl'>
@@ -447,52 +472,43 @@ const CreateUpdateUniversityModal = ({
                                             </div>
 
                                             <div>
-                                                <Label htmlFor='date_of_establish'>Date of Establishment</Label>
+                                                <Label htmlFor='date_of_establish' required={true}>Date of Establishment</Label>
                                                 <div className="relative">
                                                     <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                                     <Input
                                                         id='date_of_establish'
                                                         type='date'
-                                                        className="h-11 pl-10 rounded-xl border-gray-200"
-                                                        {...register('date_of_establish')}
+                                                        className={cn(
+                                                            "h-11 pl-10 rounded-xl border-gray-200 focus:ring-[#387cae]/20",
+                                                            errors.date_of_establish && "border-red-500"
+                                                        )}
+                                                        {...register('date_of_establish', { required: 'Establishment date is required' })}
                                                     />
                                                 </div>
+                                                {errors.date_of_establish && (
+                                                    <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.date_of_establish.message}</p>
+                                                )}
                                             </div>
                                         </div>
 
                                         <div>
-                                            <Label required={true} className="text-gray-700 font-semibold mb-3 block text-sm">Educational Levels</Label>
-                                            <div className='grid grid-cols-2 sm:grid-cols-3 gap-4'>
-                                                {allLevels.map((level) => (
-                                                    <label
-                                                        key={level.id}
-                                                        className={cn(
-                                                            'flex items-center gap-3 p-3 rounded-xl border-2 transition-all cursor-pointer group',
-                                                            watch('levels')?.includes(String(level.id))
-                                                                ? 'bg-[#387cae]/5 border-[#387cae] text-[#387cae]'
-                                                                : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-gray-50'
-                                                        )}
-                                                    >
-                                                        <input
-                                                            type='checkbox'
-                                                            value={level.id}
-                                                            {...register('levels', { required: 'At least one level is required' })}
-                                                            className='hidden'
-                                                        />
-                                                        <div className={cn(
-                                                            "w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all",
-                                                            watch('levels')?.includes(String(level.id)) ? "border-[#387cae] bg-[#387cae]" : "border-gray-200"
-                                                        )}>
-                                                            {watch('levels')?.includes(String(level.id)) && <Check size={10} className="text-white" />}
-                                                        </div>
-                                                        <span className='text-xs font-bold'>{level.title}</span>
-                                                    </label>
-                                                ))}
-                                                {loadingResources && <div className="flex items-center gap-2 text-gray-400 text-xs italic"><Loader2 className="animate-spin h-3 w-3" /> Loading levels...</div>}
-                                            </div>
+                                            <Label required={true} className="mb-3">Educational Levels</Label>
+                                            <SearchSelectCreate
+                                                onSearch={onSearchLevels}
+                                                onSelect={handleSelectLevel}
+                                                onRemove={handleRemoveLevel}
+                                                selectedItems={selectedLevels}
+                                                placeholder="Search or select levels..."
+                                                displayKey="title"
+                                                valueKey="id"
+                                                isMulti={true}
+                                                className="w-full"
+                                                isLoading={loadingResources}
+                                            />
                                             {errors.levels && (
                                                 <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.levels.message}</p>
                                             )}
+                                            <input type="hidden" {...register('levels', { required: 'At least one level is required' })} />
                                         </div>
                                     </div>
                                 </div>
@@ -502,7 +518,7 @@ const CreateUpdateUniversityModal = ({
                                     <SectionHeader icon={FileText} title="University Details" subtitle="Description and academic programs" />
                                     <div className='space-y-6'>
                                         <div>
-                                            <Label required={true} className="text-gray-700 font-semibold mb-2.5 block text-sm">Description</Label>
+                                            <Label required={true} className="mb-2.5">Description</Label>
                                             <TipTapEditor
                                                 onMediaUpload={onMediaUpload}
                                                 showImageUpload={true}
@@ -677,19 +693,19 @@ const CreateUpdateUniversityModal = ({
                                             <div key={field.id} className='group relative p-6 bg-gray-50/50 border border-gray-100 rounded-2xl transition-all hover:bg-white hover:shadow-xl hover:shadow-[#387cae]/5 hover:border-[#387cae]/20'>
                                                 <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pr-10'>
                                                     <div>
-                                                        <Label className='text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block'>Role</Label>
+                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Role</Label>
                                                         <Input {...register(`members.${index}.role`)} placeholder='e.g. Vice Chancellor' className='h-10 rounded-xl' />
                                                     </div>
                                                     <div>
-                                                        <Label className='text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block'>Salutation</Label>
+                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Salutation</Label>
                                                         <Input {...register(`members.${index}.salutation`)} placeholder='e.g. Prof. Dr.' className='h-10 rounded-xl' />
                                                     </div>
                                                     <div>
-                                                        <Label className='text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block'>Full Name</Label>
+                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Full Name</Label>
                                                         <Input {...register(`members.${index}.name`)} placeholder='Enter name...' className='h-10 rounded-xl' />
                                                     </div>
                                                     <div>
-                                                        <Label className='text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block'>Email</Label>
+                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Email</Label>
                                                         <Input
                                                             {...register(`members.${index}.email`, {
                                                                 pattern: {
@@ -706,7 +722,7 @@ const CreateUpdateUniversityModal = ({
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <Label className='text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block'>Phone</Label>
+                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Phone</Label>
                                                         <Input {...register(`members.${index}.phone`)} placeholder='Phone number' className='h-10 rounded-xl' />
                                                     </div>
                                                 </div>
@@ -732,22 +748,18 @@ const CreateUpdateUniversityModal = ({
                                     <SectionHeader icon={ImageIcon} title="Branding" subtitle="Logos and featured visuals" />
                                     <div className='space-y-8'>
                                         <div className="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 border-dashed hover:bg-white hover:border-[#387cae]/30 transition-all group">
-                                            <Label required={true} className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block text-center group-hover:text-[#387cae]">University Logo</Label>
+                                            <Label required={true} className="text-[10px] font-black text-slate-600 uppercase tracking-[0.1em] mb-4 block text-center group-hover:text-[#387cae]">University Logo</Label>
                                             <FileUploadWithPreview
                                                 label=""
-                                                required={true}
-                                                description="Best in 1:1 ratio"
-                                                id="logo"
-                                                value={uploadedFiles.logo}
-                                                onChange={(url) => {
+                                                onUploadComplete={(url) => {
                                                     handleSetFiles(prev => ({ ...prev, logo: url }))
                                                     setValue('logo', url, { shouldValidate: true })
                                                 }}
+                                                defaultPreview={uploadedFiles.logo}
                                                 onClear={() => {
                                                     handleSetFiles(prev => ({ ...prev, logo: '' }))
                                                     setValue('logo', '', { shouldValidate: true })
                                                 }}
-                                                icon={Layers}
                                             />
                                             {errors.logo && (
                                                 <p className='text-xs font-semibold text-red-500 mt-2 ml-1 text-center'>{errors.logo.message}</p>
@@ -756,22 +768,18 @@ const CreateUpdateUniversityModal = ({
                                         </div>
 
                                         <div className="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 border-dashed hover:bg-white hover:border-[#387cae]/30 transition-all group">
-                                            <Label required={true} className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block text-center group-hover:text-[#387cae]">Featured Image</Label>
+                                            <Label required={true} className="text-[10px] font-black text-slate-600 uppercase tracking-[0.1em] mb-4 block text-center group-hover:text-[#387cae]">Featured Image</Label>
                                             <FileUploadWithPreview
                                                 label=""
-                                                required={true}
-                                                description="Main identity banner"
-                                                id="featured_img"
-                                                value={uploadedFiles.featured_img}
-                                                onChange={(url) => {
-                                                    handleSetFiles(prev => ({ ...prev, featured_img: url }))
+                                                onUploadComplete={(url) => {
+                                                    handleSetFiles(prev => ({ ...prev, featured_image: url }))
                                                     setValue('assets.featured_image', url, { shouldValidate: true })
                                                 }}
+                                                defaultPreview={uploadedFiles.featured_image}
                                                 onClear={() => {
-                                                    handleSetFiles(prev => ({ ...prev, featured_img: '' }))
+                                                    handleSetFiles(prev => ({ ...prev, featured_image: '' }))
                                                     setValue('assets.featured_image', '', { shouldValidate: true })
                                                 }}
-                                                icon={ImageIcon}
                                             />
                                             {errors.assets?.featured_image && (
                                                 <p className='text-xs font-semibold text-red-500 mt-2 ml-1 text-center'>{errors.assets.featured_image.message}</p>

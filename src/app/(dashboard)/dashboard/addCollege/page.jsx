@@ -83,7 +83,6 @@ export default function CollegeForm() {
   }, [])
 
   useEffect(() => {
-    // Only run on client side
     if (typeof window === 'undefined') return
 
     setHeading('College Management')

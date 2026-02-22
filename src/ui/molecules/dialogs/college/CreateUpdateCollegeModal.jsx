@@ -53,7 +53,7 @@ const SectionHeader = ({ icon: Icon, title, subtitle }) => (
         </div>
         <div>
             <h3 className="text-lg font-bold text-gray-900 leading-tight">{title}</h3>
-            {subtitle && <p className="text-xs text-gray-400 mt-0.5 font-medium">{subtitle}</p>}
+            {subtitle && <p className="text-[11px] text-slate-500 mt-0.5 font-semibold leading-relaxed uppercase tracking-wider">{subtitle}</p>}
         </div>
     </div>
 )
@@ -252,6 +252,9 @@ const CreateUpdateCollegeModal = ({
                         images: images.length === 1 && !images[0].url ? [] : images,
                         videos
                     })
+
+                    setValue('college_logo', collegeData.college_logo || '')
+                    setValue('featured_img', collegeData.featured_img || '')
 
                     setValue('images', [...images, ...videos])
 
@@ -516,7 +519,7 @@ const CreateUpdateCollegeModal = ({
                                         </div>
 
                                         <div>
-                                            <Label required={true} className="text-gray-700 font-semibold mb-3 block text-sm">Institute Level</Label>
+                                            <Label required={true} className="mb-3">Institute Level</Label>
                                             <div className='grid grid-cols-2 gap-4'>
                                                 {['School', 'College'].map((level) => (
                                                     <label
@@ -556,7 +559,7 @@ const CreateUpdateCollegeModal = ({
                                     <SectionHeader icon={FileText} title="About College" subtitle="Detailed description and content" />
                                     <div className='space-y-6'>
                                         <div>
-                                            <Label htmlFor='description' required={true} className="text-gray-700 font-semibold mb-1.5 block text-sm">Short Description</Label>
+                                            <Label htmlFor='description' required={true} className="mb-1.5">Short Description</Label>
                                             <Textarea
                                                 id='description'
                                                 placeholder='Enter a brief summary of the college...'
@@ -569,7 +572,7 @@ const CreateUpdateCollegeModal = ({
                                         </div>
 
                                         <div className="pt-2">
-                                            <Label className="text-gray-700 font-semibold mb-2.5 block text-sm">Full Content Body</Label>
+                                            <Label className="mb-2.5">Full Content Body</Label>
                                             <TipTapEditor
                                                 onMediaUpload={onMediaUpload}
                                                 showImageUpload={true}
@@ -698,7 +701,7 @@ const CreateUpdateCollegeModal = ({
                                         <div className="pt-2 space-y-6">
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                                 <div>
-                                                    <Label htmlFor='map_type' className="flex items-center gap-2 mb-3 text-gray-700 font-semibold">
+                                                    <Label htmlFor='map_type' className="flex items-center gap-2 mb-3">
                                                         Map Type
                                                     </Label>
                                                     <select
@@ -712,7 +715,7 @@ const CreateUpdateCollegeModal = ({
                                                     </select>
                                                 </div>
                                                 <div className="flex-1">
-                                                    <Label htmlFor='google_map_url' className="flex items-center gap-2 mb-3 text-gray-700 font-semibold">
+                                                    <Label htmlFor='google_map_url' className="flex items-center gap-2 mb-3">
                                                         <Map size={14} className="text-[#387cae]" />
                                                         Map Link / URL
                                                     </Label>
@@ -736,7 +739,7 @@ const CreateUpdateCollegeModal = ({
                                         </div>
 
                                         <div>
-                                            <Label className="mb-3 block text-gray-700 font-semibold">Contact Numbers</Label>
+                                            <Label className="mb-3 block">Contact Numbers</Label>
                                             <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                                                 {[0, 1].map((index) => (
                                                     <div key={index} className="relative group">
@@ -774,7 +777,7 @@ const CreateUpdateCollegeModal = ({
                                                 <div className='space-y-4 pr-8'>
                                                     <div className='grid grid-cols-2 gap-3'>
                                                         <div>
-                                                            <Label className='text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block'>Title</Label>
+                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Title</Label>
                                                             <Input
                                                                 {...register(`facilities[${index}].title`)}
                                                                 placeholder='e.g. WiFi'
@@ -782,7 +785,7 @@ const CreateUpdateCollegeModal = ({
                                                             />
                                                         </div>
                                                         <div>
-                                                            <Label className='text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block'>Icon Code</Label>
+                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Icon Code</Label>
                                                             <Input
                                                                 {...register(`facilities[${index}].icon`)}
                                                                 placeholder='wifi'
@@ -791,7 +794,7 @@ const CreateUpdateCollegeModal = ({
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        <Label className='text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block'>Description</Label>
+                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Description</Label>
                                                         <Input
                                                             {...register(`facilities[${index}].description`)}
                                                             placeholder='Details...'
@@ -850,7 +853,7 @@ const CreateUpdateCollegeModal = ({
                                                             />
                                                         </div>
                                                         <div>
-                                                            <Label className='text-[10px] font-bold text-gray-400 uppercase mb-1 block'>Role</Label>
+                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Role</Label>
                                                             <select
                                                                 {...register(`members[${index}].role`)}
                                                                 className='flex h-10 w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
@@ -863,7 +866,7 @@ const CreateUpdateCollegeModal = ({
                                                             </select>
                                                         </div>
                                                         <div>
-                                                            <Label className='text-[10px] font-bold text-gray-400 uppercase mb-1 block'>Contact (Phone)</Label>
+                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Contact (Phone)</Label>
                                                             <Input
                                                                 {...register(`members[${index}].contact_info`)}
                                                                 placeholder='98XXXXXXXX'
@@ -871,7 +874,7 @@ const CreateUpdateCollegeModal = ({
                                                             />
                                                         </div>
                                                         <div className='sm:col-span-3'>
-                                                            <Label className='text-[10px] font-bold text-gray-400 uppercase mb-1 block'>Professional Bio</Label>
+                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Professional Bio</Label>
                                                             <Input
                                                                 {...register(`members[${index}].bio`)}
                                                                 placeholder='Achievement and specialization...'
@@ -914,7 +917,7 @@ const CreateUpdateCollegeModal = ({
                                             <div key={field.id} className='group relative p-6 bg-white border border-gray-100 rounded-2xl transition-all hover:shadow-lg hover:shadow-[#387cae]/5 hover:border-[#387cae]/20'>
                                                 <div className='space-y-4 pr-10'>
                                                     <div>
-                                                        <Label className='text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 block'>Question</Label>
+                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block'>Question</Label>
                                                         <Input
                                                             {...register(`faqs[${index}].question`)}
                                                             placeholder='e.g. What are the admission requirements?'
@@ -922,7 +925,7 @@ const CreateUpdateCollegeModal = ({
                                                         />
                                                     </div>
                                                     <div>
-                                                        <Label className='text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5 block'>Answer</Label>
+                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block'>Answer</Label>
                                                         <Textarea
                                                             {...register(`faqs[${index}].answer`)}
                                                             placeholder='Provide a detailed answer...'
@@ -953,7 +956,7 @@ const CreateUpdateCollegeModal = ({
                                     <SectionHeader icon={ImageIcon} title="Logo & Cover" subtitle="Identity visuals" />
                                     <div className="space-y-6">
                                         <div className="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 border-dashed hover:bg-white hover:border-[#387cae]/30 transition-all group">
-                                            <Label required={true} className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block text-center group-hover:text-[#387cae]">College Logo</Label>
+                                            <Label required={true} className="text-[10px] font-black text-slate-600 uppercase tracking-[0.1em] mb-4 block text-center group-hover:text-[#387cae]">College Logo</Label>
                                             <FileUploadWithPreview
                                                 label=''
                                                 required={true}
@@ -974,7 +977,7 @@ const CreateUpdateCollegeModal = ({
                                         </div>
 
                                         <div className="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 border-dashed hover:bg-white hover:border-[#387cae]/30 transition-all group">
-                                            <Label required={true} className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block text-center group-hover:text-[#387cae]">Cover Image</Label>
+                                            <Label required={true} className="text-[10px] font-black text-slate-600 uppercase tracking-[0.1em] mb-4 block text-center group-hover:text-[#387cae]">Cover Image</Label>
                                             <FileUploadWithPreview
                                                 label=''
                                                 required={true}
