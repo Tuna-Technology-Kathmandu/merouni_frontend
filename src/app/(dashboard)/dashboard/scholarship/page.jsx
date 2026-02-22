@@ -344,12 +344,6 @@ export default function ScholarshipManager() {
     }
   }
 
-  if (loading)
-    return (
-      <div className='mx-auto'>
-        <Loading />
-      </div>
-    )
 
   return (
     <>

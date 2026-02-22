@@ -208,6 +208,7 @@ export default function BlogsManager() {
 
   const loadData = async (page = 1, status = statusFilter) => {
     try {
+      setLoading(true)
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
       }
@@ -460,12 +461,6 @@ export default function BlogsManager() {
     setSelectedBlog(null)
   }
 
-  if (loading)
-    return (
-      <div className='mx-auto'>
-        <Loader />
-      </div>
-    )
 
   return (
     <>
@@ -515,6 +510,7 @@ export default function BlogsManager() {
             onPageChange={(newPage) => loadData(newPage)}
             onSearch={handleSearch}
             showSearch={false}
+            loading={loading}
           />
         </div>
       </div>

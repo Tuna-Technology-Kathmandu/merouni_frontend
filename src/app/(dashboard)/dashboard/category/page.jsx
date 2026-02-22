@@ -132,6 +132,7 @@ export default function CategoryManager() {
 
   const loadCategories = async (page = 1) => {
     try {
+      setLoading(true)
       const response = await fetchCategories(page)
       setCategories(response.items)
       setPagination({
@@ -313,12 +314,6 @@ export default function CategoryManager() {
     }
   }
 
-  if (loading)
-    return (
-      <div className='mx-auto'>
-        <Loader />
-      </div>
-    )
 
   return (
     <>
@@ -503,6 +498,7 @@ export default function CategoryManager() {
           onPageChange={(newPage) => loadCategories(newPage)}
           onSearch={handleSearch}
           showSearch={false}
+          loading={loading}
         />
       </div>
 

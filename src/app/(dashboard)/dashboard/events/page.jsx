@@ -222,6 +222,7 @@ export default function EventManager() {
 
   const loadEvents = async (page = 1) => {
     try {
+      setLoading(true)
       const params = new URLSearchParams(searchParams.toString())
       params.set('page', page)
       router.push(`${pathname}?${params.toString()}`, { scroll: false })

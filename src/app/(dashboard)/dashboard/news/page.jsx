@@ -406,6 +406,7 @@ export default function NewsManager() {
             onPageChange={(newPage) => loadData(newPage, searchQuery)}
             onSearch={handleSearch}
             showSearch={false}
+            loading={loading}
           />
         </div>
       </div>

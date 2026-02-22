@@ -130,6 +130,7 @@ export default function DisciplineManager() {
 
     const loadDisciplines = async (page = 1) => {
         try {
+            setLoading(true)
             const response = await fetchDisciplines(page)
             setDisciplines(response.items)
             setPagination({
@@ -271,6 +272,7 @@ export default function DisciplineManager() {
                         onPageChange={(newPage) => loadDisciplines(newPage)}
                         onSearch={handleSearch}
                         showSearch={false}
+                        loading={loading}
                     />
                 </div>
             </div>

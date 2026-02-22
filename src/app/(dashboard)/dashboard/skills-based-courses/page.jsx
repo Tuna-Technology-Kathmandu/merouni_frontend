@@ -159,6 +159,7 @@ export default function SkillsCoursesManager() {
 
     const loadCourses = async (page = 1) => {
         try {
+            setLoading(true)
             const response = await fetchSkillsCourses(page)
             setCourses(response.items)
             setPagination({
@@ -353,12 +354,6 @@ export default function SkillsCoursesManager() {
         }
     }
 
-    if (loading)
-        return (
-            <div className='mx-auto'>
-                <Loader />
-            </div>
-        )
 
     return (
         <>
@@ -550,6 +545,7 @@ export default function SkillsCoursesManager() {
                         onPageChange={(newPage) => loadCourses(newPage)}
                         onSearch={handleSearch}
                         showSearch={false}
+                        loading={loading}
                     />
                 </div>
             </div>

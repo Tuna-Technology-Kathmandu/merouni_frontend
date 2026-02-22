@@ -260,6 +260,7 @@ export default function ConsultancyForm() {
             onPageChange={(newPage) => fetchConsultancies(newPage)}
             onSearch={handleSearch}
             showSearch={false}
+            loading={tableLoading}
           />
         </div>
       </div>
