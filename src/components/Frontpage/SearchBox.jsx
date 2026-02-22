@@ -175,18 +175,38 @@ const SearchBox = ({ onClose }) => {
         </div>
 
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6'>
-          {items.slice(0, slice).map((item, index) => (
-            <Link href={`/${path}/${item.slugs}`} key={index} onClick={onClose}>
-              <div className='group cursor-pointer bg-white border border-gray-100 rounded-[24px] shadow-sm hover:shadow-md hover:border-[#0A6FA7]/20 transition-all p-6 flex flex-col items-center text-center'>
-                <div className='w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center text-[#0A6FA7] font-semibold text-2xl group-hover:bg-[#0A6FA7] group-hover:text-white transition-all mb-4'>
-                  {item.name?.charAt(0) || item.title?.charAt(0) || '?'}
+          {items.slice(0, slice).map((item, index) => {
+            const imageUrl = item.featured_img
+            return (
+              <Link
+                href={`/${path}/${item.slugs}`}
+                key={index}
+                onClick={onClose}
+              >
+                <div className='group cursor-pointer bg-white border border-gray-100 rounded-[24px] shadow-sm hover:shadow-md hover:border-[#0A6FA7]/20 transition-all p-6 flex flex-col items-center text-center'>
+                  <div className='w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center text-[#0A6FA7] font-semibold text-2xl group-hover:bg-[#0A6FA7] group-hover:text-white transition-all mb-4 overflow-hidden'>
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={item.name || item.title}
+                        className='w-full h-full object-cover'
+                        onError={(e) => {
+                          e.target.onerror = null
+                          e.target.src = '' // Fallback to icon if image fails
+                          e.target.style.display = 'none'
+                        }}
+                      />
+                    ) : (
+                      item.name?.charAt(0) || item.title?.charAt(0) || '?'
+                    )}
+                  </div>
+                  <h3 className='text-base md:text-lg font-semibold text-gray-800 group-hover:text-[#0A6FA7] transition-colors line-clamp-2'>
+                    {item.name || item.title}
+                  </h3>
                 </div>
-                <h3 className='text-base md:text-lg font-semibold text-gray-800 group-hover:text-[#0A6FA7] transition-colors line-clamp-2'>
-                  {item.name || item.title}
-                </h3>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            )
+          })}
         </div>
       </div>
     )
@@ -210,35 +230,40 @@ const SearchBox = ({ onClose }) => {
         </button>
 
         {/* 🔹 Search Input Container */}
-        <div className='relative w-full mb-10'>
-          <div className='relative group'>
+        <div className='relative w-full mb-16 max-w-4xl mx-auto'>
+          <div className='relative group flex items-end'>
+            <div className='absolute left-0 bottom-6 text-[#0A6FA7] opacity-60 group-focus-within:opacity-100 transition-opacity duration-300'>
+              <Search size={28} strokeWidth={1.5} />
+            </div>
             <input
               type='text'
               placeholder={
                 isMobile
-                  ? 'Colleges, Events, Blogs ...'
+                  ? 'Start typing...'
                   : 'Search Universities, Colleges, Events & more...'
               }
               value={searchTag}
-              className='w-full py-4 bg-transparent border-b-2 border-gray-100 focus:border-[#0A6FA7] transition-all focus:outline-none placeholder-gray-300 text-2xl md:text-3xl font-semibold text-gray-900 pr-16 tracking-tight'
+              className='w-full pb-5 pl-12 bg-transparent border-b border-gray-200 focus:border-[#0A6FA7] transition-all duration-500 focus:outline-none placeholder-gray-400 text-2xl md:text-4xl font-light text-gray-900 pr-12 tracking-tight'
               onChange={handleInputChange}
               autoFocus
             />
-            <div className='absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-4 pr-2'>
+            <div className='absolute right-0 bottom-6 flex items-center gap-4'>
               {isLoading && (
-                <div className='w-5 h-5 border-2 border-[#0A6FA7]/20 border-t-[#0A6FA7] rounded-full animate-spin'></div>
+                <div className='w-6 h-6 border-2 border-[#0A6FA7]/20 border-t-[#0A6FA7] rounded-full animate-spin'></div>
               )}
               {searchTag.trim() && !isLoading && (
                 <button
                   onClick={() => setSearchTag('')}
                   className='p-1 text-gray-400 hover:text-red-500 transition-colors'
+                  aria-label="Clear search"
                 >
-                  <X size={20} />
+                  <X size={24} strokeWidth={1.5} />
                 </button>
               )}
-              <Search size={24} className='text-[#0A6FA7]' />
             </div>
           </div>
+          {/* Subtle Focus Line Animation */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-[#0A6FA7] transition-all duration-500 group-focus-within:w-full"></div>
         </div>
 
         {/* 🔹 Content Area */}
@@ -267,7 +292,7 @@ const SearchBox = ({ onClose }) => {
           {searchTag.trim() && (
             <div className='animate-in fade-in duration-300'>
               {!isLoading &&
-              Object.values(searchResults).every((arr) => arr.length === 0) ? (
+                Object.values(searchResults).every((arr) => arr.length === 0) ? (
                 <div className='py-20 text-center'>
                   <div className='w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300'>
                     <Search size={32} />
@@ -305,7 +330,7 @@ const SearchBox = ({ onClose }) => {
                     icon={Calendar}
                     path='events'
                   />
-                   <ResultSection
+                  <ResultSection
                     title='Scholarships'
                     items={searchResults.scholarships}
                     icon={GraduationCap}

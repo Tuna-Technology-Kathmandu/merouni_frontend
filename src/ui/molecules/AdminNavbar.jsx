@@ -228,13 +228,14 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
                                 sub.visible.some(r => userRoles[r])
                               )
                               .map(sub => (
-                                <button
+                                <Link
                                   key={sub.label}
+                                  href={sub.href}
                                   onClick={() => {
-                                    router.push(sub.href)
                                     setSearchQuery('')
+                                    setInputValue('')
                                   }}
-                                  className='w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors'
+                                  className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors'
                                 >
                                   <div className='w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md group-hover:bg-indigo-100 group-hover:text-indigo-600'>
                                     {item.icon}
@@ -243,21 +244,22 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
                                     <span className='font-medium'>{sub.label}</span>
                                     <span className='text-[10px] text-gray-400'>{item.label}</span>
                                   </div>
-                                </button>
+                                </Link>
                               ))
                           ) : (
-                            <button
+                            <Link
+                              href={item.href}
                               onClick={() => {
-                                router.push(item.href)
                                 setSearchQuery('')
+                                setInputValue('')
                               }}
-                              className='w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors'
+                              className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors'
                             >
                               <div className='w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md group-hover:bg-indigo-100 group-hover:text-indigo-600'>
                                 {item.icon}
                               </div>
                               <span className='font-medium'>{item.label}</span>
-                            </button>
+                            </Link>
                           )}
                         </div>
                       ))}

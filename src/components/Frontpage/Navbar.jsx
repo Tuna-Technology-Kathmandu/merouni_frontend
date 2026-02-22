@@ -206,11 +206,11 @@ const Navbar = () => {
             <button
               type='button'
               onClick={openSearch}
-              className='w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 bg-gray-50/80 text-left text-gray-500 hover:bg-gray-100 hover:border-gray-300 transition-colors'
+              className='w-full flex items-center gap-3 px-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50/50 text-left text-gray-400 active:bg-white active:border-[#0A6FA7] transition-all duration-200'
               aria-label='Open search'
             >
-              <Search className='w-5 h-5 text-gray-400 shrink-0' />
-              <span className='text-sm'>Search colleges, degrees, programs...</span>
+              <Search className='w-4 h-4 text-gray-400 shrink-0' />
+              <span className='text-sm font-medium'>Search colleges, degrees...</span>
             </button>
           </div>
         </div>
