@@ -30,7 +30,8 @@ import {
   Globe,
   Upload,
   ChevronDown,
-  Plus
+  Plus,
+  Check
 } from 'lucide-react'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
@@ -63,7 +64,7 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
   if (!editor) return null;
 
   const handleLinkSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (linkUrl) {
       editor.chain().focus().setLink({ href: linkUrl }).run();
       setLinkUrl('');
@@ -110,7 +111,7 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
   }
 
   const handleImageUrlSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (imageUrl) {
       editor.chain().focus().setImage({ src: imageUrl }).run();
       setImageUrl('');
@@ -234,7 +235,7 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
 
           {isLinkMenuOpen && (
             <div className="absolute left-0 mt-2 w-72 bg-white border border-gray-100 rounded-xl shadow-2xl z-50 p-4 animate-in fade-in zoom-in duration-200 shadow-[#387cae]/5">
-              <form onSubmit={handleLinkSubmit} className="space-y-3">
+              <div className="space-y-3">
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Link URL</label>
                   <div className="flex gap-2">
@@ -243,12 +244,19 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
                       placeholder="https://example.com"
                       value={linkUrl}
                       onChange={(e) => setLinkUrl(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleLinkSubmit();
+                        }
+                      }}
                       autoFocus
                       className="h-9 text-xs bg-gray-50 border-gray-100 focus:bg-white"
                     />
                     <Button
-                      type="submit"
+                      type="button"
                       size="sm"
+                      onClick={handleLinkSubmit}
                       className="h-9 px-3 bg-[#387cae] hover:bg-[#387cae]/90"
                       disabled={!linkUrl}
                     >
@@ -268,7 +276,7 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
                     Unset Link
                   </Button>
                 )}
-              </form>
+              </div>
             </div>
           )}
         </div>
@@ -338,7 +346,7 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
                   </div>
                 </div>
 
-                <form onSubmit={handleImageUrlSubmit} className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Image URL</label>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
@@ -348,19 +356,26 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
                         placeholder="https://example.com/image.jpg"
                         value={imageUrl}
                         onChange={(e) => setImageUrl(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleImageUrlSubmit();
+                          }
+                        }}
                         className="h-9 px-8 text-xs bg-gray-50 border-gray-100 focus:bg-white"
                       />
                     </div>
                     <Button
-                      type="submit"
+                      type="button"
                       size="sm"
+                      onClick={handleImageUrlSubmit}
                       className="h-9 px-3 bg-[#387cae] hover:bg-[#387cae]/90"
                       disabled={!imageUrl}
                     >
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
-                </form>
+                </div>
               </div>
             </div>
           )}

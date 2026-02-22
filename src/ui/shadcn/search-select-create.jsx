@@ -165,7 +165,7 @@ export default function SearchSelectCreate({
                                         )}
                                     >
                                         <span className="text-sm font-medium text-gray-700">
-                                            {item[displayKey] || item.name || item}
+                                            {typeof item === 'object' ? (item[displayKey] || item.name || '') : item}
                                         </span>
                                         {isSelected && <Check className="h-4 w-4 text-[#387cae]" />}
                                     </div>
@@ -206,7 +206,7 @@ export default function SearchSelectCreate({
                             key={item[valueKey] || index}
                             className="bg-[#387cae]/10 text-[#387cae] px-3 py-1.5 rounded-lg text-xs font-bold border border-[#387cae]/20 flex items-center gap-2 group animate-in slide-in-from-left-2 duration-200"
                         >
-                            {item[displayKey] || item.name || item}
+                            {typeof item === 'object' ? (item[displayKey] || item.name || '') : item}
                             <button
                                 type="button"
                                 onClick={() => onRemove(item)}

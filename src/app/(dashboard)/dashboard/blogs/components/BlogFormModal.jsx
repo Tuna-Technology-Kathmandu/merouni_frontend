@@ -156,7 +156,7 @@ const BlogFormModal = ({
             const data = await response.json()
             if (response.ok) {
                 toast.success('Tag created successfully')
-                return data.tag || data
+                return data.tag || data.item || data
             }
             throw new Error(data.message || 'Failed to create tag')
         } catch (error) {
@@ -167,7 +167,7 @@ const BlogFormModal = ({
 
     const onSearchCategories = async (query) => {
         try {
-            const url = query ? `${process.env.baseUrl}/category?q=${query}` : `${process.env.baseUrl}/category`
+            const url = query ? `${process.env.baseUrl}/category?q=${query}&type=BLOG` : `${process.env.baseUrl}/category?type=BLOG`
             const response = await authFetch(url)
             const data = await response.json()
             return data.items || []
@@ -336,6 +336,7 @@ const BlogFormModal = ({
 
                             {/* Right Column - Media & Settings (4/12) */}
                             <div className="lg:col-span-4 space-y-8">
+
                                 {/* Featured Image Section */}
                                 <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
                                     <SectionHeader icon={ImageIcon} title="Featured Media" subtitle="Image & PDF Uploads" />
