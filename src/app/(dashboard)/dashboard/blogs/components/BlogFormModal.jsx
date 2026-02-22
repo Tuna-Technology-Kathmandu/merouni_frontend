@@ -177,24 +177,6 @@ const BlogFormModal = ({
         }
     }
 
-    const onCreateCategory = async (title) => {
-        try {
-            const response = await authFetch(`${process.env.baseUrl}/category`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, author: authors?.[0]?.id || 1, type: 'BLOG' })
-            })
-            const data = await response.json()
-            if (response.ok) {
-                toast.success('Category created successfully')
-                return data.category || data
-            }
-            throw new Error(data.message || 'Failed to create category')
-        } catch (error) {
-            toast.error(error.message)
-            return null
-        }
-    }
 
     const handleSelectCategory = (category) => {
         setSelectedCategory(category)
@@ -296,7 +278,6 @@ const BlogFormModal = ({
                                                 <Label required={true} htmlFor='category'>Category</Label>
                                                 <SearchSelectCreate
                                                     onSearch={onSearchCategories}
-                                                    onCreate={onCreateCategory}
                                                     onSelect={handleSelectCategory}
                                                     onRemove={handleRemoveCategory}
                                                     selectedItems={selectedCategory}
@@ -305,6 +286,7 @@ const BlogFormModal = ({
                                                     displayKey="title"
                                                     valueKey="id"
                                                     isMulti={false}
+                                                    allowCreate={false}
                                                 />
                                                 {errors.category && (
                                                     <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.category.message}</p>
@@ -323,6 +305,7 @@ const BlogFormModal = ({
                                                     createLabel="Create tag"
                                                     displayKey="title"
                                                     valueKey="id"
+                                                    allowCreate={true}
                                                 />
                                             </div>
                                         </div>

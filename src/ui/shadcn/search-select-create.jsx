@@ -21,6 +21,7 @@ import { cn } from '@/app/lib/utils'
  * @param {string} props.valueKey - Key to use for uniquely identifying the item
  * @param {string} props.className - Additional class names for the container
  * @param {boolean} props.isMulti - Whether multiple items can be selected (default: true)
+ * @param {boolean} props.allowCreate - Whether to show the create option (default: false)
  */
 export default function SearchSelectCreate({
     onSearch,
@@ -33,7 +34,8 @@ export default function SearchSelectCreate({
     displayKey = 'title',
     valueKey = 'id',
     className = '',
-    isMulti = true
+    isMulti = true,
+    allowCreate = false
 }) {
     const [query, setQuery] = useState('')
     const [results, setResults] = useState([])
@@ -176,7 +178,7 @@ export default function SearchSelectCreate({
                         ) : null}
                     </div>
 
-                    {onCreate && query.length > 0 && !results.some(r => {
+                    {allowCreate && onCreate && query.length > 0 && !results.some(r => {
                         const rTitle = (r[displayKey] || r).toString().toLowerCase()
                         return rTitle === query.toLowerCase()
                     }) && (

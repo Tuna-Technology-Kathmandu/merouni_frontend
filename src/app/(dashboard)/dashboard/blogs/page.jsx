@@ -179,10 +179,12 @@ export default function BlogsManager() {
 
   useEffect(() => {
     setHeading('Blogs Management')
-    const page = searchParams.get('page') || 1
-    loadData(page)
-    return () => setHeading(null)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      setHeading(null)
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort('Component unmounted')
+      }
+    }
   }, [setHeading])
 
   // Check for 'add' query parameter and open modal
@@ -210,7 +212,11 @@ export default function BlogsManager() {
     try {
       setLoading(true)
       if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
+        try {
+          abortControllerRef.current.abort('New request started')
+        } catch (e) {
+          // Ignore abort errors
+        }
       }
       abortControllerRef.current = new AbortController()
 
@@ -232,8 +238,6 @@ export default function BlogsManager() {
         total: response.pagination.totalCount
       })
     } catch (err) {
-      if (err.name === 'AbortError') return
-      toast.error('Failed to load blogs')
       console.error('Error loading blogs data:', err)
     } finally {
       if (abortControllerRef.current?.signal?.aborted === false) {
@@ -243,8 +247,9 @@ export default function BlogsManager() {
   }
 
   useEffect(() => {
-    loadData(1, statusFilter)
-  }, [statusFilter])
+    const page = parseInt(searchParams.get('page')) || 1
+    loadData(page, statusFilter)
+  }, [statusFilter, searchParams])
 
 
   const createBlogs = async (data) => {
