@@ -83,7 +83,6 @@ const ProfileUpdate = () => {
         }
       }
     )
-    console.log(response, "responseresponseresponse")
     if (!response.ok) {
       throw new Error('Failed to fetch profile')
     }
