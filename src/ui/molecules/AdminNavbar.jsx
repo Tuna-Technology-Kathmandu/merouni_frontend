@@ -199,73 +199,93 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
           {searchQuery.trim() !== '' && (
             <div className='absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200'>
               <div className='max-h-[70vh] overflow-y-auto p-1.5 custom-scrollbar'>
-                {menuItems.map((section) => {
-                  const items = section.items.filter(item => {
-                    const hasAccess = item.visible.some(r => userRoles[r])
-                    if (!hasAccess) return false
+                {(() => {
+                  let totalMatches = 0
+                  const itemsToRender = menuItems.map((section) => {
+                    const filteredItems = section.items.filter(item => {
+                      const hasAccess = item.visible.some(r => userRoles[r])
+                      if (!hasAccess) return false
 
-                    const query = searchQuery.toLowerCase().trim()
-                    const matchesLabel = item.label.toLowerCase().includes(query)
-                    const matchesSubmenu = item.submenus?.some(sub =>
-                      sub.label.toLowerCase().includes(query) && sub.visible.some(r => userRoles[r])
+                      const query = searchQuery.toLowerCase().trim()
+                      const matchesLabel = item.label.toLowerCase().includes(query)
+                      const matchesSubmenu = item.submenus?.some(sub =>
+                        sub.label.toLowerCase().includes(query) && sub.visible.some(r => userRoles[r])
+                      )
+                      return matchesLabel || matchesSubmenu
+                    })
+
+                    if (filteredItems.length === 0) return null
+                    totalMatches += filteredItems.length
+
+                    return (
+                      <div key={section.title || 'Other'}>
+                        <div className='px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest'>
+                          {section.title || 'General'}
+                        </div>
+                        {filteredItems.map(item => (
+                          <div key={item.label}>
+                            {item.submenus ? (
+                              item.submenus
+                                .filter(sub =>
+                                  (sub.label.toLowerCase().includes(searchQuery.toLowerCase()) || item.label.toLowerCase().includes(searchQuery.toLowerCase())) &&
+                                  sub.visible.some(r => userRoles[r])
+                                )
+                                .map(sub => (
+                                  <Link
+                                    key={sub.label}
+                                    href={sub.href}
+                                    onClick={() => {
+                                      setSearchQuery('')
+                                      setInputValue('')
+                                    }}
+                                    className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors'
+                                  >
+                                    <div className='w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md group-hover:bg-indigo-100 group-hover:text-indigo-600'>
+                                      {item.icon}
+                                    </div>
+                                    <div className='flex flex-col items-start'>
+                                      <span className='font-medium'>{sub.label}</span>
+                                      <span className='text-[10px] text-gray-400'>{item.label}</span>
+                                    </div>
+                                  </Link>
+                                ))
+                            ) : (
+                              <Link
+                                href={item.href}
+                                onClick={() => {
+                                  setSearchQuery('')
+                                  setInputValue('')
+                                }}
+                                className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors'
+                              >
+                                <div className='w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md group-hover:bg-indigo-100 group-hover:text-indigo-600'>
+                                  {item.icon}
+                                </div>
+                                <span className='font-medium'>{item.label}</span>
+                              </Link>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     )
-                    return matchesLabel || matchesSubmenu
                   })
 
-                  if (items.length === 0) return null
-
-                  return (
-                    <div key={section.title || 'Other'}>
-                      <div className='px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest'>
-                        {section.title || 'General'}
-                      </div>
-                      {items.map(item => (
-                        <div key={item.label}>
-                          {item.submenus ? (
-                            item.submenus
-                              .filter(sub =>
-                                (sub.label.toLowerCase().includes(searchQuery.toLowerCase()) || item.label.toLowerCase().includes(searchQuery.toLowerCase())) &&
-                                sub.visible.some(r => userRoles[r])
-                              )
-                              .map(sub => (
-                                <Link
-                                  key={sub.label}
-                                  href={sub.href}
-                                  onClick={() => {
-                                    setSearchQuery('')
-                                    setInputValue('')
-                                  }}
-                                  className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors'
-                                >
-                                  <div className='w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md group-hover:bg-indigo-100 group-hover:text-indigo-600'>
-                                    {item.icon}
-                                  </div>
-                                  <div className='flex flex-col items-start'>
-                                    <span className='font-medium'>{sub.label}</span>
-                                    <span className='text-[10px] text-gray-400'>{item.label}</span>
-                                  </div>
-                                </Link>
-                              ))
-                          ) : (
-                            <Link
-                              href={item.href}
-                              onClick={() => {
-                                setSearchQuery('')
-                                setInputValue('')
-                              }}
-                              className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors'
-                            >
-                              <div className='w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md group-hover:bg-indigo-100 group-hover:text-indigo-600'>
-                                {item.icon}
-                              </div>
-                              <span className='font-medium'>{item.label}</span>
-                            </Link>
-                          )}
+                  if (totalMatches === 0) {
+                    return (
+                      <div className='py-8 px-4 text-center'>
+                        <div className='w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-300'>
+                          <Search className='w-6 h-6' />
                         </div>
-                      ))}
-                    </div>
-                  )
-                })}
+                        <p className='text-sm font-medium text-gray-900'>No menus found</p>
+                        <p className='text-xs text-gray-500 mt-1'>
+                          No results for "{searchQuery}"
+                        </p>
+                      </div>
+                    )
+                  }
+
+                  return itemsToRender
+                })()}
               </div>
             </div>
           )}
