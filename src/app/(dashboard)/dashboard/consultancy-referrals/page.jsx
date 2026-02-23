@@ -191,14 +191,6 @@ const ConsultancyReferralsPage = () => {
                       </div>
                     </div>
 
-                    <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
-                        Service
-                      </label>
-                      <p className='text-gray-900'>
-                        {consultancy.service || 'N/A'}
-                      </p>
-                    </div>
                   </div>
 
                   {/* Description */}
