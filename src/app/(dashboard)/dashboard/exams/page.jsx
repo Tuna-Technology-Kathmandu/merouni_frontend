@@ -2,61 +2,45 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { getAllExams, createExam, updateExam, deleteExam } from './actions'
+import { useForm } from 'react-hook-form'
+import { toast, ToastContainer } from 'react-toastify'
+import { Search, Edit2, Trash2, Eye, Plus } from 'lucide-react'
+
+import { getAllExams, createExam, deleteExam, fetchUniversities, fetchLevel } from './actions'
 import Loading from '../../../../ui/molecules/Loading'
 import Table from '@/ui/shadcn/DataTable'
-import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast, ToastContainer } from 'react-toastify'
-import { useDebounce } from 'use-debounce'
-import { fetchUniversities, fetchLevel } from './actions'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
+import {
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DialogContent,
+  DialogClose
+} from '@/ui/shadcn/dialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import { Button } from '../../../../ui/shadcn/button'
 import { Input } from '../../../../ui/shadcn/input'
 import { Label } from '../../../../ui/shadcn/label'
 import { Select } from '../../../../ui/shadcn/select'
+import { Textarea } from '@/ui/shadcn/textarea'
 import SearchInput from '@/ui/molecules/SearchInput'
 import { formatDate } from '@/utils/date.util'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
+import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 import ExamViewModal from './ExamViewModal'
-import { Textarea } from '@/ui/shadcn/textarea'
-
-// Helper component for required label
-const RequiredLabel = ({ children, htmlFor }) => (
-  <Label htmlFor={htmlFor}>
-    {children} <span className='text-red-500'>*</span>
-  </Label>
-)
 
 export default function ExamManager() {
   const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data?.id)
   const searchParams = useSearchParams()
   const router = useRouter()
-
-  //for university search
-  const [uniSearch, setUniSearch] = useState('')
-  const [debouncedUni] = useDebounce(uniSearch, 300)
-  const [universities, setUniversities] = useState([])
-  const [loadUni, setLoadUni] = useState(false)
-  const [showUniDrop, setShowUniDrop] = useState(false)
-  const [hasSelectedUni, setHasSelectedUni] = useState(false)
-
-  //for level search
-  const [levelSearch, setLevelSearch] = useState('')
-  const [debouncedLevel] = useDebounce(levelSearch, 300)
-  const [levels, setLevels] = useState([])
-  const [loadLevel, setLoadLevel] = useState(false)
-  const [showLevelDrop, setShowLevelDrop] = useState(false)
-  const [hasSelectedLevel, setHasSelectedLevel] = useState(false)
+  const { requireAdmin } = useAdminPermission()
 
   const [exams, setExams] = useState([])
   const [loading, setLoading] = useState(true)
   const [tableLoading, setTableLoading] = useState(false)
-  const [error, setError] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [isOpen, setIsOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -64,168 +48,48 @@ export default function ExamManager() {
   const [viewingExam, setViewingExam] = useState(null)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchTimeout, setSearchTimeout] = useState(null)
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
     total: 0
   })
 
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    level_id: '',
-    affiliation: '',
-    syllabus: '',
-    pastQuestion: '',
-    exam_type: 'Written',
-    full_marks: '',
-    pass_marks: '',
-    questions_count: '',
-    question_type: 'MCQ',
-    duration: '',
-    normal_fee: '',
-    late_fee: '',
-    exam_date: '',
-    opening_date: '',
-    closing_date: ''
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors }
+  } = useForm({
+    defaultValues: {
+      title: '',
+      description: '',
+      level_id: '',
+      affiliation: '',
+      syllabus: '',
+      pastQuestion: '',
+      exam_type: 'Written',
+      full_marks: '',
+      pass_marks: '',
+      questions_count: '',
+      question_type: 'MCQ',
+      duration: '',
+      normal_fee: '',
+      late_fee: '',
+      exam_date: '',
+      opening_date: '',
+      closing_date: ''
+    }
   })
 
+  // Watch for SearchSelectCreate items
+  const selectedLevelId = watch('level_id')
+  const selectedAffiliationId = watch('affiliation')
 
-  const { requireAdmin } = useAdminPermission()
-
-  //for level searching
-  useEffect(() => {
-    if (hasSelectedLevel) return
-
-    const getLevels = async () => {
-      setLoadLevel(true)
-      try {
-        const levelList = await fetchLevel(debouncedLevel)
-        setLevels(levelList)
-        setShowLevelDrop(true)
-        setLoadLevel(false)
-      } catch (error) {
-        console.error('Error fetching levels:', error)
-      }
-    }
-    if (debouncedLevel !== '') {
-      getLevels()
-    } else {
-      setShowLevelDrop(false)
-    }
-  }, [debouncedLevel])
-
-  //for university searching
-  useEffect(() => {
-    if (hasSelectedUni) return
-
-    const getUniversities = async () => {
-      setLoadUni(true)
-      try {
-        const universityList = await fetchUniversities(debouncedUni)
-        setUniversities(universityList)
-        setShowUniDrop(true)
-        setLoadUni(false)
-      } catch (error) {
-        console.error('Error fetching universities:', error)
-      }
-    }
-    if (debouncedUni !== '') {
-      getUniversities()
-    } else {
-      setShowUniDrop(false)
-    }
-  }, [debouncedUni])
-
-  // Validate dates
-  const validateDates = () => {
-    const examDate = new Date(formData.exam_date)
-    const openingDate = new Date(formData.opening_date)
-    const closingDate = new Date(formData.closing_date)
-
-    if (formData.opening_date && formData.closing_date && openingDate >= closingDate) {
-      setError('Opening date must be before closing date')
-      return false
-    }
-    if (formData.closing_date && formData.exam_date && closingDate >= examDate) {
-      setError('Closing date must be before exam date')
-      return false
-    }
-    return true
-  }
-  const columns = useMemo(
-    () => [
-      {
-        header: 'Title',
-        accessorKey: 'title'
-      },
-      {
-        header: 'Description',
-        accessorKey: 'description',
-        cell: ({ getValue }) => {
-          const html = getValue() || ''
-          const text = html.replace(/<[^>]+>/g, '') // Strip HTML tags
-          const truncated = text.length > 50 ? text.substring(0, 50) + '...' : text
-          return (
-            <div className='max-w-xs text-sm text-gray-600' title={text}>
-              {truncated}
-            </div>
-          )
-        }
-      },
-      {
-        header: 'Syllabus',
-        accessorKey: 'syllabus',
-        cell: ({ getValue }) => {
-          const value = getValue() || ''
-
-          const getFirst20text = value.slice(0, 20)
-          if (value.length > 20) {
-            return getFirst20text + '...'
-          }
-          return value
-        }
-
-      },
-      {
-        header: 'Actions',
-        id: 'actions',
-        cell: ({ row }) => (
-          <div className='flex gap-2'>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleView(row.original)}
-              className='text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-              title='View Details'
-            >
-              <Eye className='w-4 h-4' />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleEdit(row.original)}
-              className='text-blue-600 hover:text-blue-800 hover:bg-blue-50'
-              title='Edit'
-            >
-              <Edit2 className='w-4 h-4' />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleDeleteClick(row.original.id)}
-              className='text-red-600 hover:text-red-800 hover:bg-red-50'
-              title='Delete'
-            >
-              <Trash2 className='w-4 h-4' />
-            </Button>
-          </div>
-        )
-      }
-    ],
-    []
-  )
+  // We need to keep track of the full objects for SearchSelectCreate's selectedItems prop
+  const [selectedLevel, setSelectedLevel] = useState(null)
+  const [selectedUniversity, setSelectedUniversity] = useState(null)
 
   useEffect(() => {
     setHeading('Exam Management')
@@ -233,58 +97,54 @@ export default function ExamManager() {
     return () => setHeading(null)
   }, [setHeading])
 
-  // Check for 'add' query parameter and open modal
+  // Handle URL param 'add=true'
   useEffect(() => {
     const addParam = searchParams.get('add')
     if (addParam === 'true') {
-      setIsOpen(true)
-      setEditingId(null)
-      setFormData({
-        title: '',
-        description: '',
-        level_id: '',
-        affiliation: '',
-        syllabus: '',
-        pastQuestion: '',
-        exam_type: 'Written',
-        full_marks: '',
-        pass_marks: '',
-        questions_count: '',
-        question_type: 'MCQ',
-        duration: '',
-        normal_fee: '',
-        late_fee: '',
-        exam_date: '',
-        opening_date: '',
-        closing_date: ''
-      })
-      setError(null)
-      // Remove query parameter from URL
+      handleAdd()
       router.replace('/dashboard/exams', { scroll: false })
     }
   }, [searchParams, router])
 
-  useEffect(() => {
-    return () => {
-      if (searchTimeout) {
-        clearTimeout(searchTimeout)
-      }
-    }
-  }, [searchTimeout])
-
-  const loadExams = async (page = 1) => {
+  const loadExams = async (page = 1, query = '') => {
     setTableLoading(true)
     try {
-      const response = await getAllExams(page)
+      let response
+      if (query) {
+        const res = await authFetch(`${process.env.baseUrl}/exam?q=${query}&page=${page}`)
+        response = await res.json()
+      } else {
+        response = await getAllExams(page)
+      }
 
-      setExams(response.items)
+      const flattenedItems = (response.items || []).map((exam) => {
+        const examDetail = exam.exam_details?.[0] || {}
+        const appDetail = exam.application_details?.[0] || {}
+        return {
+          ...exam,
+          // Extract nested fields for table and form
+          exam_type: exam.exam_type || examDetail.exam_type || 'Written',
+          question_type: exam.question_type || examDetail.question_type || 'MCQ',
+          duration: exam.duration || examDetail.duration || '',
+          full_marks: exam.full_marks || examDetail.full_marks || '',
+          pass_marks: exam.pass_marks || examDetail.pass_marks || '',
+          questions_count: exam.questions_count || examDetail.number_of_question || '',
+          normal_fee: exam.normal_fee || appDetail.normal_fee || '',
+          late_fee: exam.late_fee || appDetail.late_fee || '',
+          opening_date: exam.opening_date || appDetail.opening_date || null,
+          closing_date: exam.closing_date || appDetail.closing_date || null,
+          exam_date: exam.exam_date || appDetail.exam_date || null
+        }
+      })
+
+      setExams(flattenedItems)
       setPagination({
-        currentPage: response.pagination.currentPage,
-        totalPages: response.pagination.totalPages,
-        total: response.pagination.totalCount
+        currentPage: response.pagination?.currentPage || 1,
+        totalPages: response.pagination?.totalPages || 1,
+        total: response.pagination?.totalCount || 0
       })
     } catch (error) {
-      setError('Failed to load exams')
+      console.error('Failed to fetch exams:', error)
       toast.error('Failed to fetch exams')
     } finally {
       setTableLoading(false)
@@ -292,123 +152,16 @@ export default function ExamManager() {
     }
   }
 
-  const handleSearch = async (query) => {
-    if (!query) {
-      loadExams()
-      return
-    }
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/exam?q=${query}`
-      )
-      if (response.ok) {
-        const data = await response.json()
-        setExams(data.items)
-
-        if (data.pagination) {
-          setPagination({
-            currentPage: data.pagination.currentPage,
-            totalPages: data.pagination.totalPages,
-            total: data.pagination.totalCount
-          })
-        }
-      } else {
-        setExams([])
-      }
-    } catch (error) {
-      console.error('Error fetching exams search results:', error.message)
-      setExams([])
-    }
+  const handleSearch = (query) => {
+    setSearchQuery(query)
+    loadExams(1, query)
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!validateDates()) return
-
-    try {
-      setLoading(true)
-      const formattedData = {
-        ...formData,
-        author: author_id,
-        full_marks: Number(formData.full_marks || 0),
-        pass_marks: Number(formData.pass_marks || 0),
-        questions_count: Number(formData.questions_count || 0),
-        normal_fee: Number(formData.normal_fee || 0),
-        late_fee: Number(formData.late_fee || 0),
-        ...(editingId && { id: editingId })
-      }
-      await createExam(formattedData)
-      // Reset form...
-      setFormData({
-        title: '',
-        description: '',
-        level_id: '',
-        affiliation: '',
-        syllabus: '',
-        pastQuestion: '',
-        exam_type: 'Written',
-        full_marks: '',
-        pass_marks: '',
-        questions_count: '',
-        question_type: 'MCQ',
-        duration: '',
-        normal_fee: '',
-        late_fee: '',
-        exam_date: '',
-        opening_date: '',
-        closing_date: ''
-      })
-      setLoading(false)
-      setEditingId(null)
-      setError(null)
-      setIsOpen(false)
-      setLevelSearch('')
-      setUniSearch('')
-      setHasSelectedLevel(false)
-      setHasSelectedUni(false)
-      loadExams()
-
-      toast.success(`Successfully ${editingId ? 'updated' : 'created'} exam`)
-    } catch (error) {
-      toast.error(`Failed to ${editingId ? 'update' : 'create'} exam`)
-      console.error('Error saving exam:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleEdit = (exam) => {
-    // Determine data source (flat or nested for backward compatibility if needed, though we moved to flat)
-    // Assume API returns flat structure now based on service update
-    setFormData({
-      title: exam.title,
-      description: exam.description,
-      level_id: exam.level_id,
-      affiliation: exam.affiliation,
-      syllabus: exam.syllabus,
-      pastQuestion: exam.pastQuestion,
-      exam_type: exam.exam_type || 'Written',
-      full_marks: exam.full_marks || '',
-      pass_marks: exam.pass_marks || '',
-      questions_count: exam.questions_count || '',
-      question_type: exam.question_type || 'MCQ',
-      duration: exam.duration || '',
-      normal_fee: exam.normal_fee || '',
-      late_fee: exam.late_fee || '',
-      exam_date: exam.exam_date || '',
-      opening_date: exam.opening_date || '',
-      closing_date: exam.closing_date || ''
-    })
-    setEditingId(exam.id)
-    setError(null)
-    setIsOpen(true)
-  }
-
-  const handleModalClose = () => {
-    setIsOpen(false)
+  const handleAdd = () => {
     setEditingId(null)
-    setError(null)
-    setFormData({
+    setSelectedLevel(null)
+    setSelectedUniversity(null)
+    reset({
       title: '',
       description: '',
       level_id: '',
@@ -427,10 +180,91 @@ export default function ExamManager() {
       opening_date: '',
       closing_date: ''
     })
-    setLevelSearch('')
-    setUniSearch('')
-    setHasSelectedLevel(false)
-    setHasSelectedUni(false)
+    setIsOpen(true)
+  }
+
+  const handleEdit = (exam) => {
+    setEditingId(exam.id)
+
+    // Set selected objects for SearchSelectCreate
+    setSelectedLevel(exam.level || null)
+    setSelectedUniversity(exam.university || null)
+
+    // Formatted dates for <input type="date" />
+    const formatInputDate = (dateStr) => {
+      if (!dateStr) return ''
+      try {
+        const date = new Date(dateStr)
+        if (isNaN(date.getTime())) return ''
+        return date.toISOString().split('T')[0]
+      } catch (e) {
+        return ''
+      }
+    }
+
+    reset({
+      title: exam.title || '',
+      description: exam.description || '',
+      level_id: exam.level_id || '',
+      affiliation: exam.affiliation || '',
+      syllabus: exam.syllabus || '',
+      pastQuestion: exam.pastQuestion || '',
+      exam_type: exam.exam_type || 'Written',
+      full_marks: exam.full_marks || '',
+      pass_marks: exam.pass_marks || '',
+      questions_count: exam.questions_count || '',
+      question_type: exam.question_type || 'MCQ',
+      duration: exam.duration || '',
+      normal_fee: exam.normal_fee || '',
+      late_fee: exam.late_fee || '',
+      exam_date: formatInputDate(exam.exam_date),
+      opening_date: formatInputDate(exam.opening_date),
+      closing_date: formatInputDate(exam.closing_date)
+    })
+    setIsOpen(true)
+  }
+
+  const handleModalClose = () => {
+    setIsOpen(false)
+    setEditingId(null)
+    setSelectedLevel(null)
+    setSelectedUniversity(null)
+  }
+
+  const onSubmit = async (data) => {
+    // Basic date validation
+    if (data.opening_date && data.closing_date && new Date(data.opening_date) >= new Date(data.closing_date)) {
+      toast.error('Opening date must be before closing date')
+      return
+    }
+    if (data.closing_date && data.exam_date && new Date(data.closing_date) >= new Date(data.exam_date)) {
+      toast.error('Closing date must be before exam date')
+      return
+    }
+
+    try {
+      setTableLoading(true)
+      const formattedData = {
+        ...data,
+        author: author_id,
+        full_marks: Number(data.full_marks || 0),
+        pass_marks: Number(data.pass_marks || 0),
+        questions_count: Number(data.questions_count || 0),
+        normal_fee: Number(data.normal_fee || 0),
+        late_fee: Number(data.late_fee || 0),
+        ...(editingId && { id: editingId })
+      }
+
+      await createExam(formattedData)
+      toast.success(`Exam ${editingId ? 'updated' : 'created'} successfully`)
+      handleModalClose()
+      loadExams()
+    } catch (error) {
+      console.error('Error saving exam:', error)
+      toast.error(`Failed to ${editingId ? 'update' : 'create'} exam`)
+    } finally {
+      setTableLoading(false)
+    }
   }
 
   const handleDeleteClick = (id) => {
@@ -440,131 +274,105 @@ export default function ExamManager() {
     })
   }
 
-  const handleDialogClose = () => {
-    setIsDialogOpen(false)
-    setDeleteId(null)
-  }
-
   const handleDeleteConfirm = async () => {
-    if (!deleteId) return
-
     try {
       await deleteExam(deleteId)
-      toast.success('Exam deleted successfully!')
-      await loadExams()
-      setError(null)
+      toast.success('Exam deleted successfully')
+      loadExams()
     } catch (error) {
       toast.error('Failed to delete exam')
-      setError('Failed to delete exam')
-      console.error('Error deleting exam:', error)
     } finally {
       setIsDialogOpen(false)
       setDeleteId(null)
     }
   }
 
-  const handleView = (exam) => {
-    setViewingExam(exam)
-    setIsViewModalOpen(true)
-  }
-
-  const handleViewModalClose = () => {
-    setIsViewModalOpen(false)
-    setViewingExam(null)
-  }
-
-  const handleSearchInput = (value) => {
-    setSearchQuery(value)
-
-    if (searchTimeout) {
-      clearTimeout(searchTimeout)
+  const columns = useMemo(() => [
+    {
+      header: 'Title',
+      accessorKey: 'title',
+      cell: ({ row }) => (
+        <div className="font-medium text-gray-900">{row.original.title}</div>
+      )
+    },
+    {
+      header: 'Level',
+      accessorKey: 'level.title',
+      cell: ({ row }) => row.original.level?.title || 'N/A'
+    },
+    {
+      header: 'Affiliation',
+      accessorKey: 'university.fullname',
+      cell: ({ row }) => row.original.university?.fullname || row.original.affiliation || 'N/A'
+    },
+    {
+      header: 'Exam Date',
+      accessorKey: 'exam_date',
+      cell: ({ row }) => row.original.exam_date ? formatDate(row.original.exam_date) : 'N/A'
+    },
+    {
+      header: 'Actions',
+      id: 'actions',
+      cell: ({ row }) => (
+        <div className='flex gap-1'>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              setViewingExam(row.original)
+              setIsViewModalOpen(true)
+            }}
+            className='hover:bg-blue-50 text-blue-600'
+          >
+            <Eye className='w-4 h-4' />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleEdit(row.original)}
+            className='hover:bg-amber-50 text-amber-600'
+          >
+            <Edit2 className='w-4 h-4' />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleDeleteClick(row.original.id)}
+            className='hover:bg-red-50 text-red-600'
+          >
+            <Trash2 className='w-4 h-4' />
+          </Button>
+        </div>
+      )
     }
+  ], [requireAdmin])
 
-    if (value === '') {
-      handleSearch('')
-    } else {
-      const timeoutId = setTimeout(() => {
-        handleSearch(value)
-      }, 300)
-      setSearchTimeout(timeoutId)
-    }
-  }
-
-  const handleDescriptionChange = (value) => {
-    if (value !== formData.description) {
-      setFormData((prev) => ({
-        ...prev,
-        description: value
-      }))
-    }
-  }
-  if (loading)
-    return (
-      <div className='mx-auto'>
-        <Loading />
-      </div>
-    )
+  if (loading) return <Loading />
 
   return (
-    <>
-      <div className='w-full space-y-2'>
-        <div className='flex justify-between items-center px-4 pt-4'>
-          {/* Search Bar */}
-          <SearchInput
-            value={searchQuery}
-            onChange={(e) => handleSearchInput(e.target.value)}
-            placeholder='Search exams...'
-            className='max-w-md'
-          />
+    <div className='w-full space-y-4 p-4'>
+      <ToastContainer />
 
-          {/* Button */}
-          <div className='flex gap-2'>
-            <Button
-              type='button'
-              variant='default'
-              onClick={() => {
-                setIsOpen(true)
-                setEditingId(null)
-                setError(null)
-                setFormData({
-                  title: '',
-                  description: '',
-                  level_id: '',
-                  affiliation: '',
-                  syllabus: '',
-                  pastQuestion: '',
-                  exam_type: 'Written',
-                  full_marks: '',
-                  pass_marks: '',
-                  questions_count: '',
-                  question_type: 'MCQ',
-                  duration: '',
-                  normal_fee: '',
-                  late_fee: '',
-                  exam_date: '',
-                  opening_date: '',
-                  closing_date: ''
-                })
-                setLevelSearch('')
-                setUniSearch('')
-                setHasSelectedLevel(false)
-                setHasSelectedUni(false)
-              }}
-            >
-              Add Exam
-            </Button>
-          </div>
-        </div>
-        <ToastContainer />
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+        <SearchInput
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder='Search exams by title...'
+          className='max-w-md w-full'
+        />
+        <Button onClick={handleAdd} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
+          <Plus className="w-4 h-4" />
+          Add Exam
+        </Button>
+      </div>
 
-        {/* Table */}
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
         <Table
           loading={tableLoading}
           data={exams}
           columns={columns}
           pagination={pagination}
-          onPageChange={(newPage) => loadExams(newPage)}
-          onSearch={handleSearch}
+          onPageChange={(page) => loadExams(page, searchQuery)}
           showSearch={false}
         />
       </div>
@@ -573,354 +381,238 @@ export default function ExamManager() {
       <Dialog
         isOpen={isOpen}
         onClose={handleModalClose}
+        closeOnOutsideClick={false}
         className='max-w-5xl'
       >
-        <DialogHeader>
-          <DialogTitle>{editingId ? 'Edit Exam' : 'Add Exam'}</DialogTitle>
-          <DialogClose onClick={handleModalClose} />
-        </DialogHeader>
-        <DialogContent className='max-h-[90vh] overflow-y-auto'>
-          <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
-            <form
-              onSubmit={handleSubmit}
-              className='flex flex-col flex-1 overflow-hidden'
-            >
-              <div className='flex-1 overflow-y-auto space-y-6 pr-2 p-2'>
-                {/* Basic Information */}
-                <div>
-                  <h2 className='text-lg font-semibold mb-4 text-gray-800 border-b pb-1'>Basic Information</h2>
-                  <div className='grid grid-cols-1 gap-4 mb-4'>
-                    <div>
-                      <RequiredLabel htmlFor='exam-title'>Exam Title</RequiredLabel>
-                      <Input
-                        id='exam-title'
-                        type='text'
-                        placeholder='Enter exam title'
-                        value={formData.title}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            title: e.target.value
-                          }))
-                        }
-                        required
-                        className='mt-1'
-                      />
-                    </div>
-                     <div>
-                      <Label htmlFor='exam-description'>Description</Label>
-                      <div className='mt-1'>
-                        <TipTapEditor
-                          value={formData.description}
-                          onChange={handleDescriptionChange}
-                          placeholder='Enter exam description...'
-                        />
-                      </div>
-                    </div>
+        <DialogContent className='max-w-5xl max-h-[90vh] flex flex-col p-0'>
+          <DialogHeader className='px-6 py-4 border-b'>
+            <DialogTitle className="text-lg font-semibold text-gray-900">
+              {editingId ? 'Edit Exam' : 'Add New Exam'}
+            </DialogTitle>
+            <DialogClose onClick={handleModalClose} />
+          </DialogHeader>
+
+          <div className='flex-1 overflow-y-auto p-6'>
+            <form id="exam-form" onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
+              {/* Basic Information */}
+              <section className="space-y-4">
+                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Basic Information</h3>
+
+                <div className='grid grid-cols-1 gap-6'>
+                  <div className="space-y-2">
+                    <Label required>Exam Title</Label>
+                    <Input
+                      {...register('title', { required: 'Exam title is required' })}
+                      placeholder='Enter exam title'
+                    />
+                    {errors.title && <p className="text-xs text-red-500">{errors.title.message}</p>}
                   </div>
-                  
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    {/* level search box */}
-                    <div>
-                      <RequiredLabel htmlFor='level-search'>Level</RequiredLabel>
-                      <div className='relative mt-1'>
-                        <Input
-                          id='level-search'
-                          type='text'
-                          value={levelSearch}
-                          onChange={(e) => {
-                            setLevelSearch(e.target.value)
-                            setHasSelectedLevel(false)
-                          }}
-                          placeholder='Search levels...'
-                        />
-                        {loadLevel ? (
-                          <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2 mt-1'>
-                            Loading...
-                          </div>
-                        ) : showLevelDrop ? (
-                          levels.length > 0 ? (
-                            <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md mt-1'>
-                              {levels.map((level) => (
-                                <li
-                                  key={level.id}
-                                  className='p-2 cursor-pointer hover:bg-gray-100'
-                                  onClick={() => {
-                                    setFormData((prev) => ({
-                                      ...prev,
-                                      level_id: level.id
-                                    }))
 
-                                    setLevelSearch(level.title)
-                                    setShowLevelDrop(false)
-                                    setHasSelectedLevel(true)
-                                  }}
-                                >
-                                  {level.title}
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 mt-1 text-gray-500'>
-                              No levels found.
-                            </div>
-                          )
-                        ) : null}
-                      </div>
-                    </div>
-
-                    {/* university search box */}
-                    <div>
-                      <Label htmlFor='university-search'>
-                        University/Affiliation
-                      </Label>
-                      <div className='relative mt-1'>
-                        <Input
-                          id='university-search'
-                          type='text'
-                          value={uniSearch}
-                          onChange={(e) => {
-                            setUniSearch(e.target.value)
-                            setHasSelectedUni(false)
-                          }}
-                          placeholder='Search universities...'
-                        />
-                        {loadUni ? (
-                          <div className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md p-2 mt-1'>
-                            Loading...
-                          </div>
-                        ) : showUniDrop ? (
-                          universities.length > 0 ? (
-                            <ul className='absolute z-10 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-md mt-1'>
-                              {universities.map((uni) => (
-                                <li
-                                  key={uni.id}
-                                  className='p-2 cursor-pointer hover:bg-gray-100'
-                                  onClick={() => {
-                                    setFormData((prev) => ({
-                                      ...prev,
-                                      affiliation: uni.id
-                                    }))
-                                    setUniSearch(uni.fullname)
-                                    setShowUniDrop(false)
-                                    setHasSelectedUni(true)
-                                  }}
-                                >
-                                  {uni.fullname}
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <div className='absolute z-10 w-full bg-white border rounded shadow-md p-2 mt-1 text-gray-500'>
-                              No universities found.
-                            </div>
-                          )
-                        ) : null}
-                      </div>
-                    </div>
+                  <div className="space-y-2">
+                    <Label>Description</Label>
+                    <TipTapEditor
+                      value={watch('description')}
+                      onChange={(val) => setValue('description', val)}
+                      placeholder='Write a detailed description...'
+                    />
                   </div>
                 </div>
 
-                {/* Exam Details - Clean Grid */}
-                <div>
-                  <h2 className='text-lg font-semibold mb-4 text-gray-800 border-b pb-1'>Exam Structure</h2>
-                  <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                    <div>
-                        <Label htmlFor='full_marks'>Full Marks</Label>
-                        <Input
-                            id='full_marks'
-                            type='number'
-                            placeholder='100'
-                            value={formData.full_marks}
-                            onChange={(e) => setFormData(prev => ({ ...prev, full_marks: e.target.value }))}
-                            className='mt-1'
-                        />
-                    </div>
-                    <div>
-                        <Label htmlFor='pass_marks'>Pass Marks</Label>
-                        <Input
-                            id='pass_marks'
-                            type='number'
-                            placeholder='40'
-                            value={formData.pass_marks}
-                            onChange={(e) => setFormData(prev => ({ ...prev, pass_marks: e.target.value }))}
-                            className='mt-1'
-                        />
-                    </div>
-                     <div>
-                        <Label htmlFor='duration'>Duration</Label>
-                        <Input
-                            id='duration'
-                            type='text'
-                            placeholder='e.g. 2 Hours'
-                            value={formData.duration}
-                            onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
-                            className='mt-1'
-                        />
-                    </div>
-                     <div>
-                        <Label htmlFor='question_type'>Question Type</Label>
-                        <Select
-                            id='question_type'
-                            value={formData.question_type}
-                            onValueChange={(value) => setFormData(prev => ({ ...prev, question_type: value }))}
-                        >
-                             <option value="MCQ">MCQ</option>
-                             <option value="Written">Written</option>
-                             <option value="Practical">Practical</option>
-                             <option value="Mixed">Mixed</option>
-                        </Select>
-                    </div>
-                    <div>
-                         <Label htmlFor='exam_type'>Exam Type</Label>
-                         <Select
-                             id='exam_type'
-                             value={formData.exam_type}
-                             onValueChange={(value) => setFormData(prev => ({ ...prev, exam_type: value }))}
-                         >
-                            <option value="Written">Written</option>
-                            <option value="Online">Online</option>
-                         </Select>
-                     </div>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                  <div className="space-y-2">
+                    <Label required>Level</Label>
+                    <SearchSelectCreate
+                      onSearch={fetchLevel}
+                      onSelect={(item) => {
+                        setSelectedLevel(item)
+                        setValue('level_id', item.id, { shouldValidate: true })
+                      }}
+                      onRemove={() => {
+                        setSelectedLevel(null)
+                        setValue('level_id', '', { shouldValidate: true })
+                      }}
+                      selectedItems={selectedLevel}
+                      placeholder="Select level..."
+                      isMulti={false}
+                      displayKey="title"
+                    />
+                    <input type="hidden" {...register('level_id', { required: 'Level is required' })} />
+                    {errors.level_id && <p className="text-xs text-red-500">{errors.level_id.message}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>University/Affiliation</Label>
+                    <SearchSelectCreate
+                      onSearch={fetchUniversities}
+                      onSelect={(item) => {
+                        setSelectedUniversity(item)
+                        setValue('affiliation', item.id)
+                      }}
+                      onRemove={() => {
+                        setSelectedUniversity(null)
+                        setValue('affiliation', '')
+                      }}
+                      selectedItems={selectedUniversity}
+                      placeholder="Select university..."
+                      isMulti={false}
+                      displayKey="fullname"
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* Exam Structure */}
+              <section className="space-y-4">
+                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Exam Structure</h3>
+
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+                  <div className="space-y-2">
+                    <Label>Full Marks</Label>
+                    <Input
+                      type='number'
+                      {...register('full_marks')}
+                      placeholder='e.g. 100'
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Pass Marks</Label>
+                    <Input
+                      type='number'
+                      {...register('pass_marks')}
+                      placeholder='e.g. 40'
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Duration</Label>
+                    <Input
+                      {...register('duration')}
+                      placeholder='e.g. 2 Hours'
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Number of Questions</Label>
+                    <Input
+                      type='number'
+                      {...register('questions_count')}
+                      placeholder='e.g. 100'
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Question Type</Label>
+                    <Select {...register('question_type')}>
+                      <option value="MCQ">MCQ</option>
+                      <option value="Written">Written</option>
+                      <option value="Practical">Practical</option>
+                      <option value="Mixed">Mixed</option>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Exam Type</Label>
+                    <Select {...register('exam_type')}>
+                      <option value="Written">Written</option>
+                      <option value="Online">Online</option>
+                    </Select>
+                  </div>
+                </div>
+              </section>
+
+              {/* Dates & Fees */}
+              <section className="space-y-4">
+                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Dates & Fees</h3>
+
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                  <div className="space-y-2">
+                    <Label>Normal Fee</Label>
+                    <Input
+                      type='number'
+                      {...register('normal_fee')}
+                      placeholder='Rs. 1000'
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Late Fee</Label>
+                    <Input
+                      type='number'
+                      {...register('late_fee')}
+                      placeholder='Rs. 2000'
+                    />
                   </div>
                 </div>
 
-                {/* Application Details - Clean Grid */}
-                <div>
-                   <h2 className='text-lg font-semibold mb-4 text-gray-800 border-b pb-1'>Dates & Fees</h2>
-                   <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                        <div>
-                            <Label htmlFor='normal_fee'>Normal Fee</Label>
-                            <Input
-                                id='normal_fee'
-                                type='number'
-                                placeholder='Rs.'
-                                value={formData.normal_fee}
-                                onChange={(e) => setFormData(prev => ({ ...prev, normal_fee: e.target.value }))}
-                                className='mt-1'
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor='late_fee'>Late Fee</Label>
-                            <Input
-                                id='late_fee'
-                                type='number'
-                                placeholder='Rs.'
-                                value={formData.late_fee}
-                                onChange={(e) => setFormData(prev => ({ ...prev, late_fee: e.target.value }))}
-                                className='mt-1'
-                            />
-                        </div>
-                   </div>
-                   <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4'>
-                       <div>
-                            <Label htmlFor='opening_date'>Opening Date</Label>
-                            <Input
-                                id='opening_date'
-                                type='date'
-                                value={formData.opening_date ? formatDate(formData.opening_date, 'YYYY-MM-DD') : ''} // Need to handle date format for input type='date'
-                                onChange={(e) => setFormData(prev => ({ ...prev, opening_date: e.target.value }))}
-                                className='mt-1'
-                            />
-                        </div>
-                         <div>
-                            <Label htmlFor='closing_date'>Closing Date</Label>
-                            <Input
-                                id='closing_date'
-                                type='date'
-                                value={formData.closing_date ? formatDate(formData.closing_date, 'YYYY-MM-DD') : ''}
-                                onChange={(e) => setFormData(prev => ({ ...prev, closing_date: e.target.value }))}
-                                className='mt-1'
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor='exam_date'>Exam Date</Label>
-                            <Input
-                                id='exam_date'
-                                type='date'
-                                value={formData.exam_date ? formatDate(formData.exam_date, 'YYYY-MM-DD') : ''}
-                                onChange={(e) => setFormData(prev => ({ ...prev, exam_date: e.target.value }))}
-                                className='mt-1'
-                            />
-                        </div>
-                   </div>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+                  <div className="space-y-2">
+                    <Label>Opening Date</Label>
+                    <Input type='date' {...register('opening_date')} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Closing Date</Label>
+                    <Input type='date' {...register('closing_date')} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label required>Exam Date</Label>
+                    <Input type='date' {...register('exam_date', { required: 'Exam date is required' })} />
+                    {errors.exam_date && <p className="text-xs text-red-500">{errors.exam_date.message}</p>}
+                  </div>
                 </div>
+              </section>
 
-                {/* Additional Info */}
-                 <div>
-                    <h2 className='text-lg font-semibold mb-4 text-gray-800 border-b pb-1'>Additional Information</h2>
-                    <div className='grid grid-cols-1 gap-4'>
-                        <div>
-                            <Label htmlFor='syllabus'>Syllabus</Label>
-                            <Textarea
-                              id='syllabus'
-                              placeholder='Enter exam syllabus'
-                              value={formData.syllabus}
-                              onChange={(e) =>
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  syllabus: e.target.value
-                                }))
-                              }
-                              className='mt-1'
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor='past-question'>Past Question URL</Label>
-                            <Input
-                              id='past-question'
-                              type='text'
-                              placeholder='Enter past question URL'
-                              value={formData.pastQuestion}
-                              onChange={(e) =>
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  pastQuestion: e.target.value
-                                }))
-                              }
-                              className='mt-1'
-                            />
-                        </div>
-                    </div>
-                 </div>
+              {/* Content & Resources */}
+              <section className="space-y-4">
+                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Content & Resources</h3>
 
-              </div>
-                {error && <div className='text-red-500 text-sm mt-2'>{error}</div>}
-
-
-              {/* Submit Button */}
-              <div className='p-4 border-t mt-auto'>
-                <div className='flex justify-end gap-2'>
-                  <Button
-                    type='button'
-                    variant='outline'
-                    onClick={handleModalClose}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type='submit' disabled={loading}>
-                    {loading ? 'Saving...' : editingId ? 'Update Exam' : 'Create Exam'}
-                  </Button>
+                <div className='grid grid-cols-1 gap-6'>
+                  <div className="space-y-2">
+                    <Label>Syllabus Overview</Label>
+                    <Textarea
+                      {...register('syllabus')}
+                      placeholder='Syllabus summary...'
+                      className="min-h-[100px]"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Past Question URL</Label>
+                    <Input
+                      {...register('pastQuestion')}
+                      placeholder='Link to past questions'
+                    />
+                  </div>
                 </div>
-              </div>
+              </section>
             </form>
+          </div>
+
+          <div className='sticky bottom-0 bg-white border-t p-4 px-6 flex justify-end gap-3'>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={handleModalClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              type='submit'
+              form="exam-form"
+              disabled={tableLoading}
+            >
+              {tableLoading ? 'Saving...' : editingId ? 'Update Exam' : 'Create Exam'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
 
       <ConfirmationDialog
         open={isDialogOpen}
-        onClose={handleDialogClose}
+        onClose={() => setIsDialogOpen(false)}
         onConfirm={handleDeleteConfirm}
         title='Confirm Deletion'
-        message='Are you sure you want to delete this exam? This action cannot be undone.'
+        message='Are you sure you want to delete this exam? This action cannot be undone and will remove all associated details.'
       />
 
       <ExamViewModal
         isOpen={isViewModalOpen}
-        onClose={handleViewModalClose}
+        onClose={() => setIsViewModalOpen(false)}
         exam={viewingExam}
       />
-    </>
+    </div>
   )
 }

@@ -17,7 +17,7 @@ const Footer = () => {
   const [sections, setSections] = useState({
     Exams: { header: 'Top Exams', list: [] },
     Colleges: { header: 'Colleges', list: [] },
-    Resources: { header: 'Resources', list: [] }
+    Resources: { header: 'Materials', list: [] }
   })
 
   useEffect(() => {
@@ -60,17 +60,17 @@ const Footer = () => {
 
       // 3. Fetch Resources (Materials)
       try {
-        const res = await fetch(`${process.env.baseUrl}/material-category?page=1&limit=5`)
+        const res = await fetch(`${process.env.baseUrl}/material?page=1&limit=5`)
         if (res.ok) {
           const materialsRes = await res.json()
-          const items = materialsRes?.items || materialsRes || []
+          const items = materialsRes?.materials || materialsRes || []
           setSections(prev => ({
             ...prev,
             Resources: {
               ...prev.Resources,
               list: items.slice(0, 5).map(item => ({
                 title: item.title || item.name,
-                href: `/materials/category/${item.id}`
+                href: `/materials/${item.id}`
               }))
             }
           }))
