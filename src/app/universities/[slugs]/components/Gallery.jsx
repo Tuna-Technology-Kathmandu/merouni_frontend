@@ -1,69 +1,58 @@
-import React from 'react'
-import Image from 'next/image'
+import React, { useState } from 'react'
+import ImageLightbox from '@/ui/molecules/image-lightbox'
 
-const Gallery = ({ university }) => {
-  // Extract gallery images and videos from college data
-  const images = university?.gallery || [] // Use gallery images if available
-  const video = university?.assets?.videos || null // Use video if available
+const ImageGallery = ({ images, title = 'Campus Gallery', universityName }) => {
+  const [selectedImage, setSelectedImage] = useState(null)
+
+  if (!images || !Array.isArray(images) || images.length === 0) return null
 
   return (
-    <div className='flex flex-col w-full max-w-[1150px] mx-auto mb-20 px-4'>
-      <h2 className='font-bold text-3xl leading-10 mb-6'>Gallery</h2>
+    <section className='w-full mb-14 max-md:mb-7'>
+      <div className='relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#30AD8F]/5 to-white border border-[#30AD8F]/10 p-10 max-md:p-6 px-[75px] max-md:px-[30px]'>
+        <div className='flex items-center justify-between mb-8'>
+          <h2 className='font-bold text-lg md:text-xl text-gray-900'>
+            {title}
+          </h2>
 
-      {/* Videos Section */}
-      {video && (
-        <div className='mb-8 w-full'>
-          <h3 className='text-2xl mb-4'>Featured Video</h3>
-          <div className='relative w-full h-0 pb-[56.25%]'>
-            {' '}
-            {/* 16:9 Aspect Ratio */}
-            <video
-              controls
-              className='absolute top-0 left-0 w-full h-full rounded-lg shadow-lg'
-              poster='/images/course_description.png'
+          <span className='text-sm font-medium bg-[#30AD8F]/20 text-[#30AD8F] px-4 py-1.5 rounded-full border border-[#30AD8F]/20 shadow-sm'>
+            {images.length} Photo{images.length > 1 && 's'}
+          </span>
+        </div>
+
+        <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6'>
+          {images.map((img, idx) => (
+            <div
+              key={idx}
+              className='group relative aspect-square rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500 border border-white hover:-translate-y-1'
+              onClick={() => setSelectedImage(img)}
             >
-              <source
-                src={
-                  'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' ||
-                  video
-                }
-                type='video/mp4'
+              <img
+                src={img}
+                alt={`${universityName || 'Gallery'} ${idx + 1}`}
+                className='w-full h-full object-cover transition-transform duration-700 group-hover:scale-110'
               />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        </div>
-      )}
+              <div className='absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300' />
 
-      {/* Gallery Images Section */}
-      {images.length > 0 ? (
-        <div>
-          <h3 className='text-2xl mb-4'>Gallery Images</h3>
-          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
-            {images.map((photo, index) => (
-              <div
-                key={index}
-                className='relative w-full h-48 sm:h-56 md:h-64 lg:h-72'
-              >
-                <Image
-                  alt={`Gallery image ${index + 1}`}
-                  src={
-                    'https://yavuzceliker.github.io/sample-images/image-100.jpg' ||
-                    photo
-                  }
-                  layout='fill'
-                  objectFit='cover'
-                  className='rounded-lg shadow-lg'
-                />
+              {/* Overlay hint */}
+              <div className='absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+                <span className='bg-white/20 backdrop-blur-md text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/30'>
+                  View Image
+                </span>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
-      ) : (
-        <p className='text-gray-500 text-center'>No images available.</p>
-      )}
-    </div>
+      </div>
+
+      {/* Lightbox */}
+      <ImageLightbox
+        isOpen={!!selectedImage}
+        onClose={() => setSelectedImage(null)}
+        imageUrl={selectedImage}
+        altText={universityName}
+      />
+    </section>
   )
 }
 
-export default Gallery
+export default ImageGallery

@@ -1,15 +1,14 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import Navbar from '../../../components/Frontpage/Navbar'
-import Header from '../../../components/Frontpage/Header'
+import { useEffect, useState } from 'react'
 import Footer from '../../../components/Frontpage/Footer'
-import ImageSection from './components/upperSection'
-import { getUniversityBySlug } from '../actions'
-import Gallery from './components/Gallery'
-import RelatedUniversities from './components/RelatedUniversities'
+import Header from '../../../components/Frontpage/Header'
+import Navbar from '../../../components/Frontpage/Navbar'
 import Loading from '../../../ui/molecules/Loading'
+import { getUniversityBySlug } from '../actions'
+import RelatedUniversities from './components/RelatedUniversities'
 import ShareSection from './components/ShareSection'
+import UpperSection from './components/upperSection'
 
 const UniversityDetailPage = ({ params }) => {
   // const { slugs } = params; // Use `slugs` directly from `params`
@@ -64,7 +63,7 @@ const UniversityDetailPage = ({ params }) => {
     <div>
       <Header />
       <Navbar />
-      <ImageSection university={university} />
+      <UpperSection university={university} />
       <RelatedUniversities university={university} />
       <ShareSection university={university} />
       <Footer />
