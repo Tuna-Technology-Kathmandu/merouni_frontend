@@ -437,8 +437,9 @@ export default function TipTapEditor({ value, onChange, onMediaUpload, placehold
         <MenuBar editor={editor} onMediaUpload={onMediaUpload} showImageUpload={showImageUpload} />
       </div>
       <div
-        className="overflow-y-auto custom-scrollbar"
+        className="overflow-y-auto custom-scrollbar cursor-text"
         style={{ minHeight: '200px', height: height }}
+        onClick={() => editor?.chain().focus().run()}
       >
         <EditorContent
           editor={editor}
