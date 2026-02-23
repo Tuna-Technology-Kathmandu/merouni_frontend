@@ -253,7 +253,7 @@ const BlogFormModal = ({
                     onSubmit={handleSubmit(onSubmitForm)}
                     className='flex flex-col max-h-[calc(100vh-120px)]'
                 >
-                    <div className='flex-1 p-8 overflow-y-auto'>
+                    <div className='flex-1 p-8'>
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-6">
                             {/* Left Column - Main Content (8/12) */}
                             <div className="lg:col-span-8 space-y-8">
@@ -409,14 +409,12 @@ const BlogFormModal = ({
                             type='button'
                             onClick={onClose}
                             variant='outline'
-                            className="rounded-xl px-6 h-11 font-semibold text-gray-600 border-gray-200 hover:bg-gray-50"
                         >
                             Cancel
                         </Button>
                         <Button
                             type='submit'
                             disabled={submitting}
-                            className="rounded-xl min-w-[140px] h-11 font-bold shadow-lg shadow-[#387cae]/20 bg-[#387cae] hover:bg-[#387cae]/90 active:scale-95 transition-all text-white flex items-center justify-center gap-2"
                         >
                             {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                             <span>
