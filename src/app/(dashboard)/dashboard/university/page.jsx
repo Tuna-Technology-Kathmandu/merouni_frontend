@@ -12,6 +12,7 @@ import { Button } from '@/ui/shadcn/button'
 import CreateUpdateUniversityModal from '@/ui/molecules/dialogs/university/CreateUpdateUniversityModal'
 import UniversityViewModal from './components/UniversityViewModal'
 import SearchInput from '@/ui/molecules/SearchInput'
+import { Plus } from 'lucide-react'
 
 export default function UniversityForm() {
   const { setHeading } = usePageHeading()
@@ -55,7 +56,7 @@ export default function UniversityForm() {
   const fetchUniversities = async (page = 1, query = searchQuery) => {
     setTableLoading(true)
     try {
-      let url = `${process.env.baseUrl}/university?page=${page}`
+      let url = `${process.env.baseUrl}/university?page=${page}&limit=10&sortBy=createdAt&order=DESC`
       if (query) {
         url += `&q=${encodeURIComponent(query)}`
       }
@@ -67,7 +68,7 @@ export default function UniversityForm() {
       setPagination({
         currentPage: data.pagination?.currentPage || 1,
         totalPages: data.pagination?.totalPages,
-        total:  data.pagination?.totalItems
+        total: data.pagination?.totalItems
       })
     } catch (error) {
       toast.error('Failed to fetch universities')
@@ -185,21 +186,23 @@ export default function UniversityForm() {
 
   return (
     <>
-      <div className='w-full space-y-4'>
-        <div className='flex justify-between items-center px-4 pt-4'>
-          <SearchInput
-            value={searchQuery}
-            onChange={(e) => handleSearchInput(e.target.value)}
-            placeholder='Search universities...'
-            className='max-w-md'
-          />
-          <div className='flex gap-2'>
+      <div className='w-full space-y-4 p-4'>
+        <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
+          <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+            <SearchInput
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              placeholder='Search universities by name...'
+              className='max-w-md w-full'
+            />
             <Button
               onClick={() => {
                 setIsOpen(true)
                 setEditSlug('')
               }}
+              className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2"
             >
+              <Plus size={16} />
               Add University
             </Button>
           </div>
@@ -212,7 +215,7 @@ export default function UniversityForm() {
           onSuccess={() => fetchUniversities(pagination.currentPage)}
         />
 
-        <div className='w-full'>
+        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
           <Table
             loading={tableLoading}
             data={universities}
@@ -221,7 +224,6 @@ export default function UniversityForm() {
             onPageChange={(newPage) => fetchUniversities(newPage)}
             onSearch={handleSearch}
             showSearch={false}
-            
           />
         </div>
       </div>

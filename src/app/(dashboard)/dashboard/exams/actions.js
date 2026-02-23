@@ -4,7 +4,7 @@ let url = `${process.env.baseUrl}/exam`
 
 export async function getAllExams(page) {
   try {
-    const response = await authFetch(`${url}?page=${page}`, {
+    const response = await authFetch(`${url}?page=${page}&sortBy=createdAt&order=DESC`, {
       cache: 'no-store'
     })
     const data = await response.json()

@@ -74,24 +74,24 @@ export const createColumns = ({
       header: 'Actions',
       id: 'actions',
       cell: ({ row }) => (
-        <div className='flex gap-1.5 justify-end'>
+        <div className='flex gap-1 justify-end'>
           <button
             onClick={() => handleView(row.original.slugs)}
-            className='w-9 h-9 flex items-center justify-center rounded-xl bg-purple-50 text-purple-600 hover:bg-purple-100 transition-colors'
+            className='w-8 h-8 flex items-center justify-center rounded-lg text-blue-600 hover:bg-blue-50 transition-colors'
             title='View Details'
           >
             <Eye className='w-4 h-4' />
           </button>
           <button
             onClick={() => handleEdit(row.original.slugs)}
-            className='w-9 h-9 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors'
+            className='w-8 h-8 flex items-center justify-center rounded-lg text-amber-600 hover:bg-amber-50 transition-colors'
             title='Edit'
           >
             <Edit2 className='w-4 h-4' />
           </button>
           <button
             onClick={() => handleDeleteClick(row.original.id)}
-            className='w-9 h-9 flex items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors'
+            className='w-8 h-8 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-50 transition-colors'
             title='Delete'
           >
             <Trash2 className='w-4 h-4' />

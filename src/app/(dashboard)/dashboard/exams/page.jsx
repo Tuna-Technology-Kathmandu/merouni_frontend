@@ -104,7 +104,7 @@ export default function ExamManager() {
     try {
       let response
       if (query) {
-        const res = await authFetch(`${process.env.baseUrl}/exam?q=${query}&page=${page}`)
+        const res = await authFetch(`${process.env.baseUrl}/exam?q=${query}&page=${page}&sortBy=createdAt&order=DESC`)
         response = await res.json()
       } else {
         response = await getAllExams(page)

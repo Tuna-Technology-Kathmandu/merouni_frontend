@@ -125,7 +125,7 @@ export default function SearchSelectCreate({
                     onFocus={() => handleSearch(query)}
                     placeholder={!isMulti && currentSelected.length > 0 ? (currentSelected[0][displayKey] || currentSelected[0]) : placeholder}
                     className={cn(
-                        "pl-10 pr-10 h-12 rounded-xl border-gray-200 focus:ring-[#387cae]/20 transition-all",
+                        "pl-10 pr-10 h-12 rounded-md border-gray-200 focus:ring-[#387cae]/20 transition-all",
                         !isMulti && currentSelected.length > 0 && query.length === 0 && "placeholder:text-gray-900 placeholder:font-semibold"
                     )}
                 />

@@ -48,9 +48,6 @@ const SearchBox = ({ onClose }) => {
     handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-    handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   // Fetch popular searches
@@ -313,7 +310,7 @@ const SearchBox = ({ onClose }) => {
           {/* Popular Searches */}
           {!searchTag.trim() && (
             <div className='animate-in fade-in duration-500'>
-              <h3 className='text-[10px] uppercase tracking-[0.2em] font-semibold text-gray-400 mb-6'>
+              <h3 className='text-[10px] uppercase tracking-[0.2em] font-semibold mb-6'>
                 Popular Searches
               </h3>
               <div className='flex flex-wrap gap-2'>
