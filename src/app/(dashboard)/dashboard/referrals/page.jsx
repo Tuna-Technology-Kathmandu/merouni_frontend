@@ -4,7 +4,6 @@ import React, { useEffect, useState, useMemo, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { destr } from 'destr'
 import { fetchReferrals, updateReferralStatus, deleteReferral } from './action'
-import { FaTrashAlt, FaEdit } from 'react-icons/fa'
 import {
   Dialog,
   DialogContent,
@@ -12,18 +11,11 @@ import {
   DialogTitle,
   DialogClose,
 } from '@/ui/shadcn/dialog'
-import ShimmerEffect from '../../../../ui/molecules/ShimmerEffect'
+import Loading from '../../../../ui/molecules/Loading'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/ui/shadcn/table-primitives'
+import Table from '@/ui/shadcn/DataTable'
 import { Button } from '@/ui/shadcn/button'
-import { Search, X, Filter, ChevronDown } from 'lucide-react'
+import { Search, X, Filter, ChevronDown, Edit2, Trash2, Eye } from 'lucide-react'
 import CollegesDropdown from '@/ui/molecules/dropdown/CollegesDropdown'
 import { Select } from '@/ui/shadcn/select'
 import { Label } from '@/ui/shadcn/label'
@@ -38,6 +30,7 @@ const ReferralsPage = () => {
   const [referrals, setReferrals] = useState([])
   const [allReferrals, setAllReferrals] = useState([])
   const [loading, setLoading] = useState(true)
+  const [tableLoading, setTableLoading] = useState(false)
   const [error, setError] = useState(null)
   const [updatingId, setUpdatingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
@@ -59,6 +52,15 @@ const ReferralsPage = () => {
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false)
   const [statusSearchTerm, setStatusSearchTerm] = useState('')
 
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    total: 0
+  })
+
+  const [collegeDropdownOpen, setCollegeDropdownOpen] = useState(false)
+
   // Get user role from Redux
   const rawRole = useSelector((state) => state.user?.data?.role)
 
@@ -76,29 +78,44 @@ const ReferralsPage = () => {
 
   useEffect(() => {
     setHeading(isStudent ? 'Applied Colleges' : 'Referrals')
+    loadReferrals()
     return () => setHeading(null)
   }, [setHeading, isStudent])
 
-  useEffect(() => {
-    const loadReferrals = async () => {
-      try {
-        const data = await fetchReferrals(1, isStudent)
-        // For students, the API returns an array directly
-        const referralsArray = Array.isArray(data)
-          ? data
-          : data.items || data.referrals || []
+  const loadReferrals = async (page = 1) => {
+    setTableLoading(true)
+    try {
+      const data = await fetchReferrals(page, isStudent)
+      // For students, the API returns an array directly
+      // For admin, it returns { items, pagination }
+      if (isStudent) {
+        const referralsArray = Array.isArray(data) ? data : data.items || []
         setAllReferrals(referralsArray)
         setReferrals(referralsArray)
-      } catch (err) {
-        setError(err.message)
-        console.error('Error loading referrals:', err)
-      } finally {
-        setLoading(false)
+        setPagination({
+          currentPage: 1,
+          totalPages: 1,
+          total: referralsArray.length
+        })
+      } else {
+        const referralsArray = data.items || data.referrals || []
+        setAllReferrals(referralsArray)
+        setReferrals(referralsArray)
+        setPagination({
+          currentPage: data.pagination?.currentPage || 1,
+          totalPages: data.pagination?.totalPages || 1,
+          total: data.pagination?.totalCount || referralsArray.length
+        })
       }
+    } catch (err) {
+      setError(err.message)
+      console.error('Error loading referrals:', err)
+      toast.error('Failed to load referrals')
+    } finally {
+      setLoading(false)
+      setTableLoading(false)
     }
-
-    loadReferrals()
-  }, [isStudent])
+  }
 
   // Refs for dropdown click outside
   const statusDropdownRef = useRef(null)
@@ -130,7 +147,7 @@ const ReferralsPage = () => {
     [statusOptions, statusFilter]
   )
 
-  // Filter referrals based on search and filters
+  // Filter referrals based on search and filters (Local filtering for now)
   useEffect(() => {
     let filtered = [...allReferrals]
 
@@ -215,28 +232,17 @@ const ReferralsPage = () => {
         statusForm.status,
         statusForm.remarks || null
       )
+
+      const updatedItem = {
+        ...selectedReferral,
+        status: statusForm.status,
+        remarks: statusForm.remarks || null
+      }
+
       setAllReferrals((prev) =>
-        prev.map((ref) =>
-          ref.id === selectedReferral.id
-            ? {
-              ...ref,
-              status: statusForm.status,
-              remarks: statusForm.remarks || null
-            }
-            : ref
-        )
+        prev.map((ref) => ref.id === selectedReferral.id ? updatedItem : ref)
       )
-      setReferrals((prev) =>
-        prev.map((ref) =>
-          ref.id === selectedReferral.id
-            ? {
-              ...ref,
-              status: statusForm.status,
-              remarks: statusForm.remarks || null
-            }
-            : ref
-        )
-      )
+
       toast.success('Referral status updated successfully')
       handleCloseStatusModal()
     } catch (err) {
@@ -260,7 +266,6 @@ const ReferralsPage = () => {
       setDeletingId(referralToDelete)
       await deleteReferral(referralToDelete)
       setAllReferrals((prev) => prev.filter((ref) => ref.id !== referralToDelete))
-      setReferrals((prev) => prev.filter((ref) => ref.id !== referralToDelete))
       toast.success('Referral deleted successfully')
     } catch (err) {
       const errorMsg = err.message || 'Failed to delete referral'
@@ -285,331 +290,348 @@ const ReferralsPage = () => {
     setStatusSearchTerm('')
   }
 
-  const hasActiveFilters = searchQuery || statusFilter || collegeFilter
+  const columns = useMemo(() => {
+    const cols = [
+      {
+        header: 'S.N.',
+        accessorKey: 'id',
+        cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>
+      },
+      {
+        header: 'Student Details',
+        accessorKey: 'student_name',
+        cell: ({ row }) => (
+          <div className='flex flex-col space-y-1 py-1'>
+            <div className='font-semibold text-gray-900'>
+              {row.original.student_name || 'N/A'}
+            </div>
+            <div className='text-xs text-slate-500 flex items-center gap-1'>
+              <span className="opacity-70">Email:</span> {row.original.student_email || 'N/A'}
+            </div>
+            <div className='text-xs text-slate-500 flex items-center gap-1'>
+              <span className="opacity-70">Phone:</span> {row.original.student_phone_no || 'N/A'}
+            </div>
+          </div>
+        )
+      },
+      {
+        header: 'Applied College',
+        accessorKey: 'referralCollege.name',
+        cell: ({ row }) => (
+          <div className="font-medium text-blue-700">
+            {row.original.referralCollege?.name || 'N/A'}
+          </div>
+        )
+      }
+    ]
 
-  if (loading) return <ShimmerEffect />
-  if (error)
-    return (
-      <p className='flex items-center justify-center text-center'>
-        Error: {error}
-      </p>
+    if (!isInstitution) {
+      cols.push(
+        {
+          header: 'Referred By',
+          accessorKey: 'referralAgent',
+          cell: ({ row }) => {
+            if (row.original.referralAgent) {
+              const agent = row.original.referralAgent
+              return (
+                <div className="text-sm font-medium">
+                  {`${agent.firstName} ${agent.middleName || ''} ${agent.lastName}`.trim()}
+                </div>
+              )
+            }
+            return row.original.application_type === 'self' ? (
+              <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md">Self</span>
+            ) : (
+              <span className="text-gray-400">N/A</span>
+            )
+          }
+        },
+        {
+          header: 'Type',
+          accessorKey: 'application_type',
+          cell: ({ row }) => (
+            <span className='capitalize text-xs font-medium px-2 py-1 bg-gray-100 rounded-md'>
+              {row.original.application_type}
+            </span>
+          )
+        }
+      )
+    }
+
+    cols.push(
+      {
+        header: 'Status',
+        accessorKey: 'status',
+        cell: ({ row }) => {
+          const status = row.original.status || 'IN_PROGRESS'
+          const styles = {
+            ACCEPTED: 'bg-green-100 text-green-700 border-green-200',
+            REJECTED: 'bg-red-100 text-red-700 border-red-200',
+            IN_PROGRESS: 'bg-amber-100 text-amber-700 border-amber-200'
+          }
+          return (
+            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold border ${styles[status] || styles.IN_PROGRESS}`}>
+              {status}
+            </span>
+          )
+        }
+      },
+      {
+        header: 'Remarks',
+        accessorKey: 'remarks',
+        cell: ({ row }) => (
+          <div className='text-sm text-slate-600 max-w-[200px] truncate' title={row.original.remarks}>
+            {row.original.remarks || <span className="text-gray-400 italic">No remarks</span>}
+          </div>
+        )
+      }
     )
 
-  return (
-    <div className='p-4 bg-white min-h-screen'>
-      <ToastContainer />
-      {/* Search and Filter Section */}
-      <div className='mb-6 space-y-4'>
-        <div className='flex flex-col md:flex-row gap-4'>
-          {/* Search Input */}
-          {/* Search Input */}
-          <SearchInput
-            className='flex-1'
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onClear={() => setSearchQuery('')}
-            placeholder='Search by student name, email, phone, college, or agent...'
-          />
-
-          {/* Status Filter - Searchable Dropdown */}
-          <div className='relative' ref={statusDropdownRef}>
-            <Filter className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10' />
-            <button
-              type='button'
-              onClick={() => {
-                setStatusDropdownOpen(!statusDropdownOpen)
-                setCollegeDropdownOpen(false)
-              }}
-              className='w-full pl-10 pr-8 py-2 text-left border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white min-w-[180px] hover:bg-gray-50 transition-colors'
+    if (!isStudent) {
+      cols.push({
+        header: 'Actions',
+        id: 'actions',
+        cell: ({ row }) => (
+          <div className='flex items-center gap-1'>
+            <Button
+              variant='ghost'
+              size='icon'
+              onClick={() => handleOpenStatusModal(row.original)}
+              className='h-8 w-8 text-blue-600 hover:bg-blue-50'
+              title='Update Status'
             >
-              <span
-                className={statusFilter ? 'text-gray-900' : 'text-gray-500'}
-              >
-                {selectedStatusLabel}
-              </span>
-            </button>
-            <ChevronDown
-              className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${statusDropdownOpen ? 'rotate-180' : ''
-                }`}
+              <Edit2 className='h-4 w-4' />
+            </Button>
+            <Button
+              variant='ghost'
+              size='icon'
+              onClick={() => handleDeleteClick(row.original.id)}
+              className='h-8 w-8 text-red-600 hover:bg-red-50'
+              title='Delete'
+            >
+              <Trash2 className='h-4 w-4' />
+            </Button>
+          </div>
+        )
+      })
+    }
+
+    return cols
+  }, [isInstitution, isStudent])
+
+  const hasActiveFilters = searchQuery || statusFilter || collegeFilter
+
+  if (loading) return <Loading />
+
+  return (
+    <div className='w-full space-y-4 p-4'>
+      <ToastContainer />
+
+      {/* Sticky Filter Header */}
+      <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
+        <div className='flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+          <div className="flex flex-1 flex-col md:flex-row gap-4 w-full">
+            <SearchInput
+              className='flex-1'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onClear={() => setSearchQuery('')}
+              placeholder='Search by student name, email, phone, college, or agent...'
             />
 
-            {statusDropdownOpen && (
-              <div className='absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-hidden'>
-                <div className='p-2 border-b border-gray-200'>
-                  <div className='relative'>
-                    <Search className='absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
-                    <input
-                      type='text'
-                      placeholder='Search status...'
-                      value={statusSearchTerm}
-                      onChange={(e) => setStatusSearchTerm(e.target.value)}
-                      onClick={(e) => e.stopPropagation()}
-                      className='w-full pl-8 pr-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500'
-                      autoFocus
-                    />
-                  </div>
-                </div>
-                <div className='max-h-48 overflow-y-auto'>
-                  {filteredStatusOptions.length > 0 ? (
-                    filteredStatusOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        type='button'
-                        onClick={() => {
-                          setStatusFilter(option.value)
-                          setStatusSearchTerm('')
-                          setStatusDropdownOpen(false)
-                        }}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${statusFilter === option.value
-                          ? 'bg-blue-100 text-blue-700 font-medium'
-                          : 'text-gray-700'
-                          }`}
-                      >
-                        {option.label}
-                      </button>
-                    ))
-                  ) : (
-                    <div className='px-3 py-2 text-sm text-gray-500 text-center'>
-                      No status found
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* College Filter - Searchable Dropdown */}
-          <CollegesDropdown
-            value={collegeFilter}
-            onChange={setCollegeFilter}
-            placeholder='All Colleges'
-            minWidth={200}
-          />
-
-          {/* Clear Filters Button */}
-          {hasActiveFilters && (
-            <Button
-              variant='outline'
-              onClick={handleClearFilters}
-              className='whitespace-nowrap'
-            >
-              <X className='w-4 h-4 mr-1' />
-              Clear Filters
-            </Button>
-          )}
-        </div>
-
-        {/* Results Count */}
-        {hasActiveFilters && (
-          <div className='text-sm text-gray-600'>
-            Showing {referrals.length} of {allReferrals.length} referrals
-          </div>
-        )}
-      </div>
-
-      <div className='rounded-md border'>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className='w-[60px] text-gray-600'>S.N.</TableHead>
-              <TableHead className='text-gray-600'>Student Details</TableHead>
-              <TableHead className='text-gray-600'>Applied College</TableHead>
-              {!isInstitution && (
-                <>
-                  <TableHead className='text-gray-600'>Referred By</TableHead>
-                  <TableHead className='text-gray-600'>
-                    Application Type
-                  </TableHead>
-                </>
-              )}
-              <TableHead className='text-gray-600'>Status</TableHead>
-              <TableHead className='text-gray-600'>Remarks</TableHead>
-              {!isStudent && (
-                <TableHead className='text-center text-gray-600'>
-                  Actions
-                </TableHead>
-              )}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {referrals.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={
-                    isStudent
-                      ? isInstitution
-                        ? 5
-                        : 7
-                      : isInstitution
-                        ? 6
-                        : 8
-                  }
-                  className='text-center py-8 text-muted-foreground'
+            <div className="flex flex-wrap gap-4">
+              {/* Status Filter */}
+              <div className='relative min-w-[180px]' ref={statusDropdownRef}>
+                <Filter className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10' />
+                <button
+                  type='button'
+                  onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
+                  className='w-full pl-10 pr-8 py-2 text-left border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-sm transition-all hover:bg-gray-50'
                 >
-                  No referrals found
-                </TableCell>
-              </TableRow>
-            ) : (
-              referrals.map((referral, index) => (
-                <TableRow key={referral.id}>
-                  <TableCell className='font-medium'>{index + 1}</TableCell>
-                  <TableCell>
-                    <div className='flex flex-col space-y-1'>
-                      <div className='font-medium'>
-                        {referral.student_name || 'N/A'}
-                      </div>
-                      <div className='text-sm text-muted-foreground'>
-                        {referral.student_email || 'N/A'}
-                      </div>
-                      <div className='text-sm text-muted-foreground'>
-                        {referral.student_phone_no || 'N/A'}
+                  <span className={statusFilter ? 'text-gray-900 font-medium' : 'text-gray-500'}>
+                    {selectedStatusLabel}
+                  </span>
+                </button>
+                <ChevronDown className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${statusDropdownOpen ? 'rotate-180' : ''}`} />
+
+                {statusDropdownOpen && (
+                  <div className='absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200'>
+                    <div className='p-2 border-b border-gray-100'>
+                      <div className='relative'>
+                        <Search className='absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                        <input
+                          type='text'
+                          placeholder='Search status...'
+                          value={statusSearchTerm}
+                          onChange={(e) => setStatusSearchTerm(e.target.value)}
+                          className='w-full pl-8 pr-2 py-1.5 text-xs border border-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500'
+                          autoFocus
+                        />
                       </div>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    {referral.referralCollege?.name || 'N/A'}
-                  </TableCell>
-                  {!isInstitution && (
-                    <>
-                      <TableCell>
-                        {referral.referralAgent
-                          ? `${referral.referralAgent.firstName} ${referral.referralAgent.middleName || ''
-                            } ${referral.referralAgent.lastName}`.trim()
-                          : referral.application_type === 'self'
-                            ? 'Self'
-                            : 'N/A'}
-                      </TableCell>
-                      <TableCell className='capitalize'>
-                        {referral.application_type}
-                      </TableCell>
-                    </>
-                  )}
-                  <TableCell>
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${referral.status === 'ACCEPTED'
-                        ? 'bg-green-100 text-green-800'
-                        : referral.status === 'REJECTED'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                        }`}
-                    >
-                      {referral.status || 'IN_PROGRESS'}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span className='text-sm text-muted-foreground'>
-                      {referral.remarks
-                        ? referral.remarks.length > 50
-                          ? `${referral.remarks.substring(0, 50)}...`
-                          : referral.remarks
-                        : 'N/A'}
-                    </span>
-                  </TableCell>
-                  {!isStudent && (
-                    <TableCell>
-                      <div className='flex items-center justify-center gap-2'>
-                        <Button
-                          variant='ghost'
-                          size='icon'
-                          onClick={() => handleOpenStatusModal(referral)}
-                          disabled={updatingId === referral.id}
-                          title='Update Status'
-                        >
-                          <FaEdit className='h-4 w-4 text-blue-600' />
-                        </Button>
-                        <Button
-                          variant='ghost'
-                          size='icon'
-                          onClick={() => handleDeleteClick(referral.id)}
-                          disabled={deletingId === referral.id}
-                          title='Delete'
-                        >
-                          <FaTrashAlt className='h-4 w-4 text-red-600' />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+                    <div className='max-h-48 overflow-y-auto p-1'>
+                      {filteredStatusOptions.length > 0 ? (
+                        filteredStatusOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            type='button'
+                            onClick={() => {
+                              setStatusFilter(option.value)
+                              setStatusSearchTerm('')
+                              setStatusDropdownOpen(false)
+                            }}
+                            className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${statusFilter === option.value
+                              ? 'bg-blue-50 text-blue-700 font-semibold'
+                              : 'text-gray-700 hover:bg-gray-50'
+                              }`}
+                          >
+                            {option.label}
+                          </button>
+                        ))
+                      ) : (
+                        <div className='px-3 py-4 text-xs text-gray-400 text-center italic'>
+                          No status found
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* College Filter */}
+              <CollegesDropdown
+                value={collegeFilter}
+                onChange={setCollegeFilter}
+                placeholder='All Colleges'
+                minWidth={200}
+                className="rounded-lg border-gray-200 text-sm h-[42px]"
+              />
+
+              {/* Clear Filters */}
+              {hasActiveFilters && (
+                <Button
+                  variant='ghost'
+                  onClick={handleClearFilters}
+                  className='text-slate-500 hover:text-red-600 hover:bg-red-50 gap-2 h-[42px]'
+                >
+                  <X className='w-4 h-4' />
+                  Clear
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
+      {/* Table Container */}
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <Table
+          loading={tableLoading}
+          data={referrals}
+          columns={columns}
+          pagination={pagination}
+          onPageChange={(page) => loadReferrals(page)}
+          showSearch={false}
+          emptyContent={
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="bg-slate-100 p-4 rounded-full mb-4">
+                <Filter className="w-8 h-8 text-slate-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900">No referrals found</h3>
+              <p className="text-slate-500 max-w-sm mt-1">
+                {hasActiveFilters
+                  ? "Try adjusting your filters or search query to find what you're looking for."
+                  : "There are no referral records to display at this time."}
+              </p>
+              {hasActiveFilters && (
+                <Button variant="outline" onClick={handleClearFilters} className="mt-4">
+                  Reset All Filters
+                </Button>
+              )}
+            </div>
+          }
+        />
+      </div>
+
+      {/* Update Status Modal */}
       <Dialog
         isOpen={statusModalOpen}
         closeOnOutsideClick={false}
         onClose={handleCloseStatusModal}
-        className='max-w-5xl'
+        className='max-w-2xl'
       >
-        <DialogContent className='max-w-5xl max-h-[90vh] flex flex-col p-0'>
+        <DialogContent className='max-w-2xl max-h-[90vh] flex flex-col p-0'>
           <DialogHeader className='px-6 py-4 border-b'>
-            <DialogTitle>Update Referral Status</DialogTitle>
+            <DialogTitle className="text-lg font-semibold text-gray-900">Update Referral Status</DialogTitle>
             <DialogClose onClick={handleCloseStatusModal} />
           </DialogHeader>
-          <div className='flex-1 overflow-y-auto p-6'>
-            <form onSubmit={handleStatusSubmit} className='flex flex-col flex-1'>
-              <div className='flex-1 space-y-6'>
-                <div className='bg-white p-6 rounded-lg  space-y-4'>
-                  <div>
-                    <Label required>Status</Label>
-                    <Select
-                      className='w-full p-2 border rounded'
-                      value={statusForm.status}
-                      onChange={(e) =>
-                        setStatusForm({ ...statusForm, status: e.target.value })
-                      }
-                      required
-                    >
-                      <option value='IN_PROGRESS'>IN_PROGRESS</option>
-                      <option value='ACCEPTED'>ACCEPTED</option>
-                      <option value='REJECTED'>REJECTED</option>
-                    </Select>
-                  </div>
 
-                  <div>
-                    <Label>Remarks</Label>
-                    <Textarea
-                      className='w-full p-2 border rounded min-h-[100px]'
-                      rows={4}
-                      value={statusForm.remarks}
-                      onChange={(e) =>
-                        setStatusForm({ ...statusForm, remarks: e.target.value })
-                      }
-                      placeholder='Enter remarks (optional)'
-                    />
-                  </div>
-
-                  {error && <div className='text-red-500 text-sm'>{error}</div>}
+          <div className='flex-1 overflow-y-auto p-6 bg-slate-50/30'>
+            <form id="status-update-form" onSubmit={handleStatusSubmit} className='space-y-6'>
+              <div className='bg-white p-6 rounded-xl border shadow-sm space-y-5'>
+                <div className="space-y-2">
+                  <Label required>Referral Status</Label>
+                  <Select
+                    className='w-full'
+                    value={statusForm.status}
+                    onChange={(e) => setStatusForm({ ...statusForm, status: e.target.value })}
+                    required
+                  >
+                    <option value='IN_PROGRESS'>IN_PROGRESS</option>
+                    <option value='ACCEPTED'>ACCEPTED</option>
+                    <option value='REJECTED'>REJECTED</option>
+                  </Select>
+                  <p className="text-[11px] text-slate-500">Select the current progress of this student referral.</p>
                 </div>
-              </div>
 
-              {/* Submit Button - Sticky Footer */}
-              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
-                <Button
-                  type='button'
-                  onClick={handleCloseStatusModal}
-                  variant='outline'
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type='submit'
-                  disabled={updatingId === selectedReferral?.id}
-                >
-                  {updatingId === selectedReferral?.id ? 'Updating...' : 'Update Status'}
-                </Button>
+                <div className="space-y-2">
+                  <Label>Admin Remarks</Label>
+                  <Textarea
+                    className='min-h-[120px] resize-none'
+                    value={statusForm.remarks}
+                    onChange={(e) => setStatusForm({ ...statusForm, remarks: e.target.value })}
+                    placeholder='Enter notes about this status update...'
+                  />
+                  <p className="text-[11px] text-slate-500">These remarks will be visible to the referral source.</p>
+                </div>
+
+                {error && (
+                  <div className='p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm flex items-center gap-2'>
+                    <X className="w-4 h-4" />
+                    {error}
+                  </div>
+                )}
               </div>
             </form>
           </div>
+
+          <div className='sticky bottom-0 bg-white border-t p-4 px-6 flex justify-end gap-3'>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={handleCloseStatusModal}
+              disabled={updatingId}
+            >
+              Cancel
+            </Button>
+            <Button
+              type='submit'
+              form="status-update-form"
+              disabled={updatingId}
+              className="min-w-[120px]"
+            >
+              {updatingId ? 'Updating...' : 'Update Status'}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
+
       <ConfirmationDialog
         open={deleteConfirmationOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         title='Confirm Deletion'
-        message='Are you sure you want to delete this referral? This action cannot be undone.'
+        message='Are you sure you want to delete this referral? This action cannot be undone and will remove the record permanently.'
       />
     </div>
   )

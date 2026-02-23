@@ -15,11 +15,7 @@ import { Select } from '@/ui/shadcn/select'
 import { updateSiteConfig } from '../../../actions/siteConfigActions'
 import { toast } from 'react-toastify'
 import { CONFIG_TYPES } from './siteControlConstants'
-import dynamic from 'next/dynamic'
-
-const CKSiteControl = dynamic(() => import('./CKSiteControl'), {
-    ssr: false
-})
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 
 export default function SiteControlCreateModal({ isOpen, onClose, onSuccess }) {
     const [saving, setSaving] = useState(false)
@@ -44,11 +40,12 @@ export default function SiteControlCreateModal({ isOpen, onClose, onSuccess }) {
         setSaving(true)
         try {
             await updateSiteConfig({ type: data.type, value: data.value })
-            toast.success('Configuration saved successfully')
+            const label = CONFIG_TYPES.find(ct => ct.value === data.type)?.label || data.type
+            toast.success(`Configuration for "${label}" created successfully`)
             onSuccess && onSuccess()
             handleClose()
         } catch (error) {
-            toast.error('Failed to save configuration')
+            toast.error('Failed to create configuration')
         } finally {
             setSaving(false)
         }
@@ -65,77 +62,95 @@ export default function SiteControlCreateModal({ isOpen, onClose, onSuccess }) {
             onClose={handleClose}
             className='max-w-4xl'
         >
-            <DialogHeader>
-                <DialogTitle>Add Configuration</DialogTitle>
-                <DialogClose onClick={handleClose} />
-            </DialogHeader>
-            <DialogContent>
-                <form onSubmit={handleSubmit(onSubmit)} className='space-y-6 mt-4'>
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <Label>Configuration Type <span className="text-red-500">*</span></Label>
-                            <Controller
-                                name="type"
-                                control={control}
-                                rules={{ required: 'Configuration type is required' }}
-                                render={({ field }) => (
-                                    <Select
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                    >
-                                        <option value="" disabled>Select a type...</option>
-                                        {CONFIG_TYPES.map((type) => (
-                                            <option key={type.value} value={type.value}>
-                                                {type.label}
-                                            </option>
-                                        ))}
-                                    </Select>
-                                )}
-                            />
-                            {errors.type && <span className="text-sm text-red-500">{errors.type.message}</span>}
-                        </div>
+            <DialogContent className='max-w-4xl max-h-[90vh] flex flex-col p-0'>
+                <DialogHeader className='px-6 py-4 border-b'>
+                    <DialogTitle className="text-lg font-semibold text-gray-900">
+                        Add New Configuration
+                    </DialogTitle>
+                    <DialogClose onClick={handleClose} />
+                </DialogHeader>
 
-                        <div className="space-y-2">
-                            <Label>Value <span className="text-red-500">*</span></Label>
-                            {selectedTypeConfig?.inputType === 'richtext' ? (
-                                <Controller
-                                    name="value"
-                                    control={control}
-                                    rules={{ required: 'Value is required' }}
-                                    render={({ field }) => (
-                                        <CKSiteControl
-                                            key={`create-editor-${selectedType}`}
-                                            value={field.value}
-                                            onChange={(data) => field.onChange(data)}
-                                            id={`site-control-create-editor-${selectedType}`}
+                <div className='flex-1 overflow-y-auto p-6'>
+                    <form id="site-control-create-form" onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
+                        <section className="space-y-4">
+                            <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Configuration Details</h3>
+
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label required>Configuration Type</Label>
+                                    <Controller
+                                        name="type"
+                                        control={control}
+                                        rules={{ required: 'Configuration type is required' }}
+                                        render={({ field }) => (
+                                            <Select
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                className="w-full"
+                                            >
+                                                <option value="" disabled>Select a type...</option>
+                                                {CONFIG_TYPES.map((type) => (
+                                                    <option key={type.value} value={type.value}>
+                                                        {type.label}
+                                                    </option>
+                                                ))}
+                                            </Select>
+                                        )}
+                                    />
+                                    {errors.type && <span className="text-xs text-red-500">{errors.type.message}</span>}
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label required>Value</Label>
+                                    {selectedTypeConfig?.inputType === 'richtext' ? (
+                                        <Controller
+                                            name="value"
+                                            control={control}
+                                            rules={{ required: 'Value is required' }}
+                                            render={({ field }) => (
+                                                <div className="mt-1">
+                                                    <TipTapEditor
+                                                        value={field.value}
+                                                        onChange={(data) => field.onChange(data)}
+                                                        placeholder={`Enter ${selectedTypeConfig.label.toLowerCase()}...`}
+                                                        height="300px"
+                                                    />
+                                                </div>
+                                            )}
+                                        />
+                                    ) : (
+                                        <Input
+                                            type={selectedTypeConfig?.inputType || 'text'}
+                                            placeholder={selectedTypeConfig ? `Enter ${selectedTypeConfig.label.toLowerCase()}...` : 'Enter value...'}
+                                            {...register('value', { required: 'Value is required' })}
                                         />
                                     )}
-                                />
-                            ) : (
-                                <Input
-                                    type={selectedTypeConfig?.inputType || 'text'}
-                                    placeholder={selectedTypeConfig ? `Enter ${selectedTypeConfig.label.toLowerCase()}...` : 'Enter value...'}
-                                    {...register('value', { required: 'Value is required' })}
-                                />
-                            )}
-                            {errors.value && <span className="text-sm text-red-500">{errors.value.message}</span>}
-                        </div>
-                    </div>
+                                    {errors.value && <span className="text-xs text-red-500">{errors.value.message}</span>}
+                                </div>
+                            </div>
+                        </section>
+                    </form>
+                </div>
 
-                    <div className='flex justify-end gap-2'>
-                        <button
-                            type='button'
-                            onClick={handleClose}
-                            className='px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors'
-                        >
-                            Cancel
-                        </button>
-                        <Button type="submit" disabled={saving}>
-                            {saving ? 'Saving...' : 'Save Configuration'}
-                        </Button>
-                    </div>
-                </form>
+                <div className='sticky bottom-0 bg-white border-t p-4 px-6 flex justify-end gap-3'>
+                    <Button
+                        type='button'
+                        variant='outline'
+                        onClick={handleClose}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        type='submit'
+                        form="site-control-create-form"
+                        disabled={saving}
+                        className='bg-[#387cae] hover:bg-[#387cae]/90 text-white min-w-[120px]'
+                    >
+                        {saving ? 'Processing...' : 'Create Configuration'}
+                    </Button>
+                </div>
             </DialogContent>
         </Dialog>
     )
 }
+
