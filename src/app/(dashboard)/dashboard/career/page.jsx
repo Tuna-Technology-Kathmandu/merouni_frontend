@@ -382,6 +382,7 @@ export default function CareerForm() {
 
         <Dialog
           isOpen={isOpen}
+          closeOnOutsideClick={false}
           onClose={() => {
             setIsOpen(false)
             setEditing(false)

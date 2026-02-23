@@ -326,6 +326,7 @@ export default function BannerForm() {
 
       <Dialog
         isOpen={isOpen}
+        closeOnOutsideClick={false}
         onClose={() => {
           setIsOpen(false)
           setEditing(false)

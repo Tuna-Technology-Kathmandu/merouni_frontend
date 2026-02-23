@@ -24,7 +24,6 @@ export default function VideoManager() {
   const { setHeading } = usePageHeading()
   const author_id = useSelector((state) => state.user.data?.id)
 
-  // Initialize react-hook-form
   const {
     register,
     handleSubmit,
@@ -376,6 +375,7 @@ export default function VideoManager() {
 
         <Dialog
           isOpen={isOpen}
+          closeOnOutsideClick={false}
           onClose={() => {
             setIsOpen(false)
             setEditing(false)
