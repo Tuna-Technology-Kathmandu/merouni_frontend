@@ -298,12 +298,25 @@ export default function ExamManager() {
     {
       header: 'Level',
       accessorKey: 'level.title',
-      cell: ({ row }) => row.original.level?.title || 'N/A'
+      cell: ({ row }) => (
+        <span className='px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium'>
+          {row.original.level?.title || 'N/A'}
+        </span>
+      )
     },
     {
       header: 'Affiliation',
       accessorKey: 'university.fullname',
-      cell: ({ row }) => row.original.university?.fullname || row.original.affiliation || 'N/A'
+      cell: ({ row }) => {
+        const title = row.original.university?.fullname || row.original.affiliation
+        return title ? (
+          <span className='px-2 py-1 bg-slate-100 text-slate-800 rounded-full text-xs font-medium'>
+            {title}
+          </span>
+        ) : (
+          <span className="text-gray-400">N/A</span>
+        )
+      }
     },
     {
       header: 'Exam Date',
@@ -323,6 +336,7 @@ export default function ExamManager() {
               setIsViewModalOpen(true)
             }}
             className='hover:bg-blue-50 text-blue-600'
+            title="View Details"
           >
             <Eye className='w-4 h-4' />
           </Button>
@@ -331,6 +345,7 @@ export default function ExamManager() {
             size="icon"
             onClick={() => handleEdit(row.original)}
             className='hover:bg-amber-50 text-amber-600'
+            title="Edit"
           >
             <Edit2 className='w-4 h-4' />
           </Button>
@@ -339,6 +354,7 @@ export default function ExamManager() {
             size="icon"
             onClick={() => handleDeleteClick(row.original.id)}
             className='hover:bg-red-50 text-red-600'
+            title="Delete"
           >
             <Trash2 className='w-4 h-4' />
           </Button>
@@ -353,17 +369,19 @@ export default function ExamManager() {
     <div className='w-full space-y-4 p-4'>
       <ToastContainer />
 
-      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
-        <SearchInput
-          value={searchQuery}
-          onChange={(e) => handleSearch(e.target.value)}
-          placeholder='Search exams by title...'
-          className='max-w-md w-full'
-        />
-        <Button onClick={handleAdd} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
-          <Plus className="w-4 h-4" />
-          Add Exam
-        </Button>
+      <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+          <SearchInput
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder='Search exams by title...'
+            className='max-w-md w-full'
+          />
+          <Button onClick={handleAdd} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
+            <Plus className="w-4 h-4" />
+            Add Exam
+          </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border overflow-hidden">

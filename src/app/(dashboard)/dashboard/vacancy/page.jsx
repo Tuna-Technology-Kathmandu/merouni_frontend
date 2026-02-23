@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
 
 import Table from '@/ui/shadcn/DataTable'
 import FileUpload from '../addCollege/FileUpload'
@@ -20,7 +19,7 @@ import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Search, Eye } from 'lucide-react'
+import { Eye, Edit2, Trash2, Plus } from 'lucide-react'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
@@ -65,9 +64,7 @@ const VacancyManager = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [editing, setEditing] = useState(false)
   const [editingId, setEditingId] = useState(null)
-  const [uploadedFiles, setUploadedFiles] = useState({
-    featuredImage: ''
-  })
+  const [uploadedFiles, setUploadedFiles] = useState({ featuredImage: '' })
   const [deleteId, setDeleteId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -109,7 +106,6 @@ const VacancyManager = () => {
     } catch (err) {
       if (err.name === 'AbortError') return
       toast.error('Failed to load vacancies')
-      console.error('Error loading vacancies:', err)
     } finally {
       if (abortControllerRef.current?.signal?.aborted === false) {
         setTableLoading(false)
@@ -125,29 +121,38 @@ const VacancyManager = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setHeading])
 
-  // Open add vacancy dialog when navigating from dashboard quick action (?add=true)
   useEffect(() => {
     if (searchParams.get('add') === 'true') {
-      setIsOpen(true)
-      setEditing(false)
-      setEditingId(null)
-      reset()
-      setUploadedFiles({ featuredImage: '' })
+      handleAddClick()
       router.replace(pathname, { scroll: false })
     }
   }, [searchParams])
 
   useEffect(() => {
     return () => {
-      if (searchTimeout) {
-        clearTimeout(searchTimeout)
-      }
+      if (searchTimeout) clearTimeout(searchTimeout)
     }
   }, [searchTimeout])
 
+  const handleCloseModal = () => {
+    setIsOpen(false)
+    setEditing(false)
+    setEditingId(null)
+    reset()
+    setUploadedFiles({ featuredImage: '' })
+  }
+
+  const handleAddClick = () => {
+    setIsOpen(true)
+    setEditing(false)
+    setEditingId(null)
+    reset()
+    setUploadedFiles({ featuredImage: '' })
+  }
+
   const onSubmit = async (data) => {
+    setLoading(true)
     try {
-      setLoading(true)
       const payload = {
         ...data,
         author_id,
@@ -161,9 +166,7 @@ const VacancyManager = () => {
 
       const response = await authFetch(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
 
@@ -172,17 +175,8 @@ const VacancyManager = () => {
         throw new Error(result.message || 'Failed to save vacancy')
       }
 
-      toast.success(
-        editing
-          ? 'Vacancy updated successfully'
-          : 'Vacancy created successfully'
-      )
-
-      reset()
-      setEditing(false)
-      setEditingId(null)
-      setUploadedFiles({ featuredImage: '' })
-      setIsOpen(false)
+      toast.success(editing ? 'Vacancy updated successfully' : 'Vacancy created successfully')
+      handleCloseModal()
       loadVacancies(pagination.currentPage)
     } catch (error) {
       toast.error(error.message || 'Failed to save vacancy')
@@ -197,9 +191,7 @@ const VacancyManager = () => {
       setLoading(true)
       setIsOpen(true)
 
-      const response = await authFetch(
-        `${process.env.baseUrl}/vacancy/${slugs}`
-      )
+      const response = await authFetch(`${process.env.baseUrl}/vacancy/${slugs}`)
       const data = await response.json()
       const vacancy = data.item
 
@@ -208,13 +200,8 @@ const VacancyManager = () => {
       setValue('description', vacancy.description || '')
       setValue('content', vacancy.content || '')
       setValue('featuredImage', vacancy.featuredImage || '')
-      setValue(
-        'associated_organization_name',
-        vacancy.associated_organization_name || ''
-      )
-      setUploadedFiles({
-        featuredImage: vacancy.featuredImage || ''
-      })
+      setValue('associated_organization_name', vacancy.associated_organization_name || '')
+      setUploadedFiles({ featuredImage: vacancy.featuredImage || '' })
     } catch (error) {
       toast.error('Failed to fetch vacancy details')
     } finally {
@@ -234,17 +221,10 @@ const VacancyManager = () => {
     try {
       const response = await authFetch(
         `${process.env.baseUrl}/vacancy?id=${deleteId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+        { method: 'DELETE', headers: { 'Content-Type': 'application/json' } }
       )
       const res = await response.json()
-      if (!response.ok) {
-        throw new Error(res.message || 'Failed to delete vacancy')
-      }
+      if (!response.ok) throw new Error(res.message || 'Failed to delete vacancy')
       toast.success(res.message || 'Vacancy deleted')
       loadVacancies(pagination.currentPage)
     } catch (err) {
@@ -255,22 +235,12 @@ const VacancyManager = () => {
     }
   }
 
-  const handleDialogClose = () => {
-    setIsDialogOpen(false)
-    setDeleteId(null)
-  }
-
   const handleView = async (slug) => {
     try {
       setLoadingView(true)
       setViewModalOpen(true)
-      const response = await authFetch(
-        `${process.env.baseUrl}/vacancy/${slug}`,
-        { headers: { 'Content-Type': 'application/json' } }
-      )
-      if (!response.ok) {
-        throw new Error('Failed to fetch vacancy details')
-      }
+      const response = await authFetch(`${process.env.baseUrl}/vacancy/${slug}`)
+      if (!response.ok) throw new Error('Failed to fetch vacancy details')
       const data = await response.json()
       setViewVacancyData(data.item)
     } catch (err) {
@@ -281,20 +251,13 @@ const VacancyManager = () => {
     }
   }
 
-  const handleCloseViewModal = () => {
-    setViewModalOpen(false)
-    setViewVacancyData(null)
-  }
-
   const handleSearch = async (query) => {
     if (!query) {
       loadVacancies(pagination.currentPage)
       return
     }
     try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/vacancy?q=${query}`
-      )
+      const response = await authFetch(`${process.env.baseUrl}/vacancy?q=${query}`)
       if (response.ok) {
         const data = await response.json()
         setVacancies(data.items || [])
@@ -309,354 +272,315 @@ const VacancyManager = () => {
         setVacancies([])
       }
     } catch (error) {
-      console.error('Error fetching vacancy search results:', error.message)
       setVacancies([])
     }
   }
 
   const handleSearchInput = (value) => {
     setSearchQuery(value)
-
-    if (searchTimeout) {
-      clearTimeout(searchTimeout)
-    }
-
+    if (searchTimeout) clearTimeout(searchTimeout)
     if (value === '') {
       handleSearch('')
     } else {
-      const timeoutId = setTimeout(() => {
-        handleSearch(value)
-      }, 300)
-      setSearchTimeout(timeoutId)
+      const id = setTimeout(() => handleSearch(value), 300)
+      setSearchTimeout(id)
     }
   }
 
-  const columns = [
-    {
-      header: 'S.N',
-      id: 'sn',
-      cell: ({ row }) =>
-        (pagination.currentPage - 1) * (pagination.limit ?? 10) + row.index + 1
-    },
+  const columns = useMemo(() => [
     {
       header: 'Title',
-      accessorKey: 'title'
+      accessorKey: 'title',
+      cell: ({ row }) => (
+        <div className="font-medium text-gray-900">{row.original.title}</div>
+      )
     },
     {
-      header: 'Associated Organization / Institution',
+      header: 'Organization / Institution',
       accessorKey: 'associated_organization_name',
-      cell: ({ row }) => row.original.associated_organization_name || 'N/A'
+      cell: ({ row }) => {
+        const org = row.original.associated_organization_name
+        return org ? (
+          <span className="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
+            {org}
+          </span>
+        ) : (
+          <span className="text-gray-400 text-sm">—</span>
+        )
+      }
     },
     {
       header: 'Description',
       accessorKey: 'description',
       cell: ({ getValue }) => {
         const text = getValue()
-        return text?.length > 80 ? `${text.substring(0, 80)}...` : text || 'N/A'
+        return (
+          <span className="text-gray-600 text-sm">
+            {text?.length > 80 ? `${text.substring(0, 80)}...` : text || '—'}
+          </span>
+        )
       }
     },
     {
       header: 'Actions',
       id: 'actions',
       cell: ({ row }) => (
-        <div className='flex gap-2'>
-          <button
+        <div className="flex gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => handleView(row.original.slugs)}
-            className='p-1 text-purple-600 hover:text-purple-800'
-            title='View Details'
+            className="hover:bg-blue-50 text-blue-600"
+            title="View Details"
           >
-            <Eye className='w-4 h-4' />
-          </button>
-          <button
+            <Eye className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => handleEdit(row.original.slugs)}
-            className='p-1 text-blue-600 hover:text-blue-800'
+            className="hover:bg-amber-50 text-amber-600"
+            title="Edit"
           >
-            <span className='sr-only'>Edit</span>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              className='h-4 w-4'
-              viewBox='0 0 20 20'
-              fill='currentColor'
-            >
-              <path d='M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793z' />
-              <path d='M11.379 5.793L4 13.172V16h2.828l7.379-7.379-2.828-2.828z' />
-            </svg>
-          </button>
-          <button
+            <Edit2 className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => handleDeleteClick(row.original.id)}
-            className='p-1 text-red-600 hover:text-red-800'
+            className="hover:bg-red-50 text-red-600"
+            title="Delete"
           >
-            <span className='sr-only'>Delete</span>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              className='h-4 w-4'
-              viewBox='0 0 20 20'
-              fill='currentColor'
-            >
-              <path
-                fillRule='evenodd'
-                d='M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM8 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z'
-                clipRule='evenodd'
-              />
-            </svg>
-          </button>
+            <Trash2 className="w-4 h-4" />
+          </Button>
         </div>
       )
     }
-  ]
+  ], [requireAdmin])
 
   return (
-    <>
-      <div className='w-full space-y-2'>
-        <div className='px-4 space-y-4'>
-          <div className='flex justify-between items-center pt-4'>
-            {/* Search Bar */}
-            <SearchInput
-              value={searchQuery}
-              onChange={(e) => handleSearchInput(e.target.value)}
-              placeholder='Search vacancies...'
-              className='max-w-md'
-            />
-            {/* Button */}
-            <div className='flex gap-2'>
-              <Button
-                onClick={() => {
-                  setIsOpen(true)
-                  setEditing(false)
-                  setEditingId(null)
-                  reset()
-                  setUploadedFiles({ featuredImage: '' })
-                }}
-              >
-                Add Vacancy
-              </Button>
-            </div>
-          </div>
-          <ToastContainer />
-
-          <Dialog
-            isOpen={isOpen}
-            onClose={() => {
-              setIsOpen(false)
-              setEditing(false)
-              setEditingId(null)
-              reset()
-              setUploadedFiles({ featuredImage: '' })
-            }}
-            className='max-w-5xl'
-          >
-            <DialogHeader>
-              <div className='flex items-center justify-between'>
-                <DialogTitle>{editing ? 'Edit Vacancy' : 'Add Vacancy'}</DialogTitle>
-                <DialogClose
-                  onClick={() => {
-                    setIsOpen(false)
-                    setEditing(false)
-                    setEditingId(null)
-                    reset()
-                    setUploadedFiles({ featuredImage: '' })
-                  }}
-                />
-              </div>
-            </DialogHeader>
-            <DialogContent>
-              <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
-                <form
-                  onSubmit={handleSubmit(onSubmit)}
-                  className='flex flex-col flex-1 overflow-hidden'
-                >
-                  <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                    {/* Basic Information */}
-                    <div className='bg-white p-6 rounded-lg shadow-md'>
-                      <h2 className='text-xl font-semibold mb-4'>
-                        Vacancy Information
-                      </h2>
-                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                        <div className='space-y-2'>
-                          <Label
-                            htmlFor='title'
-                            className="after:content-['*'] after:ml-0.5 after:text-red-500"
-                          >
-                            Vacancy Title
-                          </Label>
-                          <Input
-                            id='title'
-                            placeholder='Enter vacancy title'
-                            {...register('title', {
-                              required: 'Title is required'
-                            })}
-                            className={errors.title ? 'border-destructive' : ''}
-                          />
-                          {errors.title && (
-                            <span className='text-sm font-medium text-destructive'>
-                              {errors.title.message}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className='space-y-2'>
-                          <Label htmlFor='associated_organization_name'>
-                            Associated Organization / Institution Name
-                          </Label>
-                          <Input
-                            id='associated_organization_name'
-                            placeholder='Enter organization or institution name'
-                            {...register('associated_organization_name')}
-                          />
-                        </div>
-                      </div>
-
-                      <div className='space-y-2 mt-4'>
-                        <Label htmlFor='description'>Short Description</Label>
-                        <Textarea
-                          id='description'
-                          placeholder='Enter short description'
-                          {...register('description')}
-                          className='min-h-[100px]'
-                        />
-                      </div>
-
-                      <div className='space-y-2 mt-4'>
-                        <Label htmlFor='content'>Content</Label>
-                        <Controller
-                          name='content'
-                          control={control}
-                          render={({ field }) => (
-                            <TipTapEditor
-                              value={field.value}
-                              onChange={field.onChange}
-                              placeholder='Enter detailed content'
-                            />
-                          )}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Media */}
-                    <div className='bg-white p-6 rounded-lg shadow-md'>
-                      <h2 className='text-xl font-semibold mb-4'>Media</h2>
-                      <FileUpload
-                        label='Featured Image'
-                        onUploadComplete={(url) => {
-                          setUploadedFiles((prev) => ({
-                            ...prev,
-                            featuredImage: url
-                          }))
-                          setValue('featuredImage', url)
-                        }}
-                        defaultPreview={uploadedFiles.featuredImage}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Submit Button - Sticky Footer */}
-                  <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                    <Button type='submit' disabled={loading}>
-                      {loading
-                        ? 'Processing...'
-                        : editing
-                          ? 'Update Vacancy'
-                          : 'Create Vacancy'}
-                    </Button>
-                  </div>
-                </form>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          {/* Table Section */}
-          <Table
-            loading={tableLoading}
-            data={vacancies}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => loadVacancies(newPage)}
-            onSearch={handleSearch}
-            showSearch={false}
+    <div className="w-full space-y-4 p-4">
+      <ToastContainer position="top-right" autoClose={3000} />
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-30 bg-[#F7F8FA] py-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border">
+          <SearchInput
+            value={searchQuery}
+            onChange={(e) => handleSearchInput(e.target.value)}
+            placeholder="Search vacancies..."
+            className="max-w-md w-full"
           />
+          <Button
+            onClick={handleAddClick}
+            className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Add Vacancy
+          </Button>
         </div>
       </div>
 
-      <ConfirmationDialog
-        open={isDialogOpen}
-        onClose={handleDialogClose}
-        onConfirm={handleDeleteConfirm}
-        title='Confirm Deletion'
-        message='Are you sure you want to delete this vacancy? This action cannot be undone.'
-      />
+      {/* Table */}
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <Table
+          loading={tableLoading}
+          data={vacancies}
+          columns={columns}
+          pagination={pagination}
+          onPageChange={(newPage) => loadVacancies(newPage)}
+          showSearch={false}
+        />
+      </div>
 
-      {/* View Vacancy Details Modal */}
+      {/* Add / Edit Modal */}
       <Dialog
-        isOpen={viewModalOpen}
-        onClose={handleCloseViewModal}
-        className='max-w-3xl'
+        isOpen={isOpen}
+        onClose={handleCloseModal}
+        closeOnOutsideClick={false}
+        className="max-w-4xl"
       >
-        <DialogHeader>
-          <div className='flex items-center justify-between'>
-            <DialogTitle>Vacancy Details</DialogTitle>
-            <DialogClose onClick={handleCloseViewModal} />
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0">
+          <DialogHeader className="px-6 py-4 border-b">
+            <DialogTitle className="text-lg font-semibold text-gray-900">
+              {editing ? 'Edit Vacancy' : 'Add New Vacancy'}
+            </DialogTitle>
+            <DialogClose onClick={handleCloseModal} />
+          </DialogHeader>
+
+          <div className="flex-1 overflow-y-auto p-6">
+            <form id="vacancy-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+
+              {/* Basic Information */}
+              <section className="space-y-4">
+                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Vacancy Information</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label required>Vacancy Title</Label>
+                    <Input
+                      placeholder="Enter vacancy title"
+                      {...register('title', { required: 'Title is required' })}
+                      className={errors.title ? 'border-red-400' : ''}
+                    />
+                    {errors.title && (
+                      <p className="text-xs text-red-500">{errors.title.message}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Associated Organization / Institution</Label>
+                    <Input
+                      placeholder="Enter organization or institution name"
+                      {...register('associated_organization_name')}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Short Description</Label>
+                  <Textarea
+                    placeholder="Enter a brief summary of the vacancy..."
+                    {...register('description')}
+                    className="min-h-[100px]"
+                  />
+                </div>
+              </section>
+
+              {/* Content */}
+              <section className="space-y-4">
+                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Detailed Content</h3>
+                <div className="space-y-2">
+                  <Label>Content</Label>
+                  <Controller
+                    name="content"
+                    control={control}
+                    render={({ field }) => (
+                      <TipTapEditor
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Enter detailed vacancy content, requirements, responsibilities..."
+                      />
+                    )}
+                  />
+                </div>
+              </section>
+
+              {/* Media */}
+              <section className="space-y-4">
+                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Media</h3>
+                <div className="space-y-2">
+                  <FileUpload
+                    label="Featured Image (Optional)"
+                    onUploadComplete={(url) => {
+                      setUploadedFiles((prev) => ({ ...prev, featuredImage: url }))
+                      setValue('featuredImage', url)
+                    }}
+                    defaultPreview={uploadedFiles.featuredImage}
+                  />
+                </div>
+              </section>
+            </form>
           </div>
-        </DialogHeader>
-        <DialogContent>
-          {loadingView ? (
-            <div className='flex justify-center items-center h-48'>
-              Loading...
-            </div>
-          ) : viewVacancyData ? (
-            <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
-              {viewVacancyData.featuredImage && (
-                <div className='w-full h-64 rounded-lg overflow-hidden'>
-                  <img
-                    src={viewVacancyData.featuredImage}
-                    alt={viewVacancyData.title}
-                    className='w-full h-full object-cover'
-                  />
-                </div>
-              )}
 
-              <div>
-                <h2 className='text-2xl font-bold text-gray-800'>
-                  {viewVacancyData.title}
-                </h2>
-                {viewVacancyData.associated_organization_name && (
-                  <p className='text-sm text-gray-500 mt-1'>
-                    {viewVacancyData.associated_organization_name}
-                  </p>
-                )}
-              </div>
-
-              {viewVacancyData.description && (
-                <div>
-                  <h3 className='text-lg font-semibold mb-2'>Description</h3>
-                  <div
-                    className='text-gray-700 prose max-w-none'
-                    dangerouslySetInnerHTML={{
-                      __html: viewVacancyData.description
-                    }}
-                  />
-                </div>
-              )}
-
-              {viewVacancyData.content && (
-                <div>
-                  <h3 className='text-lg font-semibold mb-2'>Content</h3>
-                  <div
-                    className='text-gray-700 prose max-w-none'
-                    dangerouslySetInnerHTML={{
-                      __html: viewVacancyData.content
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          ) : (
-            <p className='text-center text-gray-500'>
-              No vacancy data available.
-            </p>
-          )}
+          {/* Sticky Footer */}
+          <div className="sticky bottom-0 bg-white border-t p-4 px-6 flex justify-end gap-3">
+            <Button type="button" variant="outline" onClick={handleCloseModal}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="vacancy-form"
+              disabled={loading}
+              className="bg-[#387cae] hover:bg-[#387cae]/90 text-white"
+            >
+              {loading ? 'Saving...' : editing ? 'Update Vacancy' : 'Create Vacancy'}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
-    </>
+
+      <ConfirmationDialog
+        open={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this vacancy? This action cannot be undone."
+      />
+
+      {/* View Vacancy Modal */}
+      <Dialog
+        isOpen={viewModalOpen}
+        onClose={() => { setViewModalOpen(false); setViewVacancyData(null) }}
+        className="max-w-3xl"
+      >
+        <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col p-0">
+          <DialogHeader className="px-6 py-4 border-b">
+            <DialogTitle className="text-lg font-semibold text-gray-900">Vacancy Details</DialogTitle>
+            <DialogClose onClick={() => { setViewModalOpen(false); setViewVacancyData(null) }} />
+          </DialogHeader>
+
+          <div className="flex-1 overflow-y-auto p-6">
+            {loadingView ? (
+              <div className="flex justify-center items-center h-48 text-gray-400">
+                Loading...
+              </div>
+            ) : viewVacancyData ? (
+              <div className="space-y-6">
+                {viewVacancyData.featuredImage && (
+                  <div className="w-full h-56 rounded-xl overflow-hidden border">
+                    <img
+                      src={viewVacancyData.featuredImage}
+                      alt={viewVacancyData.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">{viewVacancyData.title}</h2>
+                  {viewVacancyData.associated_organization_name && (
+                    <span className="mt-2 inline-block px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm font-medium">
+                      {viewVacancyData.associated_organization_name}
+                    </span>
+                  )}
+                </div>
+
+                {viewVacancyData.description && (
+                  <div className="bg-gray-50 p-4 rounded-xl border">
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Description</h3>
+                    <div
+                      className="text-gray-700 prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{ __html: viewVacancyData.description }}
+                    />
+                  </div>
+                )}
+
+                {viewVacancyData.content && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Content</h3>
+                    <div
+                      className="text-gray-700 prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{ __html: viewVacancyData.content }}
+                    />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-center text-gray-400 py-12">No vacancy data available.</p>
+            )}
+          </div>
+
+          <div className="sticky bottom-0 bg-white border-t p-4 px-6 flex justify-end">
+            <Button
+              variant="outline"
+              onClick={() => { setViewModalOpen(false); setViewVacancyData(null) }}
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
   )
 }
 

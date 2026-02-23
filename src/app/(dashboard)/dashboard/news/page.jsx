@@ -122,12 +122,16 @@ export default function NewsManager() {
       {
         header: 'Description',
         accessorKey: 'description',
-        cell: ({ getValue }) => (
-          <div className='max-w-xs overflow-hidden'>
-            {getValue()?.substring(0, 100)}
-            {getValue()?.length > 100 ? '...' : ''}
-          </div>
-        )
+        cell: ({ getValue }) => {
+          // Strip HTML tags for table display since description may be HTML from TipTap
+          const raw = getValue() || ''
+          const stripped = raw.replace(/<[^>]*>/g, '')
+          return (
+            <div className='max-w-xs overflow-hidden text-gray-600 text-sm'>
+              {stripped.substring(0, 100)}{stripped.length > 100 ? '...' : ''}
+            </div>
+          )
+        }
       },
       {
         header: 'Created At',
@@ -291,7 +295,7 @@ export default function NewsManager() {
       loadData(pagination.currentPage, searchQuery)
     } catch (error) {
       console.error('Error saving news:', error)
-      toast.error(`Failed to ${editing ? 'update' : 'create'} news`)
+      toast.error(`Failed to ${editing ? 'update' : 'create'} news: ${error.message || ''}`)
     } finally {
       setSubmitting(false)
     }

@@ -1,23 +1,23 @@
 'use client'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { authFetch } from '@/app/utils/authFetch'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
+import useAdminPermission from '@/hooks/useAdminPermission'
+import Table from '@/ui/shadcn/DataTable'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
+import SearchInput from '@/ui/molecules/SearchInput'
+import { Button } from '@/ui/shadcn/button'
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from '@/ui/shadcn/dialog'
+import { Input } from '@/ui/shadcn/input'
+import { Label } from '@/ui/shadcn/label'
+import SearchSelectCreate from '@/ui/shadcn/search-select-create'
+import { Edit2, Plus, Trash2 } from 'lucide-react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
-import FileUpload from '../addCollege/FileUpload'
-import Table from '@/ui/shadcn/DataTable'
-import { Edit2, Trash2, Search } from 'lucide-react'
-import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
+import FileUpload from '../addCollege/FileUpload'
 
-
-import { X } from 'lucide-react'
-import useAdminPermission from '@/hooks/useAdminPermission'
-import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
-import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { Button } from '@/ui/shadcn/button'
-import SearchInput from '@/ui/molecules/SearchInput'
-import { formatDate } from '@/utils/date.util'
-import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 
 export default function MaterialForm() {
   const { setHeading } = usePageHeading()
@@ -44,6 +44,8 @@ export default function MaterialForm() {
   const [searchResults, setSearchResults] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [fileError, setFileError] = useState(false)
   const abortControllerRef = useRef(null)
   const [pagination, setPagination] = useState({
     currentPage: parseInt(searchParams.get('page')) || 1,
@@ -52,44 +54,30 @@ export default function MaterialForm() {
   })
 
 
-  const searchCollege = async (e) => {
-    const query = e.target.value
-    setCollegeSearch(query)
-    if (query.length < 2) {
-      setSearchResults([])
-      return
-    }
-
+  const fetchTags = async (query) => {
     try {
       const response = await authFetch(
         `${process.env.baseUrl}/tag?q=${query}`
       )
       const data = await response.json()
-      setSearchResults(data.items || [])
+      return data.items || []
     } catch (error) {
-      console.error('College Search Error:', error)
-      toast.error('Failed to search tags')
+      console.error('Tag Search Error:', error)
+      return []
     }
-  }
-  const addCollege = (college) => {
-    if (!selectedColleges.some((c) => c.id === college.id)) {
-      setSelectedColleges((prev) => [...prev, college])
-      // Update form value
-      const collegeIds = [...selectedColleges, college].map((c) => c.id)
-      setValue('tags', collegeIds)
-    }
-    setCollegeSearch('')
-    setSearchResults([])
   }
 
-  // Add function to remove college
-  const removeCollege = (collegeId) => {
-    setSelectedColleges((prev) => prev.filter((c) => c.id !== collegeId))
-    // Update form value
-    const updatedCollegeIds = selectedColleges
-      .filter((c) => c.id !== collegeId)
-      .map((c) => c.id)
-    setValue('tags', updatedCollegeIds)
+  const fetchCategoriesSearch = async (query) => {
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}/category?type=MATERIAL&limit=100${query ? `&q=${query}` : ''}`
+      )
+      const data = await response.json()
+      return data.items || []
+    } catch (error) {
+      console.error('Category Search Error:', error)
+      return []
+    }
   }
 
   const {
@@ -191,12 +179,14 @@ export default function MaterialForm() {
   }
 
   const onSubmit = async (data) => {
+    // Validate file is provided
+    if (!uploadedFiles.file || !uploadedFiles.file.trim()) {
+      setFileError(true)
+      return
+    }
+    setFileError(false)
+    setLoading(true)
     try {
-      // Validate file is provided
-      if (!uploadedFiles.file || !uploadedFiles.file.trim()) {
-        toast.error('Material file is required')
-        return
-      }
 
       const payload = {
         title: data.title?.trim() || '',
@@ -206,15 +196,12 @@ export default function MaterialForm() {
         file: uploadedFiles.file
       }
 
-      // Handle category_id - convert empty string to null, or parse to integer
-      if (
-        data.category_id === '' ||
-        data.category_id === null ||
-        data.category_id === undefined
-      ) {
+      // Handle category_id — use selectedCategory if available, fallback to form value
+      const resolvedCategoryId = selectedCategory?.id ?? data.category_id
+      if (!resolvedCategoryId || resolvedCategoryId === '') {
         payload.category_id = null
       } else {
-        payload.category_id = parseInt(data.category_id, 10)
+        payload.category_id = parseInt(resolvedCategoryId, 10)
       }
 
       const url = `${process.env.baseUrl}/material`
@@ -252,7 +239,8 @@ export default function MaterialForm() {
       setUploadedFiles({ image: '', file: '' })
       setSelectedColleges([])
       setSearchResults([])
-      setValue('category_id', '')
+      setSelectedCategory(null)
+      setFileError(false)
       setValue('category_id', '')
       if (editing) {
         fetchMaterials(pagination.currentPage)
@@ -263,6 +251,8 @@ export default function MaterialForm() {
       setEditingId(null)
     } catch (error) {
       toast.error(error.message || 'Failed to save material')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -295,11 +285,17 @@ export default function MaterialForm() {
         )
       }
 
-      // setValue("tags", JSON.parse(material.tags));
-      setValue('visibility', material.visibility)
-      // Extract category_id from material (could be direct field or from category association)
+      // Extract category_id from material
       const categoryId = material.category_id || material.category?.id || ''
       setValue('category_id', categoryId)
+      if (material.category) {
+        setSelectedCategory({
+          id: material.category.id,
+          title: material.category.title
+        })
+      } else {
+        setSelectedCategory(null)
+      }
 
       setUploadedFiles({
         image: material.image || '',
@@ -345,7 +341,7 @@ export default function MaterialForm() {
     }
   }
 
-  const columns = [
+  const columns = useMemo(() => [
     {
       header: 'Title',
       accessorKey: 'title'
@@ -356,7 +352,7 @@ export default function MaterialForm() {
       cell: ({ row }) => {
         const category = row.original.category
         return category ? (
-          <span className='px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm'>
+          <span className='px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium'>
             {category.title}
           </span>
         ) : (
@@ -370,23 +366,29 @@ export default function MaterialForm() {
       header: 'Actions',
       id: 'actions',
       cell: ({ row }) => (
-        <div className='flex gap-2'>
-          <button
+        <div className='flex gap-1'>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => handleEdit(row.original)}
-            className='p-1 text-blue-600 hover:text-blue-800'
+            className='hover:bg-amber-50 text-amber-600'
+            title="Edit"
           >
             <Edit2 className='w-4 h-4' />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => handleDeleteClick(row.original.id)}
-            className='p-1 text-red-600 hover:text-red-800'
+            className='hover:bg-red-50 text-red-600'
+            title="Delete"
           >
             <Trash2 className='w-4 h-4' />
-          </button>
+          </Button>
         </div>
       )
     }
-  ]
+  ], [requireAdmin])
 
   const handleSearch = async (query) => {
     setSearchQuery(query)
@@ -445,6 +447,8 @@ export default function MaterialForm() {
     setUploadedFiles({ image: '', file: '' })
     setSelectedColleges([])
     setSearchResults([])
+    setSelectedCategory(null)
+    setFileError(false)
   }
 
   const handleAddClick = () => {
@@ -455,24 +459,29 @@ export default function MaterialForm() {
     setUploadedFiles({ image: '', file: '' })
     setSelectedColleges([])
     setSearchResults([])
+    setSelectedCategory(null)
+    setFileError(false)
     fetchCategories()
   }
 
   return (
-    <div className='w-full space-y-2'>
+    <div className='w-full space-y-4 p-4'>
       {/* Header Section */}
-      <div className='sticky top-0 z-30 bg-[#F7F8FA] flex items-center justify-between px-4 pt-4'>
-        {/* Search Bar */}
-        <SearchInput
-          value={searchQuery}
-          onChange={(e) => handleSearchInput(e.target.value)}
-          placeholder='Search materials...'
-          className='max-w-md'
-        />
+      <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+          {/* Search Bar */}
+          <SearchInput
+            value={searchQuery}
+            onChange={(e) => handleSearchInput(e.target.value)}
+            placeholder='Search materials...'
+            className='max-w-md w-full'
+          />
 
-        {/* Button */}
-        <div className='flex items-center gap-4'>
-          <Button onClick={handleAddClick}>Add Material</Button>
+          {/* Button */}
+          <Button onClick={handleAddClick} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
+            <Plus className="w-4 h-4" />
+            Add Material
+          </Button>
         </div>
       </div>
 
@@ -482,26 +491,24 @@ export default function MaterialForm() {
         onClose={handleCloseModal}
         className='max-w-4xl'
       >
-        <DialogHeader>
-          <DialogTitle>{editing ? 'Edit Material' : 'Add Material'}</DialogTitle>
-          <DialogClose onClick={handleCloseModal} />
-        </DialogHeader>
-        <DialogContent className='max-h-[90vh] overflow-y-auto'>
-          <div className='container mx-auto p-1 flex flex-col'>
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className='flex flex-col space-y-6'
-            >
-              <div className='bg-white p-6 rounded-lg shadow-md'>
-                <h2 className='text-xl font-semibold mb-4'>
-                  Material Information
-                </h2>
-                <div className='grid grid-cols-1 gap-4'>
-                  <div>
-                    <label className='block mb-2'>
-                      Title <span className='text-red-500'>*</span>
-                    </label>
-                    <input
+        <DialogContent className='max-w-4xl max-h-[90vh] flex flex-col p-0'>
+          <DialogHeader className='px-6 py-4 border-b'>
+            <DialogTitle className="text-lg font-semibold text-gray-900">
+              {editing ? 'Edit Material' : 'Add New Material'}
+            </DialogTitle>
+            <DialogClose onClick={handleCloseModal} />
+          </DialogHeader>
+
+          <div className='flex-1 overflow-y-auto p-6'>
+            <form id="material-form" onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
+              {/* Basic Information */}
+              <section className="space-y-4">
+                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Material Details</h3>
+
+                <div className='grid grid-cols-1 gap-6'>
+                  <div className="space-y-2">
+                    <Label required>Title</Label>
+                    <Input
                       {...register('title', {
                         required: 'Title is required',
                         minLength: {
@@ -509,75 +516,63 @@ export default function MaterialForm() {
                           message: 'Title must be at least 3 characters long'
                         }
                       })}
-                      className='w-full p-2 border rounded'
+                      placeholder='Enter material title'
                     />
                     {errors.title && (
-                      <span className='text-red-500'>{errors.title.message}</span>
+                      <p className='text-xs text-red-500'>{errors.title.message}</p>
                     )}
                   </div>
 
-                  <div className='mb-4'>
-                    <label className='block mb-2'>Tags</label>
-                    <div className='flex flex-wrap gap-2 mb-2'>
-                      {selectedColleges.map((college) => (
-                        <div
-                          key={college.id}
-                          className='flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full'
-                        >
-                          <span>{college.title}</span>
-                          <button
-                            type='button'
-                            onClick={() => removeCollege(college.id)}
-                            className='text-blue-600 hover:text-blue-800'
-                          >
-                            <X className='w-4 h-4' />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className='relative'>
-                      <input
-                        type='text'
-                        value={collegeSearch}
-                        onChange={searchCollege}
-                        className='w-full p-2 border rounded'
-                        placeholder='Search tags...'
-                      />
-
-                      {searchResults.length > 0 && (
-                        <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto'>
-                          {searchResults.map((college) => (
-                            <div
-                              key={college.id}
-                              onClick={() => addCollege(college)}
-                              className='p-2 hover:bg-gray-100 cursor-pointer'
-                            >
-                              {college.title}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <label className='block mb-2'>Category</label>
-                    <select
-                      {...register('category_id')}
-                      className='w-full p-2 border rounded'
-                    >
-                      <option value=''>No Category</option>
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.id}>
-                          {category.title}
-                        </option>
-                      ))}
-                    </select>
+                  <div className="space-y-2">
+                    <Label>Tags</Label>
+                    <SearchSelectCreate
+                      onSearch={fetchTags}
+                      onSelect={(item) => {
+                        if (!selectedColleges.some((c) => c.id === item.id)) {
+                          const updated = [...selectedColleges, item]
+                          setSelectedColleges(updated)
+                          setValue('tags', updated.map(t => t.id))
+                        }
+                      }}
+                      onRemove={(item) => {
+                        const updated = selectedColleges.filter((c) => (c.id !== item.id))
+                        setSelectedColleges(updated)
+                        setValue('tags', updated.map(t => t.id))
+                      }}
+                      selectedItems={selectedColleges}
+                      placeholder="Search tags..."
+                      isMulti={true}
+                      displayKey="title"
+                    />
                   </div>
 
+                  <div className="space-y-2">
+                    <Label>Category</Label>
+                    <SearchSelectCreate
+                      onSearch={fetchCategoriesSearch}
+                      onSelect={(item) => {
+                        setSelectedCategory(item)
+                        setValue('category_id', item.id)
+                      }}
+                      onRemove={() => {
+                        setSelectedCategory(null)
+                        setValue('category_id', '')
+                      }}
+                      selectedItems={selectedCategory}
+                      placeholder="Search or select category..."
+                      isMulti={false}
+                      displayKey="title"
+                    />
+                  </div>
+                </div>
+              </section>
 
+              {/* Files Section */}
+              <section className="space-y-4">
+                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Files & Media</h3>
 
-                  <div>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                  <div className="space-y-3">
                     <FileUpload
                       label={
                         <>
@@ -588,24 +583,22 @@ export default function MaterialForm() {
                       onUploadComplete={(url) => {
                         setUploadedFiles((prev) => ({ ...prev, file: url }))
                         setValue('file', url)
+                        if (url) setFileError(false)
                       }}
                       defaultPreview={uploadedFiles.file}
                     />
-                    {!uploadedFiles.file && (
-                      <p className='text-red-500 text-sm mt-1'>
+                    {fileError && (
+                      <p className='text-red-500 text-xs mt-1'>
                         Material file is required
                       </p>
                     )}
                   </div>
 
-                  <div>
+                  <div className="space-y-3">
                     <FileUpload
                       label={
                         <>
-                          Material Image{' '}
-                          <span className='text-gray-500 text-sm'>
-                            (Optional)
-                          </span>
+                          Material Image <span className='text-gray-500 text-sm'>(Optional)</span>
                         </>
                       }
                       onUploadComplete={(url) => {
@@ -616,27 +609,35 @@ export default function MaterialForm() {
                     />
                   </div>
                 </div>
-              </div>
-
-              <div className='flex justify-end'>
-                <Button
-                  type='submit'
-                  disabled={loading}
-                  className='bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300'
-                >
-                  {loading
-                    ? 'Processing...'
-                    : editing
-                      ? 'Update Material'
-                      : 'Create Material'}
-                </Button>
-              </div>
+              </section>
             </form>
+          </div>
+
+          <div className='sticky bottom-0 bg-white border-t p-4 px-6 flex justify-end gap-3'>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={handleCloseModal}
+            >
+              Cancel
+            </Button>
+            <Button
+              type='submit'
+              form="material-form"
+              disabled={loading}
+              className='bg-[#387cae] hover:bg-[#387cae]/90 text-white'
+            >
+              {loading
+                ? 'Processing...'
+                : editing
+                  ? 'Update Material'
+                  : 'Create Material'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      <div className='px-4 pt-4'>
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
         <Table
           loading={tableLoading}
           data={materials}

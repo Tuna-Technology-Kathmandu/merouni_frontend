@@ -1,14 +1,14 @@
 'use client'
 import dynamic from 'next/dynamic'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import Table from '@/ui/shadcn/DataTable'
-import { Edit2, Trash2, Search, Eye } from 'lucide-react'
+import { Edit2, Trash2, Eye, Plus } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
-// import { getCourses } from '@/app/action'
 import { fetchFaculties } from './action'
 import { useDebounce } from 'use-debounce'
 import useAdminPermission from '@/hooks/useAdminPermission'
@@ -16,34 +16,16 @@ import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '../../../../ui/shadcn/button'
 import { Input } from '../../../../ui/shadcn/input'
 import { Label } from '../../../../ui/shadcn/label'
+import { Textarea } from '@/ui/shadcn/textarea'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogClose
 } from '@/ui/shadcn/dialog'
 import SearchInput from '@/ui/molecules/SearchInput'
-const TipTapEditor = dynamic(() => import('@/ui/shadcn/tiptap-editor'), {
-  ssr: false
-})
-
-// Helper component for required label
-const RequiredLabel = ({ children, htmlFor }) => (
-  <Label htmlFor={htmlFor}>
-    {children} <span className='text-red-500'>*</span>
-  </Label>
-)
-
-// Helper component for form field with error handling
-const FormField = ({ label, error, htmlFor, children }) => (
-  <div className='space-y-2'>
-    {label && <label htmlFor={htmlFor}>{label}</label>}
-    {children}
-    {error && (
-      <p className='text-sm font-medium text-destructive'>{error.message}</p>
-    )}
-  </div>
-)
+const TipTapEditor = dynamic(() => import('@/ui/shadcn/tiptap-editor'), { ssr: false })
 
 export default function CourseForm() {
   const { setHeading } = usePageHeading()
@@ -322,53 +304,29 @@ export default function CourseForm() {
     setViewCourseData(null)
   }
 
-  const columns = [
-    {
-      header: 'Title',
-      accessorKey: 'title'
-    },
-    {
-      header: 'Code',
-      accessorKey: 'code'
-    },
-    {
-      header: 'Duration',
-      accessorKey: 'duration'
-    },
-    {
-      header: 'Credits',
-      accessorKey: 'credits'
-    },
+  const columns = useMemo(() => [
+    { header: 'Title', accessorKey: 'title', cell: ({ row }) => <span className="font-medium text-gray-900">{row.original.title}</span> },
+    { header: 'Code', accessorKey: 'code', cell: ({ getValue }) => <span className="text-gray-600 text-sm font-mono">{getValue() || '—'}</span> },
+    { header: 'Duration', accessorKey: 'duration', cell: ({ getValue }) => <span className="text-gray-600 text-sm">{getValue() ? `${getValue()} months` : '—'}</span> },
+    { header: 'Credits', accessorKey: 'credits', cell: ({ getValue }) => <span className="text-gray-600 text-sm">{getValue() || '—'}</span> },
     {
       header: 'Actions',
       id: 'actions',
       cell: ({ row }) => (
-        <div className='flex gap-2'>
-          <button
-            onClick={() => handleView(row.original.slugs)}
-            className='p-1 text-purple-600 hover:text-purple-800'
-            title='View Details'
-          >
+        <div className='flex gap-1'>
+          <Button variant="ghost" size="icon" onClick={() => handleView(row.original.slugs)} className='hover:bg-blue-50 text-blue-600' title='View'>
             <Eye className='w-4 h-4' />
-          </button>
-          <button
-            onClick={() => handleEdit(row.original.slugs)}
-            className='p-1 text-blue-600 hover:text-blue-800'
-            title='Edit'
-          >
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => handleEdit(row.original.slugs)} className='hover:bg-amber-50 text-amber-600' title='Edit'>
             <Edit2 className='w-4 h-4' />
-          </button>
-          <button
-            onClick={() => handleDeleteClick(row.original.id)}
-            className='p-1 text-red-600 hover:text-red-800'
-            title='Delete'
-          >
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(row.original.id)} className='hover:bg-red-50 text-red-600' title='Delete'>
             <Trash2 className='w-4 h-4' />
-          </button>
+          </Button>
         </div>
       )
     }
-  ]
+  ], [requireAdmin])
 
   const handleSearch = async (query) => {
     if (!query) {
@@ -402,74 +360,47 @@ export default function CourseForm() {
   }
 
   return (
-    <>
-      <div className='p-4 w-full'>
-        <div className='flex justify-between items-center mb-4 gap-4'>
-          {/* Search Bar */}
-          <SearchInput
-            value={searchQuery}
-            onChange={(e) => handleSearchInput(e.target.value)}
-            placeholder='Search courses...'
-            className='max-w-md'
-          />
+    <div className='w-full space-y-4 p-4'>
+      <ToastContainer />
 
-          {/* Button */}
-          <div className='flex gap-2'>
-            <Button
-              size='sm'
-              onClick={() => {
-                setIsOpen(true)
-                setEditing(false)
-                reset()
-                setFacSearch('')
-                setHasSelectedFac(false)
-              }}
-            >
-              Add Course
-            </Button>
-          </div>
-        </div>
-
-        {/* Table Section */}
-        <div className='mt-8'>
-          <Table
-            loading={tableLoading}
-            data={courses}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => fetchCourses(newPage)}
-            onSearch={handleSearch}
-            showSearch={false}
-          />
+      {/* Header */}
+      <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+          <SearchInput value={searchQuery} onChange={(e) => handleSearchInput(e.target.value)} placeholder='Search courses...' className='max-w-md w-full' />
+          <Button onClick={() => { setIsOpen(true); setEditing(false); reset(); setFacSearch(''); setHasSelectedFac(false) }} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
+            <Plus className="w-4 h-4" /> Add Course
+          </Button>
         </div>
       </div>
 
+      {/* Table */}
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <Table loading={tableLoading} data={courses} columns={columns} pagination={pagination} onPageChange={(p) => fetchCourses(p)} showSearch={false} />
+      </div>
+
       {/* Form Modal */}
-      <Dialog
-        isOpen={isOpen}
-        onClose={handleModalClose}
-        className='max-w-5xl'
-      >
-        <DialogContent className='max-h-[90vh] flex flex-col p-6'>
-          <DialogHeader>
-            <DialogTitle>{editing ? 'Edit Course' : 'Add Course'}</DialogTitle>
+      <Dialog isOpen={isOpen} onClose={handleModalClose} className='max-w-5xl'>
+        <DialogContent className='max-w-5xl max-h-[90vh] flex flex-col p-0'>
+          <DialogHeader className='px-6 py-4 border-b'>
+            <DialogTitle className="text-lg font-semibold text-gray-900">{editing ? 'Edit Course' : 'Add Course'}</DialogTitle>
+            <DialogClose onClick={handleModalClose} />
           </DialogHeader>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className='flex flex-col flex-1 min-h-0 overflow-hidden'
-          >
-            <div className='flex-1 overflow-y-auto px-6 space-y-6'>
-              <div className='space-y-4'>
-                <br />
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col flex-1 min-h-0 overflow-hidden'>
+            <div className='flex-1 overflow-y-auto p-6 space-y-6'>
+              <div className='space-y-5'>
+                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Course Details</h3>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
                   {/* Title Field */}
                   <div className='space-y-2'>
-                    <RequiredLabel htmlFor='title'>Course Title</RequiredLabel>
+                    <Label htmlFor='title' required>Course Title</Label>
                     <Input
                       id='title'
                       placeholder='Enter course title'
-                      {...register('title', { required: 'Title is required' })}
+                      {...register('title', {
+                        required: 'Title is required',
+                        minLength: { value: 3, message: 'Title must be at least 3 characters' }
+                      })}
                       aria-invalid={errors.title ? 'true' : 'false'}
                       className={
                         errors.title
@@ -477,16 +408,12 @@ export default function CourseForm() {
                           : ''
                       }
                     />
-                    {errors.title && (
-                      <p className='text-sm font-medium text-destructive'>
-                        {errors.title.message}
-                      </p>
-                    )}
+                    {errors.title && <p className='text-xs text-destructive mt-1'>{errors.title.message}</p>}
                   </div>
 
                   {/* Code Field */}
                   <div className='space-y-2'>
-                    <RequiredLabel htmlFor='code'>Course Code</RequiredLabel>
+                    <Label htmlFor='code' required>Course Code</Label>
                     <Input
                       id='code'
                       placeholder='e.g., CS101'
@@ -498,18 +425,12 @@ export default function CourseForm() {
                           : ''
                       }
                     />
-                    {errors.code && (
-                      <p className='text-sm font-medium text-destructive'>
-                        {errors.code.message}
-                      </p>
-                    )}
+                    {errors.code && <p className='text-xs text-destructive mt-1'>{errors.code.message}</p>}
                   </div>
 
                   {/* Duration Field */}
                   <div className='space-y-2'>
-                    <RequiredLabel htmlFor='duration'>
-                      Duration (months)
-                    </RequiredLabel>
+                    <Label htmlFor='duration' required>Duration (months)</Label>
                     <Input
                       id='duration'
                       type='number'
@@ -528,11 +449,7 @@ export default function CourseForm() {
                           : ''
                       }
                     />
-                    {errors.duration && (
-                      <p className='text-sm font-medium text-destructive'>
-                        {errors.duration.message}
-                      </p>
-                    )}
+                    {errors.duration && <p className='text-xs text-destructive mt-1'>{errors.duration.message}</p>}
                   </div>
 
                   {/* Credits Field */}
@@ -555,11 +472,7 @@ export default function CourseForm() {
                           : ''
                       }
                     />
-                    {errors.credits && (
-                      <p className='text-sm font-medium text-destructive'>
-                        {errors.credits.message}
-                      </p>
-                    )}
+                    {errors.credits && <p className='text-xs text-destructive mt-1'>{errors.credits.message}</p>}
                   </div>
 
                   {/* Faculty Field */}
@@ -625,32 +538,25 @@ export default function CourseForm() {
                         )
                       ) : null}
                     </div>
-                    {errors.facultyId && (
-                      <p className='text-sm font-medium text-destructive'>
-                        {errors.facultyId.message}
-                      </p>
-                    )}
+                    {errors.facultyId && <p className='text-xs text-destructive mt-1'>{errors.facultyId.message}</p>}
                   </div>
 
-                  {/* Syllabus Topics Field */}
                   <div className='md:col-span-2 space-y-2'>
                     <Label htmlFor='syllabus'>Syllabus Topics</Label>
-                    <textarea
+                    <Textarea
                       id='syllabus'
                       {...register('syllabus')}
-                      className='flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                      rows='3'
+                      rows={3}
+                      className='resize-none'
                       placeholder='Enter topics separated by commas (e.g., Introduction, Fundamentals, Advanced Topics)'
                     />
-                    <p className='text-xs text-muted-foreground'>
-                      Enter topics separated by commas
-                    </p>
+                    <p className='text-xs text-muted-foreground'>Enter topics separated by commas</p>
                   </div>
                 </div>
               </div>
 
               {/* Description Editor */}
-              <div className='md:col-span-2 space-y-2 pt-2'>
+              <div className='space-y-2'>
                 <Label>Description</Label>
                 <div className='border border-input rounded-md overflow-hidden'>
                   <TipTapEditor
@@ -662,22 +568,11 @@ export default function CourseForm() {
               </div>
             </div>
 
-            {/* Action Buttons - Sticky Footer */}
-            <div className='sticky bottom-0 bg-white border-t pt-4 pb-4 px-6 mt-4 flex justify-end gap-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]'>
-              <Button
-                type='button'
-                onClick={handleModalClose}
-                variant='outline'
-                size='sm'
-              >
-                Cancel
-              </Button>
-              <Button type='submit' disabled={submitting} size='sm'>
-                {submitting
-                  ? 'Processing...'
-                  : editing
-                    ? 'Update Course'
-                    : 'Create Course'}
+            {/* Sticky Footer */}
+            <div className='sticky bottom-0 bg-white border-t px-6 py-4 flex justify-end gap-3'>
+              <Button type='button' onClick={handleModalClose} variant='outline' disabled={submitting}>Cancel</Button>
+              <Button type='submit' disabled={submitting} className='bg-[#387cae] hover:bg-[#387cae]/90 text-white'>
+                {submitting ? 'Processing…' : editing ? 'Update Course' : 'Create Course'}
               </Button>
             </div>
           </form>
@@ -697,54 +592,39 @@ export default function CourseForm() {
       />
 
       {/* View Course Details Modal */}
-      <Dialog
-        isOpen={viewModalOpen}
-        onClose={handleCloseViewModal}
-      >
-        <DialogContent className='max-w-3xl'>
-          <DialogHeader>
-            <DialogTitle>Course Details</DialogTitle>
+      <Dialog isOpen={viewModalOpen} onClose={handleCloseViewModal}>
+        <DialogContent className='max-w-3xl max-h-[90vh] flex flex-col p-0'>
+          <DialogHeader className='px-6 py-4 border-b'>
+            <DialogTitle className="text-lg font-semibold text-gray-900">Course Details</DialogTitle>
+            <DialogClose onClick={handleCloseViewModal} />
           </DialogHeader>
           {loadingView ? (
             <div className='flex justify-center items-center h-48'>
-              Loading...
+              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-[#387cae]' />
             </div>
           ) : viewCourseData ? (
-            <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
-              <div>
-                <h2 className='text-2xl font-bold text-gray-800'>
-                  {viewCourseData.title}
-                </h2>
-              </div>
-
+            <div className='flex-1 overflow-y-auto p-6 space-y-5'>
+              <p className="text-2xl font-bold text-gray-900">{viewCourseData.title}</p>
               <div className='grid grid-cols-2 gap-4'>
-                <div>
-                  <h3 className='text-lg font-semibold mb-2'>Course Code</h3>
-                  <p className='text-gray-700'>{viewCourseData.code || 'N/A'}</p>
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Code</p>
+                  <p className='text-gray-800 font-mono'>{viewCourseData.code || 'N/A'}</p>
                 </div>
 
-                <div>
-                  <h3 className='text-lg font-semibold mb-2'>Duration</h3>
-                  <p className='text-gray-700'>
-                    {viewCourseData.duration
-                      ? `${viewCourseData.duration} months`
-                      : 'N/A'}
-                  </p>
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Duration</p>
+                  <p className='text-gray-800'>{viewCourseData.duration ? `${viewCourseData.duration} months` : 'N/A'}</p>
                 </div>
 
-                <div>
-                  <h3 className='text-lg font-semibold mb-2'>Credits</h3>
-                  <p className='text-gray-700'>
-                    {viewCourseData.credits || 'N/A'}
-                  </p>
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Credits</p>
+                  <p className='text-gray-800'>{viewCourseData.credits || 'N/A'}</p>
                 </div>
 
                 {viewCourseData.coursefaculty && (
-                  <div>
-                    <h3 className='text-lg font-semibold mb-2'>Faculty</h3>
-                    <p className='text-gray-700'>
-                      {viewCourseData.coursefaculty.title || 'N/A'}
-                    </p>
+                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Faculty</p>
+                    <p className='text-gray-800'>{viewCourseData.coursefaculty.title || 'N/A'}</p>
                   </div>
                 )}
               </div>
@@ -807,6 +687,6 @@ export default function CourseForm() {
           )}
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   )
 }
