@@ -28,7 +28,7 @@ import {
 } from './action'
 import NewsForm from './components/NewsForm'
 import { FormatDate } from '@/lib/date'
-import { formatDate } from '@/utils/date.util'
+import { formatDate, formatDateTime } from '@/utils/date.util'
 import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function NewsManager() {
@@ -67,7 +67,7 @@ export default function NewsManager() {
         header: 'Title',
         accessorKey: 'title',
         cell: ({ row }) => {
-          const { title, status, visibility, featuredImage } = row.original
+          const { title, status, visibility, featured_image } = row.original
           const statusLabel = status || 'draft'
           const visibilityLabel = visibility || 'private'
 
@@ -83,10 +83,10 @@ export default function NewsManager() {
 
           return (
             <div className='flex items-center gap-3 max-w-xs overflow-hidden'>
-              {featuredImage ? (
+              {featured_image ? (
                 <div className='w-20 h-20 rounded shrink-0 overflow-hidden bg-gray-100'>
                   <img
-                    src={featuredImage}
+                    src={featured_image}
                     alt='News'
                     className='w-full h-full object-cover'
                   />
@@ -139,7 +139,7 @@ export default function NewsManager() {
         cell: ({ getValue }) => {
           const date = new Date(getValue())
           return (
-            <div className='whitespace-nowrap'>{date.toLocaleDateString()}</div>
+            <div className='whitespace-nowrap'>{formatDateTime(date)}</div>
           )
         }
       },
@@ -272,7 +272,7 @@ export default function NewsManager() {
       const newsData = {
         title: data.title,
         description: data.description,
-        featuredImage: data.featuredImage,
+        featured_image: data.featured_image,
         status: data.status,
         visibility: data.visibility || 'private',
         author: author_id,
@@ -440,10 +440,10 @@ export default function NewsManager() {
             </div>
           ) : viewNewsData ? (
             <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
-              {viewNewsData.featuredImage && (
+              {viewNewsData.featured_image && (
                 <div className='w-full h-64 rounded-lg overflow-hidden'>
                   <img
-                    src={viewNewsData.featuredImage}
+                    src={viewNewsData.featured_image}
                     alt={viewNewsData.title}
                     className='w-full h-full object-cover'
                   />

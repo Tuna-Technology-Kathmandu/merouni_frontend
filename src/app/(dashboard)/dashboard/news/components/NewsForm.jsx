@@ -37,7 +37,7 @@ export default function NewsForm({
   loadingCategories = false
 }) {
   const [uploadedFiles, setUploadedFiles] = useState({
-    featuredImage: ''
+    featured_image: ''
   })
   const [selectedCollege, setSelectedCollege] = useState(null)
   const [selectedCategory, setSelectedCategory] = useState(null)
@@ -54,7 +54,7 @@ export default function NewsForm({
     defaultValues: {
       title: '',
       description: '',
-      featuredImage: '',
+      featured_image: '',
       status: 'draft',
       visibility: 'private',
       college_id: '',
@@ -115,13 +115,12 @@ export default function NewsForm({
       reset({
         title: '',
         description: '',
-        featuredImage: '',
+        featured_image: '',
         status: 'draft',
-        visibility: 'private',
         college_id: '',
         category_id: ''
       })
-      setUploadedFiles({ featuredImage: '' })
+      setUploadedFiles({ featured_image: '' })
       setSelectedCollege(null)
       setSelectedCategory(null)
       setFormErrors({})
@@ -134,14 +133,13 @@ export default function NewsForm({
       reset({
         title: initialData.title || '',
         description: initialData.description || '',
-        featuredImage: initialData.featuredImage || '',
+        featured_image: initialData.featured_image || '',
         status: initialData.status || 'draft',
-        visibility: initialData.visibility || 'private',
         college_id: initialData.college_id || initialData.newsCollege?.id || '',
         category_id: initialData.category_id || initialData.newsCategory?.id || ''
       })
       setUploadedFiles({
-        featuredImage: initialData.featuredImage || ''
+        featured_image: initialData.featured_image || ''
       })
 
       // Initialize Selected College
@@ -165,8 +163,8 @@ export default function NewsForm({
     if (!data.category_id) {
       newErrors.category_id = 'Category is required'
     }
-    if (!uploadedFiles.featuredImage) {
-      newErrors.featuredImage = 'Featured image is required'
+    if (!uploadedFiles.featured_image) {
+      newErrors.featured_image = 'Featured image is required'
     }
     const descriptionText = (data.description || '').replace(/<[^>]*>/g, '').trim()
     if (!descriptionText) {
@@ -187,6 +185,7 @@ export default function NewsForm({
       isOpen={isOpen}
       onClose={onClose}
       className='max-w-6xl'
+      closeOnOutsideClick={false}
     >
       <DialogHeader className="bg-white border-b border-gray-100 p-6">
         <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -200,7 +199,7 @@ export default function NewsForm({
           onSubmit={handleSubmit(handleFormSubmit)}
           className='flex flex-col max-h-[calc(100vh-120px)]'
         >
-          <div className='flex-1 p-8 overflow-y-auto'>
+          <div className='flex-1 p-8'>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-10">
               {/* Left Column - Main Content (8/12) */}
               <div className="lg:col-span-8 space-y-8">
@@ -282,21 +281,21 @@ export default function NewsForm({
               {/* Right Column - Media & Settings (4/12) */}
               <div className="lg:col-span-4 space-y-8">
                 {/* Featured Image Section */}
-                <div className={`bg-white p-6 rounded-2xl shadow-sm border ${formErrors.featuredImage ? 'border-red-300' : 'border-gray-100'}`}>
+                <div className={`bg-white p-6 rounded-2xl shadow-sm border ${formErrors.featured_image ? 'border-red-300' : 'border-gray-100'}`}>
                   <SectionHeader icon={ImageIcon} title="Featured Image" subtitle="Required — main image for the news" />
-                  <div className={`p-4 bg-gray-50 rounded-xl border border-dashed ${formErrors.featuredImage ? 'border-red-300 bg-red-50/30' : 'border-gray-100'}`}>
+                  <div className={`p-4 bg-gray-50 rounded-xl border border-dashed ${formErrors.featured_image ? 'border-red-300 bg-red-50/30' : 'border-gray-100'}`}>
                     <FileUpload
                       label=''
                       onUploadComplete={(url) => {
-                        setUploadedFiles(prev => ({ ...prev, featuredImage: url }))
-                        setValue('featuredImage', url)
-                        setFormErrors(prev => ({ ...prev, featuredImage: '' }))
+                        setUploadedFiles(prev => ({ ...prev, featured_image: url }))
+                        setValue('featured_image', url)
+                        setFormErrors(prev => ({ ...prev, featured_image: '' }))
                       }}
-                      defaultPreview={uploadedFiles.featuredImage}
+                      defaultPreview={uploadedFiles.featured_image}
                     />
                   </div>
-                  {formErrors.featuredImage && (
-                    <p className='text-xs text-destructive mt-1'>{formErrors.featuredImage}</p>
+                  {formErrors.featured_image && (
+                    <p className='text-xs text-destructive mt-1'>{formErrors.featured_image}</p>
                   )}
                 </div>
 
@@ -316,17 +315,7 @@ export default function NewsForm({
                       </select>
                     </div>
 
-                    <div className='space-y-2'>
-                      <Label htmlFor='visibility'>Visibility</Label>
-                      <select
-                        id='visibility'
-                        {...register('visibility')}
-                        className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#387cae] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                      >
-                        <option value='private'>Private</option>
-                        <option value='public'>Public</option>
-                      </select>
-                    </div>
+                   
                   </div>
                 </div>
               </div>
