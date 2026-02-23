@@ -58,6 +58,7 @@ export default function CategoryManager() {
       setTableLoading(true)
       const response = await fetchCategories(page)
       setCategories(response.items)
+      console.log(response,"responseresponse")
       setPagination({
         currentPage: response.pagination.currentPage,
         totalPages: response.pagination.totalPages,
@@ -214,7 +215,9 @@ export default function CategoryManager() {
       </div>
 
       {/* Create / Edit Modal */}
-      <Dialog isOpen={isOpen} onClose={handleCloseModal} className='max-w-lg'>
+      <Dialog isOpen={isOpen}
+
+       onClose={handleCloseModal} className='max-w-lg'>
         <DialogContent className='max-w-lg max-h-[90vh] flex flex-col p-0'>
           <DialogHeader className='px-6 py-4 border-b'>
             <DialogTitle className="text-lg font-semibold text-gray-900">
@@ -248,10 +251,10 @@ export default function CategoryManager() {
                   className={`flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#387cae] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${errors.type ? 'border-destructive' : 'border-input'}`}
                 >
                   <option value=''>Select type…</option>
-                  <option value='BLOG'>BLOG</option>
-                  <option value='EVENT'>EVENT</option>
-                  <option value='NEWS'>NEWS</option>
-                  <option value='MATERIAL'>MATERIAL</option>
+                  <option value='BLOG'>Blog</option>
+                  <option value='EVENT'>Event</option>
+                  <option value='NEWS'>News</option>
+                  <option value='MATERIAL'>Material</option>
                 </select>
                 {errors.type && <p className='text-xs text-destructive mt-1'>{errors.type.message}</p>}
               </div>

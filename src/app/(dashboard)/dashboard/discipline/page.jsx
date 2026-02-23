@@ -191,15 +191,15 @@ export default function DisciplineManager() {
                             </div>
                         )}
                         <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Title</p>
+                            <p className="text-xs font-semibold  uppercase tracking-widest mb-0.5">Title</p>
                             <p className="text-lg font-bold text-gray-900">{viewingDiscipline?.title}</p>
                         </div>
                         <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Description</p>
+                            <p className="text-xs font-semibold  uppercase tracking-widest mb-1">Description</p>
                             <p className="text-gray-700 text-sm leading-relaxed">{viewingDiscipline?.description || 'No description provided.'}</p>
                         </div>
                         <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Created At</p>
+                            <p className="text-xs font-semibold  uppercase tracking-widest mb-0.5">Created At</p>
                             <p className="text-sm text-gray-600">{viewingDiscipline?.createdAt ? formatDate(viewingDiscipline.createdAt) : '—'}</p>
                         </div>
                     </div>
