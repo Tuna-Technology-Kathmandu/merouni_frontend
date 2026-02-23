@@ -2,23 +2,23 @@
 
 import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
+import SearchInput from '@/ui/molecules/SearchInput'
 import { Button } from '@/ui/shadcn/button'
+import Table from '@/ui/shadcn/DataTable'
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from '@/ui/shadcn/dialog'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { formatDate } from '@/utils/date.util'
-import { Edit2, ExternalLink, Eye, Search, Trash2 } from 'lucide-react'
+import { Edit2, ExternalLink, Eye, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loader from '../../../../ui/molecules/Loading'
-import Table from '@/ui/shadcn/DataTable'
-import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import FileUpload from '../addCollege/FileUpload'
 import { fetchVideos } from './action'
-import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function VideoManager() {
   const { setHeading } = usePageHeading()
@@ -220,15 +220,13 @@ export default function VideoManager() {
     }
     try {
       if (editingId) {
-        // Update video if in edit mode
         await updateVideo(formattedData, editingId)
         toast.success('Video updated successfully')
       } else {
-        // Otherwise, create a new video
         await createVideo(formattedData)
         toast.success('Video created successfully')
       }
-      reset() // Clear form
+      reset()
       setEditingId(null)
       setEditing(false)
       setIsOpen(false)
@@ -374,6 +372,7 @@ export default function VideoManager() {
             </Button>
           </div>
         </div>
+        <ToastContainer />
 
         <Dialog
           isOpen={isOpen}
@@ -384,35 +383,31 @@ export default function VideoManager() {
             reset()
             setUploadedFiles({ featured_image: '' })
           }}
-          className='max-w-2xl'
+          className='max-w-5xl'
         >
-          <DialogHeader>
-            <DialogTitle>{editing ? 'Edit Video' : 'Add Video'}</DialogTitle>
-            <DialogClose onClick={() => {
-              setIsOpen(false)
-              setEditing(false)
-              setEditingId(null)
-              reset()
-              setUploadedFiles({ featured_image: '' })
-            }}
-            />
-          </DialogHeader>
-          <DialogContent>
-            <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
+          <DialogContent className='max-w-5xl max-h-[90vh] flex flex-col p-0'>
+            <DialogHeader className='px-6 py-4 border-b'>
+              <DialogTitle>{editing ? 'Edit Video' : 'Add Video'}</DialogTitle>
+              <DialogClose
+                onClick={() => {
+                  setIsOpen(false)
+                  setEditing(false)
+                  setEditingId(null)
+                  reset()
+                  setUploadedFiles({ featured_image: '' })
+                }}
+              />
+            </DialogHeader>
+            <div className='flex-1 overflow-y-auto p-6'>
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className='flex flex-col flex-1 overflow-hidden'
+                className='flex flex-col flex-1'
               >
-                <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
+                <div className='flex-1 space-y-6'>
                   <div className='bg-white p-6 rounded-lg shadow-md'>
-                    <h2 className='text-xl font-semibold mb-4'>
-                      Video Information
-                    </h2>
                     <div className='space-y-4'>
                       <div>
-                        <Label>
-                          Title <span className='text-red-500'>*</span>
-                        </Label>
+                        <Label required>Title</Label>
                         <Input
                           type='text'
                           placeholder='Video Title'
@@ -422,51 +417,70 @@ export default function VideoManager() {
                           className='w-full p-2 border rounded'
                         />
                         {errors.title && (
-                          <span className='text-red-500 text-sm'>
+                          <span className='text-red-500 text-sm mt-1 block'>
                             {errors.title.message}
                           </span>
                         )}
                       </div>
                       <div>
-                        <Label>
-                          Youtube Link <span className='text-red-500'>*</span>
-                        </Label>
+                        <Label required>Youtube Link</Label>
                         <Input
                           type='url'
                           placeholder='https://youtube.com/...'
                           {...register('yt_video_link', {
-                            required: 'Youtube link is required'
+                            required: 'Youtube link is required',
+                            pattern: {
+                              value: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/,
+                              message: 'Please enter a valid YouTube URL'
+                            }
                           })}
                           className='w-full p-2 border rounded'
                         />
                         {errors.yt_video_link && (
-                          <span className='text-red-500 text-sm'>
+                          <span className='text-red-500 text-sm mt-1 block'>
                             {errors.yt_video_link.message}
                           </span>
                         )}
                       </div>
 
                       <div>
-                        <Label>Description</Label>
+                        <Label required>Description</Label>
                         <textarea
                           placeholder='Video Description'
-                          {...register('description')}
+                          {...register('description', {
+                            required: 'Description is required'
+                          })}
                           className='w-full p-2 border rounded min-h-[100px]'
                           rows={4}
                         />
+                        {errors.description && (
+                          <span className='text-red-500 text-sm mt-1 block'>
+                            {errors.description.message}
+                          </span>
+                        )}
                       </div>
                       <div>
-                        <Label>Featured Image (Optional)</Label>
                         <FileUpload
+                          label='Featured Image'
+                          required={true}
                           defaultPreview={uploadedFiles.featured_image}
                           onUploadComplete={(url) => {
                             setUploadedFiles((prev) => ({
                               ...prev,
                               featured_image: url
                             }))
-                            setValue('featured_image', url)
+                            setValue('featured_image', url, { shouldValidate: true })
                           }}
                         />
+                        <input
+                          type='hidden'
+                          {...register('featured_image', { required: 'Featured image is required' })}
+                        />
+                        {errors.featured_image && (
+                          <span className='text-red-500 text-sm mt-1 block'>
+                            {errors.featured_image.message}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -474,19 +488,6 @@ export default function VideoManager() {
 
                 {/* Submit Button - Sticky Footer */}
                 <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
-                  <Button
-                    type='button'
-                    variant='outline'
-                    onClick={() => {
-                      setIsOpen(false)
-                      setEditing(false)
-                      setEditingId(null)
-                      reset()
-                      setUploadedFiles({ featured_image: '' })
-                    }}
-                  >
-                    Cancel
-                  </Button>
                   <Button type='submit'>
                     {editing ? 'Update Video' : 'Create Video'}
                   </Button>
