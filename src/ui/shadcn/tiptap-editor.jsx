@@ -423,9 +423,13 @@ export default function TipTapEditor({ value, onChange, onMediaUpload, placehold
   })
 
   // Update editor content when value prop changes
-  if (editor && value !== editor.getHTML()) {
-    editor.commands.setContent(value || '')
-  }
+  useEffect(() => {
+    if (editor && value !== undefined && value !== editor.getHTML()) {
+      // Use a small timeout or check to avoid interrupting the user
+      // or simply rely on the fact that useEffect runs after render
+      editor.commands.setContent(value || '', false)
+    }
+  }, [value, editor])
 
   return (
     <div className='border border-gray-200 rounded-xl bg-white flex flex-col focus-within:ring-2 focus-within:ring-[#387cae]/10 focus-within:border-[#387cae] transition-all shadow-sm'>

@@ -28,7 +28,7 @@ import {
     Users
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
@@ -114,10 +114,7 @@ const CreateUpdateUniversityModal = ({
                     email: ''
                 }
             ],
-            assets: {
-                featured_image: '',
-                videos: ''
-            },
+            map: '',
             gallery: []
         }
     })
@@ -188,6 +185,7 @@ const CreateUpdateUniversityModal = ({
                     setValue('postal_code', uniData.postal_code)
                     setValue('date_of_establish', uniData.date_of_establish ? uniData.date_of_establish.split('T')[0] : '')
                     setValue('type_of_institute', uniData.type_of_institute || 'Public')
+                    setValue('map', uniData.map || '')
                     setValue('description', uniData.description || '')
 
                     if (uniData.contact) {
@@ -200,12 +198,13 @@ const CreateUpdateUniversityModal = ({
                     const levelIds = (uniData.levels || []).map(l => String(l.id || l))
                     setValue('levels', levelIds)
 
-                    // Programs are complicates because they might be names or IDs in the response
+                    // Programs are complicates because they might be nested objects in the response
                     const programIds = (uniData.programs || []).map(p => {
-                        if (typeof p === 'object' && p.id) return String(p.id)
-                        if (typeof p === 'string' && !isNaN(p)) return p
-                        return p
-                    })
+                        if (typeof p === 'object') {
+                            return String(p.program_id || p.program?.id || p.id)
+                        }
+                        return String(p)
+                    }).filter(Boolean)
                     setValue('programs', programIds)
 
                     const members = uniData.members?.length
@@ -213,7 +212,7 @@ const CreateUpdateUniversityModal = ({
                         : [{ role: '', salutation: '', name: '', phone: '', email: '' }]
                     setValue('members', members)
 
-                    const featuredImg = uniData.assets?.featured_image || ''
+                    const featuredImg = uniData.featured_image || ''
                     const logo = uniData.logo || ''
                     const galleryUrls = uniData.gallery || []
 
@@ -221,8 +220,14 @@ const CreateUpdateUniversityModal = ({
                         .filter(url => url)
                         .map(url => ({ url, file_type: 'image' }))
 
-                    const videoUrl = uniData.assets?.videos || ''
-                    const videos = videoUrl ? [{ url: videoUrl, file_type: 'video' }] : []
+                    let videos = []
+                    if (uniData.videos) {
+                        if (Array.isArray(uniData.videos)) {
+                            videos = uniData.videos.map(url => ({ url, file_type: 'video' }))
+                        } else if (typeof uniData.videos === 'string') {
+                            videos = [{ url: uniData.videos, file_type: 'video' }]
+                        }
+                    }
 
                     setUploadedFiles({
                         logo,
@@ -232,7 +237,7 @@ const CreateUpdateUniversityModal = ({
                     })
 
                     setValue('logo', logo)
-                    setValue('assets.featured_image', featuredImg)
+                    setValue('featured_image', featuredImg)
 
                 } catch (error) {
                     console.error('Error fetching university data:', error)
@@ -259,7 +264,7 @@ const CreateUpdateUniversityModal = ({
                 levels: [],
                 programs: [],
                 members: [{ role: '', salutation: '', name: '', phone: '', email: '' }],
-                assets: { featured_image: '', videos: '' },
+                map: '',
                 gallery: []
             })
             setUploadedFiles({
@@ -326,6 +331,7 @@ const CreateUpdateUniversityModal = ({
             data.logo = uploadedFiles.logo
             data.featured_image = uploadedFiles.featured_image
             data.gallery = uploadedFiles.images.map(img => img.url).filter(Boolean)
+            data.videos = uploadedFiles.videos.map(v => v.url).filter(Boolean)
 
             data.levels = (data.levels || []).map(id => parseInt(id)).filter(id => !isNaN(id))
             data.programs = (data.programs || []).map(id => parseInt(id)).filter(id => !isNaN(id))
@@ -365,17 +371,17 @@ const CreateUpdateUniversityModal = ({
     }
 
     const handleSelectProgram = (program) => {
-        const current = watch('programs') || []
+        const current = getValues('programs') || []
         const id = String(program.id || program)
         if (!current.includes(id)) {
-            setValue('programs', [...current, id], { shouldDirty: true })
+            setValue('programs', [...current, id], { shouldDirty: true, shouldValidate: true })
         }
     }
 
     const handleRemoveProgram = (program) => {
-        const current = watch('programs') || []
+        const current = getValues('programs') || []
         const id = String(program.id || program)
-        setValue('programs', current.filter(i => i !== id), { shouldDirty: true })
+        setValue('programs', current.filter(i => i !== id), { shouldDirty: true, shouldValidate: true })
     }
 
     const selectedPrograms = allCourses
@@ -390,7 +396,7 @@ const CreateUpdateUniversityModal = ({
     }
 
     const handleSelectLevel = (level) => {
-        const current = watch('levels') || []
+        const current = getValues('levels') || []
         const id = String(level.id || level)
         if (!current.includes(id)) {
             setValue('levels', [...current, id], { shouldDirty: true, shouldValidate: true })
@@ -398,7 +404,7 @@ const CreateUpdateUniversityModal = ({
     }
 
     const handleRemoveLevel = (level) => {
-        const current = watch('levels') || []
+        const current = getValues('levels') || []
         const id = String(level.id || level)
         setValue('levels', current.filter(i => i !== id), { shouldDirty: true, shouldValidate: true })
     }
@@ -519,21 +525,27 @@ const CreateUpdateUniversityModal = ({
                                     <div className='space-y-6'>
                                         <div>
                                             <Label required={true} className="mb-2.5">Description</Label>
-                                            <TipTapEditor
-                                                onMediaUpload={onMediaUpload}
-                                                showImageUpload={true}
-                                                value={watch('description')}
-                                                onChange={(data) => setValue('description', data, { shouldDirty: true, shouldValidate: true })}
-                                                placeholder='Enter university description and content...'
+                                            <Controller
+                                                name="description"
+                                                control={control}
+                                                rules={{ required: 'University description is required' }}
+                                                render={({ field }) => (
+                                                    <TipTapEditor
+                                                        onMediaUpload={onMediaUpload}
+                                                        showImageUpload={true}
+                                                        value={field.value}
+                                                        onChange={field.onChange}
+                                                        placeholder='Enter university description and content...'
+                                                    />
+                                                )}
                                             />
                                             {errors.description && (
                                                 <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.description.message}</p>
                                             )}
-                                            <input type="hidden" {...register('description', { required: 'University description is required' })} />
                                         </div>
 
                                         <div>
-                                            <Label className="mb-3 block">Programs Offered</Label>
+                                            <Label required={true} className="mb-3 block">Programs Offered</Label>
                                             <SearchSelectCreate
                                                 onSearch={onSearchCourses}
                                                 onSelect={handleSelectProgram}
@@ -546,6 +558,10 @@ const CreateUpdateUniversityModal = ({
                                                 className="w-full"
                                                 isLoading={loadingResources}
                                             />
+                                            {errors.programs && (
+                                                <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.programs.message}</p>
+                                            )}
+                                            <input type="hidden" {...register('programs', { required: 'At least one program is required' })} />
                                         </div>
                                     </div>
                                 </div>
@@ -603,14 +619,31 @@ const CreateUpdateUniversityModal = ({
                                                 />
                                             </div>
                                         </div>
-                                        <div>
-                                            <Label htmlFor='postal_code'>Postal Code</Label>
-                                            <Input
-                                                id='postal_code'
-                                                {...register('postal_code')}
-                                                placeholder='44600'
-                                                className="h-11 rounded-xl border-gray-200 max-w-[200px]"
-                                            />
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                            <div>
+                                                <Label htmlFor='postal_code'>Postal Code</Label>
+                                                <Input
+                                                    id='postal_code'
+                                                    {...register('postal_code')}
+                                                    placeholder='44600'
+                                                    className="h-11 rounded-xl border-gray-200"
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label htmlFor='map' required={true}>Google Maps URL</Label>
+                                                <div className="relative">
+                                                    <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                                    <Input
+                                                        id='map'
+                                                        {...register('map', { required: 'Google Maps URL is required' })}
+                                                        placeholder='Paste Google Maps share link...'
+                                                        className="h-11 pl-10 rounded-xl border-gray-200"
+                                                    />
+                                                </div>
+                                                {errors.map && (
+                                                    <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.map.message}</p>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -773,18 +806,18 @@ const CreateUpdateUniversityModal = ({
                                                 label=""
                                                 onUploadComplete={(url) => {
                                                     handleSetFiles(prev => ({ ...prev, featured_image: url }))
-                                                    setValue('assets.featured_image', url, { shouldValidate: true })
+                                                    setValue('featured_image', url, { shouldValidate: true })
                                                 }}
                                                 defaultPreview={uploadedFiles.featured_image}
                                                 onClear={() => {
                                                     handleSetFiles(prev => ({ ...prev, featured_image: '' }))
-                                                    setValue('assets.featured_image', '', { shouldValidate: true })
+                                                    setValue('featured_image', '', { shouldValidate: true })
                                                 }}
                                             />
-                                            {errors.assets?.featured_image && (
+                                            {errors.featured_image && (
                                                 <p className='text-xs font-semibold text-red-500 mt-2 ml-1 text-center'>{errors.assets.featured_image.message}</p>
                                             )}
-                                            <input type="hidden" {...register('assets.featured_image', { required: 'Featured image is required' })} />
+                                            <input type="hidden" {...register('featured_image', { required: 'Featured image is required' })} />
                                         </div>
                                     </div>
                                 </div>
