@@ -37,6 +37,8 @@ const UserCard = ({ type, value, loading }) => {
         return "/dashboard/referStudent"
       case "referred consultancies":
         return "/dashboard/referConsultancy"
+      case "total applications":
+        return "/dashboard/applications"
       default:
         return '/dashboard'
     }
