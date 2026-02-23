@@ -420,7 +420,7 @@ export default function SkillsCoursesManager() {
 
                                     {/* Price */}
                                     <div className="space-y-2">
-                                        <Label htmlFor="price">Price (Rs.)</Label>
+                                        <Label htmlFor="price" required>Price (Rs.)</Label>
                                         <Input
                                             id="price"
                                             type='number'
@@ -428,9 +428,10 @@ export default function SkillsCoursesManager() {
                                             min='0'
                                             placeholder='0 = Free'
                                             {...register('price', {
+                                                required: 'Price is required (enter 0 for free)',
                                                 min: { value: 0, message: 'Price cannot be negative' },
                                                 validate: (v) =>
-                                                    v === '' || v === null || !isNaN(parseFloat(v)) || 'Enter a valid price'
+                                                    v !== '' && v !== null && !isNaN(parseFloat(v)) || 'Enter a valid price'
                                             })}
                                             className={errors.price ? 'border-destructive focus-visible:ring-destructive' : ''}
                                         />
@@ -441,11 +442,12 @@ export default function SkillsCoursesManager() {
 
                                     {/* Duration */}
                                     <div className="space-y-2">
-                                        <Label htmlFor="duration">Duration</Label>
+                                        <Label htmlFor="duration" required>Duration</Label>
                                         <Input
                                             id="duration"
                                             placeholder='e.g. 3 months, 6 weeks'
                                             {...register('duration', {
+                                                required: 'Duration is required',
                                                 maxLength: { value: 100, message: 'Max 100 characters' }
                                             })}
                                             className={errors.duration ? 'border-destructive focus-visible:ring-destructive' : ''}
@@ -475,11 +477,12 @@ export default function SkillsCoursesManager() {
                                 <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Content</h3>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="description">Short Description</Label>
+                                    <Label htmlFor="description" required>Short Description</Label>
                                     <Textarea
                                         id="description"
                                         placeholder='Brief summary of the course...'
                                         {...register('description', {
+                                            required: 'Short description is required',
                                             maxLength: { value: 1000, message: 'Description must be 1000 characters or fewer' }
                                         })}
                                         rows={3}
@@ -491,16 +494,28 @@ export default function SkillsCoursesManager() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label>Detailed Content</Label>
+                                    <Label required>Detailed Content</Label>
                                     <Controller
                                         name='content'
                                         control={control}
+                                        rules={{
+                                            validate: (val) =>
+                                                (val && val.replace(/<[^>]*>/g, '').trim().length > 0) ||
+                                                'Detailed content is required'
+                                        }}
                                         render={({ field }) => (
-                                            <TipTapEditor
-                                                value={field.value}
-                                                onChange={field.onChange}
-                                                placeholder='Enter curriculum, modules, requirements...'
-                                            />
+                                            <>
+                                                <div className={errors.content ? 'ring-2 ring-destructive rounded-xl' : ''}>
+                                                    <TipTapEditor
+                                                        value={field.value}
+                                                        onChange={field.onChange}
+                                                        placeholder='Enter curriculum, modules, requirements...'
+                                                    />
+                                                </div>
+                                                {errors.content && (
+                                                    <p className='text-xs text-destructive mt-1'>{errors.content.message}</p>
+                                                )}
+                                            </>
                                         )}
                                     />
                                 </div>

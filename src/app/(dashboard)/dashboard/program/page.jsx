@@ -21,7 +21,6 @@ export default function ProgramForm() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
 
-  // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showViewModal, setShowViewModal] = useState(false)
   const [selectedSlug, setSelectedSlug] = useState(null)
@@ -32,14 +31,12 @@ export default function ProgramForm() {
     total: 0
   })
 
-  // Fetch all necessary data on component mount
   useEffect(() => {
     setHeading('Program Management')
     fetchPrograms()
     return () => setHeading(null)
   }, [setHeading])
 
-  // Handle query parameter to open add form
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search)
     if (searchParams.get('add') === 'true') {
@@ -230,6 +227,7 @@ export default function ProgramForm() {
     }
   ]
 
+  console.log(programs,"programsprograms")
   return (
     <div className='w-full space-y-4 p-4'>
       {/* Header Section */}
@@ -243,7 +241,6 @@ export default function ProgramForm() {
             className='max-w-md w-full'
           />
 
-          {/* Button */}
           <Button onClick={handleCreate} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
             <Plus className="w-4 h-4" />
             Add Program
