@@ -1,4 +1,6 @@
 import { Edit2, Trash2 } from 'lucide-react'
+import { Button } from '@/ui/shadcn/button'
+import { formatRelativeWithTitle } from '@/utils/date.util'
 
 export const createColumns = ({ handleEdit, handleDelete }) => [
   {
@@ -18,12 +20,12 @@ export const createColumns = ({ handleEdit, handleDelete }) => [
         }
       }
       const activeRoles = Object.entries(roles)
-        .filter(([_, value]) => value) // keep only true roles
+        .filter(([_, value]) => value)
         .map(([role]) => role)
 
       return (
         <div className='flex flex-col gap-1'>
-          <span className='font-medium'>{fullName}</span>
+          <span className='font-medium text-gray-900'>{fullName}</span>
           {activeRoles.length > 0 && (
             <div className='flex gap-1 flex-wrap'>
               {activeRoles.map((role) => (
@@ -42,35 +44,53 @@ export const createColumns = ({ handleEdit, handleDelete }) => [
   },
   {
     header: 'Email',
-    accessorKey: 'email'
+    accessorKey: 'email',
+    cell: ({ getValue }) => (
+      <span className='text-gray-600 text-sm'>{getValue() || 'N/A'}</span>
+    )
   },
   {
     header: 'Phone Number',
     accessorKey: 'phoneNo',
-    cell: ({ getValue }) => getValue() || 'N/A'
+    cell: ({ getValue }) => (
+      <span className='text-gray-600 text-sm'>{getValue() || 'N/A'}</span>
+    )
   },
   {
     header: 'Created At',
     accessorKey: 'createdAt',
-    cell: ({ getValue }) => new Date(getValue()).toLocaleDateString()
+    cell: ({ getValue }) => {
+      const { label, title } = formatRelativeWithTitle(getValue())
+      return (
+        <span className='text-gray-500 text-sm cursor-default' title={title}>
+          {label}
+        </span>
+      )
+    }
   },
   {
     header: 'Actions',
     id: 'actions',
     cell: ({ row }) => (
-      <div className='flex gap-2'>
-        <button
+      <div className='flex gap-1'>
+        <Button
+          variant='ghost'
+          size='icon'
           onClick={() => handleEdit(row.original)}
-          className='p-1 text-blue-600 hover:text-blue-800'
+          className='hover:bg-amber-50 text-amber-600'
+          title='Edit'
         >
           <Edit2 className='w-4 h-4' />
-        </button>
-        <button
+        </Button>
+        <Button
+          variant='ghost'
+          size='icon'
           onClick={() => handleDelete(row.original.id)}
-          className='p-1 text-red-600 hover:text-red-800'
+          className='hover:bg-red-50 text-red-600'
+          title='Delete'
         >
           <Trash2 className='w-4 h-4' />
-        </button>
+        </Button>
       </div>
     )
   }
