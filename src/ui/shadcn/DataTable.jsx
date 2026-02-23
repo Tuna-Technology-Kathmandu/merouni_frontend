@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-table'
 import { ChevronUp, ChevronDown } from 'lucide-react'
 import SearchInput from '../molecules/SearchInput'
-import ShimmerEffect from '../molecules/ShimmerEffect'
+import CircularLoader from '../molecules/CircularLoader'
 import {
   Table as ShadcnTable,
   TableBody,
@@ -99,8 +99,8 @@ const Table = ({
 
       {/* Table Container */}
       {loading ? (
-        <div className='px-4'>
-          <ShimmerEffect />
+        <div className='flex justify-center items-center py-24 bg-white border rounded-md'>
+          <CircularLoader size='w-8 h-8' />
         </div>
       ) : (
         <div className='rounded-md border bg-white'>

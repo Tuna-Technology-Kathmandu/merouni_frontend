@@ -1,19 +1,28 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
-import TipTapEditor from '@/ui/shadcn/tiptap-editor'
-import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
+import { authFetch } from '@/app/utils/authFetch'
 import { Button } from '@/ui/shadcn/button'
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from '@/ui/shadcn/dialog'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
-import FileUpload from '../../addCollege/FileUpload'
-import { authFetch } from '@/app/utils/authFetch'
-import { Search } from 'lucide-react'
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
+import SearchSelectCreate from '@/ui/shadcn/search-select-create'
+import axios from 'axios'
+import { Image as ImageIcon, Info, Layers, Loader2, Settings } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
+import FileUpload from '../../addCollege/FileUpload'
+import { Textarea } from '@/ui/shadcn/textarea'
 
-const RequiredLabel = ({ children, htmlFor }) => (
-    <Label htmlFor={htmlFor}>
-        {children} <span className='text-red-500'>*</span>
-    </Label>
+const SectionHeader = ({ icon: Icon, title, subtitle }) => (
+    <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 rounded-xl bg-[#387cae]/10 flex items-center justify-center text-[#387cae] shadow-sm border border-[#387cae]/20">
+            <Icon size={20} />
+        </div>
+        <div>
+            <h3 className="text-lg font-bold text-gray-900 leading-tight">{title}</h3>
+            {subtitle && <p className="text-xs text-gray-400 mt-0.5 font-medium">{subtitle}</p>}
+        </div>
+    </div>
 )
 
 const BlogFormModal = ({
@@ -30,10 +39,8 @@ const BlogFormModal = ({
         featured_image: '',
         pdf_file: ''
     })
-    const [tagsSearch, setTagsSearch] = useState('')
-    const [searchResults, setSearchResults] = useState([])
     const [selectedTags, setSelectedTags] = useState([])
-    const searchTimeout = useRef(null)
+    const [selectedCategory, setSelectedCategory] = useState(null)
 
     const {
         register,
@@ -60,10 +67,9 @@ const BlogFormModal = ({
     useEffect(() => {
         if (isOpen) {
             if (isEditing && initialData) {
-                // Reset form to initialData
                 reset({
                     title: initialData.title || '',
-                    category: initialData.category?.id || initialData.category || '', // Handle object or ID
+                    category: initialData.category?.id || initialData.category || '',
                     description: initialData.description || '',
                     content: initialData.content || '',
                     status: initialData.status || 'draft',
@@ -77,7 +83,6 @@ const BlogFormModal = ({
                 setValue('featured_image', initialData.featured_image || '')
                 setValue('pdf_file', initialData.pdf_file || '')
 
-                // Parse and set tags
                 let blogTags = initialData.tags || []
                 if (typeof blogTags === 'string') {
                     try {
@@ -87,18 +92,7 @@ const BlogFormModal = ({
                     }
                 }
 
-                // Use initialData.tags directly if they are objects, otherwise we might need to fetch them
-                // Assuming initialData passed from page.jsx acts as the source of truth.
-                // If initialData.tags are IDs (numbers), we might display them differently or fetch them?
-                // In page.jsx logic, it fetched missing tags.
-                // For simplicity, we assume `initialData.tags` passed here are fully populated objects if possible,
-                // or we handle what we have. If they are IDs, we can't show titles.
-                // Let's rely on what's passed.
-
                 if (Array.isArray(blogTags)) {
-                    // Filter out IDs if we need objects for display, or accept what we have
-                    // If we receive IDs only, we can't show names without fetching.
-                    // Ideally parent passes full objects.
                     setSelectedTags(blogTags)
                     setValue('tags', blogTags.map(t => typeof t === 'object' ? t.id : t))
                 } else {
@@ -106,8 +100,21 @@ const BlogFormModal = ({
                     setValue('tags', [])
                 }
 
+                // Handle Category Initialization
+                if (initialData.category) {
+                    const cat = typeof initialData.category === 'object'
+                        ? initialData.category
+                        : categories.find(c => c.id === initialData.category || c.id === parseInt(initialData.category))
+
+                    if (cat) {
+                        setSelectedCategory(cat)
+                        setValue('category', cat.id)
+                    }
+                } else {
+                    setSelectedCategory(null)
+                }
+
             } else {
-                // Reset for create
                 reset({
                     title: '',
                     category: '',
@@ -122,58 +129,110 @@ const BlogFormModal = ({
                 })
                 setUploadedFiles({ featured_image: '', pdf_file: '' })
                 setSelectedTags([])
-                setTagsSearch('')
-                setSearchResults([])
+                setSelectedCategory(null)
             }
         }
     }, [isOpen, isEditing, initialData, reset, setValue])
 
-
-    const handleTagsSearch = (e) => {
-        const query = e.target.value
-        setTagsSearch(query)
-
-        if (searchTimeout.current) clearTimeout(searchTimeout.current)
-        if (query.length < 2) {
-            setSearchResults([])
-            return
+    const onSearchTags = async (query) => {
+        try {
+            const url = query ? `${process.env.baseUrl}/tag?q=${query}` : `${process.env.baseUrl}/tag`
+            const response = await authFetch(url)
+            const data = await response.json()
+            return data.items || []
+        } catch (error) {
+            console.error('Tags Search Error:', error)
+            return []
         }
-        searchTimeout.current = setTimeout(async () => {
-            try {
-                const response = await authFetch(
-                    `${process.env.baseUrl}/tag?q=${query}`
-                )
-                const data = await response.json()
-                setSearchResults(data.items || [])
-            } catch (error) {
-                console.error('Tags Search Error:', error)
-                toast.error('Failed to search tags')
+    }
+
+    const onCreateTag = async (title) => {
+        try {
+            const response = await authFetch(`${process.env.baseUrl}/tag`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, author: authors?.[0]?.id || 1 })
+            })
+            const data = await response.json()
+            if (response.ok) {
+                toast.success('Tag created successfully')
+                return data.tag || data.item || data
             }
-        }, 300)
+            throw new Error(data.message || 'Failed to create tag')
+        } catch (error) {
+            toast.error(error.message)
+            return null
+        }
+    }
+
+    const onSearchCategories = async (query) => {
+        try {
+            const url = query ? `${process.env.baseUrl}/category?q=${query}&type=BLOG` : `${process.env.baseUrl}/category?type=BLOG`
+            const response = await authFetch(url)
+            const data = await response.json()
+            return data.items || []
+        } catch (error) {
+            console.error('Categories Search Error:', error)
+            return []
+        }
+    }
+
+
+    const handleSelectCategory = (category) => {
+        setSelectedCategory(category)
+        setValue('category', category.id)
+    }
+
+    const handleRemoveCategory = () => {
+        setSelectedCategory(null)
+        setValue('category', '')
     }
 
     const handleSelectTag = (tag) => {
-        // Check if tag is already selected
-        // Handle both object tags and ID tags if mixed, but prefer objects
-        const isSelected = selectedTags.some((t) => (t.id || t) === tag.id)
+        const isSelected = selectedTags.some((t) => (t.id || t) === (tag.id || tag))
         if (!isSelected) {
             const newTags = [...selectedTags, tag]
             setSelectedTags(newTags)
-            setValue(
-                'tags',
-                newTags.map((t) => t.id)
-            )
+            setValue('tags', newTags.map((t) => t.id || t))
         }
-        setTagsSearch('')
-        setSearchResults([])
+    }
+
+    const handleRemoveTag = (tag) => {
+        const newTags = selectedTags.filter((t) => (t.id || t) !== (tag.id || tag))
+        setSelectedTags(newTags)
+        setValue('tags', newTags.map((t) => t.id || t))
+    }
+
+    const onMediaUpload = async (file) => {
+        const formData = new FormData()
+        formData.append('title', file.name)
+        formData.append('altText', file.name)
+        formData.append('description', '')
+        formData.append('file', file)
+        formData.append('authorId', '1')
+
+        try {
+            const response = await axios.post(
+                `${process.env.mediaUrl}${process.env.version}/media/upload`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            )
+            return response.data?.media?.url
+        } catch (error) {
+            console.error('Image upload failed:', error)
+            toast.error('Failed to upload image')
+            throw error
+        }
     }
 
     const onSubmitForm = (data) => {
-        // Determine author if needed, but page.jsx handled it via selector or default.
-        // We pass data back.
         const finalData = {
             ...data,
-            tags: selectedTags, // Pass objects or let parent handle mapping to IDs
+            tags: selectedTags,
             featured_image: uploadedFiles.featured_image,
             pdf_file: uploadedFiles.pdf_file
         }
@@ -181,254 +240,191 @@ const BlogFormModal = ({
     }
 
     return (
-        <Dialog
-            isOpen={isOpen}
-            onClose={onClose}
-            className='max-w-5xl'
-        >
-            <DialogHeader>
-                <DialogTitle>{isEditing ? 'Edit Blog' : 'Add Blog'}</DialogTitle>
+        <Dialog isOpen={isOpen} onClose={onClose} className='max-w-6xl'>
+            <DialogHeader className="bg-white border-b border-gray-100 p-6">
+                <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <Layers className="text-[#387cae]" size={24} />
+                    {isEditing ? 'Edit Blog' : 'Create New Blog Post'}
+                </DialogTitle>
                 <DialogClose onClick={onClose} />
             </DialogHeader>
-            <DialogContent>
-                <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
-                    <form
-                        onSubmit={handleSubmit(onSubmitForm)}
-                        className='flex flex-col flex-1 overflow-hidden'
-                    >
-                        <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                            {/* Basic Information */}
-                            <div className='bg-white p-6 rounded-lg shadow-md'>
-                                <h2 className='text-xl font-semibold mb-4'>
-                                    Blog Information
-                                </h2>
-                                <div className='space-y-4'>
-                                    <div>
-                                        <RequiredLabel htmlFor='title'>Blog Title</RequiredLabel>
-                                        <Input
-                                            id='title'
-                                            placeholder='Blog Title'
-                                            {...register('title', {
-                                                required: 'Title is required'
-                                            })}
-                                            aria-invalid={errors.title ? 'true' : 'false'}
-                                        />
-                                        {errors.title && (
-                                            <p className='text-sm font-medium text-destructive mt-1'>
-                                                {errors.title.message}
-                                            </p>
-                                        )}
-                                    </div>
+            <DialogContent className="p-0 bg-gray-50/50">
+                <form
+                    onSubmit={handleSubmit(onSubmitForm)}
+                    className='flex flex-col max-h-[calc(100vh-120px)]'
+                >
+                    <div className='flex-1 p-8'>
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-6">
+                            {/* Left Column - Main Content (8/12) */}
+                            <div className="lg:col-span-8 space-y-8">
+                                <div className='bg-white p-8 rounded-2xl shadow-sm border border-gray-100'>
+                                    <SectionHeader icon={Info} title="Blog Content" subtitle="Detailed information about your post" />
+                                    <div className='space-y-6'>
+                                        <div>
+                                            <Label required={true} htmlFor='title'>Post Title</Label>
+                                            <Input
+                                                id='title'
+                                                placeholder='Enter post title...'
+                                                className="h-12 text-base rounded-xl border-gray-200"
+                                                {...register('title', { required: 'Title is required' })}
+                                            />
+                                            {errors.title && (
+                                                <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.title.message}</p>
+                                            )}
+                                        </div>
 
-                                    <div>
-                                        <RequiredLabel htmlFor='category'>Category</RequiredLabel>
-                                        <select
-                                            id='category'
-                                            {...register('category', {
-                                                required: 'Category is required'
-                                            })}
-                                            className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                                        >
-                                            <option value=''>Select Category</option>
-                                            {categories.map((cat) => (
-                                                <option key={cat.id} value={cat.id}>
-                                                    {cat.title}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {errors.category && (
-                                            <p className='text-sm font-medium text-destructive mt-1'>
-                                                {errors.category.message}
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    {/* Tags search input */}
-                                    <div className='relative'>
-                                        <Label>Tags</Label>
-                                        <Input
-                                            type='text'
-                                            placeholder='Search for tags...'
-                                            value={tagsSearch}
-                                            onChange={handleTagsSearch}
-                                            className="mt-1"
-                                        />
-
-                                        {/* Display search results in a dropdown */}
-                                        {searchResults.length > 0 && (
-                                            <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto'>
-                                                {searchResults.map((tag) => (
-                                                    <div
-                                                        key={tag.id}
-                                                        className='p-2 hover:bg-gray-100 cursor-pointer'
-                                                        onClick={() => handleSelectTag(tag)}
-                                                    >
-                                                        {tag.title}
-                                                    </div>
-                                                ))}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                            <div>
+                                                <Label required={true} htmlFor='category'>Category</Label>
+                                                <SearchSelectCreate
+                                                    onSearch={onSearchCategories}
+                                                    onSelect={handleSelectCategory}
+                                                    onRemove={handleRemoveCategory}
+                                                    selectedItems={selectedCategory}
+                                                    placeholder="Select or create category..."
+                                                    createLabel="Create category"
+                                                    displayKey="title"
+                                                    valueKey="id"
+                                                    isMulti={false}
+                                                    allowCreate={false}
+                                                />
+                                                {errors.category && (
+                                                    <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.category.message}</p>
+                                                )}
                                             </div>
-                                        )}
 
-                                        {/* Display selected tags */}
-                                        <div className='mt-2 flex flex-wrap gap-2'>
-                                            {selectedTags.map((tag) => (
-                                                <span
-                                                    key={tag.id || tag}
-                                                    className='bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center gap-1'
-                                                >
-                                                    {tag.title || tag.name || tag}
-                                                    <button
-                                                        type='button'
-                                                        onClick={() => {
-                                                            const newTags = selectedTags.filter(
-                                                                (t) => (t.id || t) !== (tag.id || tag)
-                                                            )
-                                                            setSelectedTags(newTags)
-                                                            setValue(
-                                                                'tags',
-                                                                newTags.map((t) => t.id || t)
-                                                            )
-                                                        }}
-                                                        className='text-blue-600 hover:text-blue-800 ml-1'
-                                                    >
-                                                        ×
-                                                    </button>
-                                                </span>
-                                            ))}
+                                            <div>
+                                                <Label className="text-gray-700 font-semibold mb-1.5 block text-sm">Tags</Label>
+                                                <SearchSelectCreate
+                                                    onSearch={onSearchTags}
+                                                    onCreate={onCreateTag}
+                                                    onSelect={handleSelectTag}
+                                                    onRemove={handleRemoveTag}
+                                                    selectedItems={selectedTags}
+                                                    placeholder="Search or create tags..."
+                                                    createLabel="Create tag"
+                                                    displayKey="title"
+                                                    valueKey="id"
+                                                    allowCreate={true}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor='description' className="text-gray-700 font-semibold mb-1.5 block text-sm">Short Description</Label>
+                                            <Textarea
+                                                id='description'
+                                                placeholder='Enter a brief summary...'
+                                                {...register('description')}
+                                                className='flex min-h-[80px] w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all resize-none'
+                                            />
+                                        </div>
+
+                                        <div className="pt-2">
+                                            <Label className="text-gray-700 font-semibold mb-2.5 block text-sm">Main Content Body</Label>
+                                            <TipTapEditor
+                                                onMediaUpload={onMediaUpload}
+                                                showImageUpload={true}
+                                                value={getValues('content')}
+                                                onChange={(data) => setValue('content', data)}
+                                                placeholder='Start writing your story here...'
+                                            />
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Description and Content */}
-                            <div className='bg-white p-6 rounded-lg shadow-md'>
-                                <h2 className='text-xl font-semibold mb-4'>
-                                    Description & Content
-                                </h2>
-                                <div className='space-y-4'>
-                                    <div>
-                                        <Label htmlFor='description'>Description</Label>
-                                        <textarea
-                                            id='description'
-                                            placeholder='Description'
-                                            {...register('description')}
-                                            className='flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                                            rows='4'
-                                        />
-                                    </div>
+                            {/* Right Column - Media & Settings (4/12) */}
+                            <div className="lg:col-span-4 space-y-8">
 
-                                    <div>
-                                        <label htmlFor='content' className='block mb-2 font-medium text-sm'>
-                                            Content
-                                        </label>
-                                        <TipTapEditor
-                                            value={getValues('content')}
-                                            onChange={(data) => setValue('content', data)}
-                                            placeholder='Write your blog content here...'
-                                        />
+                                {/* Featured Image Section */}
+                                <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
+                                    <SectionHeader icon={ImageIcon} title="Featured Media" subtitle="Image & PDF Uploads" />
+                                    <div className="space-y-6">
+                                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
+                                            <Label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 block">Featured Post Image</Label>
+                                            <FileUpload
+                                                label=''
+                                                onUploadComplete={(url) => {
+                                                    setUploadedFiles(prev => ({ ...prev, featured_image: url }))
+                                                    setValue('featured_image', url)
+                                                }}
+                                                defaultPreview={uploadedFiles.featured_image}
+                                            />
+                                        </div>
+
+                                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
+                                            <Label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 block">Attachment (PDF)</Label>
+                                            <FileUpload
+                                                label=''
+                                                accept='application/pdf'
+                                                onUploadComplete={(url) => {
+                                                    setUploadedFiles(prev => ({ ...prev, pdf_file: url }))
+                                                    setValue('pdf_file', url)
+                                                }}
+                                                defaultPreview={uploadedFiles.pdf_file}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Media */}
-                            <div className='bg-white p-6 rounded-lg shadow-md'>
-                                <h2 className='text-xl font-semibold mb-4'>
-                                    Featured Image{' '}
-                                </h2>
-                                <FileUpload
-                                    label='Blog Image'
-                                    onUploadComplete={(url) => {
-                                        setUploadedFiles((prev) => ({
-                                            ...prev,
-                                            featured_image: url
-                                        }))
-                                        setValue('featured_image', url)
-                                    }}
-                                    defaultPreview={uploadedFiles.featured_image}
-                                />
-                            </div>
+                                {/* Publishing Options */}
+                                <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
+                                    <SectionHeader icon={Settings} title="Publishing" subtitle="Visibility settings" />
+                                    <div className='space-y-6'>
+                                        <div>
+                                            <Label htmlFor='status' className="text-gray-700 font-semibold mb-1.5 block text-sm">Post Status</Label>
+                                            <select
+                                                id='status'
+                                                {...register('status')}
+                                                className='flex h-11 w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
+                                            >
+                                                <option value='draft'>Draft</option>
+                                                <option value='published'>Published</option>
+                                                <option value='archived'>Archived</option>
+                                            </select>
+                                        </div>
 
-                            {/* PDF File Upload */}
-                            <div className='bg-white p-6 rounded-lg shadow-md'>
-                                <h2 className='text-xl font-semibold mb-4'>
-                                    File Upload{' '}
-                                    <span className='text-sm font-normal text-gray-500'>(Optional)</span>
-                                </h2>
-                                <FileUpload
-                                    label='Upload PDF'
-                                    accept='application/pdf'
-                                    onUploadComplete={(url) => {
-                                        setUploadedFiles((prev) => ({
-                                            ...prev,
-                                            pdf_file: url
-                                        }))
-                                        setValue('pdf_file', url)
-                                    }}
-                                    defaultPreview={uploadedFiles.pdf_file}
-                                />
-                            </div>
-
-                            {/* Additional Settings */}
-                            <div className='bg-white p-6 rounded-lg shadow-md'>
-                                <h2 className='text-xl font-semibold mb-4'>
-                                    Additional Settings
-                                </h2>
-                                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-
-                                    <div>
-                                        <Label htmlFor='status'>Status</Label>
-                                        <select
-                                            id='status'
-                                            {...register('status')}
-                                            className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-                                        >
-                                            <option value='draft'>Draft</option>
-                                            <option value='published'>Published</option>
-                                            <option value='archived'>Archived</option>
-                                        </select>
+                                        <div className="flex items-center justify-between p-4 bg-[#387cae]/5 rounded-xl border border-[#387cae]/10">
+                                            <div className="flex items-center gap-3">
+                                                <input
+                                                    type="checkbox"
+                                                    id="is_featured"
+                                                    {...register('is_featured')}
+                                                    className="w-5 h-5 rounded border-gray-300 text-[#387cae] focus:ring-[#387cae]"
+                                                />
+                                                <Label htmlFor="is_featured" className="text-sm font-bold text-[#387cae] cursor-pointer">
+                                                    Mark as Featured
+                                                </Label>
+                                            </div>
+                                        </div>
                                     </div>
-
-                                    <div className="flex items-center space-x-2 pt-8">
-                                        <input
-                                            type="checkbox"
-                                            id="is_featured"
-                                            {...register('is_featured')}
-                                            className="h-4 w-4 text-[#0A70A7] focus:ring-[#0A70A7] border-gray-300 rounded"
-                                        />
-                                        <Label htmlFor="is_featured" className="text-sm font-medium text-gray-700 cursor-pointer">
-                                            Mark as Featured Blog
-                                        </Label>
-                                    </div>
-
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Submit Button - Sticky Footer */}
-                        <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
-                            <Button
-                                type='button'
-                                onClick={onClose}
-                                variant='outline'
-                                size='sm'
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                type='submit'
-                                disabled={submitting}
-                            >
+                    <div className='sticky bottom-0 bg-white border-t border-gray-100 p-6 flex justify-end gap-3 z-10'>
+                        <Button
+                            type='button'
+                            onClick={onClose}
+                            variant='outline'
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type='submit'
+                            disabled={submitting}
+                        >
+                            {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                            <span>
                                 {submitting
-                                    ? isEditing
-                                        ? 'Updating...'
-                                        : 'Adding...'
-                                    : isEditing
-                                        ? 'Update Blog'
-                                        : 'Create Blog'}
-                            </Button>
-                        </div>
-                    </form>
-                </div>
+                                    ? (isEditing ? 'Syncing...' : 'Submitting...')
+                                    : (isEditing ? 'Update Post' : 'Create Post')}
+                            </span>
+                        </Button>
+                    </div>
+                </form>
             </DialogContent>
         </Dialog>
     )

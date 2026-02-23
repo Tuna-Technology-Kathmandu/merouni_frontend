@@ -1,11 +1,10 @@
 'use client'
-import React, { useEffect, useMemo, useState, useRef } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { Edit2, Eye, Trash2, X, Search } from 'lucide-react'
-import dynamic from 'next/dynamic'
+import { Edit2, Eye, Trash2, Plus } from 'lucide-react'
 
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
@@ -15,6 +14,7 @@ import Table from '@/ui/shadcn/DataTable'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import SearchInput from '@/ui/molecules/SearchInput'
+import { Textarea } from '@/ui/shadcn/textarea'
 
 import {
   getAdmissions,
@@ -25,10 +25,8 @@ import {
   fetchPrograms
 } from './action'
 import AdmissionViewModal from './AdmissionViewModal'
-import { authFetch } from '@/app/utils/authFetch'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
-import { Controller } from 'react-hook-form'
-import ProgramDropdown from '@/ui/molecules/dropdown/ProgramDropdown'
+import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 
 export default function AdmissionManager() {
   const { setHeading } = usePageHeading()
@@ -40,8 +38,7 @@ export default function AdmissionManager() {
     handleSubmit,
     reset,
     setValue,
-    getValues,
-    control,
+    watch,
     formState: { errors }
   } = useForm({
     defaultValues: {
@@ -73,17 +70,14 @@ export default function AdmissionManager() {
   const [viewModalOpen, setViewModalOpen] = useState(false)
   const [viewData, setViewData] = useState(null)
 
-  const [colleges, setColleges] = useState([])
-  const [collegeSearch, setCollegeSearch] = useState('')
-  const [collegeSearchResults, setCollegeSearchResults] = useState([])
   const [selectedCollege, setSelectedCollege] = useState(null)
+  const [selectedProgram, setSelectedProgram] = useState(null)
 
   useEffect(() => {
     setHeading('Admission Management')
     loadAdmissions()
     return () => setHeading(null)
   }, [setHeading])
-
 
   const loadAdmissions = async (page = 1, search = searchQuery) => {
     setLoading(true)
@@ -108,38 +102,25 @@ export default function AdmissionManager() {
     setSearchTimeout(timeoutId)
   }
 
-  const searchCollegesHandler = async (e) => {
-    const query = e.target.value
-    setCollegeSearch(query)
-    if (query.length < 2) {
-      setCollegeSearchResults([])
-      return
-    }
-
-    try {
-      const response = await authFetch(`${process.env.baseUrl}/college?q=${query}`)
-      const data = await response.json()
-      setCollegeSearchResults(data.items || [])
-    } catch (error) {
-      console.error('College Search Error:', error)
-    }
-  }
-
-  const selectCollege = (college) => {
-    setSelectedCollege(college)
-    setValue('college_id', college.id)
-    setCollegeSearch('')
-    setCollegeSearchResults([])
-  }
-
-  const clearSelectedCollege = () => {
+  const handleAdd = () => {
+    setEditing(false)
+    setEditingId(null)
     setSelectedCollege(null)
-    setValue('college_id', '')
-    setCollegeSearch('')
+    setSelectedProgram(null)
+    reset({
+      college_id: '',
+      course_id: '',
+      eligibility_criteria: '',
+      admission_process: '',
+      fee_details: '',
+      description: ''
+    })
+    setIsOpen(true)
   }
 
   const onSubmit = async (data) => {
     try {
+      setLoading(true)
       const payload = { ...data }
       if (editing) payload.id = editingId
 
@@ -149,26 +130,36 @@ export default function AdmissionManager() {
       loadAdmissions(pagination.currentPage)
     } catch (err) {
       toast.error(err.message || 'Failed to save admission')
+    } finally {
+      setLoading(false)
     }
   }
 
   const handleEdit = async (item) => {
     setEditing(true)
     setEditingId(item.id)
-    setIsOpen(true)
 
-    // Set form values
-    setValue('college_id', item.collegeAdmissionCollege?.id)
-    setValue('course_id', item.program?.id)
-    setValue('eligibility_criteria', item.eligibility_criteria)
-    setValue('admission_process', item.admission_process)
-    setValue('fee_details', item.fee_details)
-    setValue('description', item.description)
+    // Set selected objects for SearchSelectCreate
+    setSelectedCollege(item.collegeAdmissionCollege ? {
+      id: item.collegeAdmissionCollege.id,
+      name: item.collegeAdmissionCollege.name
+    } : null)
 
-    setSelectedCollege({
-      id: item.collegeAdmissionCollege?.id,
-      name: item.collegeAdmissionCollege?.name
+    setSelectedProgram(item.program ? {
+      id: item.program.id,
+      title: item.program.title
+    } : null)
+
+    reset({
+      college_id: item.collegeAdmissionCollege?.id || '',
+      course_id: item.program?.id || '',
+      eligibility_criteria: item.eligibility_criteria || '',
+      admission_process: item.admission_process || '',
+      fee_details: item.fee_details || '',
+      description: item.description || ''
     })
+
+    setIsOpen(true)
   }
 
   const handleDeleteClick = (id) => {
@@ -204,6 +195,7 @@ export default function AdmissionManager() {
     setEditing(false)
     setEditingId(null)
     setSelectedCollege(null)
+    setSelectedProgram(null)
     reset()
   }
 
@@ -211,152 +203,203 @@ export default function AdmissionManager() {
     {
       header: 'College',
       accessorKey: 'collegeAdmissionCollege.name',
-      cell: ({ row }) => row.original.collegeAdmissionCollege?.name || 'N/A'
+      cell: ({ row }) => <div className="font-medium text-gray-900">{row.original.collegeAdmissionCollege?.name || 'N/A'}</div>
     },
     {
       header: 'Program',
       accessorKey: 'program.title',
-      cell: ({ row }) => row.original.program?.title || 'N/A'
+      cell: ({ row }) => <div className="text-gray-600">{row.original.program?.title || 'N/A'}</div>
     },
     {
       header: 'Actions',
       id: 'actions',
       cell: ({ row }) => (
-        <div className='flex gap-2'>
-          <button onClick={() => handleView(row.original.id)} className='text-purple-600 hover:text-purple-800'><Eye className='w-4 h-4' /></button>
-          <button onClick={() => handleEdit(row.original)} className='text-blue-600 hover:text-blue-800'><Edit2 className='w-4 h-4' /></button>
-          <button onClick={() => handleDeleteClick(row.original.id)} className='text-red-600 hover:text-red-800'><Trash2 className='w-4 h-4' /></button>
+        <div className='flex gap-1'>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleView(row.original.id)}
+            className='hover:bg-blue-50 text-blue-600'
+          >
+            <Eye className='w-4 h-4' />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleEdit(row.original)}
+            className='hover:bg-amber-50 text-amber-600'
+          >
+            <Edit2 className='w-4 h-4' />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleDeleteClick(row.original.id)}
+            className='hover:bg-red-50 text-red-600'
+          >
+            <Trash2 className='w-4 h-4' />
+          </Button>
         </div>
       )
     }
   ], [])
 
   return (
-    <div className='w-full space-y-2'>
-      <div className='flex justify-between items-center px-4 pt-4'>
+    <div className='w-full space-y-4 p-4'>
+      <ToastContainer />
+
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
         <SearchInput
           value={searchQuery}
           onChange={(e) => handleSearchInput(e.target.value)}
-          placeholder='Search admissions...'
-          className='max-w-md'
+          placeholder='Search admissions by college or program...'
+          className='max-w-md w-full'
         />
-        <Button onClick={() => { setIsOpen(true); setEditing(false); reset(); }}>Add Admission</Button>
+        <Button onClick={handleAdd} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
+          <Plus className="w-4 h-4" />
+          Add Admission
+        </Button>
       </div>
 
-      <Table
-        columns={columns}
-        data={admissions}
-        pagination={pagination}
-        onPageChange={(page) => loadAdmissions(page)}
-        onSearch={handleSearchInput}
-        loading={loading}
-        showSearch={false}
-      />
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <Table
+          columns={columns}
+          data={admissions}
+          pagination={pagination}
+          onPageChange={(page) => loadAdmissions(page)}
+          loading={loading}
+          showSearch={false}
+        />
+      </div>
 
-      <Dialog isOpen={isOpen} onClose={handleCloseModal} className='max-w-5xl'>
-        <DialogHeader>
-          <DialogTitle>{editing ? 'Edit Admission' : 'Add Admission'}</DialogTitle>
-          <DialogClose onClick={handleCloseModal} />
-        </DialogHeader>
-        <DialogContent className='max-h-[90vh] overflow-y-auto'>
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-6 pt-2'>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-              {/* College Selection */}
-              <div className='space-y-2'>
-                <Label>College <span className='text-red-500'>*</span></Label>
-                {selectedCollege ? (
-                  <div className='flex items-center justify-between p-2 bg-blue-50 border border-blue-200 rounded-md'>
-                    <span className='text-sm font-medium text-blue-800'>{selectedCollege.name}</span>
-                    <button type='button' onClick={clearSelectedCollege} className='text-blue-600 hover:text-blue-800'>
-                      <X className='w-4 h-4' />
-                    </button>
-                  </div>
-                ) : (
-                  <div className='relative'>
-                    <Input
-                      placeholder='Search college...'
-                      value={collegeSearch}
-                      onChange={searchCollegesHandler}
+      <Dialog
+        isOpen={isOpen}
+        onClose={handleCloseModal}
+        closeOnOutsideClick={false}
+        className='max-w-5xl'
+      >
+        <DialogContent className='max-w-5xl max-h-[90vh] flex flex-col p-0'>
+          <DialogHeader className='px-6 py-4 border-b'>
+            <DialogTitle className="text-lg font-semibold text-gray-900">
+              {editing ? 'Edit Admission Detail' : 'Add Admission Detail'}
+            </DialogTitle>
+            <DialogClose onClick={handleCloseModal} />
+          </DialogHeader>
+
+          <div className='flex-1 overflow-y-auto p-6'>
+            <form id="admission-form" onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
+              {/* Basic Selection */}
+              <section className="space-y-4">
+                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Basic Information</h3>
+
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                  {/* College Selection */}
+                  <div className='space-y-2'>
+                    <Label required>College</Label>
+                    <SearchSelectCreate
+                      onSearch={fetchColleges}
+                      onSelect={(item) => {
+                        setSelectedCollege(item)
+                        setValue('college_id', item.id, { shouldValidate: true })
+                      }}
+                      onRemove={() => {
+                        setSelectedCollege(null)
+                        setValue('college_id', '', { shouldValidate: true })
+                      }}
+                      selectedItems={selectedCollege}
+                      placeholder="Search and select college..."
+                      isMulti={false}
+                      displayKey="name"
                     />
-                    {collegeSearchResults.length > 0 && (
-                      <div className='absolute z-50 w-full mt-1 bg-white border rounded-md shadow-lg max-h-48 overflow-y-auto'>
-                        {collegeSearchResults.map(c => (
-                          <div
-                            key={c.id}
-                            className='p-2 hover:bg-gray-100 cursor-pointer text-sm'
-                            onClick={() => selectCollege(c)}
-                          >
-                            {c.name}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <input type="hidden" {...register('college_id', { required: 'College is required' })} />
+                    {errors.college_id && <p className="text-xs text-red-500">{errors.college_id.message}</p>}
                   </div>
-                )}
-                {errors.college_id && <span className='text-red-500 text-xs'>College is required</span>}
-              </div>
 
-              {/* Program Selection */}
-              <div className='space-y-2'>
-                <Label>Program <span className='text-red-500'>*</span></Label>
-                <Controller
-                  name="course_id"
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <ProgramDropdown
-                      value={field.value}
-                      onChange={field.onChange}
-                      className="w-full"
+                  {/* Program Selection */}
+                  <div className='space-y-2'>
+                    <Label required>Program</Label>
+                    <SearchSelectCreate
+                      onSearch={fetchPrograms}
+                      onSelect={(item) => {
+                        setSelectedProgram(item)
+                        setValue('course_id', item.id, { shouldValidate: true })
+                      }}
+                      onRemove={() => {
+                        setSelectedProgram(null)
+                        setValue('course_id', '', { shouldValidate: true })
+                      }}
+                      selectedItems={selectedProgram}
+                      placeholder="Search and select program..."
+                      isMulti={false}
+                      displayKey="title"
                     />
-                  )}
-                />
-                {errors.course_id && <span className='text-red-500 text-xs'>Program is required</span>}
-              </div>
+                    <input type="hidden" {...register('course_id', { required: 'Program is required' })} />
+                    {errors.course_id && <p className="text-xs text-red-500">{errors.course_id.message}</p>}
+                  </div>
+                </div>
+              </section>
 
-              <div className='col-span-2 space-y-2'>
-                <Label>Eligibility Criteria</Label>
-                <textarea
-                  {...register('eligibility_criteria')}
-                  className='w-full p-2 border rounded-md text-sm min-h-[80px]'
-                  placeholder='Eligibility criteria details...'
-                />
-              </div>
+              {/* Details Sections */}
+              <section className="space-y-4">
+                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Admission Process & Requirements</h3>
 
-              <div className='col-span-2 space-y-2'>
-                <Label>Admission Process</Label>
-                <textarea
-                  {...register('admission_process')}
-                  className='w-full p-2 border rounded-md text-sm min-h-[80px]'
-                  placeholder='Admission process steps...'
-                />
-              </div>
+                <div className='grid grid-cols-1 gap-6'>
+                  <div className='space-y-2'>
+                    <Label>Eligibility Criteria</Label>
+                    <Textarea
+                      {...register('eligibility_criteria')}
+                      className='min-h-[100px]'
+                      placeholder='Describe the eligibility criteria for this course...'
+                    />
+                  </div>
 
-              <div className='col-span-2 space-y-2'>
-                <Label>Fee Details</Label>
-                <textarea
-                  {...register('fee_details')}
-                  className='w-full p-2 border rounded-md text-sm min-h-[80px]'
-                  placeholder='Fee structure details...'
-                />
-              </div>
+                  <div className='space-y-2'>
+                    <Label>Admission Process</Label>
+                    <Textarea
+                      {...register('admission_process')}
+                      className='min-h-[100px]'
+                      placeholder='Step-by-step admission process...'
+                    />
+                  </div>
 
+                  <div className='space-y-2'>
+                    <Label>Fee Details</Label>
+                    <Textarea
+                      {...register('fee_details')}
+                      className='min-h-[100px]'
+                      placeholder='Detail the fee structure for this course...'
+                    />
+                  </div>
 
-              <div className='col-span-2 space-y-2'>
-                <Label>Description</Label>
-                <TipTapEditor
-                  content={getValues('description') || ''}
-                  onChange={(html) => setValue('description', html)}
-                  placeholder='Enter description...'
-                />
-              </div>
-            </div>
+                  <div className='space-y-2'>
+                    <Label>Additional Description</Label>
+                    <TipTapEditor
+                      value={watch('description')}
+                      onChange={(html) => setValue('description', html)}
+                      placeholder='Enter additional details...'
+                    />
+                  </div>
+                </div>
+              </section>
+            </form>
+          </div>
 
-            <div className='flex justify-end gap-3 pt-4 border-t'>
-              <Button type='button' variant='outline' onClick={handleCloseModal}>Cancel</Button>
-              <Button type='submit'>{editing ? 'Update' : 'Create'}</Button>
-            </div>
-          </form>
+          <div className='sticky bottom-0 bg-white border-t p-4 px-6 flex justify-end gap-3'>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={handleCloseModal}
+            >
+              Cancel
+            </Button>
+            <Button
+              type='submit'
+              form="admission-form"
+              disabled={loading}
+            >
+              {loading ? 'Saving...' : editing ? 'Update Admission' : 'Create Admission'}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -367,13 +410,12 @@ export default function AdmissionManager() {
       />
 
       <ConfirmationDialog
-        isOpen={isConfirmOpen}
+        open={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={handleDeleteConfirm}
         title="Delete Admission"
         message="Are you sure you want to delete this admission record? This action cannot be undone."
       />
-      <ToastContainer />
     </div>
   )
 }

@@ -24,6 +24,7 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
   const dropdownRef = useRef(null)
+  const searchRef = useRef(null)
   const router = useRouter()
   const dispatch = useDispatch()
   const [inputValue, setInputValue] = useState(searchQuery)
@@ -50,11 +51,10 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
   }, [userData?.id])
 
   // Use fetched profile as priority, fallback to selector data
-  const currentUser = profile || userData
+  const currentUser = profile
 
-  // Parse the role JSON string if it exists, otherwise default to an empty object
   let userRoles = {}
-  const rawRole = currentUser?.role
+  const rawRole = currentUser?.roles
   if (rawRole) {
     try {
       const parsedRole = typeof rawRole === 'string' ? destr(rawRole) : rawRole
@@ -70,6 +70,9 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false)
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setSearchQuery('')
       }
     }
 
@@ -204,7 +207,7 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
 
       {/* CENTERED SEARCH WITH SUGGESTIONS */}
       {userRoles?.admin && (
-        <div className='hidden lg:flex flex-1 max-w-xl mx-8 relative'>
+        <div ref={searchRef} className='hidden lg:flex flex-1 max-w-xl mx-8 relative'>
           <div className='w-full'>
             <SearchInput
               value={inputValue}
@@ -261,9 +264,28 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
                                       setSearchQuery('')
                                       setInputValue('')
                                     }}
-                                    className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors'
+                                    className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 rounded-lg transition-colors'
+                                    style={{ '--theme-blue': THEME_BLUE }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.backgroundColor = `${THEME_BLUE}10`;
+                                      e.currentTarget.style.color = THEME_BLUE;
+                                      const iconDiv = e.currentTarget.querySelector('.icon-container');
+                                      if (iconDiv) {
+                                        iconDiv.style.backgroundColor = `${THEME_BLUE}25`;
+                                        iconDiv.style.color = THEME_BLUE;
+                                      }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.backgroundColor = '';
+                                      e.currentTarget.style.color = '';
+                                      const iconDiv = e.currentTarget.querySelector('.icon-container');
+                                      if (iconDiv) {
+                                        iconDiv.style.backgroundColor = '';
+                                        iconDiv.style.color = '';
+                                      }
+                                    }}
                                   >
-                                    <div className='w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md group-hover:bg-indigo-100 group-hover:text-indigo-600'>
+                                    <div className='icon-container w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md transition-colors'>
                                       {item.icon}
                                     </div>
                                     <div className='flex flex-col items-start'>
@@ -279,9 +301,28 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
                                   setSearchQuery('')
                                   setInputValue('')
                                 }}
-                                className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors'
+                                className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 rounded-lg transition-colors'
+                                style={{ '--theme-blue': THEME_BLUE }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = `${THEME_BLUE}10`;
+                                  e.currentTarget.style.color = THEME_BLUE;
+                                  const iconDiv = e.currentTarget.querySelector('.icon-container');
+                                  if (iconDiv) {
+                                    iconDiv.style.backgroundColor = `${THEME_BLUE}25`;
+                                    iconDiv.style.color = THEME_BLUE;
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = '';
+                                  e.currentTarget.style.color = '';
+                                  const iconDiv = e.currentTarget.querySelector('.icon-container');
+                                  if (iconDiv) {
+                                    iconDiv.style.backgroundColor = '';
+                                    iconDiv.style.color = '';
+                                  }
+                                }}
                               >
-                                <div className='w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md group-hover:bg-indigo-100 group-hover:text-indigo-600'>
+                                <div className='icon-container w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md transition-colors'>
                                   {item.icon}
                                 </div>
                                 <span className='font-medium'>{item.label}</span>
@@ -319,9 +360,13 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
         <div className='relative' ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className='flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg p-1'
+            className='flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg p-1'
+            style={{ '--tw-ring-color': THEME_BLUE }}
           >
-            <div className='w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-md hover:shadow-lg transition-shadow relative overflow-hidden'>
+            <div
+              className='w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md hover:shadow-lg transition-shadow relative overflow-hidden'
+              style={{ background: `linear-gradient(to bottom right, ${THEME_BLUE}, #7c3aed)` }}
+            >
               {currentUser?.profileImageUrl ? (
                 <Image
                   src={currentUser.profileImageUrl}

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { THEME_BLUE } from '@/constants/constants'
 
 const SearchBox = ({ onClose }) => {
   const [popularSearches, setPopularSearches] = useState([])
@@ -154,8 +155,11 @@ const SearchBox = ({ onClose }) => {
       <div className='mb-12'>
         <div className='flex justify-between items-center mb-6 px-2'>
           <div className='flex items-center gap-3'>
-            <div className='p-2 bg-[#0A6FA7]/10 rounded-xl'>
-              <Icon className='w-5 h-5 text-[#0A6FA7]' />
+            <div
+              className='p-2 rounded-xl text-white'
+              style={{ backgroundColor: `${THEME_BLUE}1a` }}
+            >
+              <Icon className='w-5 h-5' style={{ color: THEME_BLUE }} />
             </div>
             <h2 className='text-lg md:text-xl font-semibold text-gray-900'>
               {title}
@@ -163,7 +167,8 @@ const SearchBox = ({ onClose }) => {
           </div>
           {items.length > 3 && (
             <button
-              className='text-sm font-semibold text-[#0A6FA7] hover:text-[#085a86] transition flex items-center gap-1'
+              className='text-sm font-semibold transition flex items-center gap-1 hover:opacity-80'
+              style={{ color: THEME_BLUE }}
               onClick={toggleView ? viewClick : viewLess}
             >
               {toggleView ? 'View All' : 'View Less'}
@@ -183,8 +188,25 @@ const SearchBox = ({ onClose }) => {
                 key={index}
                 onClick={onClose}
               >
-                <div className='group cursor-pointer bg-white border border-gray-100 rounded-[24px] shadow-sm hover:shadow-md hover:border-[#0A6FA7]/20 transition-all p-6 flex flex-col items-center text-center'>
-                  <div className='w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center text-[#0A6FA7] font-semibold text-2xl group-hover:bg-[#0A6FA7] group-hover:text-white transition-all mb-4 overflow-hidden'>
+                <div
+                  className='group cursor-pointer bg-white border border-gray-100 rounded-[24px] shadow-sm hover:shadow-md transition-all p-6 flex flex-col items-center text-center'
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = `${THEME_BLUE}33`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = '';
+                  }}
+                >
+                  <div
+                    className='w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center font-semibold text-2xl transition-all mb-4 overflow-hidden group-hover:text-white'
+                    style={{ '--theme-blue': THEME_BLUE }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = THEME_BLUE;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '';
+                    }}
+                  >
                     {imageUrl ? (
                       <img
                         src={imageUrl}
@@ -200,7 +222,15 @@ const SearchBox = ({ onClose }) => {
                       item.name?.charAt(0) || item.title?.charAt(0) || '?'
                     )}
                   </div>
-                  <h3 className='text-base md:text-lg font-semibold text-gray-800 group-hover:text-[#0A6FA7] transition-colors line-clamp-2'>
+                  <h3
+                    className='text-base md:text-lg font-semibold text-gray-800 transition-colors line-clamp-2'
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = THEME_BLUE;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = '';
+                    }}
+                  >
                     {item.name || item.title}
                   </h3>
                 </div>
@@ -232,7 +262,10 @@ const SearchBox = ({ onClose }) => {
         {/* 🔹 Search Input Container */}
         <div className='relative w-full mb-16 max-w-4xl mx-auto'>
           <div className='relative group flex items-end'>
-            <div className='absolute left-0 bottom-6 text-[#0A6FA7] opacity-60 group-focus-within:opacity-100 transition-opacity duration-300'>
+            <div
+              className='absolute left-0 bottom-6 opacity-60 group-focus-within:opacity-100 transition-opacity duration-300'
+              style={{ color: THEME_BLUE }}
+            >
               <Search size={28} strokeWidth={1.5} />
             </div>
             <input
@@ -243,13 +276,19 @@ const SearchBox = ({ onClose }) => {
                   : 'Search Universities, Colleges, Events & more...'
               }
               value={searchTag}
-              className='w-full pb-5 pl-12 bg-transparent border-b border-gray-200 focus:border-[#0A6FA7] transition-all duration-500 focus:outline-none placeholder-gray-400 text-2xl md:text-4xl font-light text-gray-900 pr-12 tracking-tight'
+              className='w-full pb-5 pl-12 bg-transparent border-b border-gray-200 transition-all duration-500 focus:outline-none placeholder-gray-400 text-2xl md:text-4xl font-light text-gray-900 pr-12 tracking-tight'
+              style={{ borderColor: searchTag.trim() ? THEME_BLUE : undefined }}
+              onFocus={(e) => e.target.style.borderColor = THEME_BLUE}
+              onBlur={(e) => e.target.style.borderColor = ''}
               onChange={handleInputChange}
               autoFocus
             />
             <div className='absolute right-0 bottom-6 flex items-center gap-4'>
               {isLoading && (
-                <div className='w-6 h-6 border-2 border-[#0A6FA7]/20 border-t-[#0A6FA7] rounded-full animate-spin'></div>
+                <div
+                  className='w-6 h-6 border-2 rounded-full animate-spin'
+                  style={{ borderTopColor: THEME_BLUE, borderLeftColor: `${THEME_BLUE}33` }}
+                ></div>
               )}
               {searchTag.trim() && !isLoading && (
                 <button
@@ -263,7 +302,10 @@ const SearchBox = ({ onClose }) => {
             </div>
           </div>
           {/* Subtle Focus Line Animation */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-[#0A6FA7] transition-all duration-500 group-focus-within:w-full"></div>
+          <div
+            className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] transition-all duration-500 group-focus-within:w-full"
+            style={{ backgroundColor: THEME_BLUE, width: searchTag.trim() ? '100%' : '0' }}
+          ></div>
         </div>
 
         {/* 🔹 Content Area */}
@@ -278,7 +320,18 @@ const SearchBox = ({ onClose }) => {
                 {popularSearches.map((search, index) => (
                   <button
                     key={index}
-                    className='px-5 py-2.5 rounded-2xl bg-gray-50 text-sm font-medium text-gray-600 hover:bg-[#0A6FA7]/10 hover:text-[#0A6FA7] transition-all border border-transparent hover:border-[#0A6FA7]/20'
+                    className='px-5 py-2.5 rounded-2xl bg-gray-50 text-sm font-medium text-gray-600 transition-all border border-transparent'
+                    style={{ '--theme-blue': THEME_BLUE }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = `${THEME_BLUE}10`;
+                      e.currentTarget.style.color = THEME_BLUE;
+                      e.currentTarget.style.borderColor = `${THEME_BLUE}33`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '';
+                      e.currentTarget.style.color = '';
+                      e.currentTarget.style.borderColor = '';
+                    }}
                     onClick={() => handleItemClick(search)}
                   >
                     {search}

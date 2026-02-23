@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Table from '@/ui/shadcn/DataTable'
-import { Edit2, Trash2, Search, Eye } from 'lucide-react'
+import { Edit2, Trash2, Eye, Plus } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '@/ui/shadcn/button'
@@ -139,103 +140,66 @@ export default function DegreePage() {
     }
   }
 
-  const columns = [
+  const columns = useMemo(() => [
     {
       header: 'Cover',
       id: 'cover',
       cell: ({ row }) => {
         const url = row.original.featured_image
         if (!url) return <span className='text-gray-400'>—</span>
-        return (
-          <img
-            src={url}
-            alt=''
-            className='h-8 w-12 object-cover rounded'
-          />
-        )
+        return <img src={url} alt='' className='h-8 w-12 object-cover rounded border' />
       }
     },
     {
       header: 'Title',
-      accessorKey: 'title'
+      accessorKey: 'title',
+      cell: ({ row }) => <span className="font-medium text-gray-900">{row.original.title}</span>
     },
     {
       header: 'Description',
       accessorKey: 'description',
-      cell: ({ getValue }) => (
-        <div className='max-w-xs overflow-hidden'>
-          {getValue()?.substring(0, 100)}
-          {getValue()?.length > 100 ? '...' : getValue() || '-'}
-        </div>
-      )
+      cell: ({ getValue }) => {
+        const v = getValue()
+        if (!v) return <span className="text-gray-400 italic text-xs">—</span>
+        return <span className="text-gray-600 text-sm">{v.substring(0, 80)}{v.length > 80 ? '…' : ''}</span>
+      }
     },
     {
       header: 'Actions',
       id: 'actions',
       cell: ({ row }) => (
-        <div className='flex gap-2'>
-          <button
-            onClick={() => handleView(row.original)}
-            className='p-1 text-gray-600 hover:text-gray-900'
-            title="View Details"
-            type='button'
-          >
+        <div className='flex gap-1'>
+          <Button variant="ghost" size="icon" onClick={() => handleView(row.original)} className='hover:bg-blue-50 text-blue-600' title="View" type='button'>
             <Eye className='w-4 h-4' />
-          </button>
-          <button
-            onClick={() => handleEdit(row.original)}
-            className='p-1 text-blue-600 hover:text-blue-800'
-            title="Edit"
-            type='button'
-          >
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => handleEdit(row.original)} className='hover:bg-amber-50 text-amber-600' title="Edit" type='button'>
             <Edit2 className='w-4 h-4' />
-          </button>
-          <button
-            onClick={() => handleDeleteClick(row.original.id)}
-            className='p-1 text-red-600 hover:text-red-800'
-            title="Delete"
-            type='button'
-          >
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(row.original.id)} className='hover:bg-red-50 text-red-600' title="Delete" type='button'>
             <Trash2 className='w-4 h-4' />
-          </button>
+          </Button>
         </div>
       )
     }
-  ]
+  ], [])
 
   return (
-    <>
-      <div className='p-4 w-full'>
-        <div className='flex justify-between items-center mb-4'>
-          <SearchInput
-            value={searchQuery}
-            onChange={(e) => handleSearchInput(e.target.value)}
-            placeholder='Search degrees...'
-            className='max-w-md'
-          />
-          <div className='flex gap-2'>
-            <Button
-              onClick={() => {
-                setEditingDegree(null)
-                setIsOpen(true)
-              }}
-            >
-              Add Degree
-            </Button>
-          </div>
-        </div>
+    <div className='w-full space-y-4 p-4'>
+      <ToastContainer />
 
-        <div className='mt-8'>
-          <Table
-            loading={tableLoading}
-            data={degrees}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => fetchDegrees(newPage)}
-            onSearch={handleSearch}
-            showSearch={false}
-          />
+      {/* Header */}
+      <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+          <SearchInput value={searchQuery} onChange={(e) => handleSearchInput(e.target.value)} placeholder='Search degrees...' className='max-w-md w-full' />
+          <Button onClick={() => { setEditingDegree(null); setIsOpen(true) }} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
+            <Plus className="w-4 h-4" /> Add Degree
+          </Button>
         </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <Table loading={tableLoading} data={degrees} columns={columns} pagination={pagination} onPageChange={(p) => fetchDegrees(p)} showSearch={false} />
       </div>
 
       <CreateUpdateDegree
@@ -253,14 +217,13 @@ export default function DegreePage() {
 
       <ConfirmationDialog
         open={isDialogOpen}
-        onClose={() => {
-          setIsDialogOpen(false)
-          setDeleteId(null)
-        }}
+        onClose={() => { setIsDialogOpen(false); setDeleteId(null) }}
         onConfirm={handleDeleteConfirm}
         title='Confirm Deletion'
         message='Are you sure you want to delete this degree? This action cannot be undone.'
+        confirmText='Delete'
+        cancelText='Cancel'
       />
-    </>
+    </div>
   )
 }

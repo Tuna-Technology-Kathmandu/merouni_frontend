@@ -97,26 +97,26 @@ export async function deleteAdmission(id) {
   }
 }
 
-export async function fetchColleges() {
-    try {
-        const response = await authFetch(`${process.env.baseUrl}/college?limit=1000`)
-        if (!response.ok) throw new Error('Failed to fetch colleges')
-        const data = await response.json()
-        return data.items
-    } catch (error) {
-        console.error('Error fetching colleges:', error)
-        return []
-    }
+export async function fetchColleges(searchQuery = '') {
+  try {
+    const response = await authFetch(`${process.env.baseUrl}/college?limit=100&q=${encodeURIComponent(searchQuery)}`)
+    if (!response.ok) throw new Error('Failed to fetch colleges')
+    const data = await response.json()
+    return data.items
+  } catch (error) {
+    console.error('Error fetching colleges:', error)
+    return []
+  }
 }
 
-export async function fetchPrograms() {
-    try {
-        const response = await authFetch(`${process.env.baseUrl}/program?limit=1000`)
-        if (!response.ok) throw new Error('Failed to fetch programs')
-        const data = await response.json()
-        return data.items
-    } catch (error) {
-        console.error('Error fetching programs:', error)
-        return []
-    }
+export async function fetchPrograms(searchQuery = '') {
+  try {
+    const response = await authFetch(`${process.env.baseUrl}/program?limit=100&q=${encodeURIComponent(searchQuery)}`)
+    if (!response.ok) throw new Error('Failed to fetch programs')
+    const data = await response.json()
+    return data.items
+  } catch (error) {
+    console.error('Error fetching programs:', error)
+    return []
+  }
 }

@@ -190,16 +190,16 @@ const Menu = ({ isCollapsed = false }) => {
   const dispatch = useDispatch()
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
 
-  const role = useSelector((state) => {
-    const roleData = state.user?.data?.role
-    const parsedRole = typeof roleData === 'string' ? destr(roleData) : roleData
+  const rawRole = useSelector((state) => state.user?.data?.role)
+  const role = React.useMemo(() => {
+    const parsedRole = typeof rawRole === 'string' ? destr(rawRole) : rawRole
     if (!parsedRole || typeof parsedRole !== 'object') return {}
 
     return Object.entries(parsedRole).reduce((acc, [key, value]) => {
       acc[key] = value === true || value === 'true'
       return acc
     }, {})
-  })
+  }, [rawRole])
 
 
   const handleLogout = async () => {

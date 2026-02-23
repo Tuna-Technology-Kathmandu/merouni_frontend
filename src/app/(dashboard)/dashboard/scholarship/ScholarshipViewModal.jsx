@@ -51,22 +51,16 @@ const ScholarshipViewModal = ({ isOpen, onClose, scholarship }) => {
                             </div>
                         </div>
 
-                        <div className="bg-blue-50 p-4 rounded-lg space-y-2">
-                            <h4 className="font-semibold text-blue-800">Financial Details</h4>
-                            <div className="flex justify-between items-center text-sm">
-                                <span>Amount:</span>
-                                <span className="font-bold text-lg">Rs. {scholarship.amount ? scholarship.amount.toLocaleString() : '0'}</span>
-                            </div>
+                        <div className="bg-gray-50 p-4 rounded-lg border flex justify-between items-center">
+                            <h4 className="text-sm font-medium text-gray-500">Financial Details (Amount)</h4>
+                            <span className="font-bold text-lg text-gray-900">Rs. {scholarship.amount ? scholarship.amount.toLocaleString() : '0'}</span>
                         </div>
 
-                        <div className="bg-green-50 p-4 rounded-lg space-y-2">
-                            <h4 className="font-semibold text-green-800">Important Dates</h4>
-                            <div className="flex justify-between items-center text-sm">
-                                <span>Deadline:</span>
-                                <span className="font-bold">
-                                    {scholarship.applicationDeadline ? formatDate(scholarship.applicationDeadline) : 'N/A'}
-                                </span>
-                            </div>
+                        <div className="bg-gray-50 p-4 rounded-lg border flex justify-between items-center">
+                            <h4 className="text-sm font-medium text-gray-500">Application Deadline</h4>
+                            <span className="font-bold text-gray-900">
+                                {scholarship.applicationDeadline ? formatDate(scholarship.applicationDeadline) : 'N/A'}
+                            </span>
                         </div>
 
                         <div className="space-y-1 col-span-2">

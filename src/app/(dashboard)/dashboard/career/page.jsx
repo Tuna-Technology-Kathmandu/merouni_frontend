@@ -1,34 +1,33 @@
-// eslint-disable-next-line react-hooks/rules-of-hooks
 
 'use client'
 
-/* eslint-disable react-hooks/rules-of-hooks */
-import { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { useSelector } from 'react-redux'
-import FileUpload from '../addCollege/FileUpload'
-import Table from '@/ui/shadcn/DataTable'
-import { Edit2, Trash2, Search, Eye } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast, ToastContainer } from 'react-toastify'
-import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import dynamic from 'next/dynamic'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
+import SearchInput from '@/ui/molecules/SearchInput'
+import { Button } from '@/ui/shadcn/button'
+import Table from '@/ui/shadcn/DataTable'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-  DialogClose
+  DialogTitle
 } from '@/ui/shadcn/dialog'
-import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { Button } from '@/ui/shadcn/button'
-import SearchInput from '@/ui/molecules/SearchInput'
+import { Input } from '@/ui/shadcn/input'
+import { Label } from '@/ui/shadcn/label'
+import { Select } from '@/ui/shadcn/select'
+import { Textarea } from '@/ui/shadcn/textarea'
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
+import { Edit2, Eye, Trash2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useSelector } from 'react-redux'
+import { toast, ToastContainer } from 'react-toastify'
+import FileUpload from '../addCollege/FileUpload'
 
-// Dynamically import CKEditor to avoid SSR issues
-const CKBlogs = dynamic(() => import('../../../../ui/molecules/ck-editor/CKBlogs'), {
-  ssr: false
-})
+
 
 export default function CareerForm() {
   const { setHeading } = usePageHeading()
@@ -220,6 +219,7 @@ export default function CareerForm() {
       setValue('description', career.description)
       setValue('content', career.content)
       setValue('status', career.status || 'active')
+      setValue('featuredImage', career.featuredImage || '')
 
       // Set featured image
       setUploadedFiles({
@@ -382,6 +382,7 @@ export default function CareerForm() {
 
         <Dialog
           isOpen={isOpen}
+          closeOnOutsideClick={false}
           onClose={() => {
             setIsOpen(false)
             setEditing(false)
@@ -414,10 +415,12 @@ export default function CareerForm() {
                   <div className='bg-white p-6 rounded-lg shadow-md'>
                     <div className='grid grid-cols-1 gap-4'>
                       <div>
-                        <label className='block mb-2'>
-                          Job Title <span className='text-red-500'>*</span>
-                        </label>
-                        <input
+                        <Label
+                          required
+                        >
+                          Job Title
+                        </Label>
+                        <Input
                           {...register('title', {
                             required: 'Job title is required',
                             minLength: {
@@ -428,53 +431,88 @@ export default function CareerForm() {
                           className='w-full p-2 border rounded'
                         />
                         {errors.title && (
-                          <span className='text-red-500'>
+                          <span className='text-red-500 text-sm mt-1'>
                             {errors.title.message}
                           </span>
                         )}
                       </div>
 
                       <div>
-                        <label className='block mb-2'>Status</label>
-                        <select
-                          {...register('status')}
+                        <Label required>Status</Label>
+                        <Select
+                          {...register('status', { required: 'Status is required' })}
                           className='w-full p-2 border rounded bg-white'
                         >
+                          <option value=''>Select Status</option>
                           <option value='active'>Active</option>
                           <option value='inactive'>Inactive</option>
-                        </select>
+                        </Select>
+                        {errors.status && (
+                          <span className='text-red-500 text-sm mt-1'>
+                            {errors.status.message}
+                          </span>
+                        )}
                       </div>
 
                       <div>
-                        <label className='block mb-2'>Description</label>
-                        <textarea
-                          {...register('description')}
+                        <Label required>Description</Label>
+                        <Textarea
+                          {...register('description', { required: 'Description is required' })}
                           className='w-full p-2 border rounded'
                           rows='3'
                         />
+                        {errors.description && (
+                          <span className='text-red-500 text-sm mt-1'>
+                            {errors.description.message}
+                          </span>
+                        )}
                       </div>
 
                       <div>
-                        <label className='block mb-2'>Content</label>
-                        <CKBlogs
-                          initialData={getValues('content')}
-                          onChange={(data) => setValue('content', data)}
-                          id='editor1'
+                        <Label required>Content</Label>
+                        <TipTapEditor
+                          value={watch('content')}
+                          onChange={(data) => {
+                            setValue('content', data, { shouldValidate: true })
+                          }}
                         />
+                        <input
+                          type='hidden'
+                          {...register('content', {
+                            required: 'Content is required',
+                            validate: (value) =>
+                              (value && value !== '<p></p>' && value.trim() !== '') || 'Content is required'
+                          })}
+                        />
+                        {errors.content && (
+                          <span className='text-red-500 text-sm mt-1'>
+                            {errors.content.message}
+                          </span>
+                        )}
                       </div>
 
                       <div>
                         <FileUpload
                           label='Featured Image'
+                          required={true}
                           onUploadComplete={(url) => {
                             setUploadedFiles((prev) => ({
                               ...prev,
                               featured: url
                             }))
-                            setValue('featuredImage', url)
+                            setValue('featuredImage', url, { shouldValidate: true })
                           }}
                           defaultPreview={uploadedFiles.featured}
                         />
+                        <input
+                          type='hidden'
+                          {...register('featuredImage', { required: 'Featured image is required' })}
+                        />
+                        {errors.featuredImage && (
+                          <span className='text-red-500 text-sm mt-1'>
+                            {errors.featuredImage.message}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>

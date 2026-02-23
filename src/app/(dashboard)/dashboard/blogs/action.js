@@ -18,9 +18,10 @@ export async function fetchBlogs(page = 1, limit = 10, status = '', options = {}
 
     return await response.json()
   } catch (error) {
-    console.error('Error fetching events:', error)
+    if (error.name !== 'AbortError') {
+      console.error('Error fetching blogs:', error);
+    }
     throw error
-    
   }
 }
 

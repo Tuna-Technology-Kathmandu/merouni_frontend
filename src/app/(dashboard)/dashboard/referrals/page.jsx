@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogClose,
 } from '@/ui/shadcn/dialog'
 import ShimmerEffect from '../../../../ui/molecules/ShimmerEffect'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
@@ -26,9 +27,11 @@ import { Search, X, Filter, ChevronDown } from 'lucide-react'
 import CollegesDropdown from '@/ui/molecules/dropdown/CollegesDropdown'
 import { Select } from '@/ui/shadcn/select'
 import { Label } from '@/ui/shadcn/label'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import SearchInput from '@/ui/molecules/SearchInput'
+import { Textarea } from '@/ui/shadcn/textarea'
 
 const ReferralsPage = () => {
   const { setHeading } = usePageHeading()
@@ -237,7 +240,9 @@ const ReferralsPage = () => {
       toast.success('Referral status updated successfully')
       handleCloseStatusModal()
     } catch (err) {
-      setError(err.message || 'Failed to update referral status')
+      const errorMsg = err.message || 'Failed to update referral status'
+      setError(errorMsg)
+      toast.error(errorMsg)
     } finally {
       setUpdatingId(null)
     }
@@ -258,7 +263,9 @@ const ReferralsPage = () => {
       setReferrals((prev) => prev.filter((ref) => ref.id !== referralToDelete))
       toast.success('Referral deleted successfully')
     } catch (err) {
-      setError(err.message || 'Failed to delete referral')
+      const errorMsg = err.message || 'Failed to delete referral'
+      setError(errorMsg)
+      toast.error(errorMsg)
     } finally {
       setDeletingId(null)
       setDeleteConfirmationOpen(false)
@@ -290,6 +297,7 @@ const ReferralsPage = () => {
 
   return (
     <div className='p-4 bg-white min-h-screen'>
+      <ToastContainer />
       {/* Search and Filter Section */}
       <div className='mb-6 space-y-4'>
         <div className='flex flex-col md:flex-row gap-4'>
@@ -528,68 +536,72 @@ const ReferralsPage = () => {
         </Table>
       </div>
 
-      {/* Update Status Modal */}
-      {/* Update Status Modal */}
       <Dialog
         isOpen={statusModalOpen}
+        closeOnOutsideClick={false}
         onClose={handleCloseStatusModal}
+        className='max-w-5xl'
       >
-        <DialogContent className='max-w-md'>
-          <DialogHeader>
+        <DialogContent className='max-w-5xl max-h-[90vh] flex flex-col p-0'>
+          <DialogHeader className='px-6 py-4 border-b'>
             <DialogTitle>Update Referral Status</DialogTitle>
+            <DialogClose onClick={handleCloseStatusModal} />
           </DialogHeader>
-          <form onSubmit={handleStatusSubmit} className='space-y-4'>
-            <div>
-              <Label className='block text-sm font-medium text-gray-700 mb-1'>
-                Status <span className='text-red-500'>*</span>
-              </Label>
-              <Select
-                className='w-full p-2 border rounded'
-                value={statusForm.status}
-                onChange={(e) =>
-                  setStatusForm({ ...statusForm, status: e.target.value })
-                }
-                required
-              >
-                <option value='IN_PROGRESS'>IN_PROGRESS</option>
-                <option value='ACCEPTED'>ACCEPTED</option>
-                <option value='REJECTED'>REJECTED</option>
-              </Select>
-            </div>
+          <div className='flex-1 overflow-y-auto p-6'>
+            <form onSubmit={handleStatusSubmit} className='flex flex-col flex-1'>
+              <div className='flex-1 space-y-6'>
+                <div className='bg-white p-6 rounded-lg  space-y-4'>
+                  <div>
+                    <Label required>Status</Label>
+                    <Select
+                      className='w-full p-2 border rounded'
+                      value={statusForm.status}
+                      onChange={(e) =>
+                        setStatusForm({ ...statusForm, status: e.target.value })
+                      }
+                      required
+                    >
+                      <option value='IN_PROGRESS'>IN_PROGRESS</option>
+                      <option value='ACCEPTED'>ACCEPTED</option>
+                      <option value='REJECTED'>REJECTED</option>
+                    </Select>
+                  </div>
 
-            <div>
-              <label className='block text-sm font-medium text-gray-700 mb-1'>
-                Remarks
-              </label>
-              <textarea
-                className='w-full p-2 border rounded'
-                rows={4}
-                value={statusForm.remarks}
-                onChange={(e) =>
-                  setStatusForm({ ...statusForm, remarks: e.target.value })
-                }
-                placeholder='Enter remarks (optional)'
-              />
-            </div>
+                  <div>
+                    <Label>Remarks</Label>
+                    <Textarea
+                      className='w-full p-2 border rounded min-h-[100px]'
+                      rows={4}
+                      value={statusForm.remarks}
+                      onChange={(e) =>
+                        setStatusForm({ ...statusForm, remarks: e.target.value })
+                      }
+                      placeholder='Enter remarks (optional)'
+                    />
+                  </div>
 
-            {error && <div className='text-red-500 text-sm'>{error}</div>}
+                  {error && <div className='text-red-500 text-sm'>{error}</div>}
+                </div>
+              </div>
 
-            <div className='flex justify-end gap-2 pt-2'>
-              <Button
-                type='button'
-                onClick={handleCloseStatusModal}
-                variant='outline'
-              >
-                Cancel
-              </Button>
-              <Button
-                type='submit'
-                disabled={updatingId === selectedReferral?.id}
-              >
-                {updatingId === selectedReferral?.id ? 'Updating...' : 'Update'}
-              </Button>
-            </div>
-          </form>
+              {/* Submit Button - Sticky Footer */}
+              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
+                <Button
+                  type='button'
+                  onClick={handleCloseStatusModal}
+                  variant='outline'
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type='submit'
+                  disabled={updatingId === selectedReferral?.id}
+                >
+                  {updatingId === selectedReferral?.id ? 'Updating...' : 'Update Status'}
+                </Button>
+              </div>
+            </form>
+          </div>
         </DialogContent>
       </Dialog>
       <ConfirmationDialog

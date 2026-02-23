@@ -77,3 +77,19 @@ export async function getScholarshipApplications(scholarshipId, page = 1) {
     throw error
   }
 }
+//for category search
+export const fetchCategories = async (searchQuery = '') => {
+  try {
+    const response = await authFetch(
+      `${process.env.baseUrl}/category${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+    )
+    if (!response.ok) {
+      throw new Error('Failed to fetch categories')
+    }
+    const data = await response.json()
+    return data.items
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}

@@ -5,9 +5,8 @@ import { useForm, Controller } from 'react-hook-form'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 import DOMPurify from 'dompurify'
 import { fetchSkillsCourses } from './action'
-import Loader from '../../../../ui/molecules/Loading'
 import Table from '@/ui/shadcn/DataTable'
-import { Edit2, Trash2, Search, Eye } from 'lucide-react'
+import { Edit2, Trash2, Eye, Plus } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
@@ -19,22 +18,21 @@ import { Button } from '@/ui/shadcn/button'
 import FileUpload from '../addCollege/FileUpload'
 import { Label } from '@/ui/shadcn/label'
 import { Input } from '@/ui/shadcn/input'
+import { Textarea } from '@/ui/shadcn/textarea'
 import { formatDate } from '@/utils/date.util'
-import { Select } from '@/ui/shadcn/select'
 import SearchInput from '@/ui/molecules/SearchInput'
 
 export default function SkillsCoursesManager() {
     const { setHeading } = usePageHeading()
     const author_id = useSelector((state) => state.user.data?.id)
 
-    // Initialize react-hook-form
     const {
         register,
         handleSubmit,
         reset,
         setValue,
         control,
-        formState: { errors }
+        formState: { errors, isSubmitting }
     } = useForm({
         defaultValues: {
             title: '',
@@ -43,7 +41,6 @@ export default function SkillsCoursesManager() {
             price: '',
             duration: '',
             is_featured: false,
-            is_featured: false,
             author: author_id,
             institution_name: '',
             content: ''
@@ -51,7 +48,7 @@ export default function SkillsCoursesManager() {
     })
 
     const [courses, setCourses] = useState([])
-    const [loading, setLoading] = useState(true)
+    const [tableLoading, setTableLoading] = useState(false)
     const [editingId, setEditingId] = useState(null)
     const [editing, setEditing] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
@@ -73,77 +70,8 @@ export default function SkillsCoursesManager() {
         thumbnail_image: ''
     })
 
-    const columns = useMemo(
-        () => [
-            {
-                header: 'Title',
-                accessorKey: 'title'
-            },
-            {
-                header: 'Price',
-                accessorKey: 'price',
-                cell: ({ getValue }) => getValue() ? `Rs. ${parseFloat(getValue()).toLocaleString()}` : 'Free'
-            },
-            {
-                header: 'Duration',
-                accessorKey: 'duration',
-                cell: ({ getValue }) => getValue() || 'Flexible'
-            },
-            {
-                header: 'Featured',
-                accessorKey: 'is_featured',
-                cell: ({ getValue }) => (
-                    <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getValue()
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-gray-100 text-gray-600'
-                            }`}
-                    >
-                        {getValue() ? 'Yes' : 'No'}
-                    </span>
-                )
-            },
-
-            {
-                header: 'Created At',
-                accessorKey: 'createdAt',
-                cell: ({ getValue }) => formatDate(getValue())
-            },
-            {
-                header: 'Actions',
-                id: 'actions',
-                cell: ({ row }) => (
-                    <div className='flex gap-2'>
-                        <button
-                            onClick={() => handleView(row.original)}
-                            className='p-1 text-gray-600 hover:text-gray-900'
-                            title="View Details"
-                        >
-                            <Eye className='w-4 h-4' />
-                        </button>
-                        <button
-                            onClick={() => handleEdit(row.original)}
-                            className='p-1 text-blue-600 hover:text-blue-800'
-                            title="Edit"
-                        >
-                            <Edit2 className='w-4 h-4' />
-                        </button>
-                        <button
-                            onClick={() => handleDeleteClick(row.original.id)}
-                            className='p-1 text-red-600 hover:text-red-800'
-                            title="Delete"
-                        >
-                            <Trash2 className='w-4 h-4' />
-                        </button>
-                    </div>
-                )
-            }
-        ],
-        []
-    )
-
     useEffect(() => {
-        setHeading('Skills-Based Courses Management')
+        setHeading('Skills-Based Courses')
         loadCourses()
         return () => setHeading(null)
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -151,14 +79,13 @@ export default function SkillsCoursesManager() {
 
     useEffect(() => {
         return () => {
-            if (searchTimeout) {
-                clearTimeout(searchTimeout)
-            }
+            if (searchTimeout) clearTimeout(searchTimeout)
         }
     }, [searchTimeout])
 
     const loadCourses = async (page = 1) => {
         try {
+            setTableLoading(true)
             const response = await fetchSkillsCourses(page)
             setCourses(response.items)
             setPagination({
@@ -168,58 +95,59 @@ export default function SkillsCoursesManager() {
             })
         } catch (err) {
             toast.error('Failed to load courses')
-            console.error('Error loading courses:', err)
         } finally {
-            setLoading(false)
+            setTableLoading(false)
         }
     }
 
     const createCourse = async (data) => {
-        try {
-            const response = await authFetch(
-                `${process.env.baseUrl}/skills-based-courses`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                }
-            )
-            if (!response.ok) {
-                const errorData = await response.json()
-                throw new Error(errorData.message)
+        const response = await authFetch(
+            `${process.env.baseUrl}/skills-based-courses`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
             }
-            return await response.json()
-        } catch (error) {
-            console.error('Error creating course:', error)
-            throw error
+        )
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.message || 'Failed to create course')
         }
+        return await response.json()
     }
 
     const updateCourse = async (data, id) => {
-        try {
-            const response = await authFetch(
-                `${process.env.baseUrl}/skills-based-courses/${id}`,
-                {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                }
-            )
-            if (!response.ok) {
-                throw new Error('Failed to update course')
+        const response = await authFetch(
+            `${process.env.baseUrl}/skills-based-courses/${id}`,
+            {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
             }
-            return await response.json()
-        } catch (error) {
-            console.error('Error updating course:', error)
-            throw error
+        )
+        if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.message || 'Failed to update course')
         }
+        return await response.json()
     }
 
-    // Use react-hook-form's handleSubmit to process the form data.
+    const handleCloseModal = () => {
+        setIsOpen(false)
+        setEditing(false)
+        setEditingId(null)
+        reset()
+        setUploadedFiles({ thumbnail_image: '' })
+    }
+
+    const handleAddClick = () => {
+        setIsOpen(true)
+        setEditing(false)
+        setEditingId(null)
+        reset()
+        setUploadedFiles({ thumbnail_image: '' })
+    }
+
     const onSubmit = async (data) => {
         const formattedData = {
             ...data,
@@ -229,26 +157,16 @@ export default function SkillsCoursesManager() {
         }
         try {
             if (editingId) {
-                // Update course if in edit mode
                 await updateCourse(formattedData, editingId)
                 toast.success('Course updated successfully')
             } else {
-                // Otherwise, create a new course
                 await createCourse(formattedData)
                 toast.success('Course created successfully')
             }
-            reset() // Clear form
-            setEditingId(null)
-            setEditing(false)
-            setIsOpen(false)
-            setUploadedFiles({ thumbnail_image: '' })
-            loadCourses()
+            handleCloseModal()
+            loadCourses(pagination.currentPage)
         } catch (err) {
-            const errorMsg = err.response?.data?.message || 'Network error occurred'
-            toast.error(
-                `Failed to ${editingId ? 'update' : 'create'} course: ${errorMsg}`
-            )
-            console.error('Error saving course:', err)
+            toast.error(err.message || `Failed to ${editingId ? 'update' : 'create'} course`)
         }
     }
 
@@ -282,27 +200,17 @@ export default function SkillsCoursesManager() {
         try {
             const response = await authFetch(
                 `${process.env.baseUrl}/skills-based-courses/${deleteId}`,
-                {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                }
+                { method: 'DELETE', headers: { 'Content-Type': 'application/json' } }
             )
             const res = await response.json()
-            toast.success(res.message)
-            loadCourses()
+            toast.success(res.message || 'Course deleted successfully')
+            loadCourses(pagination.currentPage)
         } catch (err) {
-            toast.error(err.message)
+            toast.error(err.message || 'Failed to delete course')
         } finally {
             setIsDialogOpen(false)
             setDeleteId(null)
         }
-    }
-
-    const handleDialogClose = () => {
-        setIsDialogOpen(false)
-        setDeleteId(null)
     }
 
     const handleSearch = async (query) => {
@@ -310,7 +218,6 @@ export default function SkillsCoursesManager() {
             loadCourses()
             return
         }
-
         try {
             const response = await authFetch(
                 `${process.env.baseUrl}/skills-based-courses?q=${query}`
@@ -318,7 +225,6 @@ export default function SkillsCoursesManager() {
             if (response.ok) {
                 const data = await response.json()
                 setCourses(data.items)
-
                 if (data.pagination) {
                     setPagination({
                         currentPage: data.pagination.currentPage,
@@ -327,231 +233,352 @@ export default function SkillsCoursesManager() {
                     })
                 }
             } else {
-                console.error('Error fetching results:', response.statusText)
                 setCourses([])
             }
         } catch (error) {
-            console.error('Error fetching course search results:', error.message)
             setCourses([])
         }
     }
 
     const handleSearchInput = (value) => {
         setSearchQuery(value)
-
-        if (searchTimeout) {
-            clearTimeout(searchTimeout)
-        }
-
+        if (searchTimeout) clearTimeout(searchTimeout)
         if (value === '') {
             handleSearch('')
         } else {
-            const timeoutId = setTimeout(() => {
-                handleSearch(value)
-            }, 300)
+            const timeoutId = setTimeout(() => handleSearch(value), 300)
             setSearchTimeout(timeoutId)
         }
     }
 
-    if (loading)
-        return (
-            <div className='mx-auto'>
-                <Loader />
-            </div>
-        )
+    const columns = useMemo(
+        () => [
+            {
+                header: 'Title',
+                accessorKey: 'title',
+                cell: ({ row }) => (
+                    <span className="font-medium text-gray-900">{row.original.title}</span>
+                )
+            },
+            {
+                header: 'Institution',
+                accessorKey: 'institution_name',
+                cell: ({ getValue }) => (
+                    <span className="text-gray-600 text-sm">{getValue() || <span className="text-gray-400 italic">N/A</span>}</span>
+                )
+            },
+            {
+                header: 'Price',
+                accessorKey: 'price',
+                cell: ({ getValue }) => (
+                    getValue()
+                        ? <span className="font-medium text-gray-800">Rs. {parseFloat(getValue()).toLocaleString()}</span>
+                        : <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-semibold">Free</span>
+                )
+            },
+            {
+                header: 'Duration',
+                accessorKey: 'duration',
+                cell: ({ getValue }) => (
+                    <span className="text-gray-600 text-sm">{getValue() || 'Flexible'}</span>
+                )
+            },
+            {
+                header: 'Featured',
+                accessorKey: 'is_featured',
+                cell: ({ getValue }) => (
+                    <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getValue()
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-600'
+                            }`}
+                    >
+                        {getValue() ? 'Yes' : 'No'}
+                    </span>
+                )
+            },
+            {
+                header: 'Created At',
+                accessorKey: 'createdAt',
+                cell: ({ getValue }) => (
+                    <span className="text-gray-500 text-sm">{formatDate(getValue())}</span>
+                )
+            },
+            {
+                header: 'Actions',
+                id: 'actions',
+                cell: ({ row }) => (
+                    <div className='flex gap-1'>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleView(row.original)}
+                            className='hover:bg-blue-50 text-blue-600'
+                            title="View Details"
+                        >
+                            <Eye className='w-4 h-4' />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEdit(row.original)}
+                            className='hover:bg-amber-50 text-amber-600'
+                            title="Edit"
+                        >
+                            <Edit2 className='w-4 h-4' />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteClick(row.original.id)}
+                            className='hover:bg-red-50 text-red-600'
+                            title="Delete"
+                        >
+                            <Trash2 className='w-4 h-4' />
+                        </Button>
+                    </div>
+                )
+            }
+        ],
+        []
+    )
 
     return (
-        <>
+        <div className='w-full space-y-4 p-4'>
+            <ToastContainer />
 
-            <div className='p-4 w-full'>
-                <div className='flex justify-between items-center mb-4'>
-                    {/* Search Bar */}
+            {/* Header */}
+            <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
+                <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
                     <SearchInput
                         value={searchQuery}
                         onChange={(e) => handleSearchInput(e.target.value)}
-                        placeholder='Search skill based courses...'
-                        className='max-w-md'
+                        placeholder='Search skill-based courses...'
+                        className='max-w-md w-full'
                     />
-                    {/* Button */}
-                    <div className='flex gap-2'>
-                        <Button
-                            onClick={() => {
-                                setIsOpen(true)
-                                setEditing(false)
-                                setEditingId(null)
-                                reset()
-                                setUploadedFiles({ thumbnail_image: '' })
-                            }}
-                        >
-                            Add Skill Based Course
-                        </Button>
-                    </div>
+                    <Button onClick={handleAddClick} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
+                        <Plus className="w-4 h-4" />
+                        Add Course
+                    </Button>
                 </div>
-                <ToastContainer />
+            </div>
 
-                <Dialog
-                    isOpen={isOpen}
-                    onClose={() => {
-                        setIsOpen(false)
-                        setEditing(false)
-                        setEditingId(null)
-                        reset()
-                        setUploadedFiles({ thumbnail_image: '' })
-                    }}
-                    className='max-w-2xl'
-                >
-                    <DialogHeader>
-                        <DialogTitle>{editing ? 'Edit Skill Based Course' : 'Add Skill Based Course'}</DialogTitle>
-                        <DialogClose onClick={() => {
-                            setIsOpen(false)
-                            setEditing(false)
-                            setEditingId(null)
-                            reset()
-                            setUploadedFiles({ thumbnail_image: '' })
-                        }} />
+            {/* Create / Edit Modal */}
+            <Dialog
+                isOpen={isOpen}
+                onClose={handleCloseModal}
+                className='max-w-3xl'
+            >
+                <DialogContent className='max-w-3xl max-h-[90vh] flex flex-col p-0'>
+                    <DialogHeader className='px-6 py-4 border-b'>
+                        <DialogTitle className="text-lg font-semibold text-gray-900">
+                            {editing ? 'Edit Skill-Based Course' : 'Add Skill-Based Course'}
+                        </DialogTitle>
+                        <DialogClose onClick={handleCloseModal} />
                     </DialogHeader>
-                    <DialogContent>
-                        <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
-                            <form
-                                onSubmit={handleSubmit(onSubmit)}
-                                className='flex flex-col flex-1 overflow-hidden'
-                            >
-                                <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                                    <div className='bg-white p-6 rounded-lg shadow-md'>
 
-                                        <div className='space-y-4'>
-                                            <div>
-                                                <Label>
-                                                    Title <span className='text-red-500'>*</span>
-                                                </Label>
-                                                <Input
-                                                    type='text'
-                                                    placeholder='Course Title'
-                                                    {...register('title', {
-                                                        required: 'Title is required'
-                                                    })}
-                                                    className='w-full p-2 border rounded'
-                                                />
-                                                {errors.title && (
-                                                    <span className='text-red-500 text-sm'>
-                                                        {errors.title.message}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <Label>Institution Name</Label>
-                                                <Input
-                                                    type='text'
-                                                    placeholder='Institution/Provider Name'
-                                                    {...register('institution_name')}
-                                                    className='w-full p-2 border rounded'
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label>Price (Rs.)</Label>
-                                                <Input
-                                                    type='number'
-                                                    step='0.01'
-                                                    placeholder='0 for Free'
-                                                    {...register('price')}
-                                                    className='w-full p-2 border rounded'
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label>Duration</Label>
-                                                <Input
-                                                    type='text'
-                                                    placeholder='e.g., 3 months, 6 weeks'
-                                                    {...register('duration')}
-                                                    className='w-full p-2 border rounded'
-                                                />
-                                            </div>
+                    <div className='flex-1 overflow-y-auto p-6'>
+                        <form id="skills-course-form" onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
 
-                                            <div>
-                                                <Label>Featured</Label>
-                                                <Select
-                                                    {...register('is_featured')}
-                                                    className='w-full p-2 border rounded'
-                                                >
-                                                    <option value={false}>No</option>
-                                                    <option value={true}>Yes</option>
-                                                </Select>
-                                            </div>
-                                            <div>
-                                                <Label>Description</Label>
-                                                <textarea
-                                                    placeholder='Course Description'
-                                                    {...register('description')}
-                                                    className='w-full p-2 border rounded min-h-[100px]'
-                                                    rows={4}
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label>Detailed Content</Label>
-                                                <Controller
-                                                    name='content'
-                                                    control={control}
-                                                    render={({ field }) => (
-                                                        <TipTapEditor
-                                                            value={field.value}
-                                                            onChange={field.onChange}
-                                                            placeholder='Enter detailed course content, curriculum, etc.'
-                                                        />
-                                                    )}
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label>Thumbnail Image (Optional)</Label>
-                                                <FileUpload
-                                                    defaultPreview={uploadedFiles.thumbnail_image}
-                                                    onUploadComplete={(url) => {
-                                                        setUploadedFiles((prev) => ({
-                                                            ...prev,
-                                                            thumbnail_image: url
-                                                        }))
-                                                        setValue('thumbnail_image', url)
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
+                            {/* Course Details */}
+                            <section className="space-y-5">
+                                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Course Details</h3>
+
+                                <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+                                    {/* Title */}
+                                    <div className="space-y-2 md:col-span-2">
+                                        <Label htmlFor="title" required>Title</Label>
+                                        <Input
+                                            id="title"
+                                            placeholder='e.g. Advanced React Development'
+                                            {...register('title', {
+                                                required: 'Title is required',
+                                                minLength: { value: 3, message: 'Title must be at least 3 characters' }
+                                            })}
+                                            className={errors.title ? 'border-destructive focus-visible:ring-destructive' : ''}
+                                        />
+                                        {errors.title && (
+                                            <p className='text-xs text-destructive mt-1'>{errors.title.message}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Institution */}
+                                    <div className="space-y-2 md:col-span-2">
+                                        <Label htmlFor="institution_name">Institution / Provider</Label>
+                                        <Input
+                                            id="institution_name"
+                                            placeholder='e.g. Coursera, Udemy, Local College'
+                                            {...register('institution_name', {
+                                                maxLength: { value: 200, message: 'Max 200 characters allowed' }
+                                            })}
+                                            className={errors.institution_name ? 'border-destructive focus-visible:ring-destructive' : ''}
+                                        />
+                                        {errors.institution_name && (
+                                            <p className='text-xs text-destructive mt-1'>{errors.institution_name.message}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Price */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="price" required>Price (Rs.)</Label>
+                                        <Input
+                                            id="price"
+                                            type='number'
+                                            step='0.01'
+                                            min='0'
+                                            placeholder='0 = Free'
+                                            {...register('price', {
+                                                required: 'Price is required (enter 0 for free)',
+                                                min: { value: 0, message: 'Price cannot be negative' },
+                                                validate: (v) =>
+                                                    v !== '' && v !== null && !isNaN(parseFloat(v)) || 'Enter a valid price'
+                                            })}
+                                            className={errors.price ? 'border-destructive focus-visible:ring-destructive' : ''}
+                                        />
+                                        {errors.price && (
+                                            <p className='text-xs text-destructive mt-1'>{errors.price.message}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Duration */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="duration" required>Duration</Label>
+                                        <Input
+                                            id="duration"
+                                            placeholder='e.g. 3 months, 6 weeks'
+                                            {...register('duration', {
+                                                required: 'Duration is required',
+                                                maxLength: { value: 100, message: 'Max 100 characters' }
+                                            })}
+                                            className={errors.duration ? 'border-destructive focus-visible:ring-destructive' : ''}
+                                        />
+                                        {errors.duration && (
+                                            <p className='text-xs text-destructive mt-1'>{errors.duration.message}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Featured */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="is_featured">Featured</Label>
+                                        <select
+                                            id="is_featured"
+                                            {...register('is_featured')}
+                                            className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#387cae] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                                        >
+                                            <option value="false">No</option>
+                                            <option value="true">Yes</option>
+                                        </select>
                                     </div>
                                 </div>
+                            </section>
 
-                                {/* Submit Button - Sticky Footer */}
-                                <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
-                                    <Button
-                                        type='button'
-                                        variant='outline'
-                                        onClick={() => {
-                                            setIsOpen(false)
-                                            setEditing(false)
-                                            setEditingId(null)
-                                            reset()
-                                            setUploadedFiles({ thumbnail_image: '' })
-                                        }}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button type='submit'>
-                                        {editing ? 'Update Course' : 'Create Course'}
-                                    </Button>
+                            {/* Description & Content */}
+                            <section className="space-y-5">
+                                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Content</h3>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="description" required>Short Description</Label>
+                                    <Textarea
+                                        id="description"
+                                        placeholder='Brief summary of the course...'
+                                        {...register('description', {
+                                            required: 'Short description is required',
+                                            maxLength: { value: 1000, message: 'Description must be 1000 characters or fewer' }
+                                        })}
+                                        rows={3}
+                                        className={`resize-none ${errors.description ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                                    />
+                                    {errors.description && (
+                                        <p className='text-xs text-destructive mt-1'>{errors.description.message}</p>
+                                    )}
                                 </div>
-                            </form>
-                        </div>
-                    </DialogContent>
-                </Dialog>
 
-                {/* Table */}
-                <div className='mt-8'>
-                    <Table
-                        data={courses}
-                        columns={columns}
-                        pagination={pagination}
-                        onPageChange={(newPage) => loadCourses(newPage)}
-                        onSearch={handleSearch}
-                        showSearch={false}
-                    />
-                </div>
+                                <div className="space-y-2">
+                                    <Label required>Detailed Content</Label>
+                                    <Controller
+                                        name='content'
+                                        control={control}
+                                        rules={{
+                                            validate: (val) =>
+                                                (val && val.replace(/<[^>]*>/g, '').trim().length > 0) ||
+                                                'Detailed content is required'
+                                        }}
+                                        render={({ field }) => (
+                                            <>
+                                                <div className={errors.content ? 'ring-2 ring-destructive rounded-xl' : ''}>
+                                                    <TipTapEditor
+                                                        value={field.value}
+                                                        onChange={field.onChange}
+                                                        placeholder='Enter curriculum, modules, requirements...'
+                                                    />
+                                                </div>
+                                                {errors.content && (
+                                                    <p className='text-xs text-destructive mt-1'>{errors.content.message}</p>
+                                                )}
+                                            </>
+                                        )}
+                                    />
+                                </div>
+                            </section>
+
+                            {/* Media */}
+                            <section className="space-y-4">
+                                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Media</h3>
+                                <div className="space-y-2">
+                                    <Label>
+                                        Thumbnail Image{' '}
+                                        <span className='text-gray-400 font-normal text-sm'>(Optional)</span>
+                                    </Label>
+                                    <FileUpload
+                                        label=''
+                                        defaultPreview={uploadedFiles.thumbnail_image}
+                                        onUploadComplete={(url) => {
+                                            setUploadedFiles((prev) => ({ ...prev, thumbnail_image: url }))
+                                            setValue('thumbnail_image', url)
+                                        }}
+                                    />
+                                </div>
+                            </section>
+
+                        </form>
+                    </div>
+
+                    {/* Sticky Footer */}
+                    <div className='sticky bottom-0 bg-white border-t px-6 py-4 flex justify-end gap-3'>
+                        <Button
+                            type='button'
+                            variant='outline'
+                            onClick={handleCloseModal}
+                            disabled={isSubmitting}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type='submit'
+                            form="skills-course-form"
+                            disabled={isSubmitting}
+                            className='bg-[#387cae] hover:bg-[#387cae]/90 text-white'
+                        >
+                            {isSubmitting
+                                ? 'Processing...'
+                                : editing
+                                    ? 'Update Course'
+                                    : 'Create Course'}
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Table */}
+            <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+                <Table
+                    data={courses}
+                    columns={columns}
+                    pagination={pagination}
+                    onPageChange={(newPage) => loadCourses(newPage)}
+                    showSearch={false}
+                    loading={tableLoading}
+                />
             </div>
 
             {/* View Modal */}
@@ -563,18 +590,19 @@ export default function SkillsCoursesManager() {
                 }}
                 className="max-w-2xl"
             >
-                <DialogHeader>
-                    <DialogTitle>Course Details</DialogTitle>
-                    <DialogClose onClick={() => {
-                        setIsViewModalOpen(false)
-                        setViewingCourse(null)
-                    }} />
-                </DialogHeader>
-                <DialogContent>
-                    <div className="p-6 space-y-6">
-                        {/* Thumbnail Image */}
+                <DialogContent className='max-w-2xl max-h-[90vh] flex flex-col p-0'>
+                    <DialogHeader className='px-6 py-4 border-b'>
+                        <DialogTitle className="text-lg font-semibold text-gray-900">Course Details</DialogTitle>
+                        <DialogClose onClick={() => {
+                            setIsViewModalOpen(false)
+                            setViewingCourse(null)
+                        }} />
+                    </DialogHeader>
+
+                    <div className='flex-1 overflow-y-auto p-6 space-y-6'>
+                        {/* Thumbnail */}
                         {viewingCourse?.thumbnail_image && (
-                            <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-100 mb-6 border border-gray-200">
+                            <div className="w-full h-56 rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
                                 <img
                                     src={viewingCourse.thumbnail_image}
                                     alt={viewingCourse.title}
@@ -583,85 +611,89 @@ export default function SkillsCoursesManager() {
                             </div>
                         )}
 
-                        {/* Details Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="md:col-span-2">
-                                <h3 className="text-sm font-medium text-gray-500">Title</h3>
-                                <p className="mt-1 text-lg font-semibold text-gray-900">{viewingCourse?.title}</p>
-                            </div>
+                        {/* Title */}
+                        <div>
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Title</p>
+                            <p className="text-xl font-bold text-gray-900">{viewingCourse?.title}</p>
+                        </div>
 
+                        {/* Meta Grid */}
+                        <div className="grid grid-cols-2 gap-4">
                             {viewingCourse?.institution_name && (
-                                <div className="md:col-span-2">
-                                    <h3 className="text-sm font-medium text-gray-500">Institution Name</h3>
-                                    <p className="mt-1 text-gray-900 font-medium">{viewingCourse.institution_name}</p>
+                                <div className="col-span-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Institution</p>
+                                    <p className="text-gray-800 font-medium">{viewingCourse.institution_name}</p>
                                 </div>
                             )}
-
-                            <div>
-                                <h3 className="text-sm font-medium text-gray-500">Price</h3>
-                                <p className="mt-1 text-gray-900 font-semibold">
-                                    {viewingCourse?.price ? `Rs. ${parseFloat(viewingCourse.price).toLocaleString()}` : 'Free'}
+                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Price</p>
+                                <p className="text-gray-800 font-semibold">
+                                    {viewingCourse?.price
+                                        ? `Rs. ${parseFloat(viewingCourse.price).toLocaleString()}`
+                                        : <span className="text-green-600">Free</span>}
                                 </p>
                             </div>
-
-                            <div>
-                                <h3 className="text-sm font-medium text-gray-500">Duration</h3>
-                                <p className="mt-1 text-gray-900">{viewingCourse?.duration || 'Flexible'}</p>
+                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Duration</p>
+                                <p className="text-gray-800">{viewingCourse?.duration || 'Flexible'}</p>
                             </div>
-
-                            <div>
-                                <h3 className="text-sm font-medium text-gray-500">Featured</h3>
-                                <span
-                                    className={`inline-flex mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${viewingCourse?.is_featured
-                                        ? 'bg-yellow-100 text-yellow-800'
-                                        : 'bg-gray-100 text-gray-600'
-                                        }`}
-                                >
+                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Featured</p>
+                                <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${viewingCourse?.is_featured
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : 'bg-gray-100 text-gray-600'
+                                    }`}>
                                     {viewingCourse?.is_featured ? 'Yes' : 'No'}
                                 </span>
                             </div>
+                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Created</p>
+                                <p className="text-gray-800 text-sm">{viewingCourse?.createdAt ? formatDate(viewingCourse.createdAt) : 'N/A'}</p>
+                            </div>
+                        </div>
 
-
-
-                            <div className="md:col-span-2">
-                                <h3 className="text-sm font-medium text-gray-500">Description</h3>
-                                <div className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                    {viewingCourse?.description || "No description provided."}
+                        {/* Description */}
+                        {viewingCourse?.description && (
+                            <div>
+                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">Description</p>
+                                <div className="text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100 text-sm leading-relaxed">
+                                    {viewingCourse.description}
                                 </div>
                             </div>
+                        )}
 
-                            <div className="md:col-span-2">
-                                <h3 className="text-sm font-medium text-gray-500">Detailed Content</h3>
-                                <div
-                                    className="mt-1 prose prose-sm max-w-none text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100 min-h-[200px]"
-                                    dangerouslySetInnerHTML={{
-                                        __html: viewingCourse?.content ? DOMPurify.sanitize(viewingCourse.content) : "No content provided."
-                                    }}
-                                />
-                            </div>
-
-                            <div className="md:col-span-2">
-                                <h3 className="text-sm font-medium text-gray-500">Created At</h3>
-                                <p className="mt-1 text-gray-900">{viewingCourse?.createdAt ? formatDate(viewingCourse.createdAt) : 'N/A'}</p>
-                            </div>
+                        {/* Detailed Content */}
+                        <div>
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">Detailed Content</p>
+                            <div
+                                className="prose prose-sm max-w-none text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100 min-h-[120px]"
+                                dangerouslySetInnerHTML={{
+                                    __html: viewingCourse?.content
+                                        ? DOMPurify.sanitize(viewingCourse.content)
+                                        : '<p class="text-gray-400 italic">No content provided.</p>'
+                                }}
+                            />
                         </div>
+                    </div>
 
-                        <div className="flex justify-end pt-4 border-t mt-6">
-                            <Button onClick={() => setIsViewModalOpen(false)}>
-                                Close
-                            </Button>
-                        </div>
+                    <div className='px-6 py-4 border-t flex justify-end'>
+                        <Button variant='outline' onClick={() => setIsViewModalOpen(false)}>
+                            Close
+                        </Button>
                     </div>
                 </DialogContent>
             </Dialog>
 
+            {/* Delete Confirmation */}
             <ConfirmationDialog
                 open={isDialogOpen}
-                onClose={handleDialogClose}
+                onClose={() => { setIsDialogOpen(false); setDeleteId(null) }}
                 onConfirm={handleDeleteConfirm}
                 title='Confirm Deletion'
                 message='Are you sure you want to delete this course? This action cannot be undone.'
+                confirmText='Delete'
+                cancelText='Cancel'
             />
-        </>
+        </div>
     )
 }

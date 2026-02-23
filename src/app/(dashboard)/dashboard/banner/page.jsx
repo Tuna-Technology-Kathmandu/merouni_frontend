@@ -11,6 +11,15 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast, ToastContainer } from 'react-toastify'
 import FileUpload from '../addCollege/FileUpload'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose
+} from '@/ui/shadcn/dialog'
+import { Label } from '@/ui/shadcn/label'
+import { Input } from '@/ui/shadcn/input'
 
 export default function BannerForm() {
   const { setHeading } = usePageHeading()
@@ -315,91 +324,39 @@ export default function BannerForm() {
         })}
       </div>
 
-      {isOpen && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
-          <div className='bg-white p-6 rounded-lg shadow-md max-w-4xl w-full max-h-[90vh] overflow-y-auto'>
-            <div className='flex justify-between items-center mb-4'>
-              <h2 className='text-xl font-semibold'>
-                {editing ? 'Edit Banner' : 'Create Banner'} (Position{' '}
-                {activePosition})
-              </h2>
-              <button
-                onClick={() => {
-                  setIsOpen(false)
-                  setEditing(false)
-                  setEditingId(null)
-                  resetFormForPosition(activePosition)
-                }}
-                className='text-gray-500 hover:text-gray-700'
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-
-              <div className='mb-4'>
-                <label className='block mb-2'>Website URL</label>
-                <input
-                  type='text'
-                  {...register('website_url', {
-                    required: 'Website URL is required',
-                    pattern: {
-                      value:
-                        /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6}\.?)(\/[\w.-]*)*\/?$/,
-                      message: 'Enter a valid URL'
-                    }
-                  })}
-                  className='w-full p-2 border rounded'
-                  placeholder='Enter website URL'
-                />
-                {errors.website_url && (
-                  <span className='text-red-500'>
-                    {errors.website_url.message}
-                  </span>
-                )}
-              </div>
-
-              <div className='mb-4'>
-                <label className='block mb-2'>
-                  Date of Expiry <span className='text-red-500'>*</span>
-                </label>
-                <input
-                  type='date'
-                  {...register('date_of_expiry', {
-                    required: 'Date of expiry is required',
-                    validate: (value) => {
-                      const selectedDate = new Date(value)
-                      const today = new Date()
-                      today.setHours(0, 0, 0, 0)
-                      return (
-                        selectedDate >= today || 'Date must be in the future'
-                      )
-                    }
-                  })}
-                  className='w-full p-2 border rounded'
-                  min={new Date().toISOString().split('T')[0]}
-                />
-                {errors.date_of_expiry && (
-                  <span className='text-red-500'>
-                    {errors.date_of_expiry.message}
-                  </span>
-                )}
-              </div>
-
-              <input
-                type='hidden'
-                {...register('display_position')}
-                value={activePosition}
-              />
-
-              <div className='space-y-6'>
-                <div className='p-4 border rounded-lg space-y-4'>
+      <Dialog
+        isOpen={isOpen}
+        closeOnOutsideClick={false}
+        onClose={() => {
+          setIsOpen(false)
+          setEditing(false)
+          setEditingId(null)
+          resetFormForPosition(activePosition)
+        }}
+        className='max-w-5xl'
+      >
+        <DialogContent className='max-w-5xl max-h-[90vh] flex flex-col p-0'>
+          <DialogHeader className='px-6 py-4 border-b'>
+            <DialogTitle>
+              {editing ? 'Edit Banner' : 'Create Banner'} (Position{' '}
+              {activePosition})
+            </DialogTitle>
+            <DialogClose
+              onClick={() => {
+                setIsOpen(false)
+                setEditing(false)
+                setEditingId(null)
+                resetFormForPosition(activePosition)
+              }}
+            />
+          </DialogHeader>
+          <div className='flex-1 overflow-y-auto p-6'>
+            <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col flex-1'>
+              <div className='flex-1 space-y-6'>
+                <div className='bg-white p-6 rounded-lg shadow-md space-y-4'>
                   <div>
-                    <label className='block mb-2'>
-                      Banner Title <span className='text-red-500'>*</span>
-                    </label>
-                    <input
+                    <Label required>Banner Title</Label>
+                    <Input
                       {...register('title', {
                         required: 'Banner title is required'
                       })}
@@ -407,45 +364,86 @@ export default function BannerForm() {
                       placeholder='Enter banner title'
                     />
                     {errors.title && (
-                      <span className='text-red-500'>
+                      <span className='text-red-500 text-sm mt-1 block'>
                         {errors.title.message}
                       </span>
                     )}
                   </div>
 
-                  <FileUpload
-                    label={
-                      editing
-                        ? 'Banner Image (Change Image)'
-                        : 'Banner Image'
-                    }
-                    onUploadComplete={(url) => {
-                      setValue('banner_image', url)
-                    }}
-                    defaultPreview={watch('banner_image')}
-                  />
-                </div>
+                  <div>
+                    <Label required>Website URL</Label>
+                    <Input
+                      type='text'
+                      {...register('website_url', {
+                        required: 'Website URL is required',
+                        pattern: {
+                          value:
+                            /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6}\.?)(\/[\w.-]*)*\/?$/,
+                          message: 'Enter a valid URL'
+                        }
+                      })}
+                      className='w-full p-2 border rounded'
+                      placeholder='Enter website URL'
+                    />
+                    {errors.website_url && (
+                      <span className='text-red-500 text-sm mt-1 block'>
+                        {errors.website_url.message}
+                      </span>
+                    )}
+                  </div>
 
+                  <div>
+                    <Label required>Date of Expiry</Label>
+                    <Input
+                      type='date'
+                      {...register('date_of_expiry', {
+                        required: 'Date of expiry is required',
+                        validate: (value) => {
+                          const selectedDate = new Date(value)
+                          const today = new Date()
+                          today.setHours(0, 0, 0, 0)
+                          return (
+                            selectedDate >= today || 'Date must be in the future'
+                          )
+                        }
+                      })}
+                      className='w-full p-2 border rounded'
+                      min={new Date().toISOString().split('T')[0]}
+                    />
+                    {errors.date_of_expiry && (
+                      <span className='text-red-500 text-sm mt-1 block'>
+                        {errors.date_of_expiry.message}
+                      </span>
+                    )}
+                  </div>
+
+                  <div>
+                    <FileUpload
+                      label='Banner Image'
+                      required={true}
+                      onUploadComplete={(url) => {
+                        setValue('banner_image', url, { shouldValidate: true })
+                      }}
+                      defaultPreview={watch('banner_image')}
+                    />
+                    <input
+                      type='hidden'
+                      {...register('banner_image', { required: 'Banner image is required' })}
+                    />
+                    {errors.banner_image && (
+                      <span className='text-red-500 text-sm mt-1 block'>
+                        {errors.banner_image.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              <div className='flex justify-end gap-4 mt-6'>
-                <Button
-                  type='button'
-                  onClick={() => {
-                    setIsOpen(false)
-                    setEditing(false)
-                    setEditingId(null)
-                    resetFormForPosition(activePosition)
-                  }}
-                  variant="outline"
-                >
-                  Cancel
-                </Button>
+              {/* Submit Button - Sticky Footer */}
+              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
                 <Button
                   type='submit'
                   disabled={loading}
-                  className='text-white hover:opacity-90 px-6 py-2 transition-all shadow-md'
-                  style={{ backgroundColor: THEME_BLUE }}
                 >
                   {loading
                     ? 'Processing...'
@@ -456,8 +454,8 @@ export default function BannerForm() {
               </div>
             </form>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
       <ConfirmationDialog
         open={isDialogOpen}

@@ -27,6 +27,7 @@ const OverviewSection = ({ consultancy }) => {
           [&_h2]:text-base [&_h2]:font-semibold [&_h2]:mt-6 [&_h2]:mb-3 [&_h2]:text-gray-900
           [&_ol]:pl-8 [&_ol]:my-6 [&_ol]:space-y-3 [&_ol]:list-decimal
           [&_ul]:list-disc [&_ul]:pl-8 [&_ul]:my-6 [&_ul]:space-y-3 [&_li]:pl-2
+          [&_a]:text-[#0A6FA7] [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-2 [&_a]:hover:text-[#085e8a] [&_a]:transition-colors
           prose max-w-none'
       />
     </div>

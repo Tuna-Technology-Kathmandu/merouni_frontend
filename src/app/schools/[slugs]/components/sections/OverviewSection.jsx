@@ -67,7 +67,7 @@ const OverviewSection = ({ college }) => {
           }}
           className='text-gray-600 mt-8 leading-relaxed text-justify 
              text-sm md:text-base
-
+             
              [&>iframe]:w-full 
              [&>iframe]:max-w-[calc(100vw-40px)] 
              [&>iframe]:aspect-video 
@@ -126,6 +126,7 @@ const OverviewSection = ({ college }) => {
              [&_ul]:my-6
              [&_ul]:space-y-3
              [&_li]:pl-2
+             [&_a]:text-[#0A6FA7] [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-2 [&_a]:hover:text-[#085e8a] [&_a]:transition-colors
              max-lg:[&_ol]:text-sm
              max-lg:[&_ul]:text-sm'
         />
