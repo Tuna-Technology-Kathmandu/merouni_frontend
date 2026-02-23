@@ -1048,14 +1048,12 @@ const CreateUpdateCollegeModal = ({
                             type='button'
                             onClick={handleCloseAttempt}
                             variant='outline'
-                            className="rounded-xl px-6 h-11 font-semibold text-gray-600 border-gray-200 hover:bg-gray-50 transition-all text-sm"
                         >
-                            Discard Changes
+                            Cancel
                         </Button>
                         <Button
                             type='submit'
                             disabled={submitting || loadingData}
-                            className="rounded-xl min-w-[160px] h-11 font-bold shadow-lg shadow-[#387cae]/20 bg-[#387cae] hover:bg-[#387cae]/90 active:scale-95 transition-all text-white flex items-center justify-center gap-2"
                         >
                             {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                             <span>

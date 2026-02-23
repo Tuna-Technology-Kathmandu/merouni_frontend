@@ -850,13 +850,11 @@ const CreateUpdateUniversityModal = ({
                             type='button'
                             onClick={handleCloseAttempt}
                             variant='outline'
-                            className="rounded-xl px-6 h-11 font-semibold text-gray-600 border-gray-200 hover:bg-gray-50 transition-all"
                         >
-                            Discard Changes
+                            Cancel
                         </Button>
                         <Button
                             type='submit'
-                            className="bg-[#387cae] hover:bg-[#387cae]/90 text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-[#387cae]/20 transition-all active:scale-95 disabled:opacity-70 flex items-center gap-2"
                             disabled={submitting}
                         >
                             {submitting ? (
