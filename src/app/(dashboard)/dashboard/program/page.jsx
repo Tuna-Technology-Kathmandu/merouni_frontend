@@ -3,9 +3,9 @@ import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Button } from '@/ui/shadcn/button'
-import { Edit2, Eye, Search, Trash2 } from 'lucide-react'
+import { Edit2, Eye, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import Table from '@/ui/shadcn/DataTable'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import CreateUpdateProgram from '@/ui/molecules/dialogs/CreateUpdateProgram'
@@ -165,11 +165,11 @@ export default function ProgramForm() {
           })
         }
       } else {
-        console.error('Error fetching levels:', response.statusText)
+        console.error('Error fetching programs:', response.statusText)
         setPrograms([])
       }
     } catch (error) {
-      console.error('Error fetching levels search results:', error.message)
+      console.error('Error fetching programs search results:', error.message)
       setPrograms([])
     }
   }
@@ -197,64 +197,71 @@ export default function ProgramForm() {
       header: 'Actions',
       id: 'actions',
       cell: ({ row }) => (
-        <div className='flex gap-2'>
-          <button
+        <div className='flex gap-1'>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => handleView(row.original.slugs)}
-            className='p-1 text-gray-600 hover:text-gray-800'
+            className='hover:bg-blue-50 text-blue-600'
             title='View'
           >
             <Eye className='w-4 h-4' />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => handleEdit(row.original.slugs)}
-            className='p-1 text-blue-600 hover:text-blue-800'
+            className='hover:bg-amber-50 text-amber-600'
             title='Edit'
           >
             <Edit2 className='w-4 h-4' />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => handleDeleteClick(row.original.id)}
-            className='p-1 text-red-600 hover:text-red-800'
+            className='hover:bg-red-50 text-red-600'
             title='Delete'
           >
             <Trash2 className='w-4 h-4' />
-          </button>
+          </Button>
         </div>
       )
     }
   ]
 
   return (
-    <>
-      <div className='p-4 w-full'>
-        <div className='flex justify-between items-center mb-4'>
+    <div className='w-full space-y-4 p-4'>
+      {/* Header Section */}
+      <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
           {/* Search Bar */}
           <SearchInput
             value={searchQuery}
             onChange={(e) => handleSearchInput(e.target.value)}
             placeholder='Search programs...'
-            className='max-w-md'
+            className='max-w-md w-full'
           />
-          {/* Button */}
-          <div className='flex gap-2'>
-            <Button onClick={handleCreate}>
-              Add Program
-            </Button>
-          </div>
-        </div>
 
-        {/* Table Section */}
-        <div className='mt-8'>
-          <Table
-            loading={tableLoading}
-            data={programs}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => fetchPrograms(newPage)}
-            onSearch={handleSearch}
-            showSearch={false}
-          />
+          {/* Button */}
+          <Button onClick={handleCreate} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
+            <Plus className="w-4 h-4" />
+            Add Program
+          </Button>
         </div>
+      </div>
+
+      {/* Table Section */}
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <Table
+          loading={tableLoading}
+          data={programs}
+          columns={columns}
+          pagination={pagination}
+          onPageChange={(newPage) => fetchPrograms(newPage)}
+          onSearch={handleSearch}
+          showSearch={false}
+        />
       </div>
 
       <CreateUpdateProgram
@@ -277,7 +284,9 @@ export default function ProgramForm() {
         onConfirm={handleDeleteConfirm}
         title='Confirm Deletion'
         message='Are you sure you want to delete this program? This action cannot be undone.'
+        confirmText='Delete'
+        cancelText='Cancel'
       />
-    </>
+    </div>
   )
 }
