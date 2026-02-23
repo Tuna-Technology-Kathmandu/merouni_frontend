@@ -18,12 +18,7 @@ import {
   Underline as UnderlineIcon,
   List,
   ListOrdered,
-  Heading1,
   Heading2,
-  Heading3,
-  Heading4,
-  Heading5,
-  Heading6,
   AlignLeft,
   AlignCenter,
   AlignRight,
@@ -125,103 +120,169 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
   }
 
   return (
-    <div className='flex flex-wrap gap-1 p-2 border-b border-gray-200 bg-gray-50'>
-      <Button
-        type='button'
-        size='sm'
-        variant={editor.isActive('bold') ? 'default' : 'outline'}
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        className='h-8 w-8 p-0'
-      >
-        <Bold className='h-4 w-4' />
-      </Button>
-      <Button
-        type='button'
-        size='sm'
-        variant={editor.isActive('italic') ? 'default' : 'outline'}
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        className='h-8 w-8 p-0'
-      >
-        <Italic className='h-4 w-4' />
-      </Button>
-      <Button
-        type='button'
-        size='sm'
-        variant={editor.isActive('underline') ? 'default' : 'outline'}
-        onClick={() => editor.chain().focus().toggleUnderline().run()}
-        className='h-8 w-8 p-0'
-      >
-        <UnderlineIcon className='h-4 w-4' />
-      </Button>
-      <div className='w-px h-8 bg-gray-300 mx-1' />
-      <Button
-        type='button'
-        size='sm'
-        variant={editor.isActive('heading', { level: 2 }) ? 'default' : 'outline'}
-        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        className='h-8 w-8 p-0'
-      >
-        <Heading2 className='h-4 w-4' />
-      </Button>
-      <div className='w-px h-8 bg-gray-300 mx-1' />
-      <Button
-        type='button'
-        size='sm'
-        variant={editor.isActive('bulletList') ? 'default' : 'outline'}
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-        className='h-8 w-8 p-0'
-      >
-        <List className='h-4 w-4' />
-      </Button>
-      <Button
-        type='button'
-        size='sm'
-        variant={editor.isActive('orderedList') ? 'default' : 'outline'}
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        className='h-8 w-8 p-0'
-      >
-        <ListOrdered className='h-4 w-4' />
-      </Button>
-      <div className='w-px h-8 bg-gray-300 mx-1' />
-      <Button
-        type='button'
-        size='sm'
-        variant={editor.isActive({ textAlign: 'left' }) ? 'default' : 'outline'}
-        onClick={() => editor.chain().focus().setTextAlign('left').run()}
-        className='h-8 w-8 p-0'
-      >
-        <AlignLeft className='h-4 w-4' />
-      </Button>
-      <Button
-        type='button'
-        size='sm'
-        variant={editor.isActive({ textAlign: 'center' }) ? 'default' : 'outline'}
-        onClick={() => editor.chain().focus().setTextAlign('center').run()}
-        className='h-8 w-8 p-0'
-      >
-        <AlignCenter className='h-4 w-4' />
-      </Button>
-      <Button
-        type='button'
-        size='sm'
-        variant={editor.isActive({ textAlign: 'right' }) ? 'default' : 'outline'}
-        onClick={() => editor.chain().focus().setTextAlign('right').run()}
-        className='h-8 w-8 p-0'
-      >
-        <AlignRight className='h-4 w-4' />
-      </Button>
-      <div className='w-px h-8 bg-gray-300 mx-1' />
-      <Button
-        type='button'
-        size='sm'
-        variant={editor.isActive('link') ? 'default' : 'outline'}
-        onClick={addLink}
-        className='h-8 w-8 p-0'
-        title='Add Link'
-      >
-        <LinkIcon className='h-4 w-4' />
-      </Button>
-      {editor.isActive('link') && (
+    <>
+      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-sm'>
+        <Button
+          type='button'
+          size='sm'
+          variant={editor.isActive('bold') ? 'default' : 'ghost'}
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          className={cn('h-8 w-8 p-0', editor.isActive('bold') && 'bg-[#387cae] text-white')}
+        >
+          <Bold className='h-4 w-4' />
+        </Button>
+        <Button
+          type='button'
+          size='sm'
+          variant={editor.isActive('italic') ? 'default' : 'ghost'}
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          className={cn('h-8 w-8 p-0', editor.isActive('italic') && 'bg-[#387cae] text-white')}
+        >
+          <Italic className='h-4 w-4' />
+        </Button>
+        <Button
+          type='button'
+          size='sm'
+          variant={editor.isActive('underline') ? 'default' : 'ghost'}
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          className={cn('h-8 w-8 p-0', editor.isActive('underline') && 'bg-[#387cae] text-white')}
+        >
+          <UnderlineIcon className='h-4 w-4' />
+        </Button>
+      </div>
+
+      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-sm'>
+        <Button
+          type='button'
+          size='sm'
+          variant={editor.isActive('heading', { level: 2 }) ? 'default' : 'ghost'}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          className={cn('h-8 w-8 p-0', editor.isActive('heading', { level: 2 }) && 'bg-[#387cae] text-white')}
+        >
+          <Heading2 className='h-4 w-4' />
+        </Button>
+      </div>
+
+      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-sm'>
+        <Button
+          type='button'
+          size='sm'
+          variant={editor.isActive('bulletList') ? 'default' : 'ghost'}
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          className={cn('h-8 w-8 p-0', editor.isActive('bulletList') && 'bg-[#387cae] text-white')}
+        >
+          <List className='h-4 w-4' />
+        </Button>
+        <Button
+          type='button'
+          size='sm'
+          variant={editor.isActive('orderedList') ? 'default' : 'ghost'}
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          className={cn('h-8 w-8 p-0', editor.isActive('orderedList') && 'bg-[#387cae] text-white')}
+        >
+          <ListOrdered className='h-4 w-4' />
+        </Button>
+      </div>
+
+      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-sm'>
+        <Button
+          type='button'
+          size='sm'
+          variant={editor.isActive({ textAlign: 'left' }) ? 'default' : 'ghost'}
+          onClick={() => editor.chain().focus().setTextAlign('left').run()}
+          className={cn('h-8 w-8 p-0', editor.isActive({ textAlign: 'left' }) && 'bg-[#387cae] text-white')}
+        >
+          <AlignLeft className='h-4 w-4' />
+        </Button>
+        <Button
+          type='button'
+          size='sm'
+          variant={editor.isActive({ textAlign: 'center' }) ? 'default' : 'ghost'}
+          onClick={() => editor.chain().focus().setTextAlign('center').run()}
+          className={cn('h-8 w-8 p-0', editor.isActive({ textAlign: 'center' }) && 'bg-[#387cae] text-white')}
+        >
+          <AlignCenter className='h-4 w-4' />
+        </Button>
+        <Button
+          type='button'
+          size='sm'
+          variant={editor.isActive({ textAlign: 'right' }) ? 'default' : 'ghost'}
+          onClick={() => editor.chain().focus().setTextAlign('right').run()}
+          className={cn('h-8 w-8 p-0', editor.isActive({ textAlign: 'right' }) && 'bg-[#387cae] text-white')}
+        >
+          <AlignRight className='h-4 w-4' />
+        </Button>
+      </div>
+
+      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-sm'>
+        <div className="relative" ref={linkMenuRef}>
+          <Button
+            type='button'
+            size='sm'
+            variant={editor.isActive('link') ? 'default' : 'ghost'}
+            onClick={() => {
+              if (editor.isActive('link')) {
+                // Pre-fill URL when editing
+                setLinkUrl(editor.getAttributes('link').href || '');
+              }
+              setIsLinkMenuOpen(!isLinkMenuOpen);
+            }}
+            className={cn('h-8 w-8 p-0', editor.isActive('link') && 'bg-[#387cae] text-white')}
+            title='Add Link'
+          >
+            <LinkIcon className='h-4 w-4' />
+          </Button>
+
+          {isLinkMenuOpen && (
+            <div className="absolute left-0 mt-2 w-72 bg-white border border-gray-100 rounded-xl shadow-2xl z-50 p-4 animate-in fade-in zoom-in duration-200 shadow-[#387cae]/5">
+              <div className="space-y-3">
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Link URL</label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="url"
+                      placeholder="https://example.com"
+                      value={linkUrl}
+                      onChange={(e) => setLinkUrl(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleLinkSubmit();
+                        }
+                      }}
+                      autoFocus
+                      className="h-9 text-xs bg-gray-50 border-gray-100 focus:bg-white"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={handleLinkSubmit}
+                      className="h-9 px-3 bg-[#387cae] hover:bg-[#387cae]/90"
+                      disabled={!linkUrl}
+                    >
+                      <Check className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                {editor.isActive('link') && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleRemoveLink}
+                    className="w-full justify-start gap-2 h-8 text-red-500 hover:text-red-600 hover:bg-red-50 text-[10px] font-bold"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Unset Link
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-sm'>
         <Button
           type='button'
           size='sm'
@@ -328,11 +389,7 @@ export default function TipTapEditor({ value, onChange, onMediaUpload, placehold
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3, 4, 5, 6],
-        },
-      }),
+      StarterKit,
       Underline,
       Placeholder.configure({
         placeholder,
@@ -375,12 +432,20 @@ export default function TipTapEditor({ value, onChange, onMediaUpload, placehold
   }, [value, editor])
 
   return (
-    <div className='border border-gray-200 rounded-md overflow-hidden bg-white'>
-      <MenuBar editor={editor} />
-      <EditorContent 
-        editor={editor} 
-        className='[&_.ProseMirror]:p-4 [&_.ProseMirror]:min-h-[300px] [&_.ProseMirror]:text-base [&_.ProseMirror]:leading-relaxed [&_.ProseMirror]:outline-none [&_.ProseMirror>*]:mb-3 [&_.ProseMirror>*:last-child]:mb-0 [&_.ProseMirror_h2]:text-xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mt-4 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_table]:border-collapse [&_.ProseMirror_table]:table-auto [&_.ProseMirror_table]:w-full [&_.ProseMirror_table]:my-4 [&_.ProseMirror_td]:border [&_.ProseMirror_td]:border-gray-300 [&_.ProseMirror_td]:p-2 [&_.ProseMirror_th]:border [&_.ProseMirror_th]:border-gray-300 [&_.ProseMirror_th]:p-2 [&_.ProseMirror_th]:bg-gray-100 [&_.ProseMirror_th]:font-bold [&_.ProseMirror_a]:text-blue-600 [&_.ProseMirror_a]:underline [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-gray-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0'
-      />
+    <div className='border border-gray-200 rounded-xl bg-white flex flex-col focus-within:ring-2 focus-within:ring-[#387cae]/10 focus-within:border-[#387cae] transition-all shadow-sm'>
+      <div className='flex flex-wrap items-center gap-2 p-2 border-b border-gray-100 bg-gray-50/50 rounded-t-xl'>
+        <MenuBar editor={editor} onMediaUpload={onMediaUpload} showImageUpload={showImageUpload} />
+      </div>
+      <div
+        className="overflow-y-auto custom-scrollbar cursor-text"
+        style={{ minHeight: '200px', height: height }}
+        onClick={() => editor?.chain().focus().run()}
+      >
+        <EditorContent
+          editor={editor}
+          className='[&_.ProseMirror]:p-6 [&_.ProseMirror]:min-h-full [&_.ProseMirror]:text-gray-800 [&_.ProseMirror]:text-base [&_.ProseMirror]:leading-relaxed [&_.ProseMirror]:outline-none [&_.ProseMirror>*]:mb-4 [&_.ProseMirror>*:last-child]:mb-0 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mt-6 [&_.ProseMirror_h2]:text-gray-900 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_table]:border-collapse [&_.ProseMirror_table]:table-auto [&_.ProseMirror_table]:w-full [&_.ProseMirror_table]:my-6 [&_.ProseMirror_td]:border [&_.ProseMirror_td]:border-gray-200 [&_.ProseMirror_td]:p-3 [&_.ProseMirror_th]:border [&_.ProseMirror_th]:border-gray-200 [&_.ProseMirror_th]:p-3 [&_.ProseMirror_th]:bg-gray-50 [&_.ProseMirror_th]:font-bold [&_.ProseMirror_a]:text-[#387cae] [&_.ProseMirror_a]:underline [&_.ProseMirror_img]:my-6 [&_.ProseMirror_img]:rounded-xl [&_.ProseMirror_img]:shadow-lg [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-gray-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0'
+        />
+      </div>
     </div>
   )
 }
