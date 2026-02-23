@@ -55,7 +55,7 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                 <div className='flex-1 overflow-y-auto p-6 space-y-8'>
                     {loading ? (
                         <div className='flex items-center justify-center py-20'>
-                            <div className='animate-pulse text-gray-400 font-medium'>Loading details...</div>
+                            <div className='animate-pulse font-medium'>Loading details...</div>
                         </div>
                     ) : consultancy ? (
                         <>
@@ -108,7 +108,7 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                                 {/* Address & Contact */}
                                 <div className='space-y-6'>
                                     <div className='space-y-3'>
-                                        <h4 className='text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2'>
+                                        <h4 className='text-xs font-bold uppercase tracking-widest flex items-center gap-2'>
                                             <MapPin className='w-3 h-3' />
                                             Office Address
                                         </h4>
@@ -126,7 +126,7 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                                     </div>
 
                                     <div className='space-y-3'>
-                                        <h4 className='text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2'>
+                                        <h4 className='text-xs font-bold uppercase tracking-widest flex items-center gap-2'>
                                             <Phone className='w-3 h-3' />
                                             Contact Information
                                         </h4>
@@ -147,7 +147,7 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                                 {/* Destinations & Courses */}
                                 <div className='space-y-6'>
                                     <div className='space-y-3'>
-                                        <h4 className='text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2'>
+                                        <h4 className='text-xs font-bold uppercase tracking-widest flex items-center gap-2'>
                                             <Globe className='w-3 h-3' />
                                             Target Countries
                                         </h4>
@@ -164,7 +164,7 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                                     </div>
 
                                     <div className='space-y-3'>
-                                        <h4 className='text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2'>
+                                        <h4 className='text-xs font-bold uppercase tracking-widest flex items-center gap-2'>
                                             <GraduationCap className='w-3 h-3' />
                                             Courses Offered
                                         </h4>
@@ -175,7 +175,7 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                                                 </span>
                                             ))}
                                             {(!consultancy.consultancyCourses || consultancy.consultancyCourses.length === 0) && (
-                                                <p className='text-xs text-gray-400 italic font-medium'>No courses listed.</p>
+                                                <p className='text-xs italic font-medium'>No courses listed.</p>
                                             )}
                                         </div>
                                     </div>
@@ -183,12 +183,12 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
 
                                 {/* Description */}
                                 <div className='col-span-1 md:col-span-2 space-y-3'>
-                                    <h4 className='text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2'>
+                                    <h4 className='text-xs font-bold uppercase tracking-widest flex items-center gap-2'>
                                         <Info className='w-3 h-3' />
                                         About Consultancy
                                     </h4>
                                     <div className='p-6 bg-white rounded-xl border shadow-sm prose prose-sm max-w-none text-gray-700 prose-headings:text-gray-900 prose-strong:text-gray-900'
-                                        dangerouslySetInnerHTML={{ __html: consultancy.description || '<p class="italic text-gray-400">No description available.</p>' }}
+                                        dangerouslySetInnerHTML={{ __html: consultancy.description || '<p class="italic">No description available.</p>' }}
                                     />
                                 </div>
                             </div>
