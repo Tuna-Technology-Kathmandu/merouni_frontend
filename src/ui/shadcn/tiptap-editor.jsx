@@ -17,8 +17,12 @@ import {
   Italic,
   Underline as UnderlineIcon,
   List,
-  ListOrdered,
+  Heading1,
   Heading2,
+  Heading3,
+  Heading4,
+  Heading5,
+  Heading6,
   AlignLeft,
   AlignCenter,
   AlignRight,
@@ -31,7 +35,8 @@ import {
   Upload,
   ChevronDown,
   Plus,
-  Check
+  Check,
+  ListOrdered
 } from 'lucide-react'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
@@ -152,15 +157,29 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
       </div>
 
       <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-sm'>
-        <Button
-          type='button'
-          size='sm'
-          variant={editor.isActive('heading', { level: 2 }) ? 'default' : 'ghost'}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={cn('h-8 w-8 p-0', editor.isActive('heading', { level: 2 }) && 'bg-[#387cae] text-white')}
-        >
-          <Heading2 className='h-4 w-4' />
-        </Button>
+        {[1, 2, 3, 4, 5, 6].map((level) => {
+          const Icon = {
+            1: Heading1,
+            2: Heading2,
+            3: Heading3,
+            4: Heading4,
+            5: Heading5,
+            6: Heading6,
+          }[level]
+          return (
+            <Button
+              key={level}
+              type='button'
+              size='sm'
+              variant={editor.isActive('heading', { level }) ? 'default' : 'ghost'}
+              onClick={() => editor.chain().focus().toggleHeading({ level }).run()}
+              className={cn('h-8 w-8 p-0', editor.isActive('heading', { level }) && 'bg-[#387cae] text-white')}
+              title={`Heading ${level}`}
+            >
+              <Icon className='h-4 w-4' />
+            </Button>
+          )
+        })}
       </div>
 
       <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-sm'>
@@ -443,7 +462,7 @@ export default function TipTapEditor({ value, onChange, onMediaUpload, placehold
       >
         <EditorContent
           editor={editor}
-          className='[&_.ProseMirror]:p-6 [&_.ProseMirror]:min-h-full [&_.ProseMirror]:text-gray-800 [&_.ProseMirror]:text-base [&_.ProseMirror]:leading-relaxed [&_.ProseMirror]:outline-none [&_.ProseMirror>*]:mb-4 [&_.ProseMirror>*:last-child]:mb-0 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mt-6 [&_.ProseMirror_h2]:text-gray-900 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_table]:border-collapse [&_.ProseMirror_table]:table-auto [&_.ProseMirror_table]:w-full [&_.ProseMirror_table]:my-6 [&_.ProseMirror_td]:border [&_.ProseMirror_td]:border-gray-200 [&_.ProseMirror_td]:p-3 [&_.ProseMirror_th]:border [&_.ProseMirror_th]:border-gray-200 [&_.ProseMirror_th]:p-3 [&_.ProseMirror_th]:bg-gray-50 [&_.ProseMirror_th]:font-bold [&_.ProseMirror_a]:text-[#387cae] [&_.ProseMirror_a]:underline [&_.ProseMirror_img]:my-6 [&_.ProseMirror_img]:rounded-xl [&_.ProseMirror_img]:shadow-lg [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-gray-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0'
+          className='[&_.ProseMirror]:p-6 [&_.ProseMirror]:min-h-full [&_.ProseMirror]:text-gray-800 [&_.ProseMirror]:text-base [&_.ProseMirror]:leading-relaxed [&_.ProseMirror]:outline-none [&_.ProseMirror>*]:mb-4 [&_.ProseMirror>*:last-child]:mb-0 [&_.ProseMirror_h1]:text-4xl [&_.ProseMirror_h1]:font-bold [&_.ProseMirror_h1]:mt-8 [&_.ProseMirror_h1]:text-gray-900 [&_.ProseMirror_h2]:text-3xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mt-6 [&_.ProseMirror_h2]:text-gray-900 [&_.ProseMirror_h3]:text-2xl [&_.ProseMirror_h3]:font-bold [&_.ProseMirror_h3]:mt-4 [&_.ProseMirror_h3]:text-gray-900 [&_.ProseMirror_h4]:text-xl [&_.ProseMirror_h4]:font-bold [&_.ProseMirror_h4]:mt-4 [&_.ProseMirror_h4]:text-gray-900 [&_.ProseMirror_h5]:text-lg [&_.ProseMirror_h5]:font-bold [&_.ProseMirror_h5]:mt-4 [&_.ProseMirror_h5]:text-gray-900 [&_.ProseMirror_h6]:text-base [&_.ProseMirror_h6]:font-bold [&_.ProseMirror_h6]:mt-4 [&_.ProseMirror_h6]:text-gray-900 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_table]:border-collapse [&_.ProseMirror_table]:table-auto [&_.ProseMirror_table]:w-full [&_.ProseMirror_table]:my-6 [&_.ProseMirror_td]:border [&_.ProseMirror_td]:border-gray-200 [&_.ProseMirror_td]:p-3 [&_.ProseMirror_th]:border [&_.ProseMirror_th]:border-gray-200 [&_.ProseMirror_th]:p-3 [&_.ProseMirror_th]:bg-gray-50 [&_.ProseMirror_th]:font-bold [&_.ProseMirror_a]:text-[#387cae] [&_.ProseMirror_a]:underline [&_.ProseMirror_img]:my-6 [&_.ProseMirror_img]:rounded-xl [&_.ProseMirror_img]:shadow-lg [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-gray-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0'
         />
       </div>
     </div>
