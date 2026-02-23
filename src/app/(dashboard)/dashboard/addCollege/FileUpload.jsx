@@ -8,6 +8,7 @@ import { cn } from '@/app/lib/utils'
 const FileUpload = ({
   onUploadComplete,
   label,
+  required = false,
   defaultPreview = null,
   accept = 'image/*'
 }) => {
@@ -112,7 +113,7 @@ const FileUpload = ({
 
   return (
     <div className='space-y-2'>
-      {label && <Label>{label}</Label>}
+      {label && <Label required={required}>{label}</Label>}
       <div
         className={cn(
           'relative border-2 border-dashed rounded-lg p-4 transition-all duration-200',
