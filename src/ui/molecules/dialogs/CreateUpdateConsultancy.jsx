@@ -24,6 +24,7 @@ export default function CreateUpdateConsultancy({
 }) {
     const [loading, setLoading] = useState(false)
     const [selectedCourses, setSelectedCourses] = useState([])
+    const [selectedDestinations, setSelectedDestinations] = useState([])
 
     const {
         register,
@@ -56,11 +57,6 @@ export default function CreateUpdateConsultancy({
         }
     })
 
-    const {
-        fields: destinationFields,
-        append: appendDestination,
-        remove: removeDestination
-    } = useFieldArray({ control, name: 'destination' })
 
     // Initialize form when opening
     useEffect(() => {
@@ -93,7 +89,13 @@ export default function CreateUpdateConsultancy({
             }
 
             const destinationForForm = (Array.isArray(parsedDestination) ? parsedDestination : [])
-                .map((d) => typeof d === 'string' ? { country: d } : { country: d?.country ?? '' })
+                .map((d) => {
+                    const title = typeof d === 'string' ? d : (d?.country || d?.title || '')
+                    return { id: title, title: title }
+                }).filter(d => d.id)
+
+            setSelectedDestinations(destinationForForm)
+            setValue('destination', destinationForForm.map(d => d.title))
 
             // Parse Address
             let address = { street: '', city: '', state: '', zip: '' }
@@ -135,13 +137,6 @@ export default function CreateUpdateConsultancy({
         } else if (isOpen && !initialData) {
             reset({
                 title: '',
-                destination: [],
-                address: { street: '', city: '', state: '', zip: '' },
-                description: '',
-                contact: ['', ''],
-                website_url: '',
-                google_map_url: '',
-                map_type: "",
                 video_url: '',
                 featured_image: '',
                 logo: '',
@@ -149,6 +144,7 @@ export default function CreateUpdateConsultancy({
                 courses: []
             })
             setSelectedCourses([])
+            setSelectedDestinations([])
         }
     }, [isOpen, initialData, reset, setValue])
 
@@ -158,10 +154,9 @@ export default function CreateUpdateConsultancy({
             const payload = {
                 ...data,
                 title: data.title?.trim(),
-                destination: data.destination.map(d => d.country).filter(Boolean),
-                pinned: data.pinned ? 1 : 0,
                 contact: data.contact.filter(Boolean),
-                courses: Array.isArray(data.courses) ? data.courses : (data.courses ? [data.courses] : [])
+                courses: Array.isArray(data.courses) ? data.courses : (data.courses ? [data.courses] : []),
+                destination: selectedDestinations.map(d => d.title).filter(Boolean)
             }
 
             if (initialData?.id) {
@@ -265,42 +260,29 @@ export default function CreateUpdateConsultancy({
                             <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Destinations & Courses</h3>
                             <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
                                 <div className='space-y-4'>
-                                    <div className='flex justify-between items-center'>
-                                        <Label>Target Destinations</Label>
-                                        <Button
-                                            type='button'
-                                            variant='outline'
-                                            size='sm'
-                                            onClick={() => appendDestination({ country: '' })}
-                                            className='h-7 text-xs gap-1'
-                                        >
-                                            <PlusCircle className='w-3.5 h-3.5' />
-                                            Add Country
-                                        </Button>
-                                    </div>
-                                    <div className='space-y-2 max-h-[200px] overflow-y-auto pr-2'>
-                                        {destinationFields.map((field, index) => (
-                                            <div key={field.id} className='flex gap-2 items-center'>
-                                                <Input
-                                                    {...register(`destination.${index}.country`)}
-                                                    placeholder='e.g. Australia'
-                                                    className='h-9'
-                                                />
-                                                <Button
-                                                    type='button'
-                                                    variant='ghost'
-                                                    size='icon'
-                                                    onClick={() => removeDestination(index)}
-                                                    className='h-9 w-9 text-red-500 hover:bg-red-50'
-                                                >
-                                                    <Trash2 className='w-4 h-4' />
-                                                </Button>
-                                            </div>
-                                        ))}
-                                        {destinationFields.length === 0 && (
-                                            <p className='text-xs text-gray-400 italic py-2'>No destinations added yet.</p>
-                                        )}
-                                    </div>
+                                    <Label>Target Destinations</Label>
+                                    <SearchSelectCreate
+                                        allowCreate={true}
+                                        onSearch={() => []}
+                                        onCreate={(query) => ({ id: query, title: query })}
+                                        onSelect={(item) => {
+                                            const current = selectedDestinations || []
+                                            if (!current.some(d => d.id === item.id)) {
+                                                const updated = [...current, item]
+                                                setSelectedDestinations(updated)
+                                                setValue('destination', updated.map(d => d.title))
+                                            }
+                                        }}
+                                        onRemove={(item) => {
+                                            const updated = selectedDestinations.filter(d => d.id !== item.id)
+                                            setSelectedDestinations(updated)
+                                            setValue('destination', updated.map(d => d.title))
+                                        }}
+                                        selectedItems={selectedDestinations}
+                                        placeholder="Add countries..."
+                                        isMulti={true}
+                                        displayKey="title"
+                                    />
                                 </div>
 
                                 <div className='space-y-2'>

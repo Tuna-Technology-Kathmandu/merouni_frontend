@@ -1,18 +1,16 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { useSelector } from 'react-redux'
-import { destr } from 'destr'
-import { Phone, MapPin, Handshake } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import QuickActions from '@/ui/organisms/admin-dashboard/home/QuickActions'
-import AnalyticsCards from '@/ui/organisms/admin-dashboard/home/AnalyticsCards'
-import TopAgentsTable from '@/ui/organisms/admin-dashboard/home/TopAgentsTable'
-import DashboardCharts from '@/ui/organisms/admin-dashboard/home/DashboardCharts'
 import UserCard from '@/ui/molecules/cards/UserCard'
 import AgentsListModal from '@/ui/organisms/admin-dashboard/home/AgentsListModal'
+import AnalyticsCards from '@/ui/organisms/admin-dashboard/home/AnalyticsCards'
+import DashboardCharts from '@/ui/organisms/admin-dashboard/home/DashboardCharts'
+import QuickActions from '@/ui/organisms/admin-dashboard/home/QuickActions'
+import TopAgentsTable from '@/ui/organisms/admin-dashboard/home/TopAgentsTable'
+import { destr } from 'destr'
+import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 const AdminDashboard = () => {
   const { setHeading } = usePageHeading()
@@ -500,7 +498,6 @@ export const AgentDashboard = () => {
         setLoading(true)
         setError(null)
 
-        // Load college referrals (referred students)
         const collegeRes = await authFetch(
           `${process.env.baseUrl}/referral/user/referrals`,
           { cache: 'no-store' }
@@ -564,6 +561,7 @@ export const AgentDashboard = () => {
           type='Referred Students'
           value={collegeReferralsCount}
           loading={loading}
+
         />
         <UserCard
           type='Referred Consultancies'
