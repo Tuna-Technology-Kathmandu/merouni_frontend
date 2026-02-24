@@ -24,6 +24,7 @@ import { createColumns } from './columns'
 export default function CollegeForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const level = searchParams.get('level')
   const pathname = usePathname()
   const { setHeading } = usePageHeading()
   const [searchQuery, setSearchQuery] = useState('')
@@ -85,16 +86,18 @@ export default function CollegeForm() {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    setHeading('College Management')
+    setHeading(level === 'School' ? 'School Management' : 'College Management')
     const loadInitialColleges = async () => {
       const page = parseInt(searchParams.get('page')) || 1
+      const level = searchParams.get('level')
       setLoading(true)
       setTableLoading(true)
       try {
-
-        const response = await authFetch(
-          `${process.env.baseUrl}/college?limit=10&page=${page}`
-        )
+        let url = `${process.env.baseUrl}/college?limit=10&page=${page}`
+        if (level) {
+          url += `&level=${level}`
+        }
+        const response = await authFetch(url)
         if (response.ok) {
           const data = await response.json()
           if (data && data.items) {
@@ -203,9 +206,12 @@ export default function CollegeForm() {
       params.set('page', page)
       router.push(`${pathname}?${params.toString()}`, { scroll: false })
 
-      const response = await authFetch(
-        `${process.env.baseUrl}/college?limit=10&page=${page}`
-      )
+      const level = searchParams.get('level')
+      let url = `${process.env.baseUrl}/college?limit=10&page=${page}`
+      if (level) {
+        url += `&level=${level}`
+      }
+      const response = await authFetch(url)
 
       if (response.ok) {
         const data = await response.json()
@@ -233,9 +239,12 @@ export default function CollegeForm() {
     }
 
     try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/college?q=${query}`
-      )
+      const level = searchParams.get('level')
+      let url = `${process.env.baseUrl}/college?q=${query}`
+      if (level) {
+        url += `&level=${level}`
+      }
+      const response = await authFetch(url)
       if (response.ok) {
         const data = await response.json()
         setColleges(data.items)
@@ -330,7 +339,7 @@ export default function CollegeForm() {
                 setEditSlug('')
               }}
             >
-              Add College
+              Add {level === 'School' ? 'School' : 'College'}
             </Button>
           </div>
         </div>

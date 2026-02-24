@@ -143,7 +143,7 @@ export const menuItems = [
           {
             icon: <IoSchoolSharp className='text-lg' />,
             label: 'Manage Colleges',
-            href: '/dashboard/addCollege',
+            href: '/dashboard/addCollege?level=College',
             visible: ['admin', 'editor']
           },
           {
@@ -181,10 +181,44 @@ export const menuItems = [
         ]
       },
       {
+        icon: <IoSchoolSharp className='text-xl' />,
+        label: 'Schools',
+        href: null,
+        visible: ['admin', 'editor'],
+        submenus: [
+          {
+            icon: <IoSchoolSharp className='text-lg' />,
+            label: 'Manage Schools',
+            href: '/dashboard/addCollege?level=School',
+            visible: ['admin', 'editor']
+          },
+          {
+            icon: <SortAsc className='text-lg' />,
+            label: 'School Orderings',
+            href: '/dashboard/school-orderings',
+            visible: ['admin', 'editor']
+          }
+        ]
+      },
+      {
         icon: <FaHandshake className='text-xl' />,
         label: 'Consultancy',
-        href: '/dashboard/consultancy',
-        visible: ['admin', 'editor']
+        href: null,
+        visible: ['admin', 'editor'],
+        submenus: [
+          {
+            icon: <FaHandshake className='text-lg' />,
+            label: 'Manage Consultancy',
+            href: '/dashboard/consultancy',
+            visible: ['admin', 'editor']
+          },
+          {
+            icon: <SortAsc className='text-lg' />,
+            label: 'Consultancy Orderings',
+            href: '/dashboard/consultancy-orderings',
+            visible: ['admin', 'editor']
+          }
+        ]
       },
       {
         icon: <BsCalendarEvent className='text-xl' />,
@@ -341,10 +375,24 @@ export const menuItems = [
       {
         icon: <MdSchool className='text-xl' />,
         label: 'Degree',
-        href: '/dashboard/degrees',
-        visible: ['admin', 'editor']
+        href: null,
+        visible: ['admin', 'editor'],
+        submenus: [
+          {
+            icon: <MdSchool className='text-lg' />,
+            label: 'Manage Degrees',
+            href: '/dashboard/degrees',
+            visible: ['admin', 'editor']
+          },
+          {
+            icon: <SortAsc className='text-lg' />,
+            label: 'Degree Orderings',
+            href: '/dashboard/degree-orderings',
+            visible: ['admin', 'editor']
+          }
+        ]
       },
-      
+
       {
         icon: <HandCoins className='text-xl' />,
         label: 'Set Referral Point',

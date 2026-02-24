@@ -1,20 +1,18 @@
 'use client'
-import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react'
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import {
-  Search,
-  Clipboard,
-  X,
-  ChevronRight,
-  GraduationCap
-} from 'lucide-react'
-import EmptyState from '@/ui/shadcn/EmptyState'
-import { getAdmission } from '../actions'
-import Link from 'next/link'
-import Pagination from '../../blogs/components/Pagination'
-import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 import AdmissionCard from '@/ui/molecules/cards/AdmissionCard'
-import ProgramDropdown from '@/ui/molecules/dropdown/ProgramDropdown'
+import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
+import EmptyState from '@/ui/shadcn/EmptyState'
+import SearchSelectCreate from '@/ui/shadcn/search-select-create'
+import {
+  Clipboard,
+  Search,
+  X
+} from 'lucide-react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
+import Pagination from '../../blogs/components/Pagination'
+import { fetchCourses, getAdmission } from '../actions'
+
 
 const AdmissionPage = () => {
   const router = useRouter()
@@ -25,12 +23,13 @@ const AdmissionPage = () => {
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [selectedProgram, setSelectedProgram] = useState('')
+  const [selectedProgram, setSelectedCourse] = useState('')
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
     totalCount: 0
   })
+  const [selectedCourseObject, setSelectedCourseObject] = useState(null)
 
   // Debounce search input
   useEffect(() => {
@@ -49,10 +48,10 @@ const AdmissionPage = () => {
 
   // Fetch admission data
   const fetchAdmissionData = useCallback(
-    async (page = 1, search = '', program = '') => {
+    async (page = 1, search = '', course = '') => {
       setLoading(true)
       try {
-        const response = await getAdmission(search, page, program)
+        const response = await getAdmission(search, page, course)
         setAdmission(response.items)
         setPagination((prev) => ({
           ...prev,
@@ -92,7 +91,8 @@ const AdmissionPage = () => {
 
   const clearFilters = () => {
     setSearchTerm('')
-    setSelectedProgram('')
+    setSelectedCourse('')
+    setSelectedCourseObject(null)
   }
 
   return (
@@ -107,7 +107,7 @@ const AdmissionPage = () => {
               </h1>
               <div className='absolute -bottom-2 left-0 w-16 h-1 bg-[#0A6FA7] rounded-full'></div>
             </div>
-           
+
           </div>
 
           {/* Clear Filters Button */}
@@ -127,32 +127,42 @@ const AdmissionPage = () => {
           <div className='grid grid-cols-1 md:grid-cols-12 gap-6'>
             {/* Search */}
             <div className='md:col-span-7'>
-              <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+              <label className='block text-[11px]  font-bold  mb-2'>
                 Search Admissions
               </label>
               <div className='relative group'>
                 <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-[#0A6FA7] transition-colors' />
                 <input
                   type='text'
-                  placeholder='Search by college or program...'
+                  placeholder='Search by college or course...'
                   onChange={(e) => setSearchTerm(e.target.value)}
                   value={searchTerm}
-                  className='w-full px-5 py-3.5 pl-12 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#0A6FA7]/10 focus:border-[#0A6FA7] focus:bg-white transition-all text-sm font-semibold text-gray-900 placeholder-gray-400'
+                  className='w-full px-5 py-3.5 pl-12 rounded-md border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#0A6FA7]/10 focus:border-[#0A6FA7] focus:bg-white transition-all text-sm font-semibold'
                 />
               </div>
             </div>
 
-            {/* Program Filter */}
+            {/* Course Filter */}
             <div className='lg:col-span-3'>
-              <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
-                Program / Course
+              <label className='block text-[11px] font-bold mb-2'>
+                Course
               </label>
-              <ProgramDropdown
-                value={selectedProgram}
-                onChange={setSelectedProgram}
+              <SearchSelectCreate
+                onSearch={fetchCourses}
+                onSelect={(prog) => {
+                  setSelectedCourseObject(prog)
+                  setSelectedCourse(prog.slugs)
+                }}
+                onRemove={() => {
+                  setSelectedCourseObject(null)
+                  setSelectedCourse('')
+                }}
+                selectedItems={selectedCourseObject}
+                placeholder="Search or select course..."
+                displayKey="title"
                 valueKey="slugs"
+                isMulti={false}
                 className="w-full"
-                placeholder="All Programs"
               />
             </div>
           </div>

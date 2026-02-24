@@ -63,7 +63,7 @@ const SortableItem = ({ university }) => {
           <h3 className='text-lg font-semibold text-gray-800'>
             {university.fullname}
           </h3>
-          {university.address && (
+          {(university.city || university.state || university.country) && (
             <p className='text-sm text-gray-500 mt-1'>
               {[
                 university.city,
