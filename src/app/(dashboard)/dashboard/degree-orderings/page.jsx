@@ -144,7 +144,6 @@ const DegreeOrderingsPage = () => {
 
     useEffect(() => {
         loadDegrees()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleDragEnd = async (event) => {
@@ -171,9 +170,9 @@ const DegreeOrderingsPage = () => {
         try {
             setSaving(true)
             const response = await authFetch(
-                `${process.env.baseUrl}/degree/order`,
+                `${process.env.baseUrl}/degree/update-order`,
                 {
-                    method: 'PUT',
+                    method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json'
                     },
