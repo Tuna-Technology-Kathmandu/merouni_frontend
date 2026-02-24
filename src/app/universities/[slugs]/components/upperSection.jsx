@@ -8,10 +8,13 @@ import he from 'he'
 import MemberSection from './MemberSection'
 import VideoSection from './VideoSection'
 import LevelSections from './LevelSections'
+import ImageGallery from './Gallery'
+import MapSection from './MapSection'
 import { formatDate } from '@/utils/date.util'
 
-const ImageSection = ({ university }) => {
-  const [selectedImage, setSelectedImage] = useState(null);
+const UpperSection = ({ university }) => {
+
+  console.log(university, "universityuniversityuniversity")
   return (
     <div className='flex flex-col items-center'>
       {/* Top Section (Already Styled) */}
@@ -19,8 +22,8 @@ const ImageSection = ({ university }) => {
       <div className='w-full'>
         <img
           src={
-            university?.assets?.featured_image !== ''
-              ? university?.assets?.featured_image
+            university?.featured_image !== ''
+              ? university?.featured_image
               : '/images/degreeHero.webp'
           }
           alt={university?.fullname || 'University Image'}
@@ -126,8 +129,8 @@ const ImageSection = ({ university }) => {
         </div>
       </div>
 
-      {/* Why Study Here */}
-      <div className=' rounded-xl p-8 w-full lp:w-[80%] mb-12 max-md:mb-7 px-[75px] max-md:px-[30px]'>
+      {/* About Section */}
+      <div className='rounded-xl p-8 w-full lg:w-[80%] mb-12 max-md:mb-7 px-[75px] max-md:px-[30px]'>
         <h2 className='font-bold text-xl md:text-2xl mb-4'>
           About {university?.fullname}
         </h2>
@@ -191,31 +194,6 @@ const ImageSection = ({ university }) => {
         />
       </div>
 
-      {/* Programs Section */}
-      {/* {Array.isArray(university?.programs) &&
-        university?.programs?.program?.length > 0 && (
-          <div className='bg-[#30AD8F] bg-opacity-10 rounded-xl p-8 w-full mb-12 px-[75px] max-md:px-[30px] overflow-hidden'>
-            <h2 className='font-bold text-xl md:text-2xl mb-6'>
-              Programs Offered
-            </h2>
-            <ul className='list-disc pl-5 space-y-2 text-gray-700'>
-              {university?.programs?.program?.map((programItem, idx) => (
-                <li
-                  key={programItem?.id || idx}
-                  className='text-sm md:text-base'
-                >
-                  {typeof programItem === 'string'
-                    ? programItem
-                    : programItem?.title ||
-                      programItem?.program ||
-                      programItem?.name ||
-                      'N/A'}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )} */}
-
       {/* college programs */}
 
       {Array.isArray(university?.programs) &&
@@ -266,47 +244,18 @@ const ImageSection = ({ university }) => {
 
 
       {/* Gallery Section */}
-      {Array.isArray(university?.gallery) && university.gallery.length > 0 && (
-        <div className=' rounded-xl p-8 w-full mb-12 px-[75px] max-md:px-[30px]'>
-          <h2 className='font-bold text-xl md:text-2xl mb-6'>Gallery</h2>
-          <div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
-            {university.gallery.map((img, idx) => (
-              <img
-                key={idx}
-                src={img}
-                alt={`Gallery ${idx + 1}`}
-                className='w-full h-40 object-cover rounded-lg shadow-md cursor-pointer'
-                onClick={() => setSelectedImage(img)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      <ImageGallery
+        images={university?.gallery}
+        universityName={university?.fullname}
+      />
 
       {/* video */}
       <VideoSection university={university} />
 
-
-
-      {/* image show */}
-      {selectedImage && (
-        <div className='fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50'>
-          <button
-            onClick={() => setSelectedImage(null)}
-            className='cursor-pointer'
-          >
-            <ImCross className=' cursor-pointer absolute right-3 top-7 z-10 text-white sm:text-lg md:text-2xl lg:text-3xl' />
-          </button>
-
-          <img
-            src={selectedImage}
-            alt='Full View'
-            className='w-[90%] h-[50%] md:h-[70%] lg:h-[90%] rounded-lg shadow-lg'
-          />
-        </div>
-      )}
+      {/* Map */}
+      <MapSection university={university} />
     </div>
   )
 }
 
-export default ImageSection
+export default UpperSection

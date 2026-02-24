@@ -1,9 +1,10 @@
 'use client'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
-import { Globe, MapPin } from 'lucide-react'
+import { Globe, MapPin, Phone, Mail, GraduationCap, Info } from 'lucide-react'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
+import { Button } from '@/ui/shadcn/button'
 
 export default function ViewConsultancy({ isOpen, onClose, slug }) {
     const [consultancy, setConsultancy] = useState(null)
@@ -15,7 +16,6 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
         } else {
             setConsultancy(null)
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen, slug])
 
     const fetchConsultancyDetails = async () => {
@@ -26,19 +26,19 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                 { headers: { 'Content-Type': 'application/json' } }
             )
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch consultancy details')
-            }
+            if (!response.ok) throw new Error('Failed to fetch details')
 
             const data = await response.json()
             setConsultancy(data.consultancy)
         } catch (err) {
-            toast.error(err.message || 'Failed to load consultancy details')
+            toast.error('Failed to load consultancy details')
             onClose()
         } finally {
             setLoading(false)
         }
     }
+
+    if (!isOpen) return null
 
     return (
         <Dialog
@@ -46,183 +46,159 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
             onClose={onClose}
             className='max-w-4xl'
         >
-            <DialogHeader>
-                <DialogTitle>Consultancy Details</DialogTitle>
-                <DialogClose onClick={onClose} />
-            </DialogHeader>
-            <DialogContent>
-            {loading ? (
-                <div className='flex items-center justify-center py-8'>
-                    <div className='text-gray-500'>Loading...</div>
-                </div>
-            ) : consultancy ? (
-                <div className='space-y-6'>
-                    {/* Logo and Basic Info */}
-                    <div className='flex items-start gap-4 border-b pb-4'>
-                        {consultancy.logo && (
-                            <img
-                                src={consultancy.logo}
-                                alt={consultancy.title}
-                                className='w-20 h-20 object-contain rounded-lg border'
-                            />
-                        )}
-                        <div className='flex-1'>
-                            <h2 className='text-2xl font-bold text-gray-800'>
-                                {consultancy.title}
-                            </h2>
-                            {consultancy.website_url && (
-                                <div className='mt-2'>
-                                    <a
-                                        href={
-                                            consultancy.website_url.startsWith('http')
-                                                ? consultancy.website_url
-                                                : `https://${consultancy.website_url}`
-                                        }
-                                        target='_blank'
-                                        rel='noopener noreferrer'
-                                        className='text-blue-600 hover:underline inline-flex items-center gap-1'
-                                    >
-                                        <Globe className='w-4 h-4' />{' '}
-                                        {consultancy.website_url}
-                                    </a>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+            <DialogContent className='max-w-4xl max-h-[90vh] flex flex-col p-0'>
+                <DialogHeader className='px-6 py-4 border-b'>
+                    <DialogTitle className="text-lg font-semibold text-gray-900">Consultancy Details</DialogTitle>
+                    <DialogClose onClick={onClose} />
+                </DialogHeader>
 
-                    {/* Address */}
-                    {consultancy.address && (
-                        <div>
-                            <h3 className='text-lg font-semibold mb-2'>Address</h3>
-                            <div className='text-gray-700 space-y-1'>
-                                {(() => {
-                                    const address =
-                                        typeof consultancy.address === 'string'
-                                            ? JSON.parse(consultancy.address)
-                                            : consultancy.address || {}
-                                    return (
-                                        <>
-                                            {address.street && <p>{address.street}</p>}
-                                            <p>
-                                                {[address.city, address.state, address.zip]
-                                                    .filter(Boolean)
-                                                    .join(', ')}
-                                            </p>
-                                            {consultancy.google_map_url && (
-                                                <a
-                                                    href={consultancy.google_map_url}
-                                                    target='_blank'
-                                                    rel='noopener noreferrer'
-                                                    className='text-blue-600 hover:underline inline-flex items-center gap-1 mt-2'
-                                                >
-                                                    <MapPin className='w-4 h-4' /> View on Map
-                                                </a>
-                                            )}
-                                        </>
-                                    )
-                                })()}
-                            </div>
+                <div className='flex-1 overflow-y-auto p-6 space-y-8'>
+                    {loading ? (
+                        <div className='flex items-center justify-center py-20'>
+                            <div className='animate-pulse font-medium'>Loading details...</div>
                         </div>
-                    )}
-
-                    {/* Contact Information */}
-                    {consultancy.contact && (
-                        <div>
-                            <h3 className='text-lg font-semibold mb-2'>
-                                Contact Information
-                            </h3>
-                            <div className='space-y-1'>
-                                {(() => {
-                                    const contacts =
-                                        typeof consultancy.contact === 'string'
-                                            ? JSON.parse(consultancy.contact)
-                                            : Array.isArray(consultancy.contact)
-                                                ? consultancy.contact
-                                                : []
-                                    return contacts.map(
-                                        (contact, index) =>
-                                            contact && (
-                                                <p key={index} className='text-gray-700'>
-                                                    {contact}
-                                                </p>
-                                            )
-                                    )
-                                })()}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Destinations */}
-                    {consultancy.destination && (
-                        <div>
-                            <h3 className='text-lg font-semibold mb-2'>Destinations</h3>
-                            <div className='flex flex-wrap gap-2'>
-                                {(() => {
-                                    const destinations =
-                                        typeof consultancy.destination === 'string'
-                                            ? JSON.parse(consultancy.destination)
-                                            : consultancy.destination || []
-                                    return destinations.map((dest, index) => (
-                                        <span
-                                            key={index}
-                                            className='px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm'
-                                        >
-                                            {typeof dest === 'string'
-                                                ? dest
-                                                : dest?.country || 'N/A'}
-                                        </span>
-                                    ))
-                                })()}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Courses/Programs */}
-                    {consultancy.consultancyCourses &&
-                        consultancy.consultancyCourses.length > 0 && (
-                            <div>
-                                <h3 className='text-lg font-semibold mb-2'>Courses</h3>
-                                <div className='flex flex-wrap gap-2'>
-                                    {consultancy.consultancyCourses.map(
-                                        (course, index) => (
-                                            <span
-                                                key={index}
-                                                className='px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm'
+                    ) : consultancy ? (
+                        <>
+                            {/* Header Section */}
+                            <div className='flex flex-col md:flex-row gap-6 items-start'>
+                                {consultancy.logo && (
+                                    <div className='w-24 h-24 rounded-xl border bg-white p-2 flex items-center justify-center shrink-0'>
+                                        <img
+                                            src={consultancy.logo}
+                                            alt={consultancy.title}
+                                            className='w-full h-full object-contain'
+                                        />
+                                    </div>
+                                )}
+                                <div className='space-y-2 flex-1'>
+                                    <h2 className='text-3xl font-bold text-gray-900 tracking-tight'>
+                                        {consultancy.title}
+                                    </h2>
+                                    <div className='flex flex-wrap gap-4'>
+                                        {consultancy.website_url && (
+                                            <a
+                                                href={consultancy.website_url.startsWith('http') ? consultancy.website_url : `https://${consultancy.website_url}`}
+                                                target='_blank'
+                                                rel='noopener noreferrer'
+                                                className='text-[#387cae] hover:underline flex items-center gap-1.5 text-sm font-medium'
                                             >
-                                                {course.title || 'N/A'}
-                                            </span>
-                                        )
-                                    )}
+                                                <Globe className='w-4 h-4' />
+                                                Website
+                                            </a>
+                                        )}
+                                        {consultancy.google_map_url && (
+                                            <a
+                                                href={consultancy.google_map_url}
+                                                target='_blank'
+                                                rel='noopener noreferrer'
+                                                className='text-gray-500 hover:text-gray-900 flex items-center gap-1.5 text-sm font-medium transition-colors'
+                                            >
+                                                <MapPin className='w-4 h-4' />
+                                                Location
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className='px-3 py-1 bg-gray-100 rounded-full text-[10px] font-bold uppercase tracking-widest text-gray-500'>
+                                    {consultancy.pinned === 1 ? 'Pinned' : 'Standard'}
                                 </div>
                             </div>
-                        )}
 
-                    {/* Description */}
-                    {consultancy.description && (
-                        <div>
-                            <h3 className='text-lg font-semibold mb-2'>Description</h3>
-                            <div
-                                className='text-gray-700 prose max-w-none'
-                                dangerouslySetInnerHTML={{
-                                    __html: consultancy.description
-                                }}
-                            />
-                        </div>
-                    )}
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                                {/* Address & Contact */}
+                                <div className='space-y-6'>
+                                    <div className='space-y-3'>
+                                        <h4 className='text-xs font-bold uppercase tracking-widest flex items-center gap-2'>
+                                            <MapPin className='w-3 h-3' />
+                                            Office Address
+                                        </h4>
+                                        <div className='p-4 bg-gray-50 rounded-xl border text-sm text-gray-700 leading-relaxed font-medium'>
+                                            {(() => {
+                                                const addr = typeof consultancy.address === 'string' ? JSON.parse(consultancy.address) : consultancy.address || {}
+                                                return (
+                                                    <div className='space-y-1'>
+                                                        {addr.street && <p>{addr.street}</p>}
+                                                        <p>{[addr.city, addr.state, addr.zip].filter(Boolean).join(', ')}</p>
+                                                    </div>
+                                                )
+                                            })()}
+                                        </div>
+                                    </div>
 
-                    {/* Status */}
-                    <div className='flex gap-4 pt-4 border-t'>
-                        <div>
-                            <span className='text-sm font-medium text-gray-700'>
-                                Pinned:{' '}
-                            </span>
-                            <span className='text-sm text-gray-600'>
-                                {consultancy.pinned === 1 ? 'Yes' : 'No'}
-                            </span>
-                        </div>
-                    </div>
+                                    <div className='space-y-3'>
+                                        <h4 className='text-xs font-bold uppercase tracking-widest flex items-center gap-2'>
+                                            <Phone className='w-3 h-3' />
+                                            Contact Information
+                                        </h4>
+                                        <div className='p-4 bg-gray-50 rounded-xl border space-y-2'>
+                                            {(() => {
+                                                const contacts = typeof consultancy.contact === 'string' ? JSON.parse(consultancy.contact) : consultancy.contact || []
+                                                return contacts.filter(Boolean).map((c, i) => (
+                                                    <p key={i} className='text-sm text-gray-700 font-medium flex items-center gap-2'>
+                                                        <span className='w-1.5 h-1.5 rounded-full bg-[#387cae]' />
+                                                        {c}
+                                                    </p>
+                                                ))
+                                            })()}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Destinations & Courses */}
+                                <div className='space-y-6'>
+                                    <div className='space-y-3'>
+                                        <h4 className='text-xs font-bold uppercase tracking-widest flex items-center gap-2'>
+                                            <Globe className='w-3 h-3' />
+                                            Target Countries
+                                        </h4>
+                                        <div className='flex flex-wrap gap-2'>
+                                            {(() => {
+                                                const dests = typeof consultancy.destination === 'string' ? JSON.parse(consultancy.destination) : consultancy.destination || []
+                                                return dests.map((d, i) => (
+                                                    <span key={i} className='px-3 py-1.5 bg-gray-100 border text-gray-700 rounded-lg text-xs font-bold uppercase'>
+                                                        {typeof d === 'string' ? d : d.country}
+                                                    </span>
+                                                ))
+                                            })()}
+                                        </div>
+                                    </div>
+
+                                    <div className='space-y-3'>
+                                        <h4 className='text-xs font-bold uppercase tracking-widest flex items-center gap-2'>
+                                            <GraduationCap className='w-3 h-3' />
+                                            Courses Offered
+                                        </h4>
+                                        <div className='flex flex-wrap gap-2'>
+                                            {consultancy.consultancyCourses?.map((course, i) => (
+                                                <span key={i} className='px-3 py-1.5 bg-blue-50/50 border border-blue-100 text-[#387cae] rounded-lg text-xs font-bold'>
+                                                    {course.title}
+                                                </span>
+                                            ))}
+                                            {(!consultancy.consultancyCourses || consultancy.consultancyCourses.length === 0) && (
+                                                <p className='text-xs italic font-medium'>No courses listed.</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Description */}
+                                <div className='col-span-1 md:col-span-2 space-y-3'>
+                                    <h4 className='text-xs font-bold uppercase tracking-widest flex items-center gap-2'>
+                                        <Info className='w-3 h-3' />
+                                        About Consultancy
+                                    </h4>
+                                    <div className='p-6 bg-white rounded-xl border shadow-sm prose prose-sm max-w-none text-gray-700 prose-headings:text-gray-900 prose-strong:text-gray-900'
+                                        dangerouslySetInnerHTML={{ __html: consultancy.description || '<p class="italic">No description available.</p>' }}
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    ) : null}
                 </div>
-            ) : null}
+
+                <div className='p-4 border-t flex justify-end'>
+                    <Button variant='outline' onClick={onClose}>Close Details</Button>
+                </div>
             </DialogContent>
         </Dialog>
     )

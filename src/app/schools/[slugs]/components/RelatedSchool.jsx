@@ -1,80 +1,149 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { getSchools } from '../../actions'
+import React, { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
-import { MapPin } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-const RelatedSchool = ({ school }) => {
-  const [schools, setSchools] = useState([])
+const RelatedSchools = ({ college }) => {
+  const [colleges, setColleges] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const scrollContainerRef = useRef(null)
 
   useEffect(() => {
-    getRelatedSchool()
+    // Only run on client side
+    if (typeof window === 'undefined') return
+    getRelatedColleges()
   }, [])
 
-  const getRelatedSchool = async () => {
+  const getRelatedColleges = async () => {
     setIsLoading(true)
     try {
-      const data = await getSchools()
-      const filteredSchools = data.schools.filter(
-        (c) => c.schoolId !== college._id
+      // Use direct fetch instead of server action to avoid SSR issues
+      const response = await fetch(
+        `${process.env.baseUrl}/college?page=1&limit=24`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          cache: 'no-store'
+        }
       )
-      setSchools(filteredSchools.slice(0, 3))
+
+      if (response.ok) {
+        const data = await response.json()
+        const collegesData =
+          data.items?.map((collegeItem) => ({
+            name: collegeItem.name,
+            location: `${collegeItem.address?.city || ''}, ${collegeItem.address?.state || ''}`,
+            description: collegeItem.description,
+            googleMapUrl: collegeItem.google_map_url,
+            instituteType: collegeItem.institute_type,
+            slug: collegeItem.slugs,
+            collegeId: collegeItem.id,
+            collegeImage: collegeItem.featured_img,
+            logo: collegeItem.college_logo
+          })) || []
+
+        // Filter out the current college
+        const filteredColleges = collegesData.filter(
+          (c) => c.collegeId !== college?.id && c.collegeId !== college?._id
+        )
+        setColleges(filteredColleges)
+      } else {
+        console.error('Failed to fetch colleges:', response.statusText)
+        setColleges([])
+      }
     } catch (error) {
       console.error('Error fetching colleges:', error)
+      setColleges([])
     } finally {
       setIsLoading(false)
     }
   }
 
-  if (isLoading) return null
-  if (schools.length === 0) return null
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: -400,
+        behavior: 'smooth'
+      })
+    }
+  }
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: 400,
+        behavior: 'smooth'
+      })
+    }
+  }
 
   return (
-    <section className='px-4 sm:px-8 md:px-12 lg:px-24 mb-20'>
-      <div className='flex items-center gap-3 mb-8'>
-        <div className='w-1 h-6 bg-[#30AD8F] rounded-full'></div>
-        <h2 className='font-bold text-xl md:text-2xl text-gray-900'>
-          Schools you may like
-        </h2>
-      </div>
+    <div className='flex flex-col max-w-[1600px] mx-auto mb-10 sm:mb-20 px-4 sm:px-8 md:px-16 lg:px-24'>
+      <h2 className='text-lg font-semibold text-gray-900 m-2 sm:m-4 text-center sm:text-left'>
+        Schools you may like
+      </h2>
+      <div className='relative'>
+        {/* Left Arrow */}
+        <button
+          onClick={scrollLeft}
+          className='absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-1.5 sm:p-2 shadow-lg hover:bg-gray-100 transition-colors hidden sm:block'
+          aria-label='Scroll left'
+        >
+          <ChevronLeft className='w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-gray-700' />
+        </button>
 
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-        {schools.map((item, index) => (
-          <Link href={`/schools/${item.slug}`} key={index} className='group'>
-            <div className='bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)] transition-all duration-300 hover:border-[#30AD8F]/20 flex flex-col h-full'>
-              <div className='aspect-[4/3] relative overflow-hidden bg-gray-50 flex items-center justify-center p-8'>
-                <img
-                  src={
-                    item?.logo ||
-                    `https://avatar.iran.liara.run/username?username=${item?.name}`
-                  }
-                  alt={item.name}
-                  className='max-w-[70%] max-h-[70%] object-contain transition-transform duration-500 group-hover:scale-110'
-                />
-                <div className='absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity'></div>
-              </div>
-
-              <div className='p-6 flex flex-col flex-1 gap-2'>
-                <h3 className='font-bold text-gray-900 line-clamp-1 group-hover:text-[#0A6FA7] transition-colors'>
-                  {item.name}
-                </h3>
-                {item.location && (
-                  <div className='flex items-center gap-1.5 text-gray-500'>
-                    <MapPin className='w-3.5 h-3.5 text-[#30AD8F]' />
-                    <p className='text-xs font-bold truncate'>
-                      {item.location}
+        {/* Scrollable Container */}
+        <div
+          ref={scrollContainerRef}
+          className='flex overflow-x-auto gap-3 sm:gap-4 px-8 sm:px-12 scroll-smooth no-scrollbar'
+        >
+          {isLoading ? (
+            <div className='flex justify-center items-center w-full py-8'>
+              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900'></div>
+            </div>
+          ) : (
+            colleges.map((college, index) => (
+              <Link
+                href={`/schools/${college.slug}`}
+                key={index}
+                className='flex-shrink-0'
+              >
+                <div className='cursor-pointer p-2 sm:p-4 w-48 sm:w-56 md:w-64'>
+                  <div className='flex justify-center border-2 rounded-2xl sm:rounded-3xl items-center overflow-hidden mb-2 p-2 sm:p-4'>
+                    <img
+                      src={college.logo}
+                      alt={college.name}
+                      className='w-36 h-36 sm:w-40 sm:h-40 md:w-48 md:h-48 object-cover'
+                    />
+                  </div>
+                  <div className='px-2 sm:px-4 pb-2 sm:pb-4 flex flex-col'>
+                    <h3 className='text-sm font-medium text-center line-clamp-2 text-gray-900'>
+                      {college.name}
+                    </h3>
+                    <p className='text-xs text-gray-500 text-center line-clamp-1 mt-1'>
+                      {college.location}
                     </p>
                   </div>
-                )}
-              </div>
-            </div>
-          </Link>
-        ))}
+                </div>
+              </Link>
+            ))
+          )}
+        </div>
+
+        {/* Right Arrow */}
+        <button
+          onClick={scrollRight}
+          className='absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-1.5 sm:p-2 shadow-lg hover:bg-gray-100 transition-colors hidden sm:block'
+          aria-label='Scroll right'
+        >
+          <ChevronRight className='w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-gray-700' />
+        </button>
       </div>
-    </section>
+    </div>
   )
 }
 
-export default RelatedSchool
+export default RelatedSchools;

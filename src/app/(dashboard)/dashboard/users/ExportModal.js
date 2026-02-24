@@ -1,6 +1,16 @@
 'use client'
 import { useState } from 'react'
-import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
+import {
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DialogContent,
+  DialogClose
+} from '@/ui/shadcn/dialog'
+import { Button } from '@/ui/shadcn/button'
+import { Input } from '@/ui/shadcn/input'
+import { Label } from '@/ui/shadcn/label'
+import { Download } from 'lucide-react'
 
 export default function ExportModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
@@ -20,24 +30,20 @@ export default function ExportModal({ isOpen, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError(null)
+
+    if (formData.startDate && formData.endDate && formData.startDate > formData.endDate) {
+      setError('Start date cannot be after end date.')
+      return
+    }
+
     setLoading(true)
-
     try {
-      if (
-        formData.startDate &&
-        formData.endDate &&
-        formData.startDate > formData.endDate
-      ) {
-        throw new Error('Start date cannot be after end date.')
-      }
-
       const queryParams = new URLSearchParams({
-        limit: formData.limit || 100, // Default to 100 if empty
+        limit: formData.limit || 100,
         startDate: formData.startDate,
         endDate: formData.endDate
       })
 
-      // Exclude role if "All" is selected
       if (formData.role !== 'All') {
         queryParams.set('role', formData.role)
       }
@@ -52,8 +58,6 @@ export default function ExportModal({ isOpen, onClose }) {
       }
 
       const responseText = await response.text()
-
-      // Trigger CSV download
       const blob = new Blob([responseText], { type: 'text/csv' })
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -65,9 +69,9 @@ export default function ExportModal({ isOpen, onClose }) {
       window.URL.revokeObjectURL(url)
 
       onClose()
-    } catch (error) {
-      console.error('Error exporting users:', error)
-      setError(error.message)
+    } catch (err) {
+      console.error('Error exporting users:', err)
+      setError(err.message)
     } finally {
       setLoading(false)
     }
@@ -76,114 +80,132 @@ export default function ExportModal({ isOpen, onClose }) {
   if (!isOpen) return null
 
   return (
-    <Dialog
-      isOpen={isOpen}
-      onClose={onClose}
-      className='max-w-md'
-    >
-      <DialogHeader>
-        <DialogTitle>Export Users</DialogTitle>
-        <DialogClose onClick={onClose} />
-      </DialogHeader>
-      <DialogContent>
-        <form onSubmit={handleSubmit} className='space-y-4 pt-4'>
-          <div>
-            <label
-              htmlFor='limit'
-              className='block text-sm font-medium text-gray-700'
-            >
-              Number of Persons
-            </label>
-            <input
-              type='number'
-              id='limit'
-              name='limit'
-              value={formData.limit}
-              onChange={handleChange}
-              className='w-full p-2 border rounded'
-              placeholder='Enter limit'
-              min='1'
-              required
-            />
-          </div>
+    <Dialog isOpen={isOpen} onClose={onClose} className='max-w-md'>
+      <DialogContent className='max-w-md max-h-[90vh] flex flex-col p-0'>
 
-          <div>
-            <label
-              htmlFor='role'
-              className='block text-sm font-medium text-gray-700'
-            >
-              Role
-            </label>
-            <select
-              id='role'
-              name='role'
-              value={formData.role}
-              onChange={handleChange}
-              className='w-full p-2 border rounded'
-              required
-            >
-              <option value='All'>All</option>
-              <option value='Agent'>Agent</option>
-              <option value='Student'>Student</option>
-            </select>
-          </div>
+        {/* Sticky Header */}
+        <DialogHeader className='px-6 py-4 border-b shrink-0'>
+          <DialogTitle className='text-lg font-semibold text-gray-900'>
+            Export Users
+          </DialogTitle>
+          <DialogClose onClick={onClose} />
+        </DialogHeader>
 
-          <div>
-            <label
-              htmlFor='startDate'
-              className='block text-sm font-medium text-gray-700'
-            >
-              Start Date
-            </label>
-            <input
-              type='date'
-              id='startDate'
-              name='startDate'
-              value={formData.startDate}
-              onChange={handleChange}
-              className='w-full p-2 border rounded'
-              required
-            />
-          </div>
+        {/* Body */}
+        <div className='flex-1 overflow-y-auto p-6'>
+          <form id='export-form' onSubmit={handleSubmit} className='space-y-8'>
 
-          <div>
-            <label
-              htmlFor='endDate'
-              className='block text-sm font-medium text-gray-700'
-            >
-              End Date
-            </label>
-            <input
-              type='date'
-              id='endDate'
-              name='endDate'
-              value={formData.endDate}
-              onChange={handleChange}
-              className='w-full p-2 border rounded'
-              required
-            />
-          </div>
+            {/* Filters */}
+            <section className='space-y-5'>
+              <h3 className='text-base font-semibold text-slate-800 border-b pb-2'>
+                Export Filters
+              </h3>
 
-          {error && <div className='text-red-500 text-sm mt-2'>{error}</div>}
+              <div className='space-y-1.5'>
+                <Label htmlFor='limit' required>
+                  Number of Records
+                </Label>
+                <Input
+                  type='number'
+                  id='limit'
+                  name='limit'
+                  value={formData.limit}
+                  onChange={handleChange}
+                  placeholder='e.g. 100'
+                  min='1'
+                  required
+                />
+              </div>
 
-          <div className='flex justify-end'>
-            <button
-              type='button'
-              onClick={onClose}
-              className='mr-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600'
-              disabled={loading}
-            >
-              Cancel
-            </button>
-            <button
-              type='submit'
-              className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
-              disabled={loading}
-            >
-              {loading ? 'Exporting...' : 'Export'}
-            </button>
-          </div>
-        </form>
+              <div className='space-y-1.5'>
+                <Label htmlFor='role'>Role</Label>
+                <select
+                  id='role'
+                  name='role'
+                  value={formData.role}
+                  onChange={handleChange}
+                  className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#387cae] focus-visible:ring-offset-2'
+                >
+                  <option value='All'>All Roles</option>
+                  <option value='Agent'>Agent</option>
+                  <option value='Student'>Student</option>
+                </select>
+              </div>
+            </section>
+
+            {/* Date Range */}
+            <section className='space-y-5'>
+              <h3 className='text-base font-semibold text-slate-800 border-b pb-2'>
+                Date Range
+              </h3>
+
+              <div className='grid grid-cols-2 gap-4'>
+                <div className='space-y-1.5'>
+                  <Label htmlFor='startDate' required>Start Date</Label>
+                  <Input
+                    type='date'
+                    id='startDate'
+                    name='startDate'
+                    value={formData.startDate}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className='space-y-1.5'>
+                  <Label htmlFor='endDate' required>End Date</Label>
+                  <Input
+                    type='date'
+                    id='endDate'
+                    name='endDate'
+                    value={formData.endDate}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* Error */}
+            {error && (
+              <div className='p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600'>
+                {error}
+              </div>
+            )}
+
+          </form>
+        </div>
+
+        {/* Sticky Footer */}
+        <div className='sticky bottom-0 bg-white border-t px-6 py-4 flex justify-end gap-3 shrink-0'>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={onClose}
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+          <Button
+            type='submit'
+            form='export-form'
+            disabled={loading}
+            className='bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2 min-w-[120px]'
+          >
+            {loading ? (
+              <span className='flex items-center gap-2'>
+                <span className='animate-spin rounded-full h-4 w-4 border-b-2 border-white' />
+                Exporting...
+              </span>
+            ) : (
+              <>
+                <Download className='w-4 h-4' />
+                Export CSV
+              </>
+            )}
+          </Button>
+        </div>
+
       </DialogContent>
     </Dialog>
   )

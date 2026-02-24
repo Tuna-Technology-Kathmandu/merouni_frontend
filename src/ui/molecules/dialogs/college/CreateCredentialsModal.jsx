@@ -3,7 +3,7 @@ import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@
 import { Input } from "@/ui/shadcn/input"
 import { Label } from "@/ui/shadcn/label"
 import { Eye, EyeOff } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
 
@@ -35,6 +35,39 @@ const CreateCredentialsModal = ({
             phoneNo: ''
         }
     })
+
+    useEffect(() => {
+        if (selectedCollege && credentialsModalOpen) {
+            let firstName = selectedCollege.name || ''
+            let lastName = ''
+            let emailName = ''
+            let phoneNo = ''
+
+            // If college has members, use the first member's data for other fields
+            if (selectedCollege.members && selectedCollege.members.length > 0) {
+                const firstMember = selectedCollege.members[0]
+                const nameParts = (firstMember.name || '').split(' ')
+                lastName = nameParts.slice(1).join(' ') || nameParts[0] || ''
+                phoneNo = firstMember.contact_number || ''
+            }
+
+            // If college has contacts, use the first contact as phone
+            if (!phoneNo && selectedCollege.contacts && selectedCollege.contacts.length > 0) {
+                phoneNo = selectedCollege.contacts[0]?.contact_number || selectedCollege.contacts[0] || ''
+            }
+
+            // Extract email name if email exists (remove any domain)
+            if (selectedCollege.email) {
+                const emailParts = selectedCollege.email.split('@')
+                emailName = emailParts[0] || ''
+            }
+
+            setValue('firstName', firstName)
+            setValue('lastName', lastName)
+            setValue('emailName', emailName)
+            setValue('phoneNo', phoneNo.slice(0, 10))
+        }
+    }, [selectedCollege, credentialsModalOpen, setValue])
 
     const handleCloseCredentialsModal = () => {
         setCredentialsModalOpen(false)

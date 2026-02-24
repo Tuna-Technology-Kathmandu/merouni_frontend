@@ -349,7 +349,9 @@ export default function TagForm() {
         <DialogContent>
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-4 pt-4'>
             <div>
-              <Label htmlFor='title'>Title</Label>
+              <Label
+              required
+               htmlFor='title'>Title</Label>
               <Input
                 id='title'
                 {...register('title', { required: 'Title is required' })}

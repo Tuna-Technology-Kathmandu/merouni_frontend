@@ -47,14 +47,14 @@ const AdmissionViewModal = ({ isOpen, onClose, admission }) => {
 
                         <div className="space-y-1 col-span-2">
                             <h4 className="text-sm font-medium text-gray-500">Admission Process</h4>
-                            <div className="p-3 bg-blue-50/50 rounded border border-blue-100 text-sm whitespace-pre-wrap">
+                            <div className="p-3 bg-gray-50 rounded border text-sm whitespace-pre-wrap">
                                 {admission.admission_process || 'N/A'}
                             </div>
                         </div>
 
                         <div className="space-y-1 col-span-2">
                             <h4 className="text-sm font-medium text-gray-500">Fee Details</h4>
-                            <div className="p-3 bg-green-50/50 rounded border border-green-100 text-sm whitespace-pre-wrap font-medium">
+                            <div className="p-3 bg-gray-50 rounded border text-sm whitespace-pre-wrap">
                                 {admission.fee_details || 'N/A'}
                             </div>
                         </div>

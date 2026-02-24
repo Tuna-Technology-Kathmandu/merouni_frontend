@@ -1,22 +1,26 @@
 'use client'
-import { authFetch } from '@/app/utils/authFetch'
+import React, { useEffect, useState, useMemo } from 'react'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useSelector } from 'react-redux'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import { Plus, Search, Edit2, Trash2, Eye, Key } from 'lucide-react'
+
+import { Button } from '@/ui/shadcn/button'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
+import Table from '@/ui/shadcn/DataTable'
+import SearchInput from '@/ui/molecules/SearchInput'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
-import CreateConsultencyUser from '@/ui/molecules/dialogs/CreateConsultencyUser'
 import CreateUpdateConsultancy from '@/ui/molecules/dialogs/CreateUpdateConsultancy'
 import ViewConsultancy from '@/ui/molecules/dialogs/ViewConsultancy'
-import SearchInput from '@/ui/molecules/SearchInput'
-import { Button } from '@/ui/shadcn/button'
-import Table from '@/ui/shadcn/DataTable'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { toast } from 'react-toastify'
-import { createColumns } from './columns'
+import CreateConsultencyUser from '@/ui/molecules/dialogs/CreateConsultencyUser'
 import EditConsultancyPage from './EditConsultancyPage'
+import { authFetch } from '@/app/utils/authFetch'
+import { deleteConsultancy } from './actions'
+import { formatDate } from '@/utils/date.util'
 
-export default function ConsultancyForm() {
+export default function ConsultancyManager() {
   const { role } = useAdminPermission()
 
   // If user is consultancy, show the edit page
@@ -25,126 +29,103 @@ export default function ConsultancyForm() {
   }
 
   const { setHeading } = usePageHeading()
-  const author_id = useSelector((state) => state.user.data?.id)
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
-  const [isOpen, setIsOpen] = useState(false)
-  const [consultancies, setConsultancies] = useState([])
-  const [tableLoading, setTableLoading] = useState(false)
-  const [deleteId, setDeleteId] = useState(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [viewModalOpen, setViewModalOpen] = useState(false)
-  const [viewSlug, setViewSlug] = useState(null)
-  const [pagination, setPagination] = useState({
-    currentPage: parseInt(searchParams.get('page')) || 1,
-    totalPages: 1,
-    total: 0
-  })
-  const [searchQuery, setSearchQuery] = useState('')
-  const [searchTimeout, setSearchTimeout] = useState(null)
 
+  const [consultancies, setConsultancies] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [tableLoading, setTableLoading] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const [editingData, setEditingData] = useState(null)
+  const [deleteId, setDeleteId] = useState(null)
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [viewSlug, setViewSlug] = useState(null)
+  const [isViewOpen, setIsViewOpen] = useState(false)
   const [credentialsModalOpen, setCredentialsModalOpen] = useState(false)
   const [selectedConsultancy, setSelectedConsultancy] = useState(null)
 
-  // State for Create/Update Modal
-  const [editingConsultancy, setEditingConsultancy] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0
+  })
 
   useEffect(() => {
     setHeading('Consultancy Management')
-    fetchConsultancies()
+    loadConsultancies()
     return () => setHeading(null)
-  }, [setHeading, searchParams])
+  }, [setHeading])
 
-  // Check for 'add' query parameter and open modal
   useEffect(() => {
     const addParam = searchParams.get('add')
     if (addParam === 'true') {
-      setEditingConsultancy(null)
-      setIsOpen(true)
-      // Remove query parameter from URL
+      handleAdd()
       router.replace('/dashboard/consultancy', { scroll: false })
     }
   }, [searchParams, router])
 
-  useEffect(() => {
-    return () => {
-      if (searchTimeout) {
-        clearTimeout(searchTimeout)
-      }
-    }
-  }, [searchTimeout])
-
-  const { requireAdmin } = useAdminPermission()
-
-  const fetchConsultancies = async (page = 1) => {
+  const loadConsultancies = async (page = 1, query = searchQuery) => {
+    setTableLoading(true)
     try {
-      const params = new URLSearchParams(searchParams.toString())
-      params.set('page', page)
-      router.push(`${pathname}?${params.toString()}`, { scroll: false })
+      const url = new URL(`${process.env.baseUrl}/consultancy`)
+      url.searchParams.append('page', page)
+      if (query) url.searchParams.append('q', query)
 
-      setTableLoading(true)
-      const response = await authFetch(
-        `${process.env.baseUrl}/consultancy?page=${page}`
-      )
+      const response = await authFetch(url.toString())
       const data = await response.json()
-      setConsultancies(data.items)
+
+      setConsultancies(data.items || [])
       setPagination({
-        currentPage: data.pagination.currentPage,
-        totalPages: data.pagination.totalPages,
-        total: data.pagination.totalCount
+        currentPage: data.pagination?.currentPage || 1,
+        totalPages: data.pagination?.totalPages || 1,
+        totalCount: data.pagination?.totalCount || 0
       })
     } catch (error) {
-      toast.error('Failed to fetch consultancies')
+      toast.error('Failed to load consultancies')
     } finally {
       setTableLoading(false)
+      setLoading(false)
     }
   }
 
-  const handleEdit = (consultancy) => {
-    setEditingConsultancy(consultancy)
+  const handleSearchInput = (value) => {
+    setSearchQuery(value)
+    loadConsultancies(1, value)
+  }
+
+  const handleAdd = () => {
+    setEditingData(null)
     setIsOpen(true)
   }
 
-  const handleDeleteClick = (id) => {
-    setDeleteId(id)
-    setIsDialogOpen(true)
-  }
-
-  function handleDialogClose() {
-    setIsDialogOpen(false)
-    setDeleteId(null)
-  }
-
-  const handleDeleteConfirm = async () => {
-    if (!deleteId) return
-
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/consultancy?id=${deleteId}`,
-        {
-          method: 'DELETE'
-        }
-      )
-      const res = await response.json()
-      toast.success(res.message)
-      await fetchConsultancies(pagination.currentPage)
-    } catch (err) {
-      toast.error(err.message)
-    } finally {
-      setIsDialogOpen(false)
-      setDeleteId(null)
-    }
+  const handleEdit = (item) => {
+    setEditingData(item)
+    setIsOpen(true)
   }
 
   const handleView = (slug) => {
     setViewSlug(slug)
-    setViewModalOpen(true)
+    setIsViewOpen(true)
   }
 
-  const handleCloseViewModal = () => {
-    setViewModalOpen(false)
-    setViewSlug(null)
+  const handleDeleteClick = (id) => {
+    setDeleteId(id)
+    setIsConfirmOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteConsultancy(deleteId)
+      toast.success('Consultancy deleted successfully')
+      loadConsultancies(pagination.currentPage)
+    } catch (error) {
+      toast.error(error.message || 'Failed to delete')
+    } finally {
+      setIsConfirmOpen(false)
+      setDeleteId(null)
+    }
   }
 
   const handleOpenCredentialsModal = (consultancy) => {
@@ -152,140 +133,148 @@ export default function ConsultancyForm() {
     setCredentialsModalOpen(true)
   }
 
-  const handleCloseCredentialsModal = () => {
-    setCredentialsModalOpen(false)
-    setSelectedConsultancy(null)
-  }
-
-  const handleCredentialsSuccess = () => {
-    fetchConsultancies(pagination.currentPage)
-  }
-
-  // Create columns with handlers (must be after handlers are defined)
-  const columns = createColumns({
-    handleView,
-    handleEdit,
-    handleDeleteClick,
-    handleOpenCredentialsModal
-  })
-
-  const handleSearch = async (query) => {
-    if (!query) {
-      fetchConsultancies()
-      return
-    }
-
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/consultancy?q=${query}`
-      )
-      if (response.ok) {
-        const data = await response.json()
-        setConsultancies(data.items)
-
-        if (data.pagination) {
-          setPagination({
-            currentPage: data.pagination.currentPage,
-            totalPages: data.pagination.totalPages,
-            total: data.pagination.totalCount
-          })
-        }
-      } else {
-        console.error('Error fetching consultancy:', response.statusText)
-        setConsultancies([])
-      }
-    } catch (error) {
-      console.error('Error fetching consutancy search results:', error.message)
-      setConsultancies([])
-    }
-  }
-
-  const handleSearchInput = (value) => {
-    setSearchQuery(value)
-
-    if (searchTimeout) {
-      clearTimeout(searchTimeout)
-    }
-
-    if (value === '') {
-      handleSearch('')
-    } else {
-      const timeoutId = setTimeout(() => {
-        handleSearch(value)
-      }, 300)
-      setSearchTimeout(timeoutId)
-    }
-  }
-  return (
-    <>
-      <div className='w-full space-y-2'>
-        <div className='px-4 space-y-4'>
-          <div className='flex justify-between items-center pt-4'>
-
-            <SearchInput
-              value={searchQuery}
-              onChange={(e) => handleSearchInput(e.target.value)}
-              placeholder='Search consultancies...'
-              className='max-w-md'
-            />
-            {/* Button */}
-            <div className='flex gap-2'>
-              <Button
-                onClick={() => {
-                  setEditingConsultancy(null)
-                  setIsOpen(true)
-                }}
-              >
-                Add Consultancy
-              </Button>
-            </div>
-          </div>
-
-          <CreateUpdateConsultancy
-            isOpen={isOpen}
-            onClose={() => {
-              setIsOpen(false)
-              setEditingConsultancy(null)
-            }}
-            onSuccess={() => {
-              fetchConsultancies(pagination.currentPage)
-            }}
-            initialData={editingConsultancy}
-          />
-
-          <Table
-            data={consultancies}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => fetchConsultancies(newPage)}
-            onSearch={handleSearch}
-            showSearch={false}
-          />
+  const columns = useMemo(() => [
+    {
+      header: 'Title',
+      accessorKey: 'title',
+      cell: ({ row }) => (
+        <div className="flex items-center gap-3">
+          {row.original.logo && (
+            <img src={row.original.logo} alt="" className="w-8 h-8 rounded-md object-contain border bg-gray-50" />
+          )}
+          <span className="font-medium text-gray-900">{row.original.title}</span>
         </div>
+      )
+    },
+    {
+      header: 'Locations',
+      accessorKey: 'destination',
+      cell: ({ row }) => {
+        let dests = row.original.destination
+        if (typeof dests === 'string') {
+          try { dests = JSON.parse(dests) } catch { dests = [] }
+        }
+        if (!Array.isArray(dests)) dests = []
+
+        return (
+          <div className="flex flex-wrap gap-1">
+            {dests.slice(0, 2).map((d, i) => (
+              <span key={i} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold uppercase tracking-tight">
+                {typeof d === 'string' ? d : d.country}
+              </span>
+            ))}
+            {dests.length > 2 && <span className="text-[10px] text-gray-400 font-medium">+{dests.length - 2} more</span>}
+            {dests.length === 0 && <span className="text-gray-400 italic text-xs">N/A</span>}
+          </div>
+        )
+      }
+    },
+    {
+      header: 'Actions',
+      id: 'actions',
+      cell: ({ row }) => (
+        <div className='flex gap-1'>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleView(row.original.slug || row.original.slugs)}
+            className='hover:bg-blue-50 text-blue-600'
+            title="View Details"
+          >
+            <Eye className='w-4 h-4' />
+          </Button>
+          {!row.original.userId && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleOpenCredentialsModal(row.original)}
+              className='hover:bg-indigo-50 text-indigo-600'
+              title="Create Credentials"
+            >
+              <Key className='w-4 h-4' />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleEdit(row.original)}
+            className='hover:bg-amber-50 text-amber-600'
+            title="Edit"
+          >
+            <Edit2 className='w-4 h-4' />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => handleDeleteClick(row.original.id)}
+            className='hover:bg-red-50 text-red-600'
+            title="Delete"
+          >
+            <Trash2 className='w-4 h-4' />
+          </Button>
+        </div>
+      )
+    }
+  ], [])
+
+  return (
+    <div className='w-full space-y-4 p-4'>
+      <ToastContainer />
+
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+        <SearchInput
+          value={searchQuery}
+          onChange={(e) => handleSearchInput(e.target.value)}
+          placeholder='Search consultancies by name...'
+          className='max-w-md w-full'
+        />
+        <Button onClick={handleAdd} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
+          <Plus className="w-4 h-4" />
+          Add Consultancy
+        </Button>
       </div>
 
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <Table
+          loading={tableLoading}
+          data={consultancies}
+          columns={columns}
+          pagination={pagination}
+          onPageChange={(page) => loadConsultancies(page)}
+          showSearch={false}
+        />
+      </div>
+
+      <CreateUpdateConsultancy
+        isOpen={isOpen}
+        onClose={() => {
+          setIsOpen(false)
+          setEditingData(null)
+        }}
+        onSuccess={() => loadConsultancies(pagination.currentPage)}
+        initialData={editingData}
+      />
+
+      <ViewConsultancy
+        isOpen={isViewOpen}
+        onClose={() => setIsViewOpen(false)}
+        slug={viewSlug}
+      />
+
+      <CreateConsultencyUser
+        isOpen={credentialsModalOpen}
+        onClose={() => setCredentialsModalOpen(false)}
+        selectedConsultancy={selectedConsultancy}
+        onSuccess={() => loadConsultancies(pagination.currentPage)}
+      />
+
       <ConfirmationDialog
-        open={isDialogOpen}
-        onClose={handleDialogClose}
+        open={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
         onConfirm={handleDeleteConfirm}
         title='Confirm Deletion'
         message='Are you sure you want to delete this consultancy? This action cannot be undone.'
       />
-
-      {/* View Consultancy Details Modal */}
-      <ViewConsultancy
-        isOpen={viewModalOpen}
-        onClose={handleCloseViewModal}
-        slug={viewSlug}
-      />
-
-      {/* Create Credentials Modal */}
-      <CreateConsultencyUser
-        isOpen={credentialsModalOpen}
-        onClose={handleCloseCredentialsModal}
-        selectedConsultancy={selectedConsultancy}
-        onSuccess={handleCredentialsSuccess}
-      />
-    </>
+    </div>
   )
 }

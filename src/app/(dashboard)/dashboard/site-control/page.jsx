@@ -3,10 +3,10 @@
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import Loading from '@/ui/molecules/Loading'
 import { Button } from '@/ui/shadcn/button'
-import { Edit2, Search, Plus, Trash2 } from 'lucide-react'
+import { Edit2, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState, useMemo } from 'react'
-import { toast, ToastContainer } from 'react-toastify'
-import { getSiteConfig, deleteSiteConfig } from '../../../actions/siteConfigActions'
+import { toast } from 'react-toastify'
+import { getSiteConfig } from '../../../actions/siteConfigActions'
 import Table from '@/ui/shadcn/DataTable'
 import { CONFIG_TYPES } from './siteControlConstants'
 import SiteControlCreateModal from './SiteControlCreateModal'
@@ -22,10 +22,10 @@ export default function SiteControlPage() {
 
     // Modal State
     const [isCreateOpen, setIsCreateOpen] = useState(false)
-    const [editingConfig, setEditingConfig] = useState(null) // Object when editing, null when closed
-    const [deletingConfig, setDeletingConfig] = useState(null) // Object when deleting
+    const [editingConfig, setEditingConfig] = useState(null)
+    const [deletingConfig, setDeletingConfig] = useState(null)
 
-    // Search & Pagination State for Table Molecule
+    // Search State
     const [searchQuery, setSearchQuery] = useState('')
     const [pagination, setPagination] = useState({
         currentPage: 1,
@@ -47,10 +47,15 @@ export default function SiteControlPage() {
         let filtered = configs
         if (searchQuery) {
             const query = searchQuery.toLowerCase()
-            filtered = configs.filter(c =>
-                c.type.toLowerCase().includes(query) ||
-                (c.value && c.value.toLowerCase().includes(query))
-            )
+            filtered = configs.filter(c => {
+                const typeDef = CONFIG_TYPES.find(ct => ct.value === c.type)
+                const label = typeDef ? typeDef.label : c.type
+                return (
+                    c.type.toLowerCase().includes(query) ||
+                    label.toLowerCase().includes(query) ||
+                    (c.value && c.value.toLowerCase().includes(query))
+                )
+            })
         }
         setFilteredConfigs(filtered)
         setPagination(prev => ({
@@ -76,36 +81,17 @@ export default function SiteControlPage() {
         }
     }
 
-    const handleAdd = () => {
-        setIsCreateOpen(true)
-    }
-
-    const handleEdit = (config) => {
-        setEditingConfig(config)
-    }
-
-    const handleDelete = (config) => {
-        setDeletingConfig(config)
-    }
-
-    const handleCloseCreate = () => {
-        setIsCreateOpen(false)
-    }
-
-    const handleCloseEdit = () => {
-        setEditingConfig(null)
-    }
-
-    const handleCloseDelete = () => {
-        setDeletingConfig(null)
-    }
-
-    const handleSuccess = () => {
-        loadConfig()
-    }
+    const handleAdd = () => setIsCreateOpen(true)
+    const handleEdit = (config) => setEditingConfig(config)
+    const handleDelete = (config) => setDeletingConfig(config)
+    const handleCloseCreate = () => setIsCreateOpen(false)
+    const handleCloseEdit = () => setEditingConfig(null)
+    const handleCloseDelete = () => setDeletingConfig(null)
+    const handleSuccess = () => loadConfig()
 
     const handleSearchInput = (value) => {
         setSearchQuery(value)
+        setPagination(prev => ({ ...prev, currentPage: 1 }))
     }
 
     const columns = useMemo(() => [
@@ -117,9 +103,9 @@ export default function SiteControlPage() {
                 const typeDef = CONFIG_TYPES.find(ct => ct.value === config.type)
                 const label = typeDef ? typeDef.label : config.type
                 return (
-                    <div>
-                        <span className="font-medium">{label}</span>
-                        <span className="block text-xs text-gray-400 font-normal">{config.type}</span>
+                    <div className="flex flex-col">
+                        <span className="font-semibold text-slate-700">{label}</span>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">{config.type}</span>
                     </div>
                 )
             }
@@ -134,27 +120,37 @@ export default function SiteControlPage() {
                 if (typeDef?.inputType === 'richtext') {
                     displayValue = displayValue.replace(/<[^>]*>?/gm, '') // Simple strip tags
                 }
-                if (displayValue.length > 100) displayValue = displayValue.substring(0, 100) + '...'
-                return <span className="text-gray-600">{displayValue}</span>
+                if (displayValue.length > 150) displayValue = displayValue.substring(0, 150) + '...'
+                return (
+                    <div className="max-w-md">
+                        <span className="text-sm text-slate-600 line-clamp-2">{displayValue || <em className="text-slate-300">No value set</em>}</span>
+                    </div>
+                )
             }
         },
         {
             header: 'Actions',
             id: 'actions',
             cell: ({ row }) => (
-                <div className='flex gap-2'>
-                    <button
+                <div className='flex gap-1'>
+                    <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => handleEdit(row.original)}
-                        className='p-1 text-blue-600 hover:text-blue-800'
+                        className='hover:bg-blue-50 text-blue-600 h-8 w-8'
+                        title="Edit"
                     >
                         <Edit2 className='w-4 h-4' />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => handleDelete(row.original)}
-                        className='p-1 text-red-600 hover:text-red-800'
+                        className='hover:bg-red-50 text-red-600 h-8 w-8'
+                        title="Delete"
                     >
                         <Trash2 className='w-4 h-4' />
-                    </button>
+                    </Button>
                 </div>
             )
         }
@@ -177,36 +173,36 @@ export default function SiteControlPage() {
     }
 
     return (
-        <>
-            <div className='p-4 w-full'>
-                <div className='flex justify-between items-center mb-4'>
+        <div className='w-full space-y-4 p-4'>
+            {/* Header Section */}
+            <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
+                <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
                     {/* Search Bar */}
                     <SearchInput
                         value={searchQuery}
                         onChange={(e) => handleSearchInput(e.target.value)}
                         placeholder='Search configurations...'
-                        className='max-w-md'
+                        className='max-w-md w-full'
                     />
-                    <div className='flex gap-2'>
-                        <Button onClick={handleAdd}>
-                            <Plus className="w-4 h-4 mr-2" /> Add Configuration
-                        </Button>
-                    </div>
-                </div>
-                <ToastContainer />
 
-                {/* Table */}
-                <div className='mt-8'>
-                    <Table
-                        loading={loading}
-                        data={paginatedData}
-                        columns={columns}
-                        pagination={pagination}
-                        onPageChange={(p) => setPagination(prev => ({ ...prev, currentPage: p }))}
-                        onSearch={handleSearchInput}
-                        showSearch={false} // We implemented external search bar above to match Tag UI
-                    />
+                    {/* Button */}
+                    <Button onClick={handleAdd} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
+                        <Plus className="w-4 h-4" />
+                        Add Configuration
+                    </Button>
                 </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+                <Table
+                    loading={loading}
+                    data={paginatedData}
+                    columns={columns}
+                    pagination={pagination}
+                    onPageChange={(p) => setPagination(prev => ({ ...prev, currentPage: p }))}
+                    onSearch={handleSearchInput}
+                    showSearch={false}
+                />
             </div>
 
             {/* Create Modal */}
@@ -231,6 +227,7 @@ export default function SiteControlPage() {
                 onSuccess={handleSuccess}
                 config={deletingConfig}
             />
-        </>
+        </div>
     )
 }
+

@@ -4,13 +4,13 @@ let url = `${process.env.baseUrl}/exam`
 
 export async function getAllExams(page) {
   try {
-    const response = await authFetch(`${url}?page=${page}`, {
+    const response = await authFetch(`${url}?page=${page}&sortBy=createdAt&order=DESC`, {
       cache: 'no-store'
     })
     const data = await response.json()
     return data
   } catch (error) {
-    throw new Error('Failed to fetch scholarships')
+    throw new Error('Failed to fetch exams')
   }
 }
 
@@ -26,7 +26,7 @@ export async function createExam(data) {
     })
     return await response.json()
   } catch (error) {
-    throw new Error('Failed to create scholarship')
+    throw new Error('Failed to create exam')
   }
 }
 

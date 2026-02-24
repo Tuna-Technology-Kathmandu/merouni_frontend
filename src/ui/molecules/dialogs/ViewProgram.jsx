@@ -41,153 +41,145 @@ const ViewProgram = ({ isOpen, onClose, slug }) => {
             onClose={onClose}
             className='max-w-2xl'
         >
-            <DialogHeader>
-                <DialogTitle>Program Details</DialogTitle>
-                <DialogClose onClick={onClose} />
-            </DialogHeader>
-            <DialogContent>
-            <div className='overflow-y-auto flex-1 -m-6 p-6'>
-                {viewLoading ? (
-                    <div className='flex items-center justify-center py-12'>
-                        <div className='animate-spin rounded-full h-10 w-10 border-b-2 border-[#0A6FA7]' />
-                    </div>
-                ) : viewProgram ? (
-                    <div className='space-y-6'>
-                        <div>
-                            <h3 className='text-lg font-semibold text-gray-900 border-b pb-2 mb-2'>
-                                {viewProgram.title}
-                            </h3>
-                            {viewProgram.code && (
-                                <p className='text-sm text-gray-500'>
-                                    Code: {viewProgram.code}
-                                </p>
-                            )}
+            <DialogContent className='max-w-2xl max-h-[90vh] flex flex-col p-0'>
+                <DialogHeader className='px-6 py-4 border-b'>
+                    <DialogTitle className="text-lg font-semibold text-gray-900">Program Details</DialogTitle>
+                    <DialogClose onClick={onClose} />
+                </DialogHeader>
+
+                <div className='flex-1 overflow-y-auto p-6'>
+                    {viewLoading ? (
+                        <div className='flex items-center justify-center py-16'>
+                            <div className='animate-spin rounded-full h-10 w-10 border-b-2 border-[#387cae]' />
                         </div>
-                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm'>
-                            {viewProgram.programfaculty?.title && (
-                                <div>
-                                    <span className='font-medium text-gray-500'>Faculty</span>
-                                    <p className='text-gray-900'>
-                                        {viewProgram.programfaculty.title}
-                                    </p>
-                                </div>
-                            )}
-                            {viewProgram.programlevel?.title && (
-                                <div>
-                                    <span className='font-medium text-gray-500'>Level</span>
-                                    <p className='text-gray-900'>
-                                        {viewProgram.programlevel.title}
-                                    </p>
-                                </div>
-                            )}
-                            {viewProgram.programdegree?.title && (
-                                <div>
-                                    <span className='font-medium text-gray-500'>Degree</span>
-                                    <p className='text-gray-900'>
-                                        {viewProgram.programdegree.title}
-                                    </p>
-                                </div>
-                            )}
-                            {viewProgram.duration && (
-                                <div>
-                                    <span className='font-medium text-gray-500'>Duration</span>
-                                    <p className='text-gray-900'>{viewProgram.duration}</p>
-                                </div>
-                            )}
-                            {viewProgram.credits != null && (
-                                <div>
-                                    <span className='font-medium text-gray-500'>Credits</span>
-                                    <p className='text-gray-900'>{viewProgram.credits}</p>
-                                </div>
-                            )}
-                            {viewProgram.fee && (
-                                <div>
-                                    <span className='font-medium text-gray-500'>Fee</span>
-                                    <p className='text-gray-900'>{viewProgram.fee}</p>
-                                </div>
-                            )}
-                            {viewProgram.delivery_type && (
-                                <div>
-                                    <span className='font-medium text-gray-500'>
-                                        Delivery Type
-                                    </span>
-                                    <p className='text-gray-900'>{viewProgram.delivery_type}</p>
-                                </div>
-                            )}
-                            {viewProgram.delivery_mode && (
-                                <div>
-                                    <span className='font-medium text-gray-500'>
-                                        Delivery Mode
-                                    </span>
-                                    <p className='text-gray-900'>{viewProgram.delivery_mode}</p>
-                                </div>
-                            )}
-                        </div>
-                        {viewProgram.eligibility_criteria && (
+                    ) : viewProgram ? (
+                        <div className='space-y-6'>
+                            {/* Title & Code */}
                             <div>
-                                <span className='block font-medium text-gray-500 text-sm mb-1'>
-                                    Eligibility Criteria
-                                </span>
-                                <div
-                                    className='text-gray-900 text-sm prose prose-sm max-w-none'
-                                    dangerouslySetInnerHTML={{
-                                        __html: viewProgram.eligibility_criteria
-                                    }}
-                                />
+                                <h3 className='text-lg font-semibold text-gray-900 border-b pb-2 mb-2'>
+                                    {viewProgram.title}
+                                </h3>
+                                {viewProgram.code && (
+                                    <p className='text-sm text-gray-500'>
+                                        Code: <span className='font-medium text-gray-700'>{viewProgram.code}</span>
+                                    </p>
+                                )}
                             </div>
-                        )}
-                        {viewProgram.learning_outcomes && (
-                            <div>
-                                <span className='block font-medium text-gray-500 text-sm mb-1'>
-                                    Learning Outcomes
-                                </span>
-                                <div
-                                    className='text-gray-900 text-sm prose prose-sm max-w-none'
-                                    dangerouslySetInnerHTML={{
-                                        __html: viewProgram.learning_outcomes
-                                    }}
-                                />
-                            </div>
-                        )}
-                        {viewProgram.syllabus?.length > 0 && (
-                            <div>
-                                <span className='block font-medium text-gray-500 text-sm mb-2'>
-                                    Syllabus
-                                </span>
-                                <div className='border rounded-lg overflow-hidden'>
-                                    <table className='w-full text-sm'>
-                                        <thead className='bg-gray-50'>
-                                            <tr>
-                                                <th className='text-left p-2'>Year</th>
-                                                <th className='text-left p-2'>Semester</th>
-                                                <th className='text-left p-2'>Course</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {viewProgram.syllabus.map((s, i) => (
-                                                <tr key={i} className='border-t'>
-                                                    <td className='p-2'>{s.year}</td>
-                                                    <td className='p-2'>{s.semester}</td>
-                                                    <td className='p-2'>
-                                                        {s.programCourse?.title ?? '—'}
-                                                    </td>
+
+                            {/* Key Details Grid */}
+                            <section className='space-y-3'>
+                                <h4 className='text-sm font-semibold text-slate-700 border-b pb-1'>Overview</h4>
+                                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm'>
+                                    {viewProgram.programfaculty?.title && (
+                                        <div className='space-y-0.5'>
+                                            <span className='font-medium text-gray-500 text-xs uppercase tracking-wide'>Faculty</span>
+                                            <p className='text-gray-900'>{viewProgram.programfaculty.title}</p>
+                                        </div>
+                                    )}
+                                    {viewProgram.programlevel?.title && (
+                                        <div className='space-y-0.5'>
+                                            <span className='font-medium text-gray-500 text-xs uppercase tracking-wide'>Level</span>
+                                            <p className='text-gray-900'>{viewProgram.programlevel.title}</p>
+                                        </div>
+                                    )}
+                                    {viewProgram.programdegree?.title && (
+                                        <div className='space-y-0.5'>
+                                            <span className='font-medium text-gray-500 text-xs uppercase tracking-wide'>Degree</span>
+                                            <p className='text-gray-900'>{viewProgram.programdegree.title}</p>
+                                        </div>
+                                    )}
+                                    {viewProgram.duration && (
+                                        <div className='space-y-0.5'>
+                                            <span className='font-medium text-gray-500 text-xs uppercase tracking-wide'>Duration</span>
+                                            <p className='text-gray-900'>{viewProgram.duration}</p>
+                                        </div>
+                                    )}
+                                    {viewProgram.credits != null && (
+                                        <div className='space-y-0.5'>
+                                            <span className='font-medium text-gray-500 text-xs uppercase tracking-wide'>Credits</span>
+                                            <p className='text-gray-900'>{viewProgram.credits}</p>
+                                        </div>
+                                    )}
+                                    {viewProgram.fee && (
+                                        <div className='space-y-0.5'>
+                                            <span className='font-medium text-gray-500 text-xs uppercase tracking-wide'>Fee</span>
+                                            <p className='text-gray-900'>{viewProgram.fee}</p>
+                                        </div>
+                                    )}
+                                    {viewProgram.delivery_type && (
+                                        <div className='space-y-0.5'>
+                                            <span className='font-medium text-gray-500 text-xs uppercase tracking-wide'>Delivery Type</span>
+                                            <p className='text-gray-900'>{viewProgram.delivery_type}</p>
+                                        </div>
+                                    )}
+                                    {viewProgram.delivery_mode && (
+                                        <div className='space-y-0.5'>
+                                            <span className='font-medium text-gray-500 text-xs uppercase tracking-wide'>Delivery Mode</span>
+                                            <p className='text-gray-900'>{viewProgram.delivery_mode}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+
+                            {/* Rich Text Fields */}
+                            {viewProgram.eligibility_criteria && (
+                                <section className='space-y-2'>
+                                    <h4 className='text-sm font-semibold text-slate-700 border-b pb-1'>Eligibility Criteria</h4>
+                                    <div
+                                        className='text-gray-700 text-sm prose prose-sm max-w-none'
+                                        dangerouslySetInnerHTML={{ __html: viewProgram.eligibility_criteria }}
+                                    />
+                                </section>
+                            )}
+
+                            {viewProgram.learning_outcomes && (
+                                <section className='space-y-2'>
+                                    <h4 className='text-sm font-semibold text-slate-700 border-b pb-1'>Learning Outcomes</h4>
+                                    <div
+                                        className='text-gray-700 text-sm prose prose-sm max-w-none'
+                                        dangerouslySetInnerHTML={{ __html: viewProgram.learning_outcomes }}
+                                    />
+                                </section>
+                            )}
+
+                            {/* Syllabus */}
+                            {viewProgram.syllabus?.length > 0 && (
+                                <section className='space-y-2'>
+                                    <h4 className='text-sm font-semibold text-slate-700 border-b pb-1'>Syllabus</h4>
+                                    <div className='border rounded-lg overflow-hidden'>
+                                        <table className='w-full text-sm'>
+                                            <thead className='bg-gray-50 border-b'>
+                                                <tr>
+                                                    <th className='text-left p-2.5 text-gray-500 font-medium'>Year</th>
+                                                    <th className='text-left p-2.5 text-gray-500 font-medium'>Semester</th>
+                                                    <th className='text-left p-2.5 text-gray-500 font-medium'>Course</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                ) : null}
-            </div>
-            {!viewLoading && viewProgram && (
-                <div className='flex justify-end gap-2 pt-4 border-t mt-4'>
+                                            </thead>
+                                            <tbody>
+                                                {viewProgram.syllabus.map((s, i) => (
+                                                    <tr key={i} className='border-t hover:bg-gray-50'>
+                                                        <td className='p-2.5 text-gray-700'>{s.year}</td>
+                                                        <td className='p-2.5 text-gray-700'>{s.semester}</td>
+                                                        <td className='p-2.5 text-gray-900 font-medium'>
+                                                            {s.programCourse?.title ?? '—'}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </section>
+                            )}
+                        </div>
+                    ) : null}
+                </div>
+
+                {/* Sticky Footer */}
+                <div className='sticky bottom-0 bg-white border-t p-4 px-6 flex justify-end gap-3'>
                     <Button variant='outline' onClick={onClose}>
                         Close
                     </Button>
                 </div>
-            )}
             </DialogContent>
         </Dialog>
     )

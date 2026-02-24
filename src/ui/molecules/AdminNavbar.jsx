@@ -2,6 +2,7 @@
 
 import { destr } from 'destr'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useRouter } from 'next/navigation'
@@ -15,6 +16,7 @@ import { THEME_BLUE } from "@/constants/constants"
 import SearchInput from '../molecules/SearchInput'
 import { menuItems } from '@/constants/menuList'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
+import { authFetch } from '@/app/utils/authFetch'
 
 const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
   const { heading, subheading } = usePageHeading()
@@ -22,19 +24,40 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
   const dropdownRef = useRef(null)
+  const searchRef = useRef(null)
   const router = useRouter()
   const dispatch = useDispatch()
   const [inputValue, setInputValue] = useState(searchQuery)
 
-  // Get user data from Redux store
+  // Get user data from Redux store for initial state and ID
   let userData = useSelector((state) => state.user.data)
+  const [profile, setProfile] = useState(null)
 
-  // Parse the role JSON string if it exists, otherwise default to an empty object
+  useEffect(() => {
+    if (userData?.id) {
+      const getProfile = async () => {
+        try {
+          const response = await authFetch(`${process.env.baseUrl}/users/profile?id=${userData.id}`)
+          const data = await response.json()
+          if (data?.user) {
+            setProfile(data.user)
+          }
+        } catch (error) {
+          console.error('Error fetching admin profile:', error)
+        }
+      }
+      getProfile()
+    }
+  }, [userData?.id])
+
+  // Use fetched profile as priority, fallback to selector data
+  const currentUser = profile
+
   let userRoles = {}
-  if (userData?.role) {
+  const rawRole = currentUser?.roles
+  if (rawRole) {
     try {
-      const parsedRole =
-        typeof userData.role === 'string' ? destr(userData.role) : userData.role
+      const parsedRole = typeof rawRole === 'string' ? destr(rawRole) : rawRole
       userRoles = parsedRole && typeof parsedRole === 'object' ? parsedRole : {}
     } catch (error) {
       console.error('Error parsing user role:', error)
@@ -47,6 +70,9 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false)
+      }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setSearchQuery('')
       }
     }
 
@@ -71,7 +97,7 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
   }, [searchQuery])
 
   const handleAgentVerification = async () => {
-    if (!userData?.id) {
+    if (!currentUser?.id) {
       toast.error('User ID not found')
       return
     }
@@ -85,7 +111,7 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ user_id: userData.id })
+          body: JSON.stringify({ user_id: currentUser?.id })
         }
       )
 
@@ -181,7 +207,7 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
 
       {/* CENTERED SEARCH WITH SUGGESTIONS */}
       {userRoles?.admin && (
-        <div className='hidden lg:flex flex-1 max-w-xl mx-8 relative'>
+        <div ref={searchRef} className='hidden lg:flex flex-1 max-w-xl mx-8 relative'>
           <div className='w-full'>
             <SearchInput
               value={inputValue}
@@ -199,71 +225,131 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
           {searchQuery.trim() !== '' && (
             <div className='absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200'>
               <div className='max-h-[70vh] overflow-y-auto p-1.5 custom-scrollbar'>
-                {menuItems.map((section) => {
-                  const items = section.items.filter(item => {
-                    const hasAccess = item.visible.some(r => userRoles[r])
-                    if (!hasAccess) return false
+                {(() => {
+                  let totalMatches = 0
+                  const itemsToRender = menuItems.map((section) => {
+                    const filteredItems = section.items.filter(item => {
+                      const hasAccess = item.visible.some(r => userRoles[r])
+                      if (!hasAccess) return false
 
-                    const query = searchQuery.toLowerCase().trim()
-                    const matchesLabel = item.label.toLowerCase().includes(query)
-                    const matchesSubmenu = item.submenus?.some(sub =>
-                      sub.label.toLowerCase().includes(query) && sub.visible.some(r => userRoles[r])
+                      const query = searchQuery.toLowerCase().trim()
+                      const matchesLabel = item.label.toLowerCase().includes(query)
+                      const matchesSubmenu = item.submenus?.some(sub =>
+                        sub.label.toLowerCase().includes(query) && sub.visible.some(r => userRoles[r])
+                      )
+                      return matchesLabel || matchesSubmenu
+                    })
+
+                    if (filteredItems.length === 0) return null
+                    totalMatches += filteredItems.length
+
+                    return (
+                      <div key={section.title || 'Other'}>
+                        <div className='px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest'>
+                          {section.title || 'General'}
+                        </div>
+                        {filteredItems.map(item => (
+                          <div key={item.label}>
+                            {item.submenus ? (
+                              item.submenus
+                                .filter(sub =>
+                                  (sub.label.toLowerCase().includes(searchQuery.toLowerCase()) || item.label.toLowerCase().includes(searchQuery.toLowerCase())) &&
+                                  sub.visible.some(r => userRoles[r])
+                                )
+                                .map(sub => (
+                                  <Link
+                                    key={sub.label}
+                                    href={sub.href}
+                                    onClick={() => {
+                                      setSearchQuery('')
+                                      setInputValue('')
+                                    }}
+                                    className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 rounded-lg transition-colors'
+                                    style={{ '--theme-blue': THEME_BLUE }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.backgroundColor = `${THEME_BLUE}10`;
+                                      e.currentTarget.style.color = THEME_BLUE;
+                                      const iconDiv = e.currentTarget.querySelector('.icon-container');
+                                      if (iconDiv) {
+                                        iconDiv.style.backgroundColor = `${THEME_BLUE}25`;
+                                        iconDiv.style.color = THEME_BLUE;
+                                      }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.backgroundColor = '';
+                                      e.currentTarget.style.color = '';
+                                      const iconDiv = e.currentTarget.querySelector('.icon-container');
+                                      if (iconDiv) {
+                                        iconDiv.style.backgroundColor = '';
+                                        iconDiv.style.color = '';
+                                      }
+                                    }}
+                                  >
+                                    <div className='icon-container w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md transition-colors'>
+                                      {item.icon}
+                                    </div>
+                                    <div className='flex flex-col items-start'>
+                                      <span className='font-medium'>{sub.label}</span>
+                                      <span className='text-[10px] text-gray-400'>{item.label}</span>
+                                    </div>
+                                  </Link>
+                                ))
+                            ) : (
+                              <Link
+                                href={item.href}
+                                onClick={() => {
+                                  setSearchQuery('')
+                                  setInputValue('')
+                                }}
+                                className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 rounded-lg transition-colors'
+                                style={{ '--theme-blue': THEME_BLUE }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = `${THEME_BLUE}10`;
+                                  e.currentTarget.style.color = THEME_BLUE;
+                                  const iconDiv = e.currentTarget.querySelector('.icon-container');
+                                  if (iconDiv) {
+                                    iconDiv.style.backgroundColor = `${THEME_BLUE}25`;
+                                    iconDiv.style.color = THEME_BLUE;
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = '';
+                                  e.currentTarget.style.color = '';
+                                  const iconDiv = e.currentTarget.querySelector('.icon-container');
+                                  if (iconDiv) {
+                                    iconDiv.style.backgroundColor = '';
+                                    iconDiv.style.color = '';
+                                  }
+                                }}
+                              >
+                                <div className='icon-container w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md transition-colors'>
+                                  {item.icon}
+                                </div>
+                                <span className='font-medium'>{item.label}</span>
+                              </Link>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     )
-                    return matchesLabel || matchesSubmenu
                   })
 
-                  if (items.length === 0) return null
-
-                  return (
-                    <div key={section.title || 'Other'}>
-                      <div className='px-3 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-widest'>
-                        {section.title || 'General'}
-                      </div>
-                      {items.map(item => (
-                        <div key={item.label}>
-                          {item.submenus ? (
-                            item.submenus
-                              .filter(sub =>
-                                (sub.label.toLowerCase().includes(searchQuery.toLowerCase()) || item.label.toLowerCase().includes(searchQuery.toLowerCase())) &&
-                                sub.visible.some(r => userRoles[r])
-                              )
-                              .map(sub => (
-                                <button
-                                  key={sub.label}
-                                  onClick={() => {
-                                    router.push(sub.href)
-                                    setSearchQuery('')
-                                  }}
-                                  className='w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors'
-                                >
-                                  <div className='w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md group-hover:bg-indigo-100 group-hover:text-indigo-600'>
-                                    {item.icon}
-                                  </div>
-                                  <div className='flex flex-col items-start'>
-                                    <span className='font-medium'>{sub.label}</span>
-                                    <span className='text-[10px] text-gray-400'>{item.label}</span>
-                                  </div>
-                                </button>
-                              ))
-                          ) : (
-                            <button
-                              onClick={() => {
-                                router.push(item.href)
-                                setSearchQuery('')
-                              }}
-                              className='w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors'
-                            >
-                              <div className='w-8 h-8 flex items-center justify-center text-gray-400 bg-gray-50 rounded-md group-hover:bg-indigo-100 group-hover:text-indigo-600'>
-                                {item.icon}
-                              </div>
-                              <span className='font-medium'>{item.label}</span>
-                            </button>
-                          )}
+                  if (totalMatches === 0) {
+                    return (
+                      <div className='py-8 px-4 text-center'>
+                        <div className='w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-300'>
+                          <Search className='w-6 h-6' />
                         </div>
-                      ))}
-                    </div>
-                  )
-                })}
+                        <p className='text-sm font-medium text-gray-900'>No menus found</p>
+                        <p className='text-xs text-gray-500 mt-1'>
+                          No results for "{searchQuery}"
+                        </p>
+                      </div>
+                    )
+                  }
+
+                  return itemsToRender
+                })()}
               </div>
             </div>
           )}
@@ -271,29 +357,27 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
       )}
       {/* ICONS AND USER */}
       <div className='flex items-center gap-4 justify-end'>
-        {/* Only show verification button if user doesn't have agent role */}
-        {/* {!userRoles?.agent && (
-          <div>
-            <button
-              type='button'
-              className='text-sm text-white font-semibold bg-[#30AD8F] bg-opacity-60 p-3 rounded-lg'
-              onClick={handleAgentVerification}
-              disabled={loading}
-            >
-              {loading ? 'Sending...' : 'Agent Verification'}
-            </button>
-          </div> */}
-        {/* )} */}
         <div className='relative' ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className='flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg p-1'
+            className='flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg p-1'
+            style={{ '--tw-ring-color': THEME_BLUE }}
           >
-            <div className='w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-md hover:shadow-lg transition-shadow'>
-              {userData?.firstName && userData?.lastName ? (
+            <div
+              className='w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md hover:shadow-lg transition-shadow relative overflow-hidden'
+              style={{ background: `linear-gradient(to bottom right, ${THEME_BLUE}, #7c3aed)` }}
+            >
+              {currentUser?.profileImageUrl ? (
+                <Image
+                  src={currentUser.profileImageUrl}
+                  alt={`${currentUser.firstName} ${currentUser.lastName}`}
+                  fill
+                  className="object-cover"
+                />
+              ) : currentUser?.firstName && currentUser?.lastName ? (
                 <span>
-                  {userData.firstName.charAt(0).toUpperCase()}
-                  {userData.lastName.charAt(0).toUpperCase()}
+                  {currentUser.firstName.charAt(0).toUpperCase()}
+                  {currentUser.lastName.charAt(0).toUpperCase()}
                 </span>
               ) : (
                 <FaUserCircle className='w-6 h-6' />
@@ -301,10 +385,10 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
             </div>
             <div className='flex flex-col items-start'>
               <span className='text-xs leading-3 font-medium text-gray-900'>
-                {userData ? `${userData.firstName} ${userData.lastName}` : ''}
+                {currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : ''}
               </span>
               <span className='text-[10px] text-gray-500 text-left'>
-                {userData?.email ||
+                {currentUser?.email ||
                   Object.entries(userRoles)
                     .filter(([_, value]) => value)
                     .map(([role]) => role)

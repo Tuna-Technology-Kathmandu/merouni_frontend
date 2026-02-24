@@ -63,7 +63,7 @@ const Sponsors = () => {
                 >
                   <img
                     src={
-                      banner.banner_galleries?.[0]?.url ||
+                      banner.banner_image ||
                       '/images/meroUniLarge.gif'
                     }
                     onError={(e) => {

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createPortal } from 'react-dom'
 import { ChevronDown, Search, X } from 'lucide-react'
+import { THEME_BLUE } from '@/constants/constants'
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -39,17 +40,17 @@ const NavLink = ({ href, label, isActive, mobile, onClick }) => (
     className={`
       relative transition-colors whitespace-nowrap
       ${mobile
-        ? `block py-3.5 px-4 text-base font-medium border-b border-gray-100 last:border-0 ${isActive ? 'text-[#0A6FA7] bg-[#0A6FA7]/5' : 'text-gray-700 active:bg-gray-50'
-        }`
-        : `py-3 px-1 text-sm font-medium ${isActive ? 'text-[#0A6FA7]' : 'text-gray-600 hover:text-gray-900'
-        }`
+        ? `block py-3.5 px-4 text-base font-medium border-b border-gray-100 last:border-0 ${isActive ? 'bg-[#387cae]/5' : 'text-gray-700 active:bg-gray-50'}`
+        : `py-3 px-1 text-sm font-medium ${isActive ? '' : 'text-gray-600 hover:text-gray-900'}`
       }
     `}
+    style={{ color: isActive ? THEME_BLUE : undefined }}
   >
     {label}
     {!mobile && isActive && (
       <span
-        className='absolute bottom-0 left-0 right-0 h-0.5 bg-[#0A6FA7] rounded-full'
+        className='absolute bottom-0 left-0 right-0 h-0.5 rounded-full'
+        style={{ backgroundColor: THEME_BLUE }}
         aria-hidden
       />
     )}
@@ -188,8 +189,9 @@ const Navbar = () => {
                 onClick={() => setIsMoreOpen(!isMoreOpen)}
                 className={`
                   flex items-center gap-0.5 py-3 px-1 text-sm font-medium transition-colors whitespace-nowrap
-                  ${isMoreActive ? 'text-[#0A6FA7]' : 'text-gray-600 hover:text-gray-900'}
+                  ${isMoreActive ? '' : 'text-gray-600 hover:text-gray-900'}
                 `}
+                style={{ color: isMoreActive ? THEME_BLUE : undefined }}
                 aria-expanded={isMoreOpen}
                 aria-haspopup='true'
               >
@@ -206,11 +208,13 @@ const Navbar = () => {
             <button
               type='button'
               onClick={openSearch}
-              className='w-full flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 bg-gray-50/80 text-left text-gray-500 hover:bg-gray-100 hover:border-gray-300 transition-colors'
+              className='w-full flex items-center gap-3 px-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50/50 text-left text-gray-400 transition-all duration-200'
+              onFocus={(e) => e.target.style.borderColor = THEME_BLUE}
+              onBlur={(e) => e.target.style.borderColor = ''}
               aria-label='Open search'
             >
-              <Search className='w-5 h-5 text-gray-400 shrink-0' />
-              <span className='text-sm'>Search colleges, degrees, programs...</span>
+              <Search className='w-4 h-4 text-gray-400 shrink-0' />
+              <span className='text-sm font-medium'>Search colleges, degrees...</span>
             </button>
           </div>
         </div>
@@ -285,10 +289,11 @@ const Navbar = () => {
                   className={`
                     block px-4 py-2.5 text-sm font-medium transition-colors
                     ${active
-                      ? 'text-[#0A6FA7] bg-[#0A6FA7]/5'
+                      ? 'bg-[#387cae]/5'
                       : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                     }
                   `}
+                  style={{ color: active ? THEME_BLUE : undefined }}
                 >
                   {label}
                 </Link>

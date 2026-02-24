@@ -5,7 +5,8 @@ import { Heart, Info, GraduationCap, MapPin } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@bprogress/next/app'
+import Link from 'next/link'
 
 
 const CollegeCard = ({
@@ -206,22 +207,22 @@ const CollegeCard = ({
         )}
 
         <div className='mt-auto pt-5 flex items-center gap-3 border-t border-gray-100'>
-          <button
-            type='button'
-            onClick={handleDetails}
+          <Link
+            href={slug ? `/colleges/${slug}` : '#'}
+            onClick={(e) => e.stopPropagation()}
             className='flex-1 py-2.5 px-3 bg-gray-50 text-gray-700 rounded-xl hover:bg-gray-100 transition-colors text-xs font-medium flex items-center justify-center gap-1.5 uppercase tracking-wider'
           >
             <Info className='w-3.5 h-3.5' />
             Details
-          </button>
-          <button
-            type='button'
-            onClick={handleApply}
+          </Link>
+          <Link
+            href={slug ? `/colleges/apply/${slug}` : '#'}
+            onClick={(e) => e.stopPropagation()}
             className='flex-1 py-2.5 px-3 bg-[#0A70A7] text-white rounded-xl hover:bg-[#085a86] transition-all text-xs font-medium flex items-center justify-center gap-1.5 shadow-sm uppercase tracking-wider'
           >
             <GraduationCap className='w-3.5 h-3.5' />
             Apply Now
-          </button>
+          </Link>
         </div>
       </div>
     </div>

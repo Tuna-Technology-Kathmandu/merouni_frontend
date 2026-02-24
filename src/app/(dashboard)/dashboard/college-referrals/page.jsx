@@ -190,14 +190,14 @@ const ReferedStudentsPage = () => {
                       </div>
                     </div>
 
-                    <div>
+                    {/* <div>
                       <label className='block text-sm font-medium text-gray-700 mb-1'>
                         Course
                       </label>
                       <p className='text-gray-900'>
                         {referral.course?.title || 'N/A'}
                       </p>
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Description */}

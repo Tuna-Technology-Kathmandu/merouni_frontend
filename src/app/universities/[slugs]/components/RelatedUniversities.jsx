@@ -20,6 +20,7 @@ const RelatedUniversities = ({ university }) => {
     setIsLoading(true)
     try {
       const response = await fetchUniversities()
+      console.log(response,"responseresponse")
       const data = response.items || []
 
       const filteredUniversities = data.filter((d) => {
@@ -91,7 +92,7 @@ const RelatedUniversities = ({ university }) => {
                   <div className='flex justify-center border-2 rounded-2xl sm:rounded-3xl items-center overflow-hidden mb-2 p-2 sm:p-4'>
                     <img
                       src={
-                        uni?.assets?.featured_image ||
+                        uni?.logo ||
                         `https://placehold.co/600x400?text=${uni.fullname}`
                       }
                       alt={uni.fullname}

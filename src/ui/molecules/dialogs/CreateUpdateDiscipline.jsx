@@ -7,7 +7,7 @@ import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
-import { Select } from '@/ui/shadcn/select'
+import { Textarea } from '@/ui/shadcn/textarea'
 import FileUpload from '@/app/(dashboard)/dashboard/addCollege/FileUpload'
 import { authFetch } from '@/app/utils/authFetch'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
@@ -19,9 +19,7 @@ export default function CreateUpdateDiscipline({
     initialData = null,
     authorId
 }) {
-    const [uploadedFiles, setUploadedFiles] = useState({
-        featured_image: ''
-    })
+    const [uploadedFiles, setUploadedFiles] = useState({ featured_image: '' })
 
     const {
         register,
@@ -29,7 +27,7 @@ export default function CreateUpdateDiscipline({
         reset,
         setValue,
         control,
-        formState: { errors }
+        formState: { errors, isSubmitting }
     } = useForm({
         defaultValues: {
             title: '',
@@ -43,189 +41,145 @@ export default function CreateUpdateDiscipline({
     useEffect(() => {
         if (isOpen) {
             if (initialData) {
-                // Edit mode
                 setValue('title', initialData.title)
                 setValue('description', initialData.description || '')
                 setValue('content', initialData.content || '')
                 setValue('featured_image', initialData.featured_image || '')
                 setUploadedFiles({ featured_image: initialData.featured_image || '' })
             } else {
-                // Create mode - reset to defaults
-                reset({
-                    title: '',
-                    description: '',
-                    content: '',
-                    featured_image: '',
-                    author: authorId
-                })
+                reset({ title: '', description: '', content: '', featured_image: '', author: authorId })
                 setUploadedFiles({ featured_image: '' })
             }
         }
     }, [isOpen, initialData, setValue, reset, authorId])
 
-    const createDiscipline = async (data) => {
-        try {
-            const response = await authFetch(
-                `${process.env.baseUrl}/discipline`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                }
-            )
-            if (!response.ok) {
-                throw new Error('Failed to create discipline')
-            }
-            
-            return await response.json()
-        } catch (error) {
-            console.error('Error creating discipline:', error)
-            throw error
-        }
-    }
-
-    const updateDiscipline = async (data, id) => {
-        try {
-            const response = await authFetch(
-                `${process.env.baseUrl}/discipline?discipline_id=${id}`,
-                {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                }
-            )
-            if (!response.ok) {
-                throw new Error('Failed to update discipline')
-            }
-            return await response.json()
-        } catch (error) {
-            console.error('Error updating discipline:', error)
-            throw error
-        }
-    }
-
     const onSubmit = async (data) => {
-        const formattedData = {
-            ...data,
-            featured_image: uploadedFiles.featured_image
-        }
+        const payload = { ...data, featured_image: uploadedFiles.featured_image }
         try {
+            let response
             if (initialData?.id) {
-                // Update
-                await updateDiscipline(formattedData, initialData.id)
-                toast.success('Discipline updated successfully')
+                response = await authFetch(`${process.env.baseUrl}/discipline?discipline_id=${initialData.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
             } else {
-                // Create
-                await createDiscipline(formattedData)
-                toast.success('Discipline created successfully')
+                response = await authFetch(`${process.env.baseUrl}/discipline`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
             }
+            if (!response.ok) throw new Error(`Failed to ${initialData ? 'update' : 'create'} discipline`)
+            toast.success(`Discipline ${initialData ? 'updated' : 'created'} successfully`)
             onSuccess?.()
             onClose()
         } catch (err) {
-            const errorMsg = err.response?.data?.message || err.message || 'Network error occurred'
-            toast.error(
-                `Failed to ${initialData ? 'update' : 'create'} discipline: ${errorMsg}`
-            )
+            toast.error(err.message || `Failed to ${initialData ? 'update' : 'create'} discipline`)
         }
     }
 
     return (
-        <Dialog
-            isOpen={isOpen}
-            onClose={onClose}
-            className='max-w-2xl'
-        >
-            <DialogHeader>
-                <DialogTitle>{initialData ? 'Edit Discipline' : 'Add Discipline'}</DialogTitle>
-                <DialogClose onClick={onClose} />
-            </DialogHeader>
-            <DialogContent>
-            <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
-                <form
-                    onSubmit={handleSubmit(onSubmit)}
-                    className='flex flex-col flex-1 overflow-hidden'
-                >
-                    <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                        <div className='bg-white p-6 rounded-lg shadow-md'>
-                          
-                            <div className='space-y-4'>
-                                <div>
-                                    <Label>
-                                        Discipline Title <span className='text-red-500'>*</span>
-                                    </Label>
-                                    <Input
-                                        type='text'
-                                        placeholder='Discipline Title'
-                                        {...register('title', {
-                                            required: 'Title is required'
-                                        })}
-                                        className='w-full p-2 border rounded'
-                                    />
-                                    {errors.title && (
-                                        <span className='text-red-500 text-sm'>
-                                            {errors.title.message}
-                                        </span>
-                                    )}
-                                </div>
-                                <div>
-                                    <Label>Description</Label>
-                                    <textarea
-                                        placeholder='Short description'
-                                        {...register('description')}
-                                        className='w-full p-2 border rounded'
-                                        rows={3}
-                                    />
-                                </div>
-                                <div>
-                                    <Label>Content</Label>
-                                    <Controller
-                                        name='content'
-                                        control={control}
-                                        render={({ field }) => (
-                                            <TipTapEditor
-                                                value={field.value}
-                                                onChange={field.onChange}
-                                                placeholder='Enter detailed content with rich formatting...'
-                                            />
-                                        )}
-                                    />
-                                </div>
-                                <div>
-                                    <Label>Image</Label>
-                                    <FileUpload
-                                        defaultPreview={uploadedFiles.featured_image}
-                                        onUploadComplete={(url) => {
-                                            setUploadedFiles((prev) => ({
-                                                ...prev,
-                                                featured_image: url
-                                            }))
-                                            setValue('featured_image', url)
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <Dialog isOpen={isOpen} onClose={onClose} className='max-w-2xl'>
+            <DialogContent className='max-w-2xl max-h-[90vh] flex flex-col p-0'>
+                <DialogHeader className='px-6 py-4 border-b'>
+                    <DialogTitle className="text-lg font-semibold text-gray-900">
+                        {initialData ? 'Edit Discipline' : 'Add Discipline'}
+                    </DialogTitle>
+                    <DialogClose onClick={onClose} />
+                </DialogHeader>
 
-                    {/* Submit Button - Sticky Footer */}
-                    <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
-                        <Button
-                            type='button'
-                            variant='outline'
-                            onClick={onClose}
-                        >
-                            Cancel
-                        </Button>
-                        <Button type='submit'>
-                            {initialData ? 'Update Discipline' : 'Create Discipline'}
-                        </Button>
-                    </div>
-                </form>
-            </div>
+                <div className='flex-1 overflow-y-auto p-6'>
+                    <form id="discipline-form" onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
+
+                        {/* Details */}
+                        <section className="space-y-5">
+                            <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Discipline Details</h3>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="disc-title" required>Title</Label>
+                                <Input
+                                    id="disc-title"
+                                    placeholder='e.g. Computer Science'
+                                    {...register('title', {
+                                        required: 'Title is required',
+                                        minLength: { value: 2, message: 'Title must be at least 2 characters' }
+                                    })}
+                                    className={errors.title ? 'border-destructive focus-visible:ring-destructive' : ''}
+                                />
+                                {errors.title && <p className='text-xs text-destructive mt-1'>{errors.title.message}</p>}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="disc-desc">Short Description</Label>
+                                <Textarea
+                                    id="disc-desc"
+                                    placeholder='Brief summary of this discipline…'
+                                    {...register('description', {
+                                        maxLength: { value: 1000, message: 'Max 1000 characters' }
+                                    })}
+                                    rows={3}
+                                    className={`resize-none ${errors.description ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                                />
+                                {errors.description && <p className='text-xs text-destructive mt-1'>{errors.description.message}</p>}
+                            </div>
+                        </section>
+
+                        {/* Rich Content */}
+                        <section className="space-y-5">
+                            <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Content</h3>
+                            <div className="space-y-2">
+                                <Label>Detailed Content</Label>
+                                <Controller
+                                    name='content'
+                                    control={control}
+                                    render={({ field }) => (
+                                        <TipTapEditor
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            placeholder='Enter detailed content with rich formatting…'
+                                        />
+                                    )}
+                                />
+                            </div>
+                        </section>
+
+                        {/* Media */}
+                        <section className="space-y-4">
+                            <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Media</h3>
+                            <div className="space-y-2">
+                                <Label>
+                                    Featured Image{' '}
+                                    <span className='text-gray-400 font-normal text-sm'>(Optional)</span>
+                                </Label>
+                                <FileUpload
+                                    label=''
+                                    defaultPreview={uploadedFiles.featured_image}
+                                    onUploadComplete={(url) => {
+                                        setUploadedFiles((prev) => ({ ...prev, featured_image: url }))
+                                        setValue('featured_image', url)
+                                    }}
+                                />
+                            </div>
+                        </section>
+
+                    </form>
+                </div>
+
+                {/* Sticky Footer */}
+                <div className='sticky bottom-0 bg-white border-t px-6 py-4 flex justify-end gap-3'>
+                    <Button type='button' variant='outline' onClick={onClose} disabled={isSubmitting}>
+                        Cancel
+                    </Button>
+                    <Button
+                        type='submit'
+                        form="discipline-form"
+                        disabled={isSubmitting}
+                        className='bg-[#387cae] hover:bg-[#387cae]/90 text-white'
+                    >
+                        {isSubmitting ? 'Processing…' : initialData ? 'Update Discipline' : 'Create Discipline'}
+                    </Button>
+                </div>
             </DialogContent>
         </Dialog>
     )

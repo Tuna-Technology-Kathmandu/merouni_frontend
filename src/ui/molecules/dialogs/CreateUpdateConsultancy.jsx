@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
@@ -7,16 +7,14 @@ import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { Textarea } from '@/ui/shadcn/textarea'
 import { Checkbox } from '@/ui/shadcn/checkbox'
-import { Plus, Trash2, X } from 'lucide-react'
-import FileUpload from '@/app/(dashboard)/dashboard/addCollege/FileUpload' // Adjust path if needed
+import { Plus, Trash2, X, PlusCircle } from 'lucide-react'
+import FileUpload from '@/app/(dashboard)/dashboard/addCollege/FileUpload'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
-import dynamic from 'next/dynamic'
 import { Select } from '@/ui/shadcn/select'
-
-const CKEditor = dynamic(() => import('@/ui/molecules/ck-editor/CKStable'), {
-    ssr: false
-})
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
+import SearchSelectCreate from '@/ui/shadcn/search-select-create'
+import { fetchCourses, createOrUpdateConsultancy } from '@/app/(dashboard)/dashboard/consultancy/actions'
 
 export default function CreateUpdateConsultancy({
     isOpen,
@@ -25,13 +23,8 @@ export default function CreateUpdateConsultancy({
     initialData = null
 }) {
     const [loading, setLoading] = useState(false)
-    const [uploadedFiles, setUploadedFiles] = useState({
-        featured: '',
-        logo: ''
-    })
-    const [collegeSearch, setCollegeSearch] = useState('')
-    const [searchResults, setSearchResults] = useState([])
-    const [selectedColleges, setSelectedColleges] = useState([])
+    const [selectedCourses, setSelectedCourses] = useState([])
+    const [selectedDestinations, setSelectedDestinations] = useState([])
 
     const {
         register,
@@ -64,71 +57,11 @@ export default function CreateUpdateConsultancy({
         }
     })
 
-    const {
-        fields: destinationFeilds,
-        append: appendDestination,
-        remove: removeDestination
-    } = useFieldArray({ control, name: 'destination' })
 
     // Initialize form when opening
     useEffect(() => {
         if (isOpen && initialData) {
-            // EDIT MODE: Populate form
             const consultancy = initialData
-            setValue('title', consultancy.title)
-            setValue('description', consultancy.description || '')
-            setValue('website_url', consultancy.website_url || '')
-            setValue('google_map_url', consultancy.google_map_url || '')
-            setValue('video_url', consultancy.video_url || '')
-            setValue('map_type', consultancy.map_type || '')
-
-
-            // Parse Destination
-            const parsedDestination = Array.isArray(consultancy.destination)
-                ? consultancy.destination
-                : typeof consultancy.destination === 'string'
-                    ? (() => {
-                        try {
-                            return JSON.parse(consultancy.destination)
-                        } catch {
-                            return []
-                        }
-                    })()
-                    : []
-            const destinationForForm = (
-                Array.isArray(parsedDestination) ? parsedDestination : []
-            ).map((d) =>
-                typeof d === 'string' ? { country: d } : { country: d?.country ?? '' }
-            )
-            setValue(
-                'destination',
-                destinationForForm.length ? destinationForForm : []
-            )
-
-            // Parse Address
-            try {
-                const address = typeof consultancy.address === 'string'
-                    ? JSON.parse(consultancy.address)
-                    : consultancy.address || {}
-                setValue('address', address)
-            } catch (e) {
-                setValue('address', { street: '', city: '', state: '', zip: '' })
-            }
-
-            // Parse Contact
-            const parsedContact = consultancy.contact
-                ? typeof consultancy.contact === 'string'
-                    ? JSON.parse(consultancy.contact)
-                    : consultancy.contact
-                : ['', '']
-            setValue(
-                'contact',
-                parsedContact.length >= 2
-                    ? parsedContact
-                    : [...parsedContact, ...Array(2 - parsedContact.length).fill('')]
-            )
-
-            setValue('pinned', consultancy.pinned)
 
             // Handle Courses/Colleges
             if (consultancy.consultancyCourses) {
@@ -136,149 +69,102 @@ export default function CreateUpdateConsultancy({
                     id: c.id,
                     title: c.title
                 }))
-                setSelectedColleges(consultData)
-                setValue(
-                    'courses',
-                    consultData.map((c) => c.id)
-                )
+                setSelectedCourses(consultData)
+                setValue('courses', consultData.map((c) => c.id))
             } else {
-                setSelectedColleges([])
+                setSelectedCourses([])
                 setValue('courses', [])
             }
 
-            setUploadedFiles({
-                featured: consultancy.featured_image || '',
-                logo: consultancy.logo || ''
+            // Parse Destination
+            let parsedDestination = []
+            try {
+                parsedDestination = Array.isArray(consultancy.destination)
+                    ? consultancy.destination
+                    : typeof consultancy.destination === 'string'
+                        ? JSON.parse(consultancy.destination)
+                        : []
+            } catch (e) {
+                parsedDestination = []
+            }
+
+            const destinationForForm = (Array.isArray(parsedDestination) ? parsedDestination : [])
+                .map((d) => {
+                    const title = typeof d === 'string' ? d : (d?.country || d?.title || '')
+                    return { id: title, title: title }
+                }).filter(d => d.id)
+
+            setSelectedDestinations(destinationForForm)
+            setValue('destination', destinationForForm.map(d => d.title))
+
+            // Parse Address
+            let address = { street: '', city: '', state: '', zip: '' }
+            try {
+                address = typeof consultancy.address === 'string'
+                    ? JSON.parse(consultancy.address)
+                    : consultancy.address || address
+            } catch (e) { }
+
+            // Parse Contact
+            let parsedContact = ['', '']
+            try {
+                const contactData = consultancy.contact
+                    ? typeof consultancy.contact === 'string'
+                        ? JSON.parse(consultancy.contact)
+                        : consultancy.contact
+                    : []
+                parsedContact = Array.isArray(contactData) ? contactData : []
+                if (parsedContact.length < 2) {
+                    parsedContact = [...parsedContact, ...Array(2 - parsedContact.length).fill('')]
+                }
+            } catch (e) { }
+
+            reset({
+                title: consultancy.title || '',
+                description: consultancy.description || '',
+                website_url: consultancy.website_url || '',
+                google_map_url: consultancy.google_map_url || '',
+                video_url: consultancy.video_url || '',
+                map_type: consultancy.map_type || '',
+                destination: destinationForForm.length ? destinationForForm : [],
+                address: address,
+                contact: parsedContact,
+                pinned: consultancy.pinned || 0,
+                featured_image: consultancy.featured_image || '',
+                logo: consultancy.logo || '',
+                courses: consultancy.consultancyCourses?.map(c => c.id) || []
             })
         } else if (isOpen && !initialData) {
-            // CREATE MODE: Reset form
             reset({
                 title: '',
-                destination: [],
-                address: {
-                    street: '',
-                    city: '',
-                    state: '',
-                    zip: ''
-                },
-                description: '',
-                contact: ['', ''],
-                website_url: '',
-                google_map_url: '',
-                map_type: "",
                 video_url: '',
                 featured_image: '',
                 logo: '',
                 pinned: 0,
                 courses: []
             })
-            setSelectedColleges([])
-            setUploadedFiles({ featured: '', logo: '' })
+            setSelectedCourses([])
+            setSelectedDestinations([])
         }
     }, [isOpen, initialData, reset, setValue])
-
-    const searchCollege = async (e) => {
-        const query = e.target.value
-        setCollegeSearch(query)
-        if (query.length < 2) {
-            setSearchResults([])
-            return
-        }
-
-        try {
-            const response = await authFetch(
-                `${process.env.baseUrl}/course?q=${query}`
-            )
-            const data = await response.json()
-            setSearchResults(data.items || [])
-        } catch (error) {
-            console.error('College Search Error:', error)
-            toast.error('Failed to search colleges')
-        }
-    }
-
-    const addCollege = (college) => {
-        if (!selectedColleges.some((c) => c.id === college.id)) {
-            const newColleges = [...selectedColleges, college]
-            setSelectedColleges(newColleges)
-            setValue('courses', newColleges.map((c) => c.id))
-        }
-        setCollegeSearch('')
-        setSearchResults([])
-    }
-
-    const removeCollege = (collegeId) => {
-        const newColleges = selectedColleges.filter((c) => c.id !== collegeId)
-        setSelectedColleges(newColleges)
-        setValue('courses', newColleges.map((c) => c.id))
-    }
 
     const onSubmit = async (data) => {
         try {
             setLoading(true)
             const payload = {
-                title: data.title?.trim() || '',
-                destination: Array.isArray(data.destination)
-                    ? data.destination
-                        .map((d) => (typeof d === 'string' ? d : (d?.country ?? '')))
-                        .filter(Boolean)
-                    : [],
-                address: data.address || {},
-                map_type: data.map_type,
-                featured_image: uploadedFiles.featured || '',
-                logo:
-                    uploadedFiles.logo && uploadedFiles.logo.trim() !== ''
-                        ? uploadedFiles.logo.trim()
-                        : null,
-                description:
-                    data.description && data.description.trim() !== ''
-                        ? data.description.trim()
-                        : null,
-                contact: Array.isArray(data.contact)
-                    ? data.contact.filter((c) => c && c.trim() !== '')
-                    : [],
-                website_url:
-                    data.website_url && data.website_url.trim() !== ''
-                        ? data.website_url.trim()
-                        : null,
-                google_map_url:
-                    data.google_map_url && data.google_map_url.trim() !== ''
-                        ? data.google_map_url.trim()
-                        : null,
-                video_url:
-                    data.video_url && data.video_url.trim() !== ''
-                        ? data.video_url.trim()
-                        : null,
-                pinned: data.pinned ? 1 : 0,
-                courses: Array.isArray(data.courses)
-                    ? data.courses
-                    : data.courses
-                        ? [data.courses]
-                        : []
+                ...data,
+                title: data.title?.trim(),
+                contact: data.contact.filter(Boolean),
+                courses: Array.isArray(data.courses) ? data.courses : (data.courses ? [data.courses] : []),
+                destination: selectedDestinations.map(d => d.title).filter(Boolean)
             }
 
             if (initialData?.id) {
                 payload.id = initialData.id
             }
 
-            const url = `${process.env.baseUrl}/consultancy`
-            const method = 'POST' // Same endpoint for create and update based on payload ID? Yes as per old code
-
-            const response = await authFetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            })
-            await response.json()
-
-            toast.success(
-                initialData
-                    ? 'Consultancy updated successfully!'
-                    : 'Consultancy created successfully!'
-            )
-
+            await createOrUpdateConsultancy(payload)
+            toast.success(initialData ? 'Consultancy updated successfully!' : 'Consultancy created successfully!')
             onSuccess?.()
             onClose()
         } catch (error) {
@@ -292,355 +178,224 @@ export default function CreateUpdateConsultancy({
         <Dialog
             isOpen={isOpen}
             onClose={onClose}
+            closeOnOutsideClick={false}
             className='max-w-5xl'
         >
-            <DialogHeader>
-                <DialogTitle>{initialData ? 'Edit Consultancy' : 'Add Consultancy'}</DialogTitle>
-                <DialogClose onClick={onClose} />
-            </DialogHeader>
-            <DialogContent>
-                <div className='container mx-auto p-1 flex flex-col max-h-[calc(100vh-200px)]'>
-                    <form
-                        onSubmit={handleSubmit(onSubmit)}
-                        className='flex flex-col flex-1 overflow-hidden'
-                    >
-                        <div className='flex-1 overflow-y-auto space-y-8 pr-2'>
-                            {/* Basic info */}
-                            <div className='space-y-4'>
-                                <h3 className='text-sm font-semibold text-gray-900 border-b pb-2'>
-                                    Basic Information
-                                </h3>
+            <DialogContent className='max-w-5xl max-h-[90vh] flex flex-col p-0'>
+                <DialogHeader className='px-6 py-4 border-b'>
+                    <DialogTitle className="text-lg font-semibold text-gray-900">
+                        {initialData ? 'Edit Consultancy' : 'Add New Consultancy'}
+                    </DialogTitle>
+                    <DialogClose onClick={onClose} />
+                </DialogHeader>
+
+                <div className='flex-1 overflow-y-auto p-6'>
+                    <form id="consultancy-form" onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
+                        {/* Basic Information */}
+                        <section className="space-y-4">
+                            <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Basic Information</h3>
+                            <div className='grid grid-cols-1 gap-6'>
                                 <div className='space-y-2'>
-                                    <Label
-                                        htmlFor='title'
-                                        className='after:content-["*"] after:ml-0.5 after:text-destructive'
-                                    >
-                                        Title
-                                    </Label>
+                                    <Label required>Consultancy Title</Label>
                                     <Input
-                                        id='title'
-                                        placeholder='Consultancy name'
-                                        {...register('title', {
-                                            required: 'Title is required',
-                                            minLength: {
-                                                value: 3,
-                                                message: 'Title must be at least 3 characters'
-                                            }
-                                        })}
-                                        className={errors.title ? 'border-destructive' : ''}
+                                        placeholder='Enter consultancy name'
+                                        {...register('title', { required: 'Title is required' })}
                                     />
-                                    {errors.title && (
-                                        <p className='text-sm text-destructive'>
-                                            {errors.title.message}
-                                        </p>
-                                    )}
+                                    {errors.title && <p className='text-xs text-red-500'>{errors.title.message}</p>}
                                 </div>
                                 <div className='space-y-2'>
-                                    <Label htmlFor='description'>Description</Label>
-                                    <CKEditor
-                                        value={watch('description') || ''}
-                                        onChange={(data) => setValue('description', data)}
-                                        id='consultancy-description-editor'
+                                    <Label>Description</Label>
+                                    <TipTapEditor
+                                        value={watch('description')}
+                                        onChange={(val) => setValue('description', val)}
+                                        placeholder='Detailed description of services...'
                                     />
                                 </div>
                             </div>
+                        </section>
 
-                            {/* Destinations */}
-                            <div className='space-y-4'>
-                                <div className='flex justify-between items-center'>
-                                    <h3 className='text-sm font-semibold text-gray-900 border-b pb-2 flex-1'>
-                                        Destinations (Countries)
-                                    </h3>
-                                    <Button
-                                        type='button'
-                                        variant='outline'
-                                        size='sm'
-                                        onClick={() => appendDestination({ country: '' })}
-                                        className='shrink-0 ml-4'
-                                    >
-                                        <Plus className='w-4 h-4 mr-1' />
-                                        Add Country
-                                    </Button>
-                                </div>
-                                <div className='space-y-3'>
-                                    {destinationFeilds.map((field, index) => (
-                                        <div key={field.id} className='flex gap-3 items-end'>
-                                            <div className='flex-1 space-y-2'>
-                                                <Label htmlFor={`destination-${index}`}>
-                                                    Country
-                                                </Label>
-                                                <Input
-                                                    id={`destination-${index}`}
-                                                    {...register(`destination.${index}.country`)}
-                                                    placeholder=''
-                                                />
-                                            </div>
-                                            {index > 0 && (
-                                                <Button
-                                                    type='button'
-                                                    variant='outline'
-                                                    size='icon'
-                                                    onClick={() => removeDestination(index)}
-                                                    className='shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10'
-                                                >
-                                                    <Trash2 className='w-4 h-4' />
-                                                </Button>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Address */}
-                            <div className='space-y-4'>
-                                <h3 className='text-sm font-semibold text-gray-900 border-b pb-2'>
-                                    Address
-                                </h3>
-                                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                                    <div className='space-y-2'>
-                                        <Label htmlFor='address.street'>Street</Label>
-                                        <Input
-                                            id='address.street'
-                                            {...register('address.street')}
-                                            placeholder='Street'
-                                        />
-                                    </div>
-                                    <div className='space-y-2'>
-                                        <Label htmlFor='address.city'>City</Label>
-                                        <Input
-                                            id='address.city'
-                                            {...register('address.city')}
-                                            placeholder='City'
-                                        />
-                                    </div>
-                                    <div className='space-y-2'>
-                                        <Label htmlFor='address.state'>State</Label>
-                                        <Input
-                                            id='address.state'
-                                            {...register('address.state')}
-                                            placeholder='State'
-                                        />
-                                    </div>
-                                    <div className='space-y-2'>
-                                        <Label htmlFor='address.zip'>ZIP</Label>
-                                        <Input
-                                            id='address.zip'
-                                            {...register('address.zip')}
-                                            placeholder='ZIP'
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Courses */}
-                            <div className='space-y-4'>
-                                <h3 className='text-sm font-semibold text-gray-900 border-b pb-2'>
-                                    Courses
-                                </h3>
-                                <div className='flex flex-wrap gap-2 mb-3'>
-                                    {selectedColleges.map((college) => (
-                                        <span
-                                            key={college.id}
-                                            className='inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary'
-                                        >
-                                            {college.title}
-                                            <button
-                                                type='button'
-                                                onClick={() => removeCollege(college.id)}
-                                                className='rounded-full hover:bg-primary/20 p-0.5'
-                                                aria-label='Remove'
-                                            >
-                                                <X className='w-3.5 h-3.5' />
-                                            </button>
-                                        </span>
-                                    ))}
-                                </div>
-                                <div className='relative space-y-2'>
-                                    <Label htmlFor='course-search'>Search courses</Label>
-                                    <Input
-                                        id='course-search'
-                                        type='text'
-                                        value={collegeSearch}
-                                        onChange={searchCollege}
-                                        placeholder='Type to search and add courses...'
-                                    />
-                                    {searchResults.length > 0 && (
-                                        <ul className='absolute z-10 w-full mt-1 rounded-md border bg-popover shadow-md max-h-60 overflow-auto py-1'>
-                                            {searchResults.map((college) => (
-                                                <li key={college.id}>
-                                                    <button
-                                                        type='button'
-                                                        onClick={() => addCollege(college)}
-                                                        className='w-full px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground'
-                                                    >
-                                                        {college.title}
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Contact & URLs */}
-                            <div className='space-y-4'>
-                                <h3 className='text-sm font-semibold text-gray-900 border-b pb-2'>
-                                    Contact & Links
-                                </h3>
-                                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                                    <div className='space-y-2'>
-                                        <Label htmlFor='contact.0'>Contact 1</Label>
-                                        <Input
-                                            id='contact.0'
-                                            {...register('contact.0')}
-                                            placeholder='Phone or email'
-                                        />
-                                    </div>
-                                    <div className='space-y-2'>
-                                        <Label htmlFor='contact.1'>Contact 2</Label>
-                                        <Input
-                                            id='contact.1'
-                                            {...register('contact.1')}
-                                            placeholder='Phone or email'
-                                        />
-                                    </div>
-                                </div>
-                                <div className='space-y-2'>
-                                    <Label htmlFor='website_url'>Website URL</Label>
-                                    <Input
-                                        id='website_url'
-                                        type='url'
-                                        {...register('website_url')}
-                                        placeholder='https://example.com'
-                                    />
-                                </div>
-                                <div className='space-y-2'>
-                                    <Label htmlFor='google_map_url'>
-                                        {watch('map_type') === 'embed_map_url' ? 'Embed Map URL' : 'Google Map URL'}
-                                    </Label>
-                                    <Textarea
-                                        id='google_map_url'
-                                        {...register('google_map_url')}
-                                        placeholder={
-                                            watch('map_type') === 'embed_map_url'
-                                                ? 'Paste the iframe src URL'
-                                                : 'Paste Google Maps embed iframe code or URL'
-                                        }
-                                        rows={3}
-                                        className='resize-none'
-                                    />
-                                    <p className='text-xs text-muted-foreground'>
-                                        {watch('map_type') === 'embed_map_url'
-                                            ? 'Enter the src attribute from the Google Maps embed code'
-                                            : 'Paste the iframe code from Google Maps embed'}
-                                    </p>
-                                </div>
-                                {/* Dropdown select for map_type */}
-                                <div className='space-y-2'>
-                                    <Label htmlFor='map_type'>Map Type</Label>
-                                    <Controller
-                                        name='map_type'
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Select
-                                                id='map_type'
-                                                value={field.value}
-                                                onChange={(e) => field.onChange(e.target.value)}
-                                            >
-                                                <option value=''>Select Map Type</option>
-                                                <option value='embed_map_url'>Embed Map URL</option>
-                                                <option value='google_map_url'>Google Map URL</option>
-                                            </Select>
-                                        )}
-                                    />
-                                </div>
-                                <div className='space-y-2'>
-                                    <Label htmlFor='video_url'>YouTube Video URL</Label>
-                                    <Input
-                                        id='video_url'
-                                        type='url'
-                                        {...register('video_url')}
-                                        placeholder='https://www.youtube.com/watch?v=...'
-                                    />
-                                    <p className='text-xs text-muted-foreground'>
-                                        Enter a YouTube video URL
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Pinned & Media */}
-                            <div className='space-y-4'>
-                                <h3 className='text-sm font-semibold text-gray-900 border-b pb-2'>
-                                    Options & Media
-                                </h3>
-                                <div className='flex items-center space-x-2'>
-                                    <Controller
-                                        name='pinned'
-                                        control={control}
-                                        render={({ field }) => (
-                                            <Checkbox
-                                                id='pinned'
-                                                checked={!!field.value}
-                                                onCheckedChange={(v) => field.onChange(v ? 1 : 0)}
-                                            />
-                                        )}
-                                    />
-                                    <Label
-                                        htmlFor='pinned'
-                                        className='font-normal cursor-pointer'
-                                    >
-                                        Pin this consultancy
-                                    </Label>
-                                </div>
-                                <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                        {/* Options & Media */}
+                        <section className="space-y-4">
+                            <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Media & Status</h3>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                                <div className='space-y-4'>
                                     <div className='space-y-2'>
                                         <Label>Logo</Label>
                                         <FileUpload
-                                            label=''
-                                            onUploadComplete={(url) => {
-                                                setUploadedFiles((prev) => ({ ...prev, logo: url }))
-                                                setValue('logo', url)
-                                            }}
-                                            defaultPreview={uploadedFiles.logo}
+                                            onUploadComplete={(url) => setValue('logo', url)}
+                                            defaultPreview={watch('logo')}
                                         />
                                     </div>
-                                    <div className='space-y-2'>
-                                        <Label className='after:content-["*"] after:ml-0.5 after:text-destructive'>
-                                            Featured Image
-                                        </Label>
-                                        <FileUpload
-                                            label=''
-                                            onUploadComplete={(url) => {
-                                                setUploadedFiles((prev) => ({
-                                                    ...prev,
-                                                    featured: url
-                                                }))
-                                                setValue('featured_image', url)
-                                            }}
-                                            defaultPreview={uploadedFiles.featured}
+                                    <div className='flex items-center gap-3 p-3 bg-gray-50 rounded-lg border'>
+                                        <Controller
+                                            name='pinned'
+                                            control={control}
+                                            render={({ field }) => (
+                                                <Checkbox
+                                                    id='pinned'
+                                                    checked={!!field.value}
+                                                    onCheckedChange={(v) => field.onChange(v ? 1 : 0)}
+                                                />
+                                            )}
                                         />
+                                        <Label htmlFor='pinned' className='font-medium cursor-pointer'>
+                                            Pin this consultancy to top
+                                        </Label>
+                                    </div>
+                                </div>
+                                <div className='space-y-2'>
+                                    <Label required>Featured Image</Label>
+                                    <FileUpload
+                                        onUploadComplete={(url) => setValue('featured_image', url)}
+                                        defaultPreview={watch('featured_image')}
+                                    />
+                                    <input type="hidden" {...register('featured_image', { required: 'Featured image is required' })} />
+                                    {errors.featured_image && <p className='text-xs text-red-500'>{errors.featured_image.message}</p>}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Destinations & Courses */}
+                        <section className="space-y-4">
+                            <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Destinations & Courses</h3>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                                <div className='space-y-4'>
+                                    <Label>Target Destinations</Label>
+                                    <SearchSelectCreate
+                                        allowCreate={true}
+                                        onSearch={() => []}
+                                        onCreate={(query) => ({ id: query, title: query })}
+                                        onSelect={(item) => {
+                                            const current = selectedDestinations || []
+                                            if (!current.some(d => d.id === item.id)) {
+                                                const updated = [...current, item]
+                                                setSelectedDestinations(updated)
+                                                setValue('destination', updated.map(d => d.title))
+                                            }
+                                        }}
+                                        onRemove={(item) => {
+                                            const updated = selectedDestinations.filter(d => d.id !== item.id)
+                                            setSelectedDestinations(updated)
+                                            setValue('destination', updated.map(d => d.title))
+                                        }}
+                                        selectedItems={selectedDestinations}
+                                        placeholder="Add countries..."
+                                        isMulti={true}
+                                        displayKey="title"
+                                    />
+                                </div>
+
+                                <div className='space-y-2'>
+                                    <Label>Courses Offered</Label>
+                                    <SearchSelectCreate
+                                        onSearch={fetchCourses}
+                                        onSelect={(item) => {
+                                            const current = watch('courses') || []
+                                            if (!current.includes(item.id)) {
+                                                setValue('courses', [...current, item.id])
+                                                setSelectedCourses(prev => [...prev, item])
+                                            }
+                                        }}
+                                        onRemove={(item) => {
+                                            const current = watch('courses') || []
+                                            setValue('courses', current.filter(id => id !== item.id))
+                                            setSelectedCourses(prev => prev.filter(c => c.id !== item.id))
+                                        }}
+                                        selectedItems={selectedCourses}
+                                        placeholder="Search and add courses..."
+                                        isMulti={true}
+                                        displayKey="title"
+                                    />
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Contact & Location */}
+                        <section className="space-y-4">
+                            <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Contact & Location</h3>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                                <div className='space-y-4'>
+                                    <div className='grid grid-cols-2 gap-4'>
+                                        <div className='space-y-2'>
+                                            <Label>Contact Number 1</Label>
+                                            <Input {...register('contact.0')} placeholder='Phone 1' />
+                                        </div>
+                                        <div className='space-y-2'>
+                                            <Label>Contact Number 2</Label>
+                                            <Input {...register('contact.1')} placeholder='Phone 2' />
+                                        </div>
+                                    </div>
+                                    <div className='space-y-2'>
+                                        <Label>Website URL</Label>
+                                        <Input {...register('website_url')} type='url' placeholder='https://...' />
+                                    </div>
+                                    <div className='space-y-2'>
+                                        <Label>YouTube Video URL</Label>
+                                        <Input {...register('video_url')} type='url' placeholder='https://www.youtube.com/watch?v=...' />
+                                    </div>
+                                </div>
+
+                                <div className='space-y-4'>
+                                    <div className='grid grid-cols-2 gap-4'>
+                                        <div className='space-y-2'>
+                                            <Label>City</Label>
+                                            <Input {...register('address.city')} placeholder='City' />
+                                        </div>
+                                        <div className='space-y-2'>
+                                            <Label>State</Label>
+                                            <Input {...register('address.state')} placeholder='State' />
+                                        </div>
+                                    </div>
+                                    <div className='space-y-2'>
+                                        <Label>Street Address</Label>
+                                        <Input {...register('address.street')} placeholder='Street, ZIP, etc.' />
+                                    </div>
+                                    <div className='grid grid-cols-2 gap-4'>
+                                        <div className='space-y-2'>
+                                            <Label>Map Type</Label>
+                                            <Controller
+                                                name='map_type'
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <Select
+                                                        value={field.value}
+                                                        onChange={(e) => field.onChange(e.target.value)}
+                                                    >
+                                                        <option value=''>Select Type</option>
+                                                        <option value='embed_map_url'>Embed URL</option>
+                                                        <option value='google_map_url'>Google Map URL</option>
+                                                    </Select>
+                                                )}
+                                            />
+                                        </div>
+                                        <div className='space-y-2'>
+                                            <Label>Map Link/Code</Label>
+                                            <Input {...register('google_map_url')} placeholder='URL or Iframe src' />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className='sticky bottom-0 bg-background border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
-                            <Button
-                                type='button'
-                                variant='outline'
-                                onClick={onClose}
-                            >
-                                Cancel
-                            </Button>
-                            <Button type='submit' disabled={loading}>
-                                {loading
-                                    ? 'Processing...'
-                                    : initialData
-                                        ? 'Update Consultancy'
-                                        : 'Create Consultancy'}
-                            </Button>
-                        </div>
+                        </section>
                     </form>
+                </div>
+
+                <div className='sticky bottom-0 bg-white border-t p-4 px-6 flex justify-end gap-3'>
+                    <Button
+                        type='button'
+                        variant='outline'
+                        onClick={onClose}
+                        disabled={loading}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        type='submit'
+                        form="consultancy-form"
+                        disabled={loading}
+                        className="bg-[#387cae] hover:bg-[#387cae]/90"
+                    >
+                        {loading ? 'Saving...' : initialData ? 'Update Consultancy' : 'Create Consultancy'}
+                    </Button>
                 </div>
             </DialogContent>
         </Dialog>

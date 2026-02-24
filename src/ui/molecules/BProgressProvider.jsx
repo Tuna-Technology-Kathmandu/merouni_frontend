@@ -1,7 +1,7 @@
 'use client'
 
 import { ProgressProvider as BProgress } from '@bprogress/next/app'
-import {THEME_BLUE } from "@/constants/constants"
+import { THEME_BLUE } from "@/constants/constants"
 
 export default function BProgressProvider({ children }) {
     return (

@@ -179,10 +179,12 @@ export default function BlogsManager() {
 
   useEffect(() => {
     setHeading('Blogs Management')
-    const page = searchParams.get('page') || 1
-    loadData(page)
-    return () => setHeading(null)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      setHeading(null)
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort('Component unmounted')
+      }
+    }
   }, [setHeading])
 
   // Check for 'add' query parameter and open modal
@@ -208,8 +210,13 @@ export default function BlogsManager() {
 
   const loadData = async (page = 1, status = statusFilter) => {
     try {
+      setLoading(true)
       if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
+        try {
+          abortControllerRef.current.abort('New request started')
+        } catch (e) {
+          // Ignore abort errors
+        }
       }
       abortControllerRef.current = new AbortController()
 
@@ -231,8 +238,6 @@ export default function BlogsManager() {
         total: response.pagination.totalCount
       })
     } catch (err) {
-      if (err.name === 'AbortError') return
-      toast.error('Failed to load blogs')
       console.error('Error loading blogs data:', err)
     } finally {
       if (abortControllerRef.current?.signal?.aborted === false) {
@@ -242,8 +247,9 @@ export default function BlogsManager() {
   }
 
   useEffect(() => {
-    loadData(1, statusFilter)
-  }, [statusFilter])
+    const page = parseInt(searchParams.get('page')) || 1
+    loadData(page, statusFilter)
+  }, [statusFilter, searchParams])
 
 
   const createBlogs = async (data) => {
@@ -324,7 +330,7 @@ export default function BlogsManager() {
     }
 
     try {
-      let url = `${process.env.baseUrl}/blogs?q=${query}`
+      let url = `${process.env.baseUrl}/blogs?q=${query}&sortBy=createdAt&order=DESC`
       if (statusFilter && statusFilter !== 'all') {
         url += `&status=${statusFilter}`
       }
@@ -460,12 +466,6 @@ export default function BlogsManager() {
     setSelectedBlog(null)
   }
 
-  if (loading)
-    return (
-      <div className='mx-auto'>
-        <Loader />
-      </div>
-    )
 
   return (
     <>
@@ -515,6 +515,7 @@ export default function BlogsManager() {
             onPageChange={(newPage) => loadData(newPage)}
             onSearch={handleSearch}
             showSearch={false}
+            loading={loading}
           />
         </div>
       </div>

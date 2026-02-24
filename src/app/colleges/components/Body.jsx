@@ -1,7 +1,9 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useRouter } from '@bprogress/next/app'
+import Link from 'next/link'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { debounce } from 'lodash'
 import { Search, Building2, School, X } from 'lucide-react'
 import { FaExpandAlt } from 'react-icons/fa'
@@ -336,16 +338,6 @@ const CollegeFinder = () => {
     init()
   }, [])
 
-  const fetchCollegesData = useCallback(
-    async () => { // Removed page parameter
-      // This function is now primarily for fetching based on selectedFilters when no search query is active
-      // The actual page number will be read from searchParams within the useEffect that calls this.
-      // It's kept for clarity, but its direct usage for pagination is now via the main data fetching useEffect.
-      // The page parameter will be passed from the useEffect that calls this.
-      // This function will be called by the main data fetching useEffect, which will get the page from searchParams.
-    },
-    [selectedFilters]
-  )
 
   // Sync state on URL change (e.g. Back button)
   useEffect(() => {

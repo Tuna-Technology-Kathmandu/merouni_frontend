@@ -1,5 +1,6 @@
 'use client'
 import { Search, X } from 'lucide-react'
+import { THEME_BLUE } from '@/constants/constants'
 
 const SearchInput = ({
     value,
@@ -22,7 +23,19 @@ const SearchInput = ({
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
-                className={`w-full ${showIcon ? 'pl-10' : 'pl-4'} ${onClear && value ? 'pr-9' : 'pr-4'} py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A6FA7]/20 focus:border-[#0A6FA7] transition-all bg-white ${inputClassName}`}
+                className={`w-full ${showIcon ? 'pl-10' : 'pl-4'} ${onClear && value ? 'pr-9' : 'pr-4'} py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 transition-all bg-white ${inputClassName}`}
+                style={{
+                    '--tw-ring-color': `${THEME_BLUE}33`,
+                    borderColor: value ? THEME_BLUE : undefined
+                }}
+                onFocus={(e) => {
+                    e.target.style.borderColor = THEME_BLUE;
+                    e.target.style.boxShadow = `0 0 0 2px ${THEME_BLUE}33`;
+                }}
+                onBlur={(e) => {
+                    e.target.style.borderColor = '';
+                    e.target.style.boxShadow = '';
+                }}
                 {...props}
             />
             {onClear && value && (

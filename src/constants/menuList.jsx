@@ -35,7 +35,7 @@ export const menuItems = [
         icon: <FaHome className='text-xl' />,
         label: 'Home',
         href: '/dashboard',
-        visible: ['admin', 'editor', 'student', 'institution', 'consultancy',"agent"]
+        visible: ['admin', 'editor', 'student', 'institution', 'consultancy', "agent"]
       },
       {
         icon: <FaGlobe className='text-xl' />,
@@ -89,14 +89,14 @@ export const menuItems = [
           }
         ]
       },
-        {
+      {
         icon: <HandCoins className='text-xl' />,
         label: 'Wishlist',
         href: '/dashboard/wishlist',
         visible: ['student']
       },
       {
-        label:"Applied Colleges",
+        label: "Applied Colleges",
         icon: <IoSchoolSharp className='text-xl' />,
         href: '/dashboard/applied-colleges',
         visible: ['student']
@@ -218,7 +218,7 @@ export const menuItems = [
         href: '/dashboard/news',
         visible: ['admin', 'editor']
       },
-     
+
       {
         icon: <MdBackHand />,
         label: 'Refer Students',
@@ -239,7 +239,7 @@ export const menuItems = [
           }
         ]
       },
-           {
+      {
         icon: <MdBackHand />,
         label: 'Refered Students',
         href: '/dashboard/referedStudent',
@@ -344,13 +344,7 @@ export const menuItems = [
         href: '/dashboard/degrees',
         visible: ['admin', 'editor']
       },
-
-      // {
-      //   icon: <FaChalkboardTeacher className='text-xl' />,
-      //   label: 'Faculty',
-      //   href: '/dashboard/faculty',
-      //   visible: ['admin', 'editor']
-      // },
+      
       {
         icon: <HandCoins className='text-xl' />,
         label: 'Set Referral Point',
@@ -361,6 +355,12 @@ export const menuItems = [
         icon: <IoSettingsOutline className='text-xl' />,
         label: 'Site Control',
         href: '/dashboard/site-control',
+        visible: ['admin']
+      },
+      {
+        icon: <MdOutlineDescription className='text-xl' />,
+        label: 'Database Export',
+        href: '/dashboard/database-export',
         visible: ['admin']
       }
     ]

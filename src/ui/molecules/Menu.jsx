@@ -181,15 +181,15 @@ const Menu = ({ isCollapsed = false }) => {
   const [expandedMenus, setExpandedMenus] = useState({})
 
   // Parse Role
-  const role = useSelector((state) => {
-    const roleData = state.user?.data?.roles || state.user?.data?.role
-    const parsedRole = typeof roleData === 'string' ? destr(roleData) : roleData
+  const rawRole = useSelector((state) => state.user?.data?.role)
+  const role = useMemo(() => {
+    const parsedRole = typeof rawRole === 'string' ? destr(rawRole) : rawRole
     if (!parsedRole || typeof parsedRole !== 'object') return {}
     return Object.entries(parsedRole).reduce((acc, [key, value]) => {
       acc[key] = value === true || value === 'true'
       return acc
     }, {})
-  })
+  }, [rawRole])
 
   // Filter Items Logic (Access)
   const filteredMenuItems = useMemo(() => {

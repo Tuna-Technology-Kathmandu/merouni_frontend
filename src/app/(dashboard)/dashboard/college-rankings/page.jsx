@@ -1,130 +1,77 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
-import { authFetch } from '@/app/utils/authFetch'
+
+import { useState, useEffect, useCallback } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import { Edit2, Trash2, Plus, GripVertical, X, ChevronDown } from 'lucide-react'
+import {
+  Edit2,
+  Trash2,
+  Plus,
+  GripVertical,
+  X,
+  Search,
+  Trophy,
+  Layers,
+  Loader2,
+  AlertCircle
+} from 'lucide-react'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogClose
 } from '@/ui/shadcn/dialog'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import Image from 'next/image'
 import { Button } from '@/ui/shadcn/button'
+import { Input } from '@/ui/shadcn/input'
+import { Label } from '@/ui/shadcn/label'
+import SearchSelectCreate from '@/ui/shadcn/search-select-create'
+import { cn } from '@/app/lib/utils'
+import * as actions from './actions'
 
 export default function CollegeRankingsPage() {
   const { setHeading } = usePageHeading()
   const [rankings, setRankings] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [deleteProgramId, setDeleteProgramId] = useState(null)
-  const [editingProgramId, setEditingProgramId] = useState(null)
+  const [deleteRankingId, setDeleteRankingId] = useState(null)
+  const [isRemoveRankingDialogOpen, setIsRemoveRankingDialogOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [draggedItem, setDraggedItem] = useState(null)
   const [draggedProgram, setDraggedProgram] = useState(null)
-  const [programs, setPrograms] = useState([])
-  const [colleges, setColleges] = useState([])
   const [selectedProgram, setSelectedProgram] = useState(null)
   const [selectedCollege, setSelectedCollege] = useState(null)
-  const [collegeSearch, setCollegeSearch] = useState('')
-  const [programSearch, setProgramSearch] = useState('')
-  const [showProgramDropdown, setShowProgramDropdown] = useState(false)
-  const programDropdownRef = useRef(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
-  const fetchRankings = async () => {
-    setLoading(true)
+  const loadRankings = useCallback(async () => {
     try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/college-ranking?limit=100`
-      )
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const data = await response.json()
-      // Handle both direct array and items array format
-      if (Array.isArray(data)) {
-        setRankings(data)
-      } else if (data.items && Array.isArray(data.items)) {
-        setRankings(data.items)
-      } else {
-        setRankings([])
-      }
+      setLoading(true)
+      const data = await actions.fetchRankings()
+      setRankings(data)
     } catch (error) {
       toast.error('Failed to fetch rankings')
-      console.error(error)
-      setRankings([])
     } finally {
       setLoading(false)
     }
-  }
-
-  const fetchPrograms = async () => {
-    try {
-      // Fetch all programs without limit
-      const response = await authFetch(
-        `${process.env.baseUrl}/program?limit=1000`
-      )
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const data = await response.json()
-      setPrograms(Array.isArray(data.items) ? data.items : [])
-    } catch (error) {
-      console.error('Failed to fetch programs:', error)
-      setPrograms([])
-    }
-  }
-
-  const fetchColleges = async (search = '') => {
-    try {
-      // Only fetch if a program is selected
-      if (!selectedProgram) {
-        setColleges([])
-        return
-      }
-
-      // Build URL with program_id filter to only get colleges offering this program
-      const baseUrl = `${process.env.baseUrl}/college`
-      const params = new URLSearchParams({
-        program_id: selectedProgram.id.toString(),
-        limit: '100'
-      })
-
-      if (search) {
-        params.append('q', search)
-      }
-
-      const url = `${baseUrl}?${params.toString()}`
-      const response = await authFetch(url)
-      const data = await response.json()
-      setColleges(data.items || [])
-    } catch (error) {
-      console.error('Failed to fetch colleges:', error)
-      setColleges([])
-    }
-  }
+  }, [])
 
   useEffect(() => {
     setHeading('College Rankings')
-    fetchRankings()
-    fetchPrograms()
+    loadRankings()
     return () => setHeading(null)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [setHeading, loadRankings])
 
   const handleDeleteProgram = async () => {
     if (!deleteProgramId) return
-
     try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/college-ranking/program?program_id=${deleteProgramId}`,
-        { method: 'DELETE' }
-      )
-      await response.json()
+      await actions.deleteProgramRankings(deleteProgramId)
       toast.success('Rankings deleted successfully')
-      fetchRankings()
+      loadRankings()
     } catch (error) {
       toast.error('Failed to delete rankings')
     } finally {
@@ -133,9 +80,34 @@ export default function CollegeRankingsPage() {
     }
   }
 
+  const handleDeleteRankingClick = (rankingId) => {
+    setDeleteRankingId(rankingId)
+    setIsRemoveRankingDialogOpen(true)
+  }
+
+  const handleDeleteRankingConfirm = async () => {
+    if (!deleteRankingId) return
+    try {
+      await actions.deleteRanking(deleteRankingId)
+      toast.success('Ranking removed')
+      loadRankings()
+    } catch (error) {
+      toast.error('Failed to remove ranking')
+    } finally {
+      setIsRemoveRankingDialogOpen(false)
+      setDeleteRankingId(null)
+    }
+  }
+
   const handleDragStart = (e, ranking, programId) => {
     setDraggedItem({ ranking, programId })
     e.dataTransfer.effectAllowed = 'move'
+    // Create a ghost image or style
+    e.target.style.opacity = '0.4'
+  }
+
+  const handleDragEnd = (e) => {
+    e.target.style.opacity = '1'
   }
 
   const handleDragOver = (e) => {
@@ -147,40 +119,30 @@ export default function CollegeRankingsPage() {
     e.preventDefault()
     if (!draggedItem || draggedItem.programId !== programId) return
 
-    const programRankings = rankings.find((r) => r.program?.id === programId)
-    if (!programRankings) return
+    const programGroup = rankings.find((r) => r.program?.id === programId)
+    if (!programGroup) return
 
-    const items = [...programRankings.rankings]
+    const items = [...programGroup.rankings]
     const draggedIndex = items.findIndex((r) => r.id === draggedItem.ranking.id)
     const targetIndex = items.findIndex((r) => r.id === targetRanking.id)
 
-    if (draggedIndex === -1 || targetIndex === -1) return
+    if (draggedIndex === -1 || targetIndex === -1 || draggedIndex === targetIndex) {
+      setDraggedItem(null)
+      return
+    }
 
-    // Reorder array
     const [removed] = items.splice(draggedIndex, 1)
     items.splice(targetIndex, 0, removed)
 
-    // Update ranks
     const updatedRankings = items.map((item, index) => ({
       id: item.id,
       rank: index + 1
     }))
 
     try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/college-ranking/order`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            program_id: programId,
-            rankings: updatedRankings
-          })
-        }
-      )
-      await response.json()
+      await actions.updateRankingOrder(programId, updatedRankings)
       toast.success('Ranking order updated')
-      fetchRankings()
+      loadRankings()
     } catch (error) {
       toast.error('Failed to update ranking order')
     } finally {
@@ -191,60 +153,37 @@ export default function CollegeRankingsPage() {
   const handleProgramDragStart = (e, programGroup) => {
     setDraggedProgram(programGroup)
     e.dataTransfer.effectAllowed = 'move'
-  }
-
-  const handleProgramDragOver = (e) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
+    e.target.style.opacity = '0.4'
   }
 
   const handleProgramDrop = async (e, targetProgramGroup) => {
     e.preventDefault()
-    if (
-      !draggedProgram ||
-      draggedProgram.program?.id === targetProgramGroup.program?.id
-    ) {
+    if (!draggedProgram || draggedProgram.program?.id === targetProgramGroup.program?.id) {
       setDraggedProgram(null)
       return
     }
 
     const items = [...rankings]
-    const draggedIndex = items.findIndex(
-      (r) => r.program?.id === draggedProgram.program?.id
-    )
-    const targetIndex = items.findIndex(
-      (r) => r.program?.id === targetProgramGroup.program?.id
-    )
+    const draggedIndex = items.findIndex((r) => r.program?.id === draggedProgram.program?.id)
+    const targetIndex = items.findIndex((r) => r.program?.id === targetProgramGroup.program?.id)
 
     if (draggedIndex === -1 || targetIndex === -1) {
       setDraggedProgram(null)
       return
     }
 
-    // Reorder array
     const [removed] = items.splice(draggedIndex, 1)
     items.splice(targetIndex, 0, removed)
 
-    // Update program orders
     const updatedProgramOrders = items.map((item, index) => ({
       program_id: item.program?.id,
       program_list_order: index + 1
     }))
 
     try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/college-ranking/program-order`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            programOrders: updatedProgramOrders
-          })
-        }
-      )
-      await response.json()
+      await actions.updateProgramOrder(updatedProgramOrders)
       toast.success('Program order updated')
-      fetchRankings()
+      loadRankings()
     } catch (error) {
       toast.error('Failed to update program order')
     } finally {
@@ -259,105 +198,78 @@ export default function CollegeRankingsPage() {
     }
 
     try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/college-ranking`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            program_id: selectedProgram.id,
-            college_id: selectedCollege.id
-          })
-        }
-      )
-      await response.json()
-      toast.success('College added to ranking successfully')
-      fetchRankings()
-      // Keep modal open and clear only college selection so user can add more colleges
+      setSubmitting(true)
+      await actions.addRanking(selectedProgram.id, selectedCollege.id)
+      toast.success('College added to ranking')
+      loadRankings()
+
+      // Close modal and clear selection
+      setIsEditModalOpen(false)
+      setSelectedProgram(null)
       setSelectedCollege(null)
-      setCollegeSearch('')
     } catch (error) {
       toast.error(error.message || 'Failed to add ranking')
+    } finally {
+      setSubmitting(false)
     }
   }
 
-  const handleOpenEditModal = (program) => {
-    setEditingProgramId(program.id)
-    setSelectedProgram(program)
-    setSelectedCollege(null)
-    setCollegeSearch('')
-    setProgramSearch(program.title || '')
-    setShowProgramDropdown(false)
-    setIsEditModalOpen(true)
-    // Colleges will be fetched automatically via useEffect when selectedProgram is set
+  const filteredRankings = rankings.filter(group =>
+    group.program?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    group.rankings?.some(r => r.college?.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+  )
+
+  const onSearchPrograms = async (q) => {
+    const allRankedProgramIds = rankings.map(r => r.program?.id)
+    const programs = await actions.fetchPrograms(q)
+    // Filter out programs that are already ranked unless we are just adding more to them
+    // Actually, the current modal allows adding colleges to existing programs too.
+    return programs
   }
 
-  const handleDeleteRanking = async (rankingId) => {
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/college-ranking?ranking_id=${rankingId}`,
-        { method: 'DELETE' }
-      )
-      await response.json()
-      toast.success('Ranking deleted successfully')
-      fetchRankings()
-    } catch (error) {
-      toast.error('Failed to delete ranking')
-    }
+  const onSearchColleges = async (q) => {
+    if (!selectedProgram) return []
+    const colleges = await actions.fetchColleges(selectedProgram.id, q)
+
+    // Filter out colleges already ranked for this program
+    const rankedCollegeIds = rankings.find(r => r.program?.id === selectedProgram.id)
+      ?.rankings?.map(r => r.college?.id) || []
+
+    return colleges.filter(c => !rankedCollegeIds.includes(c.id))
   }
 
-  useEffect(() => {
-    // Only fetch colleges if a program is selected
-    if (selectedProgram) {
-      if (collegeSearch) {
-        const timeoutId = setTimeout(() => {
-          fetchColleges(collegeSearch)
-        }, 300)
-        return () => clearTimeout(timeoutId)
-      } else {
-        fetchColleges()
-      }
-    } else {
-      setColleges([])
-    }
-  }, [collegeSearch, selectedProgram])
-
-  // Close program dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        programDropdownRef.current &&
-        !programDropdownRef.current.contains(event.target)
-      ) {
-        setShowProgramDropdown(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
-
-  if (loading) {
+  if (loading && rankings.length === 0) {
     return (
-      <div className='flex items-center justify-center h-64'>
-        <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500'></div>
+      <div className='flex flex-col items-center justify-center h-[60vh] gap-4'>
+        <div className='relative'>
+          <div className='w-16 h-16 rounded-full border-4 border-[#387cae]/10 border-t-[#387cae] animate-spin'></div>
+          <div className='absolute inset-0 flex items-center justify-center'>
+            <Trophy size={20} className='text-[#387cae] animate-pulse' />
+          </div>
+        </div>
+        <p className='text-gray-500 font-medium animate-pulse'>Loading college rankings...</p>
       </div>
     )
   }
 
   return (
-    <>
-      <div className='p-4 w-full'>
-        <div className='flex justify-end items-center mb-6'>
+    <div className='p-6 w-full space-y-6'>
+      {/* Sticky Header */}
+      <div className='sticky top-0 z-20 bg-gray-50/80 backdrop-blur-md pb-4 pt-2 -mt-2'>
+        <div className='flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100'>
+          <div className='relative w-full md:w-96 group'>
+            <Search className='absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#387cae] transition-colors' size={18} />
+            <Input
+              placeholder='Search programs or colleges...'
+              className='pl-11 h-11 rounded-xl border-gray-100 bg-gray-50/50 focus:bg-white transition-all'
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
           <Button
             onClick={() => {
               setSelectedProgram(null)
               setSelectedCollege(null)
-              setCollegeSearch('')
-              setProgramSearch('')
-              setShowProgramDropdown(false)
               setIsEditModalOpen(true)
             }}
           >
@@ -365,356 +277,295 @@ export default function CollegeRankingsPage() {
             Add Ranking
           </Button>
         </div>
-
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-          {Array.isArray(rankings) &&
-            rankings.length > 0 &&
-            rankings.map((programGroup, programIndex) => {
-              if (!programGroup || !programGroup.program) return null
-              return (
-                <div
-                  key={programGroup.program?.id}
-                  draggable
-                  onDragStart={(e) => handleProgramDragStart(e, programGroup)}
-                  onDragOver={handleProgramDragOver}
-                  onDrop={(e) => handleProgramDrop(e, programGroup)}
-                  className='bg-white rounded-lg shadow-md p-6 border border-gray-200 cursor-move hover:shadow-lg transition-shadow'
-                >
-                  <div className='flex justify-between items-start mb-4'>
-                    <div className='flex items-center gap-2'>
-                      <GripVertical className='text-gray-400' size={20} />
-                      <h2 className='text-xl font-semibold text-gray-800'>
-                        {programGroup.program?.title || 'Unknown Program'}
-                      </h2>
-                    </div>
-                    <div className='flex gap-2'>
-                      <button
-                        onClick={() =>
-                          handleOpenEditModal(programGroup.program)
-                        }
-                        className='p-2 text-blue-600 hover:bg-blue-50 rounded'
-                        title='Edit'
-                      >
-                        <Edit2 size={18} />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setDeleteProgramId(programGroup.program?.id)
-                          setIsDialogOpen(true)
-                        }}
-                        className='p-2 text-red-600 hover:bg-red-50 rounded'
-                        title='Delete'
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className='space-y-2'>
-                    {programGroup.rankings?.map((ranking, index) => (
-                      <div
-                        key={ranking.id}
-                        draggable
-                        onDragStart={(e) =>
-                          handleDragStart(e, ranking, programGroup.program?.id)
-                        }
-                        onDragOver={handleDragOver}
-                        onDrop={(e) =>
-                          handleDrop(e, ranking, programGroup.program?.id)
-                        }
-                        className='flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-move border border-gray-200'
-                      >
-                        <GripVertical className='text-gray-400' size={20} />
-                        <span className='font-bold text-blue-600 w-8'>
-                          #{ranking.rank}
-                        </span>
-                        <div className='flex-1 flex items-center gap-3'>
-                          {ranking.college?.college_logo && (
-                            <div className='relative w-10 h-10 rounded-full overflow-hidden'>
-                              <Image
-                                src={ranking.college.college_logo}
-                                alt={ranking.college.name}
-                                fill
-                                className='object-cover'
-                              />
-                            </div>
-                          )}
-                          <span className='text-sm font-medium text-gray-700'>
-                            {ranking.college?.name || 'Unknown College'}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => handleDeleteRanking(ranking.id)}
-                          className='p-1 text-red-600 hover:bg-red-100 rounded'
-                          title='Delete'
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    ))}
-                    {!programGroup.rankings?.length && (
-                      <p className='text-gray-500 text-sm text-center py-4'>
-                        No rankings yet
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-        </div>
-
-        {(!Array.isArray(rankings) || rankings.length === 0) && (
-          <div className='text-center py-12'>
-            <p className='text-gray-500 text-lg'>No rankings found</p>
-            <p className='text-gray-400 text-sm mt-2'>
-              Click "Add Ranking" to create your first ranking
-            </p>
-          </div>
-        )}
       </div>
 
-      {/* Add/Edit Ranking Modal */}
+      {/* Rankings Grid */}
+      <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6'>
+        {filteredRankings.map((programGroup) => (
+          <div
+            key={programGroup.program?.id}
+            draggable
+            onDragStart={(e) => handleProgramDragStart(e, programGroup)}
+            onDragEnd={handleDragEnd}
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleProgramDrop(e, programGroup)}
+            className='bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col group/card hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300'
+          >
+            {/* Card Header */}
+            <div className='p-5 border-b border-gray-100 flex items-center justify-between bg-white rounded-t-2xl'>
+              <div className='flex items-center gap-3 overflow-hidden'>
+                <div className='cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-[#387cae] transition-colors'>
+                  <GripVertical size={20} />
+                </div>
+                <div className='flex flex-col overflow-hidden'>
+                  <h2 className='text-[15px] font-bold text-slate-900 truncate' title={programGroup.program?.title}>
+                    {programGroup.program?.title}
+                  </h2>
+                  <span className='text-[11px] text-slate-400 font-bold uppercase tracking-wider'>
+                    {programGroup.rankings?.length || 0} Colleges Ranked
+                  </span>
+                </div>
+              </div>
+              <div className='flex gap-1'>
+                <button
+                  onClick={() => {
+                    setSelectedProgram(programGroup.program)
+                    setSelectedCollege(null)
+                    setIsEditModalOpen(true)
+                  }}
+                  className='p-2 text-[#387cae] hover:bg-[#387cae]/5 rounded-xl transition-colors'
+                  title='Add more colleges'
+                >
+                  <Plus size={18} />
+                </button>
+                <button
+                  onClick={() => {
+                    setDeleteProgramId(programGroup.program?.id)
+                    setIsDialogOpen(true)
+                  }}
+                  className='p-2 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors'
+                  title='Delete all rankings'
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Card Content - Ranking List */}
+            <div className='p-4 space-y-3 flex-1 overflow-y-auto max-h-[400px] scrollbar-thin scrollbar-thumb-gray-100'>
+              {programGroup.rankings?.length > 0 ? (
+                programGroup.rankings.map((ranking) => (
+                  <div
+                    key={ranking.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, ranking, programGroup.program?.id)}
+                    onDragEnd={handleDragEnd}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, ranking, programGroup.program?.id)}
+                    className='group/item flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-xl hover:border-[#387cae]/30 hover:shadow-lg hover:shadow-[#387cae]/5 transition-all duration-200 cursor-grab active:cursor-grabbing'
+                  >
+                    <div className='text-gray-300 group-hover/item:text-[#387cae] transition-colors'>
+                      <GripVertical size={18} />
+                    </div>
+
+                    <div className={cn(
+                      'flex items-center justify-center w-8 h-8 rounded-lg font-bold text-xs shadow-sm',
+                      ranking.rank === 1 ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
+                        ranking.rank === 2 ? 'bg-gray-100 text-gray-700 border border-gray-200' :
+                          ranking.rank === 3 ? 'bg-orange-100 text-orange-700 border border-orange-200' :
+                            'bg-blue-50 text-blue-700 border border-blue-100'
+                    )}>
+                      #{ranking.rank}
+                    </div>
+
+                    <div className='flex-1 flex items-center gap-3 overflow-hidden'>
+                      {ranking.college?.college_logo ? (
+                        <div className='relative w-9 h-9 min-w-[36px] rounded-full overflow-hidden border border-gray-100 shadow-sm'>
+                          <Image
+                            src={ranking.college.college_logo}
+                            alt={ranking.college.name}
+                            fill
+                            className='object-cover'
+                          />
+                        </div>
+                      ) : (
+                        <div className='w-9 h-9 min-w-[36px] rounded-full bg-gray-100 flex items-center justify-center text-gray-400'>
+                          <Layers size={16} />
+                        </div>
+                      )}
+                      <div className='flex flex-col min-w-0'>
+                        <span className='text-[13px] font-bold text-slate-700 truncate'>
+                          {ranking.college?.name}
+                        </span>
+                        <span className='text-[11px] text-slate-400 font-semibold truncate'>
+                          {ranking.college?.collegeAddress?.city}, {ranking.college?.collegeAddress?.state}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleDeleteRankingClick(ranking.id)}
+                      className='lg:opacity-0 group-hover/item:opacity-100 p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all'
+                      title='Remove from ranking'
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className='flex flex-col items-center justify-center py-10 gap-2 opacity-50'>
+                  <div className='p-3 rounded-full bg-gray-50 text-gray-300'>
+                    <Trophy size={24} />
+                  </div>
+                  <p className='text-[11px] font-bold text-slate-400 uppercase tracking-wider'>No Colleges Ranked</p>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {filteredRankings.length === 0 && !loading && (
+        <div className='flex flex-col items-center justify-center py-20 gap-4 bg-white border border-dashed border-gray-200 rounded-3xl'>
+          <div className='w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center text-gray-300'>
+            <AlertCircle size={40} />
+          </div>
+          <div className='text-center'>
+            <h3 className='text-lg font-bold text-gray-900'>No rankings found</h3>
+            <p className='text-sm text-gray-500'>Click the "Add Ranking" button to start ranking colleges.</p>
+          </div>
+          {searchTerm && (
+            <Button
+              variant='outline'
+              onClick={() => setSearchTerm('')}
+              className='rounded-xl h-10 border-gray-200'
+            >
+              Clear Search
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* Add/Edit Modal */}
       <Dialog
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false)
-          setEditingProgramId(null)
           setSelectedProgram(null)
           setSelectedCollege(null)
-          setCollegeSearch('')
-          setProgramSearch('')
-          setShowProgramDropdown(false)
         }}
+        closeOnOutsideClick={false}
       >
-        <DialogContent className='max-w-2xl'>
-          <DialogHeader>
-            <DialogTitle>
-              {selectedProgram
-                ? `Add Colleges to ${selectedProgram?.title || 'Program'}`
-                : 'Select Program to Add Rankings'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className='p-6 space-y-6'>
-            {/* Program Selection */}
-            <div className='relative' ref={programDropdownRef}>
-              <label className='block mb-2 font-medium'>
-                Program <span className='text-red-500'>*</span>
-              </label>
-              <div className='relative'>
-                <input
-                  type='text'
-                  value={programSearch}
-                  onChange={(e) => {
-                    const value = e.target.value
-                    setProgramSearch(value)
-                    setShowProgramDropdown(true)
-                    // Clear selection if user is typing something different from selected program
-                    if (selectedProgram && value !== selectedProgram.title) {
-                      setSelectedProgram(null)
-                    }
-                    if (!value) {
-                      setSelectedProgram(null)
-                    }
-                  }}
-                  onFocus={() => {
-                    if (!editingProgramId) {
-                      setShowProgramDropdown(true)
-                    }
-                  }}
-                  placeholder='Search programs...'
-                  className='w-full p-2 pr-10 border rounded'
-                  disabled={!!editingProgramId}
-                />
-                <button
-                  type='button'
-                  onClick={() => {
-                    if (!editingProgramId) {
-                      setShowProgramDropdown(!showProgramDropdown)
-                    }
-                  }}
-                  disabled={!!editingProgramId}
-                  className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:opacity-50'
-                >
-                  <ChevronDown
-                    size={20}
-                    className={`transition-transform ${showProgramDropdown ? 'rotate-180' : ''
-                      }`}
-                  />
-                </button>
+        <DialogContent className='max-w-xl p-0 overflow-hidden bg-white'>
+          <DialogHeader className='p-6 border-b border-gray-100'>
+            <DialogTitle className='text-xl font-bold text-gray-900 flex items-center gap-2'>
+              <div className='w-10 h-10 rounded-xl bg-[#387cae]/10 flex items-center justify-center text-[#387cae]'>
+                <Plus size={20} />
               </div>
-              {showProgramDropdown && !editingProgramId && (
-                <div className='absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto'>
-                  {(() => {
-                    // Get program IDs that already have rankings (only when not editing)
-                    const programsWithRankings = editingProgramId
-                      ? []
-                      : rankings.map((group) => group.program?.id).filter(Boolean)
+              {selectedProgram ? 'Rank more Colleges' : 'Add New Ranking'}
+            </DialogTitle>
+            <DialogDescription className='text-xs font-medium text-gray-500'>
+              Select a program and choose a college to add it to the rankings.
+            </DialogDescription>
+            <DialogClose onClick={() => setIsEditModalOpen(false)} />
+          </DialogHeader>
 
-                    // Filter programs: exclude those with rankings (unless editing that program)
-                    const availablePrograms = programs.filter((program) => {
-                      const hasRanking = programsWithRankings.includes(program.id)
-                      // When editing, show the current program even if it has rankings
-                      if (editingProgramId && program.id === editingProgramId) {
-                        return true
-                      }
-                      // When not editing, exclude programs that already have rankings
-                      return !hasRanking
-                    })
-
-                    // Apply search filter and exclude selected program
-                    const filteredPrograms = availablePrograms.filter(
-                      (program) => {
-                        const matchesSearch = program.title
-                          ?.toLowerCase()
-                          .includes(programSearch.toLowerCase())
-                        // Exclude the selected program from the dropdown list
-                        const isNotSelected =
-                          !selectedProgram || program.id !== selectedProgram.id
-                        return matchesSearch && isNotSelected
-                      }
-                    )
-
-                    if (filteredPrograms.length === 0) {
-                      return (
-                        <div className='p-3 text-gray-500 text-sm text-center'>
-                          {programSearch
-                            ? 'No programs found'
-                            : 'Start typing to search programs...'}
-                        </div>
-                      )
-                    }
-
-                    return filteredPrograms.map((program) => (
-                      <div
-                        key={program.id}
-                        onClick={() => {
-                          setSelectedProgram(program)
-                          setProgramSearch(program.title || '')
-                          setShowProgramDropdown(false)
-                        }}
-                        className='p-3 cursor-pointer hover:bg-gray-100 transition-colors'
-                      >
-                        <span className='text-sm'>{program.title}</span>
-                      </div>
-                    ))
-                  })()}
-                </div>
-              )}
+          <div className='p-8 space-y-8'>
+            {/* Program Selection */}
+            <div className='space-y-3'>
+              <Label required className='text-[11px] '>
+                Search Program
+              </Label>
+              <SearchSelectCreate
+                onSearch={onSearchPrograms}
+                onSelect={setSelectedProgram}
+                onRemove={() => {
+                  setSelectedProgram(null)
+                  setSelectedCollege(null)
+                }}
+                selectedItems={selectedProgram}
+                placeholder='Search or select a program...'
+                displayKey='title'
+                valueKey='id'
+                isMulti={false}
+                allowCreate={false}
+              />
             </div>
 
             {/* College Selection */}
-            <div>
-              <label className='block mb-2 font-medium'>
-                College <span className='text-red-500'>*</span>{' '}
+            <div className={cn(
+              'space-y-3 transition-all duration-300',
+              !selectedProgram && 'opacity-30 pointer-events-none grayscale'
+            )}>
+              <div className='flex items-center justify-between'>
+                <Label required={!!selectedProgram} className='text-[11px] '>
+                  Select College
+                </Label>
                 {selectedProgram && (
-                  <span className='text-gray-500 text-sm font-normal'>
-                    (Select colleges to rank for this program)
+                  <span className='text-[10px] text-[#387cae] bg-[#387cae]/5 px-2 py-0.5 rounded-full font-bold uppercase tracking-tight'>
+                    Offering {selectedProgram.title}
                   </span>
                 )}
-              </label>
-              <input
-                type='text'
-                value={collegeSearch}
-                onChange={(e) => setCollegeSearch(e.target.value)}
-                placeholder={
-                  selectedProgram
-                    ? 'Search colleges to add...'
-                    : 'Please select a program first'
-                }
-                className='w-full p-2 border rounded mb-2'
-                disabled={!selectedProgram}
+              </div>
+              <SearchSelectCreate
+                onSearch={onSearchColleges}
+                onSelect={setSelectedCollege}
+                onRemove={() => setSelectedCollege(null)}
+                selectedItems={selectedCollege}
+                placeholder={selectedProgram ? 'Search colleges...' : 'Please select a program first'}
+                displayKey='name'
+                valueKey='id'
+                isMulti={false}
+                allowCreate={false}
               />
-              {selectedProgram && (
-                <div className='max-h-60 overflow-y-auto border rounded'>
-                  {(() => {
-                    // Filter out colleges that are already ranked for this program
-                    const programRankings = rankings.find(
-                      (r) => r.program?.id === selectedProgram.id
-                    )
-                    const rankedCollegeIds =
-                      programRankings?.rankings?.map((r) => r.college?.id) || []
-                    const availableColleges = colleges.filter(
-                      (college) => !rankedCollegeIds.includes(college.id)
-                    )
+            </div>
 
-                    if (availableColleges.length === 0) {
-                      return (
-                        <div className='p-3 text-gray-500 text-sm text-center'>
-                          {collegeSearch
-                            ? 'No available colleges found'
-                            : rankedCollegeIds.length > 0
-                              ? 'All colleges are already ranked for this program'
-                              : 'Type to search colleges...'}
-                        </div>
-                      )
-                    }
+            {selectedProgram && !selectedCollege && (
+              <div className='p-4 rounded-2xl bg-blue-50/50 border border-blue-100 flex gap-3 animate-in fade-in slide-in-from-top-2 duration-300'>
+                <Trophy className='text-[#387cae] shrink-0' size={18} />
+                <p className='text-xs text-[#387cae] font-medium leading-relaxed'>
+                  Colleges ranked here are specific to the <b>{selectedProgram.title}</b> program.
+                  You can drag and drop them in the main view to adjust their rank.
+                </p>
+              </div>
+            )}
+          </div>
 
-                    return availableColleges.map((college) => (
-                      <div
-                        key={college.id}
-                        onClick={() => setSelectedCollege(college)}
-                        className={`p-3 cursor-pointer hover:bg-gray-100 flex items-center gap-3 ${selectedCollege?.id === college.id ? 'bg-blue-50' : ''
-                          }`}
-                      >
-                        {college.college_logo && (
-                          <div className='relative w-10 h-10 rounded-full overflow-hidden'>
-                            <Image
-                              src={college.college_logo}
-                              alt={college.name}
-                              fill
-                              className='object-cover'
-                            />
-                          </div>
-                        )}
-                        <span className='text-sm'>{college.name}</span>
-                      </div>
-                    ))
-                  })()}
-                </div>
+          <div className='p-6 bg-gray-50/50 border-t border-gray-100 flex justify-end gap-3'>
+            <Button
+              variant='outline'
+              onClick={() => setIsEditModalOpen(false)}
+              className='h-11 px-6 rounded-xl border-gray-200 font-bold text-slate-600'
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAddRanking}
+              disabled={!selectedProgram || !selectedCollege || submitting}
+              className='h-11 px-8 rounded-xl bg-[#387cae] hover:bg-[#387cae]/90 text-white font-bold shadow-lg shadow-[#387cae]/20 min-w-[140px]'
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                  Adding...
+                </>
+              ) : (
+                'Add to Ranking'
               )}
-            </div>
-
-            <div className='flex justify-end gap-3 pt-4 border-t'>
-              <button
-                onClick={() => {
-                  setIsEditModalOpen(false)
-                  setEditingProgramId(null)
-                  setSelectedProgram(null)
-                  setSelectedCollege(null)
-                  setCollegeSearch('')
-                  setProgramSearch('')
-                  setShowProgramDropdown(false)
-                }}
-                className='px-4 py-2 border rounded hover:bg-gray-50'
-              >
-                Close
-              </button>
-              <Button
-                onClick={handleAddRanking}
-                disabled={!selectedProgram || !selectedCollege}
-              >
-                Add College
-              </Button>
-            </div>
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation (Program Group) */}
       <ConfirmationDialog
-        isOpen={isDialogOpen}
+        open={isDialogOpen}
         onClose={() => {
           setIsDialogOpen(false)
           setDeleteProgramId(null)
         }}
         onConfirm={handleDeleteProgram}
-        title='Delete Rankings'
+        title='Delete Program Rankings'
         message='Are you sure you want to delete all rankings for this program? This action cannot be undone.'
         confirmText='Delete'
         cancelText='Cancel'
       />
 
-      <ToastContainer />
-    </>
+      {/* Remove Confirmation (Single College) */}
+      <ConfirmationDialog
+        open={isRemoveRankingDialogOpen}
+        onClose={() => {
+          setIsRemoveRankingDialogOpen(false)
+          setDeleteRankingId(null)
+        }}
+        onConfirm={handleDeleteRankingConfirm}
+        title='Remove College'
+        message='Are you sure you want to remove this college from the rankings? This will only remove this college from this program list.'
+        confirmText='Remove'
+        cancelText='Cancel'
+      />
+
+      <ToastContainer position='bottom-right' />
+    </div>
   )
 }

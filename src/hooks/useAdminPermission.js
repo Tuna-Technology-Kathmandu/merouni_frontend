@@ -6,7 +6,7 @@ import { toast } from 'react-toastify'
 
 const useAdminPermission = () => {
   // Get role from Redux store
-  const roleData = useSelector((state) => state.user?.data?.roles || state.user?.data?.role || '{}')
+  const roleData = useSelector((state) => state.user?.data?.role)
 
   // Parse and memoize role
   const role = useMemo(() => {

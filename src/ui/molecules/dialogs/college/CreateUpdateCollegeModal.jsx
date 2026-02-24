@@ -1,6 +1,5 @@
 import UniversityDropdown from '@/ui/molecules/dropdown/UniversityDropdown'
 import { Button } from '@/ui/shadcn/button'
-import { Plus, Trash2 } from 'lucide-react'
 import {
     Dialog,
     DialogClose,
@@ -10,9 +9,27 @@ import {
 } from '@/ui/shadcn/dialog'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
-import { Select } from '@/ui/shadcn/select'
+import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 import { Textarea } from '@/ui/shadcn/textarea'
-import dynamic from 'next/dynamic'
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
+import axios from 'axios'
+import {
+    Activity,
+    Check,
+    FileText,
+    GraduationCap,
+    HelpCircle,
+    Image as ImageIcon,
+    Info,
+    Layers,
+    Loader2,
+    Map,
+    MapPin,
+    Plus,
+    Trash2,
+    Users,
+    Video
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
@@ -22,28 +39,40 @@ import {
     createCollege,
     getUniversityBySlug
 } from '@/app/(dashboard)/dashboard/addCollege/actions'
+import { cn } from '@/app/lib/utils'
 import { authFetch } from '@/app/utils/authFetch'
 import GallerySection from './components/GallerySection'
-import VideoSection from './components/VideoSection'
 import FileUploadWithPreview from './components/MediaUploadWithBranding'
+import VideoSection from './components/VideoSection'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 
-const CKUni = dynamic(() => import('../../../molecules/ck-editor/CKUni'), {
-    ssr: false
-})
+const SectionHeader = ({ icon: Icon, title, subtitle }) => (
+    <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 rounded-xl bg-[#387cae]/10 flex items-center justify-center text-[#387cae] shadow-sm border border-[#387cae]/20">
+            <Icon size={20} />
+        </div>
+        <div>
+            <h3 className="text-lg font-bold text-gray-900 leading-tight">{title}</h3>
+            {subtitle && <p className="text-[11px] mt-0.5 font-semibold tracking-wider">{subtitle}</p>}
+        </div>
+    </div>
+)
 
 
 const CreateUpdateCollegeModal = ({
     isOpen,
-    handleCloseModal,
+    handleCloseModal: onSystemClose,
     editSlug,
     onSuccess,
     allDegrees
 }) => {
     const [submitting, setSubmitting] = useState(false)
     const [loadingData, setLoadingData] = useState(false)
+    const [showCloseConfirm, setShowCloseConfirm] = useState(false)
     const [uniSlug, setUniSlug] = useState('')
     const [universityPrograms, setUniversityPrograms] = useState([])
     const [loadingPrograms, setLoadingPrograms] = useState(false)
+    const [filesDirty, setFilesDirty] = useState(false)
     const [uploadedFiles, setUploadedFiles] = useState({
         college_logo: '',
         featured_img: '',
@@ -62,11 +91,12 @@ const CreateUpdateCollegeModal = ({
         reset,
         watch,
         getValues,
-        formState: { errors }
+        formState: { errors, isDirty }
     } = useForm({
         defaultValues: {
             name: '',
             author_id: author_id,
+            university_id: '',
             institute_type: 'Private',
             institute_level: [],
             courses: [],
@@ -86,6 +116,8 @@ const CreateUpdateCollegeModal = ({
                 street: '',
                 postal_code: ''
             },
+            google_map_url: '',
+            map_type: '',
             contacts: ['', ''],
             members: [],
             faqs: [{ question: '', answer: '' }]
@@ -110,6 +142,20 @@ const CreateUpdateCollegeModal = ({
         remove: removeFacility
     } = useFieldArray({ control, name: 'facilities' })
 
+    const handleSetFiles = (updater) => {
+        setUploadedFiles(updater)
+        if (!loadingData) setFilesDirty(true)
+    }
+
+    const handleCloseAttempt = () => {
+        // If the form is dirty (has unsaved changes) or files changed, show confirmation
+        if (isDirty || filesDirty) {
+            setShowCloseConfirm(true)
+        } else {
+            onSystemClose()
+        }
+    }
+
     // Reset form when modal closes or opens for new college
     useEffect(() => {
         if (!isOpen) {
@@ -120,6 +166,7 @@ const CreateUpdateCollegeModal = ({
                 images: [],
                 videos: []
             })
+            setFilesDirty(false)
             setUniSlug('')
             setUniversityPrograms([])
         }
@@ -182,6 +229,9 @@ const CreateUpdateCollegeModal = ({
                         setValue('address.postal_code', collegeData.collegeAddress.postal_code)
                     }
 
+                    setValue('google_map_url', collegeData.google_map_url || '')
+                    setValue('map_type', collegeData.map_type || '')
+
                     const contacts = collegeData.collegeContacts?.map(
                         (contact) => contact.contact_number
                     ) || ['', '']
@@ -202,6 +252,9 @@ const CreateUpdateCollegeModal = ({
                         images: images.length === 1 && !images[0].url ? [] : images,
                         videos
                     })
+
+                    setValue('college_logo', collegeData.college_logo || '')
+                    setValue('featured_img', collegeData.featured_img || '')
 
                     setValue('images', [...images, ...videos])
 
@@ -262,6 +315,93 @@ const CreateUpdateCollegeModal = ({
         fetchPrograms()
     }, [uniSlug])
 
+    const onSearchPrograms = async (query) => {
+        if (!universityPrograms) return []
+        const filtered = query
+            ? universityPrograms.filter(up => up.program?.title?.toLowerCase().includes(query.toLowerCase()))
+            : universityPrograms
+
+        return filtered.map(up => ({
+            id: up.program_id || up.program?.id,
+            title: up.program?.title || 'Unknown'
+        }))
+    }
+
+    const handleSelectProgram = (program) => {
+        const currentCourses = getValues('courses') || []
+        const programId = program.id || program
+        if (!currentCourses.includes(programId)) {
+            setValue('courses', [...currentCourses, programId], { shouldDirty: true })
+        }
+    }
+
+    const handleRemoveProgram = (program) => {
+        const currentCourses = getValues('courses') || []
+        const programId = program.id || program
+        setValue('courses', currentCourses.filter(id => id !== programId), { shouldDirty: true })
+    }
+
+    const selectedProgramIds = watch('courses') || []
+    const selectedPrograms = universityPrograms
+        ? universityPrograms
+            .filter(up => selectedProgramIds.includes(up.program_id || up.program?.id))
+            .map(up => ({ id: up.program_id || up.program?.id, title: up.program?.title }))
+        : []
+
+    const onSearchDegrees = async (query) => {
+        if (!allDegrees) return []
+        return query
+            ? allDegrees.filter(d => d.title?.toLowerCase().includes(query.toLowerCase()))
+            : allDegrees
+    }
+
+    const handleSelectDegree = (degree) => {
+        const currentDegrees = getValues('degrees') || []
+        const degreeId = String(degree.id || degree)
+        if (!currentDegrees.includes(degreeId)) {
+            setValue('degrees', [...currentDegrees, degreeId], { shouldDirty: true })
+        }
+    }
+
+    const handleRemoveDegree = (degree) => {
+        const currentDegrees = getValues('degrees') || []
+        const degreeId = String(degree.id || degree)
+        setValue('degrees', currentDegrees.filter(id => id !== degreeId), { shouldDirty: true })
+    }
+
+    const selectedDegreeIds = watch('degrees') || []
+    const selectedDegrees = allDegrees
+        ? allDegrees
+            .filter(d => selectedDegreeIds.includes(String(d.id)))
+            .map(d => ({ id: d.id, title: d.title }))
+        : []
+
+    const onMediaUpload = async (file) => {
+        const formData = new FormData()
+        formData.append('title', file.name)
+        formData.append('altText', file.name)
+        formData.append('description', '')
+        formData.append('file', file)
+        formData.append('authorId', '1')
+
+        try {
+            const response = await axios.post(
+                `${process.env.mediaUrl}${process.env.version}/media/upload`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            )
+            return response.data?.media?.url
+        } catch (error) {
+            console.error('Image upload failed:', error)
+            toast.error('Failed to upload image')
+            throw error
+        }
+    }
+
     const onSubmit = async (data) => {
         try {
             setSubmitting(true)
@@ -295,7 +435,7 @@ const CreateUpdateCollegeModal = ({
 
             toast.success(editSlug ? 'College updated successfully!' : 'College created successfully!')
             onSuccess?.()
-            handleCloseModal()
+            onSystemClose()
         } catch (error) {
             console.error('Submission error:', error)
             toast.error(error.message || 'Failed to submit data')
@@ -304,511 +444,639 @@ const CreateUpdateCollegeModal = ({
         }
     }
     return (
-        <Dialog isOpen={isOpen} onClose={handleCloseModal} className='max-w-7xl'>
-            <DialogContent className='max-h-[90vh] flex flex-col'>
-                <DialogHeader>
-                    <DialogTitle>{editSlug ? 'Edit College' : 'Add College'}</DialogTitle>
-                    <DialogClose onClick={handleCloseModal} />
-                </DialogHeader>
-                <div className='flex-1 overflow-y-auto px-1'>
-                    <form onSubmit={handleSubmit(onSubmit)} className='space-y-6 pb-20'>
-                        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                            {/* Basic Information */}
-                            <div className='space-y-4'>
-                                <h3 className='text-lg font-semibold border-b pb-2'>
-                                    Basic Information
-                                </h3>
-                                <div className='space-y-2'>
-                                    <Label htmlFor='name' required>College Name</Label>
-                                    <Input
-                                        id='name'
-                                        {...register('name', { required: 'College name is required' })}
-                                        placeholder='Enter college name'
-                                    />
-                                    {errors.name && (
-                                        <span className='text-red-500 text-xs'>
-                                            {errors.name.message}
-                                        </span>
-                                    )}
-                                </div>
-
-                                <div className='grid grid-cols-2 gap-4'>
-                                    <div className='space-y-2'>
-                                        <Label htmlFor='institute_type'>Institute Type</Label>
-                                        <Select
-                                            id='institute_type'
-                                            {...register('institute_type')}
-                                        >
-                                            <option value='Private'>Private</option>
-                                            <option value='Public'>Public</option>
-                                        </Select>
-                                    </div>
-
-                                    <div className='space-y-2'>
-                                        <Label htmlFor='website_url'>Website URL</Label>
-                                        <Input
-                                            id='website_url'
-                                            {...register('website_url')}
-                                            placeholder='https://example.com'
-                                        />
+        <Dialog isOpen={isOpen} onClose={handleCloseAttempt} closeOnOutsideClick={false} className='max-w-7xl'>
+            <DialogHeader className="bg-white border-b border-gray-100 p-6">
+                <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <Layers className="text-[#387cae]" size={24} />
+                    {editSlug ? 'Edit College' : 'Add New College'}
+                </DialogTitle>
+                <DialogClose onClick={handleCloseAttempt} />
+            </DialogHeader>
+            <DialogContent className="p-0 bg-gray-50/50">
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className='flex flex-col max-h-[calc(100vh-120px)] relative'
+                >
+                    {loadingData && (
+                        <div className="absolute inset-0 z-50 bg-white/60 backdrop-blur-[2px] flex items-center justify-center rounded-b-3xl">
+                            <div className="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center gap-4 border border-gray-100 animate-in fade-in zoom-in duration-300">
+                                <div className="relative">
+                                    <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-[#387cae] animate-spin"></div>
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <Info size={16} className="text-[#387cae] animate-pulse" />
                                     </div>
                                 </div>
-
-                                <div className='space-y-2'>
-                                    <Label>Institute Level</Label>
-                                    <div className='flex gap-4 items-center h-10'>
-                                        {['School', 'College'].map((level) => (
-                                            <div key={level} className='flex items-center space-x-2'>
-                                                <input
-                                                    type='checkbox'
-                                                    id={`level-${level}`}
-                                                    value={level}
-                                                    {...register('institute_level')}
-                                                    className='h-4 w-4 rounded border-gray-300'
-                                                />
-                                                <label
-                                                    htmlFor={`level-${level}`}
-                                                    className='text-sm text-gray-700'
-                                                >
-                                                    {level}
-                                                </label>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Media & Branding */}
-                            <div className='space-y-4'>
-                                <h3 className='text-lg font-semibold border-b pb-2'>
-                                    Media & Branding
-                                </h3>
-                                <div className='grid grid-cols-2 gap-4'>
-                                    <FileUploadWithPreview
-                                        label='College Logo'
-                                        onUploadComplete={(url) => setUploadedFiles(prev => ({ ...prev, college_logo: url }))}
-                                        defaultPreview={uploadedFiles.college_logo}
-                                        onClear={() => setUploadedFiles(prev => ({ ...prev, college_logo: '' }))}
-                                    />
-                                    <FileUploadWithPreview
-                                        label='Featured Image'
-                                        onUploadComplete={(url) => setUploadedFiles(prev => ({ ...prev, featured_img: url }))}
-                                        defaultPreview={uploadedFiles.featured_img}
-                                        onClear={() => setUploadedFiles(prev => ({ ...prev, featured_img: '' }))}
-                                    />
-                                </div>
-
-                                <div className='space-y-2'>
-                                    <Label htmlFor='college_broucher'>Brochure (PDF URL)</Label>
-                                    <Input
-                                        id='college_broucher'
-                                        {...register('college_broucher')}
-                                        placeholder='URL to PDF brochure'
-                                    />
+                                <div className="text-center">
+                                    <h4 className="font-bold text-gray-900">Loading Details</h4>
+                                    <p className="text-xs text-gray-500 font-medium">Please wait a moment...</p>
                                 </div>
                             </div>
                         </div>
-
-                        {/* Description & Editor */}
-                        <div className='space-y-4'>
-                            <h3 className='text-lg font-semibold border-b pb-2'>
-                                About College
-                            </h3>
-                            <div className='space-y-2'>
-                                <Label htmlFor='description'>Short Description</Label>
-                                <Textarea
-                                    id='description'
-                                    {...register('description')}
-                                    placeholder='Brief overview of the college...'
-                                    rows={4}
-                                />
-                            </div>
-                            <div className='space-y-2'>
-                                <Label>Full Content</Label>
-                                <CKUni
-                                    initialData={watch('content')}
-                                    onChange={(data) => setValue('content', data)}
-                                    data={watch('content')}
-                                />
-                            </div>
-                        </div>
-
-                        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                            {/* Academic Details */}
-                            <div className='space-y-4'>
-                                <h3 className='text-lg font-semibold border-b pb-2'>
-                                    Academic Details
-                                </h3>
-                                <div className='space-y-2'>
-                                    <Label>University</Label>
-                                    <UniversityDropdown
-                                        onChange={(id, selectedUni) => {
-                                            setValue('university_id', id)
-                                            if (selectedUni) setUniSlug(selectedUni.slugs)
-                                        }}
-                                        value={watch('university_id')}
-                                    />
-                                </div>
-
-                                <div className='space-y-2'>
-                                    <Label>Degrees</Label>
-                                    <div className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2 border rounded'>
-                                        {allDegrees.map((degree) => (
-                                            <div key={degree.id} className='flex items-center space-x-2'>
-                                                <input
-                                                    type='checkbox'
-                                                    id={`degree-${degree.id}`}
-                                                    value={degree.id}
-                                                    {...register('degrees')}
-                                                    className='h-4 w-4 rounded border-gray-300'
-                                                />
-                                                <label
-                                                    htmlFor={`degree-${degree.id}`}
-                                                    className='text-sm text-gray-700'
-                                                >
-                                                    {degree.title}
-                                                </label>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className='space-y-2'>
-                                    <Label>Programs</Label>
-                                    {loadingPrograms ? (
-                                        <div className='text-sm text-gray-500'>Loading programs...</div>
-                                    ) : (
-                                        <div className='grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2 border rounded'>
-                                            {universityPrograms && universityPrograms.length > 0 ? (
-                                                universityPrograms.map((course) => (
-                                                    <div key={course.id} className='flex items-center space-x-2'>
-                                                        <input
-                                                            type='checkbox'
-                                                            id={`course-${course.program_id}`}
-                                                            value={course.program_id}
-                                                            {...register('courses')}
-                                                            className='h-4 w-4 rounded border-gray-300'
-                                                        />
-                                                        <label
-                                                            htmlFor={`course-${course.program_id}`}
-                                                            className='text-sm text-gray-700'
-                                                        >
-                                                            {course.program.title}
-                                                        </label>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div className='text-sm text-gray-500'>
-                                                    Select a university to see programs
-                                                </div>
+                    )}
+                    <div className='flex-1 p-8  scrollbar-thin scrollbar-thumb-gray-200'>
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-8">
+                            {/* Left Column - Main Content (8/12) */}
+                            <div className="lg:col-span-8 space-y-8">
+                                {/* Basic Information */}
+                                <div className='bg-white p-8 rounded-2xl border border-gray-100'>
+                                    <SectionHeader icon={Info} title="Basic Information" subtitle="General identity of the college" />
+                                    <div className='space-y-6'>
+                                        <div>
+                                            <Label required={true} htmlFor='name'>College Name</Label>
+                                            <Input
+                                                id='name'
+                                                placeholder='Enter college name...'
+                                                className="h-12 text-base rounded-md"
+                                                {...register('name', { required: 'College name is required' })}
+                                            />
+                                            {errors.name && (
+                                                <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.name.message}</p>
                                             )}
                                         </div>
-                                    )}
-                                </div>
-                            </div>
 
-                            {/* Contacts & Address */}
-                            <div className='space-y-4'>
-                                <h3 className='text-lg font-semibold border-b pb-2'>
-                                    Location & Contact
-                                </h3>
-                                <div className='grid grid-cols-2 gap-4'>
-                                    <div className='space-y-2'>
-                                        <Label htmlFor='address.country'>Country</Label>
-                                        <Input
-                                            id='address.country'
-                                            {...register('address.country')}
-                                            placeholder='Nepal'
-                                        />
-                                    </div>
-                                    <div className='space-y-2'>
-                                        <Label htmlFor='address.state'>State</Label>
-                                        <Input
-                                            id='address.state'
-                                            {...register('address.state')}
-                                            placeholder='State/Province'
-                                        />
-                                    </div>
-                                </div>
-                                <div className='grid grid-cols-2 gap-4'>
-                                    <div className='space-y-2'>
-                                        <Label htmlFor='address.city'>City</Label>
-                                        <Input
-                                            id='address.city'
-                                            {...register('address.city')}
-                                            placeholder='City'
-                                        />
-                                    </div>
-                                    <div className='space-y-2'>
-                                        <Label htmlFor='address.street'>Street</Label>
-                                        <Input
-                                            id='address.street'
-                                            {...register('address.street')}
-                                            placeholder='Street Address'
-                                        />
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                            <div>
+                                                <Label htmlFor='institute_type'>Institute Type</Label>
+                                                <select
+                                                    id='institute_type'
+                                                    {...register('institute_type')}
+                                                    className='flex h-11 w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
+                                                >
+                                                    <option value='Private'>Private</option>
+                                                    <option value='Public'>Public</option>
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <Label htmlFor='website_url'>Website URL</Label>
+                                                <Input
+                                                    id='website_url'
+                                                    placeholder='https://example.com'
+                                                    className="h-11 rounded-md border-gray-200"
+                                                    {...register('website_url')}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <Label required={true} className="mb-3">Institute Level</Label>
+                                            <div className='grid grid-cols-2 gap-4'>
+                                                {['School', 'College'].map((level) => (
+                                                    <label
+                                                        key={level}
+                                                        className={cn(
+                                                            'flex items-center justify-center gap-3 p-4 rounded-md border-2 transition-all cursor-pointer group',
+                                                            watch('institute_level')?.includes(level)
+                                                                ? 'bg-[#387cae]/5 border-[#387cae] text-[#387cae] shadow-md'
+                                                                : 'bg-white border-gray-200 text-gray-400 hover:border-gray-200 hover:bg-gray-50'
+                                                        )}
+                                                    >
+                                                        <input
+                                                            type='checkbox'
+                                                            value={level}
+                                                            {...register('institute_level', { required: 'At least one level is required' })}
+                                                            className='hidden'
+                                                        />
+                                                        <div className={cn(
+                                                            "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
+                                                            watch('institute_level')?.includes(level) ? "border-[#387cae] bg-[#387cae]" : "border-gray-200"
+                                                        )}>
+                                                            {watch('institute_level')?.includes(level) && <Check size={12} className="text-white" />}
+                                                        </div>
+                                                        <span className='text-sm font-bold'>{level}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                            {errors.institute_level && (
+                                                <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.institute_level.message}</p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className='space-y-2'>
-                                    <Label>Contact Numbers</Label>
-                                    <div className='grid grid-cols-2 gap-2'>
-                                        {[0, 1].map((index) => (
-                                            <Input
-                                                key={index}
-                                                placeholder={`Phone ${index + 1}`}
-                                                {...register(`contacts[${index}]`)}
+                                {/* About College */}
+                                <div className='bg-white p-8 rounded-2xl shadow-sm border border-gray-100'>
+                                    <SectionHeader icon={FileText} title="About College" subtitle="Detailed description and content" />
+                                    <div className='space-y-6'>
+                                        <div>
+                                            <Label htmlFor='description' required={true} className="mb-1.5">Short Description</Label>
+                                            <Textarea
+                                                id='description'
+                                                placeholder='Enter a brief summary of the college...'
+                                                {...register('description', { required: 'Short description is required' })}
+                                                className='flex min-h-[100px] w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all resize-none'
                                             />
+                                            {errors.description && (
+                                                <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.description.message}</p>
+                                            )}
+                                        </div>
+
+                                        <div className="pt-2">
+                                            <Label className="mb-2.5">Full Content Body</Label>
+                                            <TipTapEditor
+                                                onMediaUpload={onMediaUpload}
+                                                showImageUpload={true}
+                                                value={watch('content')}
+                                                onChange={(data) => setValue('content', data, { shouldDirty: true })}
+                                                placeholder='Start writing about the college here...'
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Academic Details */}
+                                <div className='bg-white p-8 rounded-2xl shadow-sm border border-gray-100'>
+                                    <SectionHeader icon={GraduationCap} title="Academic Details" subtitle="Affiliation and programs" />
+                                    <div className='space-y-6'>
+                                        <div>
+                                            <Label required={true}>Affiliated University</Label>
+                                            <UniversityDropdown
+                                                onChange={(id, selectedUni) => {
+                                                    setValue('university_id', id, { shouldDirty: true, shouldValidate: true })
+                                                    if (selectedUni) setUniSlug(selectedUni.slugs)
+                                                }}
+                                                value={watch('university_id')}
+                                            />
+                                            {errors.university_id && (
+                                                <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.university_id.message}</p>
+                                            )}
+                                            <input type="hidden" {...register('university_id', { required: 'Please select a university' })} />
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                            <div>
+                                                <Label className="mb-3 block">Degrees Offered</Label>
+                                                <SearchSelectCreate
+                                                    onSearch={onSearchDegrees}
+                                                    onSelect={handleSelectDegree}
+                                                    onRemove={handleRemoveDegree}
+                                                    selectedItems={selectedDegrees}
+                                                    placeholder="Search or select degrees..."
+                                                    displayKey="title"
+                                                    valueKey="id"
+                                                    isMulti={true}
+                                                    className="w-full"
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <Label className="mb-3 block">Available Programs</Label>
+                                                <SearchSelectCreate
+                                                    onSearch={onSearchPrograms}
+                                                    onSelect={handleSelectProgram}
+                                                    onRemove={handleRemoveProgram}
+                                                    selectedItems={selectedPrograms}
+                                                    placeholder="Search or select programs..."
+                                                    displayKey="title"
+                                                    valueKey="id"
+                                                    isMulti={true}
+                                                    className="w-full"
+                                                    isLoading={loadingPrograms}
+                                                />
+                                                {!uniSlug && (
+                                                    <p className='text-[10px] text-gray-400 mt-2 font-medium bg-gray-50 p-2 rounded-lg border border-dashed border-gray-200'>
+                                                        Please select a university first to view available programs.
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Location & Contact */}
+                                <div className='bg-white p-8 rounded-md shadow-sm border border-gray-100'>
+                                    <SectionHeader icon={MapPin} title="Location & Contact" subtitle="Where to find the college" />
+                                    <div className='space-y-6'>
+                                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+                                            <div>
+                                                <Label htmlFor='address.country' required={true}>Country</Label>
+                                                <Input
+                                                    id='address.country'
+                                                    {...register('address.country', { required: 'Country is required' })}
+                                                    placeholder='e.g. Nepal'
+                                                    className="h-11 rounded-md border-gray-200"
+                                                />
+                                                {errors.address?.country && (
+                                                    <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.address.country.message}</p>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <Label htmlFor='address.state' required={true}>State / Province</Label>
+                                                <Input
+                                                    id='address.state'
+                                                    {...register('address.state', { required: 'State is required' })}
+                                                    placeholder='e.g. Bagmati'
+                                                    className="h-11 rounded-md border-gray-200"
+                                                />
+                                                {errors.address?.state && (
+                                                    <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.address.state.message}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+                                            <div>
+                                                <Label htmlFor='address.city' required={true}>City</Label>
+                                                <Input
+                                                    id='address.city'
+                                                    {...register('address.city', { required: 'City is required' })}
+                                                    placeholder='e.g. Kathmandu'
+                                                    className="h-11 rounded-md border-gray-200"
+                                                />
+                                                {errors.address?.city && (
+                                                    <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.address.city.message}</p>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <Label htmlFor='address.street'>Street Address</Label>
+                                                <Input
+                                                    id='address.street'
+                                                    {...register('address.street')}
+                                                    placeholder='e.g. Putalisadak'
+                                                    className="h-11 rounded-md border-gray-200"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="pt-2 space-y-6">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                                <div>
+                                                    <Label htmlFor='map_type' className="flex items-center gap-2 mb-3">
+                                                        Map Type
+                                                    </Label>
+                                                    <select
+                                                        id='map_type'
+                                                        {...register('map_type')}
+                                                        className='flex h-11 w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
+                                                    >
+                                                        <option value=''>Select Map Type</option>
+                                                        <option value='google_map_url'>Google Map URL (Share Link)</option>
+                                                        <option value='embed_map_url'>Embed Map URL (Iframe Src)</option>
+                                                    </select>
+                                                </div>
+                                                <div className="flex-1">
+                                                    <Label htmlFor='google_map_url' className="flex items-center gap-2 mb-3">
+                                                        <Map size={14} className="text-[#387cae]" />
+                                                        Map Link / URL
+                                                    </Label>
+                                                    <div className="relative group">
+                                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#387cae] transition-colors">
+                                                            <MapPin size={18} />
+                                                        </div>
+                                                        <Input
+                                                            id='google_map_url'
+                                                            {...register('google_map_url')}
+                                                            placeholder={watch('map_type') === 'embed_map_url' ? "Paste iframe src..." : "Paste Google Maps share link..."}
+                                                            className="h-11 pl-12 rounded-md bg-gray-50/30 border-gray-200 transition-all focus:ring-4 focus:ring-[#387cae]/5 focus:bg-white"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p className="text-[10px] text-gray-400 -mt-2 ml-1 flex items-center gap-1.5 font-medium">
+                                                <Info size={12} />
+                                                This interactive map will be visible to students on the college profile.
+                                            </p>
+                                        </div>
+
+                                        <div>
+                                            <Label className="mb-3 block">Contact Numbers</Label>
+                                            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                                                {[0, 1].map((index) => (
+                                                    <div key={index} className="relative group">
+                                                        <Activity className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300 group-focus-within:text-[#387cae] transition-colors" />
+                                                        <Input
+                                                            placeholder={`Phone Number ${index + 1}`}
+                                                            className="h-11 pl-10 rounded-md border-gray-200 transition-all focus:ring-4 focus:ring-[#387cae]/5"
+                                                            {...register(`contacts[${index}]`)}
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Facilities */}
+                                <div className='bg-white p-8 rounded-2xl shadow-sm border border-gray-100'>
+                                    <div className='flex justify-between items-center mb-6'>
+                                        <SectionHeader icon={Activity} title="Facilities" subtitle="Amenities and services" />
+                                        <Button
+                                            type='button'
+                                            variant='outline'
+                                            size='sm'
+                                            className='rounded-md border-[#387cae]/20 text-[#387cae] hover:bg-[#387cae]/5'
+                                            onClick={() => appendFacility({ title: '', description: '', icon: '' })}
+                                        >
+                                            <Plus className='w-4 h-4 mr-2' />
+                                            Add Facility
+                                        </Button>
+                                    </div>
+                                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                                        {facilityFields.map((field, index) => (
+                                            <div key={field.id} className='group relative p-5 bg-white border border-gray-100 rounded-md transition-all hover:shadow-xl hover:shadow-[#387cae]/5 hover:border-[#387cae]/20'>
+                                                <div className='space-y-4 pr-8'>
+                                                    <div className='grid grid-cols-2 gap-3'>
+                                                        <div>
+                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Title</Label>
+                                                            <Input
+                                                                {...register(`facilities[${index}].title`)}
+                                                                placeholder='e.g. WiFi'
+                                                                className='h-9 text-xs rounded-md'
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Icon Code</Label>
+                                                            <Input
+                                                                {...register(`facilities[${index}].icon`)}
+                                                                placeholder='wifi'
+                                                                className='h-9 text-xs rounded-md'
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Description</Label>
+                                                        <Input
+                                                            {...register(`facilities[${index}].description`)}
+                                                            placeholder='Details...'
+                                                            className='h-9 text-xs rounded-md'
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <Button
+                                                    type='button'
+                                                    variant='ghost'
+                                                    size='icon'
+                                                    className='absolute top-4 right-4 h-7 w-7 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors rounded-md'
+                                                    onClick={() => removeFacility(index)}
+                                                >
+                                                    <Trash2 size={14} />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Team Members */}
+                                <div className='bg-white p-8 rounded-2xl shadow-sm border border-gray-100'>
+                                    <div className='flex justify-between items-center mb-6'>
+                                        <SectionHeader icon={Users} title="Team Members" subtitle="Faculty and staff directory" />
+                                        <Button
+                                            type='button'
+                                            variant='outline'
+                                            size='sm'
+                                            className='rounded-md border-[#387cae]/20 text-[#387cae] hover:bg-[#387cae]/5'
+                                            onClick={() => appendMember({ name: '', role: '', image_url: '', bio: '', contact_info: '' })}
+                                        >
+                                            <Plus className='w-4 h-4 mr-2' />
+                                            Add Member
+                                        </Button>
+                                    </div>
+                                    <div className='grid grid-cols-1 gap-6'>
+                                        {memberFields.map((field, index) => (
+                                            <div key={field.id} className='group relative p-6 bg-white border border-gray-100 rounded-3xl transition-all hover:shadow-xl hover:shadow-[#387cae]/5 hover:border-[#387cae]/20'>
+                                                <div className='flex flex-col md:flex-row gap-6 pr-10'>
+                                                    <div className='w-24 shrink-0'>
+                                                        <Label className='text-[10px] font-bold text-gray-400 uppercase mb-3 block text-center'>Photo</Label>
+                                                        <FileUploadWithPreview
+                                                            onUploadComplete={(url) => setValue(`members[${index}].image_url`, url, { shouldDirty: true })}
+                                                            onClear={() => setValue(`members[${index}].image_url`, '', { shouldDirty: true })}
+                                                            defaultPreview={watch(`members[${index}].image_url`)}
+                                                        />
+                                                    </div>
+                                                    <div className='flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4'>
+                                                        <div>
+                                                            <Label className='text-[10px] font-bold text-gray-400 uppercase mb-1 block'>Full Name</Label>
+                                                            <Input
+                                                                {...register(`members[${index}].name`)}
+                                                                placeholder='Dr. John Doe'
+                                                                className='h-10 rounded-md'
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Role</Label>
+                                                            <select
+                                                                {...register(`members[${index}].role`)}
+                                                                className='flex h-10 w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
+                                                            >
+                                                                <option value="">Select Role</option>
+                                                                <option value="Principal">Principal</option>
+                                                                <option value="Professor">Professor</option>
+                                                                <option value="Lecturer">Lecturer</option>
+                                                                <option value="Admin">Admin</option>
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Contact (Phone)</Label>
+                                                            <Input
+                                                                {...register(`members[${index}].contact_info`)}
+                                                                placeholder='98XXXXXXXX'
+                                                                className='h-10 rounded-md'
+                                                            />
+                                                        </div>
+                                                        <div className='sm:col-span-3'>
+                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Professional Bio</Label>
+                                                            <Input
+                                                                {...register(`members[${index}].bio`)}
+                                                                placeholder='Achievement and specialization...'
+                                                                className='h-10 rounded-md'
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <Button
+                                                    type='button'
+                                                    variant='outline'
+                                                    size='icon'
+                                                    className='absolute top-6 right-6 h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 border-gray-100 rounded-xl'
+                                                    onClick={() => removeMember(index)}
+                                                >
+                                                    <Trash2 size={16} />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* FAQs */}
+                                <div className='bg-white p-8 rounded-2xl shadow-sm border border-gray-100'>
+                                    <div className='flex justify-between items-center mb-6'>
+                                        <SectionHeader icon={HelpCircle} title="Frequently Asked Questions" subtitle="Common queries about the college" />
+                                        <Button
+                                            type='button'
+                                            variant='outline'
+                                            size='sm'
+                                            className='rounded-md border-[#387cae]/20 text-[#387cae] hover:bg-[#387cae]/5'
+                                            onClick={() => appendFaq({ question: '', answer: '' })}
+                                        >
+                                            <Plus className='w-4 h-4 mr-2' />
+                                            Add FAQ
+                                        </Button>
+                                    </div>
+                                    <div className='space-y-4'>
+                                        {faqFields.map((field, index) => (
+                                            <div key={field.id} className='group relative p-6 bg-white border border-gray-100 rounded-2xl transition-all hover:shadow-lg hover:shadow-[#387cae]/5 hover:border-[#387cae]/20'>
+                                                <div className='space-y-4 pr-10'>
+                                                    <div>
+                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block'>Question</Label>
+                                                        <Input
+                                                            {...register(`faqs[${index}].question`)}
+                                                            placeholder='e.g. What are the admission requirements?'
+                                                            className='h-11 rounded-md font-bold text-gray-800'
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block'>Answer</Label>
+                                                        <Textarea
+                                                            {...register(`faqs[${index}].answer`)}
+                                                            placeholder='Provide a detailed answer...'
+                                                            rows={2}
+                                                            className='rounded-md resize-none min-h-[80px]'
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <Button
+                                                    type='button'
+                                                    variant='ghost'
+                                                    size='icon'
+                                                    className='absolute top-6 right-4 h-8 w-8 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors rounded-md'
+                                                    onClick={() => removeFaq(index)}
+                                                >
+                                                    <Trash2 size={16} />
+                                                </Button>
+                                            </div>
                                         ))}
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <GallerySection
-                            control={control}
-                            setValue={setValue}
-                            uploadedFiles={uploadedFiles}
-                            setUploadedFiles={setUploadedFiles}
-                            getValues={getValues}
-                        />
-                        <VideoSection
-                            control={control}
-                            setValue={setValue}
-                            uploadedFiles={uploadedFiles}
-                            setUploadedFiles={setUploadedFiles}
-                            getValues={getValues}
-                        />
+                            {/* Right Column - Media & Settings (4/12) */}
+                            <div className="lg:col-span-4 space-y-8">
+                                {/* Media & Branding */}
+                                <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
+                                    <SectionHeader icon={ImageIcon} title="Logo & Cover" subtitle="Identity visuals" />
+                                    <div className="space-y-6">
+                                        <div className="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 border-dashed hover:bg-white hover:border-[#387cae]/30 transition-all group">
+                                            <Label required={true} className="text-[11px] font-black tracking-[0.1em] mb-4 block  group-hover:text-[#387cae]">College Logo</Label>
+                                            <FileUploadWithPreview
+                                                label=''
+                                                required={true}
+                                                onUploadComplete={(url) => {
+                                                    handleSetFiles(prev => ({ ...prev, college_logo: url }))
+                                                    setValue('college_logo', url, { shouldValidate: true })
+                                                }}
+                                                defaultPreview={uploadedFiles.college_logo}
+                                                onClear={() => {
+                                                    handleSetFiles(prev => ({ ...prev, college_logo: '' }))
+                                                    setValue('college_logo', '', { shouldValidate: true })
+                                                }}
+                                            />
+                                            {errors.college_logo && (
+                                                <p className='text-[10px] font-semibold text-red-500 mt-2 '>{errors.college_logo.message}</p>
+                                            )}
+                                            <input type="hidden" {...register('college_logo', { required: 'College logo is required' })} />
+                                        </div>
 
-                        <div className='space-y-6 pt-6'>
-                            <div className='p-6 border rounded-xl bg-gray-50/50 shadow-sm space-y-4'>
-                                <div className='flex justify-between items-center bg-white p-4 rounded-lg border border-gray-100 shadow-sm'>
-                                    <div>
-                                        <h3 className='text-lg font-bold text-gray-900'>Facilities</h3>
-                                        <p className='text-xs text-gray-500'>List the amenities and services available</p>
+                                        <div className="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 border-dashed hover:bg-white hover:border-[#387cae]/30 transition-all group">
+                                            <Label required={true} className="text-[11px] font-black mb-4 block group-hover:text-[#387cae]">Cover Image</Label>
+                                            <FileUploadWithPreview
+                                                label=''
+                                                required={true}
+                                                onUploadComplete={(url) => {
+                                                    handleSetFiles(prev => ({ ...prev, featured_img: url }))
+                                                    setValue('featured_img', url, { shouldValidate: true })
+                                                }}
+                                                defaultPreview={uploadedFiles.featured_img}
+                                                onClear={() => {
+                                                    handleSetFiles(prev => ({ ...prev, featured_img: '' }))
+                                                    setValue('featured_img', '', { shouldValidate: true })
+                                                }}
+                                            />
+                                            {errors.featured_img && (
+                                                <p className='text-[10px] font-semibold text-red-500 mt-2 text-center'>{errors.featured_img.message}</p>
+                                            )}
+                                            <input type="hidden" {...register('featured_img', { required: 'Featured image is required' })} />
+                                        </div>
                                     </div>
-                                    <Button
-                                        type='button'
-                                        variant='outline'
-                                        size='sm'
-                                        className='h-9 px-4 border-gray-200 hover:bg-gray-50'
-                                        onClick={() => appendFacility({ title: '', description: '', icon: '' })}
-                                    >
-                                        <Plus className='w-4 h-4 mr-2' />
-                                        Add Facility
-                                    </Button>
                                 </div>
-                                <div className='space-y-3'>
-                                    {facilityFields.length === 0 && (
-                                        <div className='text-center py-6 border-2 border-dashed rounded-xl bg-white/30 border-gray-200'>
-                                            <p className='text-sm text-gray-400'>No facilities added yet.</p>
-                                        </div>
-                                    )}
-                                    {facilityFields.map((field, index) => (
-                                        <div key={field.id} className='group relative p-5 bg-white border border-gray-200 rounded-xl transition-all hover:shadow-md'>
-                                            <div className='grid grid-cols-1 md:grid-cols-3 gap-4 pr-10'>
-                                                <div className='space-y-1.5'>
-                                                    <Label className='text-xs text-gray-400'>Title</Label>
-                                                    <Input
-                                                        {...register(`facilities[${index}].title`)}
-                                                        placeholder='e.g. WiFi'
-                                                        className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
-                                                    />
-                                                </div>
-                                                <div className='space-y-1.5'>
-                                                    <Label className='text-xs text-gray-400'>Description</Label>
-                                                    <Input
-                                                        {...register(`facilities[${index}].description`)}
-                                                        placeholder='Details...'
-                                                        className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
-                                                    />
-                                                </div>
-                                                <div className='space-y-1.5'>
-                                                    <Label className='text-xs text-gray-400'>Icon Name</Label>
-                                                    <Input
-                                                        {...register(`facilities[${index}].icon`)}
-                                                        placeholder='lucide name'
-                                                        className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
-                                                    />
-                                                </div>
-                                            </div>
-                                            <Button
-                                                type='button'
-                                                variant='ghost'
-                                                size='icon'
-                                                className='absolute top-4 right-4 h-8 w-8 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors rounded-full'
-                                                onClick={() => removeFacility(index)}
-                                            >
-                                                <Trash2 className='w-4 h-4' />
-                                            </Button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
 
-                            <div className='p-6 border rounded-xl bg-gray-50/50 shadow-sm space-y-4'>
-                                <div className='flex justify-between items-center bg-white p-4 rounded-lg border border-gray-100 shadow-sm'>
-                                    <div>
-                                        <h3 className='text-lg font-bold text-gray-900'>Team Members</h3>
-                                        <p className='text-xs text-gray-500'>Manage the faculty and staff directory</p>
+                                {/* Attachments */}
+                                <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
+                                    <SectionHeader icon={FileText} title="Brochure" subtitle="PDF documents" />
+                                    <div className="space-y-4">
+                                        <div>
+                                            <Label htmlFor='college_broucher' className='text-xs font-bold text-gray-400 mb-1.5 block'>Brochure URL</Label>
+                                            <Input
+                                                id='college_broucher'
+                                                {...register('college_broucher')}
+                                                placeholder='URL to PDF brochure'
+                                                className="h-10 rounded-md border-gray-200"
+                                            />
+                                        </div>
                                     </div>
-                                    <Button
-                                        type='button'
-                                        variant='outline'
-                                        size='sm'
-                                        className='h-9 px-4 border-gray-200 hover:bg-gray-50'
-                                        onClick={() => appendMember({ name: '', role: '', image_url: '', bio: '', contact_info: '' })}
-                                    >
-                                        <Plus className='w-4 h-4 mr-2' />
-                                        Add Member
-                                    </Button>
-                                </div>
-                                <div className='space-y-3'>
-                                    {memberFields.length === 0 && (
-                                        <div className='text-center py-6 border-2 border-dashed rounded-xl bg-white/30 border-gray-200'>
-                                            <p className='text-sm text-gray-400'>No members added yet.</p>
-                                        </div>
-                                    )}
-                                    {memberFields.map((field, index) => (
-                                        <div key={field.id} className='group relative p-5 bg-white border border-gray-200 rounded-xl transition-all hover:shadow-md'>
-                                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pr-10'>
-                                                <div className='space-y-1.5'>
-                                                    <Label className='text-xs text-gray-400'>Name</Label>
-                                                    <Input
-                                                        {...register(`members[${index}].name`)}
-                                                        className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
-                                                    />
-                                                </div>
-                                                <div className='space-y-1.5'>
-                                                    <Label className='text-xs text-gray-400'>Role</Label>
-                                                    <Select
-                                                        {...register(`members[${index}].role`)}
-                                                        className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
-                                                    >
-                                                        <option value="">Select Role</option>
-                                                        <option value="Principal">Principal</option>
-                                                        <option value="Professor">Professor</option>
-                                                        <option value="Lecturer">Lecturer</option>
-                                                        <option value="Admin">Admin</option>
-                                                        <option value="Staff">Staff</option>
-                                                    </Select>
-                                                </div>
-                                                <div className='space-y-1.5'>
-                                                    <Label className='text-xs text-gray-400'>Image URL</Label>
-                                                    <Input
-                                                        {...register(`members[${index}].image_url`)}
-                                                        className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
-                                                    />
-                                                </div>
-                                                <div className='space-y-1.5 lg:col-span-2'>
-                                                    <Label className='text-xs text-gray-400'>Bio</Label>
-                                                    <Textarea
-                                                        {...register(`members[${index}].bio`)}
-                                                        rows={2}
-                                                        className='text-sm bg-gray-50/30 border-gray-100 focus-visible:ring-1 resize-none'
-                                                    />
-                                                </div>
-                                                <div className='space-y-1.5'>
-                                                    <Label className='text-xs text-gray-400'>Contact Info</Label>
-                                                    <Input
-                                                        {...register(`members[${index}].contact_info`)}
-                                                        className='h-9 bg-gray-50/30 border-gray-100 focus-visible:ring-1'
-                                                    />
-                                                </div>
-                                            </div>
-                                            <Button
-                                                type='button'
-                                                variant='ghost'
-                                                size='icon'
-                                                className='absolute top-4 right-4 h-8 w-8 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors rounded-full'
-                                                onClick={() => removeMember(index)}
-                                            >
-                                                <Trash2 className='w-4 h-4' />
-                                            </Button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className='p-6 border rounded-xl bg-gray-50/50 shadow-sm space-y-4'>
-                                <div className='flex justify-between items-center bg-white p-4 rounded-lg border border-gray-100 shadow-sm'>
-                                    <div>
-                                        <h3 className='text-lg font-bold text-gray-900'>FAQs</h3>
-                                        <p className='text-xs text-gray-500'>Manage frequently asked questions</p>
-                                    </div>
-                                    <Button
-                                        type='button'
-                                        variant='outline'
-                                        size='sm'
-                                        className='h-9 px-4 border-gray-200 hover:bg-gray-50'
-                                        onClick={() => appendFaq({ question: '', answer: '' })}
-                                    >
-                                        <Plus className='w-4 h-4 mr-2' />
-                                        Add FAQ
-                                    </Button>
                                 </div>
 
-                                <div className='space-y-3'>
-                                    {faqFields.length === 0 && (
-                                        <div className='text-center py-6 border-2 border-dashed rounded-xl bg-white/30 border-gray-200'>
-                                            <p className='text-sm text-gray-400'>No FAQs added yet.</p>
-                                        </div>
-                                    )}
-                                    {faqFields.map((field, index) => (
-                                        <div key={field.id} className='group relative p-5 bg-white border border-gray-200 rounded-xl transition-all hover:shadow-md'>
-                                            <div className='grid grid-cols-1 gap-4 pr-10'>
-                                                <div className='space-y-1.5'>
-                                                    <Input
-                                                        {...register(`faqs[${index}].question`)}
-                                                        placeholder='Enter the question...'
-                                                        className='font-medium text-gray-900 focus-visible:ring-1 border-gray-100 bg-gray-50/30'
-                                                    />
-                                                </div>
-                                                <div className='space-y-1.5'>
-                                                    <Textarea
-                                                        {...register(`faqs[${index}].answer`)}
-                                                        placeholder='Enter the answer...'
-                                                        rows={2}
-                                                        className='text-sm text-gray-600 focus-visible:ring-1 border-gray-100 bg-gray-50/30 resize-none min-h-[80px]'
-                                                    />
-                                                </div>
-                                            </div>
-                                            <Button
-                                                type='button'
-                                                variant='ghost'
-                                                size='icon'
-                                                className='absolute top-4 right-4 h-8 w-8 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors rounded-full'
-                                                onClick={() => removeFaq(index)}
-                                            >
-                                                <Trash2 className='w-4 h-4' />
-                                            </Button>
-                                        </div>
-                                    ))}
+                                {/* Gallery Section */}
+                                <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
+                                    <SectionHeader icon={ImageIcon} title="Image Gallery" subtitle="Visual showcase" />
+                                    <GallerySection
+                                        control={control}
+                                        setValue={setValue}
+                                        uploadedFiles={uploadedFiles}
+                                        setUploadedFiles={handleSetFiles}
+                                        getValues={getValues}
+                                    />
+                                </div>
+
+                                {/* Video Section */}
+                                <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
+                                    <SectionHeader icon={Video} title="Video Gallery" subtitle="Virtual tours & promos" />
+                                    <VideoSection
+                                        control={control}
+                                        setValue={setValue}
+                                        uploadedFiles={uploadedFiles}
+                                        setUploadedFiles={handleSetFiles}
+                                        getValues={getValues}
+                                    />
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
-                            <Button
-                                type='button'
-                                onClick={handleCloseModal}
-                                variant='outline'
-                                size='sm'
-                            >
-                                Cancel
-                            </Button>
-                            <Button type='submit' disabled={submitting || loadingData} size='sm'>
+                    {/* Footer Actions */}
+                    <div className='bg-white border-t border-gray-100 p-6 flex justify-end gap-3 z-20'>
+                        <Button
+                            type='button'
+                            onClick={handleCloseAttempt}
+                            variant='outline'
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type='submit'
+                            disabled={submitting || loadingData}
+                        >
+                            {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                            <span>
                                 {submitting
-                                    ? editSlug
-                                        ? 'Updating...'
-                                        : 'Creating...'
-                                    : editSlug
-                                        ? 'Update College'
-                                        : 'Create College'}
-                            </Button>
-                        </div>
-                    </form>
-                </div>
+                                    ? (editSlug ? 'Updating...' : 'Creating...')
+                                    : (editSlug ? 'Update College' : 'Create College')}
+                            </span>
+                        </Button>
+                    </div>
+                </form>
             </DialogContent>
+
+            <ConfirmationDialog
+                open={showCloseConfirm}
+                onClose={() => setShowCloseConfirm(false)}
+                onConfirm={() => {
+                    setShowCloseConfirm(false)
+                    onSystemClose()
+                }}
+                title="Unsaved Changes"
+                message="You have unsaved changes. Are you sure you want to close? Your progress will be lost."
+                confirmText="Discard & Close"
+                cancelText="Keep Editing"
+            />
         </Dialog>
     )
 }

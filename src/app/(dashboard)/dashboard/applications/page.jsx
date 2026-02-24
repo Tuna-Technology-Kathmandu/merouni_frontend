@@ -2,18 +2,28 @@
 
 import React, { useEffect, useState, useMemo } from 'react'
 import { authFetch } from '@/app/utils/authFetch'
-import { FaEdit, FaTrashAlt } from 'react-icons/fa'
+import { cn } from '@/app/lib/utils'
+import { Edit2, Trash2, Search, FileText, CheckCircle, Clock, XCircle, MoreVertical, RefreshCw, Loader2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogClose,
 } from '@/ui/shadcn/dialog'
-import ShimmerEffect from '../../../../ui/molecules/ShimmerEffect'
 import Table from '@/ui/shadcn/DataTable'
 import { useSelector } from 'react-redux'
 import { destr } from 'destr'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
+import { Button } from '@/ui/shadcn/button'
+import { Input } from '@/ui/shadcn/input'
+import { Label } from '@/ui/shadcn/label'
+import { Textarea } from '@/ui/shadcn/textarea'
+import { Select } from '@/ui/shadcn/select'
+import Loading from '@/ui/molecules/Loading'
+import SearchInput from '@/ui/molecules/SearchInput'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
+import { toast, ToastContainer } from 'react-toastify'
 
 const ApplicationsPage = () => {
   const { setHeading } = usePageHeading()
@@ -22,13 +32,16 @@ const ApplicationsPage = () => {
   const [error, setError] = useState(null)
   const [updatingId, setUpdatingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
-  
-  const rawRole = useSelector((state) => state.user?.data?.roles || state.user?.data?.role)
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState(null)
+
+  const rawRole = useSelector((state) => state.user?.data?.role)
   const role = typeof rawRole === 'string' ? destr(rawRole) || {} : rawRole || {}
   const isConsultancy = role?.consultancy
   const isInstitution = role?.institution
   const [statusModalOpen, setStatusModalOpen] = useState(false)
   const [selectedApplication, setSelectedApplication] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const [statusForm, setStatusForm] = useState({
     status: 'IN_PROGRESS',
     remarks: ''
@@ -37,14 +50,15 @@ const ApplicationsPage = () => {
   useEffect(() => {
     setHeading('Applications')
     loadApplications()
-  }, [])
+    return () => setHeading(null)
+  }, [setHeading])
 
   const loadApplications = async () => {
     try {
       setLoading(true)
       setError(null)
-      
-      const endpoint = isConsultancy 
+
+      const endpoint = isConsultancy
         ? `${process.env.baseUrl}/consultancy-application/mine`
         : `${process.env.baseUrl}/referral/institution/applications`
 
@@ -59,6 +73,7 @@ const ApplicationsPage = () => {
     } catch (err) {
       console.error('Error loading applications:', err)
       setError(err.message || 'Failed to load applications')
+      toast.error(err.message || 'Failed to load applications')
     } finally {
       setLoading(false)
     }
@@ -76,10 +91,6 @@ const ApplicationsPage = () => {
   const handleCloseStatusModal = () => {
     setStatusModalOpen(false)
     setSelectedApplication(null)
-    setStatusForm({
-      status: 'IN_PROGRESS',
-      remarks: ''
-    })
   }
 
   const handleStatusSubmit = async (e) => {
@@ -88,7 +99,7 @@ const ApplicationsPage = () => {
 
     try {
       setUpdatingId(selectedApplication.id)
-      
+
       const endpoint = isConsultancy
         ? `${process.env.baseUrl}/consultancy-application/${selectedApplication.id}/status`
         : `${process.env.baseUrl}/referral/${selectedApplication.id}/status`
@@ -108,27 +119,30 @@ const ApplicationsPage = () => {
         throw new Error('Failed to update application status')
       }
 
-      // Reload applications
+      toast.success('Status updated successfully')
       await loadApplications()
       handleCloseStatusModal()
     } catch (err) {
-      setError(err.message || 'Failed to update application status')
+      toast.error(err.message || 'Failed to update application status')
     } finally {
       setUpdatingId(null)
     }
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this application?')) {
-      return
-    }
+  const handleDeleteClick = (id) => {
+    setDeleteId(id)
+    setIsConfirmOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteId) return
 
     try {
-      setDeletingId(id)
-      
+      setDeletingId(deleteId)
+
       const endpoint = isConsultancy
-        ? `${process.env.baseUrl}/consultancy-application/${id}`
-        : `${process.env.baseUrl}/referral/${id}`
+        ? `${process.env.baseUrl}/consultancy-application/${deleteId}`
+        : `${process.env.baseUrl}/referral/${deleteId}`
 
       const response = await authFetch(endpoint, {
         method: 'DELETE'
@@ -138,30 +152,41 @@ const ApplicationsPage = () => {
         throw new Error('Failed to delete application')
       }
 
+      toast.success('Application deleted successfully')
       await loadApplications()
     } catch (err) {
-      setError(err.message || 'Failed to delete application')
+      toast.error(err.message || 'Failed to delete application')
     } finally {
       setDeletingId(null)
+      setIsConfirmOpen(false)
+      setDeleteId(null)
     }
   }
+
+  const filteredApplications = useMemo(() => {
+    if (!searchQuery) return applications
+    const query = searchQuery.toLowerCase()
+    return applications.filter(app =>
+      (app.student_name || '').toLowerCase().includes(query) ||
+      (app.student_email || '').toLowerCase().includes(query) ||
+      (app.student_phone_no || '').toLowerCase().includes(query)
+    )
+  }, [applications, searchQuery])
 
   const columns = useMemo(() => {
     const cols = [
       {
-        header: 'Student Name',
+        header: 'Student Info',
         accessorKey: 'student_name',
-        cell: ({ row }) => row.original.student_name || 'N/A'
-      },
-      {
-        header: 'Email',
-        accessorKey: 'student_email',
-        cell: ({ row }) => row.original.student_email || 'N/A'
-      },
-      {
-        header: 'Phone',
-        accessorKey: 'student_phone_no',
-        cell: ({ row }) => row.original.student_phone_no || 'N/A'
+        cell: ({ row }) => (
+          <div className="flex flex-col">
+            <span className="font-semibold text-slate-900">{row.original.student_name || 'N/A'}</span>
+            <div className="flex flex-col gap-0.5 mt-1">
+              <span className="text-[10px] text-slate-500 font-medium">{row.original.student_email}</span>
+              <span className="text-[10px] text-slate-500 font-medium">{row.original.student_phone_no}</span>
+            </div>
+          </div>
+        )
       }
     ]
 
@@ -169,39 +194,31 @@ const ApplicationsPage = () => {
       cols.push({
         header: 'Course',
         accessorKey: 'course.title',
-        cell: ({ row }) => row.original?.course?.title || 'N/A'
+        cell: ({ row }) => (
+          <span className="px-2.5 py-0.5 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+            {row.original?.course?.title || 'N/A'}
+          </span>
+        )
       })
     }
 
     cols.push(
       {
-        header: 'Description',
-        accessorKey: 'student_description',
-        cell: ({ row }) => (
-          <span className='text-sm text-gray-600'>
-            {row.original.student_description
-              ? row.original.student_description.length > 50
-                ? `${row.original.student_description.substring(0, 50)}...`
-                : row.original.student_description
-              : 'N/A'}
-          </span>
-        )
-      },
-      {
         header: 'Status',
         accessorKey: 'status',
         cell: ({ row }) => {
           const status = row.original.status || 'IN_PROGRESS'
+          const configs = {
+            ACCEPTED: { color: 'bg-emerald-50 text-emerald-700 border-emerald-100', icon: CheckCircle },
+            REJECTED: { color: 'bg-rose-50 text-rose-700 border-rose-100', icon: XCircle },
+            IN_PROGRESS: { color: 'bg-amber-50 text-amber-700 border-amber-100', icon: Clock }
+          }
+          const config = configs[status] || configs.IN_PROGRESS
+          const Icon = config.icon
+
           return (
-            <span
-              className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                status === 'ACCEPTED'
-                  ? 'bg-green-100 text-green-800'
-                  : status === 'REJECTED'
-                  ? 'bg-red-100 text-red-800'
-                  : 'bg-yellow-100 text-yellow-800'
-              }`}
-            >
+            <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider', config.color)}>
+              <Icon className="w-3 h-3" />
               {status}
             </span>
           )
@@ -211,37 +228,39 @@ const ApplicationsPage = () => {
         header: 'Remarks',
         accessorKey: 'remarks',
         cell: ({ row }) => (
-          <span className='text-sm text-gray-600'>
-            {row.original.remarks
-              ? row.original.remarks.length > 30
-                ? `${row.original.remarks.substring(0, 30)}...`
-                : row.original.remarks
-              : 'N/A'}
-          </span>
+          <div className="max-w-[200px]" title={row.original.remarks}>
+            <p className='text-xs text-slate-600 truncate'>
+              {row.original.remarks || <span className="text-slate-400 italic">No remarks</span>}
+            </p>
+          </div>
         )
       },
       {
         header: 'Actions',
         id: 'actions',
         cell: ({ row }) => (
-          <div className='flex items-center justify-center gap-2'>
-            <button
+          <div className='flex items-center gap-1'>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => handleOpenStatusModal(row.original)}
-              disabled={updatingId === row.original.id}
-              className='text-blue-600 hover:text-blue-800 disabled:opacity-50'
+              className='hover:bg-blue-50 text-blue-600 h-8 w-8'
               title='Update Status'
+              disabled={updatingId === row.original.id}
             >
-              <FaEdit className='inline w-4 h-4' />
-            </button>
+              <Edit2 className='w-3.5 h-3.5' />
+            </Button>
             {!isInstitution && (
-              <button
-                onClick={() => handleDelete(row.original.id)}
-                disabled={deletingId === row.original.id}
-                className='text-red-600 hover:text-red-800 disabled:opacity-50'
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleDeleteClick(row.original.id)}
+                className='hover:bg-red-50 text-red-600 h-8 w-8'
                 title='Delete'
+                disabled={deletingId === row.original.id}
               >
-                <FaTrashAlt className='inline w-4 h-4' />
-              </button>
+                <Trash2 className='w-3.5 h-3.5' />
+              </Button>
             )}
           </div>
         )
@@ -251,93 +270,130 @@ const ApplicationsPage = () => {
     return cols
   }, [isConsultancy, isInstitution, updatingId, deletingId])
 
-  if (loading && applications.length === 0) return <ShimmerEffect />
-  if (error && applications.length === 0)
-    return (
-      <div className='p-4'>
-        <p className='flex items-center justify-center text-center text-red-600'>
-          Error: {error}
-        </p>
-      </div>
-    )
+  if (loading && applications.length === 0) return <Loading />
 
   return (
-    <div className='p-4'>
-      
-      <Table
-        data={applications}
-        columns={columns}
-        loading={loading}
-        showSearch={true}
-        emptyContent='No applications found.'
-      />
+    <div className='w-full space-y-4 p-4'>
+      <ToastContainer />
+
+      {/* Sticky Header */}
+      <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+          <div className="flex items-center gap-3 w-full max-w-md">
+            <SearchInput
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder='Search applications...'
+              className='w-full'
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={loadApplications}
+              className="gap-2 text-slate-600 hover:text-[#387cae] hover:border-[#387cae] h-11 px-6 rounded-lg font-bold text-xs uppercase tracking-wider"
+            >
+              <RefreshCw size={14} className={cn(loading && "animate-spin")} />
+              Refresh
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <Table
+          data={filteredApplications}
+          columns={columns}
+          loading={loading}
+          showSearch={false}
+          emptyContent='No applications found matching your search.'
+        />
+      </div>
 
       {/* Update Status Modal */}
       <Dialog
         isOpen={statusModalOpen}
         onClose={handleCloseStatusModal}
+        className='max-w-md'
       >
-        <DialogContent className='max-w-md'>
-          <DialogHeader>
-            <DialogTitle>Update Application Status</DialogTitle>
+        <DialogContent className='max-w-md p-0'>
+          <DialogHeader className="px-6 py-4 border-b bg-slate-50/50 rounded-t-lg">
+            <DialogTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-[#387cae] flex items-center justify-center text-white">
+                <RefreshCw size={16} />
+              </div>
+              Update Application Status
+            </DialogTitle>
+            <DialogClose onClick={handleCloseStatusModal} />
           </DialogHeader>
-        <form onSubmit={handleStatusSubmit} className='space-y-4'>
-          <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Status <span className='text-red-500'>*</span>
-            </label>
-            <select
-              className='w-full p-2 border rounded'
-              value={statusForm.status}
-              onChange={(e) =>
-                setStatusForm({ ...statusForm, status: e.target.value })
-              }
-              required
-            >
-              <option value='IN_PROGRESS'>IN_PROGRESS</option>
-              <option value='ACCEPTED'>ACCEPTED</option>
-              <option value='REJECTED'>REJECTED</option>
-            </select>
+
+          <div className='p-6'>
+            <form id="status-form" onSubmit={handleStatusSubmit} className='space-y-6'>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label required className="text-xs font-bold tracking-wider">Select Status</Label>
+                  <Select
+                    value={statusForm.status}
+                    onChange={(e) => setStatusForm({ ...statusForm, status: e.target.value })}
+                    className="h-11 w-full"
+                  >
+                    <option value='IN_PROGRESS'>IN_PROGRESS</option>
+                    <option value='ACCEPTED'>ACCEPTED</option>
+                    <option value='REJECTED'>REJECTED</option>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold tracking-wider">Internal Remarks</Label>
+                  <Textarea
+                    rows={4}
+                    value={statusForm.remarks}
+                    onChange={(e) => setStatusForm({ ...statusForm, remarks: e.target.value })}
+                    placeholder='Add any internal notes or remarks...'
+                    className="resize-none focus:ring-[#387cae]/10 h-32"
+                  />
+                </div>
+              </div>
+            </form>
           </div>
 
-          <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Remarks
-            </label>
-            <textarea
-              className='w-full p-2 border rounded'
-              rows={4}
-              value={statusForm.remarks}
-              onChange={(e) =>
-                setStatusForm({ ...statusForm, remarks: e.target.value })
-              }
-              placeholder='Enter remarks (optional)'
-            />
-          </div>
-
-          {error && <div className='text-red-500 text-sm'>{error}</div>}
-
-          <div className='flex justify-end gap-2 pt-2'>
-            <button
+          <div className='sticky bottom-0 bg-white border-t p-4 px-6 flex justify-end gap-3 rounded-b-lg'>
+            <Button
               type='button'
+              variant="outline"
               onClick={handleCloseStatusModal}
-              className='px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200'
+              className="h-11 px-6 font-bold text-xs uppercase tracking-wider"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type='submit'
+              form="status-form"
               disabled={updatingId === selectedApplication?.id}
-              className='px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50'
+              className="bg-[#387cae] hover:bg-[#387cae]/90 text-white min-w-[140px] h-11 px-6 font-bold text-xs uppercase tracking-wider shadow-lg shadow-[#387cae]/20"
             >
-              {updatingId === selectedApplication?.id
-                ? 'Updating...'
-                : 'Update'}
-            </button>
+              {updatingId === selectedApplication?.id ? (
+                <>
+                  <Loader2 size={16} className="animate-spin mr-2" />
+                  Updating...
+                </>
+              ) : (
+                'Save Changes'
+              )}
+            </Button>
           </div>
-        </form>
         </DialogContent>
       </Dialog>
+
+      <ConfirmationDialog
+        open={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title='Delete Application'
+        message='Are you sure you want to permanently delete this application? This action cannot be undone.'
+        confirmText='Delete Application'
+        cancelText='Keep Application'
+      />
     </div>
   )
 }

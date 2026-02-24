@@ -10,15 +10,10 @@ import { Plus, Trash2, X } from 'lucide-react'
 import FileUpload from '@/app/(dashboard)/dashboard/addCollege/FileUpload'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
-import dynamic from 'next/dynamic'
 import { useSelector } from 'react-redux'
-
-const CKEditor = dynamic(
-  () => import('@/ui/molecules/ck-editor/CKStable'),
-  {
-    ssr: false
-  }
-)
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
+import SearchSelectCreate from '@/ui/shadcn/search-select-create'
+import { fetchCourses } from './actions'
 
 export default function EditConsultancyPage() {
   const [loading, setLoading] = useState(true)
@@ -27,9 +22,8 @@ export default function EditConsultancyPage() {
     featured: '',
     logo: ''
   })
-  const [collegeSearch, setCollegeSearch] = useState('')
-  const [searchResults, setSearchResults] = useState([])
   const [selectedColleges, setSelectedColleges] = useState([])
+  const [selectedDestinations, setSelectedDestinations] = useState([])
   const author_id = useSelector((state) => state.user.data?.id)
 
   const {
@@ -60,12 +54,6 @@ export default function EditConsultancyPage() {
       courses: []
     }
   })
-
-  const {
-    fields: destinationFeilds,
-    append: appendDestination,
-    remove: removeDestination
-  } = useFieldArray({ control, name: 'destination' })
 
   useEffect(() => {
     loadConsultancyData()
@@ -111,12 +99,15 @@ export default function EditConsultancyPage() {
           : []
       const destinationForForm = (
         Array.isArray(parsedDestination) ? parsedDestination : []
-      ).map((d) =>
-        typeof d === 'string' ? { country: d } : { country: d?.country ?? '' }
-      )
+      ).map((d) => {
+        const title = typeof d === 'string' ? d : (d?.country || d?.title || '')
+        return { id: title, title: title }
+      }).filter(d => d.id)
+
+      setSelectedDestinations(destinationForForm)
       setValue(
         'destination',
-        destinationForForm.length ? destinationForForm : []
+        destinationForForm.map(d => d.title)
       )
 
       // Parse Address
@@ -177,36 +168,6 @@ export default function EditConsultancyPage() {
     }
   }
 
-  const searchCollege = async (e) => {
-    const query = e.target.value
-    setCollegeSearch(query)
-    if (query.length < 2) {
-      setSearchResults([])
-      return
-    }
-
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/course?q=${query}`
-      )
-      const data = await response.json()
-      setSearchResults(data.items || [])
-    } catch (error) {
-      console.error('College Search Error:', error)
-      toast.error('Failed to search colleges')
-    }
-  }
-
-  const addCollege = (college) => {
-    if (!selectedColleges.some((c) => c.id === college.id)) {
-      const newColleges = [...selectedColleges, college]
-      setSelectedColleges(newColleges)
-      setValue('courses', newColleges.map((c) => c.id))
-    }
-    setCollegeSearch('')
-    setSearchResults([])
-  }
-
   const removeCollege = (collegeId) => {
     const newColleges = selectedColleges.filter((c) => c.id !== collegeId)
     setSelectedColleges(newColleges)
@@ -218,11 +179,7 @@ export default function EditConsultancyPage() {
       setSubmitting(true)
       const payload = {
         title: data.title?.trim() || '',
-        destination: Array.isArray(data.destination)
-          ? data.destination
-            .map((d) => (typeof d === 'string' ? d : d?.country ?? ''))
-            .filter(Boolean)
-          : [],
+        destination: selectedDestinations.map(d => d.title).filter(Boolean),
         address: data.address || {},
         featured_image: uploadedFiles.featured || '',
         logo:
@@ -343,57 +300,42 @@ export default function EditConsultancyPage() {
             </div>
             <div className='space-y-2'>
               <Label htmlFor='description'>Description</Label>
-              <CKEditor
+              <TipTapEditor
                 value={watch('description') || ''}
                 onChange={(data) => setValue('description', data)}
-                id='consultancy-description-editor'
+                placeholder="Write about your consultancy..."
               />
             </div>
           </div>
 
           {/* Destinations */}
           <div className='space-y-4'>
-            <div className='flex justify-between items-center'>
-              <h3 className='text-sm font-semibold text-gray-900 border-b pb-2 flex-1'>
-                Destinations (Countries)
-              </h3>
-              <Button
-                type='button'
-                variant='outline'
-                size='sm'
-                onClick={() => appendDestination({ country: '' })}
-                className='shrink-0 ml-4'
-              >
-                <Plus className='w-4 h-4 mr-1' />
-                Add Country
-              </Button>
-            </div>
+            <h3 className='text-sm font-semibold text-gray-900 border-b pb-2 flex-1'>
+              Destinations (Countries)
+            </h3>
             <div className='space-y-3'>
-              {destinationFeilds.map((field, index) => (
-                <div key={field.id} className='flex gap-3 items-end'>
-                  <div className='flex-1 space-y-2'>
-                    <Label htmlFor={`destination-${index}`}>
-                      Country
-                    </Label>
-                    <Input
-                      id={`destination-${index}`}
-                      {...register(`destination.${index}.country`)}
-                      placeholder=''
-                    />
-                  </div>
-                  {index > 0 && (
-                    <Button
-                      type='button'
-                      variant='outline'
-                      size='icon'
-                      onClick={() => removeDestination(index)}
-                      className='shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10'
-                    >
-                      <Trash2 className='w-4 h-4' />
-                    </Button>
-                  )}
-                </div>
-              ))}
+              <SearchSelectCreate
+                allowCreate={true}
+                onSearch={() => []}
+                onCreate={(query) => ({ id: query, title: query })}
+                onSelect={(item) => {
+                  const current = selectedDestinations || []
+                  if (!current.some(d => d.id === item.id)) {
+                    const updatedDestinations = [...current, item]
+                    setSelectedDestinations(updatedDestinations)
+                    setValue('destination', updatedDestinations.map(d => d.title))
+                  }
+                }}
+                onRemove={(item) => {
+                  const fresh = selectedDestinations.filter(d => d.id !== item.id)
+                  setSelectedDestinations(fresh)
+                  setValue('destination', fresh.map(d => d.title))
+                }}
+                selectedItems={selectedDestinations}
+                placeholder="Search or add countries..."
+                isMulti={true}
+                displayKey="title"
+              />
             </div>
           </div>
 
@@ -443,49 +385,25 @@ export default function EditConsultancyPage() {
             <h3 className='text-sm font-semibold text-gray-900 border-b pb-2'>
               Courses
             </h3>
-            <div className='flex flex-wrap gap-2 mb-3'>
-              {selectedColleges.map((college) => (
-                <span
-                  key={college.id}
-                  className='inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary'
-                >
-                  {college.title}
-                  <button
-                    type='button'
-                    onClick={() => removeCollege(college.id)}
-                    className='rounded-full hover:bg-primary/20 p-0.5'
-                    aria-label='Remove'
-                  >
-                    <X className='w-3.5 h-3.5' />
-                  </button>
-                </span>
-              ))}
-            </div>
-            <div className='relative space-y-2'>
-              <Label htmlFor='course-search'>Search courses</Label>
-              <Input
-                id='course-search'
-                type='text'
-                value={collegeSearch}
-                onChange={searchCollege}
-                placeholder='Type to search and add courses...'
-              />
-              {searchResults.length > 0 && (
-                <ul className='absolute z-10 w-full mt-1 rounded-md border bg-popover shadow-md max-h-60 overflow-auto py-1'>
-                  {searchResults.map((college) => (
-                    <li key={college.id}>
-                      <button
-                        type='button'
-                        onClick={() => addCollege(college)}
-                        className='w-full px-3 py-2 text-left text-sm hover:bg-accent hover:text-accent-foreground'
-                      >
-                        {college.title}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <SearchSelectCreate
+              onSearch={fetchCourses}
+              onSelect={(item) => {
+                const current = watch('courses') || []
+                if (!current.includes(item.id)) {
+                  setValue('courses', [...current, item.id])
+                  setSelectedColleges(prev => [...prev, item])
+                }
+              }}
+              onRemove={(item) => {
+                const current = watch('courses') || []
+                setValue('courses', current.filter(id => id !== item.id))
+                setSelectedColleges(prev => prev.filter(c => c.id !== item.id))
+              }}
+              selectedItems={selectedColleges}
+              placeholder="Search and add courses..."
+              isMulti={true}
+              displayKey="title"
+            />
           </div>
 
           {/* Contact & URLs */}

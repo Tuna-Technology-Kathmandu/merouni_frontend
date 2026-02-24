@@ -1,17 +1,8 @@
 'use client'
-import React, { useState, useEffect } from 'react'
-import CollegeCard from './CollegeCard'
-import { useRef } from 'react'
 import { getColleges } from '@/app/action'
-import Link from 'next/link'
-import { useQuery } from '@tanstack/react-query'
 import { useScrollContainer } from '@/hooks/useScrollContainer'
-
-const gradients = [
-  'linear-gradient(150deg,#00ADEF, #B5F1F8)',
-  'linear-gradient(150deg, #FF4B54, #FF6A88)',
-  'linear-gradient(150deg, #0049FF, #C7D6FE)'
-]
+import { useQuery } from '@tanstack/react-query'
+import CollegeCard from './CollegeCard'
 
 const Colleges = () => {
   /**
