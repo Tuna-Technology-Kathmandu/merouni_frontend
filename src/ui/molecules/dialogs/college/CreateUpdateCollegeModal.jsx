@@ -1,4 +1,3 @@
-import UniversityDropdown from '@/ui/molecules/dropdown/UniversityDropdown'
 import { Button } from '@/ui/shadcn/button'
 import {
     Dialog,
@@ -37,7 +36,8 @@ import { toast } from 'react-toastify'
 
 import {
     createCollege,
-    getUniversityBySlug
+    getUniversityBySlug,
+    fetchUniversities
 } from '@/app/(dashboard)/dashboard/addCollege/actions'
 import { cn } from '@/app/lib/utils'
 import { authFetch } from '@/app/utils/authFetch'
@@ -79,6 +79,7 @@ const CreateUpdateCollegeModal = ({
         images: [],
         videos: []
     })
+    const [selectedUniversity, setSelectedUniversity] = useState(null)
 
     const author_id = useSelector((state) => state.user.data?.id)
 
@@ -169,6 +170,7 @@ const CreateUpdateCollegeModal = ({
             setFilesDirty(false)
             setUniSlug('')
             setUniversityPrograms([])
+            setSelectedUniversity(null)
         }
     }, [isOpen, reset])
 
@@ -208,6 +210,7 @@ const CreateUpdateCollegeModal = ({
 
                     if (collegeData.university) {
                         setUniSlug(collegeData.university.slugs)
+                        setSelectedUniversity(collegeData.university)
                     }
 
                     if (collegeData.degrees && Array.isArray(collegeData.degrees)) {
@@ -245,7 +248,7 @@ const CreateUpdateCollegeModal = ({
                         college_logo: collegeData.college_logo || '',
                         featured_img: collegeData.featured_img || '',
                         images: images.length === 1 && !images[0].url ? [] : images,
-                        
+
                     })
 
                     setValue('college_logo', collegeData.college_logo || '')
@@ -585,12 +588,24 @@ const CreateUpdateCollegeModal = ({
                                     <div className='space-y-6'>
                                         <div>
                                             <Label required={true}>Affiliated University</Label>
-                                            <UniversityDropdown
-                                                onChange={(id, selectedUni) => {
-                                                    setValue('university_id', id, { shouldDirty: true, shouldValidate: true })
-                                                    if (selectedUni) setUniSlug(selectedUni.slugs)
+                                            <SearchSelectCreate
+                                                onSearch={fetchUniversities}
+                                                onSelect={(uni) => {
+                                                    setSelectedUniversity(uni)
+                                                    setValue('university_id', uni.id, { shouldDirty: true, shouldValidate: true })
+                                                    setUniSlug(uni.slugs)
                                                 }}
-                                                value={watch('university_id')}
+                                                onRemove={() => {
+                                                    setSelectedUniversity(null)
+                                                    setValue('university_id', '', { shouldDirty: true, shouldValidate: true })
+                                                    setUniSlug('')
+                                                }}
+                                                selectedItems={selectedUniversity}
+                                                placeholder="Search or select university..."
+                                                displayKey="fullname"
+                                                valueKey="id"
+                                                isMulti={false}
+                                                className="w-full"
                                             />
                                             {errors.university_id && (
                                                 <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.university_id.message}</p>

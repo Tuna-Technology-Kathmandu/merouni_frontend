@@ -30,14 +30,22 @@ const ImageSection = ({ college }) => {
         </div>
         <div className='flex flex-row min-h-[80px] md:h-[100px] bg-white items-center p-4 px-4 sm:px-8 md:px-14 lg:px-24 gap-4 sm:gap-6 shadow-sm relative z-10'>
           <div className='flex items-center justify-center rounded-2xl bg-white -translate-y-10 sm:-translate-y-12 md:-translate-y-16 overflow-hidden w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 flex-shrink-0 shadow-xl border-4 border-white transition-transform hover:scale-105 duration-300'>
-            <img
-              src={
-                college?.college_logo ||
-                `https://avatar.iran.liara.run/username?username=${college?.name}`
-              }
-              alt='College Logo'
-              className='object-cover w-full h-full rounded-xl aspect-square'
-            />
+            {college?.college_logo ? (
+              <img
+                src={college.college_logo}
+                alt='College Logo'
+                className='object-cover w-full h-full rounded-xl aspect-square'
+                onError={(e) => {
+                  e.target.style.display = 'none'
+                  e.target.nextSibling.style.display = 'flex'
+                }}
+              />
+            ) : null}
+            <div
+              className={`${college?.college_logo ? 'hidden' : 'flex'} w-full h-full items-center justify-center text-4xl sm:text-5xl md:text-6xl font-bold bg-[#387cae]/10 text-[#387cae]`}
+            >
+              {college?.name?.charAt(0) || '?'}
+            </div>
           </div>
           <div className='flex-1 min-w-0 -mt-2'>
             <h1 className='font-semibold text-xl md:text-2xl text-gray-900 truncate'>
@@ -51,7 +59,7 @@ const ImageSection = ({ college }) => {
                 <p className='text-sm text-gray-600 truncate'>
                   {college?.collegeAddress?.street}
                   {college?.collegeAddress?.street &&
-                  college?.collegeAddress?.city
+                    college?.collegeAddress?.city
                     ? ', '
                     : ''}
                   {college?.collegeAddress?.city}
