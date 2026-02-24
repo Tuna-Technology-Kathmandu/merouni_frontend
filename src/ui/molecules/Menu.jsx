@@ -4,7 +4,7 @@ import { removeUser } from '@/app/utils/userSlice'
 import { destr } from 'destr'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { menuItems } from '@/constants/menuList'
 import { ChevronDown, ChevronRight } from 'lucide-react'
@@ -179,6 +179,33 @@ const Menu = ({ isCollapsed = false }) => {
   const dispatch = useDispatch()
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
   const [expandedMenus, setExpandedMenus] = useState({})
+  
+  // Section Collapse State
+  const [collapsedSections, setCollapsedSections] = useState({})
+  
+  // Load initial section collapse state from localStorage
+  useEffect(() => {
+    try {
+      const savedState = localStorage.getItem('menu_collapsed_sections')
+      if (savedState) {
+        setCollapsedSections(JSON.parse(savedState))
+      }
+    } catch (e) {
+      console.error('Failed to parse collapsed sections state', e)
+    }
+  }, [])
+  
+  const toggleSection = (title) => {
+    setCollapsedSections((prev) => {
+      const newState = { ...prev, [title]: !prev[title] }
+      try {
+        localStorage.setItem('menu_collapsed_sections', JSON.stringify(newState))
+      } catch (e) {
+        console.error('Failed to save collapsed sections state', e)
+      }
+      return newState
+    })
+  }
 
   // Parse Role
   const rawRole = useSelector((state) => state.user?.data?.role)
@@ -261,16 +288,28 @@ const Menu = ({ isCollapsed = false }) => {
 
   return (
     <nav className='w-full px-3 py-4 space-y-6 pb-20'>
-      {filteredMenuItems.map((section, idx) => (
+      {filteredMenuItems.map((section, idx) => {
+        const isSectionCollapsed = collapsedSections[section.title] ?? false
+        
+        return (
         <div key={section.title || idx} className='space-y-1'>
           {!isCollapsed && section.title && (
-            <h2 className='px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-4'>
-              {section.title}
-            </h2>
+            <button
+              onClick={() => toggleSection(section.title)}
+              className='w-full flex items-center justify-between px-3 group mt-4 mb-2 cursor-pointer'
+            >
+              <h2 className='text-xs font-semibold text-gray-400 uppercase tracking-wider group-hover:text-gray-600 transition-colors'>
+                {section.title}
+              </h2>
+              <ChevronDown
+                className={`w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 transition-all duration-200 ${isSectionCollapsed ? '-rotate-90' : ''}`}
+              />
+            </button>
           )}
 
-          <div className='space-y-0.5'>
-            {section.items.map((item) => {
+          {!isSectionCollapsed && (
+            <div className='space-y-0.5'>
+              {section.items.map((item) => {
               // 1. Logout Special Case
               if (item.href === '/dashboard/logout') {
                 return (
@@ -331,9 +370,11 @@ const Menu = ({ isCollapsed = false }) => {
                 />
               )
             })}
-          </div>
+            </div>
+          )}
         </div>
-      ))}
+        )
+      })}
 
       <ConfirmationDialog
         open={isLogoutDialogOpen}
