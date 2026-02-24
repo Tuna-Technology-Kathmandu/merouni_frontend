@@ -11,6 +11,8 @@ import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import ExportModal from './ExportModal'
+import UserTypeFilter from './UserTypeFilter'
+import StudentDetailsModal from './StudentDetailsModal'
 import {
   Dialog,
   DialogContent,
@@ -46,7 +48,7 @@ const EMPTY_FORM = {
 export default function UsersManager() {
   const { setHeading } = usePageHeading()
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedUserType, setSelectedUserType] = useState('all')
+  const [selectedUserTypes, setSelectedUserTypes] = useState([])
   const [searchTimeout, setSearchTimeout] = useState(null)
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
@@ -62,6 +64,10 @@ export default function UsersManager() {
   const [formError, setFormError] = useState(null)
   const [showPasswordValue, setShowPasswordValue] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  // Student View State
+  const [viewingStudent, setViewingStudent] = useState(null)
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
 
   // Delete confirmation
   const [deleteId, setDeleteId] = useState(null)
@@ -73,7 +79,7 @@ export default function UsersManager() {
     setHeading('User Management')
     loadUsers()
     return () => setHeading(null)
-  }, [setHeading, selectedUserType])
+  }, [setHeading, selectedUserTypes])
 
   useEffect(() => {
     return () => {
@@ -88,8 +94,8 @@ export default function UsersManager() {
       setLoading(true)
 
       let url = `${process.env.baseUrl}/users?page=${page}`
-      if (selectedUserType !== 'all') {
-        url += `&role=${selectedUserType}`
+      if (selectedUserTypes.length > 0) {
+        url += `&role=${selectedUserTypes.join(',')}`
       }
 
       const response = await authFetch(url, {
@@ -122,7 +128,9 @@ export default function UsersManager() {
     try {
       const token = localStorage.getItem('access_token')
       let url = `${process.env.baseUrl}/users?q=${query}`
-      if (selectedUserType !== 'all') url += `&role=${selectedUserType}`
+      if (selectedUserTypes.length > 0) {
+        url += `&role=${selectedUserTypes.join(',')}`
+      }
 
       const response = await authFetch(url, {
         headers: { Authorization: `Bearer ${token}` }
@@ -248,6 +256,11 @@ export default function UsersManager() {
     setIsFormOpen(true)
   }
 
+  const handleView = (user) => {
+    setViewingStudent(user)
+    setIsViewModalOpen(true)
+  }
+
   const handleDeleteClick = (id) => {
     setDeleteId(id)
     setIsDeleteDialogOpen(true)
@@ -290,7 +303,7 @@ export default function UsersManager() {
   }
 
   const columns = useMemo(
-    () => createColumns({ handleEdit, handleDelete: handleDeleteClick }),
+    () => createColumns({ handleEdit, handleDelete: handleDeleteClick, handleView }),
     []
   )
 
@@ -306,7 +319,11 @@ export default function UsersManager() {
             placeholder='Search users...'
             className='max-w-md w-full'
           />
-          <div className='flex gap-2 shrink-0'>
+          <div className='flex gap-2 shrink-0 items-center justify-end w-full sm:w-auto mt-4 sm:mt-0'>
+            <UserTypeFilter
+              selectedTypes={selectedUserTypes}
+              onChange={setSelectedUserTypes}
+            />
             <Button
               variant='outline'
               onClick={() => setIsExportModalOpen(true)}
@@ -502,6 +519,13 @@ export default function UsersManager() {
         <h2 className='text-xl font-bold mb-4'>Export Users</h2>
         <p>This is the modal content. You can add any form or content here.</p>
       </ExportModal>
+
+      {/* Student Details View Modal */}
+      <StudentDetailsModal
+        isOpen={isViewModalOpen}
+        onClose={() => { setIsViewModalOpen(false); setViewingStudent(null) }}
+        student={viewingStudent}
+      />
     </div>
   )
 }

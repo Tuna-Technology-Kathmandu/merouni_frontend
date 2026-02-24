@@ -107,14 +107,22 @@ export default function DisciplineManager() {
         {
             header: 'Title',
             accessorKey: 'title',
-            cell: ({ row }) => <span className="font-medium text-gray-900">{row.original.title}</span>
-        },
-        {
-            header: 'Image',
-            accessorKey: 'featured_image',
-            cell: ({ getValue }) => getValue()
-                ? <img src={getValue()} alt='Discipline' className='w-10 h-10 object-cover rounded-md border' />
-                : <span className="text-gray-400 italic text-xs">—</span>
+            cell: ({ row }) => (
+                <div className='flex items-center gap-3'>
+                    {row.original.featured_image ? (
+                        <img
+                            src={row.original.featured_image}
+                            alt={row.original.title}
+                            className='w-9 h-9 object-cover rounded-md border border-gray-200 shrink-0'
+                        />
+                    ) : (
+                        <div className='w-9 h-9 rounded-md border border-gray-200 bg-gray-100 flex items-center justify-center text-gray-400 text-xs shrink-0'>
+                            —
+                        </div>
+                    )}
+                    <span className='font-medium text-gray-900'>{row.original.title}</span>
+                </div>
+            )
         },
         {
             header: 'Description',

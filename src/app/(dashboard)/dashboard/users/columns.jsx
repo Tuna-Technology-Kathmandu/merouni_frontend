@@ -1,8 +1,8 @@
-import { Edit2, Trash2 } from 'lucide-react'
+import { Edit2, Trash2, Eye } from 'lucide-react'
 import { Button } from '@/ui/shadcn/button'
 import { formatRelativeWithTitle } from '@/utils/date.util'
 
-export const createColumns = ({ handleEdit, handleDelete }) => [
+export const createColumns = ({ handleEdit, handleDelete, handleView }) => [
   {
     header: 'Full Name',
     accessorKey: 'fullName',
@@ -71,27 +71,53 @@ export const createColumns = ({ handleEdit, handleDelete }) => [
   {
     header: 'Actions',
     id: 'actions',
-    cell: ({ row }) => (
-      <div className='flex gap-1'>
-        <Button
-          variant='ghost'
-          size='icon'
-          onClick={() => handleEdit(row.original)}
-          className='hover:bg-amber-50 text-amber-600'
-          title='Edit'
-        >
-          <Edit2 className='w-4 h-4' />
-        </Button>
-        <Button
-          variant='ghost'
-          size='icon'
-          onClick={() => handleDelete(row.original.id)}
-          className='hover:bg-red-50 text-red-600'
-          title='Delete'
-        >
-          <Trash2 className='w-4 h-4' />
-        </Button>
-      </div>
-    )
+    cell: ({ row }) => {
+      let isStudent = false
+      let roles = row.original.roles || {}
+      if (typeof roles === 'string') {
+        try {
+          roles = JSON.parse(roles)
+        } catch (e) {
+          roles = {}
+        }
+      }
+      if (roles.student === true) {
+        isStudent = true
+      }
+
+      return (
+        <div className='flex gap-1'>
+          {isStudent && handleView && (
+            <Button
+              variant='ghost'
+              size='icon'
+              onClick={() => handleView(row.original)}
+              className='hover:bg-blue-50 text-blue-600'
+              title='View Details'
+            >
+              <Eye className='w-4 h-4' />
+            </Button>
+          )}
+          <Button
+            variant='ghost'
+            size='icon'
+            onClick={() => handleEdit(row.original)}
+            className='hover:bg-amber-50 text-amber-600'
+            title='Edit'
+          >
+            <Edit2 className='w-4 h-4' />
+          </Button>
+          <Button
+            variant='ghost'
+            size='icon'
+            onClick={() => handleDelete(row.original.id)}
+            className='hover:bg-red-50 text-red-600'
+            title='Delete'
+          >
+            <Trash2 className='w-4 h-4' />
+          </Button>
+        </div>
+      )
+    }
   }
 ]
