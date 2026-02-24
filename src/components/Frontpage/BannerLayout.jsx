@@ -1,4 +1,10 @@
 'use client'
+import Link from 'next/link'
+
+const isExpired = (banner) => {
+  if (!banner?.date_of_expiry) return false
+  return new Date(banner.date_of_expiry) < new Date()
+}
 
 const BannerLayout = ({ banners = [], loading = false }) => {
   if (loading) {
@@ -14,9 +20,10 @@ const BannerLayout = ({ banners = [], loading = false }) => {
     )
   }
 
-  const displayBanners = [1, 2, 3].map((position) =>
-    banners.find((banner) => banner.display_position === position)
-  )
+  const displayBanners = [1, 2, 3].map((position) => {
+    const banner = banners.find((b) => b.display_position === position)
+    return (!banner || isExpired(banner)) ? null : banner
+  })
 
   return (
     <div className='flex flex-col sm:flex-row gap-4 md:gap-3 lg:gap-3 justify-center sm:flex-nowrap xl:flex-nowrap'>
@@ -44,8 +51,14 @@ const BannerLayout = ({ banners = [], loading = false }) => {
               />
             </a>
           ) : (
-            <div className='w-full h-[44px] md:h-[58px] lg:h-[70px] flex items-center justify-center text-gray-500'>
-              Contact for Ads
+            <div className='group relative w-full h-[44px] md:h-[58px] lg:h-[70px] flex items-center justify-center text-gray-400 text-xs font-medium bg-gray-50 rounded-lg overflow-hidden cursor-pointer'>
+              <span className='group-hover:opacity-0 transition-opacity duration-200'>Ads place available</span>
+              <Link
+                href='/contact'
+                className='absolute inset-0 flex items-center justify-center bg-[#387cae]/90 text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-200'
+              >
+                Contact Us
+              </Link>
             </div>
           )}
         </div>

@@ -6,11 +6,19 @@ import useAdminPermission from '@/hooks/useAdminPermission'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import { Button } from '@/ui/shadcn/button'
 import { formatDate } from '@/utils/date.util'
-import { Edit, X } from 'lucide-react'
+import { Edit, X, GripVertical } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast, ToastContainer } from 'react-toastify'
 import FileUpload from '../addCollege/FileUpload'
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core'
+import { useDraggable, useDroppable } from '@dnd-kit/core'
 import {
   Dialog,
   DialogContent,
@@ -20,6 +28,109 @@ import {
 } from '@/ui/shadcn/dialog'
 import { Label } from '@/ui/shadcn/label'
 import { Input } from '@/ui/shadcn/input'
+
+function BannerPositionCard({ position, hasBanner, banner, status, showAlert, onEdit, onDelete }) {
+  const { setNodeRef: setDropRef, isOver } = useDroppable({ id: position })
+  const { attributes, listeners, setNodeRef: setDragRef, isDragging } = useDraggable({
+    id: position,
+    disabled: !hasBanner
+  })
+
+  return (
+    <div
+      ref={setDropRef}
+      className={`border-2 border-dashed rounded-lg p-4 min-h-[200px] flex flex-col relative transition-all duration-200 ${
+        isOver ? 'border-[#387cae] bg-[#387cae]/5 scale-[1.01]' : 'border-gray-300'
+      } ${isDragging ? 'opacity-40' : ''}`}
+    >
+      {/* Header */}
+      <div className='flex justify-between items-center mb-3'>
+        <div className='flex items-center gap-2'>
+          {hasBanner && (
+            <span
+              ref={setDragRef}
+              {...attributes}
+              {...listeners}
+              className='cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 transition-colors'
+              title='Drag to reorder'
+            >
+              <GripVertical size={16} />
+            </span>
+          )}
+          <h3 className='text-base font-semibold text-gray-800'>Position {position}</h3>
+        </div>
+        <button
+          onClick={() => onEdit(position)}
+          className='px-2.5 py-1 text-white rounded-lg hover:opacity-90 transition-all flex items-center gap-1.5 text-xs shadow-sm'
+          style={{ backgroundColor: THEME_BLUE }}
+          title={hasBanner ? 'Edit Banner' : 'Create Banner'}
+        >
+          <Edit size={12} />
+        </button>
+      </div>
+
+      {hasBanner && banner ? (
+        <div className='flex-1 flex flex-col'>
+          <div className='mb-3 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 min-h-[8rem]'>
+            {banner.banner_image ? (
+              <img
+                src={banner.banner_image}
+                alt={banner.title}
+                className='w-full h-32 object-cover'
+                onError={(e) => {
+                  e.target.onerror = null
+                  e.target.style.display = 'none'
+                  e.target.nextSibling && (e.target.nextSibling.style.display = 'flex')
+                }}
+              />
+            ) : null}
+            <div className='w-full h-32 hidden items-center justify-center bg-gray-100 text-gray-400 text-xs'>
+              Image unavailable
+            </div>
+          </div>
+
+          {showAlert && (
+            <span className={`inline-block self-start text-xs font-medium px-2 py-0.5 rounded-full mb-2 ${status === 'Expired!' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'}`}>
+              {status}
+            </span>
+          )}
+
+          <div className='mb-2'>
+            <h4 className='font-medium text-gray-800 text-sm mb-1 line-clamp-1'>{banner.title || 'Untitled Banner'}</h4>
+            {banner.website_url && (
+              <a href={banner.website_url} target='_blank' rel='noopener noreferrer'
+                className='hover:underline text-xs block mb-1 truncate font-medium'
+                style={{ color: THEME_BLUE }}
+              >
+                {banner.website_url}
+              </a>
+            )}
+            {banner.date_of_expiry && (
+              <p className={`text-xs ${showAlert ? 'text-red-600' : 'text-gray-500'}`}>
+                Expires: {formatDate(banner.date_of_expiry)}
+              </p>
+            )}
+          </div>
+
+          <button
+            onClick={() => onDelete(banner.id)}
+            className='mt-auto self-end text-red-400 hover:text-red-600 transition-colors p-1 rounded hover:bg-red-50'
+            title='Delete banner'
+          >
+            <X size={14} />
+          </button>
+        </div>
+      ) : (
+        <div className='flex-1 flex flex-col items-center justify-center gap-2 text-gray-300'>
+          <div className='w-10 h-10 rounded-full border-2 border-dashed border-gray-200 flex items-center justify-center'>
+            <Edit size={14} className='text-gray-300' />
+          </div>
+          <p className='text-xs text-gray-400 text-center'>No banner — drop here or click edit</p>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function BannerForm() {
   const { setHeading } = usePageHeading()
@@ -32,6 +143,12 @@ export default function BannerForm() {
   const [editId, setEditingId] = useState(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [bannersByPosition, setBannersByPosition] = useState({})
+  const [activeDragBanner, setActiveDragBanner] = useState(null)
+  const [isDragging, setIsDragging] = useState(false)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  )
 
   const {
     register,
@@ -62,7 +179,7 @@ export default function BannerForm() {
   const fetchBannersByPosition = async () => {
     try {
       const response = await authFetch(
-        `${process.env.baseUrl}/banner`
+        `${process.env.baseUrl}/banner?filter=all&limit=50`
       )
       const data = await response.json()
       const grouped = {}
@@ -210,6 +327,52 @@ export default function BannerForm() {
     return null
   }
 
+  const handleDragStart = ({ active }) => {
+    setIsDragging(true)
+    const fromPosition = active.id
+    const banner = (bannersByPosition[fromPosition] || [])[0]
+    setActiveDragBanner(banner || null)
+  }
+
+  const handleDragEnd = async ({ active, over }) => {
+    setIsDragging(false)
+    setActiveDragBanner(null)
+    if (!over || active.id === over.id) return
+
+    const fromPos = active.id
+    const toPos = over.id
+    const fromBanners = bannersByPosition[fromPos] || []
+    const toBanners = bannersByPosition[toPos] || []
+
+    if (fromBanners.length === 0) return
+
+    const fromBanner = fromBanners[0]
+    const toBanner = toBanners[0] || null
+
+    try {
+      // Update the dragged banner to the new position
+      await authFetch(`${process.env.baseUrl}/banner/${fromBanner.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ display_position: toPos })
+      })
+
+      // If the target position had a banner, swap it back to the original position
+      if (toBanner) {
+        await authFetch(`${process.env.baseUrl}/banner/${toBanner.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ display_position: fromPos })
+        })
+      }
+
+      toast.success('Banner position updated!')
+      await fetchBannersByPosition()
+    } catch (err) {
+      toast.error('Failed to update banner position')
+    }
+  }
+
   const handlePositionEdit = (position) => {
     const banners = bannersByPosition[position] || []
     if (banners.length > 0) {
@@ -229,100 +392,45 @@ export default function BannerForm() {
     <div className='container mx-auto p-4'>
       <ToastContainer />
 
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8'>
-        {[1, 2, 3, 4, 5, 6, 7].map((position) => {
-          const banners = bannersByPosition[position] || []
-          const hasBanner = banners.length > 0
-          const banner = hasBanner ? banners[0] : null
-          const status = banner
-            ? getExpirationStatus(banner.date_of_expiry)
-            : null
-          const showAlert = banner
-            ? isExpiredOrExpiringToday(banner.date_of_expiry)
-            : false
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8'>
+          {[1, 2, 3, 4, 5, 6, 7].map((position) => {
+            const banners = bannersByPosition[position] || []
+            const hasBanner = banners.length > 0
+            const banner = hasBanner ? banners[0] : null
+            const status = banner ? getExpirationStatus(banner.date_of_expiry) : null
+            const showAlert = banner ? isExpiredOrExpiringToday(banner.date_of_expiry) : false
 
-          return (
-            <div
+            return <BannerPositionCard
               key={position}
-              className='border-2 border-dashed border-gray-300 rounded-lg p-6 min-h-[200px] flex flex-col relative'
-            >
-              <div className='flex justify-between items-center mb-4'>
-                <h3 className='text-lg font-semibold'>Position {position}</h3>
-                <button
-                  onClick={() => handlePositionEdit(position)}
-                  className='px-3 py-1.5 text-white rounded-lg hover:opacity-90 transition-all flex items-center gap-2 text-sm shadow-sm'
-                  style={{ backgroundColor: THEME_BLUE }}
-                  title={hasBanner ? 'Edit Banner' : 'Create Banner'}
-                >
-                  <Edit size={14} />
-                  {/* Edit */}
-                </button>
-              </div>
+              position={position}
+              hasBanner={hasBanner}
+              banner={banner}
+              status={status}
+              showAlert={showAlert}
+              onEdit={handlePositionEdit}
+              onDelete={(id) => { setDeleteId(id); setIsDialogOpen(true) }}
+            />
+          })}
+        </div>
 
-              {hasBanner && banner ? (
-                <div className='flex-1 flex flex-col'>
-                  {/* Banner Image */}
-                  <div className='mb-4 rounded-lg overflow-hidden border border-gray-200 bg-gray-50'>
-                    <img
-                      src={banner.banner_image}
-                      alt={banner.title}
-                      className='w-full h-32 object-cover'
-                    />
-                  </div>
-
-                  {showAlert && (
-                    <span
-                      className={`inline-block self-start text-xs font-medium px-2 py-1 rounded-full mb-3 ${status === 'Expired!'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-amber-100 text-amber-800'
-                        }`}
-                    >
-                      {status}
-                    </span>
-                  )}
-
-                  {/* Banner content */}
-                  <div className='mb-2'>
-                    <h4 className='font-medium text-gray-800 mb-2'>
-                      {banner.title ||
-                        banner.Banners?.[0]?.title ||
-                        'Untitled Banner'}
-                    </h4>
-
-                    {banner.website_url && (
-                      <a
-                        href={banner.website_url}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='hover:underline text-sm block mb-2 truncate font-medium'
-                        style={{ color: THEME_BLUE }}
-                      >
-                        {banner.website_url}
-                      </a>
-                    )}
-
-                    {banner.date_of_expiry && (
-                      <p
-                        className={`text-sm ${showAlert ? 'text-red-600' : 'text-gray-600'
-                          }`}
-                      >
-                        Expires:{' '}
-                        {formatDate(banner.date_of_expiry)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className='flex-1 flex items-center justify-center'>
-                  <p className='text-gray-400 text-center'>
-                    No banner for this position
-                  </p>
-                </div>
-              )}
+        <DragOverlay>
+          {activeDragBanner ? (
+            <div className='border-2 border-[#387cae] rounded-lg p-4 bg-white shadow-2xl opacity-95 w-72'>
+              <img
+                src={activeDragBanner.banner_image}
+                alt={activeDragBanner.title}
+                className='w-full h-28 object-cover rounded-md mb-2'
+              />
+              <p className='font-medium text-gray-800 text-sm truncate'>{activeDragBanner.title}</p>
             </div>
-          )
-        })}
-      </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
 
       <Dialog
         isOpen={isOpen}
