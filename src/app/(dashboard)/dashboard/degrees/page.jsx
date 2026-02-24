@@ -48,12 +48,14 @@ export default function DegreePage() {
     }
   }, [searchTimeout])
 
-  const fetchDegrees = async (page = 1) => {
+  const fetchDegrees = async (page = 1, query = searchQuery) => {
     setTableLoading(true)
     try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/degree?page=${page}`
-      )
+      let url = `${process.env.baseUrl}/degree?page=${page}`
+      if (query) {
+        url += `&q=${encodeURIComponent(query)}`
+      }
+      const response = await authFetch(url)
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Failed to fetch degrees')
       setDegrees(data.items || [])
@@ -90,30 +92,7 @@ export default function DegreePage() {
   }
 
   const handleSearch = async (query) => {
-    if (!query) {
-      fetchDegrees()
-      return
-    }
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/degree?q=${encodeURIComponent(query)}`
-      )
-      const data = await response.json()
-      if (response.ok) {
-        setDegrees(data.items || [])
-        if (data.pagination) {
-          setPagination({
-            currentPage: data.pagination.currentPage,
-            totalPages: data.pagination.totalPages,
-            total: data.pagination.totalCount
-          })
-        }
-      } else {
-        setDegrees([])
-      }
-    } catch {
-      setDegrees([])
-    }
+    fetchDegrees(1, query)
   }
 
   const handleDeleteClick = (id) => {
@@ -206,7 +185,7 @@ export default function DegreePage() {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         initialData={editingDegree}
-        onSuccess={fetchDegrees}
+        onSuccess={() => fetchDegrees(pagination.currentPage, searchQuery)}
       />
 
       <ViewDegree

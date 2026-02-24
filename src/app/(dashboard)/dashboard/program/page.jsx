@@ -55,14 +55,16 @@ export default function ProgramForm() {
 
   const { requireAdmin } = useAdminPermission()
 
-  const fetchPrograms = async (page = 1) => {
+  const fetchPrograms = async (page = 1, query = searchQuery) => {
     setTableLoading(true)
     try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/program?page=${page}`
-      )
+      let url = `${process.env.baseUrl}/program?page=${page}`
+      if (query) {
+        url += `&q=${encodeURIComponent(query)}`
+      }
+      const response = await authFetch(url)
       const data = await response.json()
-      setPrograms(data.items)
+      setPrograms(data.items || [])
       setPagination({
         currentPage: data.pagination.currentPage,
         totalPages: data.pagination.totalPages,
@@ -141,34 +143,7 @@ export default function ProgramForm() {
   }
 
   const handleSearch = async (query) => {
-    if (!query) {
-      fetchPrograms()
-      return
-    }
-
-    try {
-      const response = await authFetch(
-        `${process.env.baseUrl}/program?q=${query}`
-      )
-      if (response.ok) {
-        const data = await response.json()
-        setPrograms(data.items)
-
-        if (data.pagination) {
-          setPagination({
-            currentPage: data.pagination.currentPage,
-            totalPages: data.pagination.totalPages,
-            total: data.pagination.totalCount
-          })
-        }
-      } else {
-        console.error('Error fetching programs:', response.statusText)
-        setPrograms([])
-      }
-    } catch (error) {
-      console.error('Error fetching programs search results:', error.message)
-      setPrograms([])
-    }
+    fetchPrograms(1, query)
   }
 
   const columns = [
@@ -227,7 +202,7 @@ export default function ProgramForm() {
     }
   ]
 
-  console.log(programs,"programsprograms")
+  console.log(programs, "programsprograms")
   return (
     <div className='w-full space-y-4 p-4'>
       {/* Header Section */}
@@ -265,7 +240,7 @@ export default function ProgramForm() {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         slug={selectedSlug}
-        onSuccess={fetchPrograms}
+        onSuccess={() => fetchPrograms(pagination.currentPage, searchQuery)}
       />
 
       <ViewProgram
