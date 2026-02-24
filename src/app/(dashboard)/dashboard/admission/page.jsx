@@ -142,7 +142,8 @@ export default function AdmissionManager() {
     // Set selected objects for SearchSelectCreate
     setSelectedCollege(item.collegeAdmissionCollege ? {
       id: item.collegeAdmissionCollege.id,
-      name: item.collegeAdmissionCollege.name
+      name: item.collegeAdmissionCollege.name,
+      college_logo: item.collegeAdmissionCollege.college_logo
     } : null)
 
     setSelectedProgram(item.program ? {
@@ -310,6 +311,42 @@ export default function AdmissionManager() {
                       placeholder="Search and select college..."
                       isMulti={false}
                       displayKey="name"
+                      renderItem={(item) => (
+                        <div className="flex items-center gap-3">
+                          {item.college_logo ? (
+                            <img
+                              src={item.college_logo}
+                              alt={item.name}
+                              className="w-7 h-7 rounded-full object-cover border border-gray-200 shrink-0"
+                            />
+                          ) : (
+                            <div className="w-7 h-7 rounded-full bg-[#387cae]/10 flex items-center justify-center shrink-0">
+                              <span className="text-xs font-bold text-[#387cae]">
+                                {item.name?.charAt(0)?.toUpperCase() || 'C'}
+                              </span>
+                            </div>
+                          )}
+                          <span className="text-sm font-medium text-gray-800">{item.name}</span>
+                        </div>
+                      )}
+                      renderSelected={(item) => (
+                        <div className="flex items-center gap-3">
+                          {item.college_logo ? (
+                            <img
+                              src={item.college_logo}
+                              alt={item.name}
+                              className="w-7 h-7 rounded-full object-cover border border-gray-200 shrink-0"
+                            />
+                          ) : (
+                            <div className="w-7 h-7 rounded-full bg-[#387cae]/10 flex items-center justify-center shrink-0">
+                              <span className="text-xs font-bold text-[#387cae]">
+                                {item.name?.charAt(0)?.toUpperCase() || 'C'}
+                              </span>
+                            </div>
+                          )}
+                          <span className="text-sm font-semibold text-gray-900 truncate">{item.name}</span>
+                        </div>
+                      )}
                     />
                     <input type="hidden" {...register('college_id', { required: 'College is required' })} />
                     {errors.college_id && <p className="text-xs text-red-500">{errors.college_id.message}</p>}
