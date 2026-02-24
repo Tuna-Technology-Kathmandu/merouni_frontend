@@ -1,9 +1,16 @@
 import { Skeleton } from '../../ui/shadcn/Skeleton'
+import Link from 'next/link'
+
+const isExpired = (banner) => {
+  if (!banner?.date_of_expiry) return false
+  return new Date(banner.date_of_expiry) < new Date()
+}
 
 const AdLayout = ({ banners = [], size = '', number = 1, loading = false }) => {
-  const displayBanners = [8, 9, 10].map((position) =>
-    banners.find((banner) => banner.display_position === position)
-  )
+  const displayBanners = [8, 9, 10].map((position) => {
+    const banner = banners.find((b) => b.display_position === position)
+    return (!banner || isExpired(banner)) ? null : banner
+  })
 
   if (loading) {
     return (
@@ -47,8 +54,14 @@ const AdLayout = ({ banners = [], size = '', number = 1, loading = false }) => {
                 />
               </a>
             ) : (
-              <div className='w-full h-[44px] md:h-[58px] lg:h-[70px] flex items-center justify-center text-gray-500'>
-                Contact for Ads
+              <div className='group relative w-full h-[44px] md:h-[58px] lg:h-[70px] flex items-center justify-center text-gray-400 text-xs font-medium bg-gray-50 rounded-lg overflow-hidden cursor-pointer'>
+                <span className='group-hover:opacity-0 transition-opacity duration-200'>Ads place available</span>
+                <Link
+                  href='/contact'
+                  className='absolute inset-0 flex items-center justify-center bg-[#387cae]/90 text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-200'
+                >
+                  Contact Us
+                </Link>
               </div>
             )}
           </div>
