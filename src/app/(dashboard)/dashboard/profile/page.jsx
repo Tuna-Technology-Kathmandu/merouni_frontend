@@ -29,7 +29,7 @@ import {
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import FileUpload from '../addCollege/FileUpload'
+import FileUpload from '../colleges/FileUpload'
 
 const ProfileUpdate = () => {
   const { setHeading } = usePageHeading()

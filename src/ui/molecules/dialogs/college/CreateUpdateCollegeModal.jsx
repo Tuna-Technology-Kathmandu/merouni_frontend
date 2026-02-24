@@ -38,7 +38,7 @@ import {
     createCollege,
     getUniversityBySlug,
     fetchUniversities
-} from '@/app/(dashboard)/dashboard/addCollege/actions'
+} from '@/app/(dashboard)/dashboard/colleges/actions'
 import { cn } from '@/app/lib/utils'
 import { authFetch } from '@/app/utils/authFetch'
 import GallerySection from './components/GallerySection'
@@ -67,6 +67,7 @@ const CreateUpdateCollegeModal = ({
     allDegrees
 }) => {
     const [submitting, setSubmitting] = useState(false)
+    const [submittingDraft, setSubmittingDraft] = useState(false)
     const [loadingData, setLoadingData] = useState(false)
     const [showCloseConfirm, setShowCloseConfirm] = useState(false)
     const [uniSlug, setUniSlug] = useState('')
@@ -79,7 +80,7 @@ const CreateUpdateCollegeModal = ({
         images: [],
         videos: []
     })
-    const [selectedUniversity, setSelectedUniversity] = useState(null)
+    const [selectedUniversities, setSelectedUniversities] = useState([])
 
     const author_id = useSelector((state) => state.user.data?.id)
 
@@ -97,7 +98,7 @@ const CreateUpdateCollegeModal = ({
         defaultValues: {
             name: '',
             author_id: author_id,
-            university_id: '',
+            university_id: [],
             institute_type: 'Private',
             institute_level: [],
             courses: [],
@@ -121,7 +122,8 @@ const CreateUpdateCollegeModal = ({
             map_type: '',
             contacts: ['', ''],
             members: [],
-            faqs: [{ question: '', answer: '' }]
+            faqs: [{ question: '', answer: '' }],
+            status: 'Published'
         }
     })
 
@@ -170,7 +172,7 @@ const CreateUpdateCollegeModal = ({
             setFilesDirty(false)
             setUniSlug('')
             setUniversityPrograms([])
-            setSelectedUniversity(null)
+            setSelectedUniversities([])
         }
     }, [isOpen, reset])
 
@@ -203,14 +205,21 @@ const CreateUpdateCollegeModal = ({
                     setValue('description', collegeData.description)
                     setValue('content', collegeData.content)
                     setValue('website_url', collegeData.website_url)
+                    setValue('status', collegeData.status || 'Published')
 
                     if (collegeData.university_id) {
-                        setValue('university_id', Number(collegeData.university_id))
+                        const uniIds = Array.isArray(collegeData.university_id)
+                            ? collegeData.university_id.map(Number)
+                            : [Number(collegeData.university_id)]
+                        setValue('university_id', uniIds)
                     }
 
-                    if (collegeData.university) {
-                        setUniSlug(collegeData.university.slugs)
-                        setSelectedUniversity(collegeData.university)
+                    if (collegeData.university || collegeData.universities) {
+                        const unis = collegeData.universities || (collegeData.university ? [collegeData.university] : [])
+                        setSelectedUniversities(unis)
+                        if (unis.length > 0) {
+                            setUniSlug(unis[unis.length - 1].slugs)
+                        }
                     }
 
                     if (collegeData.degrees && Array.isArray(collegeData.degrees)) {
@@ -400,15 +409,18 @@ const CreateUpdateCollegeModal = ({
         }
     }
 
-    const onSubmit = async (data) => {
+    const handleSave = async (data, status = 'Published') => {
         try {
-            setSubmitting(true)
+            status === 'Draft' ? setSubmittingDraft(true) : setSubmitting(true)
 
             // Filter logic
             data.members = (data.members || []).filter(m => Object.values(m).some(v => v && v.toString().trim() !== ''))
             if (data.members.length === 0) delete data.members
 
-            data.university_id = parseInt(data.university_id)
+            const uniIds = (data.university_id || []).map(id => parseInt(id)).filter(id => !isNaN(id))
+            if (uniIds.length > 0) data.university_id = uniIds
+            else delete data.university_id
+
             data.degrees = (data.degrees || []).map(id => parseInt(id)).filter(id => !isNaN(id))
 
             const coursesArray = (data.courses || []).map(c => parseInt(c)).filter(c => !isNaN(c) && c > 0)
@@ -429,9 +441,11 @@ const CreateUpdateCollegeModal = ({
                 data.images = [{ file_type: '', url: '' }]
             }
 
+            data.status = status
+
             await createCollege(data)
 
-            toast.success(editSlug ? 'College updated successfully!' : 'College created successfully!')
+            toast.success(status === 'Draft' ? 'Draft saved successfully!' : (editSlug ? 'College updated successfully!' : 'College created successfully!'))
             onSuccess?.()
             onSystemClose()
         } catch (error) {
@@ -439,7 +453,23 @@ const CreateUpdateCollegeModal = ({
             toast.error(error.message || 'Failed to submit data')
         } finally {
             setSubmitting(false)
+            setSubmittingDraft(false)
         }
+    }
+
+    const onSubmit = async (data) => {
+        await handleSave(data, 'Published')
+    }
+
+    const onSaveDraft = async () => {
+        const data = getValues()
+        // When saving as draft, we might want to skip basic validation
+        // But we still need the college name at least
+        if (!data.name) {
+            toast.error('College name is required even for drafts')
+            return
+        }
+        await handleSave(data, 'Draft')
     }
     return (
         <Dialog isOpen={isOpen} onClose={handleCloseAttempt} closeOnOutsideClick={false} className='max-w-7xl'>
@@ -587,30 +617,47 @@ const CreateUpdateCollegeModal = ({
                                     <SectionHeader icon={GraduationCap} title="Academic Details" subtitle="Affiliation and programs" />
                                     <div className='space-y-6'>
                                         <div>
-                                            <Label required={true}>Affiliated University</Label>
+                                            <Label required={true}>Affiliated Universities</Label>
                                             <SearchSelectCreate
                                                 onSearch={fetchUniversities}
                                                 onSelect={(uni) => {
-                                                    setSelectedUniversity(uni)
-                                                    setValue('university_id', uni.id, { shouldDirty: true, shouldValidate: true })
-                                                    setUniSlug(uni.slugs)
+                                                    const current = getValues('university_id') || []
+                                                    const newIds = [...new Set([...current, uni.id])]
+                                                    setValue('university_id', newIds, { shouldDirty: true, shouldValidate: true })
+
+                                                    const currentUnis = selectedUniversities || []
+                                                    if (!currentUnis.find(u => u.id === uni.id)) {
+                                                        const updatedUnis = [...currentUnis, uni]
+                                                        setSelectedUniversities(updatedUnis)
+                                                        setUniSlug(uni.slugs) // Use latest for context
+                                                    }
                                                 }}
-                                                onRemove={() => {
-                                                    setSelectedUniversity(null)
-                                                    setValue('university_id', '', { shouldDirty: true, shouldValidate: true })
-                                                    setUniSlug('')
+                                                onRemove={(uni) => {
+                                                    const targetId = uni.id || uni
+                                                    const current = getValues('university_id') || []
+                                                    const newIds = current.filter(id => id !== targetId)
+                                                    setValue('university_id', newIds, { shouldDirty: true, shouldValidate: true })
+
+                                                    const updatedUnis = selectedUniversities.filter(u => u.id !== targetId)
+                                                    setSelectedUniversities(updatedUnis)
+
+                                                    if (updatedUnis.length > 0) {
+                                                        setUniSlug(updatedUnis[updatedUnis.length - 1].slugs)
+                                                    } else {
+                                                        setUniSlug('')
+                                                    }
                                                 }}
-                                                selectedItems={selectedUniversity}
-                                                placeholder="Search or select university..."
+                                                selectedItems={selectedUniversities}
+                                                placeholder="Search or select universities..."
                                                 displayKey="fullname"
                                                 valueKey="id"
-                                                isMulti={false}
+                                                isMulti={true}
                                                 className="w-full"
                                             />
                                             {errors.university_id && (
                                                 <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.university_id.message}</p>
                                             )}
-                                            <input type="hidden" {...register('university_id', { required: 'Please select a university' })} />
+                                            <input type="hidden" {...register('university_id', { required: 'Please select at least one university' })} />
                                         </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -1061,8 +1108,28 @@ const CreateUpdateCollegeModal = ({
                             Cancel
                         </Button>
                         <Button
+                            type='button'
+                            onClick={onSaveDraft}
+                            variant='secondary'
+                            disabled={submitting || submittingDraft || loadingData}
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-700 border-none px-4"
+                        >
+                            {submittingDraft ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span>Saving Draft...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <FileText className="w-4 h-4" />
+                                    <span>Save as Draft</span>
+                                </>
+                            )}
+                        </Button>
+                        <Button
                             type='submit'
-                            disabled={submitting || loadingData}
+                            disabled={submitting || submittingDraft || loadingData}
+                            className="px-4"
                         >
                             {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                             <span>

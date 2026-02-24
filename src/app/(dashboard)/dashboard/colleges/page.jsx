@@ -86,7 +86,7 @@ export default function CollegeForm() {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    setHeading(level === 'School' ? 'School Management' : 'College Management')
+    setHeading('College Management')
     const loadInitialColleges = async () => {
       const page = parseInt(searchParams.get('page')) || 1
       const level = searchParams.get('level')
@@ -94,9 +94,6 @@ export default function CollegeForm() {
       setTableLoading(true)
       try {
         let url = `${process.env.baseUrl}/college?limit=10&page=${page}`
-        if (level) {
-          url += `&level=${level}`
-        }
         const response = await authFetch(url)
         if (response.ok) {
           const data = await response.json()
@@ -206,11 +203,7 @@ export default function CollegeForm() {
       params.set('page', page)
       router.push(`${pathname}?${params.toString()}`, { scroll: false })
 
-      const level = searchParams.get('level')
       let url = `${process.env.baseUrl}/college?limit=10&page=${page}`
-      if (level) {
-        url += `&level=${level}`
-      }
       const response = await authFetch(url)
 
       if (response.ok) {
@@ -239,11 +232,7 @@ export default function CollegeForm() {
     }
 
     try {
-      const level = searchParams.get('level')
       let url = `${process.env.baseUrl}/college?q=${query}`
-      if (level) {
-        url += `&level=${level}`
-      }
       const response = await authFetch(url)
       if (response.ok) {
         const data = await response.json()

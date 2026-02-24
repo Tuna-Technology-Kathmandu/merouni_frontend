@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 
 import Table from '@/ui/shadcn/DataTable'
-import FileUpload from '../addCollege/FileUpload'
+import FileUpload from '../colleges/FileUpload'
 import {
   Dialog,
   DialogContent,

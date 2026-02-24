@@ -1,18 +1,17 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useForm, useFieldArray, Controller } from 'react-hook-form'
+import FileUpload from '@/app/(dashboard)/dashboard/colleges/FileUpload'
+import { authFetch } from '@/app/utils/authFetch'
 import { Button } from '@/ui/shadcn/button'
+import { Checkbox } from '@/ui/shadcn/checkbox'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
-import { Textarea } from '@/ui/shadcn/textarea'
-import { Checkbox } from '@/ui/shadcn/checkbox'
-import { Plus, Trash2, X } from 'lucide-react'
-import FileUpload from '@/app/(dashboard)/dashboard/addCollege/FileUpload'
-import { authFetch } from '@/app/utils/authFetch'
-import { toast } from 'react-toastify'
-import { useSelector } from 'react-redux'
-import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 import SearchSelectCreate from '@/ui/shadcn/search-select-create'
+import { Textarea } from '@/ui/shadcn/textarea'
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
+import { useEffect, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
 import { fetchCourses } from './actions'
 
 export default function EditConsultancyPage() {
@@ -311,7 +310,7 @@ export default function EditConsultancyPage() {
           {/* Destinations */}
           <div className='space-y-4'>
             <h3 className='text-sm font-semibold text-gray-900 border-b pb-2 flex-1'>
-              Destinations (Countries)
+              Student's Destination (Countries)
             </h3>
             <div className='space-y-3'>
               <SearchSelectCreate
@@ -342,7 +341,7 @@ export default function EditConsultancyPage() {
           {/* Address */}
           <div className='space-y-4'>
             <h3 className='text-sm font-semibold text-gray-900 border-b pb-2'>
-              Address
+              Consultancy's Location
             </h3>
             <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
               <div className='space-y-2'>

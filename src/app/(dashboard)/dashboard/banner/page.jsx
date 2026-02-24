@@ -10,7 +10,7 @@ import { Edit, X, GripVertical } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast, ToastContainer } from 'react-toastify'
-import FileUpload from '../addCollege/FileUpload'
+import FileUpload from '../colleges/FileUpload'
 import {
   DndContext,
   DragOverlay,
@@ -39,9 +39,8 @@ function BannerPositionCard({ position, hasBanner, banner, status, showAlert, on
   return (
     <div
       ref={setDropRef}
-      className={`border-2 border-dashed rounded-lg p-4 min-h-[200px] flex flex-col relative transition-all duration-200 ${
-        isOver ? 'border-[#387cae] bg-[#387cae]/5 scale-[1.01]' : 'border-gray-300'
-      } ${isDragging ? 'opacity-40' : ''}`}
+      className={`border-2 border-dashed rounded-lg p-4 min-h-[200px] flex flex-col relative transition-all duration-200 ${isOver ? 'border-[#387cae] bg-[#387cae]/5 scale-[1.01]' : 'border-gray-300'
+        } ${isDragging ? 'opacity-40' : ''}`}
     >
       {/* Header */}
       <div className='flex justify-between items-center mb-3'>

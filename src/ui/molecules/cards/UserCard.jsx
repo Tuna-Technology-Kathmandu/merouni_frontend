@@ -16,7 +16,7 @@ const UserCard = ({ type, value, loading }) => {
       case 'users':
         return '/dashboard/users'
       case 'college':
-        return '/dashboard/addCollege'
+        return '/dashboard/colleges'
       case 'university':
         return '/dashboard/university'
       case 'consultancy':

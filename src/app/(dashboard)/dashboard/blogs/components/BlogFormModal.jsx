@@ -10,7 +10,7 @@ import { Image as ImageIcon, Info, Layers, Loader2, Settings } from 'lucide-reac
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
-import FileUpload from '../../addCollege/FileUpload'
+import FileUpload from '../../colleges/FileUpload'
 import { Textarea } from '@/ui/shadcn/textarea'
 import { Select } from '@/ui/shadcn/select'
 

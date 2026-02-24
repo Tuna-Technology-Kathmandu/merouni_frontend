@@ -6,7 +6,7 @@ import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
-import FileUpload from '../../addCollege/FileUpload'
+import FileUpload from '../../colleges/FileUpload'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 import { authFetch } from '@/app/utils/authFetch'
@@ -315,7 +315,7 @@ export default function NewsForm({
                       </select>
                     </div>
 
-                   
+
                   </div>
                 </div>
               </div>

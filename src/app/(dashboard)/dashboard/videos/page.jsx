@@ -17,7 +17,7 @@ import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loader from '../../../../ui/molecules/Loading'
-import FileUpload from '../addCollege/FileUpload'
+import FileUpload from '../colleges/FileUpload'
 import { fetchVideos } from './action'
 import { Textarea } from '@/ui/shadcn/textarea'
 

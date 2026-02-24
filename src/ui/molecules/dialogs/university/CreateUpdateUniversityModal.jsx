@@ -59,6 +59,7 @@ const CreateUpdateUniversityModal = ({
     onSuccess
 }) => {
     const [submitting, setSubmitting] = useState(false)
+    const [submittingDraft, setSubmittingDraft] = useState(false)
     const [loadingData, setLoadingData] = useState(false)
     const [showCloseConfirm, setShowCloseConfirm] = useState(false)
     const [allLevels, setAllLevels] = useState([])
@@ -115,7 +116,8 @@ const CreateUpdateUniversityModal = ({
                 }
             ],
             map: '',
-            gallery: []
+            gallery: [],
+            status: 'Published'
         }
     })
 
@@ -187,6 +189,7 @@ const CreateUpdateUniversityModal = ({
                     setValue('type_of_institute', uniData.type_of_institute || 'Public')
                     setValue('map', uniData.map || '')
                     setValue('description', uniData.description || '')
+                    setValue('status', uniData.status || 'Published')
 
                     if (uniData.contact) {
                         setValue('contact.faxes', uniData.contact.faxes || '')
@@ -265,7 +268,8 @@ const CreateUpdateUniversityModal = ({
                 programs: [],
                 members: [{ role: '', salutation: '', name: '', phone: '', email: '' }],
                 map: '',
-                gallery: []
+                gallery: [],
+                status: 'Published'
             })
             setUploadedFiles({
                 logo: '',
@@ -321,9 +325,9 @@ const CreateUpdateUniversityModal = ({
         }
     }
 
-    const onSubmit = async (data) => {
+    const handleSave = async (data, status = 'Published') => {
         try {
-            setSubmitting(true)
+            status === 'Draft' ? setSubmittingDraft(true) : setSubmitting(true)
 
             // Filter logic
             data.members = (data.members || []).filter(m => Object.values(m).some(v => v && v.toString().trim() !== ''))
@@ -335,6 +339,8 @@ const CreateUpdateUniversityModal = ({
 
             data.levels = (data.levels || []).map(id => parseInt(id)).filter(id => !isNaN(id))
             data.programs = (data.programs || []).map(id => parseInt(id)).filter(id => !isNaN(id))
+
+            data.status = status
 
             const url = `${process.env.baseUrl}/university`
             const method = editSlug ? 'PUT' : 'POST'
@@ -352,7 +358,7 @@ const CreateUpdateUniversityModal = ({
                 throw new Error(res.message || 'Failed to save university')
             }
 
-            toast.success(editSlug ? 'University updated successfully!' : 'University created successfully!')
+            toast.success(status === 'Draft' ? 'Draft saved successfully!' : (editSlug ? 'University updated successfully!' : 'University created successfully!'))
             onSuccess?.()
             onSystemClose()
         } catch (error) {
@@ -360,7 +366,23 @@ const CreateUpdateUniversityModal = ({
             toast.error(error.message || 'Failed to submit data')
         } finally {
             setSubmitting(false)
+            setSubmittingDraft(false)
         }
+    }
+
+    const onSubmit = async (data) => {
+        await handleSave(data, 'Published')
+    }
+
+    const onSaveDraft = async () => {
+        const data = getValues()
+        // When saving as draft, we might want to skip basic validation
+        // But we still need the university name at least for most backends
+        if (!data.fullname) {
+            toast.error('University name is required even for drafts')
+            return
+        }
+        await handleSave(data, 'Draft')
     }
 
     const onSearchCourses = async (query) => {
@@ -854,8 +876,27 @@ const CreateUpdateUniversityModal = ({
                             Cancel
                         </Button>
                         <Button
+                            type='button'
+                            onClick={onSaveDraft}
+                            variant='secondary'
+                            disabled={submitting || submittingDraft}
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-700 border-none"
+                        >
+                            {submittingDraft ? (
+                                <>
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                    <span>Saving Draft...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <FileText className="w-5 h-5" />
+                                    <span>Save as Draft</span>
+                                </>
+                            )}
+                        </Button>
+                        <Button
                             type='submit'
-                            disabled={submitting}
+                            disabled={submitting || submittingDraft}
                         >
                             {submitting ? (
                                 <>

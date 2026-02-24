@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import { useForm, useFieldArray } from 'react-hook-form'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
-import FileUpload from '../addCollege/FileUpload'
+import FileUpload from '../colleges/FileUpload'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
 
@@ -13,7 +13,7 @@ import {
   fetchAllCourse,
   fetchAllUniversity,
   getUniversityBySlug
-} from '../addCollege/actions'
+} from '../colleges/actions'
 import { Upload } from 'lucide-react'
 import GallerySection from '@/ui/molecules/dialogs/college/components/GallerySection'
 import VideoSection from '@/ui/molecules/dialogs/college/components/VideoSection'

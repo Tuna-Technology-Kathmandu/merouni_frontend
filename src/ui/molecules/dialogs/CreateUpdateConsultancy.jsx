@@ -1,20 +1,17 @@
 'use client'
-import React, { useState, useEffect } from 'react'
-import { useForm, useFieldArray, Controller } from 'react-hook-form'
-import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
+import FileUpload from '@/app/(dashboard)/dashboard/colleges/FileUpload'
+import { createOrUpdateConsultancy, fetchCourses } from '@/app/(dashboard)/dashboard/consultancy/actions'
 import { Button } from '@/ui/shadcn/button'
+import { Checkbox } from '@/ui/shadcn/checkbox'
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from '@/ui/shadcn/dialog'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
-import { Textarea } from '@/ui/shadcn/textarea'
-import { Checkbox } from '@/ui/shadcn/checkbox'
-import { Plus, Trash2, X, PlusCircle } from 'lucide-react'
-import FileUpload from '@/app/(dashboard)/dashboard/addCollege/FileUpload'
-import { authFetch } from '@/app/utils/authFetch'
-import { toast } from 'react-toastify'
+import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 import { Select } from '@/ui/shadcn/select'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
-import SearchSelectCreate from '@/ui/shadcn/search-select-create'
-import { fetchCourses, createOrUpdateConsultancy } from '@/app/(dashboard)/dashboard/consultancy/actions'
+import { useEffect, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
 
 export default function CreateUpdateConsultancy({
     isOpen,
@@ -257,10 +254,10 @@ export default function CreateUpdateConsultancy({
 
                         {/* Destinations & Courses */}
                         <section className="space-y-4">
-                            <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Destinations & Courses</h3>
+                            <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Student's Destination & Courses</h3>
                             <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
                                 <div className='space-y-4'>
-                                    <Label>Target Destinations</Label>
+                                    <Label>Student's Destination (Countries)</Label>
                                     <SearchSelectCreate
                                         allowCreate={true}
                                         onSearch={() => []}
@@ -312,7 +309,7 @@ export default function CreateUpdateConsultancy({
 
                         {/* Contact & Location */}
                         <section className="space-y-4">
-                            <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Contact & Location</h3>
+                            <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Contact & Consultancy's Location</h3>
                             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                                 <div className='space-y-4'>
                                     <div className='grid grid-cols-2 gap-4'>

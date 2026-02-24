@@ -34,7 +34,7 @@ export const createColumns = ({
       }
     },
     {
-      header: 'Destinations',
+      header: "Student's Destination",
       accessorKey: 'destination',
       cell: ({ row }) => {
         let destinations = row.original.destination
@@ -55,7 +55,7 @@ export const createColumns = ({
       }
     },
     {
-      header: 'Address',
+      header: "Consultancy's Location",
       accessorKey: 'address',
       cell: ({ row }) => {
         const address =
@@ -108,7 +108,7 @@ export const createColumns = ({
           ) : (
 
             null
-)}
+          )}
         </div>
       )
     }

@@ -147,7 +147,17 @@ export default function ConsultancyManager() {
       )
     },
     {
-      header: 'Locations',
+      header: 'Consultancy Location',
+      accessorKey: 'address',
+      cell: ({ row }) => {
+        const address = typeof row.original.address === 'string'
+          ? JSON.parse(row.original.address)
+          : row.original.address || {}
+        return <span className="text-gray-600 italic text-xs">{address.city || 'N/A'}</span>
+      }
+    },
+    {
+      header: "Student's Destination",
       accessorKey: 'destination',
       cell: ({ row }) => {
         let dests = row.original.destination
@@ -159,7 +169,7 @@ export default function ConsultancyManager() {
         return (
           <div className="flex flex-wrap gap-1">
             {dests.slice(0, 2).map((d, i) => (
-              <span key={i} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold uppercase tracking-tight">
+              <span key={i} className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-bold uppercase tracking-tight border border-blue-100">
                 {typeof d === 'string' ? d : d.country}
               </span>
             ))}

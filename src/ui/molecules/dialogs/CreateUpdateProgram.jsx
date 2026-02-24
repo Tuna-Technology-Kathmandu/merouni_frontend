@@ -224,22 +224,14 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
     }
 
     const onSubmit = async (data) => {
-        // Validate learning outcomes
-        const hasContent = learningOutcomes && learningOutcomes.replace(/<[^>]*>/g, '').trim().length > 0
-        if (!hasContent) {
-            setLearningOutcomesError(true)
-            toast.error('Please add a description / learning outcomes.')
-            return
-        }
-        setLearningOutcomesError(false)
-
         try {
             setSubmitting(true)
             const cleanedData = {
                 ...data,
                 learning_outcomes: learningOutcomes,
                 level_id: data.level_id ? Number(data.level_id) : undefined,
-                degree_id: data.degree_id ? Number(data.degree_id) : null,
+                degree_id: data.degree_id ? Number(data.degree_id) : undefined,
+                credits: data.credits ? Number(data.credits) : undefined,
                 syllabus: data.syllabus.map((item) => ({
                     year: item.year,
                     semester: item.semester,
@@ -324,9 +316,9 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label required>Duration</Label>
+                                        <Label>Duration <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
                                         <Input
-                                            {...register('duration', { required: 'Duration is required' })}
+                                            {...register('duration')}
                                             placeholder='e.g., 4 years'
                                             className={errors.duration ? 'border-red-400 focus-visible:ring-red-400' : ''}
                                         />
@@ -336,13 +328,12 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label required>Credits</Label>
+                                        <Label>Credits <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
                                         <Input
                                             type='number'
                                             step='0.1'
                                             placeholder='e.g., 120'
                                             {...register('credits', {
-                                                required: 'Credits are required',
                                                 valueAsNumber: true,
                                                 min: { value: 0, message: 'Credits must be a positive number' }
                                             })}
@@ -354,8 +345,8 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label required>Level</Label>
-                                        <input type='hidden' {...register('level_id', { required: 'Level is required' })} />
+                                        <Label>Level <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
+                                        <input type='hidden' {...register('level_id')} />
                                         <LevelDropdown
                                             value={watch('level_id') ?? ''}
                                             onChange={(id) => setValue('level_id', id || '', { shouldValidate: true })}
@@ -378,9 +369,9 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label required>Language of Instruction</Label>
+                                        <Label>Language of Instruction <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
                                         <Input
-                                            {...register('language', { required: 'Language is required' })}
+                                            {...register('language')}
                                             placeholder='e.g., English'
                                             className={errors.language ? 'border-red-400 focus-visible:ring-red-400' : ''}
                                         />
@@ -405,7 +396,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
 
                                 {/* Learning Outcomes – TipTap */}
                                 <div className="space-y-1.5">
-                                    <Label required>Description / Learning Outcomes</Label>
+                                    <Label>Description / Learning Outcomes <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
                                     <div className={learningOutcomesError ? 'ring-2 ring-red-400 rounded-xl' : ''}>
                                         <TipTapEditor
                                             value={learningOutcomes}
@@ -419,7 +410,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                         />
                                     </div>
                                     {learningOutcomesError && (
-                                        <p className='text-xs text-red-500'>Description / Learning Outcomes is required.</p>
+                                        <p className='text-xs text-red-500'>Description / Learning Outcomes is recommended.</p>
                                     )}
                                 </div>
 
@@ -561,8 +552,8 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                                     type='button'
                                                     onClick={() => { setCurrentYear(year); setCurrentSemester(sem) }}
                                                     className={`w-full py-1.5 px-2 rounded-lg text-xs font-medium transition-all ${currentYear === year && currentSemester === sem
-                                                            ? 'bg-[#387cae] text-white shadow-sm'
-                                                            : 'bg-white border border-gray-200 hover:border-[#387cae]/50 hover:text-[#387cae] text-gray-600'
+                                                        ? 'bg-[#387cae] text-white shadow-sm'
+                                                        : 'bg-white border border-gray-200 hover:border-[#387cae]/50 hover:text-[#387cae] text-gray-600'
                                                         }`}
                                                 >
                                                     {sem === 0 ? 'Yearly' : `Sem ${sem}`}

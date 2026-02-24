@@ -93,7 +93,7 @@ const menuItems = [
       {
         icon: <IoSchoolSharp className='text-xl' />,
         label: 'Colleges',
-        href: '/dashboard/addCollege',
+        href: '/dashboard/colleges',
         visible: ['admin', 'editor', 'admin']
       },
       {

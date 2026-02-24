@@ -110,7 +110,7 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                                     <div className='space-y-3'>
                                         <h4 className='text-xs font-bold uppercase tracking-widest flex items-center gap-2'>
                                             <MapPin className='w-3 h-3' />
-                                            Office Address
+                                            Consultancy's Location
                                         </h4>
                                         <div className='p-4 bg-gray-50 rounded-xl border text-sm text-gray-700 leading-relaxed font-medium'>
                                             {(() => {
@@ -149,7 +149,7 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                                     <div className='space-y-3'>
                                         <h4 className='text-xs font-bold uppercase tracking-widest flex items-center gap-2'>
                                             <Globe className='w-3 h-3' />
-                                            Target Countries
+                                            Student's Destination
                                         </h4>
                                         <div className='flex flex-wrap gap-2'>
                                             {(() => {

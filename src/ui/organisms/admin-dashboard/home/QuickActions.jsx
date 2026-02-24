@@ -51,7 +51,7 @@ const QuickActions = () => {
       }
     },
     {
-      href: '/dashboard/addCollege?add=true',
+      href: '/dashboard/colleges?add=true',
       label: 'Add College',
       icon: School,
       colorClasses: {
