@@ -260,14 +260,32 @@ const ScholarshipDetailsPage = ({ params }) => {
                 )}
 
                 <div className='pt-2'>
-                  <Link href={`/scholarship/apply/${scholarship.slugs || scholarship.id}`} className='w-full'>
-                    <Button
-                      className='w-full py-6 text-lg font-semibold text-white shadow-md transition-all hover:-translate-y-0.5'
-                      style={{ backgroundColor: THEME_BLUE }}
-                    >
-                      Apply Now
-                    </Button>
-                  </Link>
+                  {(() => {
+                    const isDeadlinePassed = scholarship.applicationDeadline && new Date() > new Date(scholarship.applicationDeadline)
+
+                    if (isDeadlinePassed) {
+                      return (
+                        <Button
+                          className='w-full py-6 text-lg font-semibold text-white shadow-md cursor-not-allowed opacity-70'
+                          style={{ backgroundColor: '#6b7280' }}
+                          disabled
+                        >
+                          Deadline Passed
+                        </Button>
+                      )
+                    }
+
+                    return (
+                      <Link href={`/scholarship/apply/${scholarship.slugs || scholarship.id}`} className='w-full'>
+                        <Button
+                          className='w-full py-6 text-lg font-semibold text-white shadow-md transition-all hover:-translate-y-0.5'
+                          style={{ backgroundColor: THEME_BLUE }}
+                        >
+                          Apply Now
+                        </Button>
+                      </Link>
+                    )
+                  })()}
                 </div>
               </div>
             </div>
