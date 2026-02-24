@@ -115,7 +115,7 @@ const VideoSection = ({
           <Button
             type='button'
             onClick={handleAddYoutubeLink}
-            className='h-12 px-6 rounded-xl bg-[#387cae] hover:bg-[#387cae]/90 text-white font-bold gap-2 shadow-lg shadow-[#387cae]/10 transition-all active:scale-95'
+            // className='h-12 px-6 rounded-xl bg-[#387cae] hover:bg-[#387cae]/90 text-white font-bold gap-2 shadow-lg shadow-[#387cae]/10 transition-all active:scale-95'
           >
             <Plus size={18} />
             <span>Add Video</span>

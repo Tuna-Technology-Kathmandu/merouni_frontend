@@ -473,7 +473,7 @@ const CreateUpdateCollegeModal = ({
                             </div>
                         </div>
                     )}
-                    <div className='flex-1 p-8  scrollbar-thin scrollbar-thumb-gray-200'>
+                    <div className='flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-gray-200'>
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-8">
                             {/* Left Column - Main Content (8/12) */}
                             <div className="lg:col-span-8 space-y-8">
@@ -1042,7 +1042,7 @@ const CreateUpdateCollegeModal = ({
                     </div>
 
                     {/* Footer Actions */}
-                    <div className='bg-white border-t border-gray-100 p-6 flex justify-end gap-3 z-20'>
+                    <div className='shrink-0 bg-white border-t border-gray-100 p-6 flex justify-end gap-3 z-20 sticky bottom-0'>
                         <Button
                             type='button'
                             onClick={handleCloseAttempt}

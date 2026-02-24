@@ -443,7 +443,7 @@ const CreateUpdateUniversityModal = ({
                             </div>
                         </div>
                     )}
-                    <div className='flex-1 p-8 '>
+                    <div className='flex-1 overflow-y-auto p-8'>
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-8">
                             {/* Left Column - Main Content (8/12) */}
                             <div className="lg:col-span-8 space-y-8">
@@ -815,7 +815,7 @@ const CreateUpdateUniversityModal = ({
                                                 }}
                                             />
                                             {errors.featured_image && (
-                                                <p className='text-xs font-semibold text-red-500 mt-2 ml-1 text-center'>{errors.assets.featured_image.message}</p>
+                                                <p className='text-xs font-semibold text-red-500 mt-2 ml-1 text-center'>{errors.featured_image.message}</p>
                                             )}
                                             <input type="hidden" {...register('featured_image', { required: 'Featured image is required' })} />
                                         </div>
@@ -845,7 +845,7 @@ const CreateUpdateUniversityModal = ({
                     </div>
 
                     {/* Footer Actions */}
-                    <div className='flex justify-end items-center gap-3 p-6 bg-white border-t border-gray-100 z-20'>
+                    <div className='shrink-0 flex justify-end items-center gap-3 p-6 bg-white border-t border-gray-100 z-20 sticky bottom-0'>
                         <Button
                             type='button'
                             onClick={handleCloseAttempt}

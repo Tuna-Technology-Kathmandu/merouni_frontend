@@ -86,7 +86,6 @@ const GallerySection = ({
           type='button'
           onClick={() => fileInputRef.current.click()}
           disabled={isUploading}
-          className='h-11 px-6 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold gap-2 shadow-lg shadow-green-600/10 transition-all active:scale-95 disabled:opacity-50'
         >
           {isUploading ? (
             <Loader2 size={18} className='animate-spin' />
