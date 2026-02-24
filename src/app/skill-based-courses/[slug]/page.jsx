@@ -10,8 +10,7 @@ import {
     FaAward,
     FaCheckCircle,
     FaClock,
-    FaDollarSign,
-    FaThumbsUp
+    FaMoneyBillWave
 } from 'react-icons/fa'
 import Footer from '../../../components/Frontpage/Footer'
 import Header from '../../../components/Frontpage/Header'
@@ -162,7 +161,7 @@ const SkillCourseDetailsPage = ({ params }) => {
                             <div className='space-y-6'>
                                 <div className='flex flex-col border-b border-gray-100 pb-4 last:border-0 last:pb-0'>
                                     <span className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-2'>
-                                        <FaDollarSign className='w-3 h-3' />
+                                        <FaMoneyBillWave className='w-3 h-3' />
                                         Price
                                     </span>
                                     <span className='text-2xl font-bold text-[#30ad8f]'>
@@ -179,19 +178,6 @@ const SkillCourseDetailsPage = ({ params }) => {
                                         {course.duration || 'Flexible'}
                                     </span>
                                 </div>
-
-                                {course.likes_count !== undefined && (
-                                    <div className='flex flex-col border-b border-gray-100 pb-4 last:border-0 last:pb-0'>
-                                        <span className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-2'>
-                                            <FaThumbsUp className='w-3 h-3' />
-                                            Likes
-                                        </span>
-                                        <span className='text-base font-medium text-gray-900'>
-                                            {course.likes_count}
-                                        </span>
-                                    </div>
-                                )}
-
                                 {/* Author info could go here if available */}
                             </div>
 

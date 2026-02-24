@@ -1,8 +1,9 @@
 import React from 'react'
 import { IoIosGlobe } from 'react-icons/io'
-import { FaUniversity, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa'
+import { FaUniversity, FaPhoneAlt, FaMapMarkerAlt, FaArrowLeft } from 'react-icons/fa'
 import { BsGlobe2 } from 'react-icons/bs'
 import { Eye } from 'lucide-react'
+import Link from 'next/link'
 
 const ImageSection = ({ college }) => {
   // Get current page URL to share
@@ -25,6 +26,15 @@ const ImageSection = ({ college }) => {
       {/* College image, name and location */}
       <div className='w-full'>
         <div className='w-full relative'>
+          <div className='absolute top-6 left-6 md:left-24 z-10'>
+            <Link
+              href='/colleges'
+              className='inline-flex items-center gap-2 px-4 py-2 bg-black/30 hover:bg-black/50 backdrop-blur-md text-white rounded-full text-sm font-medium transition-all shadow-lg border border-white/20'
+            >
+              <FaArrowLeft className='w-3 h-3' />
+              <span>Back to Colleges</span>
+            </Link>
+          </div>
           <img
             src={college?.featured_img || '/images/degreeHero.webp'}
             alt='College Photo'

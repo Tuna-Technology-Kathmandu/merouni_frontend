@@ -3,6 +3,8 @@
 import React from 'react'
 import { MapPin, Phone, Globe, MapPinned } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { FaArrowLeft } from 'react-icons/fa'
 
 const parseJsonField = (field) => {
   if (!field) return null
@@ -47,6 +49,15 @@ const ImageSection = ({ consultancy }) => {
       {/* Hero image + title bar */}
       <div className='w-full'>
         <div className='w-full relative'>
+          <div className='absolute top-6 left-6 md:left-24 z-10'>
+            <Link
+              href='/consultancy'
+              className='inline-flex items-center gap-2 px-4 py-2 bg-black/30 hover:bg-black/50 backdrop-blur-md text-white rounded-full text-sm font-medium transition-all shadow-lg border border-white/20'
+            >
+              <FaArrowLeft className='w-3 h-3' />
+              <span>Back to Consultancies</span>
+            </Link>
+          </div>
           <img
             src={consultancy?.featured_image || '/images/degreeHero.webp'}
             alt={consultancy?.title || 'Consultancy'}

@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { FaArrowLeft } from 'react-icons/fa'
 import Footer from '../../../components/Frontpage/Footer'
 import Header from '../../../components/Frontpage/Header'
 import Navbar from '../../../components/Frontpage/Navbar'
@@ -60,9 +62,10 @@ const UniversityDetailPage = ({ params }) => {
   }
 
   return (
-    <div>
+    <div className='bg-white min-h-screen'>
       <Header />
       <Navbar />
+
       <UpperSection university={university} />
       <RelatedUniversities university={university} />
       <ShareSection university={university} />

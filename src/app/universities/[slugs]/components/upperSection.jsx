@@ -4,6 +4,8 @@ import { LiaUniversitySolid } from 'react-icons/lia'
 import { FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa'
 import { ImCross } from 'react-icons/im'
 import { IoMdMail } from 'react-icons/io'
+import Link from 'next/link'
+import { FaArrowLeft } from 'react-icons/fa'
 import he from 'he'
 import MemberSection from './MemberSection'
 import VideoSection from './VideoSection'
@@ -19,7 +21,16 @@ const UpperSection = ({ university }) => {
     <div className='flex flex-col items-center'>
       {/* Top Section (Already Styled) */}
 
-      <div className='w-full'>
+      <div className='w-full relative'>
+        <div className='absolute top-6 left-6 md:left-24 z-10'>
+          <Link
+            href='/universities'
+            className='inline-flex items-center gap-2 px-4 py-2 bg-black/30 hover:bg-black/50 backdrop-blur-md text-white rounded-full text-sm font-medium transition-all shadow-lg border border-white/20'
+          >
+            <FaArrowLeft className='w-3 h-3' />
+            <span>Back to Universities</span>
+          </Link>
+        </div>
         <img
           src={
             university?.featured_image !== ''
