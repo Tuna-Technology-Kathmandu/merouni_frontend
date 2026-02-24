@@ -131,7 +131,6 @@ const ConsultancyOrderingsPage = () => {
                 currentPage++
             }
 
-            // Sort consultancies by order_no_for_website (nulls last), then by id
             const sortedConsultancies = allConsultancies.sort((a, b) => {
                 const orderA = a.order_no_for_website ?? Infinity
                 const orderB = b.order_no_for_website ?? Infinity
@@ -152,7 +151,6 @@ const ConsultancyOrderingsPage = () => {
 
     useEffect(() => {
         loadConsultancies()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleDragEnd = async (event) => {
@@ -179,9 +177,9 @@ const ConsultancyOrderingsPage = () => {
         try {
             setSaving(true)
             const response = await authFetch(
-                `${process.env.baseUrl}/consultancy/order`,
+                `${process.env.baseUrl}/consultancy/update-order`,
                 {
-                    method: 'PUT',
+                    method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json'
                     },

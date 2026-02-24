@@ -179,9 +179,9 @@ const SchoolOrderingsPage = () => {
         try {
             setSaving(true)
             const response = await authFetch(
-                `${process.env.baseUrl}/school/order`,
+                `${process.env.baseUrl}/school/update-order`,
                 {
-                    method: 'PUT',
+                    method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json'
                     },
