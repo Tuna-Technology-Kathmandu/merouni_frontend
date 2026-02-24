@@ -255,6 +255,8 @@ export default function CategoryManager() {
                   <option value='EVENT'>Event</option>
                   <option value='NEWS'>News</option>
                   <option value='MATERIAL'>Material</option>
+                  <option value='SCHOLARSHIP'>Scholarship</option>
+
                 </select>
                 {errors.type && <p className='text-xs text-destructive mt-1'>{errors.type.message}</p>}
               </div>

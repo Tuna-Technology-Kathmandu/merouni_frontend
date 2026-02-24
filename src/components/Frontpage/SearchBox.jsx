@@ -178,7 +178,7 @@ const SearchBox = ({ onClose }) => {
 
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6'>
           {items.slice(0, slice).map((item, index) => {
-            const imageUrl = item.featured_img
+            const imageUrl = item.logo
             return (
               <Link
                 href={`/${path}/${item.slugs}`}
@@ -186,7 +186,7 @@ const SearchBox = ({ onClose }) => {
                 onClick={onClose}
               >
                 <div
-                  className='group cursor-pointer bg-white border border-gray-100 rounded-[24px] shadow-sm hover:shadow-md transition-all p-6 flex flex-col items-center text-center'
+                  className='group cursor-pointer bg-white border border-gray-100 rounded-[24px] shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col'
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = `${THEME_BLUE}33`;
                   }}
@@ -194,42 +194,39 @@ const SearchBox = ({ onClose }) => {
                     e.currentTarget.style.borderColor = '';
                   }}
                 >
-                  <div
-                    className='w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center font-semibold text-2xl transition-all mb-4 overflow-hidden group-hover:text-white'
-                    style={{ '--theme-blue': THEME_BLUE }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = THEME_BLUE;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '';
-                    }}
-                  >
+                  {/* Full-bleed image banner */}
+                  <div className='w-full h-36 overflow-hidden rounded-t-[22px] shrink-0'>
                     {imageUrl ? (
                       <img
                         src={imageUrl}
                         alt={item.name || item.title}
-                        className='w-full h-full object-cover'
+                        className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-105'
                         onError={(e) => {
                           e.target.onerror = null
-                          e.target.src = '' // Fallback to icon if image fails
                           e.target.style.display = 'none'
+                          e.target.parentElement.classList.add('fallback-active')
                         }}
                       />
                     ) : (
-                      item.name?.charAt(0) || item.title?.charAt(0) || '?'
+                      <div
+                        className='w-full h-full flex items-center justify-center text-3xl font-bold'
+                        style={{ backgroundColor: `${THEME_BLUE}12`, color: THEME_BLUE }}
+                      >
+                        {item.name?.charAt(0)?.toUpperCase() || item.title?.charAt(0)?.toUpperCase() || '?'}
+                      </div>
                     )}
                   </div>
-                  <h3
-                    className='text-base md:text-lg font-semibold text-gray-800 transition-colors line-clamp-2'
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = THEME_BLUE;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = '';
-                    }}
-                  >
-                    {item.name || item.title}
-                  </h3>
+
+                  {/* Name */}
+                  <div className='px-4 py-3 text-center'>
+                    <h3
+                      className='text-sm font-semibold text-gray-800 leading-snug line-clamp-2 transition-colors'
+                      onMouseEnter={(e) => { e.currentTarget.style.color = THEME_BLUE }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = '' }}
+                    >
+                      {item.name || item.title}
+                    </h3>
+                  </div>
                 </div>
               </Link>
             )

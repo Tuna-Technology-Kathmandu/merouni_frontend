@@ -81,7 +81,7 @@ export async function getScholarshipApplications(scholarshipId, page = 1) {
 export const fetchCategories = async (searchQuery = '') => {
   try {
     const response = await authFetch(
-      `${process.env.baseUrl}/category${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ''}`
+      `${process.env.baseUrl}/category?type=SCHOLARSHIP${searchQuery ? `&q=${encodeURIComponent(searchQuery)}` : ''}`
     )
     if (!response.ok) {
       throw new Error('Failed to fetch categories')

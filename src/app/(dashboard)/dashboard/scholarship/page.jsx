@@ -184,7 +184,7 @@ export default function ScholarshipManager() {
       const payload = {
         ...data,
         author: author_id,
-        amount: data.amount, // API expects string according to previous code
+        amount: data.amount, 
       }
 
       if (editingId) {

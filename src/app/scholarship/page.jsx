@@ -23,7 +23,6 @@ const ScholarshipPage = () => {
   const pathname = usePathname()
   const user = useSelector((state) => state.user?.data)
 
-  // Initialization from URL
   const initialSearch = searchParams.get('q') || ''
   const initialCategory = searchParams.get('category') || ''
 
@@ -36,7 +35,6 @@ const ScholarshipPage = () => {
     category: initialCategory
   })
 
-  // URL Sync Helper
   const updateURL = useCallback((params) => {
     const newParams = new URLSearchParams(searchParams.toString())
     Object.entries(params).forEach(([key, value]) => {
@@ -155,7 +153,7 @@ const ScholarshipPage = () => {
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6'>
               {/* Search */}
               <div className='lg:col-span-8'>
-                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                <label className='block text-[10px] uppercase  font-bold mb-2'>
                   Search Scholarships
                 </label>
                 <div className='relative group'>
@@ -165,13 +163,13 @@ const ScholarshipPage = () => {
                     placeholder='Search scholarships by name...'
                     onChange={(e) => setSearchTerm(e.target.value)}
                     value={searchTerm}
-                    className='w-full px-5 py-3.5 pl-12 rounded-2xl border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#0A6FA7]/10 focus:border-[#0A6FA7] focus:bg-white transition-all text-sm font-semibold text-gray-900 placeholder-gray-400'
+                    className='w-full px-5 py-3.5 pl-12 rounded-md border border-gray-100 bg-gray-50/50 outline-none focus:ring-2 focus:ring-[#0A6FA7]/10 focus:border-[#0A6FA7] focus:bg-white transition-all text-sm font-semibold text-gray-900 placeholder-gray-400'
                   />
                 </div>
               </div>
 
               <div className='lg:col-span-4'>
-                <label className='block text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2'>
+                <label className='block text-[10px] uppercase font-bold  mb-2'>
                   Category
                 </label>
                 <div className='relative group'>
@@ -183,7 +181,7 @@ const ScholarshipPage = () => {
                         category: e.target.value
                       }))
                     }
-                    className='w-full pl-6'
+                    className='w-full pl-6 rounded-md'
                   >
                     <option value=''>All Categories</option>
                     {categories.map((cat) => (

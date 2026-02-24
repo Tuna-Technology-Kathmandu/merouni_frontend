@@ -251,7 +251,7 @@ const CreateUpdateCollegeModal = ({
                     setValue('college_logo', collegeData.college_logo || '')
                     setValue('featured_img', collegeData.featured_img || '')
 
-                    setValue('images', [...images, ...videos])
+                    setValue('images', [...images])
 
                     const memberData = collegeData.collegeMembers?.length
                         ? collegeData.collegeMembers
