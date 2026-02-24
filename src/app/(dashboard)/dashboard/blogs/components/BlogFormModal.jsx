@@ -12,6 +12,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import FileUpload from '../../addCollege/FileUpload'
 import { Textarea } from '@/ui/shadcn/textarea'
+import { Select } from '@/ui/shadcn/select'
 
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
     <div className="flex items-center gap-3 mb-6">
@@ -180,12 +181,12 @@ const BlogFormModal = ({
 
     const handleSelectCategory = (category) => {
         setSelectedCategory(category)
-        setValue('category', category.id)
+        setValue('category', category.id, { shouldValidate: true })
     }
 
     const handleRemoveCategory = () => {
         setSelectedCategory(null)
-        setValue('category', '')
+        setValue('category', '', { shouldValidate: true })
     }
 
     const handleSelectTag = (tag) => {
@@ -265,7 +266,6 @@ const BlogFormModal = ({
                                             <Input
                                                 id='title'
                                                 placeholder='Enter post title...'
-                                                className="h-12 text-base rounded-xl border-gray-200"
                                                 {...register('title', { required: 'Title is required' })}
                                             />
                                             {errors.title && (
@@ -288,6 +288,7 @@ const BlogFormModal = ({
                                                     isMulti={false}
                                                     allowCreate={false}
                                                 />
+                                                <input type="hidden" {...register('category', { required: 'Category is required' })} />
                                                 {errors.category && (
                                                     <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.category.message}</p>
                                                 )}
@@ -311,24 +312,31 @@ const BlogFormModal = ({
                                         </div>
 
                                         <div>
-                                            <Label htmlFor='description' className="text-gray-700 font-semibold mb-1.5 block text-sm">Short Description</Label>
+                                            <Label required={true} htmlFor='description' className="text-gray-700 font-semibold mb-1.5 block text-sm">Short Description</Label>
                                             <Textarea
                                                 id='description'
                                                 placeholder='Enter a brief summary...'
-                                                {...register('description')}
-                                                className='flex min-h-[80px] w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all resize-none'
+                                                {...register('description', { required: 'Short description is required' })}
+                                                className='flex min-h-[80px] w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all resize-none'
                                             />
+                                            {errors.description && (
+                                                <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.description.message}</p>
+                                            )}
                                         </div>
 
                                         <div className="pt-2">
-                                            <Label className="text-gray-700 font-semibold mb-2.5 block text-sm">Main Content Body</Label>
+                                            <Label required={true} className="text-gray-700 font-semibold mb-2.5 block text-sm">Main Content Body</Label>
                                             <TipTapEditor
                                                 onMediaUpload={onMediaUpload}
                                                 showImageUpload={true}
                                                 value={getValues('content')}
-                                                onChange={(data) => setValue('content', data)}
+                                                onChange={(data) => setValue('content', data, { shouldValidate: true })}
                                                 placeholder='Start writing your story here...'
                                             />
+                                            <input type="hidden" {...register('content', { required: 'Content body is required' })} />
+                                            {errors.content && (
+                                                <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.content.message}</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -341,20 +349,24 @@ const BlogFormModal = ({
                                 <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
                                     <SectionHeader icon={ImageIcon} title="Featured Media" subtitle="Image & PDF Uploads" />
                                     <div className="space-y-6">
-                                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
-                                            <Label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 block">Featured Post Image</Label>
+                                        <div className="p-4 bg-gray-50 rounded-md border border-gray-100 border-dashed">
+                                            <Label required={true} className="text-xs font-semibold tracking-wider mb-3 block">Featured Post Image</Label>
                                             <FileUpload
                                                 label=''
                                                 onUploadComplete={(url) => {
                                                     setUploadedFiles(prev => ({ ...prev, featured_image: url }))
-                                                    setValue('featured_image', url)
+                                                    setValue('featured_image', url, { shouldValidate: true })
                                                 }}
                                                 defaultPreview={uploadedFiles.featured_image}
                                             />
+                                            <input type="hidden" {...register('featured_image', { required: 'Featured image is required' })} />
+                                            {errors.featured_image && (
+                                                <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.featured_image.message}</p>
+                                            )}
                                         </div>
 
-                                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
-                                            <Label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 block">Attachment (PDF)</Label>
+                                        <div className="p-4 bg-gray-50 rounded-md border border-gray-100 border-dashed">
+                                            <Label className="text-xs font-semibold tracking-wider mb-3 block">Attachment (PDF)</Label>
                                             <FileUpload
                                                 label=''
                                                 accept='application/pdf'
@@ -374,18 +386,18 @@ const BlogFormModal = ({
                                     <div className='space-y-6'>
                                         <div>
                                             <Label htmlFor='status' className="text-gray-700 font-semibold mb-1.5 block text-sm">Post Status</Label>
-                                            <select
+                                            <Select
                                                 id='status'
                                                 {...register('status')}
-                                                className='flex h-11 w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
+                                                className='flex h-11 w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
                                             >
                                                 <option value='draft'>Draft</option>
                                                 <option value='published'>Published</option>
                                                 <option value='archived'>Archived</option>
-                                            </select>
+                                            </Select>
                                         </div>
 
-                                        <div className="flex items-center justify-between p-4 bg-[#387cae]/5 rounded-xl border border-[#387cae]/10">
+                                        <div className="flex items-center justify-between p-4 bg-[#387cae]/5 rounded-md border border-[#387cae]/10">
                                             <div className="flex items-center gap-3">
                                                 <input
                                                     type="checkbox"

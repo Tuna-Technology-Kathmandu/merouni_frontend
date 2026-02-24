@@ -53,7 +53,7 @@ const SectionHeader = ({ icon: Icon, title, subtitle }) => (
         </div>
         <div>
             <h3 className="text-lg font-bold text-gray-900 leading-tight">{title}</h3>
-            {subtitle && <p className="text-[11px] text-slate-500 mt-0.5 font-semibold leading-relaxed uppercase tracking-wider">{subtitle}</p>}
+            {subtitle && <p className="text-[11px] mt-0.5 font-semibold tracking-wider">{subtitle}</p>}
         </div>
     </div>
 )
@@ -478,7 +478,7 @@ const CreateUpdateCollegeModal = ({
                             {/* Left Column - Main Content (8/12) */}
                             <div className="lg:col-span-8 space-y-8">
                                 {/* Basic Information */}
-                                <div className='bg-white p-8 rounded-2xl shadow-sm border border-gray-100'>
+                                <div className='bg-white p-8 rounded-2xl border border-gray-100'>
                                     <SectionHeader icon={Info} title="Basic Information" subtitle="General identity of the college" />
                                     <div className='space-y-6'>
                                         <div>
@@ -486,7 +486,7 @@ const CreateUpdateCollegeModal = ({
                                             <Input
                                                 id='name'
                                                 placeholder='Enter college name...'
-                                                className="h-12 text-base rounded-xl border-gray-200"
+                                                className="h-12 text-base rounded-md"
                                                 {...register('name', { required: 'College name is required' })}
                                             />
                                             {errors.name && (
@@ -500,7 +500,7 @@ const CreateUpdateCollegeModal = ({
                                                 <select
                                                     id='institute_type'
                                                     {...register('institute_type')}
-                                                    className='flex h-11 w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
+                                                    className='flex h-11 w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
                                                 >
                                                     <option value='Private'>Private</option>
                                                     <option value='Public'>Public</option>
@@ -512,7 +512,7 @@ const CreateUpdateCollegeModal = ({
                                                 <Input
                                                     id='website_url'
                                                     placeholder='https://example.com'
-                                                    className="h-11 rounded-xl border-gray-200"
+                                                    className="h-11 rounded-md border-gray-200"
                                                     {...register('website_url')}
                                                 />
                                             </div>
@@ -525,10 +525,10 @@ const CreateUpdateCollegeModal = ({
                                                     <label
                                                         key={level}
                                                         className={cn(
-                                                            'flex items-center justify-center gap-3 p-4 rounded-2xl border-2 transition-all cursor-pointer group',
+                                                            'flex items-center justify-center gap-3 p-4 rounded-md border-2 transition-all cursor-pointer group',
                                                             watch('institute_level')?.includes(level)
-                                                                ? 'bg-[#387cae]/5 border-[#387cae] text-[#387cae] shadow-md shadow-[#387cae]/5'
-                                                                : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-gray-50'
+                                                                ? 'bg-[#387cae]/5 border-[#387cae] text-[#387cae] shadow-md'
+                                                                : 'bg-white border-gray-200 text-gray-400 hover:border-gray-200 hover:bg-gray-50'
                                                         )}
                                                     >
                                                         <input
@@ -564,7 +564,7 @@ const CreateUpdateCollegeModal = ({
                                                 id='description'
                                                 placeholder='Enter a brief summary of the college...'
                                                 {...register('description', { required: 'Short description is required' })}
-                                                className='flex min-h-[100px] w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all resize-none'
+                                                className='flex min-h-[100px] w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all resize-none'
                                             />
                                             {errors.description && (
                                                 <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.description.message}</p>
@@ -601,7 +601,6 @@ const CreateUpdateCollegeModal = ({
                                                 <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.university_id.message}</p>
                                             )}
                                             <input type="hidden" {...register('university_id', { required: 'Please select a university' })} />
-                                            {/* university_id is often handled differently by hook-form if it's a custom component, but let's assume it should be checked */}
                                         </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -645,7 +644,7 @@ const CreateUpdateCollegeModal = ({
                                 </div>
 
                                 {/* Location & Contact */}
-                                <div className='bg-white p-8 rounded-2xl shadow-sm border border-gray-100'>
+                                <div className='bg-white p-8 rounded-md shadow-sm border border-gray-100'>
                                     <SectionHeader icon={MapPin} title="Location & Contact" subtitle="Where to find the college" />
                                     <div className='space-y-6'>
                                         <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
@@ -655,7 +654,7 @@ const CreateUpdateCollegeModal = ({
                                                     id='address.country'
                                                     {...register('address.country', { required: 'Country is required' })}
                                                     placeholder='e.g. Nepal'
-                                                    className="h-11 rounded-xl border-gray-200"
+                                                    className="h-11 rounded-md border-gray-200"
                                                 />
                                                 {errors.address?.country && (
                                                     <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.address.country.message}</p>
@@ -667,7 +666,7 @@ const CreateUpdateCollegeModal = ({
                                                     id='address.state'
                                                     {...register('address.state', { required: 'State is required' })}
                                                     placeholder='e.g. Bagmati'
-                                                    className="h-11 rounded-xl border-gray-200"
+                                                    className="h-11 rounded-md border-gray-200"
                                                 />
                                                 {errors.address?.state && (
                                                     <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.address.state.message}</p>
@@ -681,7 +680,7 @@ const CreateUpdateCollegeModal = ({
                                                     id='address.city'
                                                     {...register('address.city', { required: 'City is required' })}
                                                     placeholder='e.g. Kathmandu'
-                                                    className="h-11 rounded-xl border-gray-200"
+                                                    className="h-11 rounded-md border-gray-200"
                                                 />
                                                 {errors.address?.city && (
                                                     <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.address.city.message}</p>
@@ -693,7 +692,7 @@ const CreateUpdateCollegeModal = ({
                                                     id='address.street'
                                                     {...register('address.street')}
                                                     placeholder='e.g. Putalisadak'
-                                                    className="h-11 rounded-xl border-gray-200"
+                                                    className="h-11 rounded-md border-gray-200"
                                                 />
                                             </div>
                                         </div>
@@ -707,7 +706,7 @@ const CreateUpdateCollegeModal = ({
                                                     <select
                                                         id='map_type'
                                                         {...register('map_type')}
-                                                        className='flex h-11 w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
+                                                        className='flex h-11 w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
                                                     >
                                                         <option value=''>Select Map Type</option>
                                                         <option value='google_map_url'>Google Map URL (Share Link)</option>
@@ -727,7 +726,7 @@ const CreateUpdateCollegeModal = ({
                                                             id='google_map_url'
                                                             {...register('google_map_url')}
                                                             placeholder={watch('map_type') === 'embed_map_url' ? "Paste iframe src..." : "Paste Google Maps share link..."}
-                                                            className="h-11 pl-12 rounded-xl bg-gray-50/30 border-gray-200 transition-all focus:ring-4 focus:ring-[#387cae]/5 focus:bg-white"
+                                                            className="h-11 pl-12 rounded-md bg-gray-50/30 border-gray-200 transition-all focus:ring-4 focus:ring-[#387cae]/5 focus:bg-white"
                                                         />
                                                     </div>
                                                 </div>
@@ -746,7 +745,7 @@ const CreateUpdateCollegeModal = ({
                                                         <Activity className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300 group-focus-within:text-[#387cae] transition-colors" />
                                                         <Input
                                                             placeholder={`Phone Number ${index + 1}`}
-                                                            className="h-11 pl-10 rounded-xl border-gray-200 transition-all focus:ring-4 focus:ring-[#387cae]/5"
+                                                            className="h-11 pl-10 rounded-md border-gray-200 transition-all focus:ring-4 focus:ring-[#387cae]/5"
                                                             {...register(`contacts[${index}]`)}
                                                         />
                                                     </div>
@@ -764,7 +763,7 @@ const CreateUpdateCollegeModal = ({
                                             type='button'
                                             variant='outline'
                                             size='sm'
-                                            className='rounded-xl border-[#387cae]/20 text-[#387cae] hover:bg-[#387cae]/5'
+                                            className='rounded-md border-[#387cae]/20 text-[#387cae] hover:bg-[#387cae]/5'
                                             onClick={() => appendFacility({ title: '', description: '', icon: '' })}
                                         >
                                             <Plus className='w-4 h-4 mr-2' />
@@ -773,7 +772,7 @@ const CreateUpdateCollegeModal = ({
                                     </div>
                                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                                         {facilityFields.map((field, index) => (
-                                            <div key={field.id} className='group relative p-5 bg-white border border-gray-100 rounded-2xl transition-all hover:shadow-xl hover:shadow-[#387cae]/5 hover:border-[#387cae]/20'>
+                                            <div key={field.id} className='group relative p-5 bg-white border border-gray-100 rounded-md transition-all hover:shadow-xl hover:shadow-[#387cae]/5 hover:border-[#387cae]/20'>
                                                 <div className='space-y-4 pr-8'>
                                                     <div className='grid grid-cols-2 gap-3'>
                                                         <div>
@@ -781,7 +780,7 @@ const CreateUpdateCollegeModal = ({
                                                             <Input
                                                                 {...register(`facilities[${index}].title`)}
                                                                 placeholder='e.g. WiFi'
-                                                                className='h-9 text-xs rounded-lg'
+                                                                className='h-9 text-xs rounded-md'
                                                             />
                                                         </div>
                                                         <div>
@@ -789,7 +788,7 @@ const CreateUpdateCollegeModal = ({
                                                             <Input
                                                                 {...register(`facilities[${index}].icon`)}
                                                                 placeholder='wifi'
-                                                                className='h-9 text-xs rounded-lg'
+                                                                className='h-9 text-xs rounded-md'
                                                             />
                                                         </div>
                                                     </div>
@@ -798,7 +797,7 @@ const CreateUpdateCollegeModal = ({
                                                         <Input
                                                             {...register(`facilities[${index}].description`)}
                                                             placeholder='Details...'
-                                                            className='h-9 text-xs rounded-lg'
+                                                            className='h-9 text-xs rounded-md'
                                                         />
                                                     </div>
                                                 </div>
@@ -806,7 +805,7 @@ const CreateUpdateCollegeModal = ({
                                                     type='button'
                                                     variant='ghost'
                                                     size='icon'
-                                                    className='absolute top-4 right-4 h-7 w-7 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors rounded-lg'
+                                                    className='absolute top-4 right-4 h-7 w-7 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors rounded-md'
                                                     onClick={() => removeFacility(index)}
                                                 >
                                                     <Trash2 size={14} />
@@ -824,7 +823,7 @@ const CreateUpdateCollegeModal = ({
                                             type='button'
                                             variant='outline'
                                             size='sm'
-                                            className='rounded-xl border-[#387cae]/20 text-[#387cae] hover:bg-[#387cae]/5'
+                                            className='rounded-md border-[#387cae]/20 text-[#387cae] hover:bg-[#387cae]/5'
                                             onClick={() => appendMember({ name: '', role: '', image_url: '', bio: '', contact_info: '' })}
                                         >
                                             <Plus className='w-4 h-4 mr-2' />
@@ -849,7 +848,7 @@ const CreateUpdateCollegeModal = ({
                                                             <Input
                                                                 {...register(`members[${index}].name`)}
                                                                 placeholder='Dr. John Doe'
-                                                                className='h-10 rounded-xl'
+                                                                className='h-10 rounded-md'
                                                             />
                                                         </div>
                                                         <div>
@@ -870,7 +869,7 @@ const CreateUpdateCollegeModal = ({
                                                             <Input
                                                                 {...register(`members[${index}].contact_info`)}
                                                                 placeholder='98XXXXXXXX'
-                                                                className='h-10 rounded-xl'
+                                                                className='h-10 rounded-md'
                                                             />
                                                         </div>
                                                         <div className='sm:col-span-3'>
@@ -878,7 +877,7 @@ const CreateUpdateCollegeModal = ({
                                                             <Input
                                                                 {...register(`members[${index}].bio`)}
                                                                 placeholder='Achievement and specialization...'
-                                                                className='h-10 rounded-xl'
+                                                                className='h-10 rounded-md'
                                                             />
                                                         </div>
                                                     </div>
@@ -905,7 +904,7 @@ const CreateUpdateCollegeModal = ({
                                             type='button'
                                             variant='outline'
                                             size='sm'
-                                            className='rounded-xl border-[#387cae]/20 text-[#387cae] hover:bg-[#387cae]/5'
+                                            className='rounded-md border-[#387cae]/20 text-[#387cae] hover:bg-[#387cae]/5'
                                             onClick={() => appendFaq({ question: '', answer: '' })}
                                         >
                                             <Plus className='w-4 h-4 mr-2' />
@@ -921,7 +920,7 @@ const CreateUpdateCollegeModal = ({
                                                         <Input
                                                             {...register(`faqs[${index}].question`)}
                                                             placeholder='e.g. What are the admission requirements?'
-                                                            className='h-11 rounded-xl font-bold text-gray-800'
+                                                            className='h-11 rounded-md font-bold text-gray-800'
                                                         />
                                                     </div>
                                                     <div>
@@ -930,7 +929,7 @@ const CreateUpdateCollegeModal = ({
                                                             {...register(`faqs[${index}].answer`)}
                                                             placeholder='Provide a detailed answer...'
                                                             rows={2}
-                                                            className='rounded-xl resize-none min-h-[80px]'
+                                                            className='rounded-md resize-none min-h-[80px]'
                                                         />
                                                     </div>
                                                 </div>
@@ -938,7 +937,7 @@ const CreateUpdateCollegeModal = ({
                                                     type='button'
                                                     variant='ghost'
                                                     size='icon'
-                                                    className='absolute top-6 right-4 h-8 w-8 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors rounded-xl'
+                                                    className='absolute top-6 right-4 h-8 w-8 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors rounded-md'
                                                     onClick={() => removeFaq(index)}
                                                 >
                                                     <Trash2 size={16} />
@@ -956,7 +955,7 @@ const CreateUpdateCollegeModal = ({
                                     <SectionHeader icon={ImageIcon} title="Logo & Cover" subtitle="Identity visuals" />
                                     <div className="space-y-6">
                                         <div className="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 border-dashed hover:bg-white hover:border-[#387cae]/30 transition-all group">
-                                            <Label required={true} className="text-[10px] font-black text-slate-600 uppercase tracking-[0.1em] mb-4 block text-center group-hover:text-[#387cae]">College Logo</Label>
+                                            <Label required={true} className="text-[11px] font-black tracking-[0.1em] mb-4 block  group-hover:text-[#387cae]">College Logo</Label>
                                             <FileUploadWithPreview
                                                 label=''
                                                 required={true}
@@ -971,13 +970,13 @@ const CreateUpdateCollegeModal = ({
                                                 }}
                                             />
                                             {errors.college_logo && (
-                                                <p className='text-[10px] font-semibold text-red-500 mt-2 text-center'>{errors.college_logo.message}</p>
+                                                <p className='text-[10px] font-semibold text-red-500 mt-2 '>{errors.college_logo.message}</p>
                                             )}
                                             <input type="hidden" {...register('college_logo', { required: 'College logo is required' })} />
                                         </div>
 
                                         <div className="p-5 bg-gray-50/50 rounded-2xl border border-gray-100 border-dashed hover:bg-white hover:border-[#387cae]/30 transition-all group">
-                                            <Label required={true} className="text-[10px] font-black text-slate-600 uppercase tracking-[0.1em] mb-4 block text-center group-hover:text-[#387cae]">Cover Image</Label>
+                                            <Label required={true} className="text-[11px] font-black mb-4 block group-hover:text-[#387cae]">Cover Image</Label>
                                             <FileUploadWithPreview
                                                 label=''
                                                 required={true}
@@ -1009,7 +1008,7 @@ const CreateUpdateCollegeModal = ({
                                                 id='college_broucher'
                                                 {...register('college_broucher')}
                                                 placeholder='URL to PDF brochure'
-                                                className="h-10 rounded-xl border-gray-200"
+                                                className="h-10 rounded-md border-gray-200"
                                             />
                                         </div>
                                     </div>

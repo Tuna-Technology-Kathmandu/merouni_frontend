@@ -7,6 +7,8 @@ export async function fetchNews(page = 1, search = '') {
         const queryParams = new URLSearchParams({
             page: page.toString(),
             limit: '10',
+            sortBy: 'createdAt',
+            order: 'DESC',
             ...(search && { search })
         })
 

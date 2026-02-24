@@ -442,6 +442,13 @@ export default function BannerForm() {
               {/* Submit Button - Sticky Footer */}
               <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
                 <Button
+                  type='button'
+                  variant='outline'
+                  onClick={() => setIsOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
                   type='submit'
                   disabled={loading}
                 >

@@ -19,6 +19,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import Loader from '../../../../ui/molecules/Loading'
 import FileUpload from '../addCollege/FileUpload'
 import { fetchVideos } from './action'
+import { Textarea } from '@/ui/shadcn/textarea'
 
 export default function VideoManager() {
   const { setHeading } = usePageHeading()
@@ -445,7 +446,7 @@ export default function VideoManager() {
 
                       <div>
                         <Label required>Description</Label>
-                        <textarea
+                        <Textarea
                           placeholder='Video Description'
                           {...register('description', {
                             required: 'Description is required'
@@ -488,6 +489,11 @@ export default function VideoManager() {
 
                 {/* Submit Button - Sticky Footer */}
                 <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
+                  <Button type='button'
+                    variant='outline'
+                    onClick={() => setIsOpen(false)}>
+                    Cancel
+                  </Button>
                   <Button type='submit'>
                     {editing ? 'Update Video' : 'Create Video'}
                   </Button>

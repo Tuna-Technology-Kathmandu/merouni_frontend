@@ -1,34 +1,34 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
-import { useSelector } from 'react-redux'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { Edit2, Eye, Plus, Trash2 } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
-import { Search, Edit2, Trash2, Eye, Plus } from 'lucide-react'
 
-import { getAllExams, createExam, deleteExam, fetchUniversities, fetchLevel } from './actions'
-import Loading from '../../../../ui/molecules/Loading'
-import Table from '@/ui/shadcn/DataTable'
 import { authFetch } from '@/app/utils/authFetch'
+import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
+import SearchInput from '@/ui/molecules/SearchInput'
+import Table from '@/ui/shadcn/DataTable'
 import {
   Dialog,
-  DialogHeader,
-  DialogTitle,
+  DialogClose,
   DialogContent,
-  DialogClose
+  DialogHeader,
+  DialogTitle
 } from '@/ui/shadcn/dialog'
-import { usePageHeading } from '@/contexts/PageHeadingContext'
-import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
+import SearchSelectCreate from '@/ui/shadcn/search-select-create'
+import { Textarea } from '@/ui/shadcn/textarea'
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
+import { formatDate } from '@/utils/date.util'
+import Loading from '../../../../ui/molecules/Loading'
 import { Button } from '../../../../ui/shadcn/button'
 import { Input } from '../../../../ui/shadcn/input'
 import { Label } from '../../../../ui/shadcn/label'
 import { Select } from '../../../../ui/shadcn/select'
-import { Textarea } from '@/ui/shadcn/textarea'
-import SearchInput from '@/ui/molecules/SearchInput'
-import { formatDate } from '@/utils/date.util'
-import TipTapEditor from '@/ui/shadcn/tiptap-editor'
-import SearchSelectCreate from '@/ui/shadcn/search-select-create'
+import { createExam, deleteExam, fetchLevel, fetchUniversities, getAllExams } from './actions'
 import ExamViewModal from './ExamViewModal'
 
 export default function ExamManager() {
@@ -82,12 +82,6 @@ export default function ExamManager() {
       closing_date: ''
     }
   })
-
-  // Watch for SearchSelectCreate items
-  const selectedLevelId = watch('level_id')
-  const selectedAffiliationId = watch('affiliation')
-
-  // We need to keep track of the full objects for SearchSelectCreate's selectedItems prop
   const [selectedLevel, setSelectedLevel] = useState(null)
   const [selectedUniversity, setSelectedUniversity] = useState(null)
 
@@ -97,7 +91,6 @@ export default function ExamManager() {
     return () => setHeading(null)
   }, [setHeading])
 
-  // Handle URL param 'add=true'
   useEffect(() => {
     const addParam = searchParams.get('add')
     if (addParam === 'true') {
@@ -111,11 +104,12 @@ export default function ExamManager() {
     try {
       let response
       if (query) {
-        const res = await authFetch(`${process.env.baseUrl}/exam?q=${query}&page=${page}`)
+        const res = await authFetch(`${process.env.baseUrl}/exam?q=${query}&page=${page}&sortBy=createdAt&order=DESC`)
         response = await res.json()
       } else {
         response = await getAllExams(page)
       }
+
 
       const flattenedItems = (response.items || []).map((exam) => {
         const examDetail = exam.exam_details?.[0] || {}
@@ -485,51 +479,57 @@ export default function ExamManager() {
 
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
                   <div className="space-y-2">
-                    <Label>Full Marks</Label>
+                    <Label required>Full Marks</Label>
                     <Input
                       type='number'
-                      {...register('full_marks')}
+                      {...register('full_marks', { required: 'Full marks is required' })}
                       placeholder='e.g. 100'
                     />
+                    {errors.full_marks && <p className="text-xs text-red-500">{errors.full_marks.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label>Pass Marks</Label>
+                    <Label required>Pass Marks</Label>
                     <Input
                       type='number'
-                      {...register('pass_marks')}
+                      {...register('pass_marks', { required: 'Pass marks is required' })}
                       placeholder='e.g. 40'
                     />
+                    {errors.pass_marks && <p className="text-xs text-red-500">{errors.pass_marks.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label>Duration</Label>
+                    <Label required>Duration</Label>
                     <Input
-                      {...register('duration')}
+                      {...register('duration', { required: 'Duration is required' })}
                       placeholder='e.g. 2 Hours'
                     />
+                    {errors.duration && <p className="text-xs text-red-500">{errors.duration.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label>Number of Questions</Label>
+                    <Label required>Number of Questions</Label>
                     <Input
                       type='number'
-                      {...register('questions_count')}
+                      {...register('questions_count', { required: 'Number of questions is required' })}
                       placeholder='e.g. 100'
                     />
+                    {errors.questions_count && <p className="text-xs text-red-500">{errors.questions_count.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label>Question Type</Label>
-                    <Select {...register('question_type')}>
+                    <Label required>Question Type</Label>
+                    <Select {...register('question_type', { required: 'Question type is required' })}>
                       <option value="MCQ">MCQ</option>
                       <option value="Written">Written</option>
                       <option value="Practical">Practical</option>
                       <option value="Mixed">Mixed</option>
                     </Select>
+                    {errors.question_type && <p className="text-xs text-red-500">{errors.question_type.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label>Exam Type</Label>
-                    <Select {...register('exam_type')}>
+                    <Label required>Exam Type</Label>
+                    <Select {...register('exam_type', { required: 'Exam type is required' })}>
                       <option value="Written">Written</option>
                       <option value="Online">Online</option>
                     </Select>
+                    {errors.exam_type && <p className="text-xs text-red-500">{errors.exam_type.message}</p>}
                   </div>
                 </div>
               </section>
@@ -559,12 +559,14 @@ export default function ExamManager() {
 
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
                   <div className="space-y-2">
-                    <Label>Opening Date</Label>
-                    <Input type='date' {...register('opening_date')} />
+                    <Label required>Opening Date</Label>
+                    <Input type='date' {...register('opening_date', { required: 'Opening date is required' })} />
+                    {errors.opening_date && <p className="text-xs text-red-500">{errors.opening_date.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label>Closing Date</Label>
-                    <Input type='date' {...register('closing_date')} />
+                    <Label required>Closing Date</Label>
+                    <Input type='date' {...register('closing_date', { required: 'Closing date is required' })} />
+                    {errors.closing_date && <p className="text-xs text-red-500">{errors.closing_date.message}</p>}
                   </div>
                   <div className="space-y-2">
                     <Label required>Exam Date</Label>

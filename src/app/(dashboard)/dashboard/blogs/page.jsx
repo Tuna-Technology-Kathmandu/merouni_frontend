@@ -330,7 +330,7 @@ export default function BlogsManager() {
     }
 
     try {
-      let url = `${process.env.baseUrl}/blogs?q=${query}`
+      let url = `${process.env.baseUrl}/blogs?q=${query}&sortBy=createdAt&order=DESC`
       if (statusFilter && statusFilter !== 'all') {
         url += `&status=${statusFilter}`
       }

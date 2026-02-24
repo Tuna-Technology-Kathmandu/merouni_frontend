@@ -4,7 +4,7 @@ let url = `${process.env.baseUrl}/blogs`
 
 export async function fetchBlogs(page = 1, limit = 10, status = '', options = {}) {
   try {
-    let query = `${url}?limit=${limit}&page=${page}`
+    let query = `${url}?limit=${limit}&page=${page}&sortBy=createdAt&order=DESC`
     if (status && status !== 'all') {
       query += `&status=${status}`
     }
