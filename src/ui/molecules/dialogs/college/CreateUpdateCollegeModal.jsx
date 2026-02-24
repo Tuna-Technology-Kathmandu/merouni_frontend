@@ -237,20 +237,15 @@ const CreateUpdateCollegeModal = ({
                     ) || ['', '']
                     setValue('contacts', contacts)
 
-                    const galleryItems = collegeData.collegeGallery || []
+                    const galleryItems = collegeData.gallery || []
                     const images = galleryItems
-                        .filter((item) => item.file_type === 'image' && item.file_url)
                         .map((img) => ({ url: img.file_url, file_type: 'image' }))
-
-                    const videos = galleryItems
-                        .filter((item) => item.file_type === 'video')
-                        .map((vid) => ({ url: vid.file_url, file_type: 'video' }))
 
                     setUploadedFiles({
                         college_logo: collegeData.college_logo || '',
                         featured_img: collegeData.featured_img || '',
                         images: images.length === 1 && !images[0].url ? [] : images,
-                        videos
+                        
                     })
 
                     setValue('college_logo', collegeData.college_logo || '')

@@ -424,9 +424,6 @@ export default function TipTapEditor({ value, onChange, onMediaUpload, placehold
       }),
       Image.configure({
         allowBase64: true,
-        HTMLAttributes: {
-          class: 'rounded-lg max-w-full h-auto',
-        },
       }),
       Table.configure({
         resizable: true,
