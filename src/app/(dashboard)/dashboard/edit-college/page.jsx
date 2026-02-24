@@ -19,9 +19,6 @@ import GallerySection from '@/ui/molecules/dialogs/college/components/GallerySec
 import VideoSection from '@/ui/molecules/dialogs/college/components/VideoSection'
 
 
-const CKUni = dynamic(() => import('../../../../ui/molecules/ck-editor/CKUni'), {
-  ssr: false
-})
 
 const FileUploadWithPreview = ({
   onUploadComplete,
