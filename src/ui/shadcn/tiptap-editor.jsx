@@ -438,18 +438,18 @@ export default function TipTapEditor({ value, onChange, onMediaUpload, placehold
     },
   })
 
-  // Update editor content when value prop changes
   useEffect(() => {
     if (editor && value !== undefined && value !== editor.getHTML()) {
-      // Use a small timeout or check to avoid interrupting the user
-      // or simply rely on the fact that useEffect runs after render
       editor.commands.setContent(value || '', false)
     }
   }, [value, editor])
 
   return (
-    <div className='border border-gray-200 rounded-md bg-white flex flex-col focus-within:ring-2 focus-within:ring-[#387cae]/10 focus-within:border-[#387cae] transition-all shadow-sm'>
-      <div className='flex flex-wrap items-center gap-2 p-2 border-b border-gray-100 bg-gray-50/50 rounded-t-xl'>
+    <div className='border border-gray-200 rounded-md bg-white flex flex-col
+focus-within:border-[#387cae]
+focus-within:ring-0
+transition-colors duration-200 shadow-sm'>
+      <div className='flex flex-wrap items-center gap-2 p-2 border-b border-gray-100 bg-gray-50/50 rounded-md'>
         <MenuBar editor={editor} onMediaUpload={onMediaUpload} showImageUpload={showImageUpload} />
       </div>
       <div

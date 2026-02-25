@@ -762,8 +762,7 @@ const CreateUpdateCollegeModal = ({
                                                     isMulti={true}
                                                     className="w-full"
                                                     isLoading={loadingPrograms}
-                                                                                                    inputSize='sm'
-
+                                                    inputSize='sm'
                                                 />
                                                 {selectedUniIds.length === 0 && (
                                                     <p className='text-[10px] text-gray-400 mt-2 font-medium bg-gray-50 p-2 rounded-md border border-dashed border-gray-200'>
