@@ -38,7 +38,7 @@ import {
     createCollege,
     updateCollege,
     saveDraft,
-    getUniversityBySlug,
+    getProgramsByUniversity,
     fetchUniversities
 } from '@/app/(dashboard)/dashboard/colleges/actions'
 import { cn } from '@/app/lib/utils'
@@ -72,7 +72,6 @@ const CreateUpdateCollegeModal = ({
     const [submittingDraft, setSubmittingDraft] = useState(false)
     const [loadingData, setLoadingData] = useState(false)
     const [showCloseConfirm, setShowCloseConfirm] = useState(false)
-    const [uniSlug, setUniSlug] = useState('')
     const [universityPrograms, setUniversityPrograms] = useState([])
     const [loadingPrograms, setLoadingPrograms] = useState(false)
     const [filesDirty, setFilesDirty] = useState(false)
@@ -122,9 +121,9 @@ const CreateUpdateCollegeModal = ({
             },
             google_map_url: '',
             map_type: '',
-            contacts: ['', ''],
+            contacts: [],
             members: [],
-            faqs: [{ question: '', answer: '' }],
+            faqs: [],
             status: 'published'
         }
     })
@@ -153,7 +152,6 @@ const CreateUpdateCollegeModal = ({
     }
 
     const handleCloseAttempt = () => {
-        // If the form is dirty (has unsaved changes) or files changed, show confirmation
         if (isDirty || filesDirty) {
             setShowCloseConfirm(true)
         } else {
@@ -161,7 +159,6 @@ const CreateUpdateCollegeModal = ({
         }
     }
 
-    // Reset form when modal closes or opens for new college
     useEffect(() => {
         if (!isOpen) {
             reset()
@@ -172,13 +169,11 @@ const CreateUpdateCollegeModal = ({
                 videos: []
             })
             setFilesDirty(false)
-            setUniSlug('')
             setUniversityPrograms([])
             setSelectedUniversities([])
         }
     }, [isOpen, reset])
 
-    // Load college data for editing
     useEffect(() => {
         if (isOpen && editSlug) {
             const fetchCollegeData = async () => {
@@ -194,7 +189,6 @@ const CreateUpdateCollegeModal = ({
                     let collegeData = await response.json()
                     collegeData = collegeData.item
 
-                    // Populate fields
                     setValue('id', collegeData.id)
                     setValue('name', collegeData.name)
                     setValue('institute_type', collegeData.institute_type)
@@ -219,9 +213,6 @@ const CreateUpdateCollegeModal = ({
                     if (collegeData.university || collegeData.universities) {
                         const unis = collegeData.universities || (collegeData.university ? [collegeData.university] : [])
                         setSelectedUniversities(unis)
-                        if (unis.length > 0) {
-                            setUniSlug(unis[unis.length - 1].slugs)
-                        }
                     }
 
                     if (collegeData.degrees && Array.isArray(collegeData.degrees)) {
@@ -282,9 +273,14 @@ const CreateUpdateCollegeModal = ({
 
                     setValue('images', [...images])
 
-                    const memberData = collegeData.collegeMembers?.length
-                        ? collegeData.collegeMembers
-                        : [{ name: '', contact_number: '', role: '', description: '' }]
+                    const memberData = (collegeData.collegeMembers || []).map(m => ({
+                        id: m.id,
+                        name: m.name || '',
+                        role: m.role || '',
+                        image_url: m.image_url || m.image || '',
+                        description: m.description || '',
+                        contact_number: m.contact_number || ''
+                    }))
                     setValue('members', memberData)
 
                     if (collegeData.college_broucher) {
@@ -319,17 +315,18 @@ const CreateUpdateCollegeModal = ({
         }
     }, [isOpen, editSlug, setValue])
 
-    // Load university programs
+    const selectedUniIds = watch('university_id') || []
+
     useEffect(() => {
         const fetchPrograms = async () => {
-            if (!uniSlug) {
+            if (!selectedUniIds || selectedUniIds.length === 0) {
                 setUniversityPrograms([])
                 return
             }
             try {
                 setLoadingPrograms(true)
-                const universityData = await getUniversityBySlug(uniSlug)
-                setUniversityPrograms(universityData.university_programs || [])
+                const universityData = await getProgramsByUniversity(selectedUniIds)
+                setUniversityPrograms(universityData || [])
             } catch (error) {
                 console.error('Error fetching university programs:', error)
             } finally {
@@ -337,17 +334,17 @@ const CreateUpdateCollegeModal = ({
             }
         }
         fetchPrograms()
-    }, [uniSlug])
+    }, [JSON.stringify(selectedUniIds)])
 
     const onSearchPrograms = async (query) => {
         if (!universityPrograms) return []
         const filtered = query
-            ? universityPrograms.filter(up => up.program?.title?.toLowerCase().includes(query.toLowerCase()))
+            ? universityPrograms.filter(p => p.title?.toLowerCase().includes(query.toLowerCase()))
             : universityPrograms
 
-        return filtered.map(up => ({
-            id: up.program_id || up.program?.id,
-            title: up.program?.title || 'Unknown'
+        return filtered.map(p => ({
+            id: p.id,
+            title: p.title || 'Unknown'
         }))
     }
 
@@ -368,8 +365,8 @@ const CreateUpdateCollegeModal = ({
     const selectedProgramIds = watch('courses') || []
     const selectedPrograms = universityPrograms
         ? universityPrograms
-            .filter(up => selectedProgramIds.includes(up.program_id || up.program?.id))
-            .map(up => ({ id: up.program_id || up.program?.id, title: up.program?.title }))
+            .filter(p => selectedProgramIds.includes(p.id))
+            .map(p => ({ id: p.id, title: p.title }))
         : []
 
     const onSearchDegrees = async (query) => {
@@ -434,7 +431,14 @@ const CreateUpdateCollegeModal = ({
             data.author_id = author_id
 
             // Filter logic
-            data.members = (data.members || []).filter(m => Object.values(m).some(v => v && v.toString().trim() !== ''))
+            data.members = (data.members || []).map(m => ({
+                id: m.id,
+                name: m.name,
+                role: m.role,
+                image_url: m.image_url,
+                description: m.description,
+                contact_number: m.contact_number
+            })).filter(m => m.name || m.role || m.description || m.contact_number || m.image_url)
             if (data.members.length === 0) delete data.members
 
             const uniIds = (data.university_id || []).map(id => parseInt(id)).filter(id => !isNaN(id))
@@ -666,7 +670,6 @@ const CreateUpdateCollegeModal = ({
                                                     if (!currentUnis.find(u => u.id === uni.id)) {
                                                         const updatedUnis = [...currentUnis, uni]
                                                         setSelectedUniversities(updatedUnis)
-                                                        setUniSlug(uni.slugs) // Use latest for context
                                                     }
                                                 }}
                                                 onRemove={(uni) => {
@@ -677,12 +680,6 @@ const CreateUpdateCollegeModal = ({
 
                                                     const updatedUnis = selectedUniversities.filter(u => u.id !== targetId)
                                                     setSelectedUniversities(updatedUnis)
-
-                                                    if (updatedUnis.length > 0) {
-                                                        setUniSlug(updatedUnis[updatedUnis.length - 1].slugs)
-                                                    } else {
-                                                        setUniSlug('')
-                                                    }
                                                 }}
                                                 selectedItems={selectedUniversities}
                                                 placeholder="Search or select universities..."
@@ -763,7 +760,7 @@ const CreateUpdateCollegeModal = ({
                                                     className="w-full"
                                                     isLoading={loadingPrograms}
                                                 />
-                                                {!uniSlug && (
+                                                {selectedUniIds.length === 0 && (
                                                     <p className='text-[10px] text-gray-400 mt-2 font-medium bg-gray-50 p-2 rounded-lg border border-dashed border-gray-200'>
                                                         Please select a university first to view available programs.
                                                     </p>
@@ -876,8 +873,20 @@ const CreateUpdateCollegeModal = ({
                                                         <Input
                                                             placeholder={`Phone Number ${index + 1}`}
                                                             className="h-11 pl-10 rounded-md border-gray-200 transition-all focus:ring-4 focus:ring-[#387cae]/5"
-                                                            {...register(`contacts[${index}]`)}
+                                                            {...register(`contacts[${index}]`, {
+                                                                pattern: {
+                                                                    value: /^[0-9]{10}$/,
+                                                                    message: 'Must be exactly 10 digits'
+                                                                }
+                                                            })}
+                                                            onInput={(e) => {
+                                                                e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10)
+                                                            }}
+                                                            maxLength={10}
                                                         />
+                                                        {errors?.contacts?.[index] && (
+                                                            <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.contacts[index].message}</p>
+                                                        )}
                                                     </div>
                                                 ))}
                                             </div>
@@ -954,7 +963,7 @@ const CreateUpdateCollegeModal = ({
                                             variant='outline'
                                             size='sm'
                                             className='rounded-md border-[#387cae]/20 text-[#387cae] hover:bg-[#387cae]/5'
-                                            onClick={() => appendMember({ name: '', role: '', image_url: '', bio: '', contact_info: '' })}
+                                            onClick={() => appendMember({ id: null, name: '', role: '', image_url: '', description: '', contact_number: '' })}
                                         >
                                             <Plus className='w-4 h-4 mr-2' />
                                             Add Member
@@ -997,15 +1006,27 @@ const CreateUpdateCollegeModal = ({
                                                         <div>
                                                             <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Contact (Phone)</Label>
                                                             <Input
-                                                                {...register(`members[${index}].contact_info`)}
+                                                                {...register(`members[${index}].contact_number`, {
+                                                                    pattern: {
+                                                                        value: /^[0-9]{10}$/,
+                                                                        message: 'Contact must be exactly 10 digits'
+                                                                    }
+                                                                })}
+                                                                onInput={(e) => {
+                                                                    e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10)
+                                                                }}
+                                                                maxLength={10}
                                                                 placeholder='98XXXXXXXX'
                                                                 className='h-10 rounded-md'
                                                             />
+                                                            {errors?.members?.[index]?.contact_number && (
+                                                                <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.members[index].contact_number.message}</p>
+                                                            )}
                                                         </div>
                                                         <div className='sm:col-span-3'>
-                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Professional Bio</Label>
+                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Professional description</Label>
                                                             <Input
-                                                                {...register(`members[${index}].bio`)}
+                                                                {...register(`members[${index}].description`)}
                                                                 placeholder='Achievement and specialization...'
                                                                 className='h-10 rounded-md'
                                                             />
@@ -1046,21 +1067,35 @@ const CreateUpdateCollegeModal = ({
                                             <div key={field.id} className='group relative p-6 bg-white border border-gray-100 rounded-2xl transition-all hover:shadow-lg hover:shadow-[#387cae]/5 hover:border-[#387cae]/20'>
                                                 <div className='space-y-4 pr-10'>
                                                     <div>
-                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block'>Question</Label>
+                                                        <Label
+                                                            required
+                                                            className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block'>Question</Label>
                                                         <Input
-                                                            {...register(`faqs[${index}].question`)}
+                                                            {...register(`faqs[${index}].question`, {
+                                                                required: 'Question is required'
+                                                            })}
                                                             placeholder='e.g. What are the admission requirements?'
                                                             className='h-11 rounded-md font-bold text-gray-800'
                                                         />
+                                                        {errors?.faqs?.[index]?.question && (
+                                                            <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.faqs[index].question.message}</p>
+                                                        )}
                                                     </div>
                                                     <div>
-                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block'>Answer</Label>
+                                                        <Label
+                                                            required
+                                                            className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block'>Answer</Label>
                                                         <Textarea
-                                                            {...register(`faqs[${index}].answer`)}
+                                                            {...register(`faqs[${index}].answer`, {
+                                                                required: 'Answer is required'
+                                                            })}
                                                             placeholder='Provide a detailed answer...'
                                                             rows={2}
                                                             className='rounded-md resize-none min-h-[80px]'
                                                         />
+                                                        {errors?.faqs?.[index]?.answer && (
+                                                            <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.faqs[index].answer.message}</p>
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <Button

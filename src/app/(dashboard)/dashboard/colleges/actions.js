@@ -123,7 +123,24 @@ export const fetchAllUniversity = async () => {
     console.error(error)
     throw error
   }
-}
+  }
+
+  export const getProgramsByUniversity = async (universityIds) => {
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}/program?universityIds=${universityIds.join(',')}`
+      )
+      if (!response.ok) {
+        throw new Error('Failed to fetch programs')
+      }
+      const data = await response.json()
+      return data.items
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+
 
 export const getUniversityBySlug = async (slug) => {
   try {
