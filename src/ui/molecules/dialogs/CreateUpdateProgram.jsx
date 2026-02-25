@@ -10,8 +10,7 @@ import { useSelector } from 'react-redux'
 import { Trash2, X, Plus, Building2 } from 'lucide-react'
 import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 
-// Dropdowns
-import CourseDropdown from '@/ui/molecules/dropdown/CourseDropdown'
+
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { Textarea } from '@/ui/shadcn/textarea'
@@ -262,6 +261,14 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
         } catch { return [] }
     }
 
+    const onSearchCourses = async (q) => {
+        try {
+            const res = await authFetch(`${process.env.baseUrl}/course?${q ? `q=${encodeURIComponent(q)}&` : ''}limit=50`)
+            const data = await res.json()
+            return (data.items || data.courses || []).map((c) => ({ id: c.id, title: c.title }))
+        } catch { return [] }
+    }
+
     // Syllabus helpers
     const getCurrentSemesterCourses = () =>
         syllabusFields
@@ -429,6 +436,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                             valueKey='id'
                                             isMulti={false}
                                             allowCreate={false}
+                                            inputSize="sm"
                                         />
                                     </div>
 
@@ -444,6 +452,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                             valueKey='id'
                                             isMulti={false}
                                             allowCreate={false}
+                                            inputSize="sm"
                                         />
                                     </div>
 
@@ -559,6 +568,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                             valueKey='id'
                                             isMulti={false}
                                             allowCreate={false}
+                                            inputSize="sm"
                                         />
                                     </div>
 
@@ -574,6 +584,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                             valueKey='id'
                                             isMulti={false}
                                             allowCreate={false}
+                                            inputSize="sm"
                                         />
                                     </div>
                                 </div>
@@ -599,6 +610,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     valueKey="id"
                                     isMulti={true}
                                     allowCreate={false}
+                                    inputSize="sm"
                                 />
                             </section>
 
@@ -657,13 +669,17 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                 <div className='flex gap-2 items-end'>
                                     <div className='flex-1 space-y-1.5'>
                                         <Label>Add Course</Label>
-                                        <CourseDropdown
-                                            value={currentCourse.id}
-                                            onChange={(id, course) => {
-                                                setCurrentCourse(course ? { id: course.id, title: course.title } : { id: '', title: '' })
-                                            }}
-                                            placeholder="Search and select a course..."
-                                            className="w-full"
+                                        <SearchSelectCreate
+                                            onSearch={onSearchCourses}
+                                            onSelect={(item) => setCurrentCourse({ id: item.id, title: item.title })}
+                                            onRemove={() => setCurrentCourse({ id: '', title: '' })}
+                                            selectedItems={currentCourse.id ? [currentCourse] : []}
+                                            placeholder='Search and select a course…'
+                                            displayKey='title'
+                                            valueKey='id'
+                                            isMulti={false}
+                                            allowCreate={false}
+                                            inputSize="sm"
                                         />
                                     </div>
                                     <Button

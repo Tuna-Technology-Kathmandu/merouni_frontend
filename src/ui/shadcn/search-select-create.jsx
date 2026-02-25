@@ -25,6 +25,12 @@ import { cn } from '@/app/lib/utils'
  * @param {Function} props.renderItem      - Optional: (item) => JSX — custom dropdown row renderer
  * @param {Function} props.renderSelected  - Optional: (item) => JSX — custom single-select display
  */
+
+const INPUT_SIZE = {
+    sm: 'h-10',
+    md: 'h-12',
+}
+
 export default function SearchSelectCreate({
     onSearch,
     onCreate,
@@ -40,8 +46,13 @@ export default function SearchSelectCreate({
     allowCreate = false,
     isLoading: externalLoading = false,
     renderItem = null,
-    renderSelected = null
+    renderSelected = null,
+    /** 'sm' = h-10 (matches standard Input), 'md' = h-12 (default, original) */
+    inputSize = 'md',
+    /** Extra classes forwarded directly to the <Input> element */
+    inputClassName = '',
 }) {
+    const sizeClass = INPUT_SIZE[inputSize] ?? INPUT_SIZE.md
     const [query, setQuery] = useState('')
     const [results, setResults] = useState([])
     const [isSearching, setIsSearching] = useState(false)
@@ -133,17 +144,22 @@ export default function SearchSelectCreate({
                     onFocus={() => handleSearch(query)}
                     placeholder={!isMulti && currentSelected.length > 0 ? (currentSelected[0][displayKey] || currentSelected[0]) : placeholder}
                     className={cn(
-                        "pl-10 pr-10 h-12 rounded-md border-gray-200 focus:ring-[#387cae]/20 transition-all",
+                        "pl-10 pr-10 rounded-md border-gray-200 focus:ring-[#387cae]/20 transition-all",
+                        sizeClass,
                         !isMulti && currentSelected.length > 0 && query.length === 0 && "placeholder:text-gray-900 placeholder:font-semibold",
                         // When custom panel visible: hide input but keep it in DOM (to receive focus on Click)
-                        showCustomPanel && 'opacity-0 absolute inset-0 pointer-events-none'
+                        showCustomPanel && 'opacity-0 absolute inset-0 pointer-events-none',
+                        inputClassName
                     )}
                 />
 
                 {/* ── Custom selected display (renderSelected mode) ── */}
                 {showCustomPanel && (
                     <div
-                        className="flex items-center pl-10 pr-4 h-12 rounded-md border border-gray-200 bg-white cursor-pointer gap-2 overflow-hidden"
+                        className={cn(
+                            "flex items-center pl-10 pr-4 rounded-md border border-gray-200 bg-white cursor-pointer gap-2 overflow-hidden",
+                            sizeClass
+                        )}
                         onClick={() => { setShowDropdown(true); handleSearch('') }}
                     >
                         <div className="flex-1 min-w-0">{renderSelected(currentSelected[0])}</div>

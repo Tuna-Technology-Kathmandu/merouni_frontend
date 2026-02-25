@@ -240,6 +240,7 @@ export default function CreateUpdateDegree({
                                 valueKey="id"
                                 isMulti={true}
                                 allowCreate={false}
+                                inputSize="sm"
                             />
                             {disciplineError && (
                                 <p className='text-xs text-destructive mt-1'>{disciplineError}</p>
