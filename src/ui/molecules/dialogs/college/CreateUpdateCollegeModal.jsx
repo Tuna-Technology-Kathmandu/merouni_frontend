@@ -493,7 +493,7 @@ const CreateUpdateCollegeModal = ({
             onSuccess?.()
             onSystemClose()
         } catch (error) {
-            console.error('Submission error:', error)
+            console.log('Submission error:', error)
             toast.error(error.message || 'Failed to submit data')
         } finally {
             setSubmitting(false)
@@ -1124,7 +1124,7 @@ const CreateUpdateCollegeModal = ({
                                                                 required: 'Question is required'
                                                             })}
                                                             placeholder='e.g. What are the admission requirements?'
-                                                            className='h-11 rounded-md font-bold text-gray-800'
+                                                            className='h-11 rounded-md text-gray-800'
                                                         />
                                                         {errors?.faqs?.[index]?.question && (
                                                             <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.faqs[index].question.message}</p>
