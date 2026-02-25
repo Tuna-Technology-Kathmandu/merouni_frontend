@@ -40,6 +40,21 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/app/lib/utils'
 
+const StatusBadge = ({ status }) => {
+  if (!status) return null
+  const isPublished = status.toLowerCase() === 'published'
+  return (
+    <span className={cn(
+      'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider shrink-0',
+      isPublished
+        ? 'bg-blue-50 text-blue-600 border-blue-100'
+        : 'bg-orange-50 text-orange-600 border-orange-100'
+    )}>
+      {status}
+    </span>
+  )
+}
+
 // ─── Type badge helper ────────────────────────────────────────────────────────
 const TypeBadge = ({ type }) => {
   if (!type) return null
@@ -119,6 +134,7 @@ const SortableCard = ({ university, rank, onView, onEdit, onDelete }) => {
               {university.fullname}
             </h3>
             <TypeBadge type={university.type_of_institute} />
+            <StatusBadge status={university.status} />
           </div>
           <div className='flex items-center gap-4 mt-1.5'>
             {location && (
@@ -185,6 +201,7 @@ const OverlayCard = ({ university, rank }) => (
         <div className='flex items-center gap-2 flex-wrap'>
           <h3 className='text-[15px] font-bold text-gray-900 truncate'>{university.fullname}</h3>
           <TypeBadge type={university.type_of_institute} />
+          <StatusBadge status={university.status} />
         </div>
       </div>
     </div>
@@ -235,6 +252,7 @@ export default function UniversityPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('All')
   const [searchTimeout, setSearchTimeout] = useState(null)
 
   const [activeId, setActiveId] = useState(null)
@@ -247,7 +265,7 @@ export default function UniversityPage() {
 
   useEffect(() => {
     setHeading('University Management')
-    loadUniversities()
+    loadUniversities(searchQuery, statusFilter)
     return () => setHeading(null)
   }, [setHeading])
 
@@ -255,7 +273,7 @@ export default function UniversityPage() {
     return () => { if (searchTimeout) clearTimeout(searchTimeout) }
   }, [searchTimeout])
 
-  const loadUniversities = async (query = '', silent = false) => {
+  const loadUniversities = async (query = '', status = 'All', silent = false) => {
     try {
       if (!silent) setLoading(true)
       let all = []
@@ -265,6 +283,7 @@ export default function UniversityPage() {
       while (hasMore) {
         let url = `${process.env.baseUrl}/university?page=${page}&limit=100`
         if (query) url += `&q=${encodeURIComponent(query)}`
+        if (status && status !== 'All') url += `&status=${status.toLowerCase()}`
         const res = await authFetch(url)
         if (!res.ok) throw new Error('Failed to load universities')
         const data = await res.json()
@@ -290,8 +309,13 @@ export default function UniversityPage() {
   const handleSearchInput = (value) => {
     setSearchQuery(value)
     if (searchTimeout) clearTimeout(searchTimeout)
-    const id = setTimeout(() => loadUniversities(value, true), 350)
+    const id = setTimeout(() => loadUniversities(value, statusFilter, true), 350)
     setSearchTimeout(id)
+  }
+
+  const handleStatusChange = (status) => {
+    setStatusFilter(status)
+    loadUniversities(searchQuery, status, true)
   }
 
   const handleDragStart = (event) => setActiveId(event.active.id)
@@ -332,7 +356,7 @@ export default function UniversityPage() {
       toast.success('Order saved', { autoClose: 1500 })
     } catch (err) {
       toast.error(err.message || 'Failed to save order')
-      loadUniversities(searchQuery, true)
+      loadUniversities(searchQuery, statusFilter, true)
     } finally {
       setSaving(false)
     }
@@ -369,7 +393,7 @@ export default function UniversityPage() {
       const data = await res.json()
       if (res.ok) {
         toast.success(data.message || 'Deleted successfully')
-        loadUniversities(searchQuery, true)
+        loadUniversities(searchQuery, statusFilter, true)
       } else {
         throw new Error(data.message || 'Failed to delete')
       }
@@ -408,8 +432,8 @@ export default function UniversityPage() {
               </div>
             </div>
 
-            <div className='flex items-center gap-2 w-full sm:w-auto'>
-              <div className='relative flex-1 sm:w-60'>
+            <div className='flex items-center gap-2 w-full sm:w-auto overflow-x-auto sm:overflow-visible pb-1 sm:pb-0'>
+              <div className='relative shrink-0 sm:w-60'>
                 <Search size={13} className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none' />
                 <input
                   type='text'
@@ -419,6 +443,17 @@ export default function UniversityPage() {
                   className='w-full pl-8 pr-3 h-9 rounded-xl border border-gray-200 text-sm text-gray-700 placeholder-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#387cae]/25 focus:border-[#387cae]/40 transition'
                 />
               </div>
+
+              <select
+                value={statusFilter}
+                onChange={(e) => handleStatusChange(e.target.value)}
+                className='h-9 rounded-xl border border-gray-200 bg-gray-50 px-3 py-1 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#387cae]/25 transition-all font-medium min-w-[120px]'
+              >
+                <option value="All">All Status</option>
+                <option value="Published">Published</option>
+                <option value="Draft">Draft</option>
+              </select>
+
               <Button
                 onClick={() => { setEditSlug(''); setIsOpen(true) }}
                 className='bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2 h-9 px-4 rounded-xl text-sm font-semibold shrink-0'
@@ -500,7 +535,7 @@ export default function UniversityPage() {
         isOpen={isOpen}
         handleCloseModal={() => { setIsOpen(false); setEditSlug('') }}
         editSlug={editSlug}
-        onSuccess={() => loadUniversities(searchQuery, true)}
+        onSuccess={() => loadUniversities(searchQuery, statusFilter, true)}
       />
 
       <ConfirmationDialog
