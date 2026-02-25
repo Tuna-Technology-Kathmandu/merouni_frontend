@@ -36,6 +36,7 @@ import { toast } from 'react-toastify'
 
 import {
     createCollege,
+    updateCollege,
     getUniversityBySlug,
     fetchUniversities
 } from '@/app/(dashboard)/dashboard/colleges/actions'
@@ -413,6 +414,9 @@ const CreateUpdateCollegeModal = ({
         try {
             status === 'Draft' ? setSubmittingDraft(true) : setSubmitting(true)
 
+            // Always include author_id from current redux state
+            data.author_id = author_id
+
             // Filter logic
             data.members = (data.members || []).filter(m => Object.values(m).some(v => v && v.toString().trim() !== ''))
             if (data.members.length === 0) delete data.members
@@ -443,9 +447,20 @@ const CreateUpdateCollegeModal = ({
 
             data.status = status
 
-            await createCollege(data)
+            // Use PUT for existing colleges, POST for new ones
+            if (editSlug && data.id) {
+                await updateCollege(data.id, data)
+            } else {
+                await createCollege(data)
+            }
 
-            toast.success(status === 'Draft' ? 'Draft saved successfully!' : (editSlug ? 'College updated successfully!' : 'College created successfully!'))
+            toast.success(
+                status === 'Draft'
+                    ? 'Draft saved successfully!'
+                    : editSlug
+                        ? 'College updated successfully!'
+                        : 'College created successfully!'
+            )
             onSuccess?.()
             onSystemClose()
         } catch (error) {
@@ -463,9 +478,9 @@ const CreateUpdateCollegeModal = ({
 
     const onSaveDraft = async () => {
         const data = getValues()
-        // When saving as draft, we might want to skip basic validation
-        // But we still need the college name at least
-        if (!data.name) {
+        // When saving as draft, skip full form validation
+        // Only require the college name as a minimum
+        if (!data.name || !data.name.trim()) {
             toast.error('College name is required even for drafts')
             return
         }
@@ -653,6 +668,42 @@ const CreateUpdateCollegeModal = ({
                                                 valueKey="id"
                                                 isMulti={true}
                                                 className="w-full"
+                                                renderItem={(item) => (
+                                                    <div className="flex items-center gap-3">
+                                                        {item.logo ? (
+                                                            <img
+                                                                src={item.logo}
+                                                                alt={item.fullname}
+                                                                className="w-7 h-7 rounded-full object-cover border border-gray-200 shrink-0"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-7 h-7 rounded-full bg-[#387cae]/10 flex items-center justify-center shrink-0">
+                                                                <span className="text-xs font-bold text-[#387cae]">
+                                                                    {item.fullname?.charAt(0)?.toUpperCase() || 'C'}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        <span className="text-sm font-medium text-gray-800">{item.fullname}</span>
+                                                    </div>
+                                                )}
+                                                renderSelected={(item) => (
+                                                    <div className="flex items-center gap-3">
+                                                        {item.logo ? (
+                                                            <img
+                                                                src={item.logo}
+                                                                alt={item.fullname}
+                                                                className="w-7 h-7 rounded-full object-cover border border-gray-200 shrink-0"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-7 h-7 rounded-full bg-[#387cae]/10 flex items-center justify-center shrink-0">
+                                                                <span className="text-xs font-bold text-[#387cae]">
+                                                                    {item.fullname?.charAt(0)?.toUpperCase() || 'C'}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        <span className="text-sm font-semibold text-gray-900 truncate">{item.fullname}</span>
+                                                    </div>
+                                                )}
                                             />
                                             {errors.university_id && (
                                                 <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.university_id.message}</p>

@@ -12,10 +12,29 @@ export async function createCollege(data) {
     }
   )
 
-
   if (!response.ok) {
     const error = await response.json()
     throw new Error(error.message || 'Failed to create college')
+  }
+
+  return response.json()
+}
+
+export async function updateCollege(id, data) {
+  const response = await authFetch(
+    `${process.env.baseUrl}/college?college_id=${id}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }
+  )
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.message || 'Failed to update college')
   }
 
   return response.json()
