@@ -11,7 +11,7 @@ export default function ContactHeroSection() {
           className='max-w-3xl'
         >
           <h1 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>
-            Let's start a <span className='text-[#30AD8F]'>conversation</span>
+            Let's start a <span className='text-[#387cae]'>conversation</span>
           </h1>
           <p className='text-gray-600 text-lg md:text-xl leading-relaxed max-w-2xl'>
             We're here to help and answer any questions you may have.

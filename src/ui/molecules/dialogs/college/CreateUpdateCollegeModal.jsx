@@ -724,6 +724,7 @@ const CreateUpdateCollegeModal = ({
                                                         <span className="text-sm font-semibold text-gray-900 truncate">{item.fullname}</span>
                                                     </div>
                                                 )}
+                                                inputSize='sm'
                                             />
                                             {errors.university_id && (
                                                 <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.university_id.message}</p>
@@ -744,6 +745,7 @@ const CreateUpdateCollegeModal = ({
                                                     valueKey="id"
                                                     isMulti={true}
                                                     className="w-full"
+                                                    inputSize='sm'
                                                 />
                                             </div>
 
@@ -760,6 +762,8 @@ const CreateUpdateCollegeModal = ({
                                                     isMulti={true}
                                                     className="w-full"
                                                     isLoading={loadingPrograms}
+                                                                                                    inputSize='sm'
+
                                                 />
                                                 {selectedUniIds.length === 0 && (
                                                     <p className='text-[10px] text-gray-400 mt-2 font-medium bg-gray-50 p-2 rounded-md border border-dashed border-gray-200'>

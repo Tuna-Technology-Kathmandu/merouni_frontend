@@ -78,11 +78,11 @@ const ContactSidebar = () => {
                             rel={item.link.startsWith('http') ? 'noopener noreferrer' : undefined}
                             className='flex items-start gap-4 group'
                         >
-                            <div className='p-3 rounded-md bg-[#30AD8F]/10 text-[#30AD8F] group-hover:bg-[#30AD8F] group-hover:text-white transition-colors duration-300'>
+                            <div className='p-3 rounded-md bg-[#387cae]/10 text-[#387cae] group-hover:bg-[#387cae] group-hover:text-white transition-colors duration-300'>
                                 <item.icon size={20} />
                             </div>
                             <div className='flex-1'>
-                                <span className='text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1 group-hover:text-[#30AD8F] transition-colors'>
+                                <span className='text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1 group-hover:text-[#387cae] transition-colors'>
                                     {item.label}
                                 </span>
                                 <h4 className='text-base font-semibold text-gray-900 leading-snug mb-0.5 break-words'>

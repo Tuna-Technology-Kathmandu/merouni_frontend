@@ -96,7 +96,7 @@ export default function ContactForm() {
                   value={formData.fullname}
                   onChange={handleChange}
                   placeholder='John Doe'
-                  className='w-full p-4 rounded-md bg-gray-50/50 border border-gray-200 focus:bg-white focus:border-[#30AD8F] outline-none transition-all duration-200'
+                  className='w-full p-4 rounded-md bg-gray-50/50 border border-gray-200 focus:bg-white focus:border-[#387cae] outline-none transition-all duration-200'
                   required
                 />
               </div>
@@ -108,7 +108,7 @@ export default function ContactForm() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder='john@example.com'
-                  className='w-full p-4 rounded-md bg-gray-50/50 border border-gray-200 focus:bg-white focus:border-[#30AD8F] outline-none transition-all duration-200'
+                  className='w-full p-4 rounded-md bg-gray-50/50 border border-gray-200 focus:bg-white focus:border-[#387cae] outline-none transition-all duration-200'
                   required
                 />
               </div>
@@ -122,7 +122,7 @@ export default function ContactForm() {
                 value={formData.subject}
                 onChange={handleChange}
                 placeholder='How can we help you?'
-                className='w-full p-4 rounded-md bg-gray-50/50 border border-gray-200 focus:bg-white focus:border-[#30AD8F] outline-none transition-all duration-200'
+                className='w-full p-4 rounded-md bg-gray-50/50 border border-gray-200 focus:bg-white focus:border-[#387cae] outline-none transition-all duration-200'
                 required
               />
             </div>
@@ -135,7 +135,7 @@ export default function ContactForm() {
                 onChange={handleChange}
                 placeholder='Your message here...'
                 rows='5'
-                className='w-full p-4 rounded-md bg-gray-50/50 border border-gray-200 focus:bg-white focus:border-[#30AD8F] outline-none transition-all duration-200 resize-none'
+                className='w-full p-4 rounded-md bg-gray-50/50 border border-gray-200 focus:bg-white focus:border-[#387cae] outline-none transition-all duration-200 resize-none'
                 required
               ></textarea>
             </div>
@@ -143,7 +143,7 @@ export default function ContactForm() {
             <div className='pt-2'>
               <button
                 type='submit'
-                className='w-full md:w-auto px-12 py-4 bg-[#30AD8F] text-white rounded-md font-bold flex items-center justify-center space-x-2 hover:bg-[#28967b] transition-all disabled:opacity-70 active:scale-[0.98]'
+                className='w-full md:w-auto px-12 py-4 bg-[#387cae] text-white rounded-md font-bold flex items-center justify-center space-x-2 hover:bg-[#2d628a] transition-all disabled:opacity-70 active:scale-[0.98]'
                 disabled={loading}
               >
                 {loading ? (
