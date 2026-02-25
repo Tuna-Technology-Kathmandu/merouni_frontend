@@ -46,7 +46,7 @@ export async function updateCollege(id, data) {
   const response = await authFetch(
     `${process.env.baseUrl}/college?college_id=${id}`,
     {
-      method: 'PUT',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },

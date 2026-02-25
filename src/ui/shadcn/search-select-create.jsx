@@ -47,8 +47,8 @@ export default function SearchSelectCreate({
     isLoading: externalLoading = false,
     renderItem = null,
     renderSelected = null,
-    /** 'sm' = h-10 (matches standard Input), 'md' = h-12 (default, original) */
-    inputSize = 'md',
+    /** 'sm' = h-10 (matches standard Input) (default, original), 'md' = h-12  */
+    inputSize = 'sm',
     /** Extra classes forwarded directly to the <Input> element */
     inputClassName = '',
 }) {

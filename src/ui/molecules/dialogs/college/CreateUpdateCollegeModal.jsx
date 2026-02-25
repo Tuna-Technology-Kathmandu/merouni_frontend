@@ -206,28 +206,39 @@ const CreateUpdateCollegeModal = ({
                     setValue('website_url', collegeData.website_url)
                     setValue('status', collegeData.status || 'published')
 
-                    if (collegeData.university_id) {
-                        const uniIds = Array.isArray(collegeData.university_id)
-                            ? collegeData.university_id.map(Number)
-                            : [Number(collegeData.university_id)]
-                        setValue('university_id', uniIds)
-                    }
+                    const uniList = collegeData.universities || (collegeData.university ? [collegeData.university] : [])
+                    setSelectedUniversities(uniList)
 
-                    if (collegeData.university || collegeData.universities) {
-                        const unis = collegeData.universities || (collegeData.university ? [collegeData.university] : [])
-                        setSelectedUniversities(unis)
-                    }
+                    const uniIds = (collegeData.university_id
+                        ? (Array.isArray(collegeData.university_id) ? collegeData.university_id : [collegeData.university_id])
+                        : uniList.map(u => u.id)
+                    ).map(Number).filter(id => !isNaN(id))
+
+                    setValue('university_id', uniIds)
 
                     if (collegeData.degrees && Array.isArray(collegeData.degrees)) {
                         const degreeIds = collegeData.degrees.map((degree) => String(degree.id))
                         setValue('degrees', degreeIds)
                     }
 
-                    const programIds = collegeData.collegeCourses
-                        ?.map((course) => course.program_id || course.program?.id)
-                        .filter((id) => id !== undefined) || []
+                    const collegeCourses = collegeData.collegeCourses || []
+                    const programIds = collegeCourses
+                        .map((course) => course.program_id || course.program?.id)
+                        .filter((id) => id !== undefined)
 
                     setValue('courses', [...new Set(programIds)])
+
+                    // Pre-populate university programs to show titles immediately
+                    const initialPrograms = collegeCourses
+                        .map(cc => ({
+                            id: cc.program_id || cc.program?.id,
+                            title: cc.program?.title || cc.course?.title || 'Unknown'
+                        }))
+                        .filter(p => p.id)
+
+                    if (initialPrograms.length > 0) {
+                        setUniversityPrograms(initialPrograms)
+                    }
 
                     if (collegeData.collegeAddress) {
                         setValue('address.country', collegeData.collegeAddress.country)
@@ -366,9 +377,9 @@ const CreateUpdateCollegeModal = ({
     }
 
     const selectedProgramIds = watch('courses') || []
-    const selectedPrograms = universityPrograms
+    const selectedPrograms = Array.isArray(universityPrograms)
         ? universityPrograms
-            .filter(p => selectedProgramIds.includes(p.id))
+            .filter(p => selectedProgramIds.map(String).includes(String(p.id)))
             .map(p => ({ id: p.id, title: p.title }))
         : []
 
@@ -473,6 +484,7 @@ const CreateUpdateCollegeModal = ({
             if (editSlug && data.id) {
                 data.college_id = data.id
             }
+
 
             // Use saveDraft (POST) for Drafts, regular logic for Published
             if (status === 'draft') {
