@@ -14,6 +14,7 @@ import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import SearchInput from '@/ui/molecules/SearchInput'
+import { THEME_BLUE } from '@/constants/constants'
 
 export default function TagForm() {
   const { setHeading } = usePageHeading()
@@ -262,15 +263,15 @@ export default function TagForm() {
                 {tags.map((tag) => (
                   <div
                     key={tag.id}
-                    className='group flex items-center gap-2 bg-white border border-gray-200 hover:border-blue-300 hover:bg-blue-50 px-4 py-2 rounded-md transition-all duration-200 shadow-sm hover:shadow-md'
+                    className='group flex items-center gap-2 bg-white border border-gray-200 hover:border-[#387cae]/50 hover:bg-[#387cae]/5 px-4 py-2 rounded-md transition-all duration-200 shadow-sm hover:shadow-md'
                   >
-                    <span className='text-sm font-semibold text-gray-700 group-hover:text-blue-700'>
+                    <span className='text-sm font-semibold text-gray-700 group-hover:text-[#387cae]'>
                       {tag.title}
                     </span>
-                    <div className='flex items-center gap-1 ml-2 pl-2 border-l border-gray-100 group-hover:border-blue-200 transition-colors'>
+                    <div className='flex items-center gap-1 ml-2 pl-2 border-l border-gray-100 group-hover:border-[#387cae]/20 transition-colors'>
                       <button
                         onClick={() => handleEdit(tag)}
-                        className='p-1.5 text-blue-500 hover:bg-blue-100 rounded-md transition-colors'
+                        className='p-1.5 text-[#387cae] hover:bg-[#387cae]/10 rounded-md transition-colors'
                         title='Edit Tag'
                       >
                         <Edit2 className='w-3.5 h-3.5' />
@@ -313,7 +314,10 @@ export default function TagForm() {
                       Previous
                     </button>
                     <div className='flex items-center px-4 bg-gray-50 rounded-md border border-gray-200'>
-                      <span className='text-sm font-semibold text-blue-600'>
+                      <span
+                        className='text-sm font-semibold'
+                        style={{ color: THEME_BLUE }}
+                      >
                         {pagination.currentPage}
                       </span>
                       <span className='text-sm text-gray-400 mx-1'>/</span>
