@@ -314,8 +314,8 @@ export default function UniversityPage() {
   const saveOrder = async (payload) => {
     try {
       setSaving(true)
-      const res = await authFetch(`${process.env.baseUrl}/university/order`, {
-        method: 'PUT',
+      const res = await authFetch(`${process.env.baseUrl}/university/update-order`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ universities: payload })
       })

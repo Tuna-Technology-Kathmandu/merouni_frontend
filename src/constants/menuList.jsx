@@ -361,22 +361,8 @@ export const menuItems = [
       {
         icon: <MdSchool className='text-xl' />,
         label: 'Degree',
-        href: null,
-        visible: ['admin', 'editor'],
-        submenus: [
-          {
-            icon: <MdSchool className='text-lg' />,
-            label: 'Manage Degrees',
-            href: '/dashboard/degrees',
-            visible: ['admin', 'editor']
-          },
-          {
-            icon: <SortAsc className='text-lg' />,
-            label: 'Degree Orderings',
-            href: '/dashboard/degree-orderings',
-            visible: ['admin', 'editor']
-          }
-        ]
+        href: '/dashboard/degrees',
+        visible: ['admin', 'editor']
       },
 
       {
