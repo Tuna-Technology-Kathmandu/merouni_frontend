@@ -94,7 +94,7 @@ const DegreeDropdown = ({
         type='button'
         onClick={() => setIsOpen(!isOpen)}
         disabled={loading}
-        className='w-full pl-4 pr-8 py-2 text-left border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed'
+        className='w-full pl-4 pr-8 py-2 text-sm text-left border border-gray-200 rounded-md bg-white hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#387cae] focus-visible:ring-offset-2'
         style={{ minWidth: `${minWidth}px` }}
       >
         <span className={value ? 'text-gray-900' : 'text-gray-500'}>
@@ -102,13 +102,12 @@ const DegreeDropdown = ({
         </span>
       </button>
       <ChevronDown
-        className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${
-          isOpen ? 'rotate-180' : ''
-        } ${loading ? 'opacity-50' : ''}`}
+        className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''
+          } ${loading ? 'opacity-50' : ''}`}
       />
 
       {isOpen && !loading && (
-        <div className='absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-hidden'>
+        <div className='absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-hidden'>
           <div className='p-2 border-b border-gray-200'>
             <div className='relative'>
               <Search className='absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
@@ -118,7 +117,7 @@ const DegreeDropdown = ({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onClick={(e) => e.stopPropagation()}
-                className='w-full pl-8 pr-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                className='w-full pl-8 pr-2 py-1.5 text-sm border border-gray-200 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#387cae] focus-visible:ring-offset-2'
                 autoFocus
               />
             </div>
@@ -127,11 +126,10 @@ const DegreeDropdown = ({
             <button
               type='button'
               onClick={() => handleSelect('')}
-              className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${
-                !value
-                  ? 'bg-blue-100 text-blue-700 font-medium'
+              className={`w-full text-left px-3 py-2 text-sm hover:bg-[#387cae]/5 transition-colors ${!value
+                  ? 'bg-[#387cae]/10 text-[#387cae] font-medium'
                   : 'text-gray-700'
-              }`}
+                }`}
             >
               {placeholder}
             </button>
@@ -141,11 +139,10 @@ const DegreeDropdown = ({
                   key={degree.id}
                   type='button'
                   onClick={() => handleSelect(String(degree.id))}
-                  className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${
-                    value === String(degree.id)
-                      ? 'bg-blue-100 text-blue-700 font-medium'
+                  className={`w-full text-left px-3 py-2 text-sm hover:bg-[#387cae]/5 transition-colors ${value === String(degree.id)
+                      ? 'bg-[#387cae]/10 text-[#387cae] font-medium'
                       : 'text-gray-700'
-                  }`}
+                    }`}
                 >
                   {degree.short_name ? `${degree.short_name} – ${degree.title}` : degree.title}
                 </button>

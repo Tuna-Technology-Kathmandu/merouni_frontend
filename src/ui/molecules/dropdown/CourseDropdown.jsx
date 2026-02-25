@@ -93,7 +93,7 @@ const CourseDropdown = ({
                 type='button'
                 onClick={() => setIsOpen(!isOpen)}
                 disabled={loading}
-                className='w-full pl-4 pr-8 py-2 text-left border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed'
+                className='w-full pl-4 pr-8 py-2 text-sm text-left border border-gray-200 rounded-md bg-white hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#387cae] focus-visible:ring-offset-2'
                 style={{ minWidth: `${minWidth}px` }}
             >
                 <span className={value ? 'text-gray-900' : 'text-gray-500'}>
@@ -116,7 +116,7 @@ const CourseDropdown = ({
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 onClick={(e) => e.stopPropagation()}
-                                className='w-full pl-8 pr-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500'
+                                className='w-full pl-8 pr-2 py-1.5 text-sm border border-gray-200 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#387cae] focus-visible:ring-offset-2'
                                 autoFocus
                             />
                         </div>
@@ -128,9 +128,9 @@ const CourseDropdown = ({
                                     key={course.id}
                                     type='button'
                                     onClick={() => handleSelect(String(course.id))}
-                                    className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${value === String(course.id)
-                                            ? 'bg-blue-100 text-blue-700 font-medium'
-                                            : 'text-gray-700'
+                                    className={`w-full text-left px-3 py-2 text-sm hover:bg-[#387cae]/5 transition-colors ${value === String(course.id)
+                                        ? 'bg-[#387cae]/10 text-[#387cae] font-medium'
+                                        : 'text-gray-700'
                                         }`}
                                 >
                                     {course.title}

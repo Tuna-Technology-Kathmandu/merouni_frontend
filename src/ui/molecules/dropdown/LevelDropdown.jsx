@@ -89,7 +89,7 @@ const LevelDropdown = ({
         type='button'
         onClick={() => setIsOpen(!isOpen)}
         disabled={loading}
-        className='w-full pl-4 pr-8 py-2 text-left border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed'
+        className='w-full pl-4 pr-8 py-2 text-sm text-left border border-gray-200 rounded-md bg-white hover:bg-gray-50 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#387cae] focus-visible:ring-offset-2'
         style={{ minWidth: `${minWidth}px` }}
       >
         <span className={value ? 'text-gray-900' : 'text-gray-500'}>
@@ -97,9 +97,8 @@ const LevelDropdown = ({
         </span>
       </button>
       <ChevronDown
-        className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${
-          isOpen ? 'rotate-180' : ''
-        } ${loading ? 'opacity-50' : ''}`}
+        className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''
+          } ${loading ? 'opacity-50' : ''}`}
       />
 
       {isOpen && !loading && (
@@ -113,7 +112,7 @@ const LevelDropdown = ({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onClick={(e) => e.stopPropagation()}
-                className='w-full pl-8 pr-2 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500'
+                className='w-full pl-8 pr-2 py-1.5 text-sm border border-gray-200 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#387cae] focus-visible:ring-offset-2'
                 autoFocus
               />
             </div>
@@ -125,11 +124,10 @@ const LevelDropdown = ({
                   key={level.id}
                   type='button'
                   onClick={() => handleSelect(String(level.id))}
-                  className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${
-                    value === String(level.id)
-                      ? 'bg-blue-100 text-blue-700 font-medium'
-                      : 'text-gray-700'
-                  }`}
+                  className={`w-full text-left px-3 py-2 text-sm hover:bg-[#387cae]/5 transition-colors ${value === String(level.id)
+                    ? 'bg-[#387cae]/10 text-[#387cae] font-medium'
+                    : 'text-gray-700'
+                    }`}
                 >
                   {level.title}
                 </button>
