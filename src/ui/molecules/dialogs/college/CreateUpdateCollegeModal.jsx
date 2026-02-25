@@ -255,19 +255,20 @@ const CreateUpdateCollegeModal = ({
                     ) || ['', '']
                     setValue('contacts', contacts)
 
-                    const galleryItems = collegeData.gallery || []
+                    const galleryItems = collegeData.collegeGallery || collegeData.gallery || []
                     const images = galleryItems
                         .filter(img => img.file_type === 'image' || !img.file_type)
-                        .map((img) => ({ url: img.file_url, file_type: 'image' }))
+                        .map((img) => ({ url: img.file_url || img.url, file_type: 'image' }))
 
                     const videos = galleryItems
                         .filter(vid => vid.file_type === 'video')
                         .map((vid) => {
-                            const youtubeId = vid.file_url.includes('embed/')
-                                ? vid.file_url.split('embed/')[1].split('?')[0]
+                            const videoUrl = vid.file_url || vid.url
+                            const youtubeId = videoUrl?.includes('embed/')
+                                ? videoUrl.split('embed/')[1].split('?')[0]
                                 : null
                             return {
-                                url: vid.file_url,
+                                url: videoUrl,
                                 file_type: 'video',
                                 thumbnail: youtubeId ? `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg` : null,
                                 youtubeId
@@ -466,17 +467,13 @@ const CreateUpdateCollegeModal = ({
 
             data.college_logo = uploadedFiles.college_logo
             data.featured_img = uploadedFiles.featured_img
-            data.images = [...(uploadedFiles.images || []), ...(uploadedFiles.videos || [])]
+            data.images = [...(uploadedFiles.images || []), ...(uploadedFiles.videos || [])].filter(img => img.url)
 
             data.facilities = (data.facilities || []).filter(f => f.title.trim() !== '' || f.description.trim() !== '' || f.icon.trim() !== '')
             if (data.facilities.length === 0) delete data.facilities
 
             data.faqs = (data.faqs || []).filter(f => f.question.trim() !== '' || f.answer.trim() !== '')
             if (data.faqs.length === 0) delete data.faqs
-
-            if (editSlug && data.images.length === 0) {
-                data.images = [{ file_type: '', url: '' }]
-            }
 
             data.status = status
             // Ensure college_id is present for updates/drafts of existing colleges
@@ -485,7 +482,6 @@ const CreateUpdateCollegeModal = ({
             }
 
 
-            // Use saveDraft (POST) for Drafts, regular logic for Published
             if (status === 'draft') {
                 await saveDraft(data)
             } else {
