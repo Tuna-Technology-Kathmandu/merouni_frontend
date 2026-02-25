@@ -29,6 +29,7 @@ export default function CollegeForm() {
   const { setHeading } = usePageHeading()
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
+  const [status, setStatus] = useState(searchParams.get('status') || 'all')
 
   const [colleges, setColleges] = useState([])
   const [tableloading, setTableLoading] = useState(false)
@@ -90,10 +91,12 @@ export default function CollegeForm() {
     const loadInitialColleges = async () => {
       const page = parseInt(searchParams.get('page')) || 1
       const level = searchParams.get('level')
-      setLoading(true)
-      setTableLoading(true)
       try {
+        const statusParam = searchParams.get('status')
         let url = `${process.env.baseUrl}/college?limit=10&page=${page}`
+        if (statusParam && statusParam !== 'all') {
+          url += `&status=${statusParam}`
+        }
         const response = await authFetch(url)
         if (response.ok) {
           const data = await response.json()
@@ -201,9 +204,17 @@ export default function CollegeForm() {
     try {
       const params = new URLSearchParams(searchParams.toString())
       params.set('page', page)
+      if (status !== 'all') {
+        params.set('status', status)
+      } else {
+        params.delete('status')
+      }
       router.push(`${pathname}?${params.toString()}`, { scroll: false })
 
       let url = `${process.env.baseUrl}/college?limit=10&page=${page}`
+      if (status !== 'all') {
+        url += `&status=${status}`
+      }
       const response = await authFetch(url)
 
       if (response.ok) {
@@ -226,13 +237,11 @@ export default function CollegeForm() {
   }
 
   const handleSearch = async (query) => {
-    if (!query) {
-      loadColleges()
-      return
-    }
-
     try {
-      let url = `${process.env.baseUrl}/college?q=${query}`
+      let url = `${process.env.baseUrl}/college?limit=10&page=1`
+      if (query) url += `&q=${query}`
+      if (status !== 'all') url += `&status=${status}`
+
       const response = await authFetch(url)
       if (response.ok) {
         const data = await response.json()
@@ -262,14 +271,22 @@ export default function CollegeForm() {
       clearTimeout(searchTimeout)
     }
 
-    if (value === '') {
-      handleSearch('')
+    const timeoutId = setTimeout(() => {
+      handleSearch(value)
+    }, 300)
+    setSearchTimeout(timeoutId)
+  }
+
+  const handleStatusChange = (newStatus) => {
+    setStatus(newStatus)
+    const params = new URLSearchParams(searchParams.toString())
+    if (newStatus !== 'all') {
+      params.set('status', newStatus)
     } else {
-      const timeoutId = setTimeout(() => {
-        handleSearch(value)
-      }, 300)
-      setSearchTimeout(timeoutId)
+      params.delete('status')
     }
+    params.set('page', '1') // Reset to page 1 on filter change
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
   const handleView = async (slug) => {
@@ -313,13 +330,24 @@ export default function CollegeForm() {
     <>
       <div className='w-full space-y-2'>
         <div className='flex justify-between items-center px-4 pt-4'>
-          {/* Search Bar */}
-          <SearchInput
-            value={searchQuery}
-            onChange={(e) => handleSearchInput(e.target.value)}
-            placeholder='Search colleges...'
-            className='max-w-md'
-          />
+          {/* Search Bar & Filters */}
+          <div className='flex gap-4 items-center flex-1'>
+            <SearchInput
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              placeholder='Search colleges...'
+              className='max-w-md'
+            />
+            <select
+              value={status}
+              onChange={(e) => handleStatusChange(e.target.value)}
+              className='flex h-11 w-40 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#387cae]/20 transition-all font-medium text-gray-700'
+            >
+              <option value="all">All Status</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
           {/* Button */}
           <div className='flex gap-2'>
             <Button

@@ -37,6 +37,7 @@ import { toast } from 'react-toastify'
 import {
     createCollege,
     updateCollege,
+    saveDraft,
     getUniversityBySlug,
     fetchUniversities
 } from '@/app/(dashboard)/dashboard/colleges/actions'
@@ -124,7 +125,7 @@ const CreateUpdateCollegeModal = ({
             contacts: ['', ''],
             members: [],
             faqs: [{ question: '', answer: '' }],
-            status: 'Published'
+            status: 'published'
         }
     })
 
@@ -206,7 +207,7 @@ const CreateUpdateCollegeModal = ({
                     setValue('description', collegeData.description)
                     setValue('content', collegeData.content)
                     setValue('website_url', collegeData.website_url)
-                    setValue('status', collegeData.status || 'Published')
+                    setValue('status', collegeData.status || 'published')
 
                     if (collegeData.university_id) {
                         const uniIds = Array.isArray(collegeData.university_id)
@@ -252,13 +253,28 @@ const CreateUpdateCollegeModal = ({
 
                     const galleryItems = collegeData.gallery || []
                     const images = galleryItems
+                        .filter(img => img.file_type === 'image' || !img.file_type)
                         .map((img) => ({ url: img.file_url, file_type: 'image' }))
+
+                    const videos = galleryItems
+                        .filter(vid => vid.file_type === 'video')
+                        .map((vid) => {
+                            const youtubeId = vid.file_url.includes('embed/')
+                                ? vid.file_url.split('embed/')[1].split('?')[0]
+                                : null
+                            return {
+                                url: vid.file_url,
+                                file_type: 'video',
+                                thumbnail: youtubeId ? `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg` : null,
+                                youtubeId
+                            }
+                        })
 
                     setUploadedFiles({
                         college_logo: collegeData.college_logo || '',
                         featured_img: collegeData.featured_img || '',
                         images: images.length === 1 && !images[0].url ? [] : images,
-
+                        videos: videos
                     })
 
                     setValue('college_logo', collegeData.college_logo || '')
@@ -410,9 +426,9 @@ const CreateUpdateCollegeModal = ({
         }
     }
 
-    const handleSave = async (data, status = 'Published') => {
+    const handleSave = async (data, status = 'published') => {
         try {
-            status === 'Draft' ? setSubmittingDraft(true) : setSubmitting(true)
+            status === 'draft' ? setSubmittingDraft(true) : setSubmitting(true)
 
             // Always include author_id from current redux state
             data.author_id = author_id
@@ -433,7 +449,7 @@ const CreateUpdateCollegeModal = ({
 
             data.college_logo = uploadedFiles.college_logo
             data.featured_img = uploadedFiles.featured_img
-            data.images = [...uploadedFiles.images, ...uploadedFiles.videos]
+            data.images = [...(uploadedFiles.images || []), ...(uploadedFiles.videos || [])]
 
             data.facilities = (data.facilities || []).filter(f => f.title.trim() !== '' || f.description.trim() !== '' || f.icon.trim() !== '')
             if (data.facilities.length === 0) delete data.facilities
@@ -446,16 +462,22 @@ const CreateUpdateCollegeModal = ({
             }
 
             data.status = status
-
-            // Use PUT for existing colleges, POST for new ones
+            // Ensure college_id is present for updates/drafts of existing colleges
             if (editSlug && data.id) {
+                data.college_id = data.id
+            }
+
+            // Use saveDraft (POST) for Drafts, regular logic for Published
+            if (status === 'draft') {
+                await saveDraft(data)
+            } else if (editSlug && data.id) {
                 await updateCollege(data.id, data)
             } else {
                 await createCollege(data)
             }
 
             toast.success(
-                status === 'Draft'
+                status === 'draft'
                     ? 'Draft saved successfully!'
                     : editSlug
                         ? 'College updated successfully!'
@@ -473,7 +495,7 @@ const CreateUpdateCollegeModal = ({
     }
 
     const onSubmit = async (data) => {
-        await handleSave(data, 'Published')
+        await handleSave(data, 'published')
     }
 
     const onSaveDraft = async () => {
@@ -484,7 +506,7 @@ const CreateUpdateCollegeModal = ({
             toast.error('College name is required even for drafts')
             return
         }
-        await handleSave(data, 'Draft')
+        await handleSave(data, 'draft')
     }
     return (
         <Dialog isOpen={isOpen} onClose={handleCloseAttempt} closeOnOutsideClick={false} className='max-w-7xl'>
