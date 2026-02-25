@@ -176,7 +176,7 @@ export default function SiteControlPage() {
         <div className='w-full space-y-4 p-4'>
             {/* Header Section */}
             <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
-                <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+                <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
                     {/* Search Bar */}
                     <SearchInput
                         value={searchQuery}
@@ -193,7 +193,7 @@ export default function SiteControlPage() {
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+            <div className="bg-white rounded-md shadow-sm border overflow-hidden">
                 <Table
                     loading={loading}
                     data={paginatedData}

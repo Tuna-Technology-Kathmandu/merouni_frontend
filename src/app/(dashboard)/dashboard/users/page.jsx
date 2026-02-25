@@ -64,7 +64,7 @@ export default function UsersManager() {
   const [formError, setFormError] = useState(null)
   const [showPasswordValue, setShowPasswordValue] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  
+
   // Student View State
   const [viewingStudent, setViewingStudent] = useState(null)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
@@ -312,7 +312,7 @@ export default function UsersManager() {
 
       {/* Sticky Header */}
       <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
-        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
           <SearchInput
             value={searchQuery}
             onChange={(e) => handleSearchInput(e.target.value)}
@@ -344,7 +344,7 @@ export default function UsersManager() {
       </div>
 
       {/* Table */}
-      <div className='bg-white rounded-xl shadow-sm border overflow-hidden'>
+      <div className='bg-white rounded-md shadow-sm border overflow-hidden'>
         <Table
           loading={loading}
           data={users}
@@ -470,7 +470,7 @@ export default function UsersManager() {
                 </div>
 
                 {formError && (
-                  <div className='p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600'>
+                  <div className='p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-600'>
                     {formError}
                   </div>
                 )}

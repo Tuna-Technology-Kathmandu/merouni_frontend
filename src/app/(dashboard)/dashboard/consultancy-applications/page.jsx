@@ -212,7 +212,7 @@ const ConsultancyApplicationsPage = () => {
       <div className='mb-6 space-y-4'>
         <div className='flex flex-col md:flex-row gap-4'>
           {/* Search Input */}
-                                 <SearchInput
+          <SearchInput
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder='Search applications...'
@@ -225,7 +225,7 @@ const ConsultancyApplicationsPage = () => {
             <button
               type='button'
               onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
-              className='w-full pl-10 pr-8 py-2 text-left border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white min-w-[180px] hover:bg-gray-50 transition-colors'
+              className='w-full pl-10 pr-8 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white min-w-[180px] hover:bg-gray-50 transition-colors'
             >
               <span
                 className={statusFilter ? 'text-gray-900' : 'text-gray-500'}
@@ -239,7 +239,7 @@ const ConsultancyApplicationsPage = () => {
             />
 
             {statusDropdownOpen && (
-              <div className='absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-hidden'>
+              <div className='absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-hidden'>
                 <div className='p-2 border-b border-gray-200'>
                   <div className='relative'>
                     <Search className='absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
@@ -266,8 +266,8 @@ const ConsultancyApplicationsPage = () => {
                           setStatusDropdownOpen(false)
                         }}
                         className={`w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors ${statusFilter === option.value
-                            ? 'bg-blue-100 text-blue-700 font-medium'
-                            : 'text-gray-700'
+                          ? 'bg-blue-100 text-blue-700 font-medium'
+                          : 'text-gray-700'
                           }`}
                       >
                         {option.label}
@@ -349,10 +349,10 @@ const ConsultancyApplicationsPage = () => {
                   <TableCell>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${app.status === 'ACCEPTED'
-                          ? 'bg-green-100 text-green-800'
-                          : app.status === 'REJECTED'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-green-100 text-green-800'
+                        : app.status === 'REJECTED'
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-yellow-100 text-yellow-800'
                         }`}
                     >
                       {app.status || 'IN_PROGRESS'}
@@ -396,59 +396,59 @@ const ConsultancyApplicationsPage = () => {
           <DialogHeader>
             <DialogTitle>Update Application Status</DialogTitle>
           </DialogHeader>
-        <form onSubmit={handleStatusSubmit} className='space-y-4'>
-          <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Status <span className='text-red-500'>*</span>
-            </label>
-            <select
-              className='w-full p-2 border rounded'
-              value={statusForm.status}
-              onChange={(e) =>
-                setStatusForm({ ...statusForm, status: e.target.value })
-              }
-              required
-            >
-              <option value='IN_PROGRESS'>IN_PROGRESS</option>
-              <option value='ACCEPTED'>ACCEPTED</option>
-              <option value='REJECTED'>REJECTED</option>
-            </select>
-          </div>
+          <form onSubmit={handleStatusSubmit} className='space-y-4'>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-1'>
+                Status <span className='text-red-500'>*</span>
+              </label>
+              <select
+                className='w-full p-2 border rounded'
+                value={statusForm.status}
+                onChange={(e) =>
+                  setStatusForm({ ...statusForm, status: e.target.value })
+                }
+                required
+              >
+                <option value='IN_PROGRESS'>IN_PROGRESS</option>
+                <option value='ACCEPTED'>ACCEPTED</option>
+                <option value='REJECTED'>REJECTED</option>
+              </select>
+            </div>
 
-          <div>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
-              Remarks
-            </label>
-            <textarea
-              className='w-full p-2 border rounded'
-              rows={4}
-              value={statusForm.remarks}
-              onChange={(e) =>
-                setStatusForm({ ...statusForm, remarks: e.target.value })
-              }
-              placeholder='Enter remarks (optional)'
-            />
-          </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 mb-1'>
+                Remarks
+              </label>
+              <textarea
+                className='w-full p-2 border rounded'
+                rows={4}
+                value={statusForm.remarks}
+                onChange={(e) =>
+                  setStatusForm({ ...statusForm, remarks: e.target.value })
+                }
+                placeholder='Enter remarks (optional)'
+              />
+            </div>
 
-          {error && <div className='text-red-500 text-sm'>{error}</div>}
+            {error && <div className='text-red-500 text-sm'>{error}</div>}
 
-          <div className='flex justify-end gap-2 pt-2'>
-            <button
-              type='button'
-              onClick={handleCloseStatusModal}
-              className='px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200'
-            >
-              Cancel
-            </button>
-            <button
-              type='submit'
-              disabled={updatingId === selectedApplication?.id}
-              className='px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50'
-            >
-              {updatingId === selectedApplication?.id ? 'Updating...' : 'Update'}
-            </button>
-          </div>
-        </form>
+            <div className='flex justify-end gap-2 pt-2'>
+              <button
+                type='button'
+                onClick={handleCloseStatusModal}
+                className='px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200'
+              >
+                Cancel
+              </button>
+              <button
+                type='submit'
+                disabled={updatingId === selectedApplication?.id}
+                className='px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 disabled:opacity-50'
+              >
+                {updatingId === selectedApplication?.id ? 'Updating...' : 'Update'}
+              </button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

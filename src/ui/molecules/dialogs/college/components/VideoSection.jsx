@@ -115,10 +115,9 @@ const VideoSection = ({
           <Button
             type='button'
             onClick={handleAddYoutubeLink}
-            // className='h-12 px-6 rounded-xl bg-[#387cae] hover:bg-[#387cae]/90 text-white font-bold gap-2 shadow-lg shadow-[#387cae]/10 transition-all active:scale-95'
+          // className='h-12 px-6 rounded-md bg-[#387cae] hover:bg-[#387cae]/90 text-white font-bold gap-2 shadow-lg shadow-[#387cae]/10 transition-all active:scale-95'
           >
             <Plus size={18} />
-            <span>Add Video</span>
           </Button>
         </div>
         {!isValidLink && (
@@ -160,7 +159,7 @@ const VideoSection = ({
                 href={video.url.replace('embed/', 'watch?v=')}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='absolute top-3 right-3 w-8 h-8 rounded-lg bg-black/50 backdrop-blur-md text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#387cae]'
+                className='absolute top-3 right-3 w-8 h-8 rounded-md bg-black/50 backdrop-blur-md text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#387cae]'
                 onClick={(e) => e.stopPropagation()}
               >
                 <ExternalLink size={14} />
@@ -170,7 +169,7 @@ const VideoSection = ({
             <button
               type='button'
               onClick={() => removeVideo(video.url)}
-              className='flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-red-100 bg-red-50/30 text-red-500 text-xs font-bold hover:bg-red-500 hover:text-white transition-all duration-200 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0'
+              className='flex items-center justify-center gap-2 w-full py-2.5 rounded-md border border-red-100 bg-red-50/30 text-red-500 text-xs font-bold hover:bg-red-500 hover:text-white transition-all duration-200 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0'
             >
               <Trash2 size={14} />
             </button>

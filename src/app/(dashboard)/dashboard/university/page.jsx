@@ -121,7 +121,7 @@ const SortableCard = ({ university, rank, onView, onEdit, onDelete }) => {
         </div>
 
         {/* Logo */}
-        <div className='w-[52px] h-[52px] rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm'>
+        <div className='w-[52px] h-[52px] rounded-md bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm'>
           {university.logo
             ? <img src={university.logo} alt={university.fullname} className='w-full h-full object-contain p-1.5' />
             : <GraduationCap className='w-6 h-6 text-gray-300' />}
@@ -158,7 +158,7 @@ const SortableCard = ({ university, rank, onView, onEdit, onDelete }) => {
             onPointerDown={(e) => e.stopPropagation()}
             onClick={() => onView(university.slugs)}
             title='View details'
-            className='w-8 h-8 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-all'
+            className='w-8 h-8 flex items-center justify-center rounded-md text-blue-500 hover:bg-blue-50 transition-all'
           >
             <Eye size={15} />
           </button>
@@ -166,7 +166,7 @@ const SortableCard = ({ university, rank, onView, onEdit, onDelete }) => {
             onPointerDown={(e) => e.stopPropagation()}
             onClick={() => onEdit(university.slugs)}
             title='Edit'
-            className='w-8 h-8 flex items-center justify-center rounded-lg text-amber-500 hover:bg-amber-50 transition-all'
+            className='w-8 h-8 flex items-center justify-center rounded-md text-amber-500 hover:bg-amber-50 transition-all'
           >
             <Edit2 size={15} />
           </button>
@@ -174,7 +174,7 @@ const SortableCard = ({ university, rank, onView, onEdit, onDelete }) => {
             onPointerDown={(e) => e.stopPropagation()}
             onClick={() => onDelete(university.id)}
             title='Delete'
-            className='w-8 h-8 flex items-center justify-center rounded-lg text-red-400 hover:bg-red-50 transition-all'
+            className='w-8 h-8 flex items-center justify-center rounded-md text-red-400 hover:bg-red-50 transition-all'
           >
             <Trash2 size={15} />
           </button>
@@ -192,7 +192,7 @@ const OverlayCard = ({ university, rank }) => (
       <div className='w-8 h-8 rounded-full bg-[#387cae]/15 flex items-center justify-center shrink-0'>
         <span className='text-[11px] font-bold text-[#387cae]'>{rank}</span>
       </div>
-      <div className='w-[52px] h-[52px] rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0'>
+      <div className='w-[52px] h-[52px] rounded-md bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0'>
         {university.logo
           ? <img src={university.logo} alt={university.fullname} className='w-full h-full object-contain p-1.5' />
           : <GraduationCap className='w-6 h-6 text-gray-300' />}
@@ -217,10 +217,10 @@ const CardSkeleton = ({ i = 0 }) => (
     <div className='flex items-center gap-3 px-4 py-3'>
       <div className='w-[18px] h-[18px] bg-gray-200 rounded shrink-0' />
       <div className='w-8 h-8 bg-gray-200 rounded-full shrink-0' />
-      <div className='w-[52px] h-[52px] bg-gray-200 rounded-xl shrink-0' />
+      <div className='w-[52px] h-[52px] bg-gray-200 rounded-md shrink-0' />
       <div className='flex-1 space-y-2.5'>
         <div className='flex items-center gap-2'>
-          <div className='h-4 bg-gray-200 rounded-lg w-48' />
+          <div className='h-4 bg-gray-200 rounded-md w-48' />
           <div className='h-5 bg-gray-200 rounded-full w-16' />
         </div>
         <div className='flex gap-3'>
@@ -229,7 +229,7 @@ const CardSkeleton = ({ i = 0 }) => (
         </div>
       </div>
       <div className='flex gap-2 shrink-0'>
-        {[0, 1, 2].map(j => <div key={j} className='w-9 h-9 bg-gray-200 rounded-xl' />)}
+        {[0, 1, 2].map(j => <div key={j} className='w-9 h-9 bg-gray-200 rounded-md' />)}
       </div>
     </div>
   </div>
@@ -413,7 +413,7 @@ export default function UniversityPage() {
         <div className='sticky top-0 z-30 bg-[#F7F8FA] py-3'>
           <div className='bg-white rounded-2xl border border-gray-200 shadow-sm px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3'>
             <div className='flex items-center gap-3'>
-              <div className='w-9 h-9 rounded-xl bg-[#387cae]/10 flex items-center justify-center shrink-0'>
+              <div className='w-9 h-9 rounded-md bg-[#387cae]/10 flex items-center justify-center shrink-0'>
                 <Building2 size={17} className='text-[#387cae]' />
               </div>
               <div>
@@ -440,14 +440,14 @@ export default function UniversityPage() {
                   value={searchQuery}
                   onChange={(e) => handleSearchInput(e.target.value)}
                   placeholder='Search universities…'
-                  className='w-full pl-8 pr-3 h-9 rounded-xl border border-gray-200 text-sm text-gray-700 placeholder-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#387cae]/25 focus:border-[#387cae]/40 transition'
+                  className='w-full pl-8 pr-3 h-9 rounded-md border border-gray-200 text-sm text-gray-700 placeholder-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#387cae]/25 focus:border-[#387cae]/40 transition'
                 />
               </div>
 
               <select
                 value={statusFilter}
                 onChange={(e) => handleStatusChange(e.target.value)}
-                className='h-9 rounded-xl border border-gray-200 bg-gray-50 px-3 py-1 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#387cae]/25 transition-all font-medium min-w-[120px]'
+                className='h-9 rounded-md border border-gray-200 bg-gray-50 px-3 py-1 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#387cae]/25 transition-all font-medium min-w-[120px]'
               >
                 <option value="All">All Status</option>
                 <option value="Published">Published</option>
@@ -456,7 +456,7 @@ export default function UniversityPage() {
 
               <Button
                 onClick={() => { setEditSlug(''); setIsOpen(true) }}
-                className='bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2 h-9 px-4 rounded-xl text-sm font-semibold shrink-0'
+                className='bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2 h-9 px-4 rounded-md text-sm font-semibold shrink-0'
               >
                 <Plus size={15} />
                 Add University

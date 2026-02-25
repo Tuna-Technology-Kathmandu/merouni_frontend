@@ -266,7 +266,7 @@ export default function EditConsultancyPage() {
         onSubmit={handleSubmit(onSubmit)}
         className='flex flex-col flex-1 overflow-hidden'
       >
-        <div className='flex-1 overflow-y-auto space-y-8 pr-2 bg-white p-6 rounded-lg shadow'>
+        <div className='flex-1 overflow-y-auto space-y-8 pr-2 bg-white p-6 rounded-md shadow'>
           {/* Basic info */}
           <div className='space-y-4'>
             <h3 className='text-sm font-semibold text-gray-900 border-b pb-2'>

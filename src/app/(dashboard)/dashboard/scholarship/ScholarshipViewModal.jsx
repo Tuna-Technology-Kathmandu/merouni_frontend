@@ -51,12 +51,12 @@ const ScholarshipViewModal = ({ isOpen, onClose, scholarship }) => {
                             </div>
                         </div>
 
-                        <div className="bg-gray-50 p-4 rounded-lg border flex justify-between items-center">
+                        <div className="bg-gray-50 p-4 rounded-md border flex justify-between items-center">
                             <h4 className="text-sm font-medium text-gray-500">Financial Details (Amount)</h4>
                             <span className="font-bold text-lg text-gray-900">Rs. {scholarship.amount ? scholarship.amount.toLocaleString() : '0'}</span>
                         </div>
 
-                        <div className="bg-gray-50 p-4 rounded-lg border flex justify-between items-center">
+                        <div className="bg-gray-50 p-4 rounded-md border flex justify-between items-center">
                             <h4 className="text-sm font-medium text-gray-500">Application Deadline</h4>
                             <span className="font-bold text-gray-900">
                                 {scholarship.applicationDeadline ? formatDate(scholarship.applicationDeadline) : 'N/A'}

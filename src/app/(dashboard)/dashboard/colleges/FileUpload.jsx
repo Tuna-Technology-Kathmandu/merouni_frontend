@@ -116,7 +116,7 @@ const FileUpload = ({
       {label && <Label required={required}>{label}</Label>}
       <div
         className={cn(
-          'relative border-2 border-dashed rounded-lg p-4 transition-all duration-200',
+          'relative border-2 border-dashed rounded-md p-4 transition-all duration-200',
           'border-input bg-background/50 hover:bg-muted/30 hover:border-[#387cae]/40',
           isUploading && 'opacity-60 cursor-not-allowed',
           preview ? 'border-[#387cae]/20 bg-[#387cae]/[0.02]' : 'border-input'

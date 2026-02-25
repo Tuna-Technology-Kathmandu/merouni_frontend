@@ -111,7 +111,7 @@ export default function DatabaseExportPage() {
                 const item = row.original;
                 return (
                     <div className="flex gap-3">
-                        <div className="shrink-0 w-9 h-9 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-[#387cae] group-hover:border-blue-100 transition-all">
+                        <div className="shrink-0 w-9 h-9 rounded-md bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-[#387cae] group-hover:border-blue-100 transition-all">
                             <FileText size={16} />
                         </div>
                         <div className="flex flex-col justify-center">
@@ -129,7 +129,7 @@ export default function DatabaseExportPage() {
                 )
             }
         },
-       
+
         {
             header: 'Exact Date & Time',
             accessorKey: 'createdAtDate',
@@ -156,7 +156,7 @@ export default function DatabaseExportPage() {
         <div className="w-full space-y-6 p-4">
             {/* Header Section */}
             <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
-                <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+                <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
                     {/* Search Bar */}
                     <div className="flex-1 max-w-md w-full">
                         <SearchInput
@@ -190,8 +190,8 @@ export default function DatabaseExportPage() {
                     { label: 'Database Name', value: dbStatus?.name, icon: Server, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
                     { label: 'Used Storage', value: dbStatus?.size, icon: HardDrive, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100' },
                 ].map((stat, i) => (
-                    <div key={i} className={`bg-white p-4 rounded-xl border ${stat.border} shadow-sm flex items-center gap-4 transition-all hover:shadow-md`}>
-                        <div className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center ${stat.color}`}>
+                    <div key={i} className={`bg-white p-4 rounded-md border ${stat.border} shadow-sm flex items-center gap-4 transition-all hover:shadow-md`}>
+                        <div className={`w-10 h-10 rounded-md ${stat.bg} flex items-center justify-center ${stat.color}`}>
                             <stat.icon size={20} />
                         </div>
                         <div>
@@ -210,7 +210,7 @@ export default function DatabaseExportPage() {
                     <h3 className="text-base font-bold text-slate-800 tracking-tight">Export History Logs</h3>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+                <div className="bg-white rounded-md shadow-sm border overflow-hidden">
                     <Table
                         loading={isLoadingHistory}
                         data={paginatedData}

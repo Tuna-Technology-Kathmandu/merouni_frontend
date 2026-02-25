@@ -40,7 +40,7 @@ const LevelSections = ({ university }) => {
         {filteredLevels.map(level => (
           <div
             key={level.id}
-            className="bg-white p-4 rounded-lg shadow-[0px_0px_10px_1px_rgba(0,0,0,0.1)]"
+            className="bg-white p-4 rounded-md shadow-[0px_0px_10px_1px_rgba(0,0,0,0.1)]"
           >
             {level.title}
           </div>

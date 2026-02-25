@@ -89,7 +89,7 @@ const FileUploadWithPreview = ({
   return (
     <div className='space-y-4'>
       <label className='block mb-2'>{label}</label>
-      <div className='border-2 border-dashed border-gray-300 rounded-lg p-6'>
+      <div className='border-2 border-dashed border-gray-300 rounded-md p-6'>
         <div className='flex flex-col items-center'>
           {!preview && <Upload className='h-12 w-12 text-gray-400' />}
           <div className='mt-4 text-center'>
@@ -118,7 +118,7 @@ const FileUploadWithPreview = ({
               <img
                 src={preview}
                 alt='Preview'
-                className='mx-auto max-h-40 rounded-lg'
+                className='mx-auto max-h-40 rounded-md'
               />
             ) : (
               <div className='text-center'>
@@ -557,7 +557,7 @@ const EditCollegePage = () => {
       >
         <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
           {/* Basic Information Section */}
-          <div className='bg-white rounded-lg shadow p-6'>
+          <div className='bg-white rounded-md shadow p-6'>
             <h2 className='text-xl font-semibold mb-4'>Basic Information</h2>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div>
@@ -663,7 +663,7 @@ const EditCollegePage = () => {
           </div>
 
           {/* Programs Section */}
-          <div className='bg-white p-6 rounded-lg shadow-md'>
+          <div className='bg-white p-6 rounded-md shadow-md'>
             <div className='flex justify-between items-center mb-4'>
               <h2 className='text-xl font-semibold'>Programs</h2>
               <div className='w-1/3'>
@@ -738,7 +738,7 @@ const EditCollegePage = () => {
           </div>
 
           {/* Media Section */}
-          <div className='bg-white p-6 rounded-lg shadow-md'>
+          <div className='bg-white p-6 rounded-md shadow-md'>
             <h2 className='text-xl font-semibold mb-4'>Media</h2>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div>
@@ -795,7 +795,7 @@ const EditCollegePage = () => {
           </div>
 
           {/* Facilities Section */}
-          <div className='bg-white p-6 rounded-lg shadow-md'>
+          <div className='bg-white p-6 rounded-md shadow-md'>
             <div className='flex justify-between items-center mb-4'>
               <h2 className='text-xl font-semibold'>Facilities</h2>
               <button
@@ -870,7 +870,7 @@ const EditCollegePage = () => {
           </div>
 
           {/* Members Section */}
-          <div className='bg-white p-6 rounded-lg shadow-md'>
+          <div className='bg-white p-6 rounded-md shadow-md'>
             <div className='flex justify-between items-center mb-4'>
               <h2 className='text-xl font-semibold'>Members</h2>
               <button
@@ -952,7 +952,7 @@ const EditCollegePage = () => {
           </div>
 
           {/* Address Section */}
-          <div className='bg-white p-6 rounded-lg shadow-md'>
+          <div className='bg-white p-6 rounded-md shadow-md'>
             <h2 className='text-xl font-semibold mb-4'>Address</h2>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               {['country', 'state', 'city', 'street', 'postal_code'].map(
@@ -986,7 +986,7 @@ const EditCollegePage = () => {
           </div>
 
           {/* Contact Information */}
-          <div className='bg-white p-6 rounded-lg shadow-md'>
+          <div className='bg-white p-6 rounded-md shadow-md'>
             <h2 className='text-xl font-semibold mb-4'>Contact Information</h2>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div>

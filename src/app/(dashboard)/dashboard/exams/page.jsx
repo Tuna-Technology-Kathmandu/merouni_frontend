@@ -361,7 +361,7 @@ export default function ExamManager() {
     <div className='w-full space-y-4 p-4'>
       <ToastContainer />
 
-      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
         <SearchInput
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
@@ -374,7 +374,7 @@ export default function ExamManager() {
         </Button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
         <Table
           loading={tableLoading}
           data={exams}

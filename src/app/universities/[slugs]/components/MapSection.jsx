@@ -4,7 +4,7 @@ import { FaMapMarkerAlt, FaExternalLinkAlt } from 'react-icons/fa'
 const MapSection = ({ university }) => {
     const mapValue = university?.map
 
-    
+
     if (!mapValue) return null
 
     // Helper to extract URL if the input is an iframe string
@@ -31,7 +31,7 @@ const MapSection = ({ university }) => {
                     </div>
                 </div>
 
-                <div className='w-full aspect-[21/7] max-md:aspect-video rounded-xl overflow-hidden border border-white shadow-md bg-gray-50 group relative'>
+                <div className='w-full aspect-[21/7] max-md:aspect-video rounded-md overflow-hidden border border-white shadow-md bg-gray-50 group relative'>
                     {isEmbeddable ? (
                         <iframe
                             src={mapUrl}

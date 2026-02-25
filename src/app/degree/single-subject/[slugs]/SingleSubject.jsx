@@ -79,7 +79,7 @@ const SingleSubject = ({ slug }) => {
                 [&>iframe]:max-w-[calc(100vw-40px)]
                 [&>iframe]:aspect-video
                 [&>iframe]:h-auto
-                [&>iframe]:rounded-lg
+                [&>iframe]:rounded-md
                 [&>iframe]:mt-4
                 [&>iframe]:mx-auto
                 [&>iframe]:block

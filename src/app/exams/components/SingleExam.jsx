@@ -24,7 +24,7 @@ const SingleExam = ({ exam }) => {
             dangerouslySetInnerHTML={{ __html: decodedContent }}
             className='text-gray-800 my-6 leading-7
             [&>iframe]:w-full [&>iframe]:max-w-[calc(100vw-40px)]
-            [&>iframe]:aspect-video [&>iframe]:h-auto [&>iframe]:rounded-lg
+            [&>iframe]:aspect-video [&>iframe]:h-auto [&>iframe]:rounded-md
             [&>iframe]:mt-4 [&>iframe]:mx-auto [&>iframe]:block
             [&_table]:w-full [&_table]:my-4 [&_table]:border-collapse
             [&_th]:bg-gray-100 [&_th]:p-2 [&_th]:text-left [&_th]:border [&_th]:border-gray-300
@@ -75,7 +75,7 @@ const SingleExam = ({ exam }) => {
             {data.exam_details.map((ed) => (
               <div
                 key={ed.id}
-                className='bg-gray-50 p-4 rounded-lg mb-3 text-gray-700 text-sm'
+                className='bg-gray-50 p-4 rounded-md mb-3 text-gray-700 text-sm'
               >
                 {ed.exam_type && (
                   <div className='flex justify-between mb-1'>
@@ -121,7 +121,7 @@ const SingleExam = ({ exam }) => {
             {data.application_details.map((ad) => (
               <div
                 key={ad.id}
-                className='bg-gray-50 p-4 rounded-lg mb-3 text-gray-700 text-sm'
+                className='bg-gray-50 p-4 rounded-md mb-3 text-gray-700 text-sm'
               >
                 {ad.opening_date && (
                   <div className='flex justify-between mb-1'>
@@ -176,7 +176,7 @@ const SingleExam = ({ exam }) => {
             href={data.pastQuestion}
             target='_blank'
             rel='noopener noreferrer'
-            className='inline-block w-full text-center bg-[#387CAE] hover:bg-[#2f6f9c] text-white px-6 py-3 rounded-lg transition-colors duration-300'
+            className='inline-block w-full text-center bg-[#387CAE] hover:bg-[#2f6f9c] text-white px-6 py-3 rounded-md transition-colors duration-300'
           >
             View Past Question
           </a>

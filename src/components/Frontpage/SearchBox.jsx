@@ -153,7 +153,7 @@ const SearchBox = ({ onClose }) => {
         <div className='flex justify-between items-center mb-6 px-2'>
           <div className='flex items-center gap-3'>
             <div
-              className='p-2 rounded-xl text-white'
+              className='p-2 rounded-md text-white'
               style={{ backgroundColor: `${THEME_BLUE}1a` }}
             >
               <Icon className='w-5 h-5' style={{ color: THEME_BLUE }} />

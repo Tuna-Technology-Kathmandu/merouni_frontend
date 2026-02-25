@@ -26,7 +26,7 @@ const ScholarshipCard = ({ scholarship, onApply, isApplying }) => {
     : false
 
   return (
-    <article className='bg-white rounded-xl border border-gray-100 p-5 flex flex-col hover:border-gray-200 hover:shadow-sm transition-all duration-200'>
+    <article className='bg-white rounded-md border border-gray-100 p-5 flex flex-col hover:border-gray-200 hover:shadow-sm transition-all duration-200'>
       <div className='flex justify-between items-start mb-2'>
         <h2 className='text-base font-semibold text-gray-900 line-clamp-2'>
           {scholarship.name}
@@ -48,13 +48,13 @@ const ScholarshipCard = ({ scholarship, onApply, isApplying }) => {
       <div className='mt-auto flex gap-2 pt-3 border-t border-gray-50'>
         <Link
           href={`/scholarship/${scholarship.slugs || scholarship.id}`}
-          className='flex-1 py-2 rounded-lg text-center text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 transition-colors'
+          className='flex-1 py-2 rounded-md text-center text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 transition-colors'
         >
           View
         </Link>
         <Link
           href={`/scholarship/apply/${scholarship.slugs || scholarship.id}`}
-          className={`flex-1 py-2 rounded-lg text-center text-sm font-medium text-white transition-colors ${isExpired ? 'bg-gray-300 pointer-events-none' : 'bg-[#0A6FA7] hover:bg-[#085a86]'
+          className={`flex-1 py-2 rounded-md text-center text-sm font-medium text-white transition-colors ${isExpired ? 'bg-gray-300 pointer-events-none' : 'bg-[#0A6FA7] hover:bg-[#085a86]'
             }`}
         >
           {isExpired ? 'Expired' : 'Apply'}

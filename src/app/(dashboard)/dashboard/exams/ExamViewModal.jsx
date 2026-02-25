@@ -75,7 +75,7 @@ const ExamViewModal = ({ isOpen, onClose, exam }) => {
 
                     <div className="border-t pt-4">
                         <h3 className="text-lg font-semibold mb-3">Exam Configuration</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-8 bg-gray-50 p-4 rounded-lg">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-8 bg-gray-50 p-4 rounded-md">
                             <div>
                                 <h4 className="text-sm font-medium text-gray-500">Exam Type</h4>
                                 <p className="font-medium">{examDetail.exam_type || 'N/A'}</p>
@@ -106,7 +106,7 @@ const ExamViewModal = ({ isOpen, onClose, exam }) => {
                     <div className="border-t pt-4">
                         <h3 className="text-lg font-semibold mb-3">Application Details</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="bg-blue-50 p-4 rounded-lg space-y-2">
+                            <div className="bg-blue-50 p-4 rounded-md space-y-2">
                                 <h4 className="font-semibold text-blue-800">Fees</h4>
                                 <div className="flex justify-between text-sm">
                                     <span>Normal Fee:</span>
@@ -117,7 +117,7 @@ const ExamViewModal = ({ isOpen, onClose, exam }) => {
                                     <span className="font-medium">Rs. {appDetail.late_fee || '0'}</span>
                                 </div>
                             </div>
-                            <div className="bg-green-50 p-4 rounded-lg space-y-2">
+                            <div className="bg-green-50 p-4 rounded-md space-y-2">
                                 <h4 className="font-semibold text-green-800">Important Dates</h4>
                                 <div className="flex justify-between text-sm">
                                     <span>Opening Date:</span>

@@ -363,7 +363,7 @@ const VacancyManager = () => {
       <ToastContainer position="top-right" autoClose={3000} />
       {/* Sticky Header */}
       <div className="sticky top-0 z-30 bg-[#F7F8FA] py-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border">
           <SearchInput
             value={searchQuery}
             onChange={(e) => handleSearchInput(e.target.value)}
@@ -381,7 +381,7 @@ const VacancyManager = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
         <Table
           loading={tableLoading}
           data={vacancies}
@@ -527,7 +527,7 @@ const VacancyManager = () => {
             ) : viewVacancyData ? (
               <div className="space-y-6">
                 {viewVacancyData.featuredImage && (
-                  <div className="w-full h-56 rounded-xl overflow-hidden border">
+                  <div className="w-full h-56 rounded-md overflow-hidden border">
                     <img
                       src={viewVacancyData.featuredImage}
                       alt={viewVacancyData.title}
@@ -546,7 +546,7 @@ const VacancyManager = () => {
                 </div>
 
                 {viewVacancyData.description && (
-                  <div className="bg-gray-50 p-4 rounded-xl border">
+                  <div className="bg-gray-50 p-4 rounded-md border">
                     <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Description</h3>
                     <div
                       className="text-gray-700 prose prose-sm max-w-none"

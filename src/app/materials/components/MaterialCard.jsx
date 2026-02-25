@@ -75,7 +75,7 @@ const MaterialCard = ({
                 <input
                   type='text'
                   placeholder='Search material...'
-                  className='w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  className='w-full p-2 pl-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                   onChange={(e) => onSearchChange(e.target.value)}
                   value={searchTerm}
                 />

@@ -163,7 +163,7 @@ export default function DisciplineManager() {
 
             {/* Header */}
             <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
-                <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+                <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
                     <SearchInput value={searchQuery} onChange={(e) => handleSearchInput(e.target.value)} placeholder='Search disciplines...' className='max-w-md w-full' />
                     <Button onClick={() => { setEditingDiscipline(null); setIsOpen(true) }} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
                         <Plus className="w-4 h-4" /> Add Discipline
@@ -181,7 +181,7 @@ export default function DisciplineManager() {
             />
 
             {/* Table */}
-            <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+            <div className="bg-white rounded-md shadow-sm border overflow-hidden">
                 <Table data={disciplines} columns={columns} pagination={pagination} onPageChange={(p) => loadDisciplines(p)} showSearch={false} loading={tableLoading} />
             </div>
 
@@ -194,19 +194,19 @@ export default function DisciplineManager() {
                     </DialogHeader>
                     <div className='flex-1 overflow-y-auto p-6 space-y-4'>
                         {viewingDiscipline?.featured_image && (
-                            <div className="w-full h-48 rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                            <div className="w-full h-48 rounded-md overflow-hidden bg-gray-100 border border-gray-200">
                                 <img src={viewingDiscipline.featured_image} alt={viewingDiscipline.title} className="w-full h-full object-contain" />
                             </div>
                         )}
-                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                             <p className="text-xs font-semibold  uppercase tracking-widest mb-0.5">Title</p>
                             <p className="text-lg font-bold text-gray-900">{viewingDiscipline?.title}</p>
                         </div>
-                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                             <p className="text-xs font-semibold  uppercase tracking-widest mb-1">Description</p>
                             <p className="text-gray-700 text-sm leading-relaxed">{viewingDiscipline?.description || 'No description provided.'}</p>
                         </div>
-                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                             <p className="text-xs font-semibold  uppercase tracking-widest mb-0.5">Created At</p>
                             <p className="text-sm text-gray-600">{viewingDiscipline?.createdAt ? formatDate(viewingDiscipline.createdAt) : '—'}</p>
                         </div>

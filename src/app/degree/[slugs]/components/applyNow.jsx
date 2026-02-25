@@ -25,7 +25,7 @@ const ApplyNow = ({ degree }) => {
             href={'#'}
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
-            className='inline-flex items-center space-x-3 bg-[#30AD8F] text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-[#28967b] transition-all'
+            className='inline-flex items-center space-x-3 bg-[#30AD8F] text-white px-10 py-4 rounded-md font-bold text-lg hover:bg-[#28967b] transition-all'
           >
             <span>Apply Now</span>
             <ArrowRight className='w-5 h-5' />

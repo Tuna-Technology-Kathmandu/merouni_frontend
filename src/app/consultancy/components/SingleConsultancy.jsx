@@ -49,12 +49,12 @@ const SingleConsultancy = ({ consultancy }) => {
   const contacts = data?.contact
     ? typeof data.contact === 'string'
       ? (() => {
-          try {
-            return JSON.parse(data.contact)
-          } catch {
-            return []
-          }
-        })()
+        try {
+          return JSON.parse(data.contact)
+        } catch {
+          return []
+        }
+      })()
       : Array.isArray(data.contact)
         ? data.contact
         : []
@@ -108,7 +108,7 @@ const SingleConsultancy = ({ consultancy }) => {
       {/* Info Section */}
       <div className='w-full max-w-5xl px-6 pb-10'>
         {/* Description */}
-        <div className='bg-white rounded-xl custom-shadow p-6 mb-8'>
+        <div className='bg-white rounded-md custom-shadow p-6 mb-8'>
           <h2 className='text-lg font-semibold mb-3'>About</h2>
           {description ? (
             <div
@@ -121,7 +121,7 @@ const SingleConsultancy = ({ consultancy }) => {
         </div>
 
         {/* Website URL */}
-        <div className='bg-white rounded-xl custom-shadow p-6 mb-8'>
+        <div className='bg-white rounded-md custom-shadow p-6 mb-8'>
           <h2 className='text-lg font-semibold flex items-center gap-2 mb-3'>
             <ExternalLink className='text-[#30AD8F]' size={20} /> Website
           </h2>
@@ -142,11 +142,11 @@ const SingleConsultancy = ({ consultancy }) => {
 
         {/* Google Map */}
         {googleMapUrl && (
-          <div className='bg-white rounded-xl custom-shadow p-6 mb-8'>
+          <div className='bg-white rounded-md custom-shadow p-6 mb-8'>
             <h2 className='text-lg font-semibold flex items-center gap-2 mb-3'>
               <Map className='text-[#30AD8F]' size={20} /> Location
             </h2>
-            <div className='w-full h-96 rounded-lg overflow-hidden'>
+            <div className='w-full h-96 rounded-md overflow-hidden'>
               <div
                 className='w-full h-full [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0'
                 dangerouslySetInnerHTML={{ __html: googleMapUrl }}
@@ -157,11 +157,11 @@ const SingleConsultancy = ({ consultancy }) => {
 
         {/* YouTube Video */}
         {videoUrl && (
-          <div className='bg-white rounded-xl custom-shadow p-6 mb-8'>
+          <div className='bg-white rounded-md custom-shadow p-6 mb-8'>
             <h2 className='text-lg font-semibold flex items-center gap-2 mb-3'>
               <Video className='text-[#30AD8F]' size={20} /> Video
             </h2>
-            <div className='w-full aspect-video rounded-lg overflow-hidden'>
+            <div className='w-full aspect-video rounded-md overflow-hidden'>
               {(() => {
                 // Convert YouTube URL to embed format
                 let embedUrl = ''
@@ -194,7 +194,7 @@ const SingleConsultancy = ({ consultancy }) => {
 
         {/* Contact Information */}
         {contacts.length > 0 && contacts.some((c) => c) && (
-          <div className='bg-white rounded-xl custom-shadow p-6 mb-8'>
+          <div className='bg-white rounded-md custom-shadow p-6 mb-8'>
             <h2 className='text-lg font-semibold flex items-center gap-2 mb-3'>
               <Phone className='text-[#30AD8F]' size={20} /> Contact Information
             </h2>
@@ -220,21 +220,21 @@ const SingleConsultancy = ({ consultancy }) => {
           address?.city ||
           address?.state ||
           address?.zip) && (
-          <div className='bg-white rounded-xl custom-shadow p-6 mb-8'>
-            <h2 className='text-lg font-semibold flex items-center gap-2 mb-3'>
-              <MapPin className='text-[#30AD8F]' size={20} /> Address
-            </h2>
-            <p className='text-gray-700'>
-              {[address.street, address.city, address.state, address.zip]
-                .filter(Boolean)
-                .join(', ')}
-            </p>
-          </div>
-        )}
+            <div className='bg-white rounded-md custom-shadow p-6 mb-8'>
+              <h2 className='text-lg font-semibold flex items-center gap-2 mb-3'>
+                <MapPin className='text-[#30AD8F]' size={20} /> Address
+              </h2>
+              <p className='text-gray-700'>
+                {[address.street, address.city, address.state, address.zip]
+                  .filter(Boolean)
+                  .join(', ')}
+              </p>
+            </div>
+          )}
 
         {/* Destinations */}
         {destinations.length > 0 && (
-          <div className='bg-white rounded-xl custom-shadow p-6 mb-8'>
+          <div className='bg-white rounded-md custom-shadow p-6 mb-8'>
             <h2 className='text-lg font-semibold flex items-center gap-2 mb-3'>
               <Globe className='text-[#30AD8F]' size={20} /> Destinations
             </h2>

@@ -39,7 +39,7 @@ function BannerPositionCard({ position, hasBanner, banner, status, showAlert, on
   return (
     <div
       ref={setDropRef}
-      className={`border-2 border-dashed rounded-lg p-4 min-h-[200px] flex flex-col relative transition-all duration-200 ${isOver ? 'border-[#387cae] bg-[#387cae]/5 scale-[1.01]' : 'border-gray-300'
+      className={`border-2 border-dashed rounded-md p-4 min-h-[200px] flex flex-col relative transition-all duration-200 ${isOver ? 'border-[#387cae] bg-[#387cae]/5 scale-[1.01]' : 'border-gray-300'
         } ${isDragging ? 'opacity-40' : ''}`}
     >
       {/* Header */}
@@ -60,7 +60,7 @@ function BannerPositionCard({ position, hasBanner, banner, status, showAlert, on
         </div>
         <button
           onClick={() => onEdit(position)}
-          className='px-2.5 py-1 text-white rounded-lg hover:opacity-90 transition-all flex items-center gap-1.5 text-xs shadow-sm'
+          className='px-2.5 py-1 text-white rounded-md hover:opacity-90 transition-all flex items-center gap-1.5 text-xs shadow-sm'
           style={{ backgroundColor: THEME_BLUE }}
           title={hasBanner ? 'Edit Banner' : 'Create Banner'}
         >
@@ -70,7 +70,7 @@ function BannerPositionCard({ position, hasBanner, banner, status, showAlert, on
 
       {hasBanner && banner ? (
         <div className='flex-1 flex flex-col'>
-          <div className='mb-3 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 min-h-[8rem]'>
+          <div className='mb-3 rounded-md overflow-hidden border border-gray-200 bg-gray-50 min-h-[8rem]'>
             {banner.banner_image ? (
               <img
                 src={banner.banner_image}
@@ -419,7 +419,7 @@ export default function BannerForm() {
 
         <DragOverlay>
           {activeDragBanner ? (
-            <div className='border-2 border-[#387cae] rounded-lg p-4 bg-white shadow-2xl opacity-95 w-72'>
+            <div className='border-2 border-[#387cae] rounded-md p-4 bg-white shadow-2xl opacity-95 w-72'>
               <img
                 src={activeDragBanner.banner_image}
                 alt={activeDragBanner.title}
@@ -460,7 +460,7 @@ export default function BannerForm() {
           <div className='flex-1 overflow-y-auto p-6'>
             <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col flex-1'>
               <div className='flex-1 space-y-6'>
-                <div className='bg-white p-6 rounded-lg shadow-md space-y-4'>
+                <div className='bg-white p-6 rounded-md shadow-md space-y-4'>
                   <div>
                     <Label required>Banner Title</Label>
                     <Input

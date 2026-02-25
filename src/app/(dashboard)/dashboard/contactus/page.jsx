@@ -141,7 +141,7 @@ export default function ContactUsManager() {
 
     return (
         <div className='w-full space-y-4 p-4'>
-            <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+            <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
                 {/* Search */}
                 <SearchInput
                     value={searchQuery}
@@ -158,7 +158,7 @@ export default function ContactUsManager() {
                             setStatusFilter(e.target.value)
                             setPagination(prev => ({ ...prev, currentPage: 1 }))
                         }}
-                        className='w-full md:w-48 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white cursor-pointer text-sm font-medium hover:bg-gray-50 transition-all'
+                        className='w-full md:w-48 px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white cursor-pointer text-sm font-medium hover:bg-gray-50 transition-all'
                     >
                         <option value='all'>All Status</option>
                         <option value='unread'>UnRead</option>
@@ -168,7 +168,7 @@ export default function ContactUsManager() {
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+            <div className="bg-white rounded-md shadow-sm border overflow-hidden">
                 <Table
                     loading={tableLoading}
                     data={contacts}

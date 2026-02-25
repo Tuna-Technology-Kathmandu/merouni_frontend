@@ -32,10 +32,10 @@ const PageSkeleton = () => {
                     <div>
                         <Skeleton className='h-8 w-40 mb-6' />
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                            <Skeleton className='h-12 w-full rounded-xl' />
-                            <Skeleton className='h-12 w-full rounded-xl' />
-                            <Skeleton className='h-12 w-full rounded-xl' />
-                            <Skeleton className='h-12 w-full rounded-xl' />
+                            <Skeleton className='h-12 w-full rounded-md' />
+                            <Skeleton className='h-12 w-full rounded-md' />
+                            <Skeleton className='h-12 w-full rounded-md' />
+                            <Skeleton className='h-12 w-full rounded-md' />
                         </div>
                     </div>
 

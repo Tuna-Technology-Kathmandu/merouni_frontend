@@ -130,7 +130,7 @@ const QuickActions = () => {
   ]
 
   return (
-    <div className='bg-white rounded-lg shadow-md p-6'>
+    <div className='bg-white rounded-md shadow-md p-6'>
       <h2 className='text-xl font-semibold text-gray-800 mb-4'>
         Quick Actions
       </h2>
@@ -141,9 +141,9 @@ const QuickActions = () => {
             <Link
               key={action.href}
               href={action.href}
-              className={`flex items-center gap-3 p-4 border border-gray-200 rounded-lg transition-colors group ${action.colorClasses.container}`}
+              className={`flex items-center gap-3 p-4 border border-gray-200 rounded-md transition-colors group ${action.colorClasses.container}`}
             >
-              <div className={`p-2 rounded-lg transition-colors ${action.colorClasses.iconBg}`}>
+              <div className={`p-2 rounded-md transition-colors ${action.colorClasses.iconBg}`}>
                 <Icon className={`w-5 h-5 ${action.colorClasses.iconColor}`} />
               </div>
               <span className={`text-sm font-medium text-gray-700 ${action.colorClasses.textHover}`}>

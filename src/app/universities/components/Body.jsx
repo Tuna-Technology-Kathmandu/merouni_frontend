@@ -16,22 +16,22 @@ const fetchUniversitiesFromAPI = async (page = 1, filters = {}, searchQuery = ''
   try {
     const queryParams = new URLSearchParams({
       page: page.toString(),
-      limit: '24' 
+      limit: '24'
     })
-    
+
     if (searchQuery) {
       queryParams.append('q', searchQuery)
     }
 
     // Add type filter if exists
     if (filters.type && filters.type.length > 0) {
-        // Taking the first one if multiple, or handling array if backend supports logic for IN
-        // Backend logic I added: type_of_institute = :type. So single value.
-        // If frontend supports multiple selection, we might need to adjust backend or send one.
-        // For now, let's assume single selection or send the last selected one for simplicity as per requirement "Public/Private" usually exclusive or filtered one by one.
-        // Actually, my backend logic `type_of_institute = :type` implies a single value.
-        // I will take the last selected value to filter. 
-        queryParams.append('type', filters.type[filters.type.length - 1])
+      // Taking the first one if multiple, or handling array if backend supports logic for IN
+      // Backend logic I added: type_of_institute = :type. So single value.
+      // If frontend supports multiple selection, we might need to adjust backend or send one.
+      // For now, let's assume single selection or send the last selected one for simplicity as per requirement "Public/Private" usually exclusive or filtered one by one.
+      // Actually, my backend logic `type_of_institute = :type` implies a single value.
+      // I will take the last selected value to filter. 
+      queryParams.append('type', filters.type[filters.type.length - 1])
     }
 
     const url = `${process.env.baseUrl}/university?${queryParams.toString()}`
@@ -77,24 +77,24 @@ const FilterSection = React.memo(function FilterSection({
           {title}
         </h3>
       </div>
-      
+
       <div className='mt-2 space-y-2.5'>
-          {options.map((opt, idx) => (
-            <label
-              key={idx}
-              className='flex items-center gap-3 group cursor-pointer'
-            >
-              <input
-                type='checkbox'
-                checked={selectedValues.includes(opt.value)}
-                onChange={() => onCheckboxChange(opt.value)}
-                className='w-4 h-4 rounded border-gray-300 text-[#0A70A7] focus:ring-[#0A70A7] transition-all cursor-pointer'
-              />
-              <span className='text-gray-600 group-hover:text-gray-900 text-sm font-medium transition-colors'>
-                {opt.name}
-              </span>
-            </label>
-          ))}
+        {options.map((opt, idx) => (
+          <label
+            key={idx}
+            className='flex items-center gap-3 group cursor-pointer'
+          >
+            <input
+              type='checkbox'
+              checked={selectedValues.includes(opt.value)}
+              onChange={() => onCheckboxChange(opt.value)}
+              className='w-4 h-4 rounded border-gray-300 text-[#0A70A7] focus:ring-[#0A70A7] transition-all cursor-pointer'
+            />
+            <span className='text-gray-600 group-hover:text-gray-900 text-sm font-medium transition-colors'>
+              {opt.name}
+            </span>
+          </label>
+        ))}
       </div>
     </div>
   )
@@ -131,10 +131,10 @@ const Body = () => {
     Object.entries(params).forEach(([key, value]) => {
       if (value) {
         if (Array.isArray(value)) {
-             if(value.length > 0) newParams.set(key, value[value.length-1]) // Supporting single select logic via URL for now
-             else newParams.delete(key)
+          if (value.length > 0) newParams.set(key, value[value.length - 1]) // Supporting single select logic via URL for now
+          else newParams.delete(key)
         } else {
-             newParams.set(key, value)
+          newParams.set(key, value)
         }
       } else {
         newParams.delete(key)
@@ -149,11 +149,11 @@ const Body = () => {
     const q = searchParams.get('q') || ''
     const pg = parseInt(searchParams.get('page')) || 1
     const type = searchParams.get('type')
-    
+
     setSearchQuery(q)
     setPagination(prev => ({ ...prev, currentPage: pg }))
-    if(type) setSelectedFilters(prev => ({...prev, type: [type] }))
-    else setSelectedFilters(prev => ({...prev, type: [] }))
+    if (type) setSelectedFilters(prev => ({ ...prev, type: [type] }))
+    else setSelectedFilters(prev => ({ ...prev, type: [] }))
 
   }, [searchParams])
 
@@ -187,13 +187,13 @@ const Body = () => {
       setIsLoading(true)
       try {
         if (q) setIsSearching(true)
-        
+
         const filters = { type: type ? [type] : [] }
         const data = await fetchUniversitiesFromAPI(pg, filters, q)
-        
+
         setUniversities(data.universities)
         setPagination(data.pagination)
-        
+
         if (q) setIsSearching(false)
 
       } catch (err) {
@@ -211,9 +211,9 @@ const Body = () => {
       const arr = prev[filterType]
       // Toggle logic
       const newArr = arr.includes(value)
-          ? arr.filter((v) => v !== value)
-          : [...arr, value]
-      
+        ? arr.filter((v) => v !== value)
+        : [...arr, value]
+
       const newFilters = {
         ...prev,
         [filterType]: newArr
@@ -233,8 +233,8 @@ const Body = () => {
   }
 
   const instituteTypes = [
-      { name: 'Public', value: 'Public' },
-      { name: 'Private', value: 'Private' }
+    { name: 'Public', value: 'Public' },
+    { name: 'Private', value: 'Private' }
   ]
 
   return (
@@ -245,7 +245,7 @@ const Body = () => {
             <h2 className='text-3xl font-extrabold text-gray-900 tracking-tight'>
               Universities
             </h2>
-            <span className='bg-blue-50 text-[#0A70A7] px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider'>
+            <span className='bg-blue-50 text-[#0A70A7] px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider'>
               {pagination.totalItems || '0'} Results
             </span>
           </div>
@@ -286,13 +286,13 @@ const Body = () => {
               onClick={() => {
                 setSearchQuery('')
                 setSelectedFilters({ type: [] })
-                updateURL({ q: '', type: [], page: 1})
+                updateURL({ q: '', type: [], page: 1 })
               }}
             >
               Clear All
             </button>
           </div>
-          
+
           <FilterSection
             title='Institute type'
             options={instituteTypes}
@@ -325,9 +325,9 @@ const Body = () => {
               action={{
                 label: 'Clear All Filters',
                 onClick: () => {
-                    setSearchQuery('')
-                    setSelectedFilters({ type: [] })
-                    updateURL({ q: '', type: [], page: 1})
+                  setSearchQuery('')
+                  setSelectedFilters({ type: [] })
+                  updateURL({ q: '', type: [], page: 1 })
                 }
               }}
             />

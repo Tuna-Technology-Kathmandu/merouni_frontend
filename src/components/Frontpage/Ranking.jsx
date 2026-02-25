@@ -26,7 +26,7 @@ const Ranking = () => {
     }
   }
 
-  useEffect(() => {}, [ranking])
+  useEffect(() => { }, [ranking])
 
   return (
     <div className=' bg-gradient-to-r flex items-center text-black my-24 '>
@@ -40,7 +40,7 @@ const Ranking = () => {
             aspirations
           </div>
           <Link href='/colleges'>
-            <button className='w-[130px] text-center border border-black rounded-xl  flex items-center justify-center p-2 font-bold'>
+            <button className='w-[130px] text-center border border-black rounded-md  flex items-center justify-center p-2 font-bold'>
               View all
               <div className='w-6 h-6 rounded-full bg-black text-white mx-2'>
                 &gt;
@@ -49,7 +49,7 @@ const Ranking = () => {
           </Link>
         </div>
         <div
-          className='flex flex-col justify-center rounded-lg border-2 shadow-md m-4 md:m-0'
+          className='flex flex-col justify-center rounded-md border-2 shadow-md m-4 md:m-0'
           style={
             {
               // background:
@@ -76,7 +76,7 @@ const Ranking = () => {
               {ranking.map((rank, index) => (
                 <Link href={`/blogs/${rank.slug}`}>
                   <div
-                    className='border border-black rounded-lg text-center p-2  md:w-[275px] flex justify-center items-center '
+                    className='border border-black rounded-md text-center p-2  md:w-[275px] flex justify-center items-center '
                     key={index}
                   >
                     {rank.title}

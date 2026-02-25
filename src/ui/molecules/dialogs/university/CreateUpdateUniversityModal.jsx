@@ -42,7 +42,7 @@ import VideoSection from '../college/components/VideoSection'
 
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
     <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-[#387cae]/10 flex items-center justify-center text-[#387cae] shadow-sm border border-[#387cae]/20">
+        <div className="w-10 h-10 rounded-md bg-[#387cae]/10 flex items-center justify-center text-[#387cae] shadow-sm border border-[#387cae]/20">
             <Icon size={20} />
         </div>
         <div>
@@ -738,7 +738,7 @@ const CreateUpdateUniversityModal = ({
                                             type='button'
                                             variant='outline'
                                             size='sm'
-                                            className='rounded-xl border-[#387cae]/20 text-[#387cae] hover:bg-[#387cae]/5'
+                                            className='rounded-md border-[#387cae]/20 text-[#387cae] hover:bg-[#387cae]/5'
                                             onClick={() => appendMember({ role: '', salutation: '', name: '', phone: '', email: '' })}
                                         >
                                             <Plus className='w-4 h-4 mr-2' />

@@ -7,7 +7,7 @@ const MemberSection = ({ validMembers }) => {
   }
 
   return (
-    <div className='bg-white rounded-xl border p-6'>
+    <div className='bg-white rounded-md border p-6'>
       <h2 className='text-xl font-bold text-gray-900 mb-6'>Our Team</h2>
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6'>
         {validMembers.map((member, index) => (
@@ -31,7 +31,7 @@ const MemberSection = ({ validMembers }) => {
               {/* Role */}
               {member.role?.trim() && (
                 <div className='flex items-start gap-3'>
-                  <div className='flex-shrink-0 w-8 h-8 rounded-xl bg-white flex items-center justify-center mt-0.5 border border-gray-100'>
+                  <div className='flex-shrink-0 w-8 h-8 rounded-md bg-white flex items-center justify-center mt-0.5 border border-gray-100'>
                     <FaBriefcase className='w-3.5 h-3.5 text-gray-400' />
                   </div>
                   <div>
@@ -48,7 +48,7 @@ const MemberSection = ({ validMembers }) => {
               {/* Contact Number */}
               {member.contact_number?.trim() && (
                 <div className='flex items-start gap-3'>
-                  <div className='flex-shrink-0 w-8 h-8 rounded-xl bg-white flex items-center justify-center mt-0.5 border border-gray-100'>
+                  <div className='flex-shrink-0 w-8 h-8 rounded-md bg-white flex items-center justify-center mt-0.5 border border-gray-100'>
                     <FaPhoneAlt className='w-3.5 h-3.5 text-orange-400' />
                   </div>
                   <div>

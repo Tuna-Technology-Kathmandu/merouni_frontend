@@ -344,7 +344,7 @@ export default function VideoManager() {
 
   return (
     <div className='w-full space-y-4 p-4'>
-      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
         {/* Search Bar */}
         <SearchInput
           value={searchQuery}
@@ -400,7 +400,7 @@ export default function VideoManager() {
               className='flex flex-col flex-1'
             >
               <div className='flex-1 space-y-6'>
-                <div className='bg-white p-6 rounded-lg shadow-md'>
+                <div className='bg-white p-6 rounded-md shadow-md'>
                   <div className='space-y-4'>
                     <div>
                       <Label required>Title</Label>
@@ -499,7 +499,7 @@ export default function VideoManager() {
       </Dialog>
 
       {/* Table Container */}
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
         <Table
           loading={tableLoading}
           data={videos}
@@ -511,7 +511,7 @@ export default function VideoManager() {
         />
       </div>
 
-      {/* View Modal */ }
+      {/* View Modal */}
       <Dialog
         isOpen={isViewModalOpen}
         onClose={() => {
@@ -532,7 +532,7 @@ export default function VideoManager() {
           <div className="p-6 space-y-6">
             {/* Featured Image */}
             {viewingVideo?.featured_image && (
-              <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-100 mb-6 border border-gray-200">
+              <div className="w-full h-64 rounded-md overflow-hidden bg-gray-100 mb-6 border border-gray-200">
                 <img
                   src={viewingVideo.featured_image}
                   alt={viewingVideo.title}
@@ -564,7 +564,7 @@ export default function VideoManager() {
 
               <div className="md:col-span-2">
                 <h3 className="text-sm font-medium text-gray-500">Description</h3>
-                <div className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                <div className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-md border border-gray-100">
                   {viewingVideo?.description || "No description provided."}
                 </div>
               </div>
@@ -591,7 +591,7 @@ export default function VideoManager() {
         title='Confirm Deletion'
         message='Are you sure you want to delete this video? This action cannot be undone.'
       />
-          </div>
+    </div>
 
   )
 }

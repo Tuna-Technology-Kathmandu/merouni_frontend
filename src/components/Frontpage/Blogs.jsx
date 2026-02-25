@@ -42,9 +42,9 @@ const Blogs = () => {
     return () => observer.disconnect()
   }, [])
 
- 
 
-  useEffect(() => {}, [blogs])
+
+  useEffect(() => { }, [blogs])
 
   return (
     <div ref={blogRef} className='max-w-[1700px] mx-auto my-36'>
@@ -154,7 +154,7 @@ const Blogs = () => {
       </div>
 
       <Link href={'/blogs'}>
-        <button className='w-[210px] text-center  border-[#2EAE8F] border-2 rounded-xl  flex items-center justify-center p-2 font-bold text-[#9ad7c8] self-center mx-auto my-8'>
+        <button className='w-[210px] text-center  border-[#2EAE8F] border-2 rounded-md  flex items-center justify-center p-2 font-bold text-[#9ad7c8] self-center mx-auto my-8'>
           View more articles
           <div className='w-6 h-6 rounded-full  mx-2 text-[#9ad7c8]'>&gt;</div>
         </button>

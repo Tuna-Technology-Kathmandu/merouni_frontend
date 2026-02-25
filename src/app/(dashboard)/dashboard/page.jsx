@@ -390,7 +390,7 @@ const InstitutionDashboard = () => {
       </div>
 
       {error && (
-        <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
+        <div className='bg-red-50 border border-red-200 rounded-md p-4'>
           <p className='text-sm text-red-600'>Error: {error}</p>
         </div>
       )}
@@ -470,7 +470,7 @@ const ConsultancyDashboard = () => {
       </div>
 
       {error && (
-        <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
+        <div className='bg-red-50 border border-red-200 rounded-md p-4'>
           <p className='text-sm text-red-600'>Error: {error}</p>
         </div>
       )}
@@ -571,7 +571,7 @@ export const AgentDashboard = () => {
       </div>
 
       {error && (
-        <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
+        <div className='bg-red-50 border border-red-200 rounded-md p-4'>
           <p className='text-sm text-red-600'>Error: {error}</p>
         </div>
       )}

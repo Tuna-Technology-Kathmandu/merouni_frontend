@@ -19,7 +19,7 @@ const OverviewSection = ({ consultancy }) => {
         className='text-gray-600 leading-relaxed text-justify text-sm md:text-base
           [&>iframe]:w-full [&>iframe]:max-w-[calc(100vw-40px)] [&>iframe]:aspect-video [&>iframe]:h-auto
           [&>iframe]:rounded-2xl [&>iframe]:mt-6 [&>iframe]:mx-auto [&>iframe]:block [&>iframe]:shadow-lg
-          [&_table]:min-w-full [&_table]:border-collapse [&_table]:rounded-xl [&_table]:overflow-hidden
+          [&_table]:min-w-full [&_table]:border-collapse [&_table]:rounded-md [&_table]:overflow-hidden
           [&_table]:border [&_table]:border-gray-100
           [&_th]:bg-gray-50 [&_th]:p-3 [&_th]:text-left [&_th]:font-semibold [&_th]:text-gray-900 [&_th]:border [&_th]:border-gray-200
           [&_td]:p-3 [&_td]:border [&_td]:border-gray-100 [&_tr:nth-child(even)]:bg-gray-50/50

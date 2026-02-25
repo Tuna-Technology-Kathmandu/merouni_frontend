@@ -412,7 +412,7 @@ export default function CareerForm() {
               >
                 <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
                   {/* Basic Information */}
-                  <div className='bg-white p-6 rounded-lg shadow-md'>
+                  <div className='bg-white p-6 rounded-md shadow-md'>
                     <div className='grid grid-cols-1 gap-4'>
                       <div>
                         <Label
@@ -575,7 +575,7 @@ export default function CareerForm() {
           ) : viewCareerData ? (
             <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
               {viewCareerData.featuredImage && (
-                <div className='w-full h-64 rounded-lg overflow-hidden'>
+                <div className='w-full h-64 rounded-md overflow-hidden'>
                   <img
                     src={viewCareerData.featuredImage}
                     alt={viewCareerData.title}

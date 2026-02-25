@@ -180,7 +180,7 @@ const ReferConsultancyPage = () => {
     return (
         <div className='w-full max-w-5xl mx-auto space-y-6 pb-20'>
             {/* Search Bar Container */}
-            <div className='bg-white p-6 rounded-xl border shadow-sm sticky top-0 z-40 flex flex-col sm:flex-row gap-4 items-center'>
+            <div className='bg-white p-6 rounded-md border shadow-sm sticky top-0 z-40 flex flex-col sm:flex-row gap-4 items-center'>
                 <div className='relative flex-1 w-full' ref={dropdownRef}>
                     <SearchInput
                         value={searchTerm}
@@ -191,10 +191,10 @@ const ReferConsultancyPage = () => {
                         onFocus={() => setIsDropdownOpen(true)}
                         placeholder='Search for a consultancy to refer...'
                         className='w-full'
-                        inputClassName="h-11 rounded-lg border-slate-200"
+                        inputClassName="h-11 rounded-md border-slate-200"
                     />
                     {isDropdownOpen && (
-                        <div className='absolute z-50 w-full mt-2 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto custom-scrollbar'>
+                        <div className='absolute z-50 w-full mt-2 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto custom-scrollbar'>
                             {fetchingConsultancies ? (
                                 <div className='p-4 text-center text-slate-500 text-sm'>Loading...</div>
                             ) : filteredConsultancies.length > 0 ? (
@@ -244,7 +244,7 @@ const ReferConsultancyPage = () => {
 
             {/* Form Section */}
             {selectedConsultancy ? (
-                <div className='bg-white rounded-xl border shadow-sm overflow-hidden'>
+                <div className='bg-white rounded-md border shadow-sm overflow-hidden'>
                     <div className='px-6 py-3 bg-slate-50 border-b flex justify-between items-center'>
                         <div className='flex items-center gap-2'>
                             <Briefcase size={18} className='text-blue-600' />
@@ -263,7 +263,7 @@ const ReferConsultancyPage = () => {
 
                     <div className='p-6 space-y-6'>
                         {students.map((s, idx) => (
-                            <div key={idx} className='p-5 bg-slate-50/50 border rounded-lg relative space-y-4'>
+                            <div key={idx} className='p-5 bg-slate-50/50 border rounded-md relative space-y-4'>
                                 <div className='flex justify-between items-center'>
                                     <div className='flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wide'>
                                         Student {idx + 1}
@@ -331,7 +331,7 @@ const ReferConsultancyPage = () => {
                     </div>
                 </div>
             ) : (
-                <div className='py-20 text-center bg-white border border-dashed rounded-xl shadow-sm'>
+                <div className='py-20 text-center bg-white border border-dashed rounded-md shadow-sm'>
                     <Briefcase size={40} className='mx-auto text-slate-200 mb-4' />
                     <h3 className='text-lg font-semibold text-slate-900'>No Consultancy Selected</h3>
                     <p className='text-slate-500 text-sm max-w-xs mx-auto mt-1'>Search for a consultancy in the bar above to start your referral.</p>

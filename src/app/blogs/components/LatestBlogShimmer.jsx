@@ -12,7 +12,7 @@ const LatestBlogsShimmer = () => {
           <Skeleton className='h-4 w-full' />
           <Skeleton className='h-4 w-2/3' />
         </div>
-        <Skeleton className='h-11 w-32 rounded-xl mt-4' />
+        <Skeleton className='h-11 w-32 rounded-md mt-4' />
       </div>
     </div>
   )

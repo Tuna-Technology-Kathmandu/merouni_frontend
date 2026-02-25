@@ -78,7 +78,7 @@ const ContactSidebar = () => {
                             rel={item.link.startsWith('http') ? 'noopener noreferrer' : undefined}
                             className='flex items-start gap-4 group'
                         >
-                            <div className='p-3 rounded-lg bg-[#30AD8F]/10 text-[#30AD8F] group-hover:bg-[#30AD8F] group-hover:text-white transition-colors duration-300'>
+                            <div className='p-3 rounded-md bg-[#30AD8F]/10 text-[#30AD8F] group-hover:bg-[#30AD8F] group-hover:text-white transition-colors duration-300'>
                                 <item.icon size={20} />
                             </div>
                             <div className='flex-1'>

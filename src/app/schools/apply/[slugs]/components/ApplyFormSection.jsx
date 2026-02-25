@@ -107,13 +107,13 @@ const ApplyFormSection = ({ id, college }) => {
     }
   }
 
- 
+
 
 
   return (
     <div className='flex flex-col items-center bg-[#D9D9D9] bg-opacity-30 p-6'>
       <h2 className='text-center text-2xl font-bold mb-6'>Apply For School</h2>
-      <div className='w-full max-w-3xl bg-white shadow-lg rounded-lg p-6'>
+      <div className='w-full max-w-3xl bg-white shadow-lg rounded-md p-6'>
         <form className='space-y-4' onSubmit={handleSubmit}>
           <div>
             <input
@@ -122,7 +122,7 @@ const ApplyFormSection = ({ id, college }) => {
               placeholder='Student Name'
               value={formData.student_name}
               onChange={handleChange}
-              className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             />
             {errors.student_name && (
               <p className='text-red-500 text-sm'>{errors.student_name}</p>
@@ -135,7 +135,7 @@ const ApplyFormSection = ({ id, college }) => {
               placeholder='Student Email'
               value={formData.student_email}
               onChange={handleChange}
-              className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             />
             {errors.student_email && (
               <p className='text-red-500 text-sm'>{errors.student_email}</p>
@@ -148,7 +148,7 @@ const ApplyFormSection = ({ id, college }) => {
               placeholder='Student Phone Number'
               value={formData.student_phone_no}
               onChange={handleChange}
-              className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             />
             {errors.student_phone_no && (
               <p className='text-red-500 text-sm'>{errors.student_phone_no}</p>
@@ -161,7 +161,7 @@ const ApplyFormSection = ({ id, college }) => {
               value={formData.student_description}
               onChange={handleChange}
               rows={3}
-              className='w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             />
             {errors.student_description && (
               <p className='text-red-500 text-sm'>
@@ -172,7 +172,7 @@ const ApplyFormSection = ({ id, college }) => {
           <button
             type='submit'
             disabled={loading}
-            className={`w-full bg-[#011E3F] bg-opacity-80 text-white font-semibold py-2 rounded-lg transition duration-200 ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#011E3F]'
+            className={`w-full bg-[#011E3F] bg-opacity-80 text-white font-semibold py-2 rounded-md transition duration-200 ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#011E3F]'
               }`}
           >
             {loading ? 'Submitting...' : 'Submit Application'}

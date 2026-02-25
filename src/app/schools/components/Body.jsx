@@ -279,7 +279,7 @@ const SchoolFinder = () => {
             <h2 className='text-3xl font-extrabold text-gray-900 tracking-tight'>
               Schools
             </h2>
-            <span className='bg-blue-50 text-[#0A70A7] px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider'>
+            <span className='bg-blue-50 text-[#0A70A7] px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider'>
               {pagination.totalCount || '0'} Results
             </span>
           </div>

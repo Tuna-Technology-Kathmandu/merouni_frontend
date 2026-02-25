@@ -191,7 +191,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
                   placeholder='First Name'
                   value={formData.firstName}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 rounded-xl border ${errors.firstName ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
+                  className={`w-full px-4 py-3 rounded-md border ${errors.firstName ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
                 />
                 {errors.firstName && <p className='text-red-500 text-[10px] ml-1'>{errors.firstName}</p>}
               </div>
@@ -203,7 +203,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
                   placeholder='Last Name'
                   value={formData.lastName}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 rounded-xl border ${errors.lastName ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
+                  className={`w-full px-4 py-3 rounded-md border ${errors.lastName ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
                 />
                 {errors.lastName && <p className='text-red-500 text-[10px] ml-1'>{errors.lastName}</p>}
               </div>
@@ -218,7 +218,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
               placeholder='Email Address'
               value={formData.email}
               onChange={handleChange}
-              className={`w-full px-4 py-3 rounded-xl border ${errors.email ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
+              className={`w-full px-4 py-3 rounded-md border ${errors.email ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
             />
             {errors.email && <p className='text-red-500 text-[10px] ml-1'>{errors.email}</p>}
           </div>
@@ -232,7 +232,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
                 placeholder='Phone Number'
                 value={formData.phoneNo}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 rounded-xl border ${errors.phoneNo ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
+                className={`w-full px-4 py-3 rounded-md border ${errors.phoneNo ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
                 maxLength={10}
               />
               {errors.phoneNo && <p className='text-red-500 text-[10px] ml-1'>{errors.phoneNo}</p>}
@@ -243,7 +243,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
             <div className='flex justify-between items-center ml-1'>
               <label className='text-xs font-bold text-gray-700 uppercase tracking-widest'>Password</label>
               {isLogin && (
-                <button 
+                <button
                   type="button"
                   onClick={() => setIsForgotPasswordOpen(true)}
                   className='text-xs font-bold text-[#0A6FA7] hover:underline'
@@ -259,7 +259,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
                 placeholder='Password'
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 rounded-xl border ${errors.password ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
+                className={`w-full px-4 py-3 rounded-md border ${errors.password ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
               />
               <button
                 type='button'
@@ -275,7 +275,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
           <button
             type='submit'
             disabled={signInFormMutation?.isPending}
-            className='w-full py-3.5 px-6 bg-[#0A6FA7] text-white rounded-xl font-bold hover:bg-[#085a86] transition-all shadow-md active:scale-[0.98] disabled:opacity-50 mt-4 text-sm'
+            className='w-full py-3.5 px-6 bg-[#0A6FA7] text-white rounded-md font-bold hover:bg-[#085a86] transition-all shadow-md active:scale-[0.98] disabled:opacity-50 mt-4 text-sm'
           >
             {signInFormMutation?.isPending ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
           </button>
@@ -306,20 +306,20 @@ const SignInPage = ({ defaultMode = 'login' }) => {
           </div>
         </DialogHeader>
         <DialogContent>
-        <div className='p-6 text-center'>
-          <div className='mb-4 flex justify-center'>
-            <div className='w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center'>
-              <svg className='w-8 h-8 text-[#0A6FA7]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' />
-              </svg>
+          <div className='p-6 text-center'>
+            <div className='mb-4 flex justify-center'>
+              <div className='w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center'>
+                <svg className='w-8 h-8 text-[#0A6FA7]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' />
+                </svg>
+              </div>
             </div>
+            <h3 className='text-xl font-bold text-gray-900 mb-2'>Contact Administrator</h3>
+            <p className='text-gray-600 mb-6'>
+              Please contact the <strong>Mero Uni Admin</strong> to reset your password. Our team will verify your identity and assist you further.
+            </p>
+
           </div>
-          <h3 className='text-xl font-bold text-gray-900 mb-2'>Contact Administrator</h3>
-          <p className='text-gray-600 mb-6'>
-            Please contact the <strong>Mero Uni Admin</strong> to reset your password. Our team will verify your identity and assist you further.
-          </p>
-         
-        </div>
         </DialogContent>
       </Dialog>
     </div>

@@ -11,6 +11,7 @@ import { Label } from '@/ui/shadcn/label'
 import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 import { Textarea } from '@/ui/shadcn/textarea'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
+import EmojiPicker from 'emoji-picker-react'
 import axios from 'axios'
 import {
     Activity,
@@ -50,7 +51,7 @@ import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
     <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-[#387cae]/10 flex items-center justify-center text-[#387cae] shadow-sm border border-[#387cae]/20">
+        <div className="w-10 h-10 rounded-md bg-[#387cae]/10 flex items-center justify-center text-[#387cae] shadow-sm border border-[#387cae]/20">
             <Icon size={20} />
         </div>
         <div>
@@ -82,6 +83,7 @@ const CreateUpdateCollegeModal = ({
         videos: []
     })
     const [selectedUniversities, setSelectedUniversities] = useState([])
+    const [openEmojiPickerIndex, setOpenEmojiPickerIndex] = useState(null)
 
     const author_id = useSelector((state) => state.user.data?.id)
 
@@ -171,6 +173,7 @@ const CreateUpdateCollegeModal = ({
             setFilesDirty(false)
             setUniversityPrograms([])
             setSelectedUniversities([])
+            setOpenEmojiPickerIndex(null)
         }
     }, [isOpen, reset])
 
@@ -504,8 +507,6 @@ const CreateUpdateCollegeModal = ({
 
     const onSaveDraft = async () => {
         const data = getValues()
-        // When saving as draft, skip full form validation
-        // Only require the college name as a minimum
         if (!data.name || !data.name.trim()) {
             toast.error('College name is required even for drafts')
             return
@@ -761,7 +762,7 @@ const CreateUpdateCollegeModal = ({
                                                     isLoading={loadingPrograms}
                                                 />
                                                 {selectedUniIds.length === 0 && (
-                                                    <p className='text-[10px] text-gray-400 mt-2 font-medium bg-gray-50 p-2 rounded-lg border border-dashed border-gray-200'>
+                                                    <p className='text-[10px] text-gray-400 mt-2 font-medium bg-gray-50 p-2 rounded-md border border-dashed border-gray-200'>
                                                         Please select a university first to view available programs.
                                                     </p>
                                                 )}
@@ -917,18 +918,53 @@ const CreateUpdateCollegeModal = ({
                                                         <div>
                                                             <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Title</Label>
                                                             <Input
-                                                                {...register(`facilities[${index}].title`)}
+                                                                {...register(`facilities[${index}].title`, { required: 'Title is required' })}
                                                                 placeholder='e.g. WiFi'
                                                                 className='h-9 text-xs rounded-md'
                                                             />
+                                                            {errors?.facilities?.[index]?.title && (
+                                                                <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.facilities[index].title.message}</p>
+                                                            )}
                                                         </div>
-                                                        <div>
-                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Icon Code</Label>
-                                                            <Input
-                                                                {...register(`facilities[${index}].icon`)}
-                                                                placeholder='wifi'
-                                                                className='h-9 text-xs rounded-md'
-                                                            />
+                                                        <div className="relative">
+                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Icon / Emoji</Label>
+                                                            <div
+                                                                className="h-9 w-full flex items-center justify-between border border-gray-200 rounded-md px-3 bg-white cursor-pointer hover:bg-gray-50 transition-colors"
+                                                                onClick={() => setOpenEmojiPickerIndex(openEmojiPickerIndex === index ? null : index)}
+                                                            >
+                                                                <span className="text-sm">
+                                                                    {watch(`facilities[${index}].icon`) || 'Select'}
+                                                                </span>
+                                                                <Plus size={12} className="text-gray-400" />
+                                                            </div>
+
+                                                            {openEmojiPickerIndex === index && (
+                                                                <div className="absolute top-full left-0 mt-2 z-[100] shadow-2xl rounded-md overflow-hidden border border-gray-100">
+                                                                    <div className="bg-white p-2 border-b flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase">
+                                                                        <span>Select Icon</span>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => setOpenEmojiPickerIndex(null)}
+                                                                            className="hover:text-red-500"
+                                                                        >Close</button>
+                                                                    </div>
+                                                                    <EmojiPicker
+                                                                        onEmojiClick={(emojiData) => {
+                                                                            setValue(`facilities[${index}].icon`, emojiData.emoji, { shouldDirty: true })
+                                                                            setOpenEmojiPickerIndex(null)
+                                                                        }}
+                                                                        width={280}
+                                                                        height={350}
+                                                                        previewConfig={{ showPreview: false }}
+                                                                        skinTonesDisabled
+                                                                        searchDisabled={false}
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                            <input type="hidden" {...register(`facilities[${index}].icon`, { required: 'Icon is required' })} />
+                                                            {errors?.facilities?.[index]?.icon && (
+                                                                <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.facilities[index].icon.message}</p>
+                                                            )}
                                                         </div>
                                                     </div>
                                                     <div>
@@ -980,21 +1016,25 @@ const CreateUpdateCollegeModal = ({
                                                             onClear={() => setValue(`members[${index}].image_url`, '', { shouldDirty: true })}
                                                             defaultPreview={watch(`members[${index}].image_url`)}
                                                         />
+                                                        <input type="hidden" {...register(`members[${index}].image_url`)} />
                                                     </div>
                                                     <div className='flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4'>
                                                         <div>
                                                             <Label className='text-[10px] font-bold text-gray-400 uppercase mb-1 block'>Full Name</Label>
                                                             <Input
-                                                                {...register(`members[${index}].name`)}
+                                                                {...register(`members[${index}].name`, { required: 'Name is required' })}
                                                                 placeholder='Dr. John Doe'
                                                                 className='h-10 rounded-md'
                                                             />
+                                                            {errors?.members?.[index]?.name && (
+                                                                <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.members[index].name.message}</p>
+                                                            )}
                                                         </div>
                                                         <div>
                                                             <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Role</Label>
                                                             <select
-                                                                {...register(`members[${index}].role`)}
-                                                                className='flex h-10 w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
+                                                                {...register(`members[${index}].role`, { required: 'Role is required' })}
+                                                                className='flex h-10 w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
                                                             >
                                                                 <option value="">Select Role</option>
                                                                 <option value="Principal">Principal</option>
@@ -1002,6 +1042,9 @@ const CreateUpdateCollegeModal = ({
                                                                 <option value="Lecturer">Lecturer</option>
                                                                 <option value="Admin">Admin</option>
                                                             </select>
+                                                            {errors?.members?.[index]?.role && (
+                                                                <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.members[index].role.message}</p>
+                                                            )}
                                                         </div>
                                                         <div>
                                                             <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Contact (Phone)</Label>
@@ -1026,10 +1069,13 @@ const CreateUpdateCollegeModal = ({
                                                         <div className='sm:col-span-3'>
                                                             <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Professional description</Label>
                                                             <Input
-                                                                {...register(`members[${index}].description`)}
+                                                                {...register(`members[${index}].description`, { required: 'Description is required' })}
                                                                 placeholder='Achievement and specialization...'
                                                                 className='h-10 rounded-md'
                                                             />
+                                                            {errors?.members?.[index]?.description && (
+                                                                <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.members[index].description.message}</p>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1037,7 +1083,7 @@ const CreateUpdateCollegeModal = ({
                                                     type='button'
                                                     variant='outline'
                                                     size='icon'
-                                                    className='absolute top-6 right-6 h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 border-gray-100 rounded-xl'
+                                                    className='absolute top-6 right-6 h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 border-gray-100 rounded-md'
                                                     onClick={() => removeMember(index)}
                                                 >
                                                     <Trash2 size={16} />

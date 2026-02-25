@@ -154,7 +154,7 @@ const VerifyOtpContent = () => {
                 onChange={(e) => handleChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 onPaste={handlePaste}
-                className='w-11 h-14 text-center text-xl font-bold border rounded-xl focus:border-[#0A6FA7] focus:ring-4 focus:ring-blue-50 focus:outline-none transition-all'
+                className='w-11 h-14 text-center text-xl font-bold border rounded-md focus:border-[#0A6FA7] focus:ring-4 focus:ring-blue-50 focus:outline-none transition-all'
                 required
               />
             ))}
@@ -163,7 +163,7 @@ const VerifyOtpContent = () => {
           <button
             type='submit'
             disabled={loading}
-            className='w-full py-4 px-6 bg-[#0A6FA7] text-white rounded-xl font-bold hover:bg-[#085a86] transition-all shadow-md active:scale-[0.98] disabled:opacity-50 text-sm tracking-wide'
+            className='w-full py-4 px-6 bg-[#0A6FA7] text-white rounded-md font-bold hover:bg-[#085a86] transition-all shadow-md active:scale-[0.98] disabled:opacity-50 text-sm tracking-wide'
           >
             {loading ? 'Verifying...' : 'Verify Email'}
           </button>

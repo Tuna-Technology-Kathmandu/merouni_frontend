@@ -19,7 +19,7 @@ const MenuItem = ({ item, isCollapsed, isActive, onClick }) => {
       title={isCollapsed ? item.label : ''}
       className={`
         relative flex items-center w-full p-3 my-1
-        rounded-xl transition-all duration-200 ease-in-out
+        rounded-md transition-all duration-200 ease-in-out
         group overflow-hidden
         ${isActive
           ? 'bg-[#0A6FA7]/10 text-[#0A6FA7] font-semibold'
@@ -99,7 +99,7 @@ const SubMenu = ({
 
   const baseClasses = `
     relative flex items-center w-full p-3 my-1
-    rounded-xl transition-all duration-200 ease-in-out
+    rounded-md transition-all duration-200 ease-in-out
     group cursor-pointer select-none
     ${isActive || isExpanded
       ? 'text-[#0A6FA7] font-semibold'
@@ -152,7 +152,7 @@ const SubMenu = ({
                 key={submenu.label}
                 href={submenu.href}
                 className={`
-                  flex items-center w-full py-2 px-3 text-sm rounded-lg transition-colors
+                  flex items-center w-full py-2 px-3 text-sm rounded-md transition-colors
                   ${isSubActive
                     ? 'bg-[#0A6FA7]/5 text-[#0A6FA7] font-medium'
                     : 'text-gray-500 hover:text-[#0A6FA7] hover:bg-gray-50'
@@ -179,10 +179,10 @@ const Menu = ({ isCollapsed = false }) => {
   const dispatch = useDispatch()
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
   const [expandedMenus, setExpandedMenus] = useState({})
-  
+
   // Section Collapse State
   const [collapsedSections, setCollapsedSections] = useState({})
-  
+
   // Load initial section collapse state from localStorage
   useEffect(() => {
     try {
@@ -194,7 +194,7 @@ const Menu = ({ isCollapsed = false }) => {
       console.error('Failed to parse collapsed sections state', e)
     }
   }, [])
-  
+
   const toggleSection = (title) => {
     setCollapsedSections((prev) => {
       const newState = { ...prev, [title]: !prev[title] }
@@ -290,89 +290,89 @@ const Menu = ({ isCollapsed = false }) => {
     <nav className='w-full px-3 py-4 space-y-6 pb-20'>
       {filteredMenuItems.map((section, idx) => {
         const isSectionCollapsed = collapsedSections[section.title] ?? false
-        
+
         return (
-        <div key={section.title || idx} className='space-y-1'>
-          {!isCollapsed && section.title && (
-            <button
-              onClick={() => toggleSection(section.title)}
-              className='w-full flex items-center justify-between px-3 group mt-4 mb-2 cursor-pointer'
-            >
-              <h2 className='text-xs font-semibold text-gray-400 uppercase tracking-wider group-hover:text-gray-600 transition-colors'>
-                {section.title}
-              </h2>
-              <ChevronDown
-                className={`w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 transition-all duration-200 ${isSectionCollapsed ? '-rotate-90' : ''}`}
-              />
-            </button>
-          )}
-
-          {!isSectionCollapsed && (
-            <div className='space-y-0.5'>
-              {section.items.map((item) => {
-              // 1. Logout Special Case
-              if (item.href === '/dashboard/logout') {
-                return (
-                  <div
-                    key={item.label}
-                    className='mt-8 pt-4 border-t border-gray-100'
-                  >
-                    <MenuItem
-                      item={item}
-                      isCollapsed={isCollapsed}
-                      isActive={false}
-                      onClick={handleLogoutClick}
-                    />
-                  </div>
-                )
-              }
-
-              // 2. Submenu Case
-              if (item.submenus?.length > 0) {
-                const isActive = item.submenus.some(
-                  (sub) => pathname === sub.href
-                )
-                // Auto-expand if active or search matched
-                const isExpanded =
-                  expandedMenus[item.label] ?? isActive
-
-                return (
-                  <SubMenu
-                    key={item.label}
-                    item={item}
-                    role={role}
-                    pathname={pathname}
-                    isCollapsed={isCollapsed}
-                    isExpanded={isExpanded}
-                    isActive={isActive}
-                    onToggle={toggleMenu}
-                  />
-                )
-              }
-
-              // 3. Regular Item Case
-              const isActive = pathname === item.href
-              // Special rename logic from original code? "Applied Colleges"
-              const displayLabel =
-                item.href === '/dashboard/referrals' &&
-                  role.student &&
-                  !role.admin
-                  ? 'Applied Colleges'
-                  : item.label
-
-              return (
-                <MenuItem
-                  key={item.label}
-                  item={{ ...item, label: displayLabel }}
-                  isCollapsed={isCollapsed}
-                  isActive={isActive}
-                  onClick={closeAllMenus}
+          <div key={section.title || idx} className='space-y-1'>
+            {!isCollapsed && section.title && (
+              <button
+                onClick={() => toggleSection(section.title)}
+                className='w-full flex items-center justify-between px-3 group mt-4 mb-2 cursor-pointer'
+              >
+                <h2 className='text-xs font-semibold text-gray-400 uppercase tracking-wider group-hover:text-gray-600 transition-colors'>
+                  {section.title}
+                </h2>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-gray-400 group-hover:text-gray-600 transition-all duration-200 ${isSectionCollapsed ? '-rotate-90' : ''}`}
                 />
-              )
-            })}
-            </div>
-          )}
-        </div>
+              </button>
+            )}
+
+            {!isSectionCollapsed && (
+              <div className='space-y-0.5'>
+                {section.items.map((item) => {
+                  // 1. Logout Special Case
+                  if (item.href === '/dashboard/logout') {
+                    return (
+                      <div
+                        key={item.label}
+                        className='mt-8 pt-4 border-t border-gray-100'
+                      >
+                        <MenuItem
+                          item={item}
+                          isCollapsed={isCollapsed}
+                          isActive={false}
+                          onClick={handleLogoutClick}
+                        />
+                      </div>
+                    )
+                  }
+
+                  // 2. Submenu Case
+                  if (item.submenus?.length > 0) {
+                    const isActive = item.submenus.some(
+                      (sub) => pathname === sub.href
+                    )
+                    // Auto-expand if active or search matched
+                    const isExpanded =
+                      expandedMenus[item.label] ?? isActive
+
+                    return (
+                      <SubMenu
+                        key={item.label}
+                        item={item}
+                        role={role}
+                        pathname={pathname}
+                        isCollapsed={isCollapsed}
+                        isExpanded={isExpanded}
+                        isActive={isActive}
+                        onToggle={toggleMenu}
+                      />
+                    )
+                  }
+
+                  // 3. Regular Item Case
+                  const isActive = pathname === item.href
+                  // Special rename logic from original code? "Applied Colleges"
+                  const displayLabel =
+                    item.href === '/dashboard/referrals' &&
+                      role.student &&
+                      !role.admin
+                      ? 'Applied Colleges'
+                      : item.label
+
+                  return (
+                    <MenuItem
+                      key={item.label}
+                      item={{ ...item, label: displayLabel }}
+                      isCollapsed={isCollapsed}
+                      isActive={isActive}
+                      onClick={closeAllMenus}
+                    />
+                  )
+                })}
+              </div>
+            )}
+          </div>
         )
       })}
 

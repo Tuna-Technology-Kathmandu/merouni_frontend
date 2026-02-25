@@ -18,7 +18,7 @@ const FeaturedAdmission = () => {
       // Use direct fetch instead of server action to avoid SSR issues and ensure correct API URL
       const apiUrl = `${process.env.baseUrl}/college?page=1&limit=6`
 
-    
+
 
       const response = await fetch(apiUrl, {
         method: 'GET',
@@ -63,8 +63,8 @@ const FeaturedAdmission = () => {
         <div className='h-5 bg-gray-200 rounded w-3/4 mb-4' />
         <div className='h-4 bg-gray-200 rounded w-1/2 mb-4' />
         <div className='flex gap-3 pt-5 border-t border-gray-100'>
-          <div className='h-10 bg-gray-200 rounded-xl flex-1' />
-          <div className='h-10 bg-gray-200 rounded-xl flex-1' />
+          <div className='h-10 bg-gray-200 rounded-md flex-1' />
+          <div className='h-10 bg-gray-200 rounded-md flex-1' />
         </div>
       </div>
     </div>
@@ -79,11 +79,11 @@ const FeaturedAdmission = () => {
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 auto-rows-fr'>
         {loading
           ? Array.from({ length: 6 }).map((_, index) => (
-              <SkeletonLoader key={index} />
-            ))
+            <SkeletonLoader key={index} />
+          ))
           : data.map((item) => (
-              <CollegeCard key={item.id} college={item} />
-            ))}
+            <CollegeCard key={item.id} college={item} />
+          ))}
       </div>
     </>
   )

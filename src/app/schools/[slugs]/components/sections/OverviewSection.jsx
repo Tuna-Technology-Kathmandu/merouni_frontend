@@ -31,7 +31,7 @@ const OverviewSection = ({ college }) => {
   }
 
   return (
-    <div className='bg-white rounded-xl border p-6'>
+    <div className='bg-white rounded-md border p-6'>
       <h2 className='text-xl font-bold text-gray-900 mb-6'>Description</h2>
 
       {/* Plain description text */}
@@ -88,7 +88,7 @@ const OverviewSection = ({ college }) => {
              /* Table styles */
              [&_table]:min-w-full
              [&_table]:border-collapse
-             [&_table]:rounded-xl
+             [&_table]:rounded-md
              [&_table]:overflow-hidden
              [&_table]:border
              [&_table]:border-gray-100

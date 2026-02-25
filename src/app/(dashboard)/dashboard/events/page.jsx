@@ -378,11 +378,11 @@ export default function EventManager() {
         return (
           <div className='flex items-center gap-3 max-w-xs overflow-hidden'>
             {image ? (
-              <div className='w-16 h-16 rounded-lg shrink-0 overflow-hidden bg-gray-100 border'>
+              <div className='w-16 h-16 rounded-md shrink-0 overflow-hidden bg-gray-100 border'>
                 <img src={image} alt='Event' className='w-full h-full object-cover' />
               </div>
             ) : (
-              <div className='w-16 h-16 rounded-lg shrink-0 bg-gray-100 border border-dashed flex items-center justify-center text-xs text-gray-400'>
+              <div className='w-16 h-16 rounded-md shrink-0 bg-gray-100 border border-dashed flex items-center justify-center text-xs text-gray-400'>
                 No img
               </div>
             )}
@@ -485,7 +485,7 @@ export default function EventManager() {
 
       {/* Sticky Header */}
       <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
-        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
           <SearchInput
             value={searchQuery}
             onChange={(e) => handleSearchInput(e.target.value)}
@@ -503,7 +503,7 @@ export default function EventManager() {
       </div>
 
       {/* Table */}
-      <div className='bg-white rounded-xl shadow-sm border overflow-hidden'>
+      <div className='bg-white rounded-md shadow-sm border overflow-hidden'>
         <Table
           columns={columns}
           data={events}
@@ -655,7 +655,7 @@ export default function EventManager() {
 
                 <div className='space-y-2'>
                   <Label>Description</Label>
-                  <div className={formErrors.description ? 'ring-2 ring-red-400/30 rounded-xl' : ''}>
+                  <div className={formErrors.description ? 'ring-2 ring-red-400/30 rounded-md' : ''}>
                     <TipTapEditor
                       value={getValues('description')}
                       onChange={(html) => {
@@ -741,7 +741,7 @@ export default function EventManager() {
             ) : viewEventData ? (
               <div className='space-y-6'>
                 {viewEventData.image && (
-                  <div className='w-full h-56 rounded-xl overflow-hidden border'>
+                  <div className='w-full h-56 rounded-md overflow-hidden border'>
                     <img src={viewEventData.image} alt={viewEventData.title} className='w-full h-full object-cover' />
                   </div>
                 )}
@@ -757,13 +757,13 @@ export default function EventManager() {
 
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   {viewEventData.category && (
-                    <div className='bg-gray-50 p-3 rounded-xl border'>
+                    <div className='bg-gray-50 p-3 rounded-md border'>
                       <p className='text-xs font-bold uppercase tracking-wide text-gray-400 mb-1'>Category</p>
                       <p className='font-medium text-gray-800'>{viewEventData.category.title}</p>
                     </div>
                   )}
                   {viewEventData.college && (
-                    <div className='bg-gray-50 p-3 rounded-xl border'>
+                    <div className='bg-gray-50 p-3 rounded-md border'>
                       <p className='text-xs font-bold uppercase tracking-wide text-gray-400 mb-1'>College</p>
                       <p className='font-medium text-gray-800'>{viewEventData.college.name}</p>
                     </div>
@@ -773,7 +773,7 @@ export default function EventManager() {
                 {viewEventData.event_host && (() => {
                   const eventHost = viewEventData.event_host
                   return (
-                    <div className='bg-gray-50 p-4 rounded-xl border space-y-2'>
+                    <div className='bg-gray-50 p-4 rounded-md border space-y-2'>
                       <h3 className='text-sm font-bold uppercase tracking-wide text-gray-400 mb-3'>Event Schedule</h3>
                       <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm'>
                         {eventHost.host && (

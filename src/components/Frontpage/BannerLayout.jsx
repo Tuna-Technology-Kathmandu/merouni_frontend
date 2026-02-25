@@ -13,7 +13,7 @@ const BannerLayout = ({ banners = [], loading = false }) => {
         {[...Array(3)].map((_, index) => (
           <div
             key={index}
-            className='w-full sm:w-[350px] lg:w-[340px] xl:w-full h-[48px] md:h-[58px] lg:h-[70px] rounded-lg animate-pulse bg-slate-300'
+            className='w-full sm:w-[350px] lg:w-[340px] xl:w-full h-[48px] md:h-[58px] lg:h-[70px] rounded-md animate-pulse bg-slate-300'
           ></div>
         ))}
       </div>
@@ -30,7 +30,7 @@ const BannerLayout = ({ banners = [], loading = false }) => {
       {displayBanners.map((banner, index) => (
         <div
           key={index}
-          className={`w-full sm:w-[350px] lg:w-[340px] xl:w-full rounded-lg overflow-hidden ${!banner ? 'bg-gray-100' : ''}`}
+          className={`w-full sm:w-[350px] lg:w-[340px] xl:w-full rounded-md overflow-hidden ${!banner ? 'bg-gray-100' : ''}`}
         >
           {banner ? (
             <a
@@ -41,7 +41,7 @@ const BannerLayout = ({ banners = [], loading = false }) => {
             >
               <img
                 src={
-                  banner.banner_image|| '/images/meroUniLarge.gif'
+                  banner.banner_image || '/images/meroUniLarge.gif'
                 }
                 onError={(e) => {
                   e.target.src = '/images/meroUniLarge.gif'
@@ -51,7 +51,7 @@ const BannerLayout = ({ banners = [], loading = false }) => {
               />
             </a>
           ) : (
-            <div className='group relative w-full h-[44px] md:h-[58px] lg:h-[70px] flex items-center justify-center text-gray-400 text-xs font-medium bg-gray-50 rounded-lg overflow-hidden cursor-pointer'>
+            <div className='group relative w-full h-[44px] md:h-[58px] lg:h-[70px] flex items-center justify-center text-gray-400 text-xs font-medium bg-gray-50 rounded-md overflow-hidden cursor-pointer'>
               <span className='group-hover:opacity-0 transition-opacity duration-200'>Ads place available</span>
               <Link
                 href='/contact'

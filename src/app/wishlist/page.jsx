@@ -56,7 +56,7 @@ const WishlistPage = () => {
             Total: {wishlist.length}
           </span>
         </div>
-        <div className='border border-black rounded-xl p-6'>
+        <div className='border border-black rounded-md p-6'>
           {!user ? (
             <p className='text-gray-600'>Please login to see your wishlist.</p>
           ) : wishlist.length > 0 ? (

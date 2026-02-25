@@ -55,7 +55,7 @@ const ImageLightbox = ({ isOpen, onClose, imageUrl, altText }) => {
                         <img
                             src={imageUrl}
                             alt={altText || 'Gallery preview'}
-                            className='max-w-full max-h-full object-contain rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] select-none'
+                            className='max-w-full max-h-full object-contain rounded-md shadow-[0_0_50px_rgba(0,0,0,0.5)] select-none'
                         />
                     </motion.div>
 

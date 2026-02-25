@@ -59,16 +59,16 @@ const Hero = ({ blog }) => {
             <img
               src={blog.featured_image}
               alt={blog?.title || 'Blog featured image'}
-              className='w-full h-auto max-h-[456px] max-1xl:max-h-[380px] max-sm:max-h-[300px] object-contain rounded-xl'
+              className='w-full h-auto max-h-[456px] max-1xl:max-h-[380px] max-sm:max-h-[300px] object-contain rounded-md'
             />
           </div>
         )}
       </div>
 
-      
+
 
       {/* Social share icons remain the same */}
-      <div className='space-y-4 z-10 text-[#b0b2c3] fixed right-4 top-[30%] lg:block md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col'>
+      <div className='space-y-4 z-10 text-[#b0b2c3] fixed right-4 top-[30%] lg:block md:-translate-y-1 bg-white p-2 rounded-md flex items-center flex-col'>
         <div className='text-black font-bold text-sm'>Share</div>
         <div className='flex flex-col gap-4 items-center'>
           {/* Facebook */}

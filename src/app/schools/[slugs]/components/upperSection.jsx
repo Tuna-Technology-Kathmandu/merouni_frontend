@@ -34,9 +34,9 @@ const ImageSection = ({ college }) => {
           <img
             src={college?.featured_img || '/images/degreeHero.webp'}
             alt='College Photo'
-            className='w-full h-auto max-h-[456px] max-xl:max-h-[380px] max-sm:max-h-[300px] object-contain rounded-xl block'
+            className='w-full h-auto max-h-[456px] max-xl:max-h-[380px] max-sm:max-h-[300px] object-contain rounded-md block'
           />
-          <div className='absolute inset-0 bg-gradient-to-t from-black/40 to-transparent rounded-xl pointer-events-none' />
+          <div className='absolute inset-0 bg-gradient-to-t from-black/40 to-transparent rounded-md pointer-events-none' />
         </div>
         <div className='flex flex-row min-h-[80px] md:h-[100px] bg-white items-center p-4 px-4 sm:px-8 md:px-14 lg:px-24 gap-4 sm:gap-6 shadow-sm relative z-10'>
           <div className='flex items-center justify-center rounded-2xl bg-white -translate-y-10 sm:-translate-y-12 md:-translate-y-16 overflow-hidden w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 flex-shrink-0 shadow-xl border-4 border-white transition-transform hover:scale-105 duration-300'>
@@ -44,7 +44,7 @@ const ImageSection = ({ college }) => {
               <img
                 src={college.college_logo}
                 alt='College Logo'
-                className='object-cover w-full h-full rounded-xl aspect-square'
+                className='object-cover w-full h-full rounded-md aspect-square'
                 onError={(e) => {
                   e.target.style.display = 'none'
                   e.target.nextSibling.style.display = 'flex'
@@ -84,7 +84,7 @@ const ImageSection = ({ college }) => {
                 href={college.college_broucher}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='bg-[#0A6FA7] hover:bg-[#085e8a] text-white px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-md hover:shadow-lg text-sm font-medium active:scale-95'
+                className='bg-[#0A6FA7] hover:bg-[#085e8a] text-white px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 rounded-md flex items-center gap-2 transition-all shadow-md hover:shadow-lg text-sm font-medium active:scale-95'
               >
                 <Eye className='w-4 h-4' />
                 <span className='hidden sm:inline'>View Brochure</span>

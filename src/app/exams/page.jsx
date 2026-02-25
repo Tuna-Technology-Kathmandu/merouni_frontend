@@ -184,14 +184,14 @@ export default function ExamsPage() {
                 selectedLevel ||
                 selectedAffiliation ||
                 selectedFaculty) && (
-                <button
-                  onClick={clearFilters}
-                  className='flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors'
-                >
-                  <X className='w-4 h-4' />
-                  Clear All Filters
-                </button>
-              )}
+                  <button
+                    onClick={clearFilters}
+                    className='flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors'
+                  >
+                    <X className='w-4 h-4' />
+                    Clear All Filters
+                  </button>
+                )}
             </div>
 
             {/* Filter Bar */}
@@ -304,23 +304,23 @@ export default function ExamsPage() {
                   title='No Exams Found'
                   description={
                     search ||
-                    selectedType ||
-                    selectedLevel ||
-                    selectedAffiliation ||
-                    selectedFaculty
+                      selectedType ||
+                      selectedLevel ||
+                      selectedAffiliation ||
+                      selectedFaculty
                       ? 'No exams match your current filter criteria. Try adjusting your selections.'
                       : 'No exams are currently available at the moment.'
                   }
                   action={
                     search ||
-                    selectedType ||
-                    selectedLevel ||
-                    selectedAffiliation ||
-                    selectedFaculty
+                      selectedType ||
+                      selectedLevel ||
+                      selectedAffiliation ||
+                      selectedFaculty
                       ? {
-                          label: 'Clear All Filters',
-                          onClick: clearFilters
-                        }
+                        label: 'Clear All Filters',
+                        onClick: clearFilters
+                      }
                       : null
                   }
                 />
@@ -387,7 +387,7 @@ export default function ExamsPage() {
                             </div>
                           </div>
                         ) : (
-                          <p className='text-xs font-bold text-gray-400 text-center py-2 bg-gray-50 rounded-xl'>
+                          <p className='text-xs font-bold text-gray-400 text-center py-2 bg-gray-50 rounded-md'>
                             Dates to be announced
                           </p>
                         )}

@@ -35,7 +35,7 @@ const EventCard = ({ event }) => {
 
       <div className='flex items-start gap-4 p-5 flex-1'>
         {/* Date Section */}
-        <div className='flex flex-col items-center justify-center min-w-[50px] h-[60px] bg-gray-50 rounded-xl border border-gray-100'>
+        <div className='flex flex-col items-center justify-center min-w-[50px] h-[60px] bg-gray-50 rounded-md border border-gray-100'>
           <p className='text-[#0A6FA7] text-xs font-bold uppercase'>{month}</p>
           <p className='text-xl font-black text-gray-800 leading-none'>{day}</p>
         </div>

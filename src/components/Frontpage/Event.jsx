@@ -88,7 +88,7 @@ const Event = () => {
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className='bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col'
+                className='bg-white rounded-md shadow-md overflow-hidden h-full flex flex-col'
               >
                 {/* Image Skeleton */}
                 <div className='w-full h-48 md:h-56 bg-gray-100 relative overflow-hidden'>
@@ -97,7 +97,7 @@ const Event = () => {
 
                 {/* Content Skeleton */}
                 <div className='p-4 flex flex-col flex-1 gap-3'>
-                  <div className='bg-gray-50 rounded-lg'>
+                  <div className='bg-gray-50 rounded-md'>
                     <Skeleton className='h-6 w-3/4 mb-2' />
                     <Skeleton className='h-6 w-1/2' />
                   </div>
@@ -116,7 +116,7 @@ const Event = () => {
                 key={event.id || index}
                 className='group'
               >
-                <div className='bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col'>
+                <div className='bg-white rounded-md shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col'>
                   {/* Event Image */}
                   <div className='relative w-full h-48 md:h-56 overflow-hidden bg-gray-100'>
                     <Image

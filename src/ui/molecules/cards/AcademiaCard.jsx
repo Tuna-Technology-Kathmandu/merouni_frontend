@@ -5,7 +5,7 @@ import React from 'react'
 const AcademiaCard = ({ title, img, link }) => {
   return (
     <Link href={link}>
-      <div className='border-2 border-gray-300 p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105'>
+      <div className='border-2 border-gray-300 p-6 rounded-md shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105'>
         <div className='flex justify-center mb-4'>
           <Image
             src={img || '/images/logo.png'}

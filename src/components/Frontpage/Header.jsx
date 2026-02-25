@@ -52,7 +52,7 @@ const Header = () => {
           <button
             type='button'
             onClick={() => window.dispatchEvent(new CustomEvent('openMobileNav'))}
-            className='flex md:hidden p-2 -ml-1 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors'
+            className='flex md:hidden p-2 -ml-1 rounded-md text-gray-700 hover:bg-gray-100 transition-colors'
             aria-label='Open menu'
           >
             <IoMenu size={24} />
@@ -62,7 +62,7 @@ const Header = () => {
             className='hidden md:flex flex-1 max-w-[440px] mx-auto cursor-pointer group'
             onClick={() => setShowSearch(true)}
           >
-            <div className='w-full flex items-center gap-3 px-5 py-2.5 rounded-xl border border-gray-200 bg-gray-50/50 text-gray-400 group-hover:bg-white group-hover:border-[#0A6FA7] group-hover:shadow-sm transition-all duration-200'>
+            <div className='w-full flex items-center gap-3 px-5 py-2.5 rounded-md border border-gray-200 bg-gray-50/50 text-gray-400 group-hover:bg-white group-hover:border-[#0A6FA7] group-hover:shadow-sm transition-all duration-200'>
               <IoSearchOutline size={18} className='text-gray-400 group-hover:text-[#0A6FA7] transition-colors' />
               <span className='text-sm font-medium'>Search for colleges, programs...</span>
             </div>

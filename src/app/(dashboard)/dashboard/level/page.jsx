@@ -165,7 +165,7 @@ export default function LevelForm() {
 
       {/* Header */}
       <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
-        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
           <SearchInput value={searchQuery} onChange={(e) => handleSearchInput(e.target.value)} placeholder='Search levels...' className='max-w-md w-full' />
           <Button onClick={() => { setIsOpen(true); setEditing(false); setEditingId(null); reset() }} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
             <Plus className="w-4 h-4" /> Add Level
@@ -174,7 +174,7 @@ export default function LevelForm() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
         <Table loading={tableLoading} data={levels} columns={columns} pagination={pagination} onPageChange={(p) => fetchLevels(p)} showSearch={false} />
       </div>
 

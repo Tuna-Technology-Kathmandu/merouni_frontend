@@ -14,7 +14,7 @@ import { Image as ImageIcon, Info, Layers, Loader2, Settings } from 'lucide-reac
 
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
   <div className="flex items-center gap-3 mb-6">
-    <div className="w-10 h-10 rounded-xl bg-[#387cae]/10 flex items-center justify-center text-[#387cae] shadow-sm border border-[#387cae]/20">
+    <div className="w-10 h-10 rounded-md bg-[#387cae]/10 flex items-center justify-center text-[#387cae] shadow-sm border border-[#387cae]/20">
       <Icon size={20} />
     </div>
     <div>
@@ -259,7 +259,7 @@ export default function NewsForm({
 
                     <div className="pt-2">
                       <Label required>Description / Body</Label>
-                      <div className={formErrors.description ? 'ring-2 ring-red-400/40 rounded-xl mt-2' : 'mt-2'}>
+                      <div className={formErrors.description ? 'ring-2 ring-red-400/40 rounded-md mt-2' : 'mt-2'}>
                         <TipTapEditor
                           value={watch('description')}
                           onChange={(data) => {
@@ -283,7 +283,7 @@ export default function NewsForm({
                 {/* Featured Image Section */}
                 <div className={`bg-white p-6 rounded-2xl shadow-sm border ${formErrors.featured_image ? 'border-red-300' : 'border-gray-100'}`}>
                   <SectionHeader icon={ImageIcon} title="Featured Image" subtitle="Required — main image for the news" />
-                  <div className={`p-4 bg-gray-50 rounded-xl border border-dashed ${formErrors.featured_image ? 'border-red-300 bg-red-50/30' : 'border-gray-100'}`}>
+                  <div className={`p-4 bg-gray-50 rounded-md border border-dashed ${formErrors.featured_image ? 'border-red-300 bg-red-50/30' : 'border-gray-100'}`}>
                     <FileUpload
                       label=''
                       onUploadComplete={(url) => {

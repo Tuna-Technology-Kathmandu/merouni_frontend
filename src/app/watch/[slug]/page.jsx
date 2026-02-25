@@ -23,7 +23,7 @@ export default async function VideoDetailPage({ params }) {
             </Link>
 
             <div className='max-w-4xl mx-auto'>
-                <div className='aspect-video w-full bg-black rounded-xl overflow-hidden shadow-2xl mb-8'>
+                <div className='aspect-video w-full bg-black rounded-md overflow-hidden shadow-2xl mb-8'>
                     <iframe
                         width="100%"
                         height="100%"

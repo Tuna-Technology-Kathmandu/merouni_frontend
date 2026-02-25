@@ -200,7 +200,7 @@ const ProgramDetailPage = ({ params }) => {
             )}
 
             {groupedSyllabus && Object.keys(groupedSyllabus).length > 0 && (
-              <section className='bg-gray-50 rounded-xl p-6'>
+              <section className='bg-gray-50 rounded-md p-6'>
                 <h2 className='text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2'>
                   <GraduationCap className='w-5 h-5 text-[#0A6FA7]' />
                   Syllabus
@@ -273,12 +273,12 @@ const ProgramDetailPage = ({ params }) => {
                       {college.slugs ? (
                         <Link
                           href={`/colleges/${encodeURIComponent(college.slugs)}`}
-                          className='block py-2 px-4 rounded-lg border border-gray-200 hover:border-[#0A6FA7] hover:bg-[#0A6FA7]/5 text-gray-800 hover:text-[#0A6FA7] transition-colors'
+                          className='block py-2 px-4 rounded-md border border-gray-200 hover:border-[#0A6FA7] hover:bg-[#0A6FA7]/5 text-gray-800 hover:text-[#0A6FA7] transition-colors'
                         >
                           {college.name}
                         </Link>
                       ) : (
-                        <div className='py-2 px-4 rounded-lg border border-gray-200 text-gray-800'>
+                        <div className='py-2 px-4 rounded-md border border-gray-200 text-gray-800'>
                           {college.name}
                         </div>
                       )}

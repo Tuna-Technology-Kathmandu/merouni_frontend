@@ -42,7 +42,7 @@ const Fcollege = ({ name, description, image, slug }) => {
               e.stopPropagation()
               router.push(`/colleges/apply/${slug}`)
             }}
-            className='px-5 py-2 bg-gray-50 text-gray-700 hover:bg-[#0A70A7] hover:text-white text-xs font-bold rounded-lg transition-all shadow-sm border border-gray-200 hover:border-[#0A70A7]'
+            className='px-5 py-2 bg-gray-50 text-gray-700 hover:bg-[#0A70A7] hover:text-white text-xs font-bold rounded-md transition-all shadow-sm border border-gray-200 hover:border-[#0A70A7]'
           >
             Apply Now
           </button>

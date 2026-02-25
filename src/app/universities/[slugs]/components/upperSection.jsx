@@ -141,7 +141,7 @@ const UpperSection = ({ university }) => {
       </div>
 
       {/* About Section */}
-      <div className='rounded-xl p-8 w-full lg:w-[80%] mb-12 max-md:mb-7 px-[75px] max-md:px-[30px]'>
+      <div className='rounded-md p-8 w-full lg:w-[80%] mb-12 max-md:mb-7 px-[75px] max-md:px-[30px]'>
         <h2 className='font-bold text-xl md:text-2xl mb-4'>
           About {university?.fullname}
         </h2>
@@ -154,7 +154,7 @@ const UpperSection = ({ university }) => {
              [&>iframe]:max-w-[calc(100vw-40px)] 
              [&>iframe]:aspect-video 
              [&>iframe]:h-auto
-             [&>iframe]:rounded-lg 
+             [&>iframe]:rounded-md 
              [&>iframe]:mt-4
              [&>iframe]:mx-auto
              [&>iframe]:block
@@ -227,7 +227,7 @@ const UpperSection = ({ university }) => {
                 {university.programs.map((item, idx) => (
                   <li
                     key={item.id || idx}
-                    className="group flex items-center gap-3 rounded-xl bg-white px-5 py-4 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+                    className="group flex items-center gap-3 rounded-md bg-white px-5 py-4 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
                   >
                     <span className="h-2.5 w-2.5 rounded-full bg-[#30AD8F] group-hover:scale-125 transition-transform" />
 

@@ -36,7 +36,7 @@ const ViewCollegeModal = ({
                                 <img
                                     src={viewCollegeData.college_logo}
                                     alt={viewCollegeData.name}
-                                    className='w-20 h-20 object-contain rounded-lg border'
+                                    className='w-20 h-20 object-contain rounded-md border'
                                 />
                             )}
                             <div className='flex-1'>

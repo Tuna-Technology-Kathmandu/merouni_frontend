@@ -42,7 +42,7 @@ const SortableItem = ({ university }) => {
     <div
       ref={setNodeRef}
       style={style}
-      className='bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow'
+      className='bg-white border border-gray-200 rounded-md p-4 shadow-sm hover:shadow-md transition-shadow'
     >
       <div className='flex items-center gap-4'>
         <div
@@ -56,7 +56,7 @@ const SortableItem = ({ university }) => {
           <img
             src={university.logo}
             alt={university.fullname}
-            className='w-16 h-16 object-contain rounded-lg border'
+            className='w-16 h-16 object-contain rounded-md border'
           />
         )}
         <div className='flex-1'>
@@ -232,7 +232,7 @@ const UniversityOrderingsPage = () => {
         </div>
 
         {universities.length === 0 ? (
-          <div className='bg-white rounded-lg p-8 text-center'>
+          <div className='bg-white rounded-md p-8 text-center'>
             <p className='text-gray-500'>No universities found.</p>
           </div>
         ) : (

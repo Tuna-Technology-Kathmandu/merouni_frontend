@@ -42,7 +42,7 @@ const SortableItem = ({ school }) => {
         <div
             ref={setNodeRef}
             style={style}
-            className='bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow'
+            className='bg-white border border-gray-200 rounded-md p-4 shadow-sm hover:shadow-md transition-shadow'
         >
             <div className='flex items-center gap-4'>
                 <div
@@ -56,7 +56,7 @@ const SortableItem = ({ school }) => {
                     <img
                         src={school.logo}
                         alt={school.name}
-                        className='w-16 h-16 object-contain rounded-lg border bg-gray-50'
+                        className='w-16 h-16 object-contain rounded-md border bg-gray-50'
                     />
                 )}
                 <div className='flex-1'>
@@ -233,7 +233,7 @@ const SchoolOrderingsPage = () => {
                 </div>
 
                 {schools.length === 0 ? (
-                    <div className='bg-white rounded-lg p-8 text-center'>
+                    <div className='bg-white rounded-md p-8 text-center'>
                         <p className='text-gray-500'>No schools found.</p>
                     </div>
                 ) : (

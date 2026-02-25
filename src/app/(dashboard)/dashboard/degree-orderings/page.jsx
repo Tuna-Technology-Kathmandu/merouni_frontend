@@ -42,7 +42,7 @@ const SortableItem = ({ degree }) => {
         <div
             ref={setNodeRef}
             style={style}
-            className='bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow'
+            className='bg-white border border-gray-200 rounded-md p-4 shadow-sm hover:shadow-md transition-shadow'
         >
             <div className='flex items-center gap-4'>
                 <div
@@ -224,7 +224,7 @@ const DegreeOrderingsPage = () => {
                 </div>
 
                 {degrees.length === 0 ? (
-                    <div className='bg-white rounded-lg p-8 text-center'>
+                    <div className='bg-white rounded-md p-8 text-center'>
                         <p className='text-gray-500'>No degrees found.</p>
                     </div>
                 ) : (

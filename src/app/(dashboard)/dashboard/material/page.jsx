@@ -330,7 +330,7 @@ export default function MaterialForm() {
 
       {/* Sticky Header */}
       <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
-        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
           <SearchInput
             value={searchQuery}
             onChange={(e) => handleSearchInput(e.target.value)}
@@ -350,7 +350,7 @@ export default function MaterialForm() {
         <DialogContent className='max-w-2xl p-0'>
           <DialogHeader className='px-6 py-4 border-b bg-slate-50/50 rounded-t-lg'>
             <DialogTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#387cae] flex items-center justify-center text-white">
+              <div className="w-8 h-8 rounded-md bg-[#387cae] flex items-center justify-center text-white">
                 <FileText size={18} />
               </div>
               {editing ? 'Edit Material' : 'Add New Material'}
@@ -449,7 +449,7 @@ export default function MaterialForm() {
         </DialogContent>
       </Dialog>
 
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
         <Table
           loading={tableLoading}
           data={materials}

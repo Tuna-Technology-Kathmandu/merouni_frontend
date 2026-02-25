@@ -7,7 +7,7 @@ const FeaturedBlogsShimmer = () => {
       {[...Array(4)].map((_, index) => (
         <div
           key={index}
-          className='bg-white rounded-xl overflow-hidden border border-gray-100 p-4'
+          className='bg-white rounded-md overflow-hidden border border-gray-100 p-4'
         >
           <Skeleton className='h-40 w-full mb-6' />
           <Skeleton className='h-5 w-3/4 mb-3' />

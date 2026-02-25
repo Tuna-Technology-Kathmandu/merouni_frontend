@@ -441,7 +441,7 @@ export default function NewsManager() {
           ) : viewNewsData ? (
             <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
               {viewNewsData.featured_image && (
-                <div className='w-full h-64 rounded-lg overflow-hidden'>
+                <div className='w-full h-64 rounded-md overflow-hidden'>
                   <img
                     src={viewNewsData.featured_image}
                     alt={viewNewsData.title}
@@ -476,7 +476,7 @@ export default function NewsManager() {
                   <p className='text-gray-700'>{viewNewsData.description}</p>
                 </div>
               )}
-              <div className='grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg'>
+              <div className='grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-md'>
                 <div>
                   <h3 className='text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1'>
                     Associated College

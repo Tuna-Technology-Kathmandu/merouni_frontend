@@ -19,7 +19,7 @@ const SideBanner = ({ banners = [], loading = false }) => {
         {[...Array(4)].map((_, index) => (
           <div
             key={index}
-            className='w-full h-32 md:h-36 rounded-lg shadow-lg animate-pulse bg-slate-200'
+            className='w-full h-32 md:h-36 rounded-md shadow-lg animate-pulse bg-slate-200'
           />
         ))}
       </div>
@@ -35,7 +35,7 @@ const SideBanner = ({ banners = [], loading = false }) => {
             target='_blank'
             rel='noopener noreferrer'
             key={banner.id}
-            className='group relative block overflow-hidden rounded-lg shadow-lg transition-transform hover:scale-[1.02]'
+            className='group relative block overflow-hidden rounded-md shadow-lg transition-transform hover:scale-[1.02]'
           >
             <img
               src={
@@ -53,7 +53,7 @@ const SideBanner = ({ banners = [], loading = false }) => {
         ) : (
           <div
             key={`empty-${index}`}
-            className='group relative w-full h-32 md:h-36 rounded-lg shadow-lg bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer'
+            className='group relative w-full h-32 md:h-36 rounded-md shadow-lg bg-gray-100 flex items-center justify-center overflow-hidden cursor-pointer'
           >
             <span className='text-gray-500 text-sm bg-white/80 px-3 py-1 rounded-md group-hover:opacity-0 transition-opacity duration-200'>
               Ads place available

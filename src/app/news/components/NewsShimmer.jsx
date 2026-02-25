@@ -6,7 +6,7 @@ const NewsShimmer = () => {
             {[...Array(8)].map((_, index) => (
                 <div
                     key={index}
-                    className='bg-white rounded-xl shadow-md overflow-hidden h-full animate-pulse'
+                    className='bg-white rounded-md shadow-md overflow-hidden h-full animate-pulse'
                 >
                     {/* Image Skeleton */}
                     <div className='h-48 w-full bg-gray-200'></div>

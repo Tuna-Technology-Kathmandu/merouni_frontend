@@ -71,14 +71,14 @@ const Sponsors = () => {
                       e.target.src = '/images/meroUniLarge.gif'
                     }}
                     alt={`Banner position ${banner.display_position}`}
-                    className='h-16 md:h-20 lg:h-36 rounded-lg shadow-lg'
+                    className='h-16 md:h-20 lg:h-36 rounded-md shadow-lg'
                   />
                 </a>
               </div>
             ) : (
               <div
                 key={`empty-${index}`}
-                className='h-36 w-[300px] flex-shrink-0 rounded-lg shadow-lg bg-gray-100 flex items-center justify-center text-gray-500'
+                className='h-36 w-[300px] flex-shrink-0 rounded-md shadow-lg bg-gray-100 flex items-center justify-center text-gray-500'
               >
                 Contact for Ads
               </div>

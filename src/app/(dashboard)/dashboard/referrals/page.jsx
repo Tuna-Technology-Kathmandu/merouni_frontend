@@ -425,7 +425,7 @@ const ReferralsPage = () => {
       <ToastContainer />
 
       {/* Filter Header */}
-      <div className='flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+      <div className='flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
         <div className="flex flex-1 flex-col md:flex-row gap-4 w-full">
           <SearchInput
             className='flex-1'
@@ -442,7 +442,7 @@ const ReferralsPage = () => {
               <button
                 type='button'
                 onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
-                className='w-full pl-10 pr-8 py-2 text-left border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-sm transition-all hover:bg-gray-50'
+                className='w-full pl-10 pr-8 py-2 text-left border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-sm transition-all hover:bg-gray-50'
               >
                 <span className={statusFilter ? 'text-gray-900 font-medium' : 'text-gray-500'}>
                   {selectedStatusLabel}
@@ -451,7 +451,7 @@ const ReferralsPage = () => {
               <ChevronDown className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${statusDropdownOpen ? 'rotate-180' : ''}`} />
 
               {statusDropdownOpen && (
-                <div className='absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200'>
+                <div className='absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-md shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200'>
                   <div className='p-2 border-b border-gray-100'>
                     <div className='relative'>
                       <Search className='absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
@@ -460,7 +460,7 @@ const ReferralsPage = () => {
                         placeholder='Search status...'
                         value={statusSearchTerm}
                         onChange={(e) => setStatusSearchTerm(e.target.value)}
-                        className='w-full pl-8 pr-2 py-1.5 text-xs border border-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500'
+                        className='w-full pl-8 pr-2 py-1.5 text-xs border border-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500'
                         autoFocus
                       />
                     </div>
@@ -476,7 +476,7 @@ const ReferralsPage = () => {
                             setStatusSearchTerm('')
                             setStatusDropdownOpen(false)
                           }}
-                          className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${statusFilter === option.value
+                          className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${statusFilter === option.value
                             ? 'bg-blue-50 text-blue-700 font-semibold'
                             : 'text-gray-700 hover:bg-gray-50'
                             }`}
@@ -524,7 +524,7 @@ const ReferralsPage = () => {
       </div>
 
       {/* Table Container */}
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
         <Table
           loading={tableLoading}
           data={referrals}
@@ -568,7 +568,7 @@ const ReferralsPage = () => {
 
           <div className='flex-1 overflow-y-auto p-6 bg-slate-50/30'>
             <form id="status-update-form" onSubmit={handleStatusSubmit} className='space-y-6'>
-              <div className='bg-white p-6 rounded-xl border shadow-sm space-y-5'>
+              <div className='bg-white p-6 rounded-md border shadow-sm space-y-5'>
                 <div className="space-y-2">
                   <Label required>Referral Status</Label>
                   <Select
@@ -596,7 +596,7 @@ const ReferralsPage = () => {
                 </div>
 
                 {error && (
-                  <div className='p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm flex items-center gap-2'>
+                  <div className='p-3 bg-red-50 border border-red-100 rounded-md text-red-600 text-sm flex items-center gap-2'>
                     <X className="w-4 h-4" />
                     {error}
                   </div>

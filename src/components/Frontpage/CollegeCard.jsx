@@ -109,7 +109,7 @@
 //           router.push(`/colleges/${slug}`)
 //         }
 //       }}
-//       className='min-w-[260px] md:min-w-[320px] lg:min-w-[360px] mx-4 bg-white rounded-xl border border-gray-200 overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300 cursor-pointer'
+//       className='min-w-[260px] md:min-w-[320px] lg:min-w-[360px] mx-4 bg-white rounded-md border border-gray-200 overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300 cursor-pointer'
 //     >
 //       <div
 //         className='flex justify-between items-start min-h-28 bg-slate-300 relative'

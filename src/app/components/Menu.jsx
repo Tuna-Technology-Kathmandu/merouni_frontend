@@ -243,7 +243,7 @@ const Menu = ({ isCollapsed = false }) => {
                 const isActive = pathname === item.href
                 const displayLabel = item.label
                 const itemClasses = `
-                  flex items-center w-full p-2 text-gray-600 transition-colors rounded-lg
+                  flex items-center w-full p-2 text-gray-600 transition-colors rounded-md
                   hover:bg-gray-100 hover:text-blue-600
                   ${isActive ? 'bg-blue-50 text-blue-600' : ''}
                   group

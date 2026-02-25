@@ -262,7 +262,7 @@ export default function TagForm() {
                 {tags.map((tag) => (
                   <div
                     key={tag.id}
-                    className='group flex items-center gap-2 bg-white border border-gray-200 hover:border-blue-300 hover:bg-blue-50 px-4 py-2 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md'
+                    className='group flex items-center gap-2 bg-white border border-gray-200 hover:border-blue-300 hover:bg-blue-50 px-4 py-2 rounded-md transition-all duration-200 shadow-sm hover:shadow-md'
                   >
                     <span className='text-sm font-semibold text-gray-700 group-hover:text-blue-700'>
                       {tag.title}
@@ -270,14 +270,14 @@ export default function TagForm() {
                     <div className='flex items-center gap-1 ml-2 pl-2 border-l border-gray-100 group-hover:border-blue-200 transition-colors'>
                       <button
                         onClick={() => handleEdit(tag)}
-                        className='p-1.5 text-blue-500 hover:bg-blue-100 rounded-lg transition-colors'
+                        className='p-1.5 text-blue-500 hover:bg-blue-100 rounded-md transition-colors'
                         title='Edit Tag'
                       >
                         <Edit2 className='w-3.5 h-3.5' />
                       </button>
                       <button
                         onClick={() => handleDeleteClick(tag.id)}
-                        className='p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors'
+                        className='p-1.5 text-red-500 hover:bg-red-50 rounded-md transition-colors'
                         title='Delete Tag'
                       >
                         <Trash2 className='w-3.5 h-3.5' />
@@ -308,11 +308,11 @@ export default function TagForm() {
                     <button
                       onClick={() => fetchTags(pagination.currentPage - 1)}
                       disabled={pagination.currentPage === 1}
-                      className='px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm'
+                      className='px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm'
                     >
                       Previous
                     </button>
-                    <div className='flex items-center px-4 bg-gray-50 rounded-lg border border-gray-200'>
+                    <div className='flex items-center px-4 bg-gray-50 rounded-md border border-gray-200'>
                       <span className='text-sm font-semibold text-blue-600'>
                         {pagination.currentPage}
                       </span>
@@ -324,7 +324,7 @@ export default function TagForm() {
                     <button
                       onClick={() => fetchTags(pagination.currentPage + 1)}
                       disabled={pagination.currentPage === pagination.totalPages}
-                      className='px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm'
+                      className='px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm'
                     >
                       Next
                     </button>
@@ -350,8 +350,8 @@ export default function TagForm() {
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-4 pt-4'>
             <div>
               <Label
-              required
-               htmlFor='title'>Title</Label>
+                required
+                htmlFor='title'>Title</Label>
               <Input
                 id='title'
                 {...register('title', { required: 'Title is required' })}

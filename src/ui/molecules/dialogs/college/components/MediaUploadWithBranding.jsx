@@ -99,7 +99,7 @@ const FileUploadWithPreview = ({
 
       <div className="flex items-center gap-4">
         {preview ? (
-          <div className="relative w-20 h-20 rounded-lg border overflow-hidden group">
+          <div className="relative w-20 h-20 rounded-md border overflow-hidden group">
             <img
               src={preview}
               alt="Preview"
@@ -121,7 +121,7 @@ const FileUploadWithPreview = ({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={loading}
-            className="w-20 h-20 rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-20 h-20 rounded-md border-2 border-dashed flex flex-col items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ImagePlus className="w-6 h-6" />
             <span className="text-[10px] mt-1">

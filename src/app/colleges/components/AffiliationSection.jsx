@@ -1,6 +1,6 @@
 const AffiliationSection = () => {
   return (
-    <div className='bg-white rounded-xl p-4 border border-gray-200 shadow-lg'>
+    <div className='bg-white rounded-md p-4 border border-gray-200 shadow-lg'>
       <div className='flex justify-between items-center mb-3'>
         <h3 className='text-gray-800 font-medium'>Affiliation (130)</h3>
         <svg
@@ -14,7 +14,7 @@ const AffiliationSection = () => {
         </svg>
       </div>
       <div className='relative'>
-        <select className='w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none appearance-none'>
+        <select className='w-full p-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none appearance-none'>
           <option>All</option>
         </select>
       </div>

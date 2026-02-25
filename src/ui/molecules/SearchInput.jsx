@@ -23,7 +23,7 @@ const SearchInput = ({
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
-                className={`w-full ${showIcon ? 'pl-10' : 'pl-4'} ${onClear && value ? 'pr-9' : 'pr-4'} py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 transition-all bg-white ${inputClassName}`}
+                className={`w-full ${showIcon ? 'pl-10' : 'pl-4'} ${onClear && value ? 'pr-9' : 'pr-4'} py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 transition-all bg-white ${inputClassName}`}
                 style={{
                     '--tw-ring-color': `${THEME_BLUE}33`,
                     borderColor: value ? THEME_BLUE : undefined

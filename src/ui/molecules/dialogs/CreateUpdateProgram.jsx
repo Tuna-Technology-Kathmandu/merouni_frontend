@@ -485,7 +485,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                 {/* Learning Outcomes – TipTap */}
                                 <div className="space-y-1.5">
                                     <Label>Description / Learning Outcomes <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
-                                    <div className={learningOutcomesError ? 'ring-2 ring-red-400 rounded-xl' : ''}>
+                                    <div className={learningOutcomesError ? 'ring-2 ring-red-400 rounded-md' : ''}>
                                         <TipTapEditor
                                             value={learningOutcomes}
                                             onChange={(html) => {
@@ -632,7 +632,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                 <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Curriculum Structure</h3>
 
                                 {/* Year / Semester Tabs */}
-                                <div className='grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-xl border'>
+                                <div className='grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-md border'>
                                     {[1, 2, 3, 4].map((year) => (
                                         <div key={year} className='space-y-1.5'>
                                             <p className='text-xs font-semibold text-gray-500 uppercase tracking-wide text-center'>
@@ -643,7 +643,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                                     key={sem}
                                                     type='button'
                                                     onClick={() => { setCurrentYear(year); setCurrentSemester(sem) }}
-                                                    className={`w-full py-1.5 px-2 rounded-lg text-xs font-medium transition-all ${currentYear === year && currentSemester === sem
+                                                    className={`w-full py-1.5 px-2 rounded-md text-xs font-medium transition-all ${currentYear === year && currentSemester === sem
                                                         ? 'bg-[#387cae] text-white shadow-sm'
                                                         : 'bg-white border border-gray-200 hover:border-[#387cae]/50 hover:text-[#387cae] text-gray-600'
                                                         }`}
@@ -656,7 +656,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                 </div>
 
                                 {/* Active Semester Banner */}
-                                <div className='flex items-center gap-2 px-4 py-2.5 bg-[#387cae]/5 border border-[#387cae]/20 rounded-lg'>
+                                <div className='flex items-center gap-2 px-4 py-2.5 bg-[#387cae]/5 border border-[#387cae]/20 rounded-md'>
                                     <div className='w-2 h-2 rounded-full bg-[#387cae]' />
                                     <p className='text-sm font-medium text-[#387cae]'>
                                         {currentSemester === 0
@@ -695,7 +695,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
 
                                 {/* Courses Table */}
                                 {getCurrentSemesterCourses().length > 0 ? (
-                                    <div className='border rounded-xl overflow-hidden'>
+                                    <div className='border rounded-md overflow-hidden'>
                                         <table className='w-full text-sm'>
                                             <thead>
                                                 <tr className='bg-gray-50 border-b'>
@@ -747,7 +747,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                         </table>
                                     </div>
                                 ) : (
-                                    <div className='flex flex-col items-center justify-center p-10 bg-gray-50 border border-dashed border-gray-200 rounded-xl text-center'>
+                                    <div className='flex flex-col items-center justify-center p-10 bg-gray-50 border border-dashed border-gray-200 rounded-md text-center'>
                                         <p className='text-sm text-gray-400'>No courses added for this semester yet.</p>
                                         <p className='text-xs text-gray-300 mt-1'>Use the dropdown above to add courses.</p>
                                     </div>

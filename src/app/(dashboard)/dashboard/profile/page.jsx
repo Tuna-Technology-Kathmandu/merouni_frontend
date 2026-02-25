@@ -228,7 +228,7 @@ const ProfileUpdate = () => {
   return (
     <div className='p-4 md:p-6 max-w-5xl mx-auto'>
       {/* Profile Header Card */}
-      <div className='bg-white rounded-lg border border-gray-200 p-6 mb-4'>
+      <div className='bg-white rounded-md border border-gray-200 p-6 mb-4'>
         <div className='flex items-start gap-6'>
           <div className='relative flex-shrink-0'>
             <div className='w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-semibold text-2xl overflow-hidden border-2 border-gray-200'>
@@ -262,7 +262,7 @@ const ProfileUpdate = () => {
       </div>
 
       {/* User Information Card */}
-      <div className='bg-white rounded-lg border border-gray-200 p-6 mb-4'>
+      <div className='bg-white rounded-md border border-gray-200 p-6 mb-4'>
         <h2 className='text-base font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100'>
           Personal Information
         </h2>
@@ -339,10 +339,10 @@ const ProfileUpdate = () => {
       <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
         <button
           onClick={() => setShowNameModal(true)}
-          className='bg-white rounded-lg border border-gray-200 p-5 hover:border-blue-200 hover:bg-blue-50/30 transition-all text-left group'
+          className='bg-white rounded-md border border-gray-200 p-5 hover:border-blue-200 hover:bg-blue-50/30 transition-all text-left group'
         >
           <div className='flex items-start gap-3.5'>
-            <div className='w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors'>
+            <div className='w-10 h-10 rounded-md bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors'>
               <FaUser className='w-4 h-4 text-blue-600' />
             </div>
             <div className='flex-1 min-w-0'>
@@ -358,10 +358,10 @@ const ProfileUpdate = () => {
 
         <button
           onClick={() => setShowPasswordModal(true)}
-          className='bg-white rounded-lg border border-gray-200 p-5 hover:border-blue-200 hover:bg-blue-50/30 transition-all text-left group'
+          className='bg-white rounded-md border border-gray-200 p-5 hover:border-blue-200 hover:bg-blue-50/30 transition-all text-left group'
         >
           <div className='flex items-start gap-3.5'>
-            <div className='w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors'>
+            <div className='w-10 h-10 rounded-md bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors'>
               <FaLock className='w-4 h-4 text-blue-600' />
             </div>
             <div className='flex-1 min-w-0'>
@@ -645,7 +645,7 @@ const ProfileUpdate = () => {
                   </div>
                 </div>
               </div>
-              <div className='rounded-lg bg-gray-50 border border-gray-200 p-3.5'>
+              <div className='rounded-md bg-gray-50 border border-gray-200 p-3.5'>
                 <p className='text-xs leading-relaxed text-gray-700'>
                   <span className='font-semibold text-gray-900'>Password requirements:</span> At least 8 characters with uppercase, lowercase, number, and special character (@$!%*?&)
                 </p>

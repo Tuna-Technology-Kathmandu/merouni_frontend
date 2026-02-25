@@ -252,13 +252,13 @@ const AppliedConsultanciesPage = () => {
     <div className='w-full space-y-2'>
       <div className='px-4 pt-4'>
         {error && (
-          <div className='bg-red-50 border border-red-200 rounded-lg p-4 mb-6'>
+          <div className='bg-red-50 border border-red-200 rounded-md p-4 mb-6'>
             <p className='text-sm text-red-600'>Error: {error}</p>
           </div>
         )}
 
         {applications.length === 0 && !loading ? (
-          <div className='bg-white rounded-lg border border-gray-200 p-12'>
+          <div className='bg-white rounded-md border border-gray-200 p-12'>
             <EmptyState
               icon={Handshake}
               title='No Applications Found'

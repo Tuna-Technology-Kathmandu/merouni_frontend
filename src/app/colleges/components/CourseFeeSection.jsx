@@ -48,7 +48,7 @@ const CourseFeeSection = () => {
   }
 
   return (
-    <div className='bg-white rounded-xl p-4 border border-gray-200 shadow-lg'>
+    <div className='bg-white rounded-md p-4 border border-gray-200 shadow-lg'>
       <div className='flex justify-between items-center mb-3'>
         <h3 className='text-gray-800 font-medium'>Course Fees</h3>
         <svg
@@ -107,13 +107,13 @@ const CourseFeeSection = () => {
             type='text'
             value={formatNumber(range[0])}
             onChange={(e) => handleInputChange(e, 0)}
-            className='w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none'
+            className='w-full p-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none'
           />
           <input
             type='text'
             value={formatNumber(range[1])}
             onChange={(e) => handleInputChange(e, 1)}
-            className='w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none'
+            className='w-full p-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none'
           />
         </div>
       </div>

@@ -28,7 +28,7 @@ const MaterialFilters = ({
                             placeholder='Search materials...'
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className='w-full py-3 pl-12 pr-4 bg-white border border-gray-200 rounded-xl outline-none text-sm text-gray-700 shadow-sm focus:border-[#0A70A7] focus:ring-2 focus:ring-[#0A70A7]/20 transition-all'
+                            className='w-full py-3 pl-12 pr-4 bg-white border border-gray-200 rounded-md outline-none text-sm text-gray-700 shadow-sm focus:border-[#0A70A7] focus:ring-2 focus:ring-[#0A70A7]/20 transition-all'
                         />
                     </div>
                 </div>

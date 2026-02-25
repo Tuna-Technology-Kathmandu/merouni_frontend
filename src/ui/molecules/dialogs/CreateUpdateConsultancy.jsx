@@ -223,7 +223,7 @@ export default function CreateUpdateConsultancy({
                                             defaultPreview={watch('logo')}
                                         />
                                     </div>
-                                    <div className='flex items-center gap-3 p-3 bg-gray-50 rounded-lg border'>
+                                    <div className='flex items-center gap-3 p-3 bg-gray-50 rounded-md border'>
                                         <Controller
                                             name='pinned'
                                             control={control}

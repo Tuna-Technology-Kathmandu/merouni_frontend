@@ -13,13 +13,13 @@ export default function FaqSection({ faqs }) {
     }
 
     return (
-        <div className="bg-white rounded-xl border p-6">
+        <div className="bg-white rounded-md border p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-6">FAQs</h2>
             <div className="space-y-4">
                 {faqs.map((faq, index) => (
                     <div
                         key={index}
-                        className={`border rounded-lg p-4 transition-all duration-200 ${openIndex === index ? 'bg-gray-50 border-gray-200' : 'bg-white border-gray-100 hover:border-gray-200'
+                        className={`border rounded-md p-4 transition-all duration-200 ${openIndex === index ? 'bg-gray-50 border-gray-200' : 'bg-white border-gray-100 hover:border-gray-200'
                             }`}
                     >
                         <button

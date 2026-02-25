@@ -19,8 +19,8 @@ import { cn } from '@/app/lib/utils'
 const InfoRow = ({ icon: Icon, label, value }) => {
     if (!value) return null
     return (
-        <div className="flex items-start gap-4 p-4 rounded-xl bg-gray-50/50 border border-gray-100/50">
-            <div className="w-9 h-9 rounded-lg bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[#387cae] shrink-0">
+        <div className="flex items-start gap-4 p-4 rounded-md bg-gray-50/50 border border-gray-100/50">
+            <div className="w-9 h-9 rounded-md bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[#387cae] shrink-0">
                 <Icon size={18} />
             </div>
             <div className="flex flex-col">
@@ -75,7 +75,7 @@ const UniversityViewModal = ({ isOpen, onClose, data, loading }) => {
                                         <div className='flex flex-wrap gap-2 mt-3'>
                                             {data.type_of_institute && (
                                                 <span className={cn(
-                                                    'px-3 py-1 text-[11px] font-bold rounded-lg uppercase tracking-wider border',
+                                                    'px-3 py-1 text-[11px] font-bold rounded-md uppercase tracking-wider border',
                                                     data.type_of_institute === 'Public'
                                                         ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
                                                         : 'bg-blue-50 text-blue-600 border-blue-100'
@@ -124,7 +124,7 @@ const UniversityViewModal = ({ isOpen, onClose, data, loading }) => {
                                                 {data.programs.map((program, index) => (
                                                     <span
                                                         key={index}
-                                                        className='px-3 py-1.5 bg-[#387cae]/5 text-[#387cae] rounded-lg text-xs font-bold border border-[#387cae]/10'
+                                                        className='px-3 py-1.5 bg-[#387cae]/5 text-[#387cae] rounded-md text-xs font-bold border border-[#387cae]/10'
                                                     >
                                                         {typeof program === 'string'
                                                             ? program
@@ -162,7 +162,7 @@ const UniversityViewModal = ({ isOpen, onClose, data, loading }) => {
                                             </div>
                                             <div className='space-y-3'>
                                                 {data.members.map((member, index) => (
-                                                    <div key={index} className="p-4 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-between">
+                                                    <div key={index} className="p-4 rounded-md bg-gray-50 border border-gray-100 flex items-center justify-between">
                                                         <div>
                                                             <p className="text-xs font-bold text-[#387cae] uppercase tracking-wider">{member.role}</p>
                                                             <p className="text-sm font-bold text-gray-800">{member.salutation} {member.name}</p>
@@ -187,7 +187,7 @@ const UniversityViewModal = ({ isOpen, onClose, data, loading }) => {
                 <div className='p-6 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3'>
                     <Button
                         onClick={onClose}
-                        className="bg-white hover:bg-gray-100 text-gray-700 border-gray-200 font-bold px-8 h-11 rounded-xl shadow-sm transition-all"
+                        className="bg-white hover:bg-gray-100 text-gray-700 border-gray-200 font-bold px-8 h-11 rounded-md shadow-sm transition-all"
                         variant='outline'
                     >
                         Close Details

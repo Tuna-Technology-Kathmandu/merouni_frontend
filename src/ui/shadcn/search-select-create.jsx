@@ -201,7 +201,7 @@ export default function SearchSelectCreate({
             </div>
 
             {showDropdown && (
-                <div className="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
                     <div className="max-h-60 overflow-y-auto custom-scrollbar">
                         {results.length > 0 ? (
                             results.map((item, index) => {
@@ -244,7 +244,7 @@ export default function SearchSelectCreate({
                                 <Button
                                     type="button"
                                     variant="ghost"
-                                    className="w-full justify-start gap-2 h-10 text-[#387cae] hover:text-[#387cae]/90 hover:bg-[#387cae]/5 rounded-lg text-xs font-bold"
+                                    className="w-full justify-start gap-2 h-10 text-[#387cae] hover:text-[#387cae]/90 hover:bg-[#387cae]/5 rounded-md text-xs font-bold"
                                 >
                                     <Plus className="h-4 w-4" />
                                     {createLabel} "{query}"
@@ -259,7 +259,7 @@ export default function SearchSelectCreate({
                     {currentSelected.map((item, index) => (
                         <div
                             key={item[valueKey] || index}
-                            className="bg-[#387cae]/10 text-[#387cae] px-3 py-1.5 rounded-lg text-xs font-bold border border-[#387cae]/20 flex items-center gap-2 group animate-in slide-in-from-left-2 duration-200"
+                            className="bg-[#387cae]/10 text-[#387cae] px-3 py-1.5 rounded-md text-xs font-bold border border-[#387cae]/20 flex items-center gap-2 group animate-in slide-in-from-left-2 duration-200"
                         >
                             {typeof item === 'object' ? (item[displayKey] || item.name || '') : item}
                             <button

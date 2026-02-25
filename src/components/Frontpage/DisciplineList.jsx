@@ -34,7 +34,7 @@ const DisciplineList = () => {
         <div className='container mx-auto px-4'>
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
             {[...Array(4)].map((_, i) => (
-              <div key={i} className='bg-gray-100 h-64 rounded-xl animate-pulse'></div>
+              <div key={i} className='bg-gray-100 h-64 rounded-md animate-pulse'></div>
             ))}
           </div>
         </div>

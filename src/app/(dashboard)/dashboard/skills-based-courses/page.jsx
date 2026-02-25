@@ -349,7 +349,7 @@ export default function SkillsCoursesManager() {
 
             {/* Header */}
             <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
-                <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+                <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
                     <SearchInput
                         value={searchQuery}
                         onChange={(e) => handleSearchInput(e.target.value)}
@@ -505,7 +505,7 @@ export default function SkillsCoursesManager() {
                                         }}
                                         render={({ field }) => (
                                             <>
-                                                <div className={errors.content ? 'ring-2 ring-destructive rounded-xl' : ''}>
+                                                <div className={errors.content ? 'ring-2 ring-destructive rounded-md' : ''}>
                                                     <TipTapEditor
                                                         value={field.value}
                                                         onChange={field.onChange}
@@ -570,7 +570,7 @@ export default function SkillsCoursesManager() {
             </Dialog>
 
             {/* Table */}
-            <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+            <div className="bg-white rounded-md shadow-sm border overflow-hidden">
                 <Table
                     data={courses}
                     columns={columns}
@@ -602,7 +602,7 @@ export default function SkillsCoursesManager() {
                     <div className='flex-1 overflow-y-auto p-6 space-y-6'>
                         {/* Thumbnail */}
                         {viewingCourse?.thumbnail_image && (
-                            <div className="w-full h-56 rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                            <div className="w-full h-56 rounded-md overflow-hidden bg-gray-100 border border-gray-200">
                                 <img
                                     src={viewingCourse.thumbnail_image}
                                     alt={viewingCourse.title}
@@ -620,12 +620,12 @@ export default function SkillsCoursesManager() {
                         {/* Meta Grid */}
                         <div className="grid grid-cols-2 gap-4">
                             {viewingCourse?.institution_name && (
-                                <div className="col-span-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                <div className="col-span-2 p-3 bg-gray-50 rounded-md border border-gray-100">
                                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Institution</p>
                                     <p className="text-gray-800 font-medium">{viewingCourse.institution_name}</p>
                                 </div>
                             )}
-                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                            <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Price</p>
                                 <p className="text-gray-800 font-semibold">
                                     {viewingCourse?.price
@@ -633,11 +633,11 @@ export default function SkillsCoursesManager() {
                                         : <span className="text-green-600">Free</span>}
                                 </p>
                             </div>
-                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                            <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Duration</p>
                                 <p className="text-gray-800">{viewingCourse?.duration || 'Flexible'}</p>
                             </div>
-                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                            <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Featured</p>
                                 <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${viewingCourse?.is_featured
                                     ? 'bg-yellow-100 text-yellow-800'
@@ -646,7 +646,7 @@ export default function SkillsCoursesManager() {
                                     {viewingCourse?.is_featured ? 'Yes' : 'No'}
                                 </span>
                             </div>
-                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                            <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Created</p>
                                 <p className="text-gray-800 text-sm">{viewingCourse?.createdAt ? formatDate(viewingCourse.createdAt) : 'N/A'}</p>
                             </div>
@@ -656,7 +656,7 @@ export default function SkillsCoursesManager() {
                         {viewingCourse?.description && (
                             <div>
                                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">Description</p>
-                                <div className="text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100 text-sm leading-relaxed">
+                                <div className="text-gray-700 bg-gray-50 p-4 rounded-md border border-gray-100 text-sm leading-relaxed">
                                     {viewingCourse.description}
                                 </div>
                             </div>
@@ -666,7 +666,7 @@ export default function SkillsCoursesManager() {
                         <div>
                             <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">Detailed Content</p>
                             <div
-                                className="prose prose-sm max-w-none text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100 min-h-[120px]"
+                                className="prose prose-sm max-w-none text-gray-700 bg-gray-50 p-4 rounded-md border border-gray-100 min-h-[120px]"
                                 dangerouslySetInnerHTML={{
                                     __html: viewingCourse?.content
                                         ? DOMPurify.sanitize(viewingCourse.content)
