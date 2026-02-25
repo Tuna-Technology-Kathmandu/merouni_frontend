@@ -11,8 +11,8 @@ import { Label } from '@/ui/shadcn/label'
 import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 import { Textarea } from '@/ui/shadcn/textarea'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
-import EmojiPicker from 'emoji-picker-react'
 import axios from 'axios'
+import EmojiPicker from 'emoji-picker-react'
 import {
     Activity,
     Check,
@@ -36,18 +36,17 @@ import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
 import {
-    createCollege,
-    updateCollege,
-    saveDraft,
+    createOrUpdateCollege,
+    fetchUniversities,
     getProgramsByUniversity,
-    fetchUniversities
+    saveDraft
 } from '@/app/(dashboard)/dashboard/colleges/actions'
 import { cn } from '@/app/lib/utils'
 import { authFetch } from '@/app/utils/authFetch'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import GallerySection from './components/GallerySection'
 import FileUploadWithPreview from './components/MediaUploadWithBranding'
 import VideoSection from './components/VideoSection'
-import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
     <div className="flex items-center gap-3 mb-6">
@@ -104,7 +103,7 @@ const CreateUpdateCollegeModal = ({
             university_id: [],
             institute_type: 'Private',
             institute_level: [],
-            courses: [],
+            programs: [],
             degrees: [],
             description: '',
             content: '',
@@ -221,18 +220,18 @@ const CreateUpdateCollegeModal = ({
                         setValue('degrees', degreeIds)
                     }
 
-                    const collegeCourses = collegeData.collegeCourses || []
-                    const programIds = collegeCourses
-                        .map((course) => course.program_id || course.program?.id)
+                    const collegePrograms = collegeData.collegePrograms || []
+                    const programIds = collegePrograms
+                        .map((program) => program.program_id || program.program?.id)
                         .filter((id) => id !== undefined)
 
-                    setValue('courses', [...new Set(programIds)])
+                    setValue('programs', [...new Set(programIds)])
 
                     // Pre-populate university programs to show titles immediately
-                    const initialPrograms = collegeCourses
+                    const initialPrograms = collegePrograms
                         .map(cc => ({
                             id: cc.program_id || cc.program?.id,
-                            title: cc.program?.title || cc.course?.title || 'Unknown'
+                            title: cc.program?.title || cc.program?.title || 'Unknown'
                         }))
                         .filter(p => p.id)
 
@@ -363,20 +362,20 @@ const CreateUpdateCollegeModal = ({
     }
 
     const handleSelectProgram = (program) => {
-        const currentCourses = getValues('courses') || []
+        const currentPrograms = getValues('programs') || []
         const programId = program.id || program
-        if (!currentCourses.includes(programId)) {
-            setValue('courses', [...currentCourses, programId], { shouldDirty: true })
+        if (!currentPrograms.includes(programId)) {
+            setValue('programs', [...currentPrograms, programId], { shouldDirty: true })
         }
     }
 
     const handleRemoveProgram = (program) => {
-        const currentCourses = getValues('courses') || []
+        const currentPrograms = getValues('programs') || []
         const programId = program.id || program
-        setValue('courses', currentCourses.filter(id => id !== programId), { shouldDirty: true })
+        setValue('programs', currentPrograms.filter(id => id !== programId), { shouldDirty: true })
     }
 
-    const selectedProgramIds = watch('courses') || []
+    const selectedProgramIds = watch('programs') || []
     const selectedPrograms = Array.isArray(universityPrograms)
         ? universityPrograms
             .filter(p => selectedProgramIds.map(String).includes(String(p.id)))
@@ -461,9 +460,9 @@ const CreateUpdateCollegeModal = ({
 
             data.degrees = (data.degrees || []).map(id => parseInt(id)).filter(id => !isNaN(id))
 
-            const coursesArray = (data.courses || []).map(c => parseInt(c)).filter(c => !isNaN(c) && c > 0)
-            if (coursesArray.length > 0) data.courses = coursesArray
-            else delete data.courses
+            const programsArray = (data.programs || []).map(c => parseInt(c)).filter(c => !isNaN(c) && c > 0)
+            if (programsArray.length > 0) data.programs = programsArray
+            else delete data.programs
 
             data.college_logo = uploadedFiles.college_logo
             data.featured_img = uploadedFiles.featured_img
@@ -489,10 +488,8 @@ const CreateUpdateCollegeModal = ({
             // Use saveDraft (POST) for Drafts, regular logic for Published
             if (status === 'draft') {
                 await saveDraft(data)
-            } else if (editSlug && data.id) {
-                await updateCollege(data.id, data)
             } else {
-                await createCollege(data)
+                await createOrUpdateCollege(data)
             }
 
             toast.success(

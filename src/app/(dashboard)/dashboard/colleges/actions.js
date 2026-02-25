@@ -1,5 +1,5 @@
 import { authFetch } from '@/app/utils/authFetch'
-export async function createCollege(data) {
+export async function createOrUpdateCollege(data) {
   const response = await authFetch(
     `${process.env.baseUrl}/college`,
     {
@@ -42,25 +42,7 @@ export async function saveDraft(data) {
   return response.json()
 }
 
-export async function updateCollege(id, data) {
-  const response = await authFetch(
-    `${process.env.baseUrl}/college?college_id=${id}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    }
-  )
 
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || 'Failed to update college')
-  }
-
-  return response.json()
-}
 
 export const fetchUniversities = async (searchQuery = '') => {
   try {
