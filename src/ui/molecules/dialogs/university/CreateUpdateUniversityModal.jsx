@@ -32,7 +32,7 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
-import { fetchAllCourse, fetchLevel } from '@/app/(dashboard)/dashboard/university/actions'
+import { fetchAllCourse, fetchLevel, saveUniversityDraft } from '@/app/(dashboard)/dashboard/university/actions'
 import { cn } from '@/app/lib/utils'
 import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
@@ -342,20 +342,24 @@ const CreateUpdateUniversityModal = ({
 
             data.status = status
 
-            const url = `${process.env.baseUrl}/university`
-            const method = editSlug ? 'PUT' : 'POST'
+            if (status === 'Draft') {
+                await saveUniversityDraft(data)
+            } else {
+                const url = `${process.env.baseUrl}/university`
+                const method = editSlug ? 'PUT' : 'POST'
 
-            const response = await authFetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
+                const response = await authFetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
 
-            if (!response.ok) {
-                const res = await response.json()
-                throw new Error(res.message || 'Failed to save university')
+                if (!response.ok) {
+                    const res = await response.json()
+                    throw new Error(res.message || 'Failed to save university')
+                }
             }
 
             toast.success(status === 'Draft' ? 'Draft saved successfully!' : (editSlug ? 'University updated successfully!' : 'University created successfully!'))
@@ -376,8 +380,6 @@ const CreateUpdateUniversityModal = ({
 
     const onSaveDraft = async () => {
         const data = getValues()
-        // When saving as draft, we might want to skip basic validation
-        // But we still need the university name at least for most backends
         if (!data.fullname) {
             toast.error('University name is required even for drafts')
             return
@@ -465,7 +467,7 @@ const CreateUpdateUniversityModal = ({
                             </div>
                         </div>
                     )}
-                    <div className='flex-1 overflow-y-auto p-8'>
+                    <div className='flex-1  p-8'>
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-8">
                             {/* Left Column - Main Content (8/12) */}
                             <div className="lg:col-span-8 space-y-8">
@@ -478,7 +480,7 @@ const CreateUpdateUniversityModal = ({
                                             <Input
                                                 id='fullname'
                                                 placeholder='Enter university name...'
-                                                className="h-12 text-base rounded-xl border-gray-200 focus:ring-[#387cae]/20"
+                                                className="h-12 text-base rounded-md border-gray-200 focus:ring-[#387cae]/20"
                                                 {...register('fullname', { required: 'University name is required' })}
                                             />
                                             {errors.fullname && (
@@ -492,7 +494,7 @@ const CreateUpdateUniversityModal = ({
                                                 <select
                                                     id='type_of_institute'
                                                     {...register('type_of_institute')}
-                                                    className='flex h-11 w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
+                                                    className='flex h-11 w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
                                                 >
                                                     <option value='Public'>Public</option>
                                                     <option value='Private'>Private</option>
@@ -507,7 +509,7 @@ const CreateUpdateUniversityModal = ({
                                                         id='date_of_establish'
                                                         type='date'
                                                         className={cn(
-                                                            "h-11 pl-10 rounded-xl border-gray-200 focus:ring-[#387cae]/20",
+                                                            "h-11 pl-10 rounded-md border-gray-200 focus:ring-[#387cae]/20",
                                                             errors.date_of_establish && "border-red-500"
                                                         )}
                                                         {...register('date_of_establish', { required: 'Establishment date is required' })}
@@ -599,7 +601,7 @@ const CreateUpdateUniversityModal = ({
                                                     id='country'
                                                     {...register('country', { required: 'Country is required' })}
                                                     placeholder='e.g. Nepal'
-                                                    className="h-11 rounded-xl border-gray-200"
+                                                    className="h-11 rounded-md border-gray-200"
                                                 />
                                                 {errors.country && (
                                                     <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.country.message}</p>
@@ -611,7 +613,7 @@ const CreateUpdateUniversityModal = ({
                                                     id='state'
                                                     {...register('state', { required: 'State is required' })}
                                                     placeholder='e.g. Bagmati'
-                                                    className="h-11 rounded-xl border-gray-200"
+                                                    className="h-11 rounded-md border-gray-200"
                                                 />
                                                 {errors.state && (
                                                     <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.state.message}</p>
@@ -625,7 +627,7 @@ const CreateUpdateUniversityModal = ({
                                                     id='city'
                                                     {...register('city', { required: 'City is required' })}
                                                     placeholder='e.g. Kathmandu'
-                                                    className="h-11 rounded-xl border-gray-200"
+                                                    className="h-11 rounded-md border-gray-200"
                                                 />
                                                 {errors.city && (
                                                     <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.city.message}</p>
@@ -637,7 +639,7 @@ const CreateUpdateUniversityModal = ({
                                                     id='street'
                                                     {...register('street')}
                                                     placeholder='e.g. Kirtipur'
-                                                    className="h-11 rounded-xl border-gray-200"
+                                                    className="h-11 rounded-md border-gray-200"
                                                 />
                                             </div>
                                         </div>
@@ -648,7 +650,7 @@ const CreateUpdateUniversityModal = ({
                                                     id='postal_code'
                                                     {...register('postal_code')}
                                                     placeholder='44600'
-                                                    className="h-11 rounded-xl border-gray-200"
+                                                    className="h-11 rounded-md border-gray-200"
                                                 />
                                             </div>
                                             <div>
@@ -659,7 +661,7 @@ const CreateUpdateUniversityModal = ({
                                                         id='map'
                                                         {...register('map', { required: 'Google Maps URL is required' })}
                                                         placeholder='Paste Google Maps share link...'
-                                                        className="h-11 pl-10 rounded-xl border-gray-200"
+                                                        className="h-11 pl-10 rounded-md border-gray-200"
                                                     />
                                                 </div>
                                                 {errors.map && (
@@ -688,7 +690,7 @@ const CreateUpdateUniversityModal = ({
                                                         }
                                                     })}
                                                     placeholder='info@university.edu'
-                                                    className="h-11 pl-10 rounded-xl border-gray-200"
+                                                    className="h-11 pl-10 rounded-md border-gray-200"
                                                 />
                                                 {errors.contact?.email && (
                                                     <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.contact.email.message}</p>
@@ -703,7 +705,7 @@ const CreateUpdateUniversityModal = ({
                                                     id='contact.phone_number'
                                                     {...register('contact.phone_number')}
                                                     placeholder='+977 1-XXXXXXX'
-                                                    className="h-11 pl-10 rounded-xl border-gray-200"
+                                                    className="h-11 pl-10 rounded-md border-gray-200"
                                                 />
                                             </div>
                                         </div>
@@ -713,7 +715,7 @@ const CreateUpdateUniversityModal = ({
                                                 id='contact.faxes'
                                                 {...register('contact.faxes')}
                                                 placeholder='Optional fax number'
-                                                className="h-11 rounded-xl border-gray-200"
+                                                className="h-11 rounded-md border-gray-200"
                                             />
                                         </div>
                                         <div>
@@ -722,7 +724,7 @@ const CreateUpdateUniversityModal = ({
                                                 id='contact.poboxes'
                                                 {...register('contact.poboxes')}
                                                 placeholder='Optional P.O. Box'
-                                                className="h-11 rounded-xl border-gray-200"
+                                                className="h-11 rounded-md border-gray-200"
                                             />
                                         </div>
                                     </div>
@@ -749,15 +751,15 @@ const CreateUpdateUniversityModal = ({
                                                 <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pr-10'>
                                                     <div>
                                                         <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Role</Label>
-                                                        <Input {...register(`members.${index}.role`)} placeholder='e.g. Vice Chancellor' className='h-10 rounded-xl' />
+                                                        <Input {...register(`members.${index}.role`)} placeholder='e.g. Vice Chancellor' className='h-10 rounded-md' />
                                                     </div>
                                                     <div>
                                                         <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Salutation</Label>
-                                                        <Input {...register(`members.${index}.salutation`)} placeholder='e.g. Prof. Dr.' className='h-10 rounded-xl' />
+                                                        <Input {...register(`members.${index}.salutation`)} placeholder='e.g. Prof. Dr.' className='h-10 rounded-md' />
                                                     </div>
                                                     <div>
                                                         <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Full Name</Label>
-                                                        <Input {...register(`members.${index}.name`)} placeholder='Enter name...' className='h-10 rounded-xl' />
+                                                        <Input {...register(`members.${index}.name`)} placeholder='Enter name...' className='h-10 rounded-md' />
                                                     </div>
                                                     <div>
                                                         <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Email</Label>
@@ -770,7 +772,7 @@ const CreateUpdateUniversityModal = ({
                                                             })}
                                                             type="email"
                                                             placeholder='Email address'
-                                                            className='h-10 rounded-xl'
+                                                            className='h-10 rounded-md'
                                                         />
                                                         {errors.members?.[index]?.email && (
                                                             <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.members[index].email.message}</p>
@@ -778,14 +780,14 @@ const CreateUpdateUniversityModal = ({
                                                     </div>
                                                     <div>
                                                         <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Phone</Label>
-                                                        <Input {...register(`members.${index}.phone`)} placeholder='Phone number' className='h-10 rounded-xl' />
+                                                        <Input {...register(`members.${index}.phone`)} placeholder='Phone number' className='h-10 rounded-md' />
                                                     </div>
                                                 </div>
                                                 <Button
                                                     type='button'
                                                     variant='ghost'
                                                     size='icon'
-                                                    className='absolute top-6 right-6 h-8 w-8 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors rounded-xl'
+                                                    className='absolute top-6 right-6 h-8 w-8 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors rounded-md'
                                                     onClick={() => removeMember(index)}
                                                 >
                                                     <Trash2 size={16} />

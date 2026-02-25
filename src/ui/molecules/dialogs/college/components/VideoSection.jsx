@@ -103,7 +103,7 @@ const VideoSection = ({
               }}
               placeholder='Paste YouTube URL here...'
               className={cn(
-                "pl-10 h-12 rounded-xl transition-all",
+                "pl-10 h-12 rounded-md transition-all",
                 !isValidLink && "border-red-500 bg-red-50/50 focus-visible:ring-red-200"
               )}
             />
