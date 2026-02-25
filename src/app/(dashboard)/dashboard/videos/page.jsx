@@ -364,7 +364,6 @@ export default function VideoManager() {
           className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2 h-11 px-6 rounded-md shadow-sm transition-all shrink-0 w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
-          Add Video
         </Button>
       </div>
       <ToastContainer />
