@@ -143,7 +143,7 @@ export const menuItems = [
           {
             icon: <IoSchoolSharp className='text-lg' />,
             label: 'Manage Colleges',
-            href: '/dashboard/colleges?level=College',
+            href: '/dashboard/colleges',
             visible: ['admin', 'editor']
           },
           {

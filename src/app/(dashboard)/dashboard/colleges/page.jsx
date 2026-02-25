@@ -25,7 +25,6 @@ import { createColumns } from './columns'
 export default function CollegeForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const level = searchParams.get('level')
   const pathname = usePathname()
   const { setHeading } = usePageHeading()
   const [searchQuery, setSearchQuery] = useState('')
@@ -90,7 +89,6 @@ export default function CollegeForm() {
     setHeading('College Management')
     const loadInitialColleges = async () => {
       const page = parseInt(searchParams.get('page')) || 1
-      const level = searchParams.get('level')
       try {
         const statusParam = searchParams.get('status')
         let url = `${process.env.baseUrl}/college?limit=10&page=${page}`
@@ -355,7 +353,7 @@ export default function CollegeForm() {
           className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2 h-11 px-6 rounded-md shadow-sm transition-all shrink-0 w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
-          Add {level === 'School' ? 'School' : 'College'}
+          Add College
         </Button>
       </div>
       <ToastContainer />
