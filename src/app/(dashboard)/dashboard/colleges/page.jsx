@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
+import { Plus } from 'lucide-react'
 import {
   fetchAllDegrees
 } from './actions'
@@ -32,8 +33,7 @@ export default function CollegeForm() {
   const [status, setStatus] = useState(searchParams.get('status') || 'all')
 
   const [colleges, setColleges] = useState([])
-  const [tableloading, setTableLoading] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [tableLoading, setTableLoading] = useState(true)
   const [editSlug, setEditSlug] = useState('')
   const [pagination, setPagination] = useState({
     currentPage: parseInt(searchParams.get('page')) || 1,
@@ -120,7 +120,6 @@ export default function CollegeForm() {
           total: 0
         })
       } finally {
-        setLoading(false)
         setTableLoading(false)
       }
     }
@@ -232,7 +231,7 @@ export default function CollegeForm() {
       toast.error('Failed to load colleges')
       console.error('Error loading colleges:', err)
     } finally {
-      setLoading(false)
+      setTableLoading(false)
     }
   }
 
@@ -327,90 +326,88 @@ export default function CollegeForm() {
 
 
   return (
-    <>
-      <div className='w-full space-y-2'>
-        <div className='flex justify-between items-center px-4 pt-4'>
-          {/* Search Bar & Filters */}
-          <div className='flex gap-4 items-center flex-1'>
-            <SearchInput
-              value={searchQuery}
-              onChange={(e) => handleSearchInput(e.target.value)}
-              placeholder='Search colleges...'
-              className='max-w-md'
-            />
-            <select
-              value={status}
-              onChange={(e) => handleStatusChange(e.target.value)}
-              className='flex h-11 w-40 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#387cae]/20 transition-all font-medium text-gray-700'
-            >
-              <option value="all">All Status</option>
-              <option value="published">Published</option>
-              <option value="draft">Draft</option>
-            </select>
-          </div>
-          {/* Button */}
-          <div className='flex gap-2'>
-            <Button
-              onClick={() => {
-                setIsOpen(true)
-                setEditSlug('')
-              }}
-            >
-              Add {level === 'School' ? 'School' : 'College'}
-            </Button>
-          </div>
-        </div>
-        <ToastContainer />
-
-        <CreateUpdateCollegeModal
-          isOpen={isOpen}
-          handleCloseModal={handleCloseModal}
-          editSlug={editSlug}
-          onSuccess={() => loadColleges(pagination.currentPage)}
-          allDegrees={allDegrees}
-        />
-        <ConfirmationDialog
-          open={isDialogOpen}
-          onClose={handleDialogClose}
-          onConfirm={handleDeleteConfirm}
-          title='Confirm Deletion'
-          message='Are you sure you want to delete this College? This action cannot be undone.'
-        />
-
-        {/* View College Details Modal */}
-        <ViewCollegeModal
-          viewModalOpen={viewModalOpen}
-          handleCloseViewModal={handleCloseViewModal}
-          loadingView={loadingView}
-          viewCollegeData={viewCollegeData}
-        />
-
-        {/*table*/}
-        <div className='w-full space-y-2'>
-          <Table
-            loading={tableloading}
-            data={colleges}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => loadColleges(newPage)}
-            onSearch={handleSearch}
-            showSearch={false}
+    <div className='w-full space-y-4 p-4'>
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+        {/* Search Bar & Filters */}
+        <div className='flex flex-col md:flex-row gap-4 items-start md:items-center flex-1 w-full'>
+          <SearchInput
+            value={searchQuery}
+            onChange={(e) => handleSearchInput(e.target.value)}
+            placeholder='Search colleges...'
+            className='max-w-md w-full'
           />
+          <select
+            value={status}
+            onChange={(e) => handleStatusChange(e.target.value)}
+            className='flex h-11 w-full md:w-40 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#387cae]/20 transition-all font-medium text-gray-700 hover:bg-gray-50'
+          >
+            <option value="all">All Status</option>
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+          </select>
         </div>
-        {/* Create Credentials Modal */}
-        <CreateCredentialsModal
-          setCredentialsModalOpen={setCredentialsModalOpen}
-          credentialsModalOpen={credentialsModalOpen}
-          selectedCollege={selectedCollege}
-          setSelectedCollege={setSelectedCollege}
-          setTableLoading={setTableLoading}
-          pagination={pagination}
-          setPagination={setPagination}
-          setColleges={setColleges}
-        />
-
-
+        {/* Button */}
+        <Button
+          onClick={() => {
+            setIsOpen(true)
+            setEditSlug('')
+          }}
+          className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2 h-11 px-6 rounded-md shadow-sm transition-all shrink-0 w-full sm:w-auto"
+        >
+          <Plus className="w-4 h-4" />
+          Add {level === 'School' ? 'School' : 'College'}
+        </Button>
       </div>
-    </>
+      <ToastContainer />
+
+      <CreateUpdateCollegeModal
+        isOpen={isOpen}
+        handleCloseModal={handleCloseModal}
+        editSlug={editSlug}
+        onSuccess={() => loadColleges(pagination.currentPage)}
+        allDegrees={allDegrees}
+      />
+      <ConfirmationDialog
+        open={isDialogOpen}
+        onClose={handleDialogClose}
+        onConfirm={handleDeleteConfirm}
+        title='Confirm Deletion'
+        message='Are you sure you want to delete this College? This action cannot be undone.'
+      />
+
+      {/* View College Details Modal */}
+      <ViewCollegeModal
+        viewModalOpen={viewModalOpen}
+        handleCloseViewModal={handleCloseViewModal}
+        loadingView={loadingView}
+        viewCollegeData={viewCollegeData}
+      />
+
+      {/* table container */}
+      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <Table
+          loading={tableLoading}
+          data={colleges}
+          columns={columns}
+          pagination={pagination}
+          onPageChange={(newPage) => loadColleges(newPage)}
+          onSearch={handleSearch}
+          showSearch={false}
+        />
+      </div>
+      {/* Create Credentials Modal */}
+      <CreateCredentialsModal
+        setCredentialsModalOpen={setCredentialsModalOpen}
+        credentialsModalOpen={credentialsModalOpen}
+        selectedCollege={selectedCollege}
+        setSelectedCollege={setSelectedCollege}
+        setTableLoading={setTableLoading}
+        pagination={pagination}
+        setPagination={setPagination}
+        setColleges={setColleges}
+      />
+
+
+    </div>
   )
 }

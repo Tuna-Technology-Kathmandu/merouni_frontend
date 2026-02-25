@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { destr } from 'destr'
-import { fetchReferrals, updateReferralStatus, deleteReferral } from './action'
+import { fetchReferrals, updateReferralStatus, deleteReferral, fetchColleges } from './action'
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,7 @@ import { usePageHeading } from '@/contexts/PageHeadingContext'
 import Table from '@/ui/shadcn/DataTable'
 import { Button } from '@/ui/shadcn/button'
 import { Search, X, Filter, ChevronDown, Edit2, Trash2, Eye } from 'lucide-react'
-import CollegesDropdown from '@/ui/molecules/dropdown/CollegesDropdown'
+import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 import { Select } from '@/ui/shadcn/select'
 import { Label } from '@/ui/shadcn/label'
 import { toast, ToastContainer } from 'react-toastify'
@@ -29,8 +29,7 @@ const ReferralsPage = () => {
   const { setHeading } = usePageHeading()
   const [referrals, setReferrals] = useState([])
   const [allReferrals, setAllReferrals] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [tableLoading, setTableLoading] = useState(false)
+  const [tableLoading, setTableLoading] = useState(true)
   const [error, setError] = useState(null)
   const [updatingId, setUpdatingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
@@ -46,7 +45,7 @@ const ReferralsPage = () => {
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
-  const [collegeFilter, setCollegeFilter] = useState('')
+  const [selectedCollege, setSelectedCollege] = useState(null)
 
   // Dropdown states
   const [statusDropdownOpen, setStatusDropdownOpen] = useState(false)
@@ -112,7 +111,6 @@ const ReferralsPage = () => {
       console.error('Error loading referrals:', err)
       toast.error('Failed to load referrals')
     } finally {
-      setLoading(false)
       setTableLoading(false)
     }
   }
@@ -179,9 +177,9 @@ const ReferralsPage = () => {
     }
 
     // College filter
-    if (collegeFilter) {
+    if (selectedCollege) {
       filtered = filtered.filter(
-        (referral) => referral.referralCollege?.id === parseInt(collegeFilter)
+        (referral) => referral.referralCollege?.id === selectedCollege.id
       )
     }
 
@@ -286,7 +284,7 @@ const ReferralsPage = () => {
   const handleClearFilters = () => {
     setSearchQuery('')
     setStatusFilter('')
-    setCollegeFilter('')
+    setSelectedCollege(null)
     setStatusSearchTerm('')
   }
 
@@ -419,106 +417,108 @@ const ReferralsPage = () => {
     return cols
   }, [isInstitution, isStudent])
 
-  const hasActiveFilters = searchQuery || statusFilter || collegeFilter
+  const hasActiveFilters = searchQuery || statusFilter || selectedCollege
 
-  if (loading) return <Loading />
 
   return (
     <div className='w-full space-y-4 p-4'>
       <ToastContainer />
 
-      {/* Sticky Filter Header */}
-      <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
-        <div className='flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
-          <div className="flex flex-1 flex-col md:flex-row gap-4 w-full">
-            <SearchInput
-              className='flex-1'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onClear={() => setSearchQuery('')}
-              placeholder='Search by student name, email, phone, college, or agent...'
-            />
+      {/* Filter Header */}
+      <div className='flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+        <div className="flex flex-1 flex-col md:flex-row gap-4 w-full">
+          <SearchInput
+            className='flex-1'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onClear={() => setSearchQuery('')}
+            placeholder='Search by student name, email, phone, college, or agent...'
+          />
 
-            <div className="flex flex-wrap gap-4">
-              {/* Status Filter */}
-              <div className='relative min-w-[180px]' ref={statusDropdownRef}>
-                <Filter className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10' />
-                <button
-                  type='button'
-                  onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
-                  className='w-full pl-10 pr-8 py-2 text-left border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-sm transition-all hover:bg-gray-50'
-                >
-                  <span className={statusFilter ? 'text-gray-900 font-medium' : 'text-gray-500'}>
-                    {selectedStatusLabel}
-                  </span>
-                </button>
-                <ChevronDown className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${statusDropdownOpen ? 'rotate-180' : ''}`} />
+          <div className="flex flex-wrap gap-4">
+            {/* Status Filter */}
+            <div className='relative min-w-[180px]' ref={statusDropdownRef}>
+              <Filter className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10' />
+              <button
+                type='button'
+                onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
+                className='w-full pl-10 pr-8 py-2 text-left border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-sm transition-all hover:bg-gray-50'
+              >
+                <span className={statusFilter ? 'text-gray-900 font-medium' : 'text-gray-500'}>
+                  {selectedStatusLabel}
+                </span>
+              </button>
+              <ChevronDown className={`absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${statusDropdownOpen ? 'rotate-180' : ''}`} />
 
-                {statusDropdownOpen && (
-                  <div className='absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200'>
-                    <div className='p-2 border-b border-gray-100'>
-                      <div className='relative'>
-                        <Search className='absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
-                        <input
-                          type='text'
-                          placeholder='Search status...'
-                          value={statusSearchTerm}
-                          onChange={(e) => setStatusSearchTerm(e.target.value)}
-                          className='w-full pl-8 pr-2 py-1.5 text-xs border border-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500'
-                          autoFocus
-                        />
-                      </div>
-                    </div>
-                    <div className='max-h-48 overflow-y-auto p-1'>
-                      {filteredStatusOptions.length > 0 ? (
-                        filteredStatusOptions.map((option) => (
-                          <button
-                            key={option.value}
-                            type='button'
-                            onClick={() => {
-                              setStatusFilter(option.value)
-                              setStatusSearchTerm('')
-                              setStatusDropdownOpen(false)
-                            }}
-                            className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${statusFilter === option.value
-                              ? 'bg-blue-50 text-blue-700 font-semibold'
-                              : 'text-gray-700 hover:bg-gray-50'
-                              }`}
-                          >
-                            {option.label}
-                          </button>
-                        ))
-                      ) : (
-                        <div className='px-3 py-4 text-xs text-gray-400 text-center italic'>
-                          No status found
-                        </div>
-                      )}
+              {statusDropdownOpen && (
+                <div className='absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200'>
+                  <div className='p-2 border-b border-gray-100'>
+                    <div className='relative'>
+                      <Search className='absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400' />
+                      <input
+                        type='text'
+                        placeholder='Search status...'
+                        value={statusSearchTerm}
+                        onChange={(e) => setStatusSearchTerm(e.target.value)}
+                        className='w-full pl-8 pr-2 py-1.5 text-xs border border-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500'
+                        autoFocus
+                      />
                     </div>
                   </div>
-                )}
-              </div>
-
-              {/* College Filter */}
-              <CollegesDropdown
-                value={collegeFilter}
-                onChange={setCollegeFilter}
-                placeholder='All Colleges'
-                minWidth={200}
-                className="rounded-lg border-gray-200 text-sm h-[42px]"
-              />
-
-              {/* Clear Filters */}
-              {hasActiveFilters && (
-                <Button
-                  variant='ghost'
-                  onClick={handleClearFilters}
-                  className='text-slate-500 hover:text-red-600 hover:bg-red-50 gap-2 h-[42px]'
-                >
-                  <X className='w-4 h-4' />
-                  Clear
-                </Button>
+                  <div className='max-h-48 overflow-y-auto p-1'>
+                    {filteredStatusOptions.length > 0 ? (
+                      filteredStatusOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          type='button'
+                          onClick={() => {
+                            setStatusFilter(option.value)
+                            setStatusSearchTerm('')
+                            setStatusDropdownOpen(false)
+                          }}
+                          className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${statusFilter === option.value
+                            ? 'bg-blue-50 text-blue-700 font-semibold'
+                            : 'text-gray-700 hover:bg-gray-50'
+                            }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))
+                    ) : (
+                      <div className='px-3 py-4 text-xs text-gray-400 text-center italic'>
+                        No status found
+                      </div>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
+
+            {/* College Filter */}
+            <div className="min-w-[220px]">
+              <SearchSelectCreate
+                onSearch={fetchColleges}
+                onSelect={(item) => setSelectedCollege(item)}
+                onRemove={() => setSelectedCollege(null)}
+                selectedItems={selectedCollege}
+                placeholder="All Colleges"
+                isMulti={false}
+                displayKey="name"
+                className="h-[42px]"
+              />
+            </div>
+
+            {/* Clear Filters */}
+            {hasActiveFilters && (
+              <Button
+                variant='ghost'
+                onClick={handleClearFilters}
+                className='text-slate-500 hover:text-red-600 hover:bg-red-50 gap-2 h-[42px]'
+              >
+                <X className='w-4 h-4' />
+                Clear
+              </Button>
+            )}
           </div>
         </div>
       </div>

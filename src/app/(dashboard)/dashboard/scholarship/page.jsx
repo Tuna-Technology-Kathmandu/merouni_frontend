@@ -14,7 +14,7 @@ import {
   getScholarshipApplications,
   fetchCategories
 } from './actions'
-import Loading from '../../../../ui/molecules/Loading'
+import CircularLoader from '@/ui/molecules/CircularLoader'
 import Table from '@/ui/shadcn/DataTable'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
@@ -44,8 +44,7 @@ export default function ScholarshipManager() {
   const router = useRouter()
 
   const [scholarships, setScholarships] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [tableLoading, setTableLoading] = useState(false)
+  const [tableLoading, setTableLoading] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [deleteId, setDeleteId] = useState(null)
@@ -126,7 +125,6 @@ export default function ScholarshipManager() {
       toast.error('Failed to fetch scholarships')
     } finally {
       setTableLoading(false)
-      setLoading(false)
     }
   }
 
@@ -184,7 +182,7 @@ export default function ScholarshipManager() {
       const payload = {
         ...data,
         author: author_id,
-        amount: data.amount, 
+        amount: data.amount,
       }
 
       if (editingId) {
@@ -303,7 +301,6 @@ export default function ScholarshipManager() {
     }
   ], [])
 
-  if (loading) return <Loading />
 
   return (
     <div className='w-full space-y-4 p-4'>
@@ -482,7 +479,7 @@ export default function ScholarshipManager() {
           <div className='flex-1 overflow-y-auto p-6'>
             {applicationsLoading ? (
               <div className='flex items-center justify-center py-12'>
-                <Loading />
+                <CircularLoader size='w-8 h-8' />
               </div>
             ) : applicationsData.length === 0 ? (
               <div className='py-12 text-center text-gray-500 h-full flex flex-col justify-center items-center'>
@@ -513,8 +510,8 @@ export default function ScholarshipManager() {
                       </div>
                       <div className='flex flex-col items-end gap-2'>
                         <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${application.status === 'APPROVED' ? 'bg-green-100 text-green-700' :
-                            application.status === 'REJECTED' ? 'bg-red-100 text-red-700' :
-                              'bg-amber-100 text-amber-700'
+                          application.status === 'REJECTED' ? 'bg-red-100 text-red-700' :
+                            'bg-amber-100 text-amber-700'
                           }`}>
                           {application.status}
                         </span>

@@ -19,7 +19,7 @@ import SearchInput from '@/ui/molecules/SearchInput'
 export default function ContactUsManager() {
     const { setHeading } = usePageHeading()
     const [contacts, setContacts] = useState([])
-    const [loading, setLoading] = useState(true)
+    const [tableLoading, setTableLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
     const [pagination, setPagination] = useState({
@@ -54,7 +54,7 @@ export default function ContactUsManager() {
     }, [pagination.currentPage, statusFilter, debouncedSearchQuery])
 
     const loadContacts = async () => {
-        setLoading(true)
+        setTableLoading(true)
         try {
             const data = await getContacts(pagination.currentPage, statusFilter, debouncedSearchQuery)
             setContacts(data.items)
@@ -66,7 +66,7 @@ export default function ContactUsManager() {
             toast.error('Failed to load messages')
             console.error(error)
         } finally {
-            setLoading(false)
+            setTableLoading(false)
         }
     }
 
@@ -138,17 +138,10 @@ export default function ContactUsManager() {
 
     const columns = useMemo(() => createColumns({ handleView, handleDelete, handleStatusUpdate }), [])
 
-    if (loading && contacts.length === 0) {
-        return (
-            <div className="flex h-96 items-center justify-center">
-                <Loading />
-            </div>
-        )
-    }
 
     return (
-        <div className='p-6 w-full space-y-6'>
-            <div className='flex justify-between items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100'>
+        <div className='w-full space-y-4 p-4'>
+            <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
                 {/* Search */}
                 <SearchInput
                     value={searchQuery}
@@ -165,7 +158,7 @@ export default function ContactUsManager() {
                             setStatusFilter(e.target.value)
                             setPagination(prev => ({ ...prev, currentPage: 1 }))
                         }}
-                        className='w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer'
+                        className='w-full md:w-48 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 bg-white cursor-pointer text-sm font-medium hover:bg-gray-50 transition-all'
                     >
                         <option value='all'>All Status</option>
                         <option value='unread'>UnRead</option>
@@ -175,8 +168,9 @@ export default function ContactUsManager() {
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
                 <Table
+                    loading={tableLoading}
                     data={contacts}
                     columns={columns}
                     pagination={pagination}

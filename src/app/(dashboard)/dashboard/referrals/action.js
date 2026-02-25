@@ -3,10 +3,10 @@ import { authFetch } from '@/app/utils/authFetch'
 export async function fetchReferrals(page = 1, isStudent = false) {
   try {
     // Use different endpoint for students vs admin
-    const endpoint = isStudent 
+    const endpoint = isStudent
       ? `/referral/user/referrals`
       : `/referral?page=${page}`
-    
+
     const response = await authFetch(
       `${process.env.baseUrl}${endpoint}`,
       { cache: 'no-store' }
@@ -65,5 +65,19 @@ export async function deleteReferral(id) {
   } catch (error) {
     console.error('Error deleting referral:', error)
     throw error
+  }
+}
+
+export async function fetchColleges(searchQuery = '') {
+  try {
+    const response = await authFetch(
+      `${process.env.baseUrl}/college?limit=100&q=${encodeURIComponent(searchQuery)}`
+    )
+    if (!response.ok) throw new Error('Failed to fetch colleges')
+    const data = await response.json()
+    return data.items
+  } catch (error) {
+    console.error('Error fetching colleges:', error)
+    return []
   }
 }
