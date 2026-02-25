@@ -6,7 +6,8 @@ import {
     DialogHeader,
     DialogTitle,
     DialogDescription,
-    DialogFooter
+    DialogFooter,
+    DialogClose
 } from '@/ui/shadcn/dialog'
 import { cn } from '@/app/lib/utils'
 
@@ -49,6 +50,7 @@ const ConfirmationDialog = ({
             <DialogHeader>
                 <DialogTitle>{title}</DialogTitle>
                 <DialogDescription>{message}</DialogDescription>
+                <DialogClose onClick={!isLoading ? onClose : undefined} />
             </DialogHeader>
 
             <DialogFooter className='px-6 pb-6'>
