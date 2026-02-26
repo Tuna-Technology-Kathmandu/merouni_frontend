@@ -16,6 +16,7 @@ import CreateUpdateConsultancy from '@/ui/molecules/dialogs/CreateUpdateConsulta
 import ViewConsultancy from '@/ui/molecules/dialogs/ViewConsultancy'
 import CreateConsultencyUser from '@/ui/molecules/dialogs/CreateConsultencyUser'
 import EditConsultancyPage from './EditConsultancyPage'
+import ImageLightbox from '@/ui/molecules/image-lightbox'
 import { authFetch } from '@/app/utils/authFetch'
 import { deleteConsultancy } from './actions'
 import { formatDate } from '@/utils/date.util'
@@ -51,6 +52,21 @@ export default function ConsultancyManager() {
     totalPages: 1,
     totalCount: 0
   })
+
+  // Lightbox State
+  const [lightbox, setLightbox] = useState({
+    isOpen: false,
+    imageUrl: '',
+    altText: ''
+  })
+
+  const handleImageClick = (imageUrl, altText) => {
+    setLightbox({
+      isOpen: true,
+      imageUrl,
+      altText: altText || 'Consultancy Logo'
+    })
+  }
 
   useEffect(() => {
     setHeading('Consultancy Management')
@@ -140,7 +156,12 @@ export default function ConsultancyManager() {
       cell: ({ row }) => (
         <div className="flex items-center gap-3">
           {row.original.logo && (
-            <img src={row.original.logo} alt="" className="w-8 h-8 rounded-md object-contain border bg-gray-50" />
+            <img
+              src={row.original.logo}
+              alt=""
+              className="w-8 h-8 rounded-md object-contain border bg-gray-50 cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => handleImageClick(row.original.logo, row.original.title)}
+            />
           )}
           <span className="font-medium text-gray-900">{row.original.title}</span>
         </div>
@@ -284,6 +305,13 @@ export default function ConsultancyManager() {
         onConfirm={handleDeleteConfirm}
         title='Confirm Deletion'
         message='Are you sure you want to delete this consultancy? This action cannot be undone.'
+      />
+
+      <ImageLightbox
+        isOpen={lightbox.isOpen}
+        onClose={() => setLightbox({ ...lightbox, isOpen: false })}
+        imageUrl={lightbox.imageUrl}
+        altText={lightbox.altText}
       />
     </div>
   )

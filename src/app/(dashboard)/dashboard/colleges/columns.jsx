@@ -5,19 +5,22 @@ export const createColumns = ({
   handleView,
   handleEdit,
   handleOpenCredentialsModal,
-  handleDeleteClick
+  handleDeleteClick,
+  handleImageClick
 }) => [
     {
       header: '',
       accessorKey: 'college_logo',
-      cell: ({ getValue }) => {
+      cell: ({ row, getValue }) => {
         const logoUrl = getValue()
+        const collegeName = row.original.name
         return logoUrl ? (
           <div className='flex items-center justify-center'>
             <img
               src={logoUrl}
               alt='College Logo'
-              className='w-20 h-20 object-contain rounded'
+              className='w-20 h-20 object-contain rounded cursor-pointer hover:opacity-80 transition-opacity'
+              onClick={() => handleImageClick(logoUrl, collegeName)}
             />
           </div>
         ) : (

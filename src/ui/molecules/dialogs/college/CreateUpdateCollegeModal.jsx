@@ -523,7 +523,7 @@ const CreateUpdateCollegeModal = ({
             <DialogHeader className="bg-white border-b border-gray-100 p-6">
                 <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                     <Layers className="text-[#387cae]" size={24} />
-                    {editSlug ? 'Edit College' : 'Add New College'}
+                    {editSlug ? 'Edit College/School' : 'Add New College/School'}
                 </DialogTitle>
                 <DialogClose onClick={handleCloseAttempt} />
             </DialogHeader>

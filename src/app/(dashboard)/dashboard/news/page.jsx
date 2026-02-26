@@ -30,6 +30,7 @@ import NewsForm from './components/NewsForm'
 import { FormatDate } from '@/lib/date'
 import { formatDate, formatDateTime } from '@/utils/date.util'
 import SearchInput from '@/ui/molecules/SearchInput'
+import ImageLightbox from '@/ui/molecules/image-lightbox'
 
 export default function NewsManager() {
   const { setHeading } = usePageHeading()
@@ -61,6 +62,21 @@ export default function NewsManager() {
   const [loadingColleges, setLoadingColleges] = useState(false)
   const [loadingCategories, setLoadingCategories] = useState(false)
 
+  // Lightbox State
+  const [lightbox, setLightbox] = useState({
+    isOpen: false,
+    imageUrl: '',
+    altText: ''
+  })
+
+  const handleImageClick = (imageUrl, altText) => {
+    setLightbox({
+      isOpen: true,
+      imageUrl,
+      altText: altText || 'News Image'
+    })
+  }
+
   const columns = useMemo(
     () => [
       {
@@ -84,7 +100,10 @@ export default function NewsManager() {
           return (
             <div className='flex items-center gap-3 max-w-xs overflow-hidden'>
               {featured_image ? (
-                <div className='w-20 h-20 rounded shrink-0 overflow-hidden bg-gray-100'>
+                <div
+                  className='w-20 h-20 rounded shrink-0 overflow-hidden bg-gray-100 cursor-pointer hover:opacity-80 transition-opacity'
+                  onClick={() => handleImageClick(featured_image, title)}
+                >
                   <img
                     src={featured_image}
                     alt='News'
@@ -507,6 +526,13 @@ export default function NewsManager() {
           )}
         </DialogContent>
       </Dialog>
+
+      <ImageLightbox
+        isOpen={lightbox.isOpen}
+        onClose={() => setLightbox({ ...lightbox, isOpen: false })}
+        imageUrl={lightbox.imageUrl}
+        altText={lightbox.altText}
+      />
     </>
   )
 }
