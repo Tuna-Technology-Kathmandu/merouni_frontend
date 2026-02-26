@@ -59,6 +59,7 @@ const ApplyPage = ({ params }) => {
     }
   }, [slugs, user?.id])
 
+
   const renderContent = () => {
     if (loading) {
       return (
@@ -111,7 +112,12 @@ const ApplyPage = ({ params }) => {
           variant='centered'
           icon={<CheckCircle2 className='w-full h-full text-red-500' />}
           title='Admin Access'
-          description='You are logged in as an Admin. Admins cannot submit college applications.'
+          description={
+            <>
+              You are logged in as an Admin. Admins cannot submit college applications for{' '}
+              <span className='font-semibold text-gray-900'>{college?.name || 'this college'}</span>.
+            </>
+          }
         >
           <Link href='/dashboard'>
             <Button
@@ -131,7 +137,12 @@ const ApplyPage = ({ params }) => {
           variant='centered'
           icon={<CheckCircle2 className='w-full h-full text-orange-500' />}
           title='Agent Access'
-          description='You are logged in as an Agent. Agents are not eligible to apply for colleges directly.'
+          description={
+            <>
+              You are logged in as an Agent. Agents are not eligible to apply for{' '}
+              <span className='font-semibold text-gray-900'>{college?.name || 'this college'}</span> directly.
+            </>
+          }
         >
           <Link href='/dashboard'>
             <Button
@@ -175,13 +186,25 @@ const ApplyPage = ({ params }) => {
           <div className='max-w-7xl mx-auto'>
             {/* Back Button */}
             <div className='mb-8 max-w-2xl mx-auto'>
-              <button
-                onClick={() => router.back()}
-                className='inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors font-medium'
-              >
-                <ArrowLeft className='w-4 h-4' />
-                <span>Back</span>
-              </button>
+              <div className='flex items-center justify-between'>
+                <button
+                  onClick={() => router.back()}
+                  className='inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors font-medium'
+                >
+                  <ArrowLeft className='w-4 h-4' />
+                  <span>Back</span>
+                </button>
+                {college && (
+                  <div className='flex items-center gap-2 transition-opacity duration-300'>
+                    <span className='text-xs font-medium text-gray-400 uppercase tracking-wider hidden sm:inline'>
+                      Applying for
+                    </span>
+                    <span className='text-sm font-semibold text-gray-700 bg-gray-100 px-3 py-1 rounded-full'>
+                      {college.name}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Content Section - Centered */}

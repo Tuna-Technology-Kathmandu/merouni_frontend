@@ -184,7 +184,7 @@ const ReferralsPage = () => {
     }
 
     setReferrals(filtered)
-  }, [searchQuery, statusFilter, collegeFilter, allReferrals])
+  }, [searchQuery, statusFilter, allReferrals])
 
   // Close dropdowns when clicking outside
   useEffect(() => {
