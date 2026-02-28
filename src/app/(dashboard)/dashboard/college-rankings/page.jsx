@@ -253,15 +253,15 @@ export default function CollegeRankingsPage() {
   }
 
   return (
-    <div className='p-6 w-full space-y-6'>
+    <div className='w-full'>
       {/* Sticky Header */}
-      <div className='sticky top-0 z-20 bg-gray-50/80 backdrop-blur-md pb-4 pt-2 -mt-2'>
+      <div className='sticky mb-3 top-0 z-20 bg-gray-50/80 backdrop-blur-md pb-4 pt-2 -mt-2'>
         <div className='flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100'>
           <div className='relative w-full md:w-96 group'>
             <Search className='absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#387cae] transition-colors' size={18} />
             <Input
               placeholder='Search programs or colleges...'
-              className='pl-11 h-11 rounded-md border-gray-100 bg-gray-50/50 focus:bg-white transition-all'
+              className='pl-11 h-11 rounded-md border-gray-200 bg-gray-50/50 focus:bg-white transition-all'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -301,7 +301,7 @@ export default function CollegeRankingsPage() {
                   <h2 className='text-[15px] font-bold text-slate-900 truncate' title={programGroup.program?.title}>
                     {programGroup.program?.title}
                   </h2>
-                  <span className='text-[11px] text-slate-400 font-bold uppercase tracking-wider'>
+                  <span className='text-[11px] text-slate-500 font-semibold'>
                     {programGroup.rankings?.length || 0} Colleges Ranked
                   </span>
                 </div>

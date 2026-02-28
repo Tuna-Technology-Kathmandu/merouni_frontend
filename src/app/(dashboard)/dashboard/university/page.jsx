@@ -407,10 +407,10 @@ export default function UniversityPage() {
 
   return (
     <>
-      <div className='w-full p-4 space-y-3'>
+      <div className='w-full'>
 
         {/* ── Sticky Header ──────────────────────────────────────────────────── */}
-        <div className='sticky top-0 z-30 bg-[#F7F8FA] py-3'>
+        <div className='sticky mb-3 top-0 z-30 bg-[#F7F8FA] py-3'>
           <div className='bg-white rounded-2xl border border-gray-200 shadow-sm px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3'>
             <div className='flex items-center gap-3'>
               <div className='w-9 h-9 rounded-md bg-[#387cae]/10 flex items-center justify-center shrink-0'>

@@ -50,7 +50,8 @@ export default function ExamManager() {
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
-    total: 0
+    total: 0,
+    limit: 10
   })
 
   const {
@@ -282,6 +283,15 @@ export default function ExamManager() {
 
   const columns = useMemo(() => [
     {
+      header: 'S.N.',
+      accessorKey: 'id',
+      cell: ({ row }) => (
+        <span className="text-gray-500 font-medium">
+          {(pagination.currentPage - 1) * (pagination.limit || 10) + row.index + 1}
+        </span>
+      )
+    },
+    {
       header: 'Title',
       accessorKey: 'title',
       cell: ({ row }) => (
@@ -354,14 +364,14 @@ export default function ExamManager() {
         </div>
       )
     }
-  ], [requireAdmin])
+  ], [requireAdmin, pagination])
 
 
   return (
-    <div className='w-full space-y-4 p-4'>
+    <div className='w-full'>
       <ToastContainer />
 
-      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
+      <div className='flex flex-col mb-3 sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
         <SearchInput
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}

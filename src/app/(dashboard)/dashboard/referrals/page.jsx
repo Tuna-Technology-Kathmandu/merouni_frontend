@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo, useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { destr } from 'destr'
 import { fetchReferrals, updateReferralStatus, deleteReferral, fetchColleges } from './action'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import {
   Dialog,
   DialogContent,
@@ -42,9 +43,31 @@ const ReferralsPage = () => {
     remarks: ''
   })
 
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  // Helper to update URL params
+  const updateQueryParams = (updates) => {
+    const params = new URLSearchParams(searchParams.toString())
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === undefined || value === '') {
+        params.delete(key)
+      } else {
+        params.set(key, value)
+      }
+    })
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }
+
+  // Initial states from URL
+  const initialPage = parseInt(searchParams.get('page')) || 1
+  const initialStatus = searchParams.get('status') || ''
+  const initialQ = searchParams.get('q') || ''
+
   // Search and filter states
-  const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
+  const [searchQuery, setSearchQuery] = useState(initialQ)
+  const [statusFilter, setStatusFilter] = useState(initialStatus)
   const [selectedCollege, setSelectedCollege] = useState(null)
 
   // Dropdown states
@@ -53,12 +76,14 @@ const ReferralsPage = () => {
 
   // Pagination state
   const [pagination, setPagination] = useState({
-    currentPage: 1,
+    currentPage: initialPage,
     totalPages: 1,
-    total: 0
+    total: 0,
+    limit: 10
   })
 
-  const [collegeDropdownOpen, setCollegeDropdownOpen] = useState(false)
+  // Debounced search query
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(initialQ)
 
   // Get user role from Redux
   const rawRole = useSelector((state) => state.user?.data?.role)
@@ -77,33 +102,35 @@ const ReferralsPage = () => {
 
   useEffect(() => {
     setHeading(isStudent ? 'Applied Colleges' : 'Referrals')
-    loadReferrals()
     return () => setHeading(null)
   }, [setHeading, isStudent])
 
-  const loadReferrals = async (page = 1) => {
+  const loadReferrals = async () => {
+    const page = parseInt(searchParams.get('page')) || 1
+    const status = searchParams.get('status') || ''
+    const q = searchParams.get('q') || ''
+    const college_id = searchParams.get('college_id') || ''
+
     setTableLoading(true)
     try {
-      const data = await fetchReferrals(page, isStudent)
-      if (isStudent) {
-        const referralsArray = Array.isArray(data) ? data : data.items || []
-        setAllReferrals(referralsArray)
-        setReferrals(referralsArray)
-        setPagination({
-          currentPage: 1,
-          totalPages: 1,
-          total: referralsArray.length
-        })
-      } else {
-        const referralsArray = data.items || []
-        setAllReferrals(referralsArray)
-        setReferrals(referralsArray)
-        setPagination({
-          currentPage: data.pagination?.currentPage || 1,
-          totalPages: data.pagination?.totalPages || 1,
-          total: data.pagination?.totalCount || referralsArray.length
-        })
-      }
+      const data = await fetchReferrals({
+        page,
+        limit: pagination.limit,
+        q,
+        status,
+        college_id,
+        isStudent
+      })
+
+      const referralsArray = data.items || (Array.isArray(data) ? data : [])
+      setAllReferrals(referralsArray)
+      setReferrals(referralsArray)
+      setPagination(prev => ({
+        ...prev,
+        currentPage: data.pagination?.currentPage || page,
+        totalPages: data.pagination?.totalPages || 1,
+        total: data.pagination?.totalCount || referralsArray.length
+      }))
     } catch (err) {
       setError(err.message)
       console.error('Error loading referrals:', err)
@@ -143,46 +170,28 @@ const ReferralsPage = () => {
     [statusOptions, statusFilter]
   )
 
-  // Filter referrals based on search and filters (Local filtering for now)
+  // Sync search query with URL
   useEffect(() => {
-    let filtered = [...allReferrals]
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery)
+      updateQueryParams({ q: searchQuery, page: 1 })
+    }, 500)
+    return () => clearTimeout(handler)
+  }, [searchQuery])
 
-    // Search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter((referral) => {
-        const studentName = (referral.student_name || '').toLowerCase()
-        const studentEmail = (referral.student_email || '').toLowerCase()
-        const studentPhone = (referral.student_phone_no || '').toLowerCase()
-        const collegeName = (referral.referralCollege?.name || '').toLowerCase()
-        const agentName = referral.referralAgent
-          ? `${referral.referralAgent.firstName || ''} ${referral.referralAgent.lastName || ''}`.toLowerCase()
-          : ''
+  // Trigger API call when URL search params or user role changes
+  useEffect(() => {
+    loadReferrals()
+  }, [searchParams, isStudent])
 
-        return (
-          studentName.includes(query) ||
-          studentEmail.includes(query) ||
-          studentPhone.includes(query) ||
-          collegeName.includes(query) ||
-          agentName.includes(query)
-        )
-      })
+  // Fetch initial college if ID is in URL
+  useEffect(() => {
+    const collegeId = searchParams.get('college_id')
+    if (collegeId && !selectedCollege) {
+      // Small optimization: we could fetch the college details here if needed
+      // For now, we'll assume the search query or list will handle it
     }
-
-    // Status filter
-    if (statusFilter) {
-      filtered = filtered.filter((referral) => referral.status === statusFilter)
-    }
-
-    // College filter
-    if (selectedCollege) {
-      filtered = filtered.filter(
-        (referral) => referral.referralCollege?.id === selectedCollege.id
-      )
-    }
-
-    setReferrals(filtered)
-  }, [searchQuery, statusFilter, allReferrals])
+  }, [])
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -284,6 +293,7 @@ const ReferralsPage = () => {
     setStatusFilter('')
     setSelectedCollege(null)
     setStatusSearchTerm('')
+    router.replace(pathname) // Clear all query params
   }
 
   const columns = useMemo(() => {
@@ -291,7 +301,11 @@ const ReferralsPage = () => {
       {
         header: 'S.N.',
         accessorKey: 'id',
-        cell: ({ row }) => <span className="text-gray-500 font-medium">{row.index + 1}</span>
+        cell: ({ row }) => (
+          <span className="text-gray-500 font-medium">
+            {(pagination.currentPage - 1) * pagination.limit + row.index + 1}
+          </span>
+        )
       },
       {
         header: 'Student Details',
@@ -377,7 +391,7 @@ const ReferralsPage = () => {
         accessorKey: 'remarks',
         cell: ({ row }) => (
           <div className='text-sm text-slate-600 max-w-[200px] truncate' title={row.original.remarks}>
-            {row.original.remarks || <span className="text-gray-400 italic">No remarks</span>}
+            {row.original.remarks || <span className="text-gray-400 italic">-</span>}
           </div>
         )
       }
@@ -413,7 +427,7 @@ const ReferralsPage = () => {
     }
 
     return cols
-  }, [isInstitution, isStudent])
+  }, [isInstitution, isStudent, pagination])
 
   const hasActiveFilters = searchQuery || statusFilter || selectedCollege
 
@@ -423,7 +437,7 @@ const ReferralsPage = () => {
       <ToastContainer />
 
       {/* Filter Header */}
-      <div className='flex flex-col mb-4 xl:flex-row justify-between items-start xl:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
+      <div className='flex flex-col mb-3 xl:flex-row justify-between items-start xl:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
         <div className="flex flex-1 flex-col md:flex-row gap-4 w-full">
           <SearchInput
             className='flex-1'
@@ -473,6 +487,7 @@ const ReferralsPage = () => {
                             setStatusFilter(option.value)
                             setStatusSearchTerm('')
                             setStatusDropdownOpen(false)
+                            updateQueryParams({ status: option.value, page: 1 })
                           }}
                           className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${statusFilter === option.value
                             ? 'bg-blue-50 text-blue-700 font-semibold'
@@ -496,8 +511,14 @@ const ReferralsPage = () => {
             <div className="min-w-[220px]">
               <SearchSelectCreate
                 onSearch={fetchColleges}
-                onSelect={(item) => setSelectedCollege(item)}
-                onRemove={() => setSelectedCollege(null)}
+                onSelect={(item) => {
+                  setSelectedCollege(item)
+                  updateQueryParams({ college_id: item.id, page: 1 })
+                }}
+                onRemove={() => {
+                  setSelectedCollege(null)
+                  updateQueryParams({ college_id: '', page: 1 })
+                }}
                 selectedItems={selectedCollege}
                 placeholder="All Colleges"
                 isMulti={false}
@@ -528,7 +549,7 @@ const ReferralsPage = () => {
           data={referrals}
           columns={columns}
           pagination={pagination}
-          onPageChange={(page) => loadReferrals(page)}
+          onPageChange={(page) => updateQueryParams({ page })}
           showSearch={false}
           emptyContent={
             <div className="flex flex-col items-center justify-center py-12 text-center">

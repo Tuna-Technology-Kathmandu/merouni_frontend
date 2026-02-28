@@ -230,7 +230,7 @@ const ApplicationsPage = () => {
         cell: ({ row }) => (
           <div className="max-w-[200px]" title={row.original.remarks}>
             <p className='text-xs text-slate-600 truncate'>
-              {row.original.remarks || <span className="text-slate-400 italic">No remarks</span>}
+              {row.original.remarks || <span className="text-slate-400 italic">-</span>}
             </p>
           </div>
         )

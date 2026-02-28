@@ -339,8 +339,8 @@ export default function CollegeForm() {
   })
 
   return (
-    <div className='w-full space-y-4 p-4'>
-      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
+    <div className='w-full'>
+      <div className='flex flex-col mb-3 sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
         {/* Search Bar & Filters */}
         <div className='flex flex-col md:flex-row gap-4 items-start md:items-center flex-1 w-full'>
           <SearchInput
