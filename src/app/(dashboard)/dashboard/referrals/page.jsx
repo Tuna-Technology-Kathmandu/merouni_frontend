@@ -11,11 +11,10 @@ import {
   DialogTitle,
   DialogClose,
 } from '@/ui/shadcn/dialog'
-import Loading from '../../../../ui/molecules/Loading'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import Table from '@/ui/shadcn/DataTable'
 import { Button } from '@/ui/shadcn/button'
-import { Search, X, Filter, ChevronDown, Edit2, Trash2, Eye } from 'lucide-react'
+import { Search, X, Filter, ChevronDown, Edit2, Trash2 } from 'lucide-react'
 import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 import { Select } from '@/ui/shadcn/select'
 import { Label } from '@/ui/shadcn/label'
@@ -184,7 +183,7 @@ const ReferralsPage = () => {
     }
 
     setReferrals(filtered)
-  }, [searchQuery, statusFilter, collegeFilter, allReferrals])
+  }, [searchQuery, statusFilter, allReferrals])
 
   // Close dropdowns when clicking outside
   useEffect(() => {
