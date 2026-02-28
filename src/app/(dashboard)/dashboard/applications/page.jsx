@@ -273,7 +273,8 @@ const ApplicationsPage = () => {
   if (loading && applications.length === 0) return <Loading />
 
   return (
-    <div className='w-full space-y-4 p-4'>
+    <div className='w-full'>
+
       <ToastContainer />
 
       {/* Sticky Header */}

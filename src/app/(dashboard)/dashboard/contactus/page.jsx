@@ -140,7 +140,8 @@ export default function ContactUsManager() {
 
 
     return (
-        <div className='w-full space-y-4 p-4'>
+        <div className='w-full'>
+
             <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
                 {/* Search */}
                 <SearchInput

@@ -158,7 +158,8 @@ export default function DisciplineManager() {
     ], [])
 
     return (
-        <div className='w-full space-y-4 p-4'>
+        <div className='w-full'>
+
             <ToastContainer />
 
             {/* Header */}

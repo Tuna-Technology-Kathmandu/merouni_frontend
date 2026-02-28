@@ -480,11 +480,11 @@ export default function EventManager() {
   ], [categories])
 
   return (
-    <div className='w-full space-y-4 p-4'>
+    <div className='w-full'>
       <ToastContainer position='top-right' autoClose={3000} />
 
       {/* Sticky Header */}
-      <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
+      <div className='sticky mb-3 top-0 z-30 bg-[#F7F8FA] py-4'>
         <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
           <SearchInput
             value={searchQuery}
