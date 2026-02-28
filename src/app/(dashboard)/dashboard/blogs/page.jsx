@@ -6,7 +6,7 @@ import { authFetch } from '@/app/utils/authFetch'
 import Loader from '@/ui/molecules/Loading'
 import Table from '@/ui/shadcn/DataTable'
 import { Select } from '@/ui/shadcn/select'
-import { Edit2, Trash2, Eye } from 'lucide-react'
+import { Edit2, Trash2, Eye, Plus } from 'lucide-react'
 import SearchInput from '@/ui/molecules/SearchInput'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -74,6 +74,15 @@ export default function BlogsManager() {
   const columns = useMemo(
     () => [
       {
+        header: 'S.N.',
+        accessorKey: 'id',
+        cell: ({ row }) => (
+          <span className="text-gray-500 font-medium">
+            {(pagination.currentPage - 1) * 10 + row.index + 1}
+          </span>
+        )
+      },
+      {
         header: 'Title',
         accessorKey: 'title',
         cell: ({ row }) => {
@@ -95,7 +104,7 @@ export default function BlogsManager() {
             <div className='flex items-center gap-3 max-w-xs overflow-hidden'>
               {featured_image ? (
                 <div
-                  className='w-20 h-20 rounded shrink-0 overflow-hidden bg-gray-100 cursor-pointer hover:opacity-80 transition-opacity'
+                  className='w-14 h-14 rounded shrink-0 overflow-hidden bg-gray-100 cursor-pointer hover:opacity-80 transition-opacity'
                   onClick={() => handleImageClick(featured_image, title)}
                 >
                   <img
@@ -105,23 +114,23 @@ export default function BlogsManager() {
                   />
                 </div>
               ) : (
-                <div className='w-20 h-20 rounded shrink-0 bg-gray-100 border border-dashed flex items-center justify-center text-xs text-gray-400'>
+                <div className='w-14 h-14 rounded shrink-0 bg-gray-100 border border-dashed flex items-center justify-center text-xs text-gray-400'>
                   No img
                 </div>
               )}
               <div className='flex-1 overflow-hidden'>
-                <div className='truncate font-medium text-gray-900'>{title}</div>
+                <div className='truncate font-semibold text-slate-900'>{title}</div>
                 <div className='flex flex-wrap gap-2 mt-1'>
                   {status && (
                     <span
-                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusClasses}`}
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusClasses}`}
                     >
                       {statusLabel}
                     </span>
                   )}
                   {visibility && (
                     <span
-                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${visibilityClasses}`}
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${visibilityClasses}`}
                     >
                       {visibilityLabel}
                     </span>
@@ -133,53 +142,51 @@ export default function BlogsManager() {
         }
       },
       {
-        header: 'Description',
-        accessorKey: 'description',
-        cell: ({ getValue }) => (
-          <div className='max-w-xs overflow-hidden'>
-            {getValue()?.substring(0, 100)}
-            {getValue()?.length > 100 ? '...' : ''}
-          </div>
-        )
-      },
-      {
         header: 'Created At',
         accessorKey: 'createdAt',
         cell: ({ getValue }) => {
           const date = new Date(getValue())
-          return <div className='whitespace-nowrap'>{formatDate(date)}</div>
+          return <div className='whitespace-nowrap text-sm text-slate-600'>{formatDate(date)}</div>
         }
       },
       {
         header: 'Actions',
         id: 'actions',
         cell: ({ row }) => (
-          <div className='flex gap-2'>
-            <button
+          <div className='flex gap-1'>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => handleView(row.original.slug)}
-              className='p-1 text-purple-600 hover:text-purple-800'
+              className='hover:bg-purple-50 text-purple-600'
               title='View Details'
             >
               <Eye className='w-4 h-4' />
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => handleEdit(row.original)}
-              className='p-1 text-blue-600 hover:text-blue-800'
+              className='hover:bg-blue-50 text-blue-600'
               disabled={tagsLoading}
+              title='Edit'
             >
               <Edit2 className='w-4 h-4' />
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => handleDeleteClick(row.original.id)}
-              className='p-1 text-red-600 hover:text-red-800'
+              className='hover:bg-red-50 text-red-600'
+              title='Delete'
             >
               <Trash2 className='w-4 h-4' />
-            </button>
+            </Button>
           </div>
         )
       }
     ],
-    [tags, tagsLoading]
+    [tags, tagsLoading, pagination]
   )
 
   useEffect(() => {
@@ -487,57 +494,63 @@ export default function BlogsManager() {
 
 
   return (
-    <>
-      <div className='w-full space-y-2'>
-        <div className='px-4 space-y-4'>
-          <div className='flex justify-between items-center pt-4'>
-            {/* Search Bar */}
-            <SearchInput
-              value={searchQuery}
-              onChange={(e) => handleSearchInput(e.target.value)}
-              placeholder='Search blogs...'
-              className='max-w-md'
-            />
-            {/* Filters & Button */}
-            <div className='flex gap-4 items-center'>
-              <Select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className='min-w-[150px]'
-              >
-                <option value='all'>All Status</option>
-                <option value='published'>Published</option>
-                <option value='draft'>Draft</option>
-                <option value='archived'>Archived</option>
-              </Select>
-              <Button onClick={handleAddBlog}>
-                Add Blog
-              </Button>
-            </div>
+    <div className='w-full'>
+      <ToastContainer />
+      {/* Sticky Header */}
+      <div className='sticky mb-3 top-0 z-30 bg-[#F7F8FA] py-4'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
+          <SearchInput
+            value={searchQuery}
+            onChange={(e) => handleSearchInput(e.target.value)}
+            placeholder='Search blogs...'
+            className='max-w-md w-full'
+          />
+          {/* Filters & Button */}
+          <div className='flex gap-4 items-center w-full sm:w-auto'>
+            <Select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className='min-w-[150px] h-11'
+            >
+              <option value='all'>All Status</option>
+              <option value='published'>Published</option>
+              <option value='draft'>Draft</option>
+              <option value='archived'>Archived</option>
+            </Select>
+            <Button
+              onClick={handleAddBlog}
+              className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2 h-11 px-6 shadow-md shadow-[#387cae]/20 transition-all active:scale-95 whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4" />
+              Add Blog
+            </Button>
           </div>
-
-          <BlogFormModal
-            isOpen={isOpen}
-            onClose={handleCloseModal}
-            isEditing={editing}
-            initialData={selectedBlog}
-            categories={categories}
-            onSave={handleSave}
-            submitting={submitting}
-          />
-
-          {/* Table Section */}
-          <Table
-            data={blogs}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => loadData(newPage)}
-            onSearch={handleSearch}
-            showSearch={false}
-            loading={loading}
-          />
         </div>
       </div>
+
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
+        {/* Table Section */}
+        <Table
+          data={blogs}
+          columns={columns}
+          pagination={pagination}
+          onPageChange={(newPage) => loadData(newPage)}
+          onSearch={handleSearch}
+          showSearch={false}
+          loading={loading}
+          emptyContent={searchQuery ? "No blogs found matching your search." : "No blogs available."}
+        />
+      </div>
+
+      <BlogFormModal
+        isOpen={isOpen}
+        onClose={handleCloseModal}
+        isEditing={editing}
+        initialData={selectedBlog}
+        categories={categories}
+        onSave={handleSave}
+        submitting={submitting}
+      />
 
       <ConfirmationDialog
         open={isDialogOpen}
@@ -560,6 +573,6 @@ export default function BlogsManager() {
         imageUrl={lightbox.imageUrl}
         altText={lightbox.altText}
       />
-    </>
+    </div>
   )
 }
