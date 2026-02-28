@@ -138,6 +138,8 @@ const CreateUpdateUniversityModal = ({
         } else {
             onSystemClose()
         }
+                reset()
+
     }
 
     // Load resources (levels, courses)

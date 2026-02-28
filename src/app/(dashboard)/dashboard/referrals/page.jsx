@@ -85,8 +85,6 @@ const ReferralsPage = () => {
     setTableLoading(true)
     try {
       const data = await fetchReferrals(page, isStudent)
-      // For students, the API returns an array directly
-      // For admin, it returns { items, pagination }
       if (isStudent) {
         const referralsArray = Array.isArray(data) ? data : data.items || []
         setAllReferrals(referralsArray)
@@ -97,7 +95,7 @@ const ReferralsPage = () => {
           total: referralsArray.length
         })
       } else {
-        const referralsArray = data.items || data.referrals || []
+        const referralsArray = data.items || []
         setAllReferrals(referralsArray)
         setReferrals(referralsArray)
         setPagination({
@@ -421,11 +419,11 @@ const ReferralsPage = () => {
 
 
   return (
-    <div className='w-full space-y-4 p-4'>
+    <div className='w-full '>
       <ToastContainer />
 
       {/* Filter Header */}
-      <div className='flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
+      <div className='flex flex-col mb-4 xl:flex-row justify-between items-start xl:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
         <div className="flex flex-1 flex-col md:flex-row gap-4 w-full">
           <SearchInput
             className='flex-1'
