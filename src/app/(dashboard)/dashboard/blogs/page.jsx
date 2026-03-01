@@ -11,6 +11,7 @@ import Table from '@/ui/shadcn/DataTable'
 import { Select } from '@/ui/shadcn/select'
 import { formatDate } from '@/utils/date.util'
 import { Edit2, Eye, Plus, Trash2 } from 'lucide-react'
+import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -73,19 +74,10 @@ export default function BlogsManager() {
   const columns = useMemo(
     () => [
       {
-        header: 'S.N.',
-        accessorKey: 'id',
-        cell: ({ row }) => (
-          <span className="text-gray-500 font-medium">
-            {(pagination.currentPage - 1) * 10 + row.index + 1}
-          </span>
-        )
-      },
-      {
         header: 'Title',
         accessorKey: 'title',
         cell: ({ row }) => {
-          const { title, status, visibility, featured_image } = row.original
+          const { title, status, visibility, featured_image, slug } = row.original
           const statusLabel = status || 'draft'
           const visibilityLabel = visibility || 'private'
 
@@ -118,7 +110,14 @@ export default function BlogsManager() {
                 </div>
               )}
               <div className='flex-1 overflow-hidden'>
-                <div className='truncate font-semibold text-slate-900'>{title}</div>
+                <Link
+                  href={slug ? `/blogs/${slug}` : '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className='truncate font-semibold text-slate-900 hover:text-[#387cae] hover:underline block'
+                >
+                  {title}
+                </Link>
                 <div className='flex flex-wrap gap-2 mt-1'>
                   {status && (
                     <span
@@ -139,6 +138,15 @@ export default function BlogsManager() {
             </div>
           )
         }
+      },
+      {
+        header: 'Category',
+        accessorKey: 'blogCategory.title',
+        cell: ({ row }) => (
+          <span className="text-sm text-slate-600">
+            {row.original.blogCategory?.title || '—'}
+          </span>
+        )
       },
       {
         header: 'Created At',
@@ -185,7 +193,7 @@ export default function BlogsManager() {
         )
       }
     ],
-    [tags, tagsLoading, pagination]
+    [tags, tagsLoading]
   )
 
   useEffect(() => {

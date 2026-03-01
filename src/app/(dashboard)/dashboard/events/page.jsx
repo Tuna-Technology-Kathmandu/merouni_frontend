@@ -6,6 +6,7 @@ import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Edit2, Eye, MapPin, Plus, Trash2 } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -374,7 +375,7 @@ export default function EventManager() {
       header: 'Title',
       accessorKey: 'title',
       cell: ({ row }) => {
-        const { title, image } = row.original
+        const { title, image, slugs } = row.original
         return (
           <div className='flex items-center gap-3 max-w-xs overflow-hidden'>
             {image ? (
@@ -387,7 +388,14 @@ export default function EventManager() {
               </div>
             )}
             <div className='flex-1 min-w-0'>
-              <div className='truncate font-medium text-gray-900'>{title}</div>
+              <Link
+                href={slugs ? `/events/${slugs}` : '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className='truncate font-medium text-gray-900 hover:text-[#387cae] hover:underline block'
+              >
+                {title}
+              </Link>
             </div>
           </div>
         )

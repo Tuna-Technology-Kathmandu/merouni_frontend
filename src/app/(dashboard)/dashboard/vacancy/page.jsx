@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import Link from 'next/link'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { useSelector } from 'react-redux'
@@ -291,9 +292,19 @@ const VacancyManager = () => {
     {
       header: 'Title',
       accessorKey: 'title',
-      cell: ({ row }) => (
-        <div className="font-medium text-gray-900">{row.original.title}</div>
-      )
+      cell: ({ row }) => {
+        const { title, slugs } = row.original
+        return (
+          <Link
+            href={slugs ? `/vacancies/${slugs}` : '#'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-gray-900 hover:text-[#387cae] hover:underline"
+          >
+            {title}
+          </Link>
+        )
+      }
     },
     {
       header: 'Organization / Institution',
