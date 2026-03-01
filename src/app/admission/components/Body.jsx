@@ -151,7 +151,7 @@ const AdmissionPage = () => {
                 onSearch={fetchCourses}
                 onSelect={(prog) => {
                   setSelectedCourseObject(prog)
-                  setSelectedCourse(prog.slugs)
+                  setSelectedCourse(prog.id?.toString() ?? '')
                 }}
                 onRemove={() => {
                   setSelectedCourseObject(null)
@@ -160,7 +160,7 @@ const AdmissionPage = () => {
                 selectedItems={selectedCourseObject}
                 placeholder="Search or select course..."
                 displayKey="title"
-                valueKey="slugs"
+                valueKey="id"
                 isMulti={false}
                 className="w-full"
               />

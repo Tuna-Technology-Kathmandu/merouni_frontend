@@ -1,4 +1,3 @@
-
 export async function getAdmission(search = '', page = 1, course = '') {
   try {
     const url = new URL(`${process.env.baseUrl}/college/admission`)
@@ -44,13 +43,16 @@ export async function getAdmission(search = '', page = 1, course = '') {
 
 export async function getAdmissionDetail(id) {
   try {
-    const response = await fetch(`${process.env.baseUrl}/college/admission/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      cache: 'no-store'
-    })
+    const response = await fetch(
+      `${process.env.baseUrl}/college/admission/${id}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        cache: 'no-store'
+      }
+    )
 
     if (!response.ok) {
       throw new Error('Failed to fetch Admission Detail')
@@ -66,12 +68,14 @@ export async function getAdmissionDetail(id) {
 
 export async function fetchCourses(searchQuery = '') {
   try {
-    const response = await fetch(`${process.env.baseUrl}/course?limit=100${searchQuery ? `&q=${encodeURIComponent(searchQuery)}` : ''}`)
-    if (!response.ok) throw new Error('Failed to fetch courses')
+    const response = await fetch(
+      `${process.env.baseUrl}/program?limit=100${searchQuery ? `&q=${encodeURIComponent(searchQuery)}` : ''}`
+    )
+    if (!response.ok) throw new Error('Failed to fetch programs')
     const data = await response.json()
     return data.items
   } catch (error) {
-    console.error('Error fetching courses:', error)
+    console.error('Error fetching programs:', error)
     return []
   }
 }
