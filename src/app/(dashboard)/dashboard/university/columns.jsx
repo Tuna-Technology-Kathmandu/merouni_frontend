@@ -62,10 +62,10 @@ export const createColumns = ({
       header: 'Established',
       accessorKey: 'date_of_establish',
       cell: ({ getValue }) => {
-        const date = getValue()
-        return date ? (
+        const year = getValue()
+        return year ? (
           <span className='text-sm font-medium text-gray-600 uppercase'>
-            {new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}
+            {year}
           </span>
         ) : <span className='text-gray-400'>-</span>
       }

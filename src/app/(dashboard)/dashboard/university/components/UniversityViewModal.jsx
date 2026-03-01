@@ -1,7 +1,6 @@
 import React from 'react'
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
 import { Button } from '@/ui/shadcn/button'
-import { formatDate } from '@/utils/date.util'
 import {
     GraduationCap,
     MapPin,
@@ -12,7 +11,8 @@ import {
     FileText,
     Activity,
     Users,
-    Globe
+    Globe,
+    Link
 } from 'lucide-react'
 import { cn } from '@/app/lib/utils'
 
@@ -88,7 +88,7 @@ const UniversityViewModal = ({ isOpen, onClose, data, loading }) => {
 
                                     <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
                                         <InfoRow icon={MapPin} label="Location" value={[data.city, data.state, data.country].filter(Boolean).join(', ')} />
-                                        <InfoRow icon={Calendar} label="Established" value={data.date_of_establish ? formatDate(data.date_of_establish) : null} />
+                                        <InfoRow icon={Calendar} label="Established" value={data.date_of_establish ? String(data.date_of_establish) : null} />
                                         <InfoRow icon={Globe} label="Postal Code" value={data.postal_code} />
                                     </div>
                                 </div>
@@ -148,6 +148,11 @@ const UniversityViewModal = ({ isOpen, onClose, data, loading }) => {
                                             <div className="grid grid-cols-1 gap-3">
                                                 <InfoRow icon={Mail} label="Email Address" value={data.contact.email} />
                                                 <InfoRow icon={Phone} label="Phone Number" value={data.contact.phone_number} />
+                                                <InfoRow icon={Link} label="Website" value={data.contact.website_url ? (
+                                                    <a href={data.contact.website_url} target="_blank" rel="noopener noreferrer" className="text-[#387cae] hover:underline">
+                                                        {data.contact.website_url}
+                                                    </a>
+                                                ) : null} />
                                                 <InfoRow icon={Globe} label="Fax/PO Box" value={[data.contact.faxes, data.contact.poboxes].filter(Boolean).join(' / ')} />
                                             </div>
                                         </div>

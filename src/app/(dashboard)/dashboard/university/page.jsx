@@ -90,7 +90,7 @@ const SortableCard = ({ university, rank, onView, onEdit, onDelete }) => {
   }
 
   const location = [university.city, university.state, university.country].filter(Boolean).join(', ')
-  const year = university.date_of_establish ? new Date(university.date_of_establish).getFullYear() : null
+  const year = university.date_of_establish ?? null
 
   return (
     <div
@@ -295,7 +295,7 @@ export default function UniversityPage() {
       all.sort((a, b) => {
         const oA = a.order_no_for_website ?? Infinity
         const oB = b.order_no_for_website ?? Infinity
-        return oA !== oB ? oA - oB : a.id - b.id
+        return oA !== oB ? oA - oB : b.id - a.id
       })
 
       setUniversities(all)

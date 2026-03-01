@@ -12,8 +12,6 @@ import VideoSection from './VideoSection'
 import LevelSections from './LevelSections'
 import ImageGallery from './Gallery'
 import MapSection from './MapSection'
-import { formatDate } from '@/utils/date.util'
-
 const UpperSection = ({ university }) => {
 
   console.log(university, "universityuniversityuniversity")
@@ -71,7 +69,7 @@ const UpperSection = ({ university }) => {
               Established
             </p>
             <p className='text-sm text-gray-700'>
-              {formatDate(university?.date_of_establish) || 'N/A'}
+              {university?.date_of_establish ?? 'N/A'}
             </p>
           </div>
 
