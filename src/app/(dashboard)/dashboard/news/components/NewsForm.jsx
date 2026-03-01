@@ -163,9 +163,6 @@ export default function NewsForm({
     if (!data.category_id) {
       newErrors.category_id = 'Category is required'
     }
-    if (!uploadedFiles.featured_image) {
-      newErrors.featured_image = 'Featured image is required'
-    }
     const descriptionText = (data.description || '').replace(/<[^>]*>/g, '').trim()
     if (!descriptionText) {
       newErrors.description = 'Description is required'
@@ -282,7 +279,7 @@ export default function NewsForm({
               <div className="lg:col-span-4 space-y-8">
                 {/* Featured Image Section */}
                 <div className={`bg-white p-6 rounded-2xl shadow-sm border ${formErrors.featured_image ? 'border-red-300' : 'border-gray-100'}`}>
-                  <SectionHeader icon={ImageIcon} title="Featured Image" subtitle="Required — main image for the news" />
+                  <SectionHeader icon={ImageIcon} title="Featured Image" subtitle="Optional — main image for the news" />
                   <div className={`p-4 bg-gray-50 rounded-md border border-dashed ${formErrors.featured_image ? 'border-red-300 bg-red-50/30' : 'border-gray-100'}`}>
                     <FileUpload
                       label=''

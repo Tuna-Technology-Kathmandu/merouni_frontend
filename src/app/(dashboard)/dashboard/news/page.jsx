@@ -5,6 +5,7 @@ import { Button } from '@/ui/shadcn/button'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
 import { Edit2, Eye, Trash2, Plus } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -80,19 +81,10 @@ export default function NewsManager() {
   const columns = useMemo(
     () => [
       {
-        header: 'S.N.',
-        accessorKey: 'id',
-        cell: ({ row }) => (
-          <span className="text-gray-500 font-medium">
-            {(pagination.currentPage - 1) * 10 + row.index + 1}
-          </span>
-        )
-      },
-      {
         header: 'Title',
         accessorKey: 'title',
         cell: ({ row }) => {
-          const { title, status, visibility, featured_image } = row.original
+          const { title, status, visibility, featured_image, slug } = row.original
           const statusLabel = status || 'draft'
           const visibilityLabel = visibility || 'private'
 
@@ -125,7 +117,14 @@ export default function NewsManager() {
                 </div>
               )}
               <div className='flex-1 overflow-hidden'>
-                <div className='truncate font-semibold text-slate-900'>{title}</div>
+                <Link
+                  href={slug ? `/news/${slug}` : '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className='truncate font-semibold text-slate-900 hover:text-[#387cae] hover:underline block'
+                >
+                  {title}
+                </Link>
                 <div className='flex flex-wrap gap-2 mt-1'>
                   {status && (
                     <span
@@ -144,6 +143,18 @@ export default function NewsManager() {
                 </div>
               </div>
             </div>
+          )
+        }
+      },
+      {
+        header: 'Category',
+        accessorKey: 'newsCategory',
+        cell: ({ row }) => {
+          const category = row.original.newsCategory
+          return (
+            <span className="text-sm text-slate-600">
+              {category?.title || '—'}
+            </span>
           )
         }
       },
@@ -193,7 +204,7 @@ export default function NewsManager() {
         )
       }
     ],
-    [pagination]
+    []
   )
 
   useEffect(() => {
