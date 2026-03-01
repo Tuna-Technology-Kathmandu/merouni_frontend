@@ -72,7 +72,7 @@ const CollegeRankings = () => {
   if (loading) {
     return (
       <div className='bg-gradient-to-br from-blue-50 via-white to-green-50 py-8 md:py-10'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 md:px-8'>
+        <div className='container mx-auto px-4 sm:px-6 md:px-8'>
           <div className='h-6 w-48 bg-gray-200 rounded animate-pulse mb-6' />
           <div className='flex gap-4 overflow-hidden'>
             {[1, 2, 3].map((i) => (
@@ -100,11 +100,13 @@ const CollegeRankings = () => {
 
   return (
     <div className='bg-gradient-to-br from-blue-50 via-white to-green-50 py-8 md:py-10'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 md:px-8'>
-        <h2 className='text-xl font-semibold text-gray-800 mt-4 mb-5 md:mt-5 md:mb-6 pb-2 relative inline-block'>
-          Top College Rankings
-          <span className='absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#0870A8] to-[#31AD8F] rounded-full' />
-        </h2>
+      <div className='container mx-auto px-4 sm:px-6 md:px-8'>
+        <div className='mb-10'>
+          <h2 className='text-2xl md:text-3xl font-bold text-gray-900'>
+            Top College Rankings
+          </h2>
+          <div className='h-1 w-20 mt-2 rounded-full' style={{ backgroundColor: '#387cae' }}></div>
+        </div>
 
         <div className='relative group'>
           {canScrollLeft && (

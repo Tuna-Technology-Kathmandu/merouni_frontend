@@ -39,11 +39,11 @@ const SideBanner = ({ banners = [], loading = false }) => {
           >
             <img
               src={
-                banner.banner_image || '/images/meroUniSmall.gif'
+                banner.banner_image || '/images/meroUniLarge.gif'
               }
               onError={(e) => {
                 e.target.onerror = null
-                e.target.src = '/images/meroUniSmall.gif'
+                e.target.src = '/images/meroUniLarge.gif'
               }}
               alt={`Banner position ${banner.display_position}`}
               className='w-full h-32 md:h-36 object-cover'

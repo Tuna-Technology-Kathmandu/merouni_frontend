@@ -78,10 +78,12 @@ const Event = () => {
       className='bg-gradient-to-br from-blue-50 via-white to-green-50 py-8 md:py-10'
     >
       <div className='container mx-auto px-4 sm:px-6 md:px-8'>
-        <h1 className='text-xl font-semibold text-gray-800 mt-4 mb-5 md:mt-5 md:mb-6 text-left pb-2 relative inline-block'>
-          Our Events
-          <span className='absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#0870A8] to-[#31AD8F]'></span>
-        </h1>
+        <div className='mb-10'>
+          <h2 className='text-2xl md:text-3xl font-bold text-gray-900'>
+            Our Events
+          </h2>
+          <div className='h-1 w-20 mt-2 rounded-full' style={{ backgroundColor: '#387cae' }}></div>
+        </div>
 
         {loading && (
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 w-full'>

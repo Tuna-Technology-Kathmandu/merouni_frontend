@@ -19,6 +19,7 @@ import CreateUpdateCollegeModal from '@/ui/molecules/dialogs/college/CreateUpdat
 import ViewCollegeModal from '@/ui/molecules/dialogs/college/ViewCollegeModal'
 import { Button } from '../../../../ui/shadcn/button'
 import { createColumns } from './columns'
+import ImageLightbox from '@/ui/molecules/image-lightbox'
 
 
 
@@ -49,6 +50,21 @@ export default function CollegeForm() {
   const [viewModalOpen, setViewModalOpen] = useState(false)
   const [viewCollegeData, setViewCollegeData] = useState(null)
   const [loadingView, setLoadingView] = useState(false)
+
+  // Lightbox State
+  const [lightbox, setLightbox] = useState({
+    isOpen: false,
+    imageUrl: '',
+    altText: ''
+  })
+
+  const handleImageClick = (imageUrl, altText) => {
+    setLightbox({
+      isOpen: true,
+      imageUrl,
+      altText: altText || 'College Logo'
+    })
+  }
 
 
   const author_id = useSelector((state) => state.user.data?.id)
@@ -314,18 +330,17 @@ export default function CollegeForm() {
     setViewModalOpen(false)
     setViewCollegeData(null)
   }
-
   const columns = createColumns({
     handleView,
     handleEdit,
     handleOpenCredentialsModal,
-    handleDeleteClick
+    handleDeleteClick,
+    handleImageClick
   })
 
-
   return (
-    <div className='w-full space-y-4 p-4'>
-      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
+    <div className='w-full'>
+      <div className='flex flex-col mb-3 sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
         {/* Search Bar & Filters */}
         <div className='flex flex-col md:flex-row gap-4 items-start md:items-center flex-1 w-full'>
           <SearchInput
@@ -405,7 +420,12 @@ export default function CollegeForm() {
         setColleges={setColleges}
       />
 
-
+      <ImageLightbox
+        isOpen={lightbox.isOpen}
+        onClose={() => setLightbox({ ...lightbox, isOpen: false })}
+        imageUrl={lightbox.imageUrl}
+        altText={lightbox.altText}
+      />
     </div>
   )
 }

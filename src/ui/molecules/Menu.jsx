@@ -69,11 +69,12 @@ const SubMenu = ({
   )
 
   const handleMainClick = () => {
-    // For specific parent menus (Referrals, Colleges), navigate to first submenu only when expanding (not collapsing)
+    // For specific parent menus (Referrals, Colleges/Schools, Consultancy), navigate to first submenu only when expanding (not collapsing)
     const shouldAutoNavigate =
       (item.label === 'Referrals' ||
-        item.label === 'Colleges' ||
+        item.label === 'Colleges/Schools' ||
         item.label === 'University' ||
+        item.label === 'Consultancy' ||
         item.label === 'MeroUni') &&
       !isExpanded &&
       firstSubmenu
@@ -88,8 +89,9 @@ const SubMenu = ({
       isCollapsed &&
       firstSubmenu &&
       item.label !== 'Referrals' &&
-      item.label !== 'Colleges' &&
+      item.label !== 'Colleges/Schools' &&
       item.label !== 'University' &&
+      item.label !== 'Consultancy' &&
       item.label !== 'MeroUni'
     ) {
       // Preserve previous behavior for other menus when collapsed

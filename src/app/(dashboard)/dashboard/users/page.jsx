@@ -308,7 +308,8 @@ export default function UsersManager() {
   )
 
   return (
-    <div className='w-full space-y-4 p-4'>
+    <div className='w-full'>
+
 
       {/* Sticky Header */}
       <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>

@@ -42,7 +42,7 @@ const FormSection = ({ id, college }) => {
     student_phone_no: '',
     student_email: '',
     student_description: '',
-    course_id: '',
+    program_id: '',
   })
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const FormSection = ({ id, college }) => {
       newErrors.student_email = 'Email is required'
     if (!formData.student_phone_no && !isLoggedIn)
       newErrors.student_phone_no = 'Phone number is required'
-    if (!formData.course_id) newErrors.course_id = 'Please select a course'
+    if (!formData.program_id) newErrors.program_id = 'Please select a course'
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -97,7 +97,7 @@ const FormSection = ({ id, college }) => {
           student_id: user?.id,
           referral_type: 'self',
           college_id: formData.college_id,
-          course_id: formData.course_id || null,
+          program_id: formData.program_id || null,
           description: formData.student_description
         }
         : {
@@ -106,7 +106,7 @@ const FormSection = ({ id, college }) => {
           student_phone_no: formData.student_phone_no,
           student_email: formData.student_email,
           student_description: formData.student_description,
-          course_id: formData.course_id
+          program_id: formData.program_id
         }
 
       const response = await authFetch(
@@ -150,7 +150,7 @@ const FormSection = ({ id, college }) => {
         student_phone_no: isLoggedIn ? user?.phoneNo || '' : '',
         student_email: isLoggedIn ? user?.email || '' : '',
         student_description: '',
-        course_id: ''
+        program_id: ''
       })
       setIsSubmitting(false)
 
@@ -161,18 +161,19 @@ const FormSection = ({ id, college }) => {
     }
   }
 
+  console.log(college,"collegecollegecollege")
   const courseOptions = useMemo(() => {
-    if (!college?.collegeCourses) return []
+    if (!college?.collegePrograms) return []
     if (id) {
-      const option = college.collegeCourses.find(
+      const option = college.collegePrograms.find(
         (item) => String(item.id) === String(id)
       )
       if (option) {
-        setFormData((prev) => ({ ...prev, course_id: option?.id }))
+        setFormData((prev) => ({ ...prev, program_id: option?.id }))
       }
     }
-    return college.collegeCourses
-  }, [id, college?.collegeCourses])
+    return college.collegePrograms
+  }, [id, college?.collegePrograms])
 
   if (isSubmitted) {
     return (
@@ -183,7 +184,11 @@ const FormSection = ({ id, college }) => {
         description={
           <>
             Thank you for applying. Your application has been successfully
-            submitted to the college. We will get back to you soon.
+            submitted to{' '}
+            <span className='font-semibold text-gray-900'>
+              {college?.name || 'the college'}
+            </span>
+            . We will get back to you soon.
           </>
         }
       >
@@ -265,15 +270,29 @@ const FormSection = ({ id, college }) => {
         }}
       >
         <div className='relative z-10 text-left'>
-          <div className='flex items-center gap-3 mb-2'>
-            <GraduationCap className='w-8 h-8' />
-            <h2 className='text-3xl font-bold font-poppins'>
-              Apply For College
-            </h2>
+          <div className='flex items-center gap-4 mb-2'>
+            {college?.logo ? (
+              <div className='bg-white p-2 rounded-xl shadow-sm group-hover:shadow-md transition-shadow'>
+                <img
+                  src={college.logo}
+                  alt={college.name}
+                  className='w-12 h-12 object-contain'
+                />
+              </div>
+            ) : (
+              <GraduationCap className='w-10 h-10' />
+            )}
+            <div>
+              <h2 className='text-2xl md:text-3xl font-bold font-poppins tracking-tight'>
+                Apply to {college?.name || 'College'}
+              </h2>
+              <p className='text-white/80 text-sm md:text-base'>
+                Begin your academic journey today
+              </p>
+            </div>
           </div>
-          <p className='text-white/80'>Begin your academic journey today</p>
         </div>
-        <div className='absolute -right-8 -bottom-8 opacity-10'>
+        <div className='absolute -right-8 -bottom-8 opacity-10 pointer-events-none'>
           <GraduationCap size={160} />
         </div>
       </div>
@@ -339,14 +358,14 @@ const FormSection = ({ id, college }) => {
               label='Select Program'
               options={courseOptions}
               displayKey={(opt) => opt?.program?.title || 'Unknown Program'}
-              value={formData.course_id}
+              value={formData.program_id}
               onChange={(option) => {
-                setFormData((prev) => ({ ...prev, course_id: option?.id || '' }))
-                if (errors.course_id)
-                  setErrors((prev) => ({ ...prev, course_id: '' }))
+                setFormData((prev) => ({ ...prev, program_id: option?.id || '' }))
+                if (errors.program_id)
+                  setErrors((prev) => ({ ...prev, program_id: '' }))
               }}
               placeholder='Search and select a program'
-              error={errors.course_id}
+              error={errors.program_id}
               required
             />
           </div>
@@ -360,7 +379,7 @@ const FormSection = ({ id, college }) => {
               value={formData.student_description}
               onChange={handleChange}
               rows={4}
-              className='flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all resize-none'
+              className='flex min-h-[80px] w-full rounded-md  resize-none'
             />
           </div>
 

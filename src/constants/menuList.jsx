@@ -136,7 +136,7 @@ export const menuItems = [
 
       {
         icon: <IoSchoolSharp className='text-xl' />,
-        label: 'Colleges',
+        label: 'Colleges/Schools',
         href: null, // No direct href, has submenus
         visible: ['admin', 'editor'],
         submenus: [
@@ -157,6 +157,12 @@ export const menuItems = [
             label: 'College Orderings',
             href: '/dashboard/college-orderings',
             visible: ['admin', 'editor']
+          },
+           {
+            icon: <SortAsc className='text-lg' />,
+            label: 'School Orderings',
+            href: '/dashboard/school-orderings',
+            visible: ['admin', 'editor']
           }
         ]
       },
@@ -166,26 +172,7 @@ export const menuItems = [
         href: '/dashboard/university',
         visible: ['admin', 'editor']
       },
-      {
-        icon: <IoSchoolSharp className='text-xl' />,
-        label: 'Schools',
-        href: null,
-        visible: ['admin', 'editor'],
-        submenus: [
-          {
-            icon: <IoSchoolSharp className='text-lg' />,
-            label: 'Manage Schools',
-            href: '/dashboard/colleges?level=School',
-            visible: ['admin', 'editor']
-          },
-          {
-            icon: <SortAsc className='text-lg' />,
-            label: 'School Orderings',
-            href: '/dashboard/school-orderings',
-            visible: ['admin', 'editor']
-          }
-        ]
-      },
+     
       {
         icon: <FaHandshake className='text-xl' />,
         label: 'Consultancy',
