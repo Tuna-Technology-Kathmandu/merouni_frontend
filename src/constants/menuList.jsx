@@ -25,6 +25,7 @@ import {
   MdQuiz,
   MdSchool
 } from 'react-icons/md'
+import { BookOpen } from 'lucide-react'
 import { VscReferences } from 'react-icons/vsc'
 
 export const menuItems = [
@@ -340,7 +341,7 @@ export const menuItems = [
         visible: ['admin', 'editor']
       },
       {
-        icon: <FaGraduationCap className='text-xl' />,
+        icon: <BookOpen className='text-xl' />,
         label: 'Program',
         href: '/dashboard/program',
         visible: ['admin', 'editor']

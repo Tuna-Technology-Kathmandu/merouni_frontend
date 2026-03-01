@@ -152,6 +152,15 @@ export default function ProgramForm() {
       accessorKey: 'title'
     },
     {
+      header: 'University',
+      accessorKey: 'universities',
+      cell: ({ row }) => {
+        const universities = row.original.universities || []
+        const names = universities.map((u) => u?.fullname).filter(Boolean)
+        return names.length > 0 ? names.join(', ') : '—'
+      }
+    },
+    {
       header: 'Duration',
       accessorKey: 'duration'
     },
@@ -202,7 +211,6 @@ export default function ProgramForm() {
     }
   ]
 
-  console.log(programs, "programsprograms")
   return (
     <div className='w-full'>
 
