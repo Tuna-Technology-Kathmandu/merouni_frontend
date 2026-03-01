@@ -67,6 +67,12 @@ export const menuItems = [
             label: 'Banner',
             href: '/dashboard/banner',
             visible: ['admin', 'editor']
+          },
+          {
+            icon: <HiOutlineUsers className='text-lg' />,
+            label: 'Users',
+            href: '/dashboard/users',
+            visible: ['admin']
           }
         ]
       },
@@ -290,13 +296,6 @@ export const menuItems = [
         label: 'Edit Consultancy Info',
         href: '/dashboard/consultancy',
         visible: ['consultancy']
-      },
-
-      {
-        icon: <HiOutlineUsers className='text-xl' />,
-        label: 'Users',
-        href: '/dashboard/users',
-        visible: ['admin']
       },
 
       {
