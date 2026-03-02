@@ -45,6 +45,24 @@ export const menuItems = [
         visible: ['admin', 'editor'],
         submenus: [
           {
+            icon: <HiOutlineUsers className='text-lg' />,
+            label: 'Users',
+            href: '/dashboard/users',
+            visible: ['admin']
+          },
+          {
+            icon: <FaHandshake className='text-lg' />,
+            label: 'Approve Agents',
+            href: '/dashboard/approve-agents',
+            visible: ['admin']
+          },
+          {
+            icon: <FaBuilding className='text-lg' />,
+            label: 'Banner',
+            href: '/dashboard/banner',
+            visible: ['admin', 'editor']
+          },
+          {
             icon: <MdPermContactCalendar className='text-lg' />,
             label: 'Messages',
             href: '/dashboard/contactus',
@@ -61,18 +79,6 @@ export const menuItems = [
             label: 'Videos',
             href: '/dashboard/videos',
             visible: ['admin', 'editor']
-          },
-          {
-            icon: <FaBuilding className='text-lg' />,
-            label: 'Banner',
-            href: '/dashboard/banner',
-            visible: ['admin', 'editor']
-          },
-          {
-            icon: <HiOutlineUsers className='text-lg' />,
-            label: 'Users',
-            href: '/dashboard/users',
-            visible: ['admin']
           }
         ]
       },

@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
@@ -8,6 +9,7 @@ import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Button } from '@/ui/shadcn/button'
 import CreateUpdateUniversityModal from '@/ui/molecules/dialogs/university/CreateUpdateUniversityModal'
 import UniversityViewModal from './components/UniversityViewModal'
+import ImageLightbox from '@/ui/molecules/image-lightbox'
 import {
   Plus,
   GripVertical,
@@ -17,6 +19,7 @@ import {
   Trash2,
   Search,
   MapPin,
+  Globe,
   CalendarDays,
   Loader2,
   GraduationCap
@@ -34,7 +37,7 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
+  rectSortingStrategy,
   useSortable
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
@@ -72,8 +75,8 @@ const TypeBadge = ({ type }) => {
   )
 }
 
-// ─── Sortable University Card ─────────────────────────────────────────────────
-const SortableCard = ({ university, rank, onView, onEdit, onDelete }) => {
+// ─── Sortable University Card (grid layout, college-style) ────────────────────
+const SortableCard = ({ university, onView, onEdit, onDelete, onImageClick }) => {
   const {
     attributes,
     listeners,
@@ -84,13 +87,15 @@ const SortableCard = ({ university, rank, onView, onEdit, onDelete }) => {
   } = useSortable({ id: university.id })
 
   const style = {
-    transform: transform ? CSS.Transform.toString({ ...transform, x: 0 }) : undefined,
+    transform: transform ? CSS.Transform.toString(transform) : undefined,
     transition,
-    opacity: isDragging ? 0 : 1
+    opacity: isDragging ? 0.5 : 1
   }
 
   const location = [university.city, university.state, university.country].filter(Boolean).join(', ')
   const year = university.date_of_establish ?? null
+  const websiteUrl = university.contact?.website_url
+  const mapUrl = university.map
 
   return (
     <div
@@ -98,62 +103,102 @@ const SortableCard = ({ university, rank, onView, onEdit, onDelete }) => {
       style={style}
       {...attributes}
       className={cn(
-        'bg-white border rounded-2xl transition-all duration-200',
+        'bg-white border rounded-2xl transition-all duration-200 overflow-hidden',
         isDragging
-          ? 'border-[#387cae]/30 bg-[#387cae]/[0.03]'
+          ? 'border-[#387cae]/40 shadow-xl ring-2 ring-[#387cae]/20'
           : 'border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300'
       )}
     >
-      <div className='flex items-center gap-3 px-4 py-3'>
-
-        {/* Drag handle */}
-        <div
-          {...listeners}
-          className='shrink-0 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing touch-none transition-colors'
-          title='Drag to reorder'
-        >
-          <GripVertical size={18} />
-        </div>
-
-        {/* Rank circle */}
-        <div className='w-8 h-8 rounded-full bg-[#387cae]/10 flex items-center justify-center shrink-0'>
-          <span className='text-[11px] font-bold text-[#387cae] tabular-nums'>{rank}</span>
-        </div>
-
-        {/* Logo */}
-        <div className='w-[52px] h-[52px] rounded-md bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm'>
-          {university.logo
-            ? <img src={university.logo} alt={university.fullname} className='w-full h-full object-contain p-1.5' />
-            : <GraduationCap className='w-6 h-6 text-gray-300' />}
-        </div>
-
-        {/* Info */}
-        <div className='flex-1 min-w-0'>
-          <div className='flex items-center gap-2 flex-wrap'>
-            <h3 className='text-[15px] font-bold text-gray-900 truncate leading-tight'>
-              {university.fullname}
-            </h3>
-            <TypeBadge type={university.type_of_institute} />
-            <StatusBadge status={university.status} />
+      <div className='flex flex-col h-full'>
+        <div className='flex items-start gap-3 p-4'>
+          {/* Drag handle */}
+          <div
+            {...listeners}
+            className='shrink-0 mt-1 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing touch-none transition-colors'
+            title='Drag to reorder'
+          >
+            <GripVertical size={18} />
           </div>
-          <div className='flex items-center gap-4 mt-1.5'>
-            {location && (
-              <span className='flex items-center gap-1.5 text-[12px] text-gray-400'>
-                <MapPin size={12} className='shrink-0' />
-                {location}
-              </span>
+
+          {/* Logo (clickable) */}
+          <div
+            role='button'
+            tabIndex={0}
+            onClick={() => university.logo && onImageClick(university.logo, university.fullname)}
+            onKeyDown={(e) => e.key === 'Enter' && university.logo && onImageClick(university.logo, university.fullname)}
+            className={cn(
+              'w-16 h-16 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm',
+              university.logo && 'cursor-pointer hover:opacity-90 transition-opacity'
             )}
-            {year && (
-              <span className='flex items-center gap-1.5 text-[12px] text-gray-400'>
-                <CalendarDays size={12} className='shrink-0' />
-                Est. {year}
-              </span>
+          >
+            {university.logo
+              ? <img src={university.logo} alt={university.fullname} className='w-full h-full object-contain p-1.5' />
+              : <GraduationCap className='w-7 h-7 text-gray-300' />}
+          </div>
+
+          {/* Info */}
+          <div className='flex-1 min-w-0'>
+            <div className='flex items-center gap-2 flex-wrap'>
+              {university.slugs ? (
+                <Link
+                  href={`/universities/${university.slugs}`}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='font-bold text-gray-900 hover:text-[#387cae] hover:underline text-[15px] leading-tight truncate'
+                >
+                  {university.fullname}
+                </Link>
+              ) : (
+                <h3 className='text-[15px] font-bold text-gray-900 truncate leading-tight'>
+                  {university.fullname}
+                </h3>
+              )}
+              <TypeBadge type={university.type_of_institute} />
+              <StatusBadge status={university.status} />
+            </div>
+            {websiteUrl && (
+              <a
+                href={websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-blue-600 hover:underline text-sm mt-1 inline-flex items-center gap-1'
+              >
+                <Globe className='inline w-4 h-4 shrink-0' /> {websiteUrl}
+              </a>
             )}
           </div>
         </div>
 
-        {/* Action buttons */}
-        <div className='flex items-center gap-1 shrink-0'>
+        <div className='px-4 pb-3 flex flex-col gap-1.5'>
+          {(location || mapUrl) && (
+            <div className='flex flex-col'>
+              {location && (
+                <span className='flex items-center gap-1.5 text-[12px] text-gray-500'>
+                  <MapPin size={12} className='shrink-0' />
+                  {location}
+                </span>
+              )}
+              {mapUrl && (
+                <a
+                  href={mapUrl}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='text-blue-600 hover:underline text-sm mt-0.5 inline-flex items-center gap-1'
+                >
+                  <MapPin className='inline w-4 h-4 shrink-0' /> View Map
+                </a>
+              )}
+            </div>
+          )}
+          {year && (
+            <span className='flex items-center gap-1.5 text-[12px] text-gray-400'>
+              <CalendarDays size={12} className='shrink-0' />
+              Est. {year}
+            </span>
+          )}
+        </div>
+
+        <div className='flex items-center justify-end gap-1 px-4 py-3 border-t border-gray-100 bg-gray-50/50'>
           <button
             onPointerDown={(e) => e.stopPropagation()}
             onClick={() => onView(university.slugs)}
@@ -185,17 +230,14 @@ const SortableCard = ({ university, rank, onView, onEdit, onDelete }) => {
 }
 
 // ─── Drag Overlay Ghost Card ──────────────────────────────────────────────────
-const OverlayCard = ({ university, rank }) => (
+const OverlayCard = ({ university }) => (
   <div className='bg-white border-2 border-[#387cae]/40 rounded-2xl shadow-2xl rotate-[0.6deg] scale-[1.01]'>
-    <div className='flex items-center gap-3 px-4 py-3'>
-      <GripVertical size={18} className='text-[#387cae]/50 cursor-grabbing shrink-0' />
-      <div className='w-8 h-8 rounded-full bg-[#387cae]/15 flex items-center justify-center shrink-0'>
-        <span className='text-[11px] font-bold text-[#387cae]'>{rank}</span>
-      </div>
-      <div className='w-[52px] h-[52px] rounded-md bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0'>
+    <div className='flex items-start gap-3 p-4'>
+      <GripVertical size={18} className='text-[#387cae]/50 cursor-grabbing shrink-0 mt-1' />
+      <div className='w-16 h-16 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0'>
         {university.logo
           ? <img src={university.logo} alt={university.fullname} className='w-full h-full object-contain p-1.5' />
-          : <GraduationCap className='w-6 h-6 text-gray-300' />}
+          : <GraduationCap className='w-7 h-7 text-gray-300' />}
       </div>
       <div className='flex-1 min-w-0'>
         <div className='flex items-center gap-2 flex-wrap'>
@@ -211,26 +253,26 @@ const OverlayCard = ({ university, rank }) => (
 // ─── Skeleton Card ────────────────────────────────────────────────────────────
 const CardSkeleton = ({ i = 0 }) => (
   <div
-    className='bg-white border border-gray-200 rounded-2xl animate-pulse'
+    className='bg-white border border-gray-200 rounded-2xl overflow-hidden animate-pulse'
     style={{ animationDelay: `${i * 60}ms` }}
   >
-    <div className='flex items-center gap-3 px-4 py-3'>
-      <div className='w-[18px] h-[18px] bg-gray-200 rounded shrink-0' />
-      <div className='w-8 h-8 bg-gray-200 rounded-full shrink-0' />
-      <div className='w-[52px] h-[52px] bg-gray-200 rounded-md shrink-0' />
+    <div className='flex items-start gap-3 p-4'>
+      <div className='w-[18px] h-[18px] bg-gray-200 rounded shrink-0 mt-1' />
+      <div className='w-16 h-16 bg-gray-200 rounded-lg shrink-0' />
       <div className='flex-1 space-y-2.5'>
         <div className='flex items-center gap-2'>
-          <div className='h-4 bg-gray-200 rounded-md w-48' />
+          <div className='h-4 bg-gray-200 rounded-md w-40' />
           <div className='h-5 bg-gray-200 rounded-full w-16' />
         </div>
-        <div className='flex gap-3'>
-          <div className='h-3 bg-gray-200 rounded-full w-32' />
-          <div className='h-3 bg-gray-200 rounded-full w-20' />
-        </div>
+        <div className='h-3 bg-gray-200 rounded w-28' />
       </div>
-      <div className='flex gap-2 shrink-0'>
-        {[0, 1, 2].map(j => <div key={j} className='w-9 h-9 bg-gray-200 rounded-md' />)}
-      </div>
+    </div>
+    <div className='px-4 pb-3 space-y-2'>
+      <div className='h-3 bg-gray-200 rounded w-36' />
+      <div className='h-3 bg-gray-200 rounded w-24' />
+    </div>
+    <div className='flex justify-end gap-2 px-4 py-3 border-t border-gray-100'>
+      {[0, 1, 2].map(j => <div key={j} className='w-8 h-8 bg-gray-200 rounded-md' />)}
     </div>
   </div>
 )
@@ -257,6 +299,11 @@ export default function UniversityPage() {
 
   const [activeId, setActiveId] = useState(null)
   const activeUniversity = universities.find((u) => u.id === activeId)
+  const [lightbox, setLightbox] = useState({ isOpen: false, imageUrl: '', altText: '' })
+
+  const handleImageClick = (imageUrl, altText) => {
+    setLightbox({ isOpen: true, imageUrl, altText: altText || 'University Logo' })
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -467,8 +514,8 @@ export default function UniversityPage() {
 
         {/* ── Card List ─────────────────────────────────────────────────────── */}
         {loading ? (
-          <div className='space-y-2.5'>
-            {[...Array(5)].map((_, i) => <CardSkeleton key={i} i={i} />)}
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+            {[...Array(6)].map((_, i) => <CardSkeleton key={i} i={i} />)}
           </div>
         ) : universities.length === 0 ? (
           <div className='bg-white border border-dashed border-gray-200 rounded-2xl py-20 text-center'>
@@ -501,29 +548,24 @@ export default function UniversityPage() {
             >
               <SortableContext
                 items={universities.map((u) => u.id)}
-                strategy={verticalListSortingStrategy}
+                strategy={rectSortingStrategy}
               >
-                <div className='space-y-2'>
-                  {universities.map((university, idx) => (
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+                  {universities.map((university) => (
                     <SortableCard
                       key={university.id}
                       university={university}
-                      rank={idx + 1}
                       onView={handleView}
                       onEdit={handleEdit}
                       onDelete={handleDeleteClick}
+                      onImageClick={handleImageClick}
                     />
                   ))}
                 </div>
               </SortableContext>
 
               <DragOverlay dropAnimation={{ duration: 180, easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)' }}>
-                {activeUniversity ? (
-                  <OverlayCard
-                    university={activeUniversity}
-                    rank={universities.findIndex((u) => u.id === activeId) + 1}
-                  />
-                ) : null}
+                {activeUniversity ? <OverlayCard university={activeUniversity} /> : null}
               </DragOverlay>
             </DndContext>
           </>
@@ -551,6 +593,13 @@ export default function UniversityPage() {
         onClose={() => { setViewModalOpen(false); setViewUniversityData(null) }}
         data={viewUniversityData}
         loading={loadingView}
+      />
+
+      <ImageLightbox
+        isOpen={lightbox.isOpen}
+        onClose={() => setLightbox({ ...lightbox, isOpen: false })}
+        imageUrl={lightbox.imageUrl}
+        altText={lightbox.altText}
       />
 
       <ToastContainer position='bottom-right' />

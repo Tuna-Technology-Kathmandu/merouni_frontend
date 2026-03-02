@@ -22,7 +22,7 @@ const UserCard = ({ type, value, loading }) => {
       case 'consultancy':
         return '/dashboard/consultancy'
       case 'agents':
-        return '/dashboard/agent'
+        return '/dashboard/users?role=agent'
       case 'events':
         return '/dashboard/events'
       case 'referrals':

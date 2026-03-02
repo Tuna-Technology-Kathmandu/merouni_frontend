@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Eye, EyeOff, Plus, Download } from 'lucide-react'
 import {
   createUser,
@@ -47,6 +48,7 @@ const EMPTY_FORM = {
 
 export default function UsersManager() {
   const { setHeading } = usePageHeading()
+  const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedUserTypes, setSelectedUserTypes] = useState([])
   const [searchTimeout, setSearchTimeout] = useState(null)
@@ -74,6 +76,14 @@ export default function UsersManager() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const userData = useSelector((state) => state.user.data)
+
+  useEffect(() => {
+    const roleParam = searchParams.get('role')
+    if (roleParam) {
+      const roles = roleParam.split(',').map((r) => r.trim()).filter(Boolean)
+      if (roles.length > 0) setSelectedUserTypes(roles)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     setHeading('User Management')

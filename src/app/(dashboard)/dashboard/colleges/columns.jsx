@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Globe, MapPin, Edit2, Trash2, UserPlus, Eye } from 'lucide-react'
 import { cn } from '@/app/lib/utils'
 
@@ -35,12 +36,24 @@ export const createColumns = ({
       accessorKey: 'name',
       cell: ({ row }) => {
         const name = row.original.name
+        const slugs = row.original.slugs
         const type = row.original.institute_type
         const websiteUrl = row.original.website_url
         return (
           <div className='flex flex-col'>
             <div className='flex items-center gap-2'>
-              <span>{name}</span>
+              {slugs ? (
+                <Link
+                  href={`/colleges/${slugs}`}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='font-semibold text-slate-900 hover:text-[#387cae] hover:underline'
+                >
+                  {name}
+                </Link>
+              ) : (
+                <span>{name}</span>
+              )}
               {type && (
                 <span className='px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800'>
                   {type}
