@@ -37,7 +37,7 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
-  rectSortingStrategy,
+  verticalListSortingStrategy,
   useSortable
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
@@ -75,7 +75,7 @@ const TypeBadge = ({ type }) => {
   )
 }
 
-// ─── Sortable University Card (grid layout, college-style) ────────────────────
+// ─── Sortable University Card (list layout, matching college-style) ──────────
 const SortableCard = ({ university, onView, onEdit, onDelete, onImageClick }) => {
   const {
     attributes,
@@ -101,127 +101,119 @@ const SortableCard = ({ university, onView, onEdit, onDelete, onImageClick }) =>
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
       className={cn(
-        'bg-white border rounded-2xl transition-all duration-200 overflow-hidden',
+        'bg-white border rounded-xl transition-all duration-200 overflow-hidden',
         isDragging
           ? 'border-[#387cae]/40 shadow-xl ring-2 ring-[#387cae]/20'
           : 'border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300'
       )}
     >
-      <div className='flex flex-col h-full'>
-        <div className='flex items-start gap-3 p-4'>
-          {/* Drag handle */}
-          <div
-            {...listeners}
-            className='shrink-0 mt-1 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing touch-none transition-colors'
-            title='Drag to reorder'
-          >
-            <GripVertical size={18} />
-          </div>
+      <div className='flex items-center gap-4 p-4'>
+        {/* Drag handle */}
+        <div
+          {...attributes}
+          {...listeners}
+          className='shrink-0 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing touch-none transition-colors'
+          title='Drag to reorder'
+        >
+          <GripVertical size={20} />
+        </div>
 
-          {/* Logo (clickable) */}
-          <div
-            role='button'
-            tabIndex={0}
-            onClick={() => university.logo && onImageClick(university.logo, university.fullname)}
-            onKeyDown={(e) => e.key === 'Enter' && university.logo && onImageClick(university.logo, university.fullname)}
-            className={cn(
-              'w-16 h-16 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm',
-              university.logo && 'cursor-pointer hover:opacity-90 transition-opacity'
+        {/* Logo (clickable) */}
+        <div
+          role='button'
+          tabIndex={0}
+          onClick={() => university.logo && onImageClick(university.logo, university.fullname)}
+          onKeyDown={(e) => e.key === 'Enter' && university.logo && onImageClick(university.logo, university.fullname)}
+          className={cn(
+            'w-16 h-16 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm',
+            university.logo && 'cursor-pointer hover:opacity-90 transition-opacity'
+          )}
+        >
+          {university.logo
+            ? <img src={university.logo} alt={university.fullname} className='w-full h-full object-contain p-1.5' />
+            : <GraduationCap className='w-7 h-7 text-gray-300' />}
+        </div>
+
+        {/* Info */}
+        <div className='flex-1 min-w-0'>
+          <div className='flex items-center gap-2 flex-wrap mb-1'>
+            {university.slugs ? (
+              <Link
+                href={`/universities/${university.slugs}`}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='font-bold text-gray-900 hover:text-[#387cae] hover:underline text-[16px] leading-tight truncate'
+              >
+                {university.fullname}
+              </Link>
+            ) : (
+              <h3 className='text-[16px] font-bold text-gray-900 truncate leading-tight'>
+                {university.fullname}
+              </h3>
             )}
-          >
-            {university.logo
-              ? <img src={university.logo} alt={university.fullname} className='w-full h-full object-contain p-1.5' />
-              : <GraduationCap className='w-7 h-7 text-gray-300' />}
+            <TypeBadge type={university.type_of_institute} />
+            <StatusBadge status={university.status} />
           </div>
 
-          {/* Info */}
-          <div className='flex-1 min-w-0'>
-            <div className='flex items-center gap-2 flex-wrap'>
-              {university.slugs ? (
-                <Link
-                  href={`/universities/${university.slugs}`}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='font-bold text-gray-900 hover:text-[#387cae] hover:underline text-[15px] leading-tight truncate'
-                >
-                  {university.fullname}
-                </Link>
-              ) : (
-                <h3 className='text-[15px] font-bold text-gray-900 truncate leading-tight'>
-                  {university.fullname}
-                </h3>
-              )}
-              <TypeBadge type={university.type_of_institute} />
-              <StatusBadge status={university.status} />
-            </div>
+          <div className='flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5'>
+            {location && (
+              <span className='flex items-center gap-1.5 text-[12px] text-gray-500'>
+                <MapPin size={12} className='shrink-0 text-gray-400' />
+                {location}
+              </span>
+            )}
+            {mapUrl && (
+              <a
+                href={mapUrl}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-blue-600 hover:underline text-[12px] inline-flex items-center gap-1'
+              >
+                <MapPin className='inline w-3 h-3 shrink-0' /> View Map
+              </a>
+            )}
             {websiteUrl && (
               <a
                 href={websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='text-blue-600 hover:underline text-sm mt-1 inline-flex items-center gap-1'
+                className='text-blue-600 hover:underline text-[12px] inline-flex items-center gap-1'
               >
-                <Globe className='inline w-4 h-4 shrink-0' /> {websiteUrl}
+                <Globe className='inline w-3 h-3 shrink-0' /> {websiteUrl}
               </a>
+            )}
+            {year && (
+              <span className='flex items-center gap-1.5 text-[12px] text-gray-400 border-l border-gray-200 pl-4 ml-0'>
+                <CalendarDays size={12} className='shrink-0' />
+                Est. {year}
+              </span>
             )}
           </div>
         </div>
 
-        <div className='px-4 pb-3 flex flex-col gap-1.5'>
-          {(location || mapUrl) && (
-            <div className='flex flex-col'>
-              {location && (
-                <span className='flex items-center gap-1.5 text-[12px] text-gray-500'>
-                  <MapPin size={12} className='shrink-0' />
-                  {location}
-                </span>
-              )}
-              {mapUrl && (
-                <a
-                  href={mapUrl}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='text-blue-600 hover:underline text-sm mt-0.5 inline-flex items-center gap-1'
-                >
-                  <MapPin className='inline w-4 h-4 shrink-0' /> View Map
-                </a>
-              )}
-            </div>
-          )}
-          {year && (
-            <span className='flex items-center gap-1.5 text-[12px] text-gray-400'>
-              <CalendarDays size={12} className='shrink-0' />
-              Est. {year}
-            </span>
-          )}
-        </div>
-
-        <div className='flex items-center justify-end gap-1 px-4 py-3 border-t border-gray-100 bg-gray-50/50'>
+        {/* Actions - Right aligned in list view */}
+        <div className='flex items-center gap-1 pl-4 border-l border-gray-100'>
           <button
-            onPointerDown={(e) => e.stopPropagation()}
             onClick={() => onView(university.slugs)}
             title='View details'
-            className='w-8 h-8 flex items-center justify-center rounded-md text-blue-500 hover:bg-blue-50 transition-all'
+            className='w-9 h-9 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-all'
           >
-            <Eye size={15} />
+            <Eye size={18} />
           </button>
           <button
-            onPointerDown={(e) => e.stopPropagation()}
             onClick={() => onEdit(university.slugs)}
             title='Edit'
-            className='w-8 h-8 flex items-center justify-center rounded-md text-amber-500 hover:bg-amber-50 transition-all'
+            className='w-9 h-9 flex items-center justify-center rounded-lg text-amber-500 hover:bg-amber-50 transition-all'
           >
-            <Edit2 size={15} />
+            <Edit2 size={18} />
           </button>
           <button
-            onPointerDown={(e) => e.stopPropagation()}
             onClick={() => onDelete(university.id)}
             title='Delete'
-            className='w-8 h-8 flex items-center justify-center rounded-md text-red-400 hover:bg-red-50 transition-all'
+            className='w-9 h-9 flex items-center justify-center rounded-lg text-red-500 hover:bg-red-50 transition-all'
           >
-            <Trash2 size={15} />
+            <Trash2 size={18} />
           </button>
         </div>
       </div>
@@ -231,9 +223,9 @@ const SortableCard = ({ university, onView, onEdit, onDelete, onImageClick }) =>
 
 // ─── Drag Overlay Ghost Card ──────────────────────────────────────────────────
 const OverlayCard = ({ university }) => (
-  <div className='bg-white border-2 border-[#387cae]/40 rounded-2xl shadow-2xl rotate-[0.6deg] scale-[1.01]'>
-    <div className='flex items-start gap-3 p-4'>
-      <GripVertical size={18} className='text-[#387cae]/50 cursor-grabbing shrink-0 mt-1' />
+  <div className='bg-white border-2 border-[#387cae]/40 rounded-xl shadow-2xl rotate-[0.6deg] scale-[1.01]'>
+    <div className='flex items-center gap-4 p-4'>
+      <GripVertical size={20} className='text-[#387cae]/50 cursor-grabbing shrink-0' />
       <div className='w-16 h-16 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0'>
         {university.logo
           ? <img src={university.logo} alt={university.fullname} className='w-full h-full object-contain p-1.5' />
@@ -241,7 +233,7 @@ const OverlayCard = ({ university }) => (
       </div>
       <div className='flex-1 min-w-0'>
         <div className='flex items-center gap-2 flex-wrap'>
-          <h3 className='text-[15px] font-bold text-gray-900 truncate'>{university.fullname}</h3>
+          <h3 className='text-[16px] font-bold text-gray-900 truncate'>{university.fullname}</h3>
           <TypeBadge type={university.type_of_institute} />
           <StatusBadge status={university.status} />
         </div>
@@ -253,26 +245,26 @@ const OverlayCard = ({ university }) => (
 // ─── Skeleton Card ────────────────────────────────────────────────────────────
 const CardSkeleton = ({ i = 0 }) => (
   <div
-    className='bg-white border border-gray-200 rounded-2xl overflow-hidden animate-pulse'
+    className='bg-white border border-gray-200 rounded-xl overflow-hidden animate-pulse'
     style={{ animationDelay: `${i * 60}ms` }}
   >
-    <div className='flex items-start gap-3 p-4'>
-      <div className='w-[18px] h-[18px] bg-gray-200 rounded shrink-0 mt-1' />
+    <div className='flex items-center gap-4 p-4'>
+      <div className='w-5 h-5 bg-gray-200 rounded shrink-0' />
       <div className='w-16 h-16 bg-gray-200 rounded-lg shrink-0' />
       <div className='flex-1 space-y-2.5'>
         <div className='flex items-center gap-2'>
-          <div className='h-4 bg-gray-200 rounded-md w-40' />
+          <div className='h-4 bg-gray-200 rounded-md w-1/3' />
+          <div className='h-5 bg-gray-200 rounded-full w-16' />
           <div className='h-5 bg-gray-200 rounded-full w-16' />
         </div>
-        <div className='h-3 bg-gray-200 rounded w-28' />
+        <div className='flex gap-4'>
+          <div className='h-3 bg-gray-200 rounded w-24' />
+          <div className='h-3 bg-gray-200 rounded w-32' />
+        </div>
       </div>
-    </div>
-    <div className='px-4 pb-3 space-y-2'>
-      <div className='h-3 bg-gray-200 rounded w-36' />
-      <div className='h-3 bg-gray-200 rounded w-24' />
-    </div>
-    <div className='flex justify-end gap-2 px-4 py-3 border-t border-gray-100'>
-      {[0, 1, 2].map(j => <div key={j} className='w-8 h-8 bg-gray-200 rounded-md' />)}
+      <div className='flex gap-2 pl-4 border-l border-gray-100'>
+        {[0, 1, 2].map(j => <div key={j} className='w-9 h-9 bg-gray-200 rounded-lg' />)}
+      </div>
     </div>
   </div>
 )
@@ -295,6 +287,7 @@ export default function UniversityPage() {
   const [saving, setSaving] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
+
   const [searchTimeout, setSearchTimeout] = useState(null)
 
   const [activeId, setActiveId] = useState(null)
@@ -327,6 +320,9 @@ export default function UniversityPage() {
       let page = 1
       let hasMore = true
 
+      // Using a large limit (100) and loop logic to get all data and avoid multiple small API calls 
+      // but still handling pagination if it exists. 
+      // The user wants "no pagination" in dashboard, which means we show everything in one list.
       while (hasMore) {
         let url = `${process.env.baseUrl}/university?page=${page}&limit=100`
         if (query) url += `&q=${encodeURIComponent(query)}`
@@ -339,13 +335,18 @@ export default function UniversityPage() {
         page++
       }
 
-      all.sort((a, b) => {
+      // Use Map to ensure unique universities by ID (deduplication)
+      const uniqueItems = Array.from(
+        new Map(all.map((u) => [u.id, u])).values()
+      )
+
+      uniqueItems.sort((a, b) => {
         const oA = a.order_no_for_website ?? Infinity
         const oB = b.order_no_for_website ?? Infinity
         return oA !== oB ? oA - oB : b.id - a.id
       })
 
-      setUniversities(all)
+      setUniversities(uniqueItems)
     } catch (err) {
       toast.error(err.message || 'Failed to load universities')
     } finally {
@@ -514,7 +515,7 @@ export default function UniversityPage() {
 
         {/* ── Card List ─────────────────────────────────────────────────────── */}
         {loading ? (
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+          <div className='flex flex-col gap-3'>
             {[...Array(6)].map((_, i) => <CardSkeleton key={i} i={i} />)}
           </div>
         ) : universities.length === 0 ? (
@@ -548,9 +549,9 @@ export default function UniversityPage() {
             >
               <SortableContext
                 items={universities.map((u) => u.id)}
-                strategy={rectSortingStrategy}
+                strategy={verticalListSortingStrategy}
               >
-                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+                <div className='flex flex-col gap-3'>
                   {universities.map((university) => (
                     <SortableCard
                       key={university.id}

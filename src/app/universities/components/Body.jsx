@@ -16,7 +16,7 @@ const fetchUniversitiesFromAPI = async (page = 1, filters = {}, searchQuery = ''
   try {
     const queryParams = new URLSearchParams({
       page: page.toString(),
-      limit: '24'
+      limit: '25'
     })
 
     if (searchQuery) {
@@ -48,16 +48,16 @@ const fetchUniversitiesFromAPI = async (page = 1, filters = {}, searchQuery = ''
     return {
       universities: data.items || [],
       pagination: {
-        currentPage: data.currentPage || 1,
-        totalPages: data.totalPages || 1,
-        totalItems: data.totalItems || 0
+        currentPage: data.pagination?.currentPage || 1,
+        totalPages: data.pagination?.totalPages || 1,
+        totalItems: data.pagination?.totalItems || 0
       }
     }
   } catch (error) {
     console.error('Failed to fetch universities:', error)
     return {
       universities: [],
-      pagination: { currentPage: 1, totalPages: 1, totalCount: 0 }
+      pagination: { currentPage: 1, totalPages: 1, totalItems: 0 }
     }
   }
 }
@@ -131,7 +131,7 @@ const Body = () => {
     Object.entries(params).forEach(([key, value]) => {
       if (value) {
         if (Array.isArray(value)) {
-          if (value.length > 0) newParams.set(key, value[value.length - 1]) // Supporting single select logic via URL for now
+          if (value.length > 0) newParams.set(key, value[value.length - 1])
           else newParams.delete(key)
         } else {
           newParams.set(key, value)
@@ -191,7 +191,12 @@ const Body = () => {
         const filters = { type: type ? [type] : [] }
         const data = await fetchUniversitiesFromAPI(pg, filters, q)
 
-        setUniversities(data.universities)
+        // Deduplicate universities by ID
+        const uniqueUniversities = Array.from(
+          new Map(data.universities.map((u) => [u.id, u])).values()
+        )
+
+        setUniversities(uniqueUniversities)
         setPagination(data.pagination)
 
         if (q) setIsSearching(false)

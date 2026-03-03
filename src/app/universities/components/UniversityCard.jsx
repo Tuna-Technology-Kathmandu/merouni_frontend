@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { MapPin, Info, GraduationCap, Building2 } from 'lucide-react'
+import { MapPin, Info, GraduationCap } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const UniversityCard = ({ university }) => {
@@ -72,16 +72,6 @@ const UniversityCard = ({ university }) => {
             Details
           </button>
 
-          {/* 
-            Since there's no direct "apply" page for universities in the same way as colleges (maybe),
-            or if there is, we can link to it. For now, just keeping "Details" mainly, or linking "Apply" to details too.
-            Wait, existing colleges apply goes to `/colleges/apply/${slug}`. 
-            I'll assume `/universities/apply/${slug}` doesn't exist or logic is different.
-            I'll just link to the university detail page for now, or remove the button. 
-            Actually, visually it looks better with two buttons. I'll add "View Courses" or similar?
-            Or just keep "Apply Now" and link to same place or a hypothetical apply link.
-            I'll link to `${slugs}` for now.
-          */}
           <button
             onClick={(e) => {
               e.stopPropagation()
