@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { MapPin, Info, GraduationCap, Building2 } from 'lucide-react'
+import { MapPin, Info, GraduationCap } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const UniversityCard = ({ university }) => {
@@ -40,7 +40,7 @@ const UniversityCard = ({ university }) => {
         <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent'></div>
 
         <div className='absolute top-3 left-3 flex gap-2'>
-          <div className='bg-white px-2.5 py-1 rounded-lg text-[10px] font-bold text-[#0A70A7] uppercase tracking-wider shadow-sm'>
+          <div className='bg-white px-2.5 py-1 rounded-md text-[10px] font-bold text-[#0A70A7] uppercase tracking-wider shadow-sm'>
             {type_of_institute || 'University'}
           </div>
         </div>
@@ -66,32 +66,22 @@ const UniversityCard = ({ university }) => {
               e.stopPropagation()
               router.push(`/universities/${slugs}`)
             }}
-            className='flex-1 py-2.5 px-3 bg-gray-50 text-gray-700 rounded-xl hover:bg-gray-100 transition-colors text-[10px] font-bold flex items-center justify-center gap-1.5 uppercase tracking-wider'
+            className='flex-1 py-2.5 px-3 bg-gray-50 text-gray-700 rounded-md hover:bg-gray-100 transition-colors text-[10px] font-bold flex items-center justify-center gap-1.5 uppercase tracking-wider'
           >
             <Info className='w-3.5 h-3.5' />
             Details
           </button>
 
-          {/* 
-            Since there's no direct "apply" page for universities in the same way as colleges (maybe),
-            or if there is, we can link to it. For now, just keeping "Details" mainly, or linking "Apply" to details too.
-            Wait, existing colleges apply goes to `/colleges/apply/${slug}`. 
-            I'll assume `/universities/apply/${slug}` doesn't exist or logic is different.
-            I'll just link to the university detail page for now, or remove the button. 
-            Actually, visually it looks better with two buttons. I'll add "View Courses" or similar?
-            Or just keep "Apply Now" and link to same place or a hypothetical apply link.
-            I'll link to `${slugs}` for now.
-          */}
-           <button
-             onClick={(e) => {
-               e.stopPropagation()
-               router.push(`/universities/${slugs}`)
-             }}
-             className='flex-1 py-2.5 px-3 bg-[#0A70A7] text-white rounded-xl hover:bg-[#085a86] transition-all text-[10px] font-bold flex items-center justify-center gap-1.5 shadow-sm uppercase tracking-wider'
-           >
-             <GraduationCap className='w-3.5 h-3.5' />
-             View Programs
-           </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              router.push(`/universities/${slugs}`)
+            }}
+            className='flex-1 py-2.5 px-3 bg-[#0A70A7] text-white rounded-md hover:bg-[#085a86] transition-all text-[10px] font-bold flex items-center justify-center gap-1.5 shadow-sm uppercase tracking-wider'
+          >
+            <GraduationCap className='w-3.5 h-3.5' />
+            View Programs
+          </button>
         </div>
       </div>
     </motion.div>

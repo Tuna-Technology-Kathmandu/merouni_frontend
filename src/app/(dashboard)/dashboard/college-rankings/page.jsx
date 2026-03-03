@@ -253,15 +253,15 @@ export default function CollegeRankingsPage() {
   }
 
   return (
-    <div className='p-6 w-full space-y-6'>
+    <div className='w-full'>
       {/* Sticky Header */}
-      <div className='sticky top-0 z-20 bg-gray-50/80 backdrop-blur-md pb-4 pt-2 -mt-2'>
+      <div className='sticky mb-3 top-0 z-20 bg-gray-50/80 backdrop-blur-md pb-4 pt-2 -mt-2'>
         <div className='flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100'>
           <div className='relative w-full md:w-96 group'>
             <Search className='absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#387cae] transition-colors' size={18} />
             <Input
               placeholder='Search programs or colleges...'
-              className='pl-11 h-11 rounded-xl border-gray-100 bg-gray-50/50 focus:bg-white transition-all'
+              className='pl-11 h-11 rounded-md border-gray-200 bg-gray-50/50 focus:bg-white transition-all'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -301,7 +301,7 @@ export default function CollegeRankingsPage() {
                   <h2 className='text-[15px] font-bold text-slate-900 truncate' title={programGroup.program?.title}>
                     {programGroup.program?.title}
                   </h2>
-                  <span className='text-[11px] text-slate-400 font-bold uppercase tracking-wider'>
+                  <span className='text-[11px] text-slate-500 font-semibold'>
                     {programGroup.rankings?.length || 0} Colleges Ranked
                   </span>
                 </div>
@@ -313,7 +313,7 @@ export default function CollegeRankingsPage() {
                     setSelectedCollege(null)
                     setIsEditModalOpen(true)
                   }}
-                  className='p-2 text-[#387cae] hover:bg-[#387cae]/5 rounded-xl transition-colors'
+                  className='p-2 text-[#387cae] hover:bg-[#387cae]/5 rounded-md transition-colors'
                   title='Add more colleges'
                 >
                   <Plus size={18} />
@@ -323,7 +323,7 @@ export default function CollegeRankingsPage() {
                     setDeleteProgramId(programGroup.program?.id)
                     setIsDialogOpen(true)
                   }}
-                  className='p-2 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors'
+                  className='p-2 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors'
                   title='Delete all rankings'
                 >
                   <Trash2 size={18} />
@@ -342,14 +342,14 @@ export default function CollegeRankingsPage() {
                     onDragEnd={handleDragEnd}
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, ranking, programGroup.program?.id)}
-                    className='group/item flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-xl hover:border-[#387cae]/30 hover:shadow-lg hover:shadow-[#387cae]/5 transition-all duration-200 cursor-grab active:cursor-grabbing'
+                    className='group/item flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-md hover:border-[#387cae]/30 hover:shadow-lg hover:shadow-[#387cae]/5 transition-all duration-200 cursor-grab active:cursor-grabbing'
                   >
                     <div className='text-gray-300 group-hover/item:text-[#387cae] transition-colors'>
                       <GripVertical size={18} />
                     </div>
 
                     <div className={cn(
-                      'flex items-center justify-center w-8 h-8 rounded-lg font-bold text-xs shadow-sm',
+                      'flex items-center justify-center w-8 h-8 rounded-md font-bold text-xs shadow-sm',
                       ranking.rank === 1 ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
                         ranking.rank === 2 ? 'bg-gray-100 text-gray-700 border border-gray-200' :
                           ranking.rank === 3 ? 'bg-orange-100 text-orange-700 border border-orange-200' :
@@ -385,7 +385,7 @@ export default function CollegeRankingsPage() {
 
                     <button
                       onClick={() => handleDeleteRankingClick(ranking.id)}
-                      className='lg:opacity-0 group-hover/item:opacity-100 p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all'
+                      className='lg:opacity-0 group-hover/item:opacity-100 p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-all'
                       title='Remove from ranking'
                     >
                       <X size={16} />
@@ -418,7 +418,7 @@ export default function CollegeRankingsPage() {
             <Button
               variant='outline'
               onClick={() => setSearchTerm('')}
-              className='rounded-xl h-10 border-gray-200'
+              className='rounded-md h-10 border-gray-200'
             >
               Clear Search
             </Button>
@@ -439,7 +439,7 @@ export default function CollegeRankingsPage() {
         <DialogContent className='max-w-xl p-0 overflow-hidden bg-white'>
           <DialogHeader className='p-6 border-b border-gray-100'>
             <DialogTitle className='text-xl font-bold text-gray-900 flex items-center gap-2'>
-              <div className='w-10 h-10 rounded-xl bg-[#387cae]/10 flex items-center justify-center text-[#387cae]'>
+              <div className='w-10 h-10 rounded-md bg-[#387cae]/10 flex items-center justify-center text-[#387cae]'>
                 <Plus size={20} />
               </div>
               {selectedProgram ? 'Rank more Colleges' : 'Add New Ranking'}
@@ -515,14 +515,14 @@ export default function CollegeRankingsPage() {
             <Button
               variant='outline'
               onClick={() => setIsEditModalOpen(false)}
-              className='h-11 px-6 rounded-xl border-gray-200 font-bold text-slate-600'
+              className='h-11 px-6 rounded-md border-gray-200 font-bold text-slate-600'
             >
               Cancel
             </Button>
             <Button
               onClick={handleAddRanking}
               disabled={!selectedProgram || !selectedCollege || submitting}
-              className='h-11 px-8 rounded-xl bg-[#387cae] hover:bg-[#387cae]/90 text-white font-bold shadow-lg shadow-[#387cae]/20 min-w-[140px]'
+              className='h-11 px-8 rounded-md bg-[#387cae] hover:bg-[#387cae]/90 text-white font-bold shadow-lg shadow-[#387cae]/20 min-w-[140px]'
             >
               {submitting ? (
                 <>

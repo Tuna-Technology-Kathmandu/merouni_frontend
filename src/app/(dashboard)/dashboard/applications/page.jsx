@@ -195,7 +195,7 @@ const ApplicationsPage = () => {
         header: 'Course',
         accessorKey: 'course.title',
         cell: ({ row }) => (
-          <span className="px-2.5 py-0.5 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+          <span className="px-2.5 py-0.5 bg-slate-100 text-slate-700 border border-slate-200 rounded-md text-[10px] font-bold uppercase tracking-wider">
             {row.original?.course?.title || 'N/A'}
           </span>
         )
@@ -230,7 +230,7 @@ const ApplicationsPage = () => {
         cell: ({ row }) => (
           <div className="max-w-[200px]" title={row.original.remarks}>
             <p className='text-xs text-slate-600 truncate'>
-              {row.original.remarks || <span className="text-slate-400 italic">No remarks</span>}
+              {row.original.remarks || <span className="text-slate-400 italic">-</span>}
             </p>
           </div>
         )
@@ -273,12 +273,13 @@ const ApplicationsPage = () => {
   if (loading && applications.length === 0) return <Loading />
 
   return (
-    <div className='w-full space-y-4 p-4'>
+    <div className='w-full'>
+
       <ToastContainer />
 
       {/* Sticky Header */}
       <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
-        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
           <div className="flex items-center gap-3 w-full max-w-md">
             <SearchInput
               value={searchQuery}
@@ -291,7 +292,7 @@ const ApplicationsPage = () => {
             <Button
               variant="outline"
               onClick={loadApplications}
-              className="gap-2 text-slate-600 hover:text-[#387cae] hover:border-[#387cae] h-11 px-6 rounded-lg font-bold text-xs uppercase tracking-wider"
+              className="gap-2 text-slate-600 hover:text-[#387cae] hover:border-[#387cae] h-11 px-6 rounded-md font-bold text-xs uppercase tracking-wider"
             >
               <RefreshCw size={14} className={cn(loading && "animate-spin")} />
               Refresh
@@ -300,7 +301,7 @@ const ApplicationsPage = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
         <Table
           data={filteredApplications}
           columns={columns}
@@ -319,7 +320,7 @@ const ApplicationsPage = () => {
         <DialogContent className='max-w-md p-0'>
           <DialogHeader className="px-6 py-4 border-b bg-slate-50/50 rounded-t-lg">
             <DialogTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-[#387cae] flex items-center justify-center text-white">
+              <div className="w-8 h-8 rounded-md bg-[#387cae] flex items-center justify-center text-white">
                 <RefreshCw size={16} />
               </div>
               Update Application Status

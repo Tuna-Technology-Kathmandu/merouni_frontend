@@ -149,7 +149,7 @@ const SchoolCard = ({
         <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none' />
 
         <div className='absolute top-3 left-3 flex gap-2 z-10'>
-          <span className='bg-white px-2.5 py-1 rounded-lg text-xs font-medium text-[#0A70A7] uppercase tracking-wider shadow-sm'>
+          <span className='bg-white px-2.5 py-1 rounded-md text-xs font-medium text-[#0A70A7] uppercase tracking-wider shadow-sm'>
             {instituteType || 'College'}
           </span>
         </div>
@@ -196,7 +196,7 @@ const SchoolCard = ({
           <Link
             href={slug ? `/schools/${slug}` : '#'}
             onClick={(e) => e.stopPropagation()}
-            className='flex-1 py-2.5 px-3 bg-gray-50 text-gray-700 rounded-xl hover:bg-gray-100 transition-colors text-xs font-medium flex items-center justify-center gap-1.5 uppercase tracking-wider'
+            className='flex-1 py-2.5 px-3 bg-gray-50 text-gray-700 rounded-md hover:bg-gray-100 transition-colors text-xs font-medium flex items-center justify-center gap-1.5 uppercase tracking-wider'
           >
             <Info className='w-3.5 h-3.5' />
             Details
@@ -204,7 +204,7 @@ const SchoolCard = ({
           <Link
             href={slug ? `/schools/apply/${slug}` : '#'}
             onClick={(e) => e.stopPropagation()}
-            className='flex-1 py-2.5 px-3 bg-[#0A70A7] text-white rounded-xl hover:bg-[#085a86] transition-all text-xs font-medium flex items-center justify-center gap-1.5 shadow-sm uppercase tracking-wider'
+            className='flex-1 py-2.5 px-3 bg-[#0A70A7] text-white rounded-md hover:bg-[#085a86] transition-all text-xs font-medium flex items-center justify-center gap-1.5 shadow-sm uppercase tracking-wider'
           >
             <GraduationCap className='w-3.5 h-3.5' />
             Apply Now

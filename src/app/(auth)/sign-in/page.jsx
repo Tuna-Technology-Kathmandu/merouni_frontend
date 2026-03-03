@@ -46,7 +46,9 @@ const SignInPage = ({ defaultMode = 'login' }) => {
     lastName: '',
     email: '',
     phoneNo: '',
-    password: ''
+    password: '',
+    role: 'student',
+    agent_experience: ''
   })
   const [errors, setErrors] = useState({})
   const [showPassword, setShowPassword] = useState(false)
@@ -63,6 +65,9 @@ const SignInPage = ({ defaultMode = 'login' }) => {
         newErrors.phoneNo = 'Phone number is required'
       } else if (!/^\d{10}$/.test(formData.phoneNo)) {
         newErrors.phoneNo = 'Phone number must be 10 digits'
+      }
+      if (formData.role === 'agent' && !formData.agent_experience.trim()) {
+        newErrors.agent_experience = 'Please tell us about yourself and your experiences'
       }
     }
     if (!formData.email.trim()) {
@@ -101,7 +106,9 @@ const SignInPage = ({ defaultMode = 'login' }) => {
           lastName: formData.lastName,
           email: formData.email,
           phoneNo: formData.phoneNo,
-          password: formData.password
+          password: formData.password,
+          role: formData.role,
+          ...(formData.role === 'agent' && { agent_experience: formData.agent_experience })
         }
 
       const response = await axios.post(
@@ -136,14 +143,20 @@ const SignInPage = ({ defaultMode = 'login' }) => {
           toast.error("Error signing in. Please try again.")
         }
       } else {
-        toast.success('Account created! Please sign in.')
+        toast.success(
+          formData.role === 'agent'
+            ? 'Application submitted! Your agent request is pending admin approval. You will be notified once approved.'
+            : 'Account created! Please sign in.'
+        )
         setIsLogin(true)
         setFormData({
           firstName: '',
           lastName: '',
           email: formData.email,
           phoneNo: '',
-          password: ''
+          password: '',
+          role: 'student',
+          agent_experience: ''
         })
       }
     },
@@ -159,8 +172,8 @@ const SignInPage = ({ defaultMode = 'login' }) => {
   }
 
   return (
-    <div className='min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12 px-4'>
-      <div className='w-full max-w-md mb-4 text-left'>
+    <div className='min-h-screen flex flex-col items-center justify-center bg-gray-50 py-6 sm:py-12 px-4 sm:px-6'>
+      <div className='w-full max-w-md sm:max-w-lg md:max-w-xl mb-4 text-left'>
         <Link
           href='/'
           className='inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#0A6FA7] transition-colors font-medium'
@@ -170,9 +183,9 @@ const SignInPage = ({ defaultMode = 'login' }) => {
         </Link>
       </div>
 
-      <div className='max-w-md w-full bg-white p-10 rounded-2xl shadow-xl border border-gray-100'>
+      <div className='w-full max-w-md sm:max-w-lg md:max-w-xl bg-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-xl border border-gray-100'>
         <div className='mb-6'>
-          <h2 className='text-3xl font-extrabold text-gray-900'>
+          <h2 className='text-2xl sm:text-3xl font-extrabold text-gray-900'>
             {isLogin ? 'Sign In' : 'Sign Up'}
           </h2>
           <p className='mt-2 text-sm text-gray-500 font-medium'>
@@ -182,7 +195,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
 
         <form onSubmit={handleSubmit} className='space-y-4'>
           {!isLogin && (
-            <div className='grid grid-cols-2 gap-4'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
               <div className='space-y-1.5'>
                 <label className='text-xs font-bold text-gray-700 uppercase tracking-widest ml-1'>First Name</label>
                 <input
@@ -191,7 +204,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
                   placeholder='First Name'
                   value={formData.firstName}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 rounded-xl border ${errors.firstName ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
+                  className={`w-full px-4 py-3 rounded-md border ${errors.firstName ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
                 />
                 {errors.firstName && <p className='text-red-500 text-[10px] ml-1'>{errors.firstName}</p>}
               </div>
@@ -203,7 +216,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
                   placeholder='Last Name'
                   value={formData.lastName}
                   onChange={handleChange}
-                  className={`w-full px-4 py-3 rounded-xl border ${errors.lastName ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
+                  className={`w-full px-4 py-3 rounded-md border ${errors.lastName ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
                 />
                 {errors.lastName && <p className='text-red-500 text-[10px] ml-1'>{errors.lastName}</p>}
               </div>
@@ -218,7 +231,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
               placeholder='Email Address'
               value={formData.email}
               onChange={handleChange}
-              className={`w-full px-4 py-3 rounded-xl border ${errors.email ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
+              className={`w-full px-4 py-3 rounded-md border ${errors.email ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
             />
             {errors.email && <p className='text-red-500 text-[10px] ml-1'>{errors.email}</p>}
           </div>
@@ -232,10 +245,60 @@ const SignInPage = ({ defaultMode = 'login' }) => {
                 placeholder='Phone Number'
                 value={formData.phoneNo}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 rounded-xl border ${errors.phoneNo ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
+                className={`w-full px-4 py-3 rounded-md border ${errors.phoneNo ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
                 maxLength={10}
               />
               {errors.phoneNo && <p className='text-red-500 text-[10px] ml-1'>{errors.phoneNo}</p>}
+            </div>
+          )}
+
+          {!isLogin && (
+            <div className='space-y-1.5'>
+              <label className='text-xs font-bold text-gray-700 uppercase tracking-widest ml-1'>I want to join as</label>
+              <div className='flex flex-wrap gap-4'>
+                <label className='flex items-center gap-2 cursor-pointer'>
+                  <input
+                    type='radio'
+                    name='role'
+                    value='student'
+                    checked={formData.role === 'student'}
+                    onChange={handleChange}
+                    className='w-4 h-4 text-[#0A6FA7] border-gray-300 focus:ring-[#0A6FA7]'
+                  />
+                  <span className='text-sm font-medium text-gray-700'>Student</span>
+                </label>
+                <label className='flex items-center gap-2 cursor-pointer'>
+                  <input
+                    type='radio'
+                    name='role'
+                    value='agent'
+                    checked={formData.role === 'agent'}
+                    onChange={handleChange}
+                    className='w-4 h-4 text-[#0A6FA7] border-gray-300 focus:ring-[#0A6FA7]'
+                  />
+                  <span className='text-sm font-medium text-gray-700'>Agent</span>
+                </label>
+              </div>
+              <p className='text-[10px] text-gray-500 ml-1'>
+                {formData.role === 'student' ? 'Auto-approved. You can start right away.' : 'Requires admin approval.'}
+              </p>
+            </div>
+          )}
+
+          {!isLogin && formData.role === 'agent' && (
+            <div className='space-y-1.5'>
+              <label className='text-xs font-bold text-gray-700 uppercase tracking-widest ml-1'>
+                Tell us about yourself and your experiences <span className='text-red-500'>*</span>
+              </label>
+              <textarea
+                name='agent_experience'
+                placeholder='Describe your background, experience in education consulting, and why you want to become an agent...'
+                value={formData.agent_experience}
+                onChange={handleChange}
+                rows={4}
+                className={`w-full px-4 py-3 rounded-md border ${errors.agent_experience ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm resize-none`}
+              />
+              {errors.agent_experience && <p className='text-red-500 text-[10px] ml-1'>{errors.agent_experience}</p>}
             </div>
           )}
 
@@ -243,7 +306,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
             <div className='flex justify-between items-center ml-1'>
               <label className='text-xs font-bold text-gray-700 uppercase tracking-widest'>Password</label>
               {isLogin && (
-                <button 
+                <button
                   type="button"
                   onClick={() => setIsForgotPasswordOpen(true)}
                   className='text-xs font-bold text-[#0A6FA7] hover:underline'
@@ -259,7 +322,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
                 placeholder='Password'
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 rounded-xl border ${errors.password ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
+                className={`w-full px-4 py-3 rounded-md border ${errors.password ? 'border-red-500 bg-red-50/20' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm`}
               />
               <button
                 type='button'
@@ -275,7 +338,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
           <button
             type='submit'
             disabled={signInFormMutation?.isPending}
-            className='w-full py-3.5 px-6 bg-[#0A6FA7] text-white rounded-xl font-bold hover:bg-[#085a86] transition-all shadow-md active:scale-[0.98] disabled:opacity-50 mt-4 text-sm'
+            className='w-full py-3.5 px-6 bg-[#0A6FA7] text-white rounded-md font-bold hover:bg-[#085a86] transition-all shadow-md active:scale-[0.98] disabled:opacity-50 mt-4 text-sm'
           >
             {signInFormMutation?.isPending ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
           </button>
@@ -306,20 +369,20 @@ const SignInPage = ({ defaultMode = 'login' }) => {
           </div>
         </DialogHeader>
         <DialogContent>
-        <div className='p-6 text-center'>
-          <div className='mb-4 flex justify-center'>
-            <div className='w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center'>
-              <svg className='w-8 h-8 text-[#0A6FA7]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' />
-              </svg>
+          <div className='p-6 text-center'>
+            <div className='mb-4 flex justify-center'>
+              <div className='w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center'>
+                <svg className='w-8 h-8 text-[#0A6FA7]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' />
+                </svg>
+              </div>
             </div>
+            <h3 className='text-xl font-bold text-gray-900 mb-2'>Contact Administrator</h3>
+            <p className='text-gray-600 mb-6'>
+              Please contact the <strong>Mero Uni Admin</strong> to reset your password. Our team will verify your identity and assist you further.
+            </p>
+
           </div>
-          <h3 className='text-xl font-bold text-gray-900 mb-2'>Contact Administrator</h3>
-          <p className='text-gray-600 mb-6'>
-            Please contact the <strong>Mero Uni Admin</strong> to reset your password. Our team will verify your identity and assist you further.
-          </p>
-         
-        </div>
         </DialogContent>
       </Dialog>
     </div>

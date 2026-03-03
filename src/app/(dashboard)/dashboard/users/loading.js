@@ -10,7 +10,7 @@ const Loading = () => {
         <Skeleton width={120} height={36} />
       </div>
 
-      <div className='bg-white rounded-lg shadow overflow-hidden'>
+      <div className='bg-white rounded-md shadow overflow-hidden'>
         <table className='min-w-full'>
           <thead>
             <tr className='bg-gray-50 border-b'>

@@ -39,8 +39,7 @@ export default function ExamManager() {
   const { requireAdmin } = useAdminPermission()
 
   const [exams, setExams] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [tableLoading, setTableLoading] = useState(false)
+  const [tableLoading, setTableLoading] = useState(true)
   const [editingId, setEditingId] = useState(null)
   const [isOpen, setIsOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
@@ -51,7 +50,8 @@ export default function ExamManager() {
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
-    total: 0
+    total: 0,
+    limit: 10
   })
 
   const {
@@ -142,7 +142,7 @@ export default function ExamManager() {
       toast.error('Failed to fetch exams')
     } finally {
       setTableLoading(false)
-      setLoading(false)
+      setTableLoading(false)
     }
   }
 
@@ -283,6 +283,15 @@ export default function ExamManager() {
 
   const columns = useMemo(() => [
     {
+      header: 'S.N.',
+      accessorKey: 'id',
+      cell: ({ row }) => (
+        <span className="text-gray-500 font-medium">
+          {(pagination.currentPage - 1) * (pagination.limit || 10) + row.index + 1}
+        </span>
+      )
+    },
+    {
       header: 'Title',
       accessorKey: 'title',
       cell: ({ row }) => (
@@ -355,30 +364,27 @@ export default function ExamManager() {
         </div>
       )
     }
-  ], [requireAdmin])
+  ], [requireAdmin, pagination])
 
-  if (loading) return <Loading />
 
   return (
-    <div className='w-full space-y-4 p-4'>
+    <div className='w-full'>
       <ToastContainer />
 
-      <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
-        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
-          <SearchInput
-            value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
-            placeholder='Search exams by title...'
-            className='max-w-md w-full'
-          />
-          <Button onClick={handleAdd} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
-            <Plus className="w-4 h-4" />
-            Add Exam
-          </Button>
-        </div>
+      <div className='flex flex-col mb-3 sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
+        <SearchInput
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder='Search exams by title...'
+          className='max-w-md w-full'
+        />
+        <Button onClick={handleAdd} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2 h-11 px-6 rounded-md shadow-sm transition-all shrink-0 w-full sm:w-auto">
+          <Plus className="w-4 h-4" />
+          Add Exam
+        </Button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
         <Table
           loading={tableLoading}
           data={exams}

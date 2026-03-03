@@ -2,6 +2,7 @@
 
 import { formatDate } from '@/utils/date.util'
 import { Eye, Trash2, SquarePen } from 'lucide-react'
+import { Button } from '@/ui/shadcn/button'
 
 export const createColumns = ({ handleView, handleDelete, handleStatusUpdate }) => [
     {
@@ -48,28 +49,34 @@ export const createColumns = ({ handleView, handleDelete, handleStatusUpdate }) 
         header: 'Actions',
         id: 'actions',
         cell: ({ row }) => (
-            <div className='flex gap-2 justify-end'>
-                <button
+            <div className='flex gap-1'>
+                <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => handleStatusUpdate(row.original)}
-                    className='p-1 hover:bg-blue-50 rounded-md text-blue-600 transition-colors'
+                    className='hover:bg-purple-50 text-purple-600'
                     title='Update Status'
                 >
-                    <SquarePen size={18} />
-                </button>
-                <button
+                    <SquarePen className='w-4 h-4' />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => handleView(row.original)}
-                    className='p-1 hover:bg-gray-100 rounded-md text-gray-600 transition-colors'
+                    className='hover:bg-blue-50 text-blue-600'
                     title='View Details'
                 >
-                    <Eye size={18} />
-                </button>
-                <button
+                    <Eye className='w-4 h-4' />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => handleDelete(row.original.id)}
-                    className='p-1 hover:bg-red-50 rounded-md text-red-500 transition-colors'
+                    className='hover:bg-red-50 text-red-600'
                     title='Delete Message'
                 >
-                    <Trash2 size={18} />
-                </button>
+                    <Trash2 className='w-4 h-4' />
+                </Button>
             </div>
         )
     }

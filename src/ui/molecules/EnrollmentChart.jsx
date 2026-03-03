@@ -28,7 +28,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
 
   return (
-    <div className='bg-white/95 backdrop-blur rounded-xl shadow-lg border border-gray-100 px-4 py-3 min-w-[160px] z-[9999] relative'>
+    <div className='bg-white/95 backdrop-blur rounded-md shadow-lg border border-gray-100 px-4 py-3 min-w-[160px] z-[9999] relative'>
       <p className='text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2'>
         {label}
       </p>
@@ -139,25 +139,24 @@ const StudentEnrollmentGrowthChart = ({
         <div className='relative' ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className='flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-all'
+            className='flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-md hover:bg-gray-100 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-all'
           >
             <span>Years</span>
             <ChevronDown
               size={16}
-              className={`transition-transform duration-200 ${
-                isDropdownOpen ? 'rotate-180' : ''
-              }`}
+              className={`transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''
+                }`}
             />
           </button>
           {isDropdownOpen && availableYears.length > 0 && (
-            <div className='absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-xl shadow-lg z-[9999] max-h-64 overflow-y-auto'>
+            <div className='absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-md shadow-lg z-[9999] max-h-64 overflow-y-auto'>
               <div className='p-2'>
                 {availableYears.map((year) => {
                   const isSelected = selectedYears.includes(year)
                   return (
                     <label
                       key={year}
-                      className='flex items-center gap-3 p-2.5 hover:bg-gray-50 cursor-pointer rounded-lg transition-colors'
+                      className='flex items-center gap-3 p-2.5 hover:bg-gray-50 cursor-pointer rounded-md transition-colors'
                     >
                       <input
                         type='checkbox'

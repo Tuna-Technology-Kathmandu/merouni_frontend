@@ -99,7 +99,7 @@ const CoursePage = () => {
     try {
       const response = await getBanners()
       setBanner(response.items)
-    } catch (error) {}
+    } catch (error) { }
   }
 
   const handleFilterChange = (e) => {
@@ -184,7 +184,7 @@ const CoursePage = () => {
         <div className='w-full p-4 flex flex-col lg:flex-row gap-10 justify-between'>
           {/* Sidebar with Filters */}
           <div className='w-full lg:w-1/4 mb-6 lg:mb-0'>
-            <div className='bg-white rounded-xl p-6 border border-gray-200 shadow-lg'>
+            <div className='bg-white rounded-md p-6 border border-gray-200 shadow-lg'>
               <div className='mb-4 w-full flex justify-between'>
                 <h3 className='font-semibold text-xl'>Filters</h3>
                 <h3
@@ -198,7 +198,7 @@ const CoursePage = () => {
               {/* faculty filter */}
               <div className='mb-4 relative'>
                 <div
-                  className='w-full border p-3 flex items-center rounded-lg cursor-pointer'
+                  className='w-full border p-3 flex items-center rounded-md cursor-pointer'
                   onClick={() => setShowFaculties(!showFaculties)}
                 >
                   <h1 className='block text-sm font-medium text-gray-600'>
@@ -207,7 +207,7 @@ const CoursePage = () => {
                 </div>
 
                 {showFaculties && (
-                  <div className='absolute top-[122%] text-sm h-44 overflow-scroll w-full bg-white rounded-lg shadow-[0px_0px_10px_3px_rgba(0,0,0,0.2)]'>
+                  <div className='absolute top-[122%] text-sm h-44 overflow-scroll w-full bg-white rounded-md shadow-[0px_0px_10px_3px_rgba(0,0,0,0.2)]'>
                     {storeFaculties.map((item, index) => {
                       return (
                         <div
@@ -241,7 +241,7 @@ const CoursePage = () => {
                     value={filters.credits.min}
                     onChange={handleFilterChange}
                     placeholder='Min'
-                    className='w-1/2 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    className='w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                   />
                   <input
                     type='number'
@@ -249,7 +249,7 @@ const CoursePage = () => {
                     value={filters.credits.max}
                     onChange={handleFilterChange}
                     placeholder='Max'
-                    className='w-1/2 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    className='w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                   />
                 </div>
               </div>
@@ -266,7 +266,7 @@ const CoursePage = () => {
                     value={filters.duration.min}
                     onChange={handleFilterChange}
                     placeholder='Min'
-                    className='w-1/2 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    className='w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                   />
                   <input
                     type='number'
@@ -274,7 +274,7 @@ const CoursePage = () => {
                     value={filters.duration.max}
                     onChange={handleFilterChange}
                     placeholder='Max'
-                    className='w-1/2 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    className='w-1/2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                   />
                 </div>
               </div>
@@ -289,7 +289,7 @@ const CoursePage = () => {
                   .map((_, index) => (
                     <div
                       key={index}
-                      className='bg-white rounded-xl p-6 border border-gray-200 shadow-lg'
+                      className='bg-white rounded-md p-6 border border-gray-200 shadow-lg'
                     >
                       <div className='flex justify-evenly items-start mb-4'>
                         <div className='w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center'>
@@ -314,7 +314,7 @@ const CoursePage = () => {
                   courses.map((course, index) => (
                     <div
                       key={index}
-                      className='bg-white w-full rounded-xl p-4 border border-gray-200 shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300'
+                      className='bg-white w-full rounded-md p-4 border border-gray-200 shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300'
                     >
                       <div className='w-full flex mb-4'>
                         <div className='w-full'>

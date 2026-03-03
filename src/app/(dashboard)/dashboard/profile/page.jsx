@@ -23,13 +23,15 @@ import {
   FaFilePdf,
   FaLock,
   FaPhone,
+  FaFileImage,
+  FaTrash,
   FaUser,
   FaUserTag
 } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import FileUpload from '../addCollege/FileUpload'
+import FileUpload from '../colleges/FileUpload'
 
 const ProfileUpdate = () => {
   const { setHeading } = usePageHeading()
@@ -45,6 +47,8 @@ const ProfileUpdate = () => {
   const [showOldPassword, setShowOldPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [academicDocs, setAcademicDocs] = useState([])
+  const [isAcademicLoading, setIsAcademicLoading] = useState(false)
   const userData = useSelector((state) => state.user.data)
 
   const [nameForm, setNameForm] = useState({
@@ -74,35 +78,58 @@ const ProfileUpdate = () => {
   }
 
   const fetchUserProfile = async () => {
-    const response = await authFetch(
-      `${process.env.baseUrl}/users/profile?id=${userData.id}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}/users/profile?id=${userData.id}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
+      )
+      if (!response.ok) {
+        throw new Error('Failed to fetch profile')
       }
-    )
-    if (!response.ok) {
-      throw new Error('Failed to fetch profile')
+      const data = await response.json()
+      const user = data.user
+      setNameForm({
+        firstName: user.firstName || '',
+        middleName: user.middleName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phoneNo: user.phoneNo || '',
+        profileImageUrl: user.profileImageUrl || '',
+        cvUrl: user.cvUrl || ''
+      })
+    } catch (error) {
+      console.error('Fetch profile error:', error)
     }
-    const data = await response.json()
-    console.log(data, "data")
-    const user = data.user
-    setNameForm({
-      firstName: user.firstName || '',
-      middleName: user.middleName || '',
-      lastName: user.lastName || '',
-      email: user.email || '',
-      phoneNo: user.phoneNo || '',
-      profileImageUrl: user.profileImageUrl || '',
-      cvUrl: user.cvUrl || ''
-    })
+  }
+
+  const fetchAcademicDocs = async () => {
+    if (!userData?.id) return
+    setIsAcademicLoading(true)
+    try {
+      const response = await fetch(
+        `${process.env.mediaUrl}${process.env.version}/media/gallery?authorId=${userData.id}&mediaType=ACADEMIC`
+      )
+      if (!response.ok) throw new Error('Failed to fetch academic documents')
+      const data = await response.json()
+      setAcademicDocs(data.items || [])
+    } catch (error) {
+      console.error('Fetch academic documents error:', error)
+    } finally {
+      setIsAcademicLoading(false)
+    }
   }
 
   useEffect(() => {
     fetchUserProfile()
-  }, [])
+    if (isStudent) {
+      fetchAcademicDocs()
+    }
+  }, [userData?.id])
 
   const handleNameSubmit = async (e) => {
     e.preventDefault()
@@ -201,6 +228,23 @@ const ProfileUpdate = () => {
     }
   }
 
+  const handleAcademicDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this document?')) return
+
+    try {
+      const response = await fetch(
+        `${process.env.mediaUrl}${process.env.version}/media/delete/${id}`,
+        { method: 'DELETE' }
+      )
+      if (!response.ok) throw new Error('Failed to delete document')
+      toast.success('Document deleted successfully')
+      fetchAcademicDocs()
+    } catch (error) {
+      console.error('Delete academic document error:', error)
+      toast.error('Failed to delete document')
+    }
+  }
+
   const roles = userData?.role
     ? Object.entries(
       typeof userData.role === 'string'
@@ -228,41 +272,64 @@ const ProfileUpdate = () => {
   return (
     <div className='p-4 md:p-6 max-w-5xl mx-auto'>
       {/* Profile Header Card */}
-      <div className='bg-white rounded-lg border border-gray-200 p-6 mb-4'>
-        <div className='flex items-start gap-6'>
-          <div className='relative flex-shrink-0'>
-            <div className='w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-semibold text-2xl overflow-hidden border-2 border-gray-200'>
-              {nameForm.profileImageUrl ? (
-                <img
-                  src={nameForm.profileImageUrl}
-                  alt='Profile'
-                  className='w-full h-full object-cover'
-                />
-              ) : (
-                getInitials()
-              )}
+      <div className='bg-white rounded-md border border-gray-200 p-6 mb-4'>
+        <div className='flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6'>
+          <div className='flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left'>
+            <div className='relative flex-shrink-0'>
+              <div className='w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-semibold text-2xl overflow-hidden border-2 border-gray-200'>
+                {nameForm.profileImageUrl ? (
+                  <img
+                    src={nameForm.profileImageUrl}
+                    alt='Profile'
+                    className='w-full h-full object-cover'
+                  />
+                ) : (
+                  getInitials()
+                )}
+              </div>
+              <button
+                onClick={() => setShowNameModal(true)}
+                className='absolute -bottom-1 -right-1 p-1.5 bg-white rounded-full border border-gray-300 text-gray-600 hover:text-gray-900 hover:border-gray-400 transition-colors'
+                title='Change Photo'
+              >
+                <FaCamera className='w-3.5 h-3.5' />
+              </button>
             </div>
-            <button
-              onClick={() => setShowNameModal(true)}
-              className='absolute -bottom-1 -right-1 p-1.5 bg-white rounded-full border border-gray-300 text-gray-600 hover:text-gray-900 hover:border-gray-400 transition-colors'
-              title='Change Photo'
-            >
-              <FaCamera className='w-3.5 h-3.5' />
-            </button>
+            <div className='min-w-0'>
+              <h1 className='text-xl font-semibold text-gray-900 mb-1 truncate'>
+                {nameForm?.firstName && nameForm?.lastName
+                  ? `${nameForm.firstName} ${nameForm.middleName || ''} ${nameForm.lastName}`.trim()
+                  : 'User Profile'}
+              </h1>
+              {!isStudent && <p className='text-sm text-gray-600'>{roles}</p>}
+            </div>
           </div>
-          <div className='flex-1 min-w-0'>
-            <h1 className='text-xl font-semibold text-gray-900 mb-1 truncate'>
-              {nameForm?.firstName && nameForm?.lastName
-                ? `${nameForm.firstName} ${nameForm.middleName || ''} ${nameForm.lastName}`.trim()
-                : 'User Profile'}
-            </h1>
-            <p className='text-sm text-gray-600'>{roles}</p>
+
+          <div className='flex flex-wrap items-center gap-2'>
+            <Button
+              onClick={() => setShowNameModal(true)}
+              variant='outline'
+              size='sm'
+              className='gap-2 h-9 border-gray-200'
+            >
+              <FaUser className='w-3.5 h-3.5 text-blue-600' />
+              <span>Update Profile</span>
+            </Button>
+            <Button
+              onClick={() => setShowPasswordModal(true)}
+              variant='outline'
+              size='sm'
+              className='gap-2 h-9 border-gray-200'
+            >
+              <FaLock className='w-3.5 h-3.5 text-orange-600' />
+              <span>Change Password</span>
+            </Button>
           </div>
         </div>
       </div>
 
       {/* User Information Card */}
-      <div className='bg-white rounded-lg border border-gray-200 p-6 mb-4'>
+      <div className='bg-white rounded-md border border-gray-200 p-6 mb-4'>
         <h2 className='text-base font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100'>
           Personal Information
         </h2>
@@ -294,22 +361,24 @@ const ProfileUpdate = () => {
               {nameForm?.phoneNo || 'Not provided'}
             </p>
           </div>
-          <div className='space-y-1.5'>
-            <Label className='text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1.5'>
-              <FaUserTag className='w-3 h-3' />
-              Role
-            </Label>
-            <div className='flex flex-wrap gap-1.5'>
-              {roles.split(', ').map((role, idx) => (
-                <span
-                  key={idx}
-                  className='inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200'
-                >
-                  {role}
-                </span>
-              ))}
+          {!isStudent && (
+            <div className='space-y-1.5'>
+              <Label className='text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1.5'>
+                <FaUserTag className='w-3 h-3' />
+                Role
+              </Label>
+              <div className='flex flex-wrap gap-1.5'>
+                {roles.split(', ').map((role, idx) => (
+                  <span
+                    key={idx}
+                    className='inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200'
+                  >
+                    {role}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
           {isStudent && (
             <div className='space-y-1.5'>
               <Label className='text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1.5'>
@@ -335,50 +404,100 @@ const ProfileUpdate = () => {
         </div>
       </div>
 
-      {/* Action Cards */}
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
-        <button
-          onClick={() => setShowNameModal(true)}
-          className='bg-white rounded-lg border border-gray-200 p-5 hover:border-blue-200 hover:bg-blue-50/30 transition-all text-left group'
-        >
-          <div className='flex items-start gap-3.5'>
-            <div className='w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors'>
-              <FaUser className='w-4 h-4 text-blue-600' />
-            </div>
-            <div className='flex-1 min-w-0'>
-              <h3 className='text-sm font-semibold text-gray-900 mb-0.5'>
-                Update Profile
-              </h3>
-              <p className='text-xs text-gray-600'>
-                Edit your personal information and contact details
-              </p>
-            </div>
-          </div>
-        </button>
+      {/* Academic Documents Section - Only for Students */}
+      {isStudent && (
+        <div className='bg-white rounded-md border border-gray-200 p-6 mb-4'>
+          <h2 className='text-base font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100 flex items-center gap-2'>
+            <FaFileImage className='w-4 h-4 text-blue-600' />
+            Academic Documents
+          </h2>
 
-        <button
-          onClick={() => setShowPasswordModal(true)}
-          className='bg-white rounded-lg border border-gray-200 p-5 hover:border-blue-200 hover:bg-blue-50/30 transition-all text-left group'
-        >
-          <div className='flex items-start gap-3.5'>
-            <div className='w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors'>
-              <FaLock className='w-4 h-4 text-blue-600' />
-            </div>
-            <div className='flex-1 min-w-0'>
-              <h3 className='text-sm font-semibold text-gray-900 mb-0.5'>
-                Change Password
-              </h3>
-              <p className='text-xs text-gray-600'>
-                Update your password to keep your account secure
-              </p>
-            </div>
+          {/* Upload Section */}
+          <div className='mb-6'>
+            <FileUpload
+              label="Add New Document"
+              accept="image/*,application/pdf"
+              authorId={userData.id}
+              extraData={{ mediaType: 'ACADEMIC' }}
+              onUploadComplete={() => {
+                fetchAcademicDocs()
+              }}
+            />
+            <p className='mt-2 text-[11px] text-gray-500 italic'>
+              Supported formats: PNG, JPG, PDF. Maximum size 3MB per file.
+            </p>
           </div>
-        </button>
-      </div>
+
+          {/* Documents List */}
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+            {isAcademicLoading ? (
+              <div className='col-span-full py-10 flex flex-col items-center justify-center text-gray-500'>
+                <div className='h-8 w-8 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin mb-3' />
+                <p className='text-sm italic'>Loading documents...</p>
+              </div>
+            ) : academicDocs.length > 0 ? (
+              academicDocs.map((file) => (
+                <div key={file.id} className='group relative bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300'>
+                  {/* File Preview Icon/Image */}
+                  <div className='aspect-video bg-gray-200 flex items-center justify-center relative overflow-hidden'>
+                    {file.url.endsWith('.pdf') ? (
+                      <FaFilePdf className='w-12 h-12 text-red-500' />
+                    ) : (
+                      <img src={file.url} alt={file.title} className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-500' />
+                    )}
+                    <div className='absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3'>
+                      <a
+                        href={file.url}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='p-2 bg-white rounded-full text-gray-900 hover:bg-blue-600 hover:text-white transition-colors'
+                        title='View File'
+                      >
+                        <FaEye className='w-4 h-4' />
+                      </a>
+                      <button
+                        onClick={() => handleAcademicDelete(file.id)}
+                        className='p-2 bg-white rounded-full text-red-600 hover:bg-red-600 hover:text-white transition-colors'
+                        title='Delete'
+                      >
+                        <FaTrash className='w-4 h-4' />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Info */}
+                  <div className='p-3'>
+                    <p className='text-xs font-medium text-gray-900 truncate' title={file.title}>
+                      {file.title}
+                    </p>
+                    {file.description && (
+                      <p className='text-[10px] text-gray-600 mt-1 line-clamp-2 italic' title={file.description}>
+                        "{file.description}"
+                      </p>
+                    )}
+                    <p className='text-[10px] text-gray-400 mt-2 flex items-center justify-between'>
+                      <span>{new Date(file.createdAt || Date.now()).toLocaleDateString()}</span>
+                      <span className='px-1.5 py-0.5 bg-gray-200 rounded text-[9px] uppercase font-bold text-gray-500'>
+                        {file.url.split('.').pop()}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className='col-span-full py-12 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50'>
+                <FaFileImage className='w-10 h-10 text-gray-300 mb-3' />
+                <p className='text-sm text-gray-500'>No academic documents uploaded yet</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
 
       {/* Update Profile Dialog */}
       <Dialog isOpen={showNameModal} onClose={() => setShowNameModal(false)}>
-        <DialogContent className='max-w-2xl'>
+        <DialogContent className='max-w-4xl'>
           <DialogClose onClick={() => setShowNameModal(false)} />
           <DialogHeader>
             <DialogTitle className='text-lg'>Update Profile Information</DialogTitle>
@@ -645,7 +764,7 @@ const ProfileUpdate = () => {
                   </div>
                 </div>
               </div>
-              <div className='rounded-lg bg-gray-50 border border-gray-200 p-3.5'>
+              <div className='rounded-md bg-gray-50 border border-gray-200 p-3.5'>
                 <p className='text-xs leading-relaxed text-gray-700'>
                   <span className='font-semibold text-gray-900'>Password requirements:</span> At least 8 characters with uppercase, lowercase, number, and special character (@$!%*?&)
                 </p>

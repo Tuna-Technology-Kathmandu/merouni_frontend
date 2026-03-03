@@ -13,14 +13,14 @@ const ApplyNow = () => {
       <p className='text-2xl font-semibold mb-4'>
         Are you ready to take the next step toward your future career?
       </p>
-      {/* <div className="flex flex-row items-center bg-[#0A6FA7] text-white rounded-lg p-2 cursor-pointer" onClick={()=> }>
+      {/* <div className="flex flex-row items-center bg-[#0A6FA7] text-white rounded-md p-2 cursor-pointer" onClick={()=> }>
 
       <button type="button" className="font-semibold">
         Apply Now 
       </button>
         <FaArrowRight className="ml-2"/>
       </div> */}
-      <div className='flex flex-row items-center bg-[#0A6FA7] text-white rounded-lg p-2 cursor-pointer'>
+      <div className='flex flex-row items-center bg-[#0A6FA7] text-white rounded-md p-2 cursor-pointer'>
         <a href={'#'} target='_blank'>
           Apply Now
         </a>

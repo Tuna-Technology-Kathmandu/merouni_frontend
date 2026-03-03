@@ -14,7 +14,7 @@ const Description = ({ event }) => {
 
   const MetaItem = ({ icon: Icon, label, value }) => (
     <div className='flex items-start gap-4 py-4 border-b border-gray-50 last:border-0'>
-      <div className='p-2 rounded-lg bg-blue-50 text-[#0A6FA7]'>
+      <div className='p-2 rounded-md bg-blue-50 text-[#0A6FA7]'>
         {Icon && <Icon size={16} />}
       </div>
       <div className='flex flex-col'>
@@ -53,7 +53,7 @@ const Description = ({ event }) => {
                 prose-headings:font-bold prose-headings:text-gray-900
                 prose-p:text-gray-600 prose-p:leading-relaxed
                 prose-a:text-[#0A6FA7] prose-a:no-underline hover:prose-a:underline
-                prose-img:rounded-xl'
+                prose-img:rounded-md'
                 dangerouslySetInnerHTML={{ __html: event?.description }}
               />
             </section>
@@ -65,10 +65,10 @@ const Description = ({ event }) => {
                   prose-headings:font-bold prose-headings:text-gray-900
                   prose-p:text-gray-600 prose-p:leading-relaxed
                   prose-a:text-[#0A6FA7] prose-a:no-underline hover:prose-a:underline
-                  prose-img:rounded-xl
+                  prose-img:rounded-md
                   [&_.table-wrapper]:overflow-x-auto
                   [&_.table-wrapper]:my-8
-                  [&_.table-wrapper]:rounded-xl
+                  [&_.table-wrapper]:rounded-md
                   [&_.table-wrapper]:border
                   [&_.table-wrapper]:border-gray-100
                   [&_table]:w-full
@@ -108,7 +108,7 @@ const Description = ({ event }) => {
                   <FaMapMarkerAlt className='text-[#0A6FA7]' />
                   Location
                 </h3>
-                <div className='w-full h-48 rounded-xl overflow-hidden border border-gray-100 shadow-sm'>
+                <div className='w-full h-48 rounded-md overflow-hidden border border-gray-100 shadow-sm'>
                   <GoogleMap mapUrl={hostData.map_url} />
                 </div>
               </div>

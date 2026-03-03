@@ -24,16 +24,16 @@ const BlogCard = ({
   const date =
     typeof rawDate === 'string' && rawDate
       ? (() => {
-          try {
-            return new Date(rawDate).toLocaleDateString(undefined, {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })
-          } catch {
-            return rawDate
-          }
-        })()
+        try {
+          return new Date(rawDate).toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })
+        } catch {
+          return rawDate
+        }
+      })()
       : dateProp ?? ''
 
   const handleShareClick = (e) => {
@@ -47,7 +47,7 @@ const BlogCard = ({
   }
 
   return (
-    <div className='group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 ease-in-out border border-gray-100 overflow-hidden h-full flex flex-col'>
+    <div className='group bg-white rounded-md shadow-sm hover:shadow-xl transition-all duration-300 ease-in-out border border-gray-100 overflow-hidden h-full flex flex-col'>
       <div className='h-[200px] relative overflow-hidden'>
         <img
           src={image}

@@ -6,7 +6,7 @@ const AdLayoutShimmer = ({ number = 3 }) => {
       <div className='flex flex-col md:flex-row justify-between gap-4'>
         {[...Array(number)].map((_, index) => (
           <div className='w-full md:w-auto relative'>
-            <div className='w-full h-48 bg-gray-300 rounded-lg animate-pulse' />
+            <div className='w-full h-48 bg-gray-300 rounded-md animate-pulse' />
           </div>
         ))}
       </div>

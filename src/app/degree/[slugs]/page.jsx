@@ -147,9 +147,9 @@ const CourseDescription = ({ params }) => {
                           }
                         />
                       </div>
-                      
+
                       {degree.content && (
-                        <div 
+                        <div
                           className='prose prose-blue max-w-none mb-8'
                           dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(degree.content) }}
                         />
@@ -170,7 +170,7 @@ const CourseDescription = ({ params }) => {
                             {program.slugs ? (
                               <Link
                                 href={`/program/${encodeURIComponent(program.slugs)}`}
-                                className='block py-2 px-4 rounded-lg border border-gray-200 hover:border-[#0A6FA7] hover:bg-[#0A6FA7]/5 transition-colors text-gray-800 hover:text-[#0A6FA7]'
+                                className='block py-2 px-4 rounded-md border border-gray-200 hover:border-[#0A6FA7] hover:bg-[#0A6FA7]/5 transition-colors text-gray-800 hover:text-[#0A6FA7]'
                               >
                                 <span className='font-medium'>
                                   {program.title}
@@ -193,7 +193,7 @@ const CourseDescription = ({ params }) => {
                                 )}
                               </Link>
                             ) : (
-                              <div className='block py-2 px-4 rounded-lg border border-gray-200 text-gray-800'>
+                              <div className='block py-2 px-4 rounded-md border border-gray-200 text-gray-800'>
                                 <span className='font-medium'>
                                   {program.title}
                                   {program.university_programs?.[0]?.university?.fullname && (
@@ -263,11 +263,11 @@ const CourseDescription = ({ params }) => {
             ) : (
               <>
                 <ImageSection degree={degree} />
-                
+
                 {degree.content && (
                   <div className='container mx-auto px-4 py-12'>
                     <div className='max-w-4xl mx-auto'>
-                      <div 
+                      <div
                         className='prose prose-blue max-w-none'
                         dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(degree.content) }}
                       />
@@ -290,7 +290,7 @@ const CourseDescription = ({ params }) => {
                           <li key={program.id}>
                             <Link
                               href={`/program/${encodeURIComponent(program.slugs || program.slug)}`}
-                              className='block p-4 rounded-xl border border-gray-100 bg-white hover:border-[#0A6FA7] hover:shadow-md transition-all group'
+                              className='block p-4 rounded-md border border-gray-100 bg-white hover:border-[#0A6FA7] hover:shadow-md transition-all group'
                             >
                               <div className='flex items-center justify-between'>
                                 <div className='flex-1'>
@@ -316,7 +316,7 @@ const CourseDescription = ({ params }) => {
                                   </div>
                                 </div>
                                 <div className='ml-4'>
-                                  <span className='px-4 py-2 rounded-lg bg-gray-50 text-[#0A6FA7] text-sm font-semibold group-hover:bg-[#0A6FA7] group-hover:text-white transition-all'>
+                                  <span className='px-4 py-2 rounded-md bg-gray-50 text-[#0A6FA7] text-sm font-semibold group-hover:bg-[#0A6FA7] group-hover:text-white transition-all'>
                                     View Program
                                   </span>
                                 </div>

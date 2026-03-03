@@ -1,13 +1,13 @@
 import React from 'react'
-import { FaPhoneAlt, FaBriefcase  } from 'react-icons/fa'
+import { FaPhoneAlt, FaBriefcase } from 'react-icons/fa'
 import { MdEmail } from 'react-icons/md'
 
 const MembersSection = ({ university }) => {
   const members = Array.isArray(university?.members)
     ? university.members.filter(
-        ({ name, role, phone, email }) =>
-          name?.trim() || role?.trim() || phone?.trim() || email?.trim()
-      )
+      ({ name, role, phone, email }) =>
+        name?.trim() || role?.trim() || phone?.trim() || email?.trim()
+    )
     : []
 
   if (members.length === 0) return null
@@ -26,7 +26,7 @@ const MembersSection = ({ university }) => {
           {members.map((member, idx) => (
             <div
               key={member.id || idx}
-              className="group bg-white rounded-xl p-6 shadow-[0px_0px_10px_1px_rgba(0,0,0,0.1)] transition-all duration-300"
+              className="group bg-white rounded-md p-6 shadow-[0px_0px_10px_1px_rgba(0,0,0,0.1)] transition-all duration-300"
             >
               {/* Avatar + Name */}
               <div className="flex items-center gap-4 mb-4">

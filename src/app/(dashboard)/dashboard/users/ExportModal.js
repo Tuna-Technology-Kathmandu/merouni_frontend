@@ -168,7 +168,7 @@ export default function ExportModal({ isOpen, onClose }) {
 
             {/* Error */}
             {error && (
-              <div className='p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600'>
+              <div className='p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-600'>
                 {error}
               </div>
             )}

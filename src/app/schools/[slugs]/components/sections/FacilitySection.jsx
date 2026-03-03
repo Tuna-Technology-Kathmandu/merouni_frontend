@@ -5,7 +5,7 @@ const FacilitySection = ({ college }) => {
   }
 
   return (
-    <div className='bg-white rounded-xl border p-6'>
+    <div className='bg-white rounded-md border p-6'>
       <h2 className='text-xl font-bold text-gray-900 mb-6'>Facilities</h2>
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8'>
         {college.facilities.map((item, index) => {
@@ -16,7 +16,7 @@ const FacilitySection = ({ college }) => {
             >
               <div className='flex items-center gap-4 mb-4'>
                 {item?.icon && (
-                  <div className='w-12 h-12 rounded-xl overflow-hidden bg-white flex-shrink-0 p-2 border border-gray-100 group-hover:bg-[#30AD8F]/5 transition-colors'>
+                  <div className='w-12 h-12 rounded-md overflow-hidden bg-white flex-shrink-0 p-2 border border-gray-100 group-hover:bg-[#30AD8F]/5 transition-colors'>
                     <img
                       src={item.icon}
                       alt={item?.title}

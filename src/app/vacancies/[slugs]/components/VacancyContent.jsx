@@ -109,7 +109,7 @@ const VacancyContent = ({ vacancy }) => {
               className='flex items-center p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors'
             >
               <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 shadow-sm ${item.color}`}
+                className={`w-10 h-10 rounded-md flex items-center justify-center mr-4 shadow-sm ${item.color}`}
               >
                 <item.icon className='w-5 h-5' />
               </div>
@@ -162,7 +162,7 @@ const VacancyContent = ({ vacancy }) => {
              /* Table styles */
              [&_.table-wrapper]:overflow-x-auto
              [&_.table-wrapper]:my-8
-             [&_.table-wrapper]:rounded-xl
+             [&_.table-wrapper]:rounded-md
              [&_.table-wrapper]:border
              [&_.table-wrapper]:border-gray-100
              [&_table]:w-full

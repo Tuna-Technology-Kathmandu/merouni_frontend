@@ -67,12 +67,12 @@ const RelatedConsultancies = ({ consultancy }) => {
             const address = item?.address
               ? typeof item.address === 'string'
                 ? (() => {
-                    try {
-                      return JSON.parse(item.address)
-                    } catch {
-                      return {}
-                    }
-                  })()
+                  try {
+                    return JSON.parse(item.address)
+                  } catch {
+                    return {}
+                  }
+                })()
                 : item.address || {}
               : {}
             const location = [address?.street, address?.city]
@@ -96,7 +96,7 @@ const RelatedConsultancies = ({ consultancy }) => {
                         className='w-36 h-36 sm:w-40 sm:h-40 md:w-48 md:h-48 object-contain'
                       />
                     ) : (
-                      <div className='w-36 h-36 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-gray-50 flex items-center justify-center rounded-xl'>
+                      <div className='w-36 h-36 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-gray-50 flex items-center justify-center rounded-md'>
                         <span className='text-gray-400 text-sm'>No logo</span>
                       </div>
                     )}

@@ -46,7 +46,7 @@ const Newsletter = () => {
         {/* Right Section - Input and Button */}
         <form
           onSubmit={handleSubmit}
-          className='mt-2 flex flex-row items-center bg-[#eaf4f3] rounded-xl shadow-md w-full md:w-1/2'
+          className='mt-2 flex flex-row items-center bg-[#eaf4f3] rounded-md shadow-md w-full md:w-1/2'
         >
           <input
             type='email'

@@ -41,7 +41,7 @@ const ApplyNow = ({ college }) => {
             {college?.slugs && (
               <button
                 onClick={handleApplyClick}
-                className='group bg-white text-[#0870A8] px-6 md:px-8 py-3 md:py-4 rounded-xl font-medium text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 min-w-[160px] justify-center'
+                className='group bg-white text-[#0870A8] px-6 md:px-8 py-3 md:py-4 rounded-md font-medium text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2 min-w-[160px] justify-center'
               >
                 <span>Apply Now</span>
                 <FaArrowRight className='w-4 h-4 group-hover:translate-x-1 transition-transform' />
@@ -53,7 +53,7 @@ const ApplyNow = ({ college }) => {
                 href={college.website_url}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='group bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl font-medium text-sm hover:bg-white/20 hover:border-white/50 transition-all duration-300 flex items-center gap-2 min-w-[160px] justify-center'
+                className='group bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white px-6 md:px-8 py-3 md:py-4 rounded-md font-medium text-sm hover:bg-white/20 hover:border-white/50 transition-all duration-300 flex items-center gap-2 min-w-[160px] justify-center'
               >
                 <span>Visit Website</span>
                 <FaArrowRight className='w-4 h-4 group-hover:translate-x-1 transition-transform' />

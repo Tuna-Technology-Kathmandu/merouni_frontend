@@ -16,7 +16,7 @@ const ProgramSection = ({ college }) => {
   }
 
   return (
-    <div className='bg-white rounded-xl border p-6'>
+    <div className='bg-white rounded-md border p-6'>
       <h2 className='text-xl font-bold text-gray-900 mb-6'>
         Offered Programs
       </h2>
@@ -38,7 +38,7 @@ const ProgramSection = ({ college }) => {
             <button
               onClick={() => handleApply(course.id)}
               type='button'
-              className='w-full sm:w-max bg-[#0A6FA7] hover:bg-[#085e8a] text-white text-sm font-medium py-2.5 px-6 rounded-xl transition-all active:scale-95 shadow-sm'
+              className='w-full sm:w-max bg-[#0A6FA7] hover:bg-[#085e8a] text-white text-sm font-medium py-2.5 px-6 rounded-md transition-all active:scale-95 shadow-sm'
             >
               Apply Now
             </button>

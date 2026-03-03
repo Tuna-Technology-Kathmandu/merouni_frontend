@@ -13,15 +13,8 @@ import {
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { Select } from '@/ui/shadcn/select'
-import dynamic from 'next/dynamic'
+import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 import { formatDate } from '@/utils/date.util'
-
-const CKEditor = dynamic(
-  () => import('@/ui/molecules/ck-editor/CKStable'),
-  {
-    ssr: false
-  }
-)
 
 const ScholarshipFormDialog = ({
   open: isOpen,
@@ -160,10 +153,10 @@ const ScholarshipFormDialog = ({
 
               <div className='space-y-2 col-span-2'>
                 <Label>Description</Label>
-                <CKEditor
+                <TipTapEditor
                   value={formData.description}
                   onChange={handleEditorChange}
-                  id='scholarship-description-editor'
+                  placeholder='Write scholarship description...'
                 />
               </div>
 

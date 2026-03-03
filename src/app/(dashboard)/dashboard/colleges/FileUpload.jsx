@@ -10,11 +10,15 @@ const FileUpload = ({
   label,
   required = false,
   defaultPreview = null,
-  accept = 'image/*'
+  accept = 'image/*',
+  extraData = {},
+  authorId = '1' // Added support for dynamic authorId
 }) => {
   const [isUploading, setIsUploading] = useState(false)
   const [preview, setPreview] = useState(defaultPreview)
   const [fileType, setFileType] = useState(null)
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [description, setDescription] = useState('')
   const fileInputRef = useRef(null)
 
   useEffect(() => {
@@ -28,9 +32,12 @@ const FileUpload = ({
     }
   }, [defaultPreview])
 
-  const handleFileUpload = async (event) => {
+  const handleFileSelect = (event) => {
     const file = event.target.files[0]
     if (!file) return
+
+    setSelectedFile(file)
+    setDescription('') // Reset description for new file
 
     // Create preview for images
     if (file.type.startsWith('image/')) {
@@ -42,15 +49,24 @@ const FileUpload = ({
       setFileType('pdf')
       setPreview(file.name)
     }
+  }
+
+  const handleFileUpload = async () => {
+    if (!selectedFile) return
 
     setIsUploading(true)
 
     const formData = new FormData()
-    formData.append('title', file.name)
-    formData.append('altText', file.name)
-    formData.append('description', '')
-    formData.append('file', file)
-    formData.append('authorId', '1')
+    formData.append('title', selectedFile.name)
+    formData.append('altText', selectedFile.name)
+    formData.append('description', description)
+    formData.append('file', selectedFile)
+    formData.append('authorId', authorId)
+
+    // Append extra data (e.g., mediaType)
+    Object.entries(extraData).forEach(([key, value]) => {
+      formData.append(key, value)
+    })
 
     try {
       const response = await axios.post(
@@ -68,26 +84,18 @@ const FileUpload = ({
 
       if (data.success === false) {
         toast.error(data.message || 'Upload failed.')
-        // Reset file input and preview on failure
-        if (fileInputRef.current) {
-          fileInputRef.current.value = ''
-        }
-        setPreview(defaultPreview)
-        setFileType(null)
         return
       }
 
       toast.success('File uploaded successfully!')
-      onUploadComplete(data.media.url)
-    } catch (error) {
-      console.error('Upload failed:', error)
-
-      // Reset file input and preview on error
+      setSelectedFile(null)
+      setDescription('')
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
-      setPreview(defaultPreview)
-      setFileType(null)
+      onUploadComplete(data.media.url)
+    } catch (error) {
+      console.error('Upload failed:', error)
 
       if (error.response) {
         toast.error(error.response.data?.message || 'Upload failed.')
@@ -116,14 +124,14 @@ const FileUpload = ({
       {label && <Label required={required}>{label}</Label>}
       <div
         className={cn(
-          'relative border-2 border-dashed rounded-lg p-4 transition-all duration-200',
+          'relative border-2 border-dashed rounded-md p-4 transition-all duration-200',
           'border-input bg-background/50 hover:bg-muted/30 hover:border-[#387cae]/40',
           isUploading && 'opacity-60 cursor-not-allowed',
           preview ? 'border-[#387cae]/20 bg-[#387cae]/[0.02]' : 'border-input'
         )}
       >
         <div className='flex flex-col items-center justify-center min-h-[120px]'>
-          {!preview && !isUploading && (
+          {!selectedFile && !preview && !isUploading && (
             <div className='flex flex-col items-center animate-in fade-in zoom-in duration-300'>
               <Upload className='h-8 w-8 text-muted-foreground mb-3 opacity-60' />
               <div className='text-sm text-center'>
@@ -133,7 +141,7 @@ const FileUpload = ({
                     ref={fileInputRef}
                     type='file'
                     className='hidden'
-                    onChange={handleFileUpload}
+                    onChange={handleFileSelect}
                     accept={accept}
                     disabled={isUploading}
                   />
@@ -154,7 +162,7 @@ const FileUpload = ({
             </div>
           )}
 
-          {preview && !isUploading && (
+          {(selectedFile || preview) && !isUploading && (
             <div className='w-full animate-in fade-in slide-in-from-bottom-2 duration-300'>
               <div className='flex items-center justify-between mb-3 px-1'>
                 <span className='text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70'>
@@ -197,6 +205,27 @@ const FileUpload = ({
                       </a>
                     )}
                   </div>
+                </div>
+              )}
+
+              {selectedFile && (
+                <div className='mt-4 space-y-3'>
+                  <div className='space-y-1.5'>
+                    <Label htmlFor="file-description" className="text-xs font-medium text-gray-500">Remarks / Description</Label>
+                    <textarea
+                      id="file-description"
+                      className='w-full min-h-[80px] p-2 text-sm border rounded-md bg-white focus:ring-2 focus:ring-[#387cae]/20 focus:border-[#387cae] outline-none transition-all'
+                      placeholder='Add some remarks about this document...'
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                  </div>
+                  <button
+                    onClick={handleFileUpload}
+                    className='w-full py-2 bg-[#387cae] text-white rounded-md text-sm font-medium hover:bg-[#2d658e] transition-colors shadow-sm'
+                  >
+                    Upload Document
+                  </button>
                 </div>
               )}
             </div>

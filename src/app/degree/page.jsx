@@ -55,7 +55,7 @@ const FilterSection = React.memo(function FilterSection({
           value={localSearch}
           onChange={handleInputChange}
           placeholder={`Search ${title.toLowerCase()}...`}
-          className='w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all'
+          className='w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all'
         />
         {isLoading && (
           <div className='absolute right-3'>
@@ -241,7 +241,7 @@ const DegreePage = () => {
                 <h2 className='text-3xl font-extrabold text-gray-900 tracking-tight'>
                   Degrees
                 </h2>
-                <span className='bg-blue-50 text-[#0A6FA7] px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider'>
+                <span className='bg-blue-50 text-[#0A6FA7] px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider'>
                   {pagination.totalCount || '0'} Results
                 </span>
               </div>
@@ -314,53 +314,53 @@ const DegreePage = () => {
                 </div>
               )}
 
-          {/* Degrees Grid */}
-          {loading || isScrolling ? (
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-              {Array(6)
-                .fill('')
-                .map((_, index) => (
-                  <CardSkeleton key={index} />
-                ))}
-            </div>
-          ) : degrees.length === 0 ? (
-            <div className='bg-white rounded-[32px] border border-gray-100 border-dashed py-20'>
-              <EmptyState
-                icon={BookOpen}
-                title='No Degrees Found'
-                description={
-                  searchTerm
-                    ? 'No degrees match your search. Try a different keyword.'
-                    : 'No degrees are currently available'
-                }
-                action={
-                  searchTerm
-                    ? { label: 'Clear Search', onClick: clearFilters }
-                    : null
-                }
-              />
-            </div>
-          ) : (
-            <>
-              <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                {degrees.map((degree) => (
-                  <DegreeCard key={degree.id ?? degree.slug} degree={degree} />
-                ))}
-              </div>
-
-              {/* Pagination */}
-              {pagination.totalPages > 1 && (
-                <div className='mt-20 flex justify-center'>
-                  <div className='bg-white px-8 py-4 rounded-[24px] shadow-sm border border-gray-100'>
-                    <Pagination
-                      pagination={pagination}
-                      onPageChange={handlePageChange}
-                    />
-                  </div>
+              {/* Degrees Grid */}
+              {loading || isScrolling ? (
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                  {Array(6)
+                    .fill('')
+                    .map((_, index) => (
+                      <CardSkeleton key={index} />
+                    ))}
                 </div>
+              ) : degrees.length === 0 ? (
+                <div className='bg-white rounded-[32px] border border-gray-100 border-dashed py-20'>
+                  <EmptyState
+                    icon={BookOpen}
+                    title='No Degrees Found'
+                    description={
+                      searchTerm
+                        ? 'No degrees match your search. Try a different keyword.'
+                        : 'No degrees are currently available'
+                    }
+                    action={
+                      searchTerm
+                        ? { label: 'Clear Search', onClick: clearFilters }
+                        : null
+                    }
+                  />
+                </div>
+              ) : (
+                <>
+                  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                    {degrees.map((degree) => (
+                      <DegreeCard key={degree.id ?? degree.slug} degree={degree} />
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  {pagination.totalPages > 1 && (
+                    <div className='mt-20 flex justify-center'>
+                      <div className='bg-white px-8 py-4 rounded-[24px] shadow-sm border border-gray-100'>
+                        <Pagination
+                          pagination={pagination}
+                          onPageChange={handlePageChange}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
-            </>
-          )}
             </div>
           </div>
         </div>

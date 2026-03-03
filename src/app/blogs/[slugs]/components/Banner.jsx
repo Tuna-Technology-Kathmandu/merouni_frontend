@@ -43,7 +43,7 @@ const Banner = () => {
       {displayBanners.map((banner, index) => (
         <div
           key={index}
-          className={`w-full sm:w-[350px] lg:w-[340px] xl:w-full rounded-lg overflow-hidden shadow-md ${!banner ? 'bg-gray-100' : ''}`}
+          className={`w-full sm:w-[350px] lg:w-[340px] xl:w-full rounded-md overflow-hidden shadow-md ${!banner ? 'bg-gray-100' : ''}`}
         >
           {banner ? (
             <a

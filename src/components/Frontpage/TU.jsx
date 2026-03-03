@@ -40,7 +40,7 @@
 //               <h3 key={index}>{college}</h3>
 //             ))}
 //           </div>
-//           <button className="w-[130px] text-center border border-white rounded-xl flex items-center justify-center p-2 font-bold mt-2">
+//           <button className="w-[130px] text-center border border-white rounded-md flex items-center justify-center p-2 font-bold mt-2">
 //             View all
 //             <div className="w-6 h-6 rounded-full bg-white text-black mx-2">
 //               &gt;
@@ -164,7 +164,7 @@ const UniversitySection = ({ name, colleges, logo, zIndex, index }) => {
           </div>
 
           {/* View all button */}
-          <button className='w-[130px] text-center border border-black rounded-xl flex items-center justify-center p-2 font-bold hover:bg-[]'>
+          <button className='w-[130px] text-center border border-black rounded-md flex items-center justify-center p-2 font-bold hover:bg-[]'>
             View all
             <div className='w-6 h-6 rounded-full bg-white text-black mx-2'>
               &gt;

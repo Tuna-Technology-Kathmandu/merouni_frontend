@@ -65,6 +65,26 @@ export async function deleteUniversity(id) {
   }
 }
 
+export async function saveUniversityDraft(data) {
+  const response = await authFetch(
+    `${process.env.baseUrl}/university/save-as-draft`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }
+  )
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.message || 'Failed to save university draft')
+  }
+
+  return response.json()
+}
+
 //for level search
 export const fetchLevel = async (searchQuery = '') => {
   try {

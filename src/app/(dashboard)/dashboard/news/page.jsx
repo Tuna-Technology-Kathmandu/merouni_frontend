@@ -4,7 +4,8 @@ import { authFetch } from '@/app/utils/authFetch'
 import { Button } from '@/ui/shadcn/button'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import useAdminPermission from '@/hooks/useAdminPermission'
-import { Edit2, Eye, Trash2 } from 'lucide-react'
+import { Edit2, Eye, Trash2, Plus } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -30,6 +31,7 @@ import NewsForm from './components/NewsForm'
 import { FormatDate } from '@/lib/date'
 import { formatDate, formatDateTime } from '@/utils/date.util'
 import SearchInput from '@/ui/molecules/SearchInput'
+import ImageLightbox from '@/ui/molecules/image-lightbox'
 
 export default function NewsManager() {
   const { setHeading } = usePageHeading()
@@ -61,13 +63,28 @@ export default function NewsManager() {
   const [loadingColleges, setLoadingColleges] = useState(false)
   const [loadingCategories, setLoadingCategories] = useState(false)
 
+  // Lightbox State
+  const [lightbox, setLightbox] = useState({
+    isOpen: false,
+    imageUrl: '',
+    altText: ''
+  })
+
+  const handleImageClick = (imageUrl, altText) => {
+    setLightbox({
+      isOpen: true,
+      imageUrl,
+      altText: altText || 'News Image'
+    })
+  }
+
   const columns = useMemo(
     () => [
       {
         header: 'Title',
         accessorKey: 'title',
         cell: ({ row }) => {
-          const { title, status, visibility, featured_image } = row.original
+          const { title, status, visibility, featured_image, slug } = row.original
           const statusLabel = status || 'draft'
           const visibilityLabel = visibility || 'private'
 
@@ -84,7 +101,10 @@ export default function NewsManager() {
           return (
             <div className='flex items-center gap-3 max-w-xs overflow-hidden'>
               {featured_image ? (
-                <div className='w-20 h-20 rounded shrink-0 overflow-hidden bg-gray-100'>
+                <div
+                  className='w-14 h-14 rounded shrink-0 overflow-hidden bg-gray-100 cursor-pointer hover:opacity-80 transition-opacity'
+                  onClick={() => handleImageClick(featured_image, title)}
+                >
                   <img
                     src={featured_image}
                     alt='News'
@@ -92,23 +112,30 @@ export default function NewsManager() {
                   />
                 </div>
               ) : (
-                <div className='w-20 h-20 rounded shrink-0 bg-gray-100 border border-dashed flex items-center justify-center text-xs text-gray-400'>
+                <div className='w-14 h-14 rounded shrink-0 bg-gray-100 border border-dashed flex items-center justify-center text-xs text-gray-400'>
                   No img
                 </div>
               )}
               <div className='flex-1 overflow-hidden'>
-                <div className='truncate font-medium text-gray-900'>{title}</div>
+                <Link
+                  href={slug ? `/news/${slug}` : '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className='truncate font-semibold text-slate-900 hover:text-[#387cae] hover:underline block'
+                >
+                  {title}
+                </Link>
                 <div className='flex flex-wrap gap-2 mt-1'>
                   {status && (
                     <span
-                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusClasses}`}
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusClasses}`}
                     >
                       {statusLabel}
                     </span>
                   )}
                   {visibility && (
                     <span
-                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${visibilityClasses}`}
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${visibilityClasses}`}
                     >
                       {visibilityLabel}
                     </span>
@@ -120,16 +147,14 @@ export default function NewsManager() {
         }
       },
       {
-        header: 'Description',
-        accessorKey: 'description',
-        cell: ({ getValue }) => {
-          // Strip HTML tags for table display since description may be HTML from TipTap
-          const raw = getValue() || ''
-          const stripped = raw.replace(/<[^>]*>/g, '')
+        header: 'Category',
+        accessorKey: 'newsCategory',
+        cell: ({ row }) => {
+          const category = row.original.newsCategory
           return (
-            <div className='max-w-xs overflow-hidden text-gray-600 text-sm'>
-              {stripped.substring(0, 100)}{stripped.length > 100 ? '...' : ''}
-            </div>
+            <span className="text-sm text-slate-600">
+              {category?.title || '—'}
+            </span>
           )
         }
       },
@@ -139,44 +164,42 @@ export default function NewsManager() {
         cell: ({ getValue }) => {
           const date = new Date(getValue())
           return (
-            <div className='whitespace-nowrap'>{formatDateTime(date)}</div>
+            <div className='whitespace-nowrap text-sm text-slate-600'>{formatDateTime(date)}</div>
           )
         }
-      },
-      {
-        header: 'Associated College',
-        accessorKey: 'newsCollege.name',
-        cell: ({ row }) => row.original.newsCollege?.name || 'N/A'
-      },
-      {
-        header: 'Category',
-        accessorKey: 'newsCategory.name',
-        cell: ({ row }) => row.original.newsCategory?.title || 'N/A'
       },
       {
         header: 'Actions',
         id: 'actions',
         cell: ({ row }) => (
-          <div className='flex gap-2'>
-            <button
+          <div className='flex gap-1'>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => handleView(row.original.id)}
-              className='p-1 text-purple-600 hover:text-purple-800'
+              className='hover:bg-purple-50 text-purple-600'
               title='View Details'
             >
               <Eye className='w-4 h-4' />
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => handleEdit(row.original)}
-              className='p-1 text-blue-600 hover:text-blue-800'
+              className='hover:bg-blue-50 text-blue-600'
+              title='Edit'
             >
               <Edit2 className='w-4 h-4' />
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => handleDeleteClick(row.original.id)}
-              className='p-1 text-red-600 hover:text-red-800'
+              className='hover:bg-red-50 text-red-600'
+              title='Delete'
             >
               <Trash2 className='w-4 h-4' />
-            </button>
+            </Button>
           </div>
         )
       }
@@ -365,56 +388,61 @@ export default function NewsManager() {
   }
 
   return (
-    <>
-      <div className='w-full space-y-2'>
-        <div className='px-4 space-y-4'>
-          <div className='flex justify-between items-center pt-4'>
-            <SearchInput
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              placeholder='Search news...'
-              className='max-w-md'
-            />
-            <Button
-              onClick={() => {
-                setIsOpen(true)
-                setEditing(false)
-                setInitialData(null)
-                fetchAllColleges()
-                fetchAllCategories()
-              }}
-            >
-              Add News
-            </Button>
-          </div>
+    <div className='w-full'>
+      <ToastContainer position='top-right' />
 
-          {/* News Form Modal */}
-          <NewsForm
-            isOpen={isOpen}
-            onClose={handleModalClose}
-            editing={editing}
-            initialData={initialData}
-            onSubmit={handleSubmit}
-            submitting={submitting}
-            colleges={colleges}
-            categories={categories}
-            loadingColleges={loadingColleges}
-            loadingCategories={loadingCategories}
+      {/* Sticky Header */}
+      <div className='sticky mb-3 top-0 z-30 bg-[#F7F8FA] py-4'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
+          <SearchInput
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder='Search news...'
+            className='max-w-md w-full'
           />
-
-          {/* Table Section */}
-          <Table
-            data={news}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => loadData(newPage, searchQuery)}
-            onSearch={handleSearch}
-            showSearch={false}
-            loading={loading}
-          />
+          <Button
+            onClick={() => {
+              setIsOpen(true)
+              setEditing(false)
+              setInitialData(null)
+              fetchAllColleges()
+              fetchAllCategories()
+            }}
+            className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2 h-11 px-6 shadow-md shadow-[#387cae]/20 transition-all active:scale-95"
+          >
+            <Plus className="w-4 h-4" />
+            Add News
+          </Button>
         </div>
       </div>
-      <ToastContainer position='top-right' />
+
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
+        {/* Table Section */}
+        <Table
+          data={news}
+          columns={columns}
+          pagination={pagination}
+          onPageChange={(newPage) => loadData(newPage, searchQuery)}
+          onSearch={handleSearch}
+          showSearch={false}
+          loading={loading}
+          emptyContent={searchQuery ? "No news found matching your search." : "No news available."}
+        />
+      </div>
+
+      {/* News Form Modal */}
+      <NewsForm
+        isOpen={isOpen}
+        onClose={handleModalClose}
+        editing={editing}
+        initialData={initialData}
+        onSubmit={handleSubmit}
+        submitting={submitting}
+        colleges={colleges}
+        categories={categories}
+        loadingColleges={loadingColleges}
+        loadingCategories={loadingCategories}
+      />
 
       {/* Delete Confirmation Dialog */}
       <ConfirmationDialog
@@ -441,7 +469,7 @@ export default function NewsManager() {
           ) : viewNewsData ? (
             <div className='space-y-4 max-h-[70vh] overflow-y-auto p-2'>
               {viewNewsData.featured_image && (
-                <div className='w-full h-64 rounded-lg overflow-hidden'>
+                <div className='w-full h-64 rounded-md overflow-hidden'>
                   <img
                     src={viewNewsData.featured_image}
                     alt={viewNewsData.title}
@@ -476,7 +504,7 @@ export default function NewsManager() {
                   <p className='text-gray-700'>{viewNewsData.description}</p>
                 </div>
               )}
-              <div className='grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg'>
+              <div className='grid grid-cols-2 gap-4 bg-muted/30 p-4 rounded-md'>
                 <div>
                   <h3 className='text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1'>
                     Associated College
@@ -507,6 +535,13 @@ export default function NewsManager() {
           )}
         </DialogContent>
       </Dialog>
-    </>
+
+      <ImageLightbox
+        isOpen={lightbox.isOpen}
+        onClose={() => setLightbox({ ...lightbox, isOpen: false })}
+        imageUrl={lightbox.imageUrl}
+        altText={lightbox.altText}
+      />
+    </div>
   )
 }

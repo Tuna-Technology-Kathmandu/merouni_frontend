@@ -56,7 +56,7 @@ const HeroCareer = ({ career }) => {
       </div>
 
       {/* Social share icons remain the same */}
-      <div className='space-y-4 z-10 text-[#b0b2c3] fixed left-4 top-[30%] lg:block md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col'>
+      <div className='space-y-4 z-10 text-[#b0b2c3] fixed left-4 top-[30%] lg:block md:-translate-y-1 bg-white p-2 rounded-md flex items-center flex-col'>
         <div className='text-black font-bold text-sm'>Share</div>
         <div className='flex flex-col gap-4 items-center'>
           {/* Facebook */}

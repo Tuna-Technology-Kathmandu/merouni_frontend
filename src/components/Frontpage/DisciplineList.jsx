@@ -34,7 +34,7 @@ const DisciplineList = () => {
         <div className='container mx-auto px-4'>
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
             {[...Array(4)].map((_, i) => (
-              <div key={i} className='bg-gray-100 h-64 rounded-xl animate-pulse'></div>
+              <div key={i} className='bg-gray-100 h-64 rounded-md animate-pulse'></div>
             ))}
           </div>
         </div>
@@ -82,7 +82,7 @@ const DisciplineList = () => {
                   <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300'></div>
 
                   <div className='absolute bottom-4 left-4 right-4'>
-                    <h3 className='text-lg font-bold text-white leading-tight group-hover:text-[#387cae] transition-colors'>
+                    <h3 className='text-lg font-bold text-white leading-tight transition-colors'>
                       {item.title}
                     </h3>
                   </div>

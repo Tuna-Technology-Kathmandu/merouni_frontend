@@ -1,4 +1,3 @@
-import UniversityDropdown from '@/ui/molecules/dropdown/UniversityDropdown'
 import { Button } from '@/ui/shadcn/button'
 import {
     Dialog,
@@ -13,6 +12,7 @@ import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 import { Textarea } from '@/ui/shadcn/textarea'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 import axios from 'axios'
+import EmojiPicker from 'emoji-picker-react'
 import {
     Activity,
     Check,
@@ -36,19 +36,21 @@ import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
 import {
-    createCollege,
-    getUniversityBySlug
-} from '@/app/(dashboard)/dashboard/addCollege/actions'
+    createOrUpdateCollege,
+    fetchUniversities,
+    getProgramsByUniversity,
+    saveDraft
+} from '@/app/(dashboard)/dashboard/colleges/actions'
 import { cn } from '@/app/lib/utils'
 import { authFetch } from '@/app/utils/authFetch'
+import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import GallerySection from './components/GallerySection'
 import FileUploadWithPreview from './components/MediaUploadWithBranding'
 import VideoSection from './components/VideoSection'
-import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
     <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-[#387cae]/10 flex items-center justify-center text-[#387cae] shadow-sm border border-[#387cae]/20">
+        <div className="w-10 h-10 rounded-md bg-[#387cae]/10 flex items-center justify-center text-[#387cae] shadow-sm border border-[#387cae]/20">
             <Icon size={20} />
         </div>
         <div>
@@ -67,9 +69,9 @@ const CreateUpdateCollegeModal = ({
     allDegrees
 }) => {
     const [submitting, setSubmitting] = useState(false)
+    const [submittingDraft, setSubmittingDraft] = useState(false)
     const [loadingData, setLoadingData] = useState(false)
     const [showCloseConfirm, setShowCloseConfirm] = useState(false)
-    const [uniSlug, setUniSlug] = useState('')
     const [universityPrograms, setUniversityPrograms] = useState([])
     const [loadingPrograms, setLoadingPrograms] = useState(false)
     const [filesDirty, setFilesDirty] = useState(false)
@@ -79,6 +81,8 @@ const CreateUpdateCollegeModal = ({
         images: [],
         videos: []
     })
+    const [selectedUniversities, setSelectedUniversities] = useState([])
+    const [openEmojiPickerIndex, setOpenEmojiPickerIndex] = useState(null)
 
     const author_id = useSelector((state) => state.user.data?.id)
 
@@ -96,10 +100,10 @@ const CreateUpdateCollegeModal = ({
         defaultValues: {
             name: '',
             author_id: author_id,
-            university_id: '',
+            university_id: [],
             institute_type: 'Private',
             institute_level: [],
-            courses: [],
+            programs: [],
             degrees: [],
             description: '',
             content: '',
@@ -118,9 +122,10 @@ const CreateUpdateCollegeModal = ({
             },
             google_map_url: '',
             map_type: '',
-            contacts: ['', ''],
+            contacts: [],
             members: [],
-            faqs: [{ question: '', answer: '' }]
+            faqs: [],
+            status: 'published'
         }
     })
 
@@ -148,7 +153,6 @@ const CreateUpdateCollegeModal = ({
     }
 
     const handleCloseAttempt = () => {
-        // If the form is dirty (has unsaved changes) or files changed, show confirmation
         if (isDirty || filesDirty) {
             setShowCloseConfirm(true)
         } else {
@@ -156,7 +160,6 @@ const CreateUpdateCollegeModal = ({
         }
     }
 
-    // Reset form when modal closes or opens for new college
     useEffect(() => {
         if (!isOpen) {
             reset()
@@ -167,12 +170,12 @@ const CreateUpdateCollegeModal = ({
                 videos: []
             })
             setFilesDirty(false)
-            setUniSlug('')
             setUniversityPrograms([])
+            setSelectedUniversities([])
+            setOpenEmojiPickerIndex(null)
         }
     }, [isOpen, reset])
 
-    // Load college data for editing
     useEffect(() => {
         if (isOpen && editSlug) {
             const fetchCollegeData = async () => {
@@ -188,7 +191,6 @@ const CreateUpdateCollegeModal = ({
                     let collegeData = await response.json()
                     collegeData = collegeData.item
 
-                    // Populate fields
                     setValue('id', collegeData.id)
                     setValue('name', collegeData.name)
                     setValue('institute_type', collegeData.institute_type)
@@ -201,25 +203,41 @@ const CreateUpdateCollegeModal = ({
                     setValue('description', collegeData.description)
                     setValue('content', collegeData.content)
                     setValue('website_url', collegeData.website_url)
+                    setValue('status', collegeData.status || 'published')
 
-                    if (collegeData.university_id) {
-                        setValue('university_id', Number(collegeData.university_id))
-                    }
+                    const uniList = collegeData.universities || (collegeData.university ? [collegeData.university] : [])
+                    setSelectedUniversities(uniList)
 
-                    if (collegeData.university) {
-                        setUniSlug(collegeData.university.slugs)
-                    }
+                    const uniIds = (collegeData.university_id
+                        ? (Array.isArray(collegeData.university_id) ? collegeData.university_id : [collegeData.university_id])
+                        : uniList.map(u => u.id)
+                    ).map(Number).filter(id => !isNaN(id))
+
+                    setValue('university_id', uniIds)
 
                     if (collegeData.degrees && Array.isArray(collegeData.degrees)) {
                         const degreeIds = collegeData.degrees.map((degree) => String(degree.id))
                         setValue('degrees', degreeIds)
                     }
 
-                    const programIds = collegeData.collegeCourses
-                        ?.map((course) => course.program_id || course.program?.id)
-                        .filter((id) => id !== undefined) || []
+                    const collegePrograms = collegeData.collegePrograms || []
+                    const programIds = collegePrograms
+                        .map((program) => program.program_id || program.program?.id)
+                        .filter((id) => id !== undefined)
 
-                    setValue('courses', [...new Set(programIds)])
+                    setValue('programs', [...new Set(programIds)])
+
+                    // Pre-populate university programs to show titles immediately
+                    const initialPrograms = collegePrograms
+                        .map(cc => ({
+                            id: cc.program_id || cc.program?.id,
+                            title: cc.program?.title || cc.program?.title || 'Unknown'
+                        }))
+                        .filter(p => p.id)
+
+                    if (initialPrograms.length > 0) {
+                        setUniversityPrograms(initialPrograms)
+                    }
 
                     if (collegeData.collegeAddress) {
                         setValue('address.country', collegeData.collegeAddress.country)
@@ -237,30 +255,46 @@ const CreateUpdateCollegeModal = ({
                     ) || ['', '']
                     setValue('contacts', contacts)
 
-                    const galleryItems = collegeData.collegeGallery || []
+                    const galleryItems = collegeData.collegeGallery || collegeData.gallery || []
                     const images = galleryItems
-                        .filter((item) => item.file_type === 'image' && item.file_url)
-                        .map((img) => ({ url: img.file_url, file_type: 'image' }))
+                        .filter(img => img.file_type === 'image' || !img.file_type)
+                        .map((img) => ({ url: img.file_url || img.url, file_type: 'image' }))
 
                     const videos = galleryItems
-                        .filter((item) => item.file_type === 'video')
-                        .map((vid) => ({ url: vid.file_url, file_type: 'video' }))
+                        .filter(vid => vid.file_type === 'video')
+                        .map((vid) => {
+                            const videoUrl = vid.file_url || vid.url
+                            const youtubeId = videoUrl?.includes('embed/')
+                                ? videoUrl.split('embed/')[1].split('?')[0]
+                                : null
+                            return {
+                                url: videoUrl,
+                                file_type: 'video',
+                                thumbnail: youtubeId ? `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg` : null,
+                                youtubeId
+                            }
+                        })
 
                     setUploadedFiles({
                         college_logo: collegeData.college_logo || '',
                         featured_img: collegeData.featured_img || '',
                         images: images.length === 1 && !images[0].url ? [] : images,
-                        videos
+                        videos: videos
                     })
 
                     setValue('college_logo', collegeData.college_logo || '')
                     setValue('featured_img', collegeData.featured_img || '')
 
-                    setValue('images', [...images, ...videos])
+                    setValue('images', [...images])
 
-                    const memberData = collegeData.collegeMembers?.length
-                        ? collegeData.collegeMembers
-                        : [{ name: '', contact_number: '', role: '', description: '' }]
+                    const memberData = (collegeData.collegeMembers || []).map(m => ({
+                        id: m.id,
+                        name: m.name || '',
+                        role: m.role || '',
+                        image_url: m.image_url || m.image || '',
+                        description: m.description || '',
+                        contact_number: m.contact_number || ''
+                    }))
                     setValue('members', memberData)
 
                     if (collegeData.college_broucher) {
@@ -295,17 +329,18 @@ const CreateUpdateCollegeModal = ({
         }
     }, [isOpen, editSlug, setValue])
 
-    // Load university programs
+    const selectedUniIds = watch('university_id') || []
+
     useEffect(() => {
         const fetchPrograms = async () => {
-            if (!uniSlug) {
+            if (!selectedUniIds || selectedUniIds.length === 0) {
                 setUniversityPrograms([])
                 return
             }
             try {
                 setLoadingPrograms(true)
-                const universityData = await getUniversityBySlug(uniSlug)
-                setUniversityPrograms(universityData.university_programs || [])
+                const universityData = await getProgramsByUniversity(selectedUniIds)
+                setUniversityPrograms(universityData || [])
             } catch (error) {
                 console.error('Error fetching university programs:', error)
             } finally {
@@ -313,39 +348,39 @@ const CreateUpdateCollegeModal = ({
             }
         }
         fetchPrograms()
-    }, [uniSlug])
+    }, [JSON.stringify(selectedUniIds)])
 
     const onSearchPrograms = async (query) => {
         if (!universityPrograms) return []
         const filtered = query
-            ? universityPrograms.filter(up => up.program?.title?.toLowerCase().includes(query.toLowerCase()))
+            ? universityPrograms.filter(p => p.title?.toLowerCase().includes(query.toLowerCase()))
             : universityPrograms
 
-        return filtered.map(up => ({
-            id: up.program_id || up.program?.id,
-            title: up.program?.title || 'Unknown'
+        return filtered.map(p => ({
+            id: p.id,
+            title: p.title || 'Unknown'
         }))
     }
 
     const handleSelectProgram = (program) => {
-        const currentCourses = getValues('courses') || []
+        const currentPrograms = getValues('programs') || []
         const programId = program.id || program
-        if (!currentCourses.includes(programId)) {
-            setValue('courses', [...currentCourses, programId], { shouldDirty: true })
+        if (!currentPrograms.includes(programId)) {
+            setValue('programs', [...currentPrograms, programId], { shouldDirty: true })
         }
     }
 
     const handleRemoveProgram = (program) => {
-        const currentCourses = getValues('courses') || []
+        const currentPrograms = getValues('programs') || []
         const programId = program.id || program
-        setValue('courses', currentCourses.filter(id => id !== programId), { shouldDirty: true })
+        setValue('programs', currentPrograms.filter(id => id !== programId), { shouldDirty: true })
     }
 
-    const selectedProgramIds = watch('courses') || []
-    const selectedPrograms = universityPrograms
+    const selectedProgramIds = watch('programs') || []
+    const selectedPrograms = Array.isArray(universityPrograms)
         ? universityPrograms
-            .filter(up => selectedProgramIds.includes(up.program_id || up.program?.id))
-            .map(up => ({ id: up.program_id || up.program?.id, title: up.program?.title }))
+            .filter(p => selectedProgramIds.map(String).includes(String(p.id)))
+            .map(p => ({ id: p.id, title: p.title }))
         : []
 
     const onSearchDegrees = async (query) => {
@@ -402,24 +437,37 @@ const CreateUpdateCollegeModal = ({
         }
     }
 
-    const onSubmit = async (data) => {
+    const handleSave = async (data, status = 'published') => {
         try {
-            setSubmitting(true)
+            status === 'draft' ? setSubmittingDraft(true) : setSubmitting(true)
+
+            // Always include author_id from current redux state
+            data.author_id = author_id
 
             // Filter logic
-            data.members = (data.members || []).filter(m => Object.values(m).some(v => v && v.toString().trim() !== ''))
+            data.members = (data.members || []).map(m => ({
+                id: m.id,
+                name: m.name,
+                role: m.role,
+                image_url: m.image_url,
+                description: m.description,
+                contact_number: m.contact_number
+            })).filter(m => m.name || m.role || m.description || m.contact_number || m.image_url)
             if (data.members.length === 0) delete data.members
 
-            data.university_id = parseInt(data.university_id)
+            const uniIds = (data.university_id || []).map(id => parseInt(id)).filter(id => !isNaN(id))
+            if (uniIds.length > 0) data.university_id = uniIds
+            else delete data.university_id
+
             data.degrees = (data.degrees || []).map(id => parseInt(id)).filter(id => !isNaN(id))
 
-            const coursesArray = (data.courses || []).map(c => parseInt(c)).filter(c => !isNaN(c) && c > 0)
-            if (coursesArray.length > 0) data.courses = coursesArray
-            else delete data.courses
+            const programsArray = (data.programs || []).map(c => parseInt(c)).filter(c => !isNaN(c) && c > 0)
+            if (programsArray.length > 0) data.programs = programsArray
+            else delete data.programs
 
             data.college_logo = uploadedFiles.college_logo
             data.featured_img = uploadedFiles.featured_img
-            data.images = [...uploadedFiles.images, ...uploadedFiles.videos]
+            data.images = [...(uploadedFiles.images || []), ...(uploadedFiles.videos || [])].filter(img => img.url)
 
             data.facilities = (data.facilities || []).filter(f => f.title.trim() !== '' || f.description.trim() !== '' || f.icon.trim() !== '')
             if (data.facilities.length === 0) delete data.facilities
@@ -427,28 +475,55 @@ const CreateUpdateCollegeModal = ({
             data.faqs = (data.faqs || []).filter(f => f.question.trim() !== '' || f.answer.trim() !== '')
             if (data.faqs.length === 0) delete data.faqs
 
-            if (editSlug && data.images.length === 0) {
-                data.images = [{ file_type: '', url: '' }]
+            data.status = status
+            // Ensure college_id is present for updates/drafts of existing colleges
+            if (editSlug && data.id) {
+                data.college_id = data.id
             }
 
-            await createCollege(data)
 
-            toast.success(editSlug ? 'College updated successfully!' : 'College created successfully!')
+            if (status === 'draft') {
+                await saveDraft(data)
+            } else {
+                await createOrUpdateCollege(data)
+            }
+
+            toast.success(
+                status === 'draft'
+                    ? 'Draft saved successfully!'
+                    : editSlug
+                        ? 'College updated successfully!'
+                        : 'College created successfully!'
+            )
             onSuccess?.()
             onSystemClose()
         } catch (error) {
-            console.error('Submission error:', error)
+            console.log('Submission error:', error)
             toast.error(error.message || 'Failed to submit data')
         } finally {
             setSubmitting(false)
+            setSubmittingDraft(false)
         }
+    }
+
+    const onSubmit = async (data) => {
+        await handleSave(data, 'published')
+    }
+
+    const onSaveDraft = async () => {
+        const data = getValues()
+        if (!data.name || !data.name.trim()) {
+            toast.error('College name is required even for drafts')
+            return
+        }
+        await handleSave(data, 'draft')
     }
     return (
         <Dialog isOpen={isOpen} onClose={handleCloseAttempt} closeOnOutsideClick={false} className='max-w-7xl'>
             <DialogHeader className="bg-white border-b border-gray-100 p-6">
                 <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                     <Layers className="text-[#387cae]" size={24} />
-                    {editSlug ? 'Edit College' : 'Add New College'}
+                    {editSlug ? 'Edit College/School' : 'Add New College/School'}
                 </DialogTitle>
                 <DialogClose onClick={handleCloseAttempt} />
             </DialogHeader>
@@ -473,7 +548,7 @@ const CreateUpdateCollegeModal = ({
                             </div>
                         </div>
                     )}
-                    <div className='flex-1 p-8  scrollbar-thin scrollbar-thumb-gray-200'>
+                    <div className='flex-1'>
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-8">
                             {/* Left Column - Main Content (8/12) */}
                             <div className="lg:col-span-8 space-y-8">
@@ -589,18 +664,77 @@ const CreateUpdateCollegeModal = ({
                                     <SectionHeader icon={GraduationCap} title="Academic Details" subtitle="Affiliation and programs" />
                                     <div className='space-y-6'>
                                         <div>
-                                            <Label required={true}>Affiliated University</Label>
-                                            <UniversityDropdown
-                                                onChange={(id, selectedUni) => {
-                                                    setValue('university_id', id, { shouldDirty: true, shouldValidate: true })
-                                                    if (selectedUni) setUniSlug(selectedUni.slugs)
+                                            <Label required={true}>Affiliated Universities</Label>
+                                            <SearchSelectCreate
+                                                onSearch={fetchUniversities}
+                                                onSelect={(uni) => {
+                                                    const current = getValues('university_id') || []
+                                                    const newIds = [...new Set([...current, uni.id])]
+                                                    setValue('university_id', newIds, { shouldDirty: true, shouldValidate: true })
+
+                                                    const currentUnis = selectedUniversities || []
+                                                    if (!currentUnis.find(u => u.id === uni.id)) {
+                                                        const updatedUnis = [...currentUnis, uni]
+                                                        setSelectedUniversities(updatedUnis)
+                                                    }
                                                 }}
-                                                value={watch('university_id')}
+                                                onRemove={(uni) => {
+                                                    const targetId = uni.id || uni
+                                                    const current = getValues('university_id') || []
+                                                    const newIds = current.filter(id => id !== targetId)
+                                                    setValue('university_id', newIds, { shouldDirty: true, shouldValidate: true })
+
+                                                    const updatedUnis = selectedUniversities.filter(u => u.id !== targetId)
+                                                    setSelectedUniversities(updatedUnis)
+                                                }}
+                                                selectedItems={selectedUniversities}
+                                                placeholder="Search or select universities..."
+                                                displayKey="fullname"
+                                                valueKey="id"
+                                                isMulti={true}
+                                                className="w-full"
+                                                renderItem={(item) => (
+                                                    <div className="flex items-center gap-3">
+                                                        {item.logo ? (
+                                                            <img
+                                                                src={item.logo}
+                                                                alt={item.fullname}
+                                                                className="w-7 h-7 rounded-full object-cover border border-gray-200 shrink-0"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-7 h-7 rounded-full bg-[#387cae]/10 flex items-center justify-center shrink-0">
+                                                                <span className="text-xs font-bold text-[#387cae]">
+                                                                    {item.fullname?.charAt(0)?.toUpperCase() || 'C'}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        <span className="text-sm font-medium text-gray-800">{item.fullname}</span>
+                                                    </div>
+                                                )}
+                                                renderSelected={(item) => (
+                                                    <div className="flex items-center gap-3">
+                                                        {item.logo ? (
+                                                            <img
+                                                                src={item.logo}
+                                                                alt={item.fullname}
+                                                                className="w-7 h-7 rounded-full object-cover border border-gray-200 shrink-0"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-7 h-7 rounded-full bg-[#387cae]/10 flex items-center justify-center shrink-0">
+                                                                <span className="text-xs font-bold text-[#387cae]">
+                                                                    {item.fullname?.charAt(0)?.toUpperCase() || 'C'}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        <span className="text-sm font-semibold text-gray-900 truncate">{item.fullname}</span>
+                                                    </div>
+                                                )}
+                                                inputSize='sm'
                                             />
                                             {errors.university_id && (
                                                 <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.university_id.message}</p>
                                             )}
-                                            <input type="hidden" {...register('university_id', { required: 'Please select a university' })} />
+                                            <input type="hidden" {...register('university_id', { required: 'Please select at least one university' })} />
                                         </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -616,6 +750,7 @@ const CreateUpdateCollegeModal = ({
                                                     valueKey="id"
                                                     isMulti={true}
                                                     className="w-full"
+                                                    inputSize='sm'
                                                 />
                                             </div>
 
@@ -632,9 +767,10 @@ const CreateUpdateCollegeModal = ({
                                                     isMulti={true}
                                                     className="w-full"
                                                     isLoading={loadingPrograms}
+                                                    inputSize='sm'
                                                 />
-                                                {!uniSlug && (
-                                                    <p className='text-[10px] text-gray-400 mt-2 font-medium bg-gray-50 p-2 rounded-lg border border-dashed border-gray-200'>
+                                                {selectedUniIds.length === 0 && (
+                                                    <p className='text-[10px] text-gray-400 mt-2 font-medium bg-gray-50 p-2 rounded-md border border-dashed border-gray-200'>
                                                         Please select a university first to view available programs.
                                                     </p>
                                                 )}
@@ -746,8 +882,20 @@ const CreateUpdateCollegeModal = ({
                                                         <Input
                                                             placeholder={`Phone Number ${index + 1}`}
                                                             className="h-11 pl-10 rounded-md border-gray-200 transition-all focus:ring-4 focus:ring-[#387cae]/5"
-                                                            {...register(`contacts[${index}]`)}
+                                                            {...register(`contacts[${index}]`, {
+                                                                pattern: {
+                                                                    value: /^[0-9]{10}$/,
+                                                                    message: 'Must be exactly 10 digits'
+                                                                }
+                                                            })}
+                                                            onInput={(e) => {
+                                                                e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10)
+                                                            }}
+                                                            maxLength={10}
                                                         />
+                                                        {errors?.contacts?.[index] && (
+                                                            <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.contacts[index].message}</p>
+                                                        )}
                                                     </div>
                                                 ))}
                                             </div>
@@ -778,18 +926,53 @@ const CreateUpdateCollegeModal = ({
                                                         <div>
                                                             <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Title</Label>
                                                             <Input
-                                                                {...register(`facilities[${index}].title`)}
+                                                                {...register(`facilities[${index}].title`, { required: 'Title is required' })}
                                                                 placeholder='e.g. WiFi'
                                                                 className='h-9 text-xs rounded-md'
                                                             />
+                                                            {errors?.facilities?.[index]?.title && (
+                                                                <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.facilities[index].title.message}</p>
+                                                            )}
                                                         </div>
-                                                        <div>
-                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Icon Code</Label>
-                                                            <Input
-                                                                {...register(`facilities[${index}].icon`)}
-                                                                placeholder='wifi'
-                                                                className='h-9 text-xs rounded-md'
-                                                            />
+                                                        <div className="relative">
+                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block'>Icon / Emoji</Label>
+                                                            <div
+                                                                className="h-9 w-full flex items-center justify-between border border-gray-200 rounded-md px-3 bg-white cursor-pointer hover:bg-gray-50 transition-colors"
+                                                                onClick={() => setOpenEmojiPickerIndex(openEmojiPickerIndex === index ? null : index)}
+                                                            >
+                                                                <span className="text-sm">
+                                                                    {watch(`facilities[${index}].icon`) || 'Select'}
+                                                                </span>
+                                                                <Plus size={12} className="text-gray-400" />
+                                                            </div>
+
+                                                            {openEmojiPickerIndex === index && (
+                                                                <div className="absolute top-full left-0 mt-2 z-[100] shadow-2xl rounded-md overflow-hidden border border-gray-100">
+                                                                    <div className="bg-white p-2 border-b flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase">
+                                                                        <span>Select Icon</span>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => setOpenEmojiPickerIndex(null)}
+                                                                            className="hover:text-red-500"
+                                                                        >Close</button>
+                                                                    </div>
+                                                                    <EmojiPicker
+                                                                        onEmojiClick={(emojiData) => {
+                                                                            setValue(`facilities[${index}].icon`, emojiData.emoji, { shouldDirty: true })
+                                                                            setOpenEmojiPickerIndex(null)
+                                                                        }}
+                                                                        width={280}
+                                                                        height={350}
+                                                                        previewConfig={{ showPreview: false }}
+                                                                        skinTonesDisabled
+                                                                        searchDisabled={false}
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                            <input type="hidden" {...register(`facilities[${index}].icon`, { required: 'Icon is required' })} />
+                                                            {errors?.facilities?.[index]?.icon && (
+                                                                <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.facilities[index].icon.message}</p>
+                                                            )}
                                                         </div>
                                                     </div>
                                                     <div>
@@ -824,7 +1007,7 @@ const CreateUpdateCollegeModal = ({
                                             variant='outline'
                                             size='sm'
                                             className='rounded-md border-[#387cae]/20 text-[#387cae] hover:bg-[#387cae]/5'
-                                            onClick={() => appendMember({ name: '', role: '', image_url: '', bio: '', contact_info: '' })}
+                                            onClick={() => appendMember({ id: null, name: '', role: '', image_url: '', description: '', contact_number: '' })}
                                         >
                                             <Plus className='w-4 h-4 mr-2' />
                                             Add Member
@@ -841,21 +1024,25 @@ const CreateUpdateCollegeModal = ({
                                                             onClear={() => setValue(`members[${index}].image_url`, '', { shouldDirty: true })}
                                                             defaultPreview={watch(`members[${index}].image_url`)}
                                                         />
+                                                        <input type="hidden" {...register(`members[${index}].image_url`)} />
                                                     </div>
                                                     <div className='flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4'>
                                                         <div>
                                                             <Label className='text-[10px] font-bold text-gray-400 uppercase mb-1 block'>Full Name</Label>
                                                             <Input
-                                                                {...register(`members[${index}].name`)}
+                                                                {...register(`members[${index}].name`, { required: 'Name is required' })}
                                                                 placeholder='Dr. John Doe'
                                                                 className='h-10 rounded-md'
                                                             />
+                                                            {errors?.members?.[index]?.name && (
+                                                                <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.members[index].name.message}</p>
+                                                            )}
                                                         </div>
                                                         <div>
                                                             <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Role</Label>
                                                             <select
-                                                                {...register(`members[${index}].role`)}
-                                                                className='flex h-10 w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
+                                                                {...register(`members[${index}].role`, { required: 'Role is required' })}
+                                                                className='flex h-10 w-full rounded-md border border-gray-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all'
                                                             >
                                                                 <option value="">Select Role</option>
                                                                 <option value="Principal">Principal</option>
@@ -863,22 +1050,40 @@ const CreateUpdateCollegeModal = ({
                                                                 <option value="Lecturer">Lecturer</option>
                                                                 <option value="Admin">Admin</option>
                                                             </select>
+                                                            {errors?.members?.[index]?.role && (
+                                                                <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.members[index].role.message}</p>
+                                                            )}
                                                         </div>
                                                         <div>
                                                             <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Contact (Phone)</Label>
                                                             <Input
-                                                                {...register(`members[${index}].contact_info`)}
+                                                                {...register(`members[${index}].contact_number`, {
+                                                                    pattern: {
+                                                                        value: /^[0-9]{10}$/,
+                                                                        message: 'Contact must be exactly 10 digits'
+                                                                    }
+                                                                })}
+                                                                onInput={(e) => {
+                                                                    e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 10)
+                                                                }}
+                                                                maxLength={10}
                                                                 placeholder='98XXXXXXXX'
                                                                 className='h-10 rounded-md'
                                                             />
+                                                            {errors?.members?.[index]?.contact_number && (
+                                                                <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.members[index].contact_number.message}</p>
+                                                            )}
                                                         </div>
                                                         <div className='sm:col-span-3'>
-                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Professional Bio</Label>
+                                                            <Label className='text-[10px] font-bold text-slate-500 uppercase mb-1 block'>Professional description</Label>
                                                             <Input
-                                                                {...register(`members[${index}].bio`)}
+                                                                {...register(`members[${index}].description`, { required: 'Description is required' })}
                                                                 placeholder='Achievement and specialization...'
                                                                 className='h-10 rounded-md'
                                                             />
+                                                            {errors?.members?.[index]?.description && (
+                                                                <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.members[index].description.message}</p>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -886,7 +1091,7 @@ const CreateUpdateCollegeModal = ({
                                                     type='button'
                                                     variant='outline'
                                                     size='icon'
-                                                    className='absolute top-6 right-6 h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 border-gray-100 rounded-xl'
+                                                    className='absolute top-6 right-6 h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 border-gray-100 rounded-md'
                                                     onClick={() => removeMember(index)}
                                                 >
                                                     <Trash2 size={16} />
@@ -916,21 +1121,35 @@ const CreateUpdateCollegeModal = ({
                                             <div key={field.id} className='group relative p-6 bg-white border border-gray-100 rounded-2xl transition-all hover:shadow-lg hover:shadow-[#387cae]/5 hover:border-[#387cae]/20'>
                                                 <div className='space-y-4 pr-10'>
                                                     <div>
-                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block'>Question</Label>
+                                                        <Label
+                                                            required
+                                                            className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block'>Question</Label>
                                                         <Input
-                                                            {...register(`faqs[${index}].question`)}
+                                                            {...register(`faqs[${index}].question`, {
+                                                                required: 'Question is required'
+                                                            })}
                                                             placeholder='e.g. What are the admission requirements?'
-                                                            className='h-11 rounded-md font-bold text-gray-800'
+                                                            className='h-11 rounded-md text-gray-800'
                                                         />
+                                                        {errors?.faqs?.[index]?.question && (
+                                                            <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.faqs[index].question.message}</p>
+                                                        )}
                                                     </div>
                                                     <div>
-                                                        <Label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block'>Answer</Label>
+                                                        <Label
+                                                            required
+                                                            className='text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 block'>Answer</Label>
                                                         <Textarea
-                                                            {...register(`faqs[${index}].answer`)}
+                                                            {...register(`faqs[${index}].answer`, {
+                                                                required: 'Answer is required'
+                                                            })}
                                                             placeholder='Provide a detailed answer...'
                                                             rows={2}
                                                             className='rounded-md resize-none min-h-[80px]'
                                                         />
+                                                        {errors?.faqs?.[index]?.answer && (
+                                                            <p className='text-[10px] font-semibold text-red-500 mt-1 ml-1'>{errors.faqs[index].answer.message}</p>
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <Button
@@ -1042,7 +1261,7 @@ const CreateUpdateCollegeModal = ({
                     </div>
 
                     {/* Footer Actions */}
-                    <div className='bg-white border-t border-gray-100 p-6 flex justify-end gap-3 z-20'>
+                    <div className='shrink-0 bg-white border-t border-gray-100 p-6 flex justify-end gap-3 z-20 sticky bottom-0'>
                         <Button
                             type='button'
                             onClick={handleCloseAttempt}
@@ -1051,8 +1270,28 @@ const CreateUpdateCollegeModal = ({
                             Cancel
                         </Button>
                         <Button
+                            type='button'
+                            onClick={onSaveDraft}
+                            variant='secondary'
+                            disabled={submitting || submittingDraft || loadingData}
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-700 border-none px-4"
+                        >
+                            {submittingDraft ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span>Saving Draft...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <FileText className="w-4 h-4" />
+                                    <span>Save as Draft</span>
+                                </>
+                            )}
+                        </Button>
+                        <Button
                             type='submit'
-                            disabled={submitting || loadingData}
+                            disabled={submitting || submittingDraft || loadingData}
+                            className="px-4"
                         >
                             {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                             <span>

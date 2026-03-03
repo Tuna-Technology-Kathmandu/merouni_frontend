@@ -108,9 +108,9 @@ const ConsultancyCard = ({ consultancy }) => {
   return (
     <Link
       href={slug ? `/consultancy/${slug}` : '#'}
-      className='group block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0A6FA7] focus-visible:ring-offset-2 rounded-xl relative'
+      className='group block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0A6FA7] focus-visible:ring-offset-2 rounded-md relative'
     >
-      <article className='bg-white rounded-xl border border-gray-200/80 overflow-hidden h-full flex flex-col hover:border-gray-300 hover:shadow-md transition-all duration-200'>
+      <article className='bg-white rounded-md border border-gray-200/80 overflow-hidden h-full flex flex-col hover:border-gray-300 hover:shadow-md transition-all duration-200'>
         {/* Image — fixed 16:9 aspect ratio so image never stretches */}
         <div className='relative w-full aspect-[16/9] bg-gray-100 overflow-hidden'>
           <Image
@@ -155,7 +155,7 @@ const ConsultancyCard = ({ consultancy }) => {
         <div className='p-5 flex flex-col flex-1 min-w-0'>
           <div className='flex items-start gap-3 mb-3'>
             {logo && (
-              <div className='relative w-10 h-10 flex-shrink-0 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden'>
+              <div className='relative w-10 h-10 flex-shrink-0 rounded-md bg-gray-50 border border-gray-100 overflow-hidden'>
                 <Image src={logo} alt='' fill className='object-contain p-1' />
               </div>
             )}

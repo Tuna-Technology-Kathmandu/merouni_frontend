@@ -360,12 +360,13 @@ export default function CourseForm() {
   }
 
   return (
-    <div className='w-full space-y-4 p-4'>
+    <div className='w-full'>
+
       <ToastContainer />
 
       {/* Header */}
       <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
-        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
           <SearchInput value={searchQuery} onChange={(e) => handleSearchInput(e.target.value)} placeholder='Search courses...' className='max-w-md w-full' />
           <Button onClick={() => { setIsOpen(true); setEditing(false); reset(); setFacSearch(''); setHasSelectedFac(false) }} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
             <Plus className="w-4 h-4" /> Add Course
@@ -374,7 +375,7 @@ export default function CourseForm() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
         <Table loading={tableLoading} data={courses} columns={columns} pagination={pagination} onPageChange={(p) => fetchCourses(p)} showSearch={false} />
       </div>
 
@@ -606,23 +607,23 @@ export default function CourseForm() {
             <div className='flex-1 overflow-y-auto p-6 space-y-5'>
               <p className="text-2xl font-bold text-gray-900">{viewCourseData.title}</p>
               <div className='grid grid-cols-2 gap-4'>
-                <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                   <p className="text-xs font-semibold uppercase tracking-widest mb-0.5">Code</p>
                   <p className='text-gray-800 font-mono'>{viewCourseData.code || 'N/A'}</p>
                 </div>
 
-                <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                   <p className="text-xs font-semibold uppercase tracking-widest mb-0.5">Duration</p>
                   <p className='text-gray-800'>{viewCourseData.duration ? `${viewCourseData.duration} months` : 'N/A'}</p>
                 </div>
 
-                <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                   <p className="text-xs font-semibold uppercase tracking-widest mb-0.5">Credits</p>
                   <p className='text-gray-800'>{viewCourseData.credits || 'N/A'}</p>
                 </div>
 
                 {viewCourseData.coursefaculty && (
-                  <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                  <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                     <p className="text-xs font-semibold uppercase tracking-widest mb-0.5">Faculty</p>
                     <p className='text-gray-800'>{viewCourseData.coursefaculty.title || 'N/A'}</p>
                   </div>

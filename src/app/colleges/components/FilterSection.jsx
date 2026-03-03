@@ -46,7 +46,7 @@
 //   }
 
 //   return (
-//     <div className='bg-white rounded-xl p-4 border border-gray-200 shadow-lg'>
+//     <div className='bg-white rounded-md p-4 border border-gray-200 shadow-lg'>
 //       <div className='flex justify-between items-center mb-3'>
 //         <h3 className='text-gray-800 font-medium'>{title}</h3>
 //       </div>
@@ -57,7 +57,7 @@
 //           placeholder={placeholder}
 //           value={searchText}
 //           onChange={(e) => setSearchText(e.target.value)}
-//           className='w-full pl-9 pr-3 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none'
+//           className='w-full pl-9 pr-3 py-2 bg-gray-100 rounded-md text-sm focus:outline-none'
 //         />
 //       </div>
 

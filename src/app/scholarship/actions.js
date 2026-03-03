@@ -22,10 +22,10 @@ export const fetchScholarships = async (filters = {}) => {
   }
 }
 
-export const fetchCategories = async () => {
+export const fetchCategories = async (type = 'SCHOLARSHIP') => {
   try {
     const response = await fetch(
-      `${process.env.baseUrl}/category`
+      `${process.env.baseUrl}/category?type=${type}`
     )
     if (!response.ok) throw new Error('Failed to fetch categories')
     const data = await response.json()

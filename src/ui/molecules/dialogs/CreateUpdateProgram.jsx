@@ -7,15 +7,10 @@ import { Button } from '@/ui/shadcn/button'
 import { authFetch } from '@/app/utils/authFetch'
 import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
-import { Trash2, X, Plus } from 'lucide-react'
+import { Trash2, X, Plus, Building2 } from 'lucide-react'
+import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 
-// Dropdowns
-import CollegesDropdown from '@/ui/molecules/dropdown/CollegesDropdown'
-import DegreeDropdown from '@/ui/molecules/dropdown/DegreeDropdown'
-import ExamDropdown from '@/ui/molecules/dropdown/ExamDropdown'
-import LevelDropdown from '@/ui/molecules/dropdown/LevelDropdown'
-import ScholarshipDropdown from '@/ui/molecules/dropdown/ScholarshipDropdown'
-import CourseDropdown from '@/ui/molecules/dropdown/CourseDropdown'
+
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { Textarea } from '@/ui/shadcn/textarea'
@@ -36,8 +31,14 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
     const [currentSemester, setCurrentSemester] = useState(1)
     const [currentCourse, setCurrentCourse] = useState({ id: '', title: '' })
 
-    // Selected colleges state
-    const [selectedColleges, setSelectedColleges] = useState([])
+    // Selected universities state
+    const [selectedUniversities, setSelectedUniversities] = useState([])
+
+    // Single-select states for dropdowns
+    const [selectedLevel, setSelectedLevel] = useState(null)
+    const [selectedDegree, setSelectedDegree] = useState(null)
+    const [selectedScholarship, setSelectedScholarship] = useState(null)
+    const [selectedExam, setSelectedExam] = useState(null)
 
     const {
         register,
@@ -65,8 +66,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
             delivery_mode: 'On-campus',
             careers: '',
             exam_id: '',
-            syllabus: [],
-            colleges: []
+            syllabus: []
         }
     })
 
@@ -99,7 +99,11 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
         })
         setLearningOutcomes('')
         setLearningOutcomesError(false)
-        setSelectedColleges([])
+        setSelectedUniversities([])
+        setSelectedLevel(null)
+        setSelectedDegree(null)
+        setSelectedScholarship(null)
+        setSelectedExam(null)
         setCurrentYear(1)
         setCurrentSemester(1)
         setCurrentCourse({ id: '', title: '' })
@@ -155,15 +159,36 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
             setValue('level_id', program.level_id ?? program.programlevel?.id ?? '')
             setValue('degree_id', program.degree_id ?? program.programdegree?.id ?? '')
 
-            // Colleges
-            if (program.colleges?.length) {
-                const collegeIds = program.colleges.map((c) => c.program_college.college_id)
-                setValue('colleges', collegeIds)
-                setSelectedColleges(
-                    program.colleges.map((c) => ({
-                        id: c.program_college.college_id,
-                        name: c.name,
-                        slugs: c.slugs
+            // Level
+            if (program.level_id || program.programlevel) {
+                const lvl = program.programlevel
+                if (lvl) setSelectedLevel({ id: lvl.id, title: lvl.title })
+            }
+            // Degree
+            if (program.degree_id || program.programdegree) {
+                const deg = program.programdegree
+                if (deg) setSelectedDegree({ id: deg.id, title: deg.short_name ? `${deg.short_name} – ${deg.title}` : deg.title })
+            }
+            // Scholarship
+            if (program.scholarship_id || program.programscholarship) {
+                const sch = program.programscholarship
+                if (sch) setSelectedScholarship({ id: sch.id, name: sch.name })
+            }
+            // Exam
+            if (program.exam_id || program.programexam) {
+                const ex = program.programexam
+                if (ex) setSelectedExam({ id: ex.id, title: ex.title })
+            }
+
+            // Universities
+            if (program.universities?.length) {
+                const universityIds = program.universities.map((u) => u.id)
+                setValue('universities', universityIds)
+                setSelectedUniversities(
+                    program.universities.map((u) => ({
+                        id: u.id,
+                        fullname: u.fullname,
+                        slugs: u.slugs
                     }))
                 )
             }
@@ -176,19 +201,72 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
         }
     }
 
-    const addCollege = (college) => {
-        if (!college) return
-        if (!selectedColleges.some((c) => c.id === college.id)) {
-            const updated = [...selectedColleges, college]
-            setSelectedColleges(updated)
-            setValue('colleges', updated.map((c) => c.id))
+    // University search via API
+    const onSearchUniversities = async (query) => {
+        try {
+            const url = query
+                ? `${process.env.baseUrl}/university?q=${encodeURIComponent(query)}&limit=20`
+                : `${process.env.baseUrl}/university?limit=20`
+            const res = await authFetch(url)
+            const data = await res.json()
+            return (data.items || []).map((u) => ({ id: u.id, fullname: u.fullname, logo: u.logo, slugs: u.slugs }))
+        } catch { return [] }
+    }
+
+    const addUniversity = (university) => {
+        if (!university) return
+        if (!selectedUniversities.some((u) => u.id === university.id)) {
+            const updated = [...selectedUniversities, university]
+            setSelectedUniversities(updated)
+            setValue('universities', updated.map((u) => u.id))
         }
     }
 
-    const removeCollege = (collegeId) => {
-        const updated = selectedColleges.filter((c) => c.id !== collegeId)
-        setSelectedColleges(updated)
-        setValue('colleges', updated.map((c) => c.id))
+    const removeUniversity = (university) => {
+        const updated = selectedUniversities.filter((u) => u.id !== university.id)
+        setSelectedUniversities(updated)
+        setValue('universities', updated.map((u) => u.id))
+    }
+
+    // Generic single-select search helpers
+    const onSearchLevels = async (q) => {
+        try {
+            const res = await authFetch(`${process.env.baseUrl}/level?${q ? `q=${encodeURIComponent(q)}&` : ''}limit=50`)
+            const data = await res.json()
+            return (data.items || []).map((l) => ({ id: l.id, title: l.title }))
+        } catch { return [] }
+    }
+
+    const onSearchDegrees = async (q) => {
+        try {
+            const res = await authFetch(`${process.env.baseUrl}/degree?${q ? `q=${encodeURIComponent(q)}&` : ''}limit=50`)
+            const data = await res.json()
+            return (data.items || []).map((d) => ({ id: d.id, title: d.short_name ? `${d.short_name} – ${d.title}` : d.title }))
+        } catch { return [] }
+    }
+
+    const onSearchScholarships = async (q) => {
+        try {
+            const res = await authFetch(`${process.env.baseUrl}/scholarship?${q ? `q=${encodeURIComponent(q)}&` : ''}limit=50`)
+            const data = await res.json()
+            return (data.scholarships || data.items || []).map((s) => ({ id: s.id, name: s.name }))
+        } catch { return [] }
+    }
+
+    const onSearchExams = async (q) => {
+        try {
+            const res = await authFetch(`${process.env.baseUrl}/exam?${q ? `q=${encodeURIComponent(q)}&` : ''}limit=50`)
+            const data = await res.json()
+            return (data.items || []).map((e) => ({ id: e.id, title: e.title }))
+        } catch { return [] }
+    }
+
+    const onSearchCourses = async (q) => {
+        try {
+            const res = await authFetch(`${process.env.baseUrl}/course?${q ? `q=${encodeURIComponent(q)}&` : ''}limit=50`)
+            const data = await res.json()
+            return (data.items || data.courses || []).map((c) => ({ id: c.id, title: c.title }))
+        } catch { return [] }
     }
 
     // Syllabus helpers
@@ -224,22 +302,15 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
     }
 
     const onSubmit = async (data) => {
-        // Validate learning outcomes
-        const hasContent = learningOutcomes && learningOutcomes.replace(/<[^>]*>/g, '').trim().length > 0
-        if (!hasContent) {
-            setLearningOutcomesError(true)
-            toast.error('Please add a description / learning outcomes.')
-            return
-        }
-        setLearningOutcomesError(false)
-
         try {
             setSubmitting(true)
             const cleanedData = {
                 ...data,
                 learning_outcomes: learningOutcomes,
                 level_id: data.level_id ? Number(data.level_id) : undefined,
-                degree_id: data.degree_id ? Number(data.degree_id) : null,
+                degree_id: data.degree_id ? Number(data.degree_id) : undefined,
+                credits: data.credits ? Number(data.credits) : undefined,
+                universities: selectedUniversities.map((u) => u.id),
                 syllabus: data.syllabus.map((item) => ({
                     year: item.year,
                     semester: item.semester,
@@ -324,9 +395,9 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label required>Duration</Label>
+                                        <Label>Duration <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
                                         <Input
-                                            {...register('duration', { required: 'Duration is required' })}
+                                            {...register('duration')}
                                             placeholder='e.g., 4 years'
                                             className={errors.duration ? 'border-red-400 focus-visible:ring-red-400' : ''}
                                         />
@@ -336,13 +407,12 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label required>Credits</Label>
+                                        <Label>Credits <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
                                         <Input
                                             type='number'
                                             step='0.1'
                                             placeholder='e.g., 120'
                                             {...register('credits', {
-                                                required: 'Credits are required',
                                                 valueAsNumber: true,
                                                 min: { value: 0, message: 'Credits must be a positive number' }
                                             })}
@@ -354,33 +424,42 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label required>Level</Label>
-                                        <input type='hidden' {...register('level_id', { required: 'Level is required' })} />
-                                        <LevelDropdown
-                                            value={watch('level_id') ?? ''}
-                                            onChange={(id) => setValue('level_id', id || '', { shouldValidate: true })}
-                                            placeholder='Select level'
-                                            className={`w-full ${errors.level_id ? 'ring-1 ring-red-400 rounded-md' : ''}`}
+                                        <Label>Level <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
+                                        <input type='hidden' {...register('level_id')} />
+                                        <SearchSelectCreate
+                                            onSearch={onSearchLevels}
+                                            onSelect={(item) => { setSelectedLevel(item); setValue('level_id', item.id) }}
+                                            onRemove={() => { setSelectedLevel(null); setValue('level_id', '') }}
+                                            selectedItems={selectedLevel ? [selectedLevel] : []}
+                                            placeholder='Search level…'
+                                            displayKey='title'
+                                            valueKey='id'
+                                            isMulti={false}
+                                            allowCreate={false}
+                                            inputSize="sm"
                                         />
-                                        {errors.level_id && (
-                                            <p className='text-xs text-red-500'>{errors.level_id.message}</p>
-                                        )}
                                     </div>
 
                                     <div className="space-y-1.5">
                                         <Label>Degree <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
-                                        <DegreeDropdown
-                                            value={watch('degree_id') ?? ''}
-                                            onChange={(id) => setValue('degree_id', id || '')}
-                                            placeholder='Select degree'
-                                            className='w-full'
+                                        <SearchSelectCreate
+                                            onSearch={onSearchDegrees}
+                                            onSelect={(item) => { setSelectedDegree(item); setValue('degree_id', item.id) }}
+                                            onRemove={() => { setSelectedDegree(null); setValue('degree_id', '') }}
+                                            selectedItems={selectedDegree ? [selectedDegree] : []}
+                                            placeholder='Search degree…'
+                                            displayKey='title'
+                                            valueKey='id'
+                                            isMulti={false}
+                                            allowCreate={false}
+                                            inputSize="sm"
                                         />
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label required>Language of Instruction</Label>
+                                        <Label>Language of Instruction <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
                                         <Input
-                                            {...register('language', { required: 'Language is required' })}
+                                            {...register('language')}
                                             placeholder='e.g., English'
                                             className={errors.language ? 'border-red-400 focus-visible:ring-red-400' : ''}
                                         />
@@ -405,8 +484,8 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
 
                                 {/* Learning Outcomes – TipTap */}
                                 <div className="space-y-1.5">
-                                    <Label required>Description / Learning Outcomes</Label>
-                                    <div className={learningOutcomesError ? 'ring-2 ring-red-400 rounded-xl' : ''}>
+                                    <Label>Description / Learning Outcomes <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
+                                    <div className={learningOutcomesError ? 'ring-2 ring-red-400 rounded-md' : ''}>
                                         <TipTapEditor
                                             value={learningOutcomes}
                                             onChange={(html) => {
@@ -419,7 +498,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                         />
                                     </div>
                                     {learningOutcomesError && (
-                                        <p className='text-xs text-red-500'>Description / Learning Outcomes is required.</p>
+                                        <p className='text-xs text-red-500'>Description / Learning Outcomes is recommended.</p>
                                     )}
                                 </div>
 
@@ -479,56 +558,60 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                 <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
                                     <div className="space-y-1.5">
                                         <Label>Scholarship <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
-                                        <ScholarshipDropdown
-                                            value={watch('scholarship_id') ?? ''}
-                                            onChange={(id) => setValue('scholarship_id', id || '')}
-                                            placeholder='Select scholarship'
-                                            className='w-full'
+                                        <SearchSelectCreate
+                                            onSearch={onSearchScholarships}
+                                            onSelect={(item) => { setSelectedScholarship(item); setValue('scholarship_id', item.id) }}
+                                            onRemove={() => { setSelectedScholarship(null); setValue('scholarship_id', '') }}
+                                            selectedItems={selectedScholarship ? [selectedScholarship] : []}
+                                            placeholder='Search scholarship…'
+                                            displayKey='name'
+                                            valueKey='id'
+                                            isMulti={false}
+                                            allowCreate={false}
+                                            inputSize="sm"
                                         />
                                     </div>
 
                                     <div className="space-y-1.5">
                                         <Label>Entrance Exam <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
-                                        <ExamDropdown
-                                            value={watch('exam_id') ?? ''}
-                                            onChange={(id) => setValue('exam_id', id || '')}
-                                            placeholder='Select entrance exam'
-                                            className='w-full'
+                                        <SearchSelectCreate
+                                            onSearch={onSearchExams}
+                                            onSelect={(item) => { setSelectedExam(item); setValue('exam_id', item.id) }}
+                                            onRemove={() => { setSelectedExam(null); setValue('exam_id', '') }}
+                                            selectedItems={selectedExam ? [selectedExam] : []}
+                                            placeholder='Search entrance exam…'
+                                            displayKey='title'
+                                            valueKey='id'
+                                            isMulti={false}
+                                            allowCreate={false}
+                                            inputSize="sm"
                                         />
                                     </div>
                                 </div>
                             </section>
 
-                            {/* ── Section 5: Associated Colleges ── */}
+                            {/* ── Section 5: Associated Universities ── */}
                             <section className="space-y-4">
-                                <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Associated Colleges</h3>
-                                <div className="space-y-3">
-                                    <CollegesDropdown
-                                        onChange={(id, college) => { if (college) addCollege(college) }}
-                                        placeholder="Search and select a college to add..."
-                                        className='w-full'
-                                    />
-                                    <div className='flex flex-wrap gap-2'>
-                                        {selectedColleges.map((college) => (
-                                            <span
-                                                key={college.id}
-                                                className='inline-flex items-center gap-1.5 bg-blue-50 text-blue-800 border border-blue-200 text-sm px-3 py-1 rounded-full'
-                                            >
-                                                {college.name}
-                                                <button
-                                                    type='button'
-                                                    onClick={() => removeCollege(college.id)}
-                                                    className='text-blue-400 hover:text-blue-700 transition-colors'
-                                                >
-                                                    <X className='w-3 h-3' />
-                                                </button>
-                                            </span>
-                                        ))}
-                                        {selectedColleges.length === 0 && (
-                                            <p className="text-sm text-gray-400 italic">No colleges selected.</p>
-                                        )}
+                                <div className="flex items-center gap-2 border-b pb-2">
+                                    <div className="w-6 h-6 rounded-md bg-violet-100 flex items-center justify-center shrink-0">
+                                        <Building2 size={13} className="text-violet-600" />
                                     </div>
+                                    <h3 className="text-base font-semibold text-slate-800">Associated Universities</h3>
+                                    <span className="ml-auto text-xs text-gray-400 font-normal">(optional)</span>
                                 </div>
+                                <p className="text-xs text-gray-400">Search and select the universities this program is affiliated with. You can select multiple.</p>
+                                <SearchSelectCreate
+                                    onSearch={onSearchUniversities}
+                                    onSelect={addUniversity}
+                                    onRemove={removeUniversity}
+                                    selectedItems={selectedUniversities}
+                                    placeholder="Search universities…"
+                                    displayKey="fullname"
+                                    valueKey="id"
+                                    isMulti={true}
+                                    allowCreate={false}
+                                    inputSize="sm"
+                                />
                             </section>
 
                             {/* ── Section 6: Additional Info ── */}
@@ -549,7 +632,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                 <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Curriculum Structure</h3>
 
                                 {/* Year / Semester Tabs */}
-                                <div className='grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-xl border'>
+                                <div className='grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-md border'>
                                     {[1, 2, 3, 4].map((year) => (
                                         <div key={year} className='space-y-1.5'>
                                             <p className='text-xs font-semibold text-gray-500 uppercase tracking-wide text-center'>
@@ -560,9 +643,9 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                                     key={sem}
                                                     type='button'
                                                     onClick={() => { setCurrentYear(year); setCurrentSemester(sem) }}
-                                                    className={`w-full py-1.5 px-2 rounded-lg text-xs font-medium transition-all ${currentYear === year && currentSemester === sem
-                                                            ? 'bg-[#387cae] text-white shadow-sm'
-                                                            : 'bg-white border border-gray-200 hover:border-[#387cae]/50 hover:text-[#387cae] text-gray-600'
+                                                    className={`w-full py-1.5 px-2 rounded-md text-xs font-medium transition-all ${currentYear === year && currentSemester === sem
+                                                        ? 'bg-[#387cae] text-white shadow-sm'
+                                                        : 'bg-white border border-gray-200 hover:border-[#387cae]/50 hover:text-[#387cae] text-gray-600'
                                                         }`}
                                                 >
                                                     {sem === 0 ? 'Yearly' : `Sem ${sem}`}
@@ -573,7 +656,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                 </div>
 
                                 {/* Active Semester Banner */}
-                                <div className='flex items-center gap-2 px-4 py-2.5 bg-[#387cae]/5 border border-[#387cae]/20 rounded-lg'>
+                                <div className='flex items-center gap-2 px-4 py-2.5 bg-[#387cae]/5 border border-[#387cae]/20 rounded-md'>
                                     <div className='w-2 h-2 rounded-full bg-[#387cae]' />
                                     <p className='text-sm font-medium text-[#387cae]'>
                                         {currentSemester === 0
@@ -586,13 +669,17 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                 <div className='flex gap-2 items-end'>
                                     <div className='flex-1 space-y-1.5'>
                                         <Label>Add Course</Label>
-                                        <CourseDropdown
-                                            value={currentCourse.id}
-                                            onChange={(id, course) => {
-                                                setCurrentCourse(course ? { id: course.id, title: course.title } : { id: '', title: '' })
-                                            }}
-                                            placeholder="Search and select a course..."
-                                            className="w-full"
+                                        <SearchSelectCreate
+                                            onSearch={onSearchCourses}
+                                            onSelect={(item) => setCurrentCourse({ id: item.id, title: item.title })}
+                                            onRemove={() => setCurrentCourse({ id: '', title: '' })}
+                                            selectedItems={currentCourse.id ? [currentCourse] : []}
+                                            placeholder='Search and select a course…'
+                                            displayKey='title'
+                                            valueKey='id'
+                                            isMulti={false}
+                                            allowCreate={false}
+                                            inputSize="sm"
                                         />
                                     </div>
                                     <Button
@@ -608,7 +695,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
 
                                 {/* Courses Table */}
                                 {getCurrentSemesterCourses().length > 0 ? (
-                                    <div className='border rounded-xl overflow-hidden'>
+                                    <div className='border rounded-md overflow-hidden'>
                                         <table className='w-full text-sm'>
                                             <thead>
                                                 <tr className='bg-gray-50 border-b'>
@@ -660,7 +747,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                         </table>
                                     </div>
                                 ) : (
-                                    <div className='flex flex-col items-center justify-center p-10 bg-gray-50 border border-dashed border-gray-200 rounded-xl text-center'>
+                                    <div className='flex flex-col items-center justify-center p-10 bg-gray-50 border border-dashed border-gray-200 rounded-md text-center'>
                                         <p className='text-sm text-gray-400'>No courses added for this semester yet.</p>
                                         <p className='text-xs text-gray-300 mt-1'>Use the dropdown above to add courses.</p>
                                     </div>

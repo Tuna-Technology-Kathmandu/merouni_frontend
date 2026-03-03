@@ -2,7 +2,7 @@ import { Skeleton } from '@/ui/shadcn/Skeleton'
 
 export const ShimmerCard = () => {
   return (
-    <div className='bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm w-full'>
+    <div className='bg-white rounded-md border border-gray-100 overflow-hidden shadow-sm w-full'>
       {/* Image Section */}
       <Skeleton className='aspect-[16/10] w-full rounded-none' />
 
@@ -12,8 +12,8 @@ export const ShimmerCard = () => {
         <Skeleton className='h-4 w-3/5 mb-6' />
 
         <div className='flex gap-4'>
-          <Skeleton className='h-10 flex-1 rounded-xl' />
-          <Skeleton className='h-10 flex-1 rounded-xl' />
+          <Skeleton className='h-10 flex-1 rounded-md' />
+          <Skeleton className='h-10 flex-1 rounded-md' />
         </div>
       </div>
     </div>

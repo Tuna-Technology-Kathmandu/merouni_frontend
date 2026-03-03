@@ -7,7 +7,7 @@ const DegreeCard = ({ degree }) => {
   const isProgramShape = !!degree.programlevel || !!degree.programfaculty
 
   return (
-    <article className='bg-white rounded-xl border border-gray-100 overflow-hidden flex flex-col hover:border-gray-200 hover:shadow-sm transition-all duration-200 h-full'>
+    <article className='bg-white rounded-md border border-gray-100 overflow-hidden flex flex-col hover:border-gray-200 hover:shadow-sm transition-all duration-200 h-full'>
       <div className='aspect-[3/2] w-full bg-gray-50 flex items-center justify-center overflow-hidden'>
         <img
           src={degree.cover_image || degree.featured_image || '/images/logo.png'}
@@ -47,7 +47,7 @@ const DegreeCard = ({ degree }) => {
         <div className='mt-auto pt-3 border-t border-gray-50'>
           <Link
             href={`/degree/${slug}`}
-            className='block py-2 rounded-lg text-center text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 transition-colors'
+            className='block py-2 rounded-md text-center text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 transition-colors'
           >
             View
           </Link>

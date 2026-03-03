@@ -126,7 +126,7 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
 
   return (
     <>
-      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-sm'>
+      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-md p-0.5 shadow-sm'>
         <Button
           type='button'
           size='sm'
@@ -156,7 +156,7 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
         </Button>
       </div>
 
-      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-sm'>
+      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-md p-0.5 shadow-sm'>
         {[1, 2, 3, 4, 5, 6].map((level) => {
           const Icon = {
             1: Heading1,
@@ -182,7 +182,7 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
         })}
       </div>
 
-      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-sm'>
+      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-md p-0.5 shadow-sm'>
         <Button
           type='button'
           size='sm'
@@ -203,7 +203,7 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
         </Button>
       </div>
 
-      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-sm'>
+      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-md p-0.5 shadow-sm'>
         <Button
           type='button'
           size='sm'
@@ -233,7 +233,7 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
         </Button>
       </div>
 
-      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-sm'>
+      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-md p-0.5 shadow-sm'>
         <div className="relative" ref={linkMenuRef}>
           <Button
             type='button'
@@ -253,7 +253,7 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
           </Button>
 
           {isLinkMenuOpen && (
-            <div className="absolute left-0 mt-2 w-72 bg-white border border-gray-100 rounded-xl shadow-2xl z-50 p-4 animate-in fade-in zoom-in duration-200 shadow-[#387cae]/5">
+            <div className="absolute left-0 mt-2 w-72 bg-white border border-gray-100 rounded-md shadow-2xl z-50 p-4 animate-in fade-in zoom-in duration-200 shadow-[#387cae]/5">
               <div className="space-y-3">
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Link URL</label>
@@ -301,7 +301,7 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
         </div>
       </div>
 
-      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-0.5 shadow-sm'>
+      <div className='flex items-center gap-1 bg-white border border-gray-200 rounded-md p-0.5 shadow-sm'>
         <Button
           type='button'
           size='sm'
@@ -340,7 +340,7 @@ const MenuBar = ({ editor, onMediaUpload, showImageUpload = false }) => {
           </Button>
 
           {isMenuOpen && (
-            <div className="absolute left-0 mt-2 w-72 bg-white border border-gray-100 rounded-xl shadow-2xl z-50 p-4 animate-in fade-in zoom-in duration-200 shadow-[#387cae]/5">
+            <div className="absolute left-0 mt-2 w-72 bg-white border border-gray-100 rounded-md shadow-2xl z-50 p-4 animate-in fade-in zoom-in duration-200 shadow-[#387cae]/5">
               <div className="space-y-4">
                 <div className="flex flex-col gap-2">
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Upload from computer</label>
@@ -424,9 +424,6 @@ export default function TipTapEditor({ value, onChange, onMediaUpload, placehold
       }),
       Image.configure({
         allowBase64: true,
-        HTMLAttributes: {
-          class: 'rounded-lg max-w-full h-auto',
-        },
       }),
       Table.configure({
         resizable: true,
@@ -441,18 +438,18 @@ export default function TipTapEditor({ value, onChange, onMediaUpload, placehold
     },
   })
 
-  // Update editor content when value prop changes
   useEffect(() => {
     if (editor && value !== undefined && value !== editor.getHTML()) {
-      // Use a small timeout or check to avoid interrupting the user
-      // or simply rely on the fact that useEffect runs after render
       editor.commands.setContent(value || '', false)
     }
   }, [value, editor])
 
   return (
-    <div className='border border-gray-200 rounded-xl bg-white flex flex-col focus-within:ring-2 focus-within:ring-[#387cae]/10 focus-within:border-[#387cae] transition-all shadow-sm'>
-      <div className='flex flex-wrap items-center gap-2 p-2 border-b border-gray-100 bg-gray-50/50 rounded-t-xl'>
+    <div className='border border-gray-200 rounded-md bg-white flex flex-col
+focus-within:border-[#387cae]
+focus-within:ring-0
+transition-colors duration-200 shadow-sm'>
+      <div className='flex flex-wrap items-center gap-2 p-2 border-b border-gray-100 bg-gray-50/50 rounded-md'>
         <MenuBar editor={editor} onMediaUpload={onMediaUpload} showImageUpload={showImageUpload} />
       </div>
       <div
@@ -462,7 +459,7 @@ export default function TipTapEditor({ value, onChange, onMediaUpload, placehold
       >
         <EditorContent
           editor={editor}
-          className='[&_.ProseMirror]:p-6 [&_.ProseMirror]:min-h-full [&_.ProseMirror]:text-gray-800 [&_.ProseMirror]:text-base [&_.ProseMirror]:leading-relaxed [&_.ProseMirror]:outline-none [&_.ProseMirror>*]:mb-4 [&_.ProseMirror>*:last-child]:mb-0 [&_.ProseMirror_h1]:text-4xl [&_.ProseMirror_h1]:font-bold [&_.ProseMirror_h1]:mt-8 [&_.ProseMirror_h1]:text-gray-900 [&_.ProseMirror_h2]:text-3xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mt-6 [&_.ProseMirror_h2]:text-gray-900 [&_.ProseMirror_h3]:text-2xl [&_.ProseMirror_h3]:font-bold [&_.ProseMirror_h3]:mt-4 [&_.ProseMirror_h3]:text-gray-900 [&_.ProseMirror_h4]:text-xl [&_.ProseMirror_h4]:font-bold [&_.ProseMirror_h4]:mt-4 [&_.ProseMirror_h4]:text-gray-900 [&_.ProseMirror_h5]:text-lg [&_.ProseMirror_h5]:font-bold [&_.ProseMirror_h5]:mt-4 [&_.ProseMirror_h5]:text-gray-900 [&_.ProseMirror_h6]:text-base [&_.ProseMirror_h6]:font-bold [&_.ProseMirror_h6]:mt-4 [&_.ProseMirror_h6]:text-gray-900 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_table]:border-collapse [&_.ProseMirror_table]:table-auto [&_.ProseMirror_table]:w-full [&_.ProseMirror_table]:my-6 [&_.ProseMirror_td]:border [&_.ProseMirror_td]:border-gray-200 [&_.ProseMirror_td]:p-3 [&_.ProseMirror_th]:border [&_.ProseMirror_th]:border-gray-200 [&_.ProseMirror_th]:p-3 [&_.ProseMirror_th]:bg-gray-50 [&_.ProseMirror_th]:font-bold [&_.ProseMirror_a]:text-[#387cae] [&_.ProseMirror_a]:underline [&_.ProseMirror_img]:my-6 [&_.ProseMirror_img]:rounded-xl [&_.ProseMirror_img]:shadow-lg [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-gray-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0'
+          className='[&_.ProseMirror]:p-6 [&_.ProseMirror]:min-h-full [&_.ProseMirror]:text-gray-800 [&_.ProseMirror]:text-base [&_.ProseMirror]:leading-relaxed [&_.ProseMirror]:outline-none [&_.ProseMirror>*]:mb-4 [&_.ProseMirror>*:last-child]:mb-0 [&_.ProseMirror_h1]:text-4xl [&_.ProseMirror_h1]:font-bold [&_.ProseMirror_h1]:mt-8 [&_.ProseMirror_h1]:text-gray-900 [&_.ProseMirror_h2]:text-3xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mt-6 [&_.ProseMirror_h2]:text-gray-900 [&_.ProseMirror_h3]:text-2xl [&_.ProseMirror_h3]:font-bold [&_.ProseMirror_h3]:mt-4 [&_.ProseMirror_h3]:text-gray-900 [&_.ProseMirror_h4]:text-xl [&_.ProseMirror_h4]:font-bold [&_.ProseMirror_h4]:mt-4 [&_.ProseMirror_h4]:text-gray-900 [&_.ProseMirror_h5]:text-lg [&_.ProseMirror_h5]:font-bold [&_.ProseMirror_h5]:mt-4 [&_.ProseMirror_h5]:text-gray-900 [&_.ProseMirror_h6]:text-base [&_.ProseMirror_h6]:font-bold [&_.ProseMirror_h6]:mt-4 [&_.ProseMirror_h6]:text-gray-900 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_table]:border-collapse [&_.ProseMirror_table]:table-auto [&_.ProseMirror_table]:w-full [&_.ProseMirror_table]:my-6 [&_.ProseMirror_td]:border [&_.ProseMirror_td]:border-gray-200 [&_.ProseMirror_td]:p-3 [&_.ProseMirror_th]:border [&_.ProseMirror_th]:border-gray-200 [&_.ProseMirror_th]:p-3 [&_.ProseMirror_th]:bg-gray-50 [&_.ProseMirror_th]:font-bold [&_.ProseMirror_a]:text-[#387cae] [&_.ProseMirror_a]:underline [&_.ProseMirror_img]:my-6 [&_.ProseMirror_img]:rounded-md [&_.ProseMirror_img]:shadow-lg [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-gray-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0'
         />
       </div>
     </div>

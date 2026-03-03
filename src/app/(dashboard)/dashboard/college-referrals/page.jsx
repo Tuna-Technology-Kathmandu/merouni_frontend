@@ -82,7 +82,7 @@ const ReferedStudentsPage = () => {
       </div>
 
       {referrals.length === 0 ? (
-        <div className='text-center py-12 border border-gray-200 rounded-lg bg-gray-50'>
+        <div className='text-center py-12 border border-gray-200 rounded-md bg-gray-50'>
           <FileText className='w-16 h-16 text-gray-400 mx-auto mb-4' />
           <p className='text-lg text-gray-600 mb-2'>No referred students yet</p>
           <p className='text-sm text-gray-500'>
@@ -101,7 +101,7 @@ const ReferedStudentsPage = () => {
             return (
               <div
                 key={referral.id}
-                className='border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow bg-white'
+                className='border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow bg-white'
               >
                 <div className='p-6'>
                   {/* College Info */}
@@ -111,10 +111,10 @@ const ReferedStudentsPage = () => {
                         <img
                           src={college.college_logo}
                           alt={college.name}
-                          className='w-16 h-16 object-contain rounded-lg border border-gray-200'
+                          className='w-16 h-16 object-contain rounded-md border border-gray-200'
                         />
                       ) : (
-                        <div className='w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200'>
+                        <div className='w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center border border-gray-200'>
                           <Building2 className='w-8 h-8 text-gray-400' />
                         </div>
                       )}
@@ -132,13 +132,12 @@ const ReferedStudentsPage = () => {
                     </div>
                     <div className='flex-shrink-0'>
                       <span
-                        className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                          referral.status === 'ACCEPTED'
+                        className={`px-3 py-1 text-xs font-semibold rounded-full ${referral.status === 'ACCEPTED'
                             ? 'bg-green-100 text-green-800'
                             : referral.status === 'REJECTED'
                               ? 'bg-red-100 text-red-800'
                               : 'bg-yellow-100 text-yellow-800'
-                        }`}
+                          }`}
                       >
                         {referral.status || 'IN_PROGRESS'}
                       </span>

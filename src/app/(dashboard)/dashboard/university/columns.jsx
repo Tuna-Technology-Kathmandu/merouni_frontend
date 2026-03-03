@@ -16,7 +16,7 @@ export const createColumns = ({
 
         return (
           <div className='flex items-center gap-4'>
-            <div className='w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0'>
+            <div className='w-12 h-12 rounded-md bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0'>
               {logoUrl ? (
                 <img
                   src={logoUrl}
@@ -62,10 +62,10 @@ export const createColumns = ({
       header: 'Established',
       accessorKey: 'date_of_establish',
       cell: ({ getValue }) => {
-        const date = getValue()
-        return date ? (
+        const year = getValue()
+        return year ? (
           <span className='text-sm font-medium text-gray-600 uppercase'>
-            {new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}
+            {year}
           </span>
         ) : <span className='text-gray-400'>-</span>
       }
@@ -77,21 +77,21 @@ export const createColumns = ({
         <div className='flex gap-1 justify-end'>
           <button
             onClick={() => handleView(row.original.slugs)}
-            className='w-8 h-8 flex items-center justify-center rounded-lg text-blue-600 hover:bg-blue-50 transition-colors'
+            className='w-8 h-8 flex items-center justify-center rounded-md text-blue-600 hover:bg-blue-50 transition-colors'
             title='View Details'
           >
             <Eye className='w-4 h-4' />
           </button>
           <button
             onClick={() => handleEdit(row.original.slugs)}
-            className='w-8 h-8 flex items-center justify-center rounded-lg text-amber-600 hover:bg-amber-50 transition-colors'
+            className='w-8 h-8 flex items-center justify-center rounded-md text-amber-600 hover:bg-amber-50 transition-colors'
             title='Edit'
           >
             <Edit2 className='w-4 h-4' />
           </button>
           <button
             onClick={() => handleDeleteClick(row.original.id)}
-            className='w-8 h-8 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-50 transition-colors'
+            className='w-8 h-8 flex items-center justify-center rounded-md text-red-600 hover:bg-red-50 transition-colors'
             title='Delete'
           >
             <Trash2 className='w-4 h-4' />

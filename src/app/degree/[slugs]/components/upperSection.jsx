@@ -94,7 +94,7 @@ const ImageSection = ({ degree }) => {
               transition={{ delay: index * 0.1 }}
               className='flex flex-col p-8 bg-gray-50 rounded-3xl border border-gray-100'
             >
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 shadow-sm ${item.color}`}>
+              <div className={`w-12 h-12 rounded-md flex items-center justify-center mb-6 shadow-sm ${item.color}`}>
                 <item.icon className='w-6 h-6' />
               </div>
               <p className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-2'>{item.label}</p>

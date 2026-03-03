@@ -102,7 +102,7 @@ const UniversityCard = ({
       onClick={() => {
         router.push(`/schools/${slug}`)
       }}
-      className='bg-white cursor-pointer rounded-xl p-6 border border-gray-200 shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300'
+      className='bg-white cursor-pointer rounded-md p-6 border border-gray-200 shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300'
     >
       <div className='flex justify-between items-start mb-4'>
         <img

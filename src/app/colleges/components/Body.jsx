@@ -201,7 +201,7 @@ const FilterSection = React.memo(function FilterSection({
           value={localSearch}
           onChange={handleInputChange}
           placeholder={`Search ${title.toLowerCase()}...`}
-          className='w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all'
+          className='w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none focus:ring-2 focus:ring-[#0A70A7] focus:border-[#0A70A7] transition-all'
         />
         {isLoading && (
           <div className='absolute right-3'>
@@ -445,7 +445,7 @@ const CollegeFinder = () => {
             <h2 className='text-3xl font-extrabold text-gray-900 tracking-tight'>
               Colleges
             </h2>
-            <span className='bg-blue-50 text-[#0A70A7] px-3 py-1.5 rounded-xl text-[11px] font-bold uppercase tracking-wider'>
+            <span className='bg-blue-50 text-[#0A70A7] px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider'>
               {pagination.totalCount || '0'} Results
             </span>
           </div>

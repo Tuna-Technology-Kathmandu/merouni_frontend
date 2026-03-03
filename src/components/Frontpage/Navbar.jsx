@@ -208,7 +208,7 @@ const Navbar = () => {
             <button
               type='button'
               onClick={openSearch}
-              className='w-full flex items-center gap-3 px-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50/50 text-left text-gray-400 transition-all duration-200'
+              className='w-full flex items-center gap-3 px-4 py-2.5 rounded-md border border-gray-100 bg-gray-50/50 text-left text-gray-400 transition-all duration-200'
               onFocus={(e) => e.target.style.borderColor = THEME_BLUE}
               onBlur={(e) => e.target.style.borderColor = ''}
               aria-label='Open search'
@@ -244,7 +244,7 @@ const Navbar = () => {
             <button
               type='button'
               onClick={() => setIsMobileMenuOpen(false)}
-              className='p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+              className='p-2 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700'
               aria-label='Close menu'
             >
               <X className='w-5 h-5' />
@@ -271,7 +271,7 @@ const Navbar = () => {
         createPortal(
           <div
             ref={dropdownRef}
-            className='fixed z-[10000] min-w-[200px] rounded-xl bg-white shadow-lg border border-gray-100 py-1 hidden md:block'
+            className='fixed z-[10000] min-w-[200px] rounded-md bg-white shadow-lg border border-gray-100 py-1 hidden md:block'
             style={{
               top: `${dropdownPosition.top}px`,
               left: `${dropdownPosition.left}px`

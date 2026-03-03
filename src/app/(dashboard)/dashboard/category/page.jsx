@@ -58,7 +58,7 @@ export default function CategoryManager() {
       setTableLoading(true)
       const response = await fetchCategories(page)
       setCategories(response.items)
-      console.log(response,"responseresponse")
+      console.log(response, "responseresponse")
       setPagination({
         currentPage: response.pagination.currentPage,
         totalPages: response.pagination.totalPages,
@@ -201,12 +201,13 @@ export default function CategoryManager() {
   ], [])
 
   return (
-    <div className='w-full space-y-4 p-4'>
+    <div className='w-full'>
+
       <ToastContainer />
 
       {/* Header */}
       <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
-        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
           <SearchInput value={searchQuery} onChange={(e) => handleSearchInput(e.target.value)} placeholder='Search categories...' className='max-w-md w-full' />
           <Button onClick={handleAddClick} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
             <Plus className="w-4 h-4" /> Add Category
@@ -217,7 +218,7 @@ export default function CategoryManager() {
       {/* Create / Edit Modal */}
       <Dialog isOpen={isOpen}
 
-       onClose={handleCloseModal} className='max-w-lg'>
+        onClose={handleCloseModal} className='max-w-lg'>
         <DialogContent className='max-w-lg max-h-[90vh] flex flex-col p-0'>
           <DialogHeader className='px-6 py-4 border-b'>
             <DialogTitle className="text-lg font-semibold text-gray-900">
@@ -255,6 +256,8 @@ export default function CategoryManager() {
                   <option value='EVENT'>Event</option>
                   <option value='NEWS'>News</option>
                   <option value='MATERIAL'>Material</option>
+                  <option value='SCHOLARSHIP'>Scholarship</option>
+
                 </select>
                 {errors.type && <p className='text-xs text-destructive mt-1'>{errors.type.message}</p>}
               </div>
@@ -284,7 +287,7 @@ export default function CategoryManager() {
       </Dialog>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
         <Table data={categories} columns={columns} pagination={pagination} onPageChange={(p) => loadCategories(p)} showSearch={false} loading={tableLoading} />
       </div>
 
@@ -296,26 +299,26 @@ export default function CategoryManager() {
             <DialogClose onClick={() => { setIsViewOpen(false); setViewingCategory(null) }} />
           </DialogHeader>
           <div className='flex-1 overflow-y-auto p-6 space-y-4'>
-            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+            <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Title</p>
               <p className="text-lg font-bold text-gray-900">{viewingCategory?.title}</p>
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+            <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Type</p>
               {viewingCategory?.type
                 ? <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-semibold uppercase">{viewingCategory.type}</span>
                 : <span className="text-gray-400 italic text-sm">—</span>}
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+            <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Description</p>
               <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-wrap">{viewingCategory?.description || 'No description provided.'}</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+              <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Created</p>
                 <p className="text-sm text-gray-600">{viewingCategory?.createdAt ? new Date(viewingCategory.createdAt).toLocaleDateString() : '—'}</p>
               </div>
-              <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+              <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Updated</p>
                 <p className="text-sm text-gray-600">{viewingCategory?.updatedAt ? new Date(viewingCategory.updatedAt).toLocaleDateString() : '—'}</p>
               </div>

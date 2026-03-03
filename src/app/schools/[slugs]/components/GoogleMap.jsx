@@ -9,14 +9,14 @@ const SchoolGoogleMap = ({ mapUrl }) => {
   if (isIframe) {
     return (
       <div
-        className='w-full h-full [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0 rounded-lg'
+        className='w-full h-full [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0 rounded-md'
         dangerouslySetInnerHTML={{ __html: mapUrl }}
       />
     )
   }
 
   return (
-    <div className='w-full h-full rounded-lg overflow-hidden'>
+    <div className='w-full h-full rounded-md overflow-hidden'>
       <iframe
         src={mapUrl}
         className='w-full h-full border-0'

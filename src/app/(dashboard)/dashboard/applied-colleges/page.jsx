@@ -57,7 +57,7 @@ const AppliedCollegesPage = () => {
 
   return (
     <div className='p-4'>
-      <div className='bg-white rounded-xl shadow p-4'>
+      <div className='bg-white rounded-md shadow p-4'>
         <h2 className='text-lg font-semibold mb-2'>
           Your Applied Colleges
         </h2>
@@ -86,7 +86,7 @@ const AppliedCollegesPage = () => {
                 {applications.map((app) => (
                   <div
                     key={app.id}
-                    className='flex flex-col md:flex-row md:items-center justify-between border rounded-lg px-3 py-3 gap-2'
+                    className='flex flex-col md:flex-row md:items-center justify-between border rounded-md px-3 py-3 gap-2'
                   >
                     <div className='flex-1 flex items-start gap-3'>
                       {/* College Logo */}

@@ -25,7 +25,7 @@ const ApplyImageSection = ({ college, loading }) => {
             )}
           </div>
           <div className='flex flex-row bg-[#30AD8F] bg-opacity-5 h-[110px] justify-center items-center p-0 mt-4 sm:mt-0'>
-           
+
             <div className='w-full flex justify-center flex-col items-center'>
               <h2 className='font-bold text-3xl leading-10'>{college?.name}</h2>
               <div className='flex flex-row justify-center'>
@@ -96,7 +96,7 @@ const ApplyImageSection = ({ college, loading }) => {
           </div>
         </div>
 
-        <div className='space-y-4 text-[#b0b2c3] fixed left-8 top-[30%] md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col'>
+        <div className='space-y-4 text-[#b0b2c3] fixed left-8 top-[30%] md:-translate-y-1 bg-white p-2 rounded-md flex items-center flex-col'>
           <div className='text-black font-bold text-sm'>Share</div>
           <img src='/images/fb.png' alt='Facebook' className='w-6' />
           <img src='/images/insta.png' alt='Instagram' className='w-6' />

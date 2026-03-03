@@ -47,7 +47,7 @@ export default function SiteControlDeleteModal({ isOpen, onClose, onSuccess, con
                         <p className="text-slate-700">
                             Are you sure you want to delete the configuration <span className="font-bold underline decoration-red-200">{config?.type}</span>?
                         </p>
-                        <p className="text-sm text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                        <p className="text-sm text-slate-500 bg-slate-50 p-3 rounded-md border border-slate-100">
                             This action is permanent and cannot be undone. This may affect site functionality.
                         </p>
                     </div>

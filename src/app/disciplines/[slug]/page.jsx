@@ -75,8 +75,8 @@ const DisciplineDetailPage = () => {
         {/* Hero Section */}
         <div className='bg-white border-b border-gray-100'>
           <div className='container mx-auto px-4 py-12 md:py-16'>
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className='inline-flex items-center text-sm font-medium text-gray-500 hover:text-[#0A6FA7] mb-8 transition-colors'
             >
               <ArrowLeft className='w-4 h-4 mr-2' />
@@ -100,9 +100,9 @@ const DisciplineDetailPage = () => {
 
               {discipline.featured_image && (
                 <div className='w-full md:w-80 aspect-[16/10] rounded-2xl overflow-hidden shadow-lg border border-gray-100'>
-                  <img 
-                    src={discipline.featured_image} 
-                    alt={discipline.title} 
+                  <img
+                    src={discipline.featured_image}
+                    alt={discipline.title}
                     className='w-full h-full object-cover'
                   />
                 </div>
@@ -122,9 +122,9 @@ const DisciplineDetailPage = () => {
               <p className='text-gray-500'>Browse academic programs in {discipline.title}</p>
             </div>
             <div className='hidden md:block'>
-               <span className='text-sm text-gray-400 font-medium'>
-                 Showing {degrees.length} Programs
-               </span>
+              <span className='text-sm text-gray-400 font-medium'>
+                Showing {degrees.length} Programs
+              </span>
             </div>
           </div>
 
@@ -141,12 +141,12 @@ const DisciplineDetailPage = () => {
               </div>
               <h3 className='text-xl font-bold text-gray-900 mb-2'>No Degrees Found</h3>
               <p className='text-gray-500 max-w-md mx-auto'>
-                We currently don't have any degree programs listed under {discipline.title}. 
+                We currently don't have any degree programs listed under {discipline.title}.
                 Please check back later or explore other fields.
               </p>
-              <Link 
-                href="/" 
-                className='mt-8 inline-flex px-6 py-3 bg-[#0A6FA7] text-white font-bold rounded-xl hover:bg-[#085a88] transition-colors shadow-lg shadow-blue-900/10'
+              <Link
+                href="/"
+                className='mt-8 inline-flex px-6 py-3 bg-[#0A6FA7] text-white font-bold rounded-md hover:bg-[#085a88] transition-colors shadow-lg shadow-blue-900/10'
               >
                 Explore Other Fields
               </Link>

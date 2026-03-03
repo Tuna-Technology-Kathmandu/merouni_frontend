@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import Link from 'next/link'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 
 import Table from '@/ui/shadcn/DataTable'
-import FileUpload from '../addCollege/FileUpload'
+import FileUpload from '../colleges/FileUpload'
 import {
   Dialog,
   DialogContent,
@@ -291,9 +292,19 @@ const VacancyManager = () => {
     {
       header: 'Title',
       accessorKey: 'title',
-      cell: ({ row }) => (
-        <div className="font-medium text-gray-900">{row.original.title}</div>
-      )
+      cell: ({ row }) => {
+        const { title, slugs } = row.original
+        return (
+          <Link
+            href={slugs ? `/vacancies/${slugs}` : '#'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-gray-900 hover:text-[#387cae] hover:underline"
+          >
+            {title}
+          </Link>
+        )
+      }
     },
     {
       header: 'Organization / Institution',
@@ -359,11 +370,11 @@ const VacancyManager = () => {
   ], [requireAdmin])
 
   return (
-    <div className="w-full space-y-4 p-4">
+    <div className="w-full">
       <ToastContainer position="top-right" autoClose={3000} />
       {/* Sticky Header */}
-      <div className="sticky top-0 z-30 bg-[#F7F8FA] py-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border">
+      <div className="sticky mb-3 top-0 z-30 bg-[#F7F8FA] py-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border">
           <SearchInput
             value={searchQuery}
             onChange={(e) => handleSearchInput(e.target.value)}
@@ -381,7 +392,7 @@ const VacancyManager = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
         <Table
           loading={tableLoading}
           data={vacancies}
@@ -527,7 +538,7 @@ const VacancyManager = () => {
             ) : viewVacancyData ? (
               <div className="space-y-6">
                 {viewVacancyData.featuredImage && (
-                  <div className="w-full h-56 rounded-xl overflow-hidden border">
+                  <div className="w-full h-56 rounded-md overflow-hidden border">
                     <img
                       src={viewVacancyData.featuredImage}
                       alt={viewVacancyData.title}
@@ -546,7 +557,7 @@ const VacancyManager = () => {
                 </div>
 
                 {viewVacancyData.description && (
-                  <div className="bg-gray-50 p-4 rounded-xl border">
+                  <div className="bg-gray-50 p-4 rounded-md border">
                     <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Description</h3>
                     <div
                       className="text-gray-700 prose prose-sm max-w-none"

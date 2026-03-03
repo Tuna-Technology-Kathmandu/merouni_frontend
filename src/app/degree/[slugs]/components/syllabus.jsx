@@ -21,7 +21,7 @@ const Syllabus = ({ degree }) => {
   }, {})
 
   return (
-    <section className='bg-gradient-to-b from-[#f8fafc] to-[#edf6f9] pt-10 px-6 mt-12 rounded-xl'>
+    <section className='bg-gradient-to-b from-[#f8fafc] to-[#edf6f9] pt-10 px-6 mt-12 rounded-md'>
       <div className='max-w-6xl mx-auto'>
         <h2 className='text-xl md:text-2xl font-extrabold text-gray-800 text-center mb-12'>
           📘 Syllabus

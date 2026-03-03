@@ -62,7 +62,7 @@ const WishlistCollegeCard = ({
   }
 
   return (
-    <div className='bg-white rounded-xl p-6 border border-gray-200 shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300'>
+    <div className='bg-white rounded-md p-6 border border-gray-200 shadow-lg transition-all duration-300 hover:scale-105 hover:border-gray-300'>
       <div className='flex justify-between items-start mb-4'>
         <img
           src={imageUrl}

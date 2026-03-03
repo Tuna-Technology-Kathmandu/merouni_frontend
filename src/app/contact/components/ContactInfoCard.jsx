@@ -36,8 +36,8 @@ export default function ContactInfoCard() {
               transition={{ delay: index * 0.1 }}
               className='flex flex-col'
             >
-              <div className='w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center mb-6 border border-gray-100'>
-                <item.icon className='w-6 h-6 text-[#30AD8F]' />
+              <div className='w-12 h-12 bg-gray-50 rounded-md flex items-center justify-center mb-6 border border-gray-100'>
+                <item.icon className='w-6 h-6 text-[#387cae]' />
               </div>
               <h3 className='text-sm font-bold text-gray-400 uppercase tracking-widest mb-3'>
                 {item.title}

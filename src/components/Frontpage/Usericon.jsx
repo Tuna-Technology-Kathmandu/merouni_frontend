@@ -90,7 +90,7 @@ export default function UserDropdown() {
         <div className='flex items-center gap-2 mx-2 relative' ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className='flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg p-1'
+            className='flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-md p-1'
           >
             <div className='w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-md hover:shadow-lg transition-shadow'>
               {user?.firstName && user?.lastName ? (
@@ -118,7 +118,7 @@ export default function UserDropdown() {
 
           {/* Dropdown Menu */}
           {isDropdownOpen && (
-            <div className='absolute right-0 top-full mt-2 w-60 bg-white rounded-xl shadow-xl border border-gray-200 py-1.5 z-50 ring-1 ring-black ring-opacity-5 animate-in fade-in zoom-in-95 duration-100'>
+            <div className='absolute right-0 top-full mt-2 w-60 bg-white rounded-md shadow-xl border border-gray-200 py-1.5 z-50 ring-1 ring-black ring-opacity-5 animate-in fade-in zoom-in-95 duration-100'>
               <div className='px-1.5'>
                 <div className='sm:hidden px-3 py-2 border-b border-gray-100 mb-1'>
                   <p className='font-medium text-sm text-gray-900'>
@@ -130,7 +130,7 @@ export default function UserDropdown() {
                 <Link
                   href='/dashboard'
                   onClick={() => setIsDropdownOpen(false)}
-                  className='group flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-all duration-200'
+                  className='group flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md transition-all duration-200'
                   style={{ '--theme-blue': THEME_BLUE }}
                 >
                   <FaUser
@@ -147,7 +147,7 @@ export default function UserDropdown() {
 
                 <button
                   onClick={handleLogoutClick}
-                  className='w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-all duration-200 group'
+                  className='w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition-all duration-200 group'
                 >
                   <FaSignOutAlt className='w-4 h-4 text-gray-500 group-hover:text-red-500 transition-colors' />
                   <span>Logout</span>
@@ -174,12 +174,12 @@ export default function UserDropdown() {
   return (
     <div className='flex items-center gap-3 mx-2'>
       <Link href='/sign-in'>
-        <button className='px-6 py-2.5 bg-[#0A6FA7] text-white rounded-xl font-extrabold hover:bg-[#085a86] transition-all shadow-sm hover:shadow-lg active:scale-[0.98] text-xs sm:text-sm uppercase tracking-widest border border-white/10'>
+        <button className='px-6 py-2.5 bg-[#0A6FA7] text-white rounded-md font-extrabold hover:bg-[#085a86] transition-all shadow-sm hover:shadow-lg active:scale-[0.98] text-xs sm:text-sm uppercase tracking-widest border border-white/10'>
           Login
         </button>
       </Link>
       <Link href='/sign-in?mode=signup'>
-        <button className='px-6 py-2.5 bg-white text-[#0A6FA7] border-2 border-[#0A6FA7] rounded-xl font-extrabold hover:bg-blue-50/50 transition-all text-xs sm:text-sm uppercase tracking-widest active:scale-[0.98]'>
+        <button className='px-6 py-2.5 bg-white text-[#0A6FA7] border-2 border-[#0A6FA7] rounded-md font-extrabold hover:bg-blue-50/50 transition-all text-xs sm:text-sm uppercase tracking-widest active:scale-[0.98]'>
           Sign Up
         </button>
       </Link>

@@ -32,7 +32,7 @@ const DestinationsSection = ({ consultancy }) => {
         {destinations.map((d, i) => (
           <span
             key={i}
-            className='inline-flex px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-100 text-sm text-gray-700'
+            className='inline-flex px-3 py-1.5 rounded-md bg-gray-50 border border-gray-100 text-sm text-gray-700'
           >
             {typeof d === 'object' && d?.country ? d.country : String(d)}
           </span>

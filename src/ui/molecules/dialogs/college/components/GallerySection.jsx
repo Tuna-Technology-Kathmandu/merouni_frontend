@@ -86,7 +86,6 @@ const GallerySection = ({
           type='button'
           onClick={() => fileInputRef.current.click()}
           disabled={isUploading}
-          className='h-11 px-6 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold gap-2 shadow-lg shadow-green-600/10 transition-all active:scale-95 disabled:opacity-50'
         >
           {isUploading ? (
             <Loader2 size={18} className='animate-spin' />
@@ -126,7 +125,7 @@ const GallerySection = ({
               <button
                 type='button'
                 onClick={() => removeImage(image.url)}
-                className='absolute top-2 right-2 w-8 h-8 rounded-lg bg-white/90 backdrop-blur-md text-red-500 shadow-sm border border-red-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white transform scale-90 group-hover:scale-100'
+                className='absolute top-2 right-2 w-8 h-8 rounded-md bg-white/90 backdrop-blur-md text-red-500 shadow-sm border border-red-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white transform scale-90 group-hover:scale-100'
               >
                 <Trash2 size={14} />
               </button>

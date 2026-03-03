@@ -146,7 +146,7 @@ const ViewProgram = ({ isOpen, onClose, slug }) => {
                             {viewProgram.syllabus?.length > 0 && (
                                 <section className='space-y-2'>
                                     <h4 className='text-sm font-semibold text-slate-700 border-b pb-1'>Syllabus</h4>
-                                    <div className='border rounded-lg overflow-hidden'>
+                                    <div className='border rounded-md overflow-hidden'>
                                         <table className='w-full text-sm'>
                                             <thead className='bg-gray-50 border-b'>
                                                 <tr>

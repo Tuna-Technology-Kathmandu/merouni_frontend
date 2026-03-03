@@ -5,7 +5,7 @@ import React from 'react'
 const GoogleMap = ({ mapUrl }) => {
   return (
     <div
-      className='w-full h-full [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0 rounded-lg'
+      className='w-full h-full [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0 rounded-md'
       dangerouslySetInnerHTML={{ __html: mapUrl }}
     />
   )

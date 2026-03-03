@@ -72,18 +72,18 @@ const CollegeRankings = () => {
   if (loading) {
     return (
       <div className='bg-gradient-to-br from-blue-50 via-white to-green-50 py-8 md:py-10'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 md:px-8'>
+        <div className='container mx-auto px-4 sm:px-6 md:px-8'>
           <div className='h-6 w-48 bg-gray-200 rounded animate-pulse mb-6' />
           <div className='flex gap-4 overflow-hidden'>
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className='flex-shrink-0 w-[320px] md:w-[360px] rounded-xl border border-gray-200/80 bg-white p-5'
+                className='flex-shrink-0 w-[320px] md:w-[360px] rounded-md border border-gray-200/80 bg-white p-5'
               >
                 <div className='h-5 w-3/4 bg-gray-100 rounded mb-4' />
                 <div className='space-y-2'>
                   {[1, 2, 3, 4].map((j) => (
-                    <div key={j} className='h-12 bg-gray-50 rounded-lg' />
+                    <div key={j} className='h-12 bg-gray-50 rounded-md' />
                   ))}
                 </div>
               </div>
@@ -100,11 +100,13 @@ const CollegeRankings = () => {
 
   return (
     <div className='bg-gradient-to-br from-blue-50 via-white to-green-50 py-8 md:py-10'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 md:px-8'>
-        <h2 className='text-xl font-semibold text-gray-800 mt-4 mb-5 md:mt-5 md:mb-6 pb-2 relative inline-block'>
-          Top College Rankings
-          <span className='absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#0870A8] to-[#31AD8F] rounded-full' />
-        </h2>
+      <div className='container mx-auto px-4 sm:px-6 md:px-8'>
+        <div className='mb-10'>
+          <h2 className='text-2xl md:text-3xl font-bold text-gray-900'>
+            Top College Rankings
+          </h2>
+          <div className='h-1 w-20 mt-2 rounded-full' style={{ backgroundColor: '#387cae' }}></div>
+        </div>
 
         <div className='relative group'>
           {canScrollLeft && (
@@ -131,11 +133,11 @@ const CollegeRankings = () => {
               return (
                 <div
                   key={programGroup.program.id}
-                  className='flex-shrink-0 w-[300px] sm:w-[320px] md:w-[360px] rounded-xl border border-gray-200/80 bg-white overflow-hidden hover:border-gray-300 hover:shadow-md transition-all'
+                  className='flex-shrink-0 w-[300px] sm:w-[320px] md:w-[360px] rounded-md border border-gray-200/80 bg-white overflow-hidden hover:border-gray-300 hover:shadow-md transition-all'
                 >
                   <div className='px-5 pt-5 pb-3'>
                     <div className='flex items-center gap-2 mb-4'>
-                      <div className='p-1.5 rounded-lg bg-[#0A6FA7]/10'>
+                      <div className='p-1.5 rounded-md bg-[#0A6FA7]/10'>
                         <GraduationCap className='w-4 h-4 text-[#0A6FA7]' />
                       </div>
                       <h3 className='text-base font-semibold text-gray-900 line-clamp-2'>
@@ -152,13 +154,13 @@ const CollegeRankings = () => {
                           <li key={ranking.id}>
                             <Link
                               href={`/colleges/${college.slugs || ''}`}
-                              className='flex items-center gap-3 py-2.5 px-3 rounded-lg text-left hover:bg-gray-50 transition-colors -mx-1'
+                              className='flex items-center gap-3 py-2.5 px-3 rounded-md text-left hover:bg-gray-50 transition-colors -mx-1'
                             >
                               <span className='flex-shrink-0 w-7 h-7 rounded-md bg-gray-100 text-xs font-semibold text-gray-600 flex items-center justify-center'>
                                 {ranking.rank}
                               </span>
                               {college.college_logo ? (
-                                <div className='relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-50'>
+                                <div className='relative w-12 h-12 rounded-md overflow-hidden flex-shrink-0 bg-gray-50'>
                                   <Image
                                     src={college.college_logo}
                                     alt=''
@@ -167,7 +169,7 @@ const CollegeRankings = () => {
                                   />
                                 </div>
                               ) : (
-                                <div className='w-12 h-12 rounded-lg bg-gray-50 flex-shrink-0 flex items-center justify-center text-xs font-medium text-gray-400'>
+                                <div className='w-12 h-12 rounded-md bg-gray-50 flex-shrink-0 flex items-center justify-center text-xs font-medium text-gray-400'>
                                   {college.name?.charAt(0) || '?'}
                                 </div>
                               )}

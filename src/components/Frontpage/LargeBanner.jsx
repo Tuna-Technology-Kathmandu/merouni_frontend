@@ -7,7 +7,7 @@ const LargeBanner = () => {
         <img
           src='https://media.edusanjal.com/bfs/edupatra-banner_RHpsuBl.webp'
           alt=''
-          className='w-full h-32 object-cover rounded-lg'
+          className='w-full h-32 object-cover rounded-md'
         />
       </div>
     </div>

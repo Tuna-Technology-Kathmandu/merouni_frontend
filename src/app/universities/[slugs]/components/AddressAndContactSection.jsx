@@ -1,6 +1,6 @@
 import React from 'react'
 import { MdLocationOn, MdEmail } from 'react-icons/md'
-import { FaPhoneAlt, FaCity, FaPhoneSquareAlt  } from 'react-icons/fa'
+import { FaPhoneAlt, FaCity, FaPhoneSquareAlt } from 'react-icons/fa'
 import { HiOutlineOfficeBuilding } from 'react-icons/hi'
 import { MdPublic } from 'react-icons/md'
 import { BsMailbox } from 'react-icons/bs'
@@ -33,7 +33,7 @@ const AddressContactCard = ({ university }) => {
 
           {/* Address */}
           {hasAddress && (
-            <div className='shadow-[0px_0px_10px_2px_rgba(0,0,0,0.2)] rounded-lg p-6'>
+            <div className='shadow-[0px_0px_10px_2px_rgba(0,0,0,0.2)] rounded-md p-6'>
               <div className="flex items-center gap-2 mb-4">
                 <MdLocationOn className="text-[#30AD8F]" size={22} />
                 <h3 className="font-semibold text-base md:text-lg text-gray-800">
@@ -74,7 +74,7 @@ const AddressContactCard = ({ university }) => {
 
           {/* Contact */}
           {hasContact && (
-               <div className='shadow-[0px_0px_10px_2px_rgba(0,0,0,0.2)] rounded-lg p-6'>
+            <div className='shadow-[0px_0px_10px_2px_rgba(0,0,0,0.2)] rounded-md p-6'>
               <div className="flex items-center gap-2 mb-4">
                 <FaPhoneSquareAlt className="text-[#30AD8F]" size={18} />
                 <h3 className="font-semibold text-base md:text-lg text-gray-800">

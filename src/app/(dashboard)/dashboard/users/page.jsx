@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Eye, EyeOff, Plus, Download } from 'lucide-react'
 import {
   createUser,
@@ -47,6 +48,7 @@ const EMPTY_FORM = {
 
 export default function UsersManager() {
   const { setHeading } = usePageHeading()
+  const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedUserTypes, setSelectedUserTypes] = useState([])
   const [searchTimeout, setSearchTimeout] = useState(null)
@@ -64,7 +66,7 @@ export default function UsersManager() {
   const [formError, setFormError] = useState(null)
   const [showPasswordValue, setShowPasswordValue] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  
+
   // Student View State
   const [viewingStudent, setViewingStudent] = useState(null)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
@@ -74,6 +76,14 @@ export default function UsersManager() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const userData = useSelector((state) => state.user.data)
+
+  useEffect(() => {
+    const roleParam = searchParams.get('role')
+    if (roleParam) {
+      const roles = roleParam.split(',').map((r) => r.trim()).filter(Boolean)
+      if (roles.length > 0) setSelectedUserTypes(roles)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     setHeading('User Management')
@@ -308,11 +318,12 @@ export default function UsersManager() {
   )
 
   return (
-    <div className='w-full space-y-4 p-4'>
+    <div className='w-full'>
+
 
       {/* Sticky Header */}
       <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
-        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
           <SearchInput
             value={searchQuery}
             onChange={(e) => handleSearchInput(e.target.value)}
@@ -344,7 +355,7 @@ export default function UsersManager() {
       </div>
 
       {/* Table */}
-      <div className='bg-white rounded-xl shadow-sm border overflow-hidden'>
+      <div className='bg-white rounded-md shadow-sm border overflow-hidden'>
         <Table
           loading={loading}
           data={users}
@@ -470,7 +481,7 @@ export default function UsersManager() {
                 </div>
 
                 {formError && (
-                  <div className='p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600'>
+                  <div className='p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-600'>
                     {formError}
                   </div>
                 )}

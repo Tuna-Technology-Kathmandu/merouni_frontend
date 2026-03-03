@@ -10,14 +10,14 @@ import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from '@
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { formatDate } from '@/utils/date.util'
-import { Edit2, ExternalLink, Eye, Trash2 } from 'lucide-react'
+import { Edit2, ExternalLink, Eye, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Loader from '../../../../ui/molecules/Loading'
-import FileUpload from '../addCollege/FileUpload'
+import FileUpload from '../colleges/FileUpload'
 import { fetchVideos } from './action'
 import { Textarea } from '@/ui/shadcn/textarea'
 
@@ -42,7 +42,7 @@ export default function VideoManager() {
   })
 
   const [videos, setVideos] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [tableLoading, setTableLoading] = useState(true)
   const [editingId, setEditingId] = useState(null)
   const [editing, setEditing] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -107,28 +107,34 @@ export default function VideoManager() {
         header: 'Actions',
         id: 'actions',
         cell: ({ row }) => (
-          <div className='flex gap-2'>
-            <button
+          <div className='flex gap-1'>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => handleView(row.original)}
-              className='p-1 text-gray-600 hover:text-gray-900'
+              className='hover:bg-blue-50 text-blue-600'
               title="View Details"
             >
               <Eye className='w-4 h-4' />
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => handleEdit(row.original)}
-              className='p-1 text-blue-600 hover:text-blue-800'
+              className='hover:bg-amber-50 text-amber-600'
               title="Edit"
             >
               <Edit2 className='w-4 h-4' />
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => handleDeleteClick(row.original.id)}
-              className='p-1 text-red-600 hover:text-red-800'
+              className='hover:bg-red-50 text-red-600'
               title="Delete"
             >
               <Trash2 className='w-4 h-4' />
-            </button>
+            </Button>
           </div>
         )
       }
@@ -163,7 +169,7 @@ export default function VideoManager() {
     } catch (err) {
       console.error('Error loading videos:', err)
     } finally {
-      setLoading(false)
+      setTableLoading(false)
     }
   }
 
@@ -328,192 +334,181 @@ export default function VideoManager() {
       clearTimeout(searchTimeout)
     }
 
-    if (value === '') {
-      handleSearch('')
-    } else {
-      const timeoutId = setTimeout(() => {
-        handleSearch(value)
-      }, 300)
-      setSearchTimeout(timeoutId)
-    }
+    const timeoutId = setTimeout(() => {
+      handleSearch(value)
+    }, 300)
+    setSearchTimeout(timeoutId)
+    // No setTableLoading here to allow silent search updates, but you could add if desired
   }
 
-  if (loading)
-    return (
-      <div className='mx-auto'>
-        <Loader />
-      </div>
-    )
 
   return (
-    <>
+    <div className='w-full'>
 
-      <div className='p-4 w-full'>
-        <div className='flex justify-between items-center mb-4'>
-          {/* Search Bar */}
-          <SearchInput
-            value={searchQuery}
-            onChange={(e) => handleSearchInput(e.target.value)}
-            placeholder='Search videos...'
-            className='max-w-md'
-          />
-          {/* Button */}
-          <div className='flex gap-2'>
-            <Button
-              onClick={() => {
-                setIsOpen(true)
-                setEditing(false)
-                setEditingId(null)
-                reset()
-                setUploadedFiles({ featured_image: '' })
-              }}
-            >
-              Add Video
-            </Button>
-          </div>
-        </div>
-        <ToastContainer />
-
-        <Dialog
-          isOpen={isOpen}
-          closeOnOutsideClick={false}
-          onClose={() => {
-            setIsOpen(false)
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
+        {/* Search Bar */}
+        <SearchInput
+          value={searchQuery}
+          onChange={(e) => handleSearchInput(e.target.value)}
+          placeholder='Search videos...'
+          className='max-w-md w-full'
+        />
+        {/* Button */}
+        <Button
+          onClick={() => {
+            setIsOpen(true)
             setEditing(false)
             setEditingId(null)
             reset()
             setUploadedFiles({ featured_image: '' })
           }}
-          className='max-w-5xl'
+          className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2 h-11 px-6 rounded-md shadow-sm transition-all shrink-0 w-full sm:w-auto"
         >
-          <DialogContent className='max-w-5xl max-h-[90vh] flex flex-col p-0'>
-            <DialogHeader className='px-6 py-4 border-b'>
-              <DialogTitle>{editing ? 'Edit Video' : 'Add Video'}</DialogTitle>
-              <DialogClose
-                onClick={() => {
-                  setIsOpen(false)
-                  setEditing(false)
-                  setEditingId(null)
-                  reset()
-                  setUploadedFiles({ featured_image: '' })
-                }}
-              />
-            </DialogHeader>
-            <div className='flex-1 overflow-y-auto p-6'>
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className='flex flex-col flex-1'
-              >
-                <div className='flex-1 space-y-6'>
-                  <div className='bg-white p-6 rounded-lg shadow-md'>
-                    <div className='space-y-4'>
-                      <div>
-                        <Label required>Title</Label>
-                        <Input
-                          type='text'
-                          placeholder='Video Title'
-                          {...register('title', {
-                            required: 'Title is required'
-                          })}
-                          className='w-full p-2 border rounded'
-                        />
-                        {errors.title && (
-                          <span className='text-red-500 text-sm mt-1 block'>
-                            {errors.title.message}
-                          </span>
-                        )}
-                      </div>
-                      <div>
-                        <Label required>Youtube Link</Label>
-                        <Input
-                          type='url'
-                          placeholder='https://youtube.com/...'
-                          {...register('yt_video_link', {
-                            required: 'Youtube link is required',
-                            pattern: {
-                              value: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/,
-                              message: 'Please enter a valid YouTube URL'
-                            }
-                          })}
-                          className='w-full p-2 border rounded'
-                        />
-                        {errors.yt_video_link && (
-                          <span className='text-red-500 text-sm mt-1 block'>
-                            {errors.yt_video_link.message}
-                          </span>
-                        )}
-                      </div>
+          <Plus className="w-4 h-4" />
+        </Button>
+      </div>
+      <ToastContainer />
 
-                      <div>
-                        <Label required>Description</Label>
-                        <Textarea
-                          placeholder='Video Description'
-                          {...register('description', {
-                            required: 'Description is required'
-                          })}
-                          className='w-full p-2 border rounded min-h-[100px]'
-                          rows={4}
-                        />
-                        {errors.description && (
-                          <span className='text-red-500 text-sm mt-1 block'>
-                            {errors.description.message}
-                          </span>
-                        )}
-                      </div>
-                      <div>
-                        <FileUpload
-                          label='Featured Image'
-                          required={true}
-                          defaultPreview={uploadedFiles.featured_image}
-                          onUploadComplete={(url) => {
-                            setUploadedFiles((prev) => ({
-                              ...prev,
-                              featured_image: url
-                            }))
-                            setValue('featured_image', url, { shouldValidate: true })
-                          }}
-                        />
-                        <input
-                          type='hidden'
-                          {...register('featured_image', { required: 'Featured image is required' })}
-                        />
-                        {errors.featured_image && (
-                          <span className='text-red-500 text-sm mt-1 block'>
-                            {errors.featured_image.message}
-                          </span>
-                        )}
-                      </div>
+      <Dialog
+        isOpen={isOpen}
+        closeOnOutsideClick={false}
+        onClose={() => {
+          setIsOpen(false)
+          setEditing(false)
+          setEditingId(null)
+          reset()
+          setUploadedFiles({ featured_image: '' })
+        }}
+        className='max-w-5xl'
+      >
+        <DialogContent className='max-w-5xl max-h-[90vh] flex flex-col p-0'>
+          <DialogHeader className='px-6 py-4 border-b'>
+            <DialogTitle>{editing ? 'Edit Video' : 'Add Video'}</DialogTitle>
+            <DialogClose
+              onClick={() => {
+                setIsOpen(false)
+                setEditing(false)
+                setEditingId(null)
+                reset()
+                setUploadedFiles({ featured_image: '' })
+              }}
+            />
+          </DialogHeader>
+          <div className='flex-1 overflow-y-auto p-6'>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className='flex flex-col flex-1'
+            >
+              <div className='flex-1 space-y-6'>
+                <div className='bg-white p-6 rounded-md shadow-md'>
+                  <div className='space-y-4'>
+                    <div>
+                      <Label required>Title</Label>
+                      <Input
+                        type='text'
+                        placeholder='Video Title'
+                        {...register('title', {
+                          required: 'Title is required'
+                        })}
+                        className='w-full p-2 border rounded'
+                      />
+                      {errors.title && (
+                        <span className='text-red-500 text-sm mt-1 block'>
+                          {errors.title.message}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <Label required>Youtube Link</Label>
+                      <Input
+                        type='url'
+                        placeholder='https://youtube.com/...'
+                        {...register('yt_video_link', {
+                          required: 'Youtube link is required',
+                          pattern: {
+                            value: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/,
+                            message: 'Please enter a valid YouTube URL'
+                          }
+                        })}
+                        className='w-full p-2 border rounded'
+                      />
+                      {errors.yt_video_link && (
+                        <span className='text-red-500 text-sm mt-1 block'>
+                          {errors.yt_video_link.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div>
+                      <Label required>Description</Label>
+                      <Textarea
+                        placeholder='Video Description'
+                        {...register('description', {
+                          required: 'Description is required'
+                        })}
+                        className='w-full p-2 border rounded min-h-[100px]'
+                        rows={4}
+                      />
+                      {errors.description && (
+                        <span className='text-red-500 text-sm mt-1 block'>
+                          {errors.description.message}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <FileUpload
+                        label='Featured Image'
+                        required={true}
+                        defaultPreview={uploadedFiles.featured_image}
+                        onUploadComplete={(url) => {
+                          setUploadedFiles((prev) => ({
+                            ...prev,
+                            featured_image: url
+                          }))
+                          setValue('featured_image', url, { shouldValidate: true })
+                        }}
+                      />
+                      <input
+                        type='hidden'
+                        {...register('featured_image', { required: 'Featured image is required' })}
+                      />
+                      {errors.featured_image && (
+                        <span className='text-red-500 text-sm mt-1 block'>
+                          {errors.featured_image.message}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Submit Button - Sticky Footer */}
-                <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
-                  <Button type='button'
-                    variant='outline'
-                    onClick={() => setIsOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type='submit'>
-                    {editing ? 'Update Video' : 'Create Video'}
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </DialogContent>
-        </Dialog>
+              {/* Submit Button - Sticky Footer */}
+              <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end gap-2'>
+                <Button type='button'
+                  variant='outline'
+                  onClick={() => setIsOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type='submit'>
+                  {editing ? 'Update Video' : 'Create Video'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-        {/* Table */}
-        <div className='mt-8'>
-          <Table
-            data={videos}
-            columns={columns}
-            pagination={pagination}
-            onPageChange={(newPage) => loadVideos(newPage)}
-            onSearch={handleSearch}
-            showSearch={false}
-          />
-        </div>
+      {/* Table Container */}
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
+        <Table
+          loading={tableLoading}
+          data={videos}
+          columns={columns}
+          pagination={pagination}
+          onPageChange={(newPage) => loadVideos(newPage)}
+          onSearch={handleSearch}
+          showSearch={false}
+        />
       </div>
 
       {/* View Modal */}
@@ -537,7 +532,7 @@ export default function VideoManager() {
           <div className="p-6 space-y-6">
             {/* Featured Image */}
             {viewingVideo?.featured_image && (
-              <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-100 mb-6 border border-gray-200">
+              <div className="w-full h-64 rounded-md overflow-hidden bg-gray-100 mb-6 border border-gray-200">
                 <img
                   src={viewingVideo.featured_image}
                   alt={viewingVideo.title}
@@ -569,7 +564,7 @@ export default function VideoManager() {
 
               <div className="md:col-span-2">
                 <h3 className="text-sm font-medium text-gray-500">Description</h3>
-                <div className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                <div className="mt-1 text-gray-700 bg-gray-50 p-4 rounded-md border border-gray-100">
                   {viewingVideo?.description || "No description provided."}
                 </div>
               </div>
@@ -596,6 +591,7 @@ export default function VideoManager() {
         title='Confirm Deletion'
         message='Are you sure you want to delete this video? This action cannot be undone.'
       />
-    </>
+    </div>
+
   )
 }

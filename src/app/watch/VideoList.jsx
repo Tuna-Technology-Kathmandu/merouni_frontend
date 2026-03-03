@@ -76,7 +76,7 @@ export default function VideoList({ initialData }) {
                     <>
                         <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'>
                             {videos.map((video) => (
-                                <Link href={`/watch/${video.slug}`} key={video.id} className='group block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1'>
+                                <Link href={`/watch/${video.slug}`} key={video.id} className='group block bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1'>
                                     <div className='relative h-48 bg-gray-100 overflow-hidden'>
                                         {video.featured_image ? (
                                             <img
@@ -116,7 +116,7 @@ export default function VideoList({ initialData }) {
                                 <button
                                     onClick={loadMore}
                                     disabled={loading}
-                                    className='px-8 py-3 bg-[#387cae] text-white rounded-xl font-semibold hover:bg-[#2c6590] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl active:scale-95'
+                                    className='px-8 py-3 bg-[#387cae] text-white rounded-md font-semibold hover:bg-[#2c6590] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl active:scale-95'
                                 >
                                     {loading ? 'Loading...' : 'Load More Videos'}
                                 </button>

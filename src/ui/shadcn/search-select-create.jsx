@@ -8,21 +8,29 @@ import { cn } from '@/app/lib/utils'
 
 /**
  * A reusable Search-Select-Create component.
- * 
+ *
  * @param {Object} props
- * @param {Function} props.onSearch - Function to call for searching: (query) => Promise<items[]>
- * @param {Function} props.onCreate - Optional: Function to call for creating: (query) => Promise<newItem>
- * @param {Function} props.onSelect - Function to call when an item is selected: (item) => void
- * @param {Function} props.onRemove - Function to call when an item is removed: (item) => void
+ * @param {Function} props.onSearch        - (query) => Promise<items[]>
+ * @param {Function} props.onCreate        - Optional: (query) => Promise<newItem>
+ * @param {Function} props.onSelect        - Called when an item is selected: (item) => void
+ * @param {Function} props.onRemove        - Called when an item is removed: (item) => void
  * @param {Array|Object} props.selectedItems - Currently selected item(s)
- * @param {string} props.placeholder - Input placeholder
- * @param {string} props.createLabel - Label for the create button
- * @param {string} props.displayKey - Key to use for displaying the item text
- * @param {string} props.valueKey - Key to use for uniquely identifying the item
- * @param {string} props.className - Additional class names for the container
- * @param {boolean} props.isMulti - Whether multiple items can be selected (default: true)
- * @param {boolean} props.allowCreate - Whether to show the create option (default: false)
+ * @param {string} props.placeholder       - Input placeholder
+ * @param {string} props.createLabel       - Label for the create button
+ * @param {string} props.displayKey        - Key to display item text
+ * @param {string} props.valueKey          - Key to uniquely identify item
+ * @param {string} props.className         - Additional container classes
+ * @param {boolean} props.isMulti          - Allow multiple selections (default: true)
+ * @param {boolean} props.allowCreate      - Show create option (default: false)
+ * @param {Function} props.renderItem      - Optional: (item) => JSX — custom dropdown row renderer
+ * @param {Function} props.renderSelected  - Optional: (item) => JSX — custom single-select display
  */
+
+const INPUT_SIZE = {
+    sm: 'h-10',
+    md: 'h-12',
+}
+
 export default function SearchSelectCreate({
     onSearch,
     onCreate,
@@ -36,20 +44,29 @@ export default function SearchSelectCreate({
     className = '',
     isMulti = true,
     allowCreate = false,
-    isLoading: externalLoading = false
+    isLoading: externalLoading = false,
+    renderItem = null,
+    renderSelected = null,
+    /** 'sm' = h-10 (matches standard Input) (default, original), 'md' = h-12  */
+    inputSize = 'sm',
+    /** Extra classes forwarded directly to the <Input> element */
+    inputClassName = '',
 }) {
+    const sizeClass = INPUT_SIZE[inputSize] ?? INPUT_SIZE.md
     const [query, setQuery] = useState('')
     const [results, setResults] = useState([])
     const [isSearching, setIsSearching] = useState(false)
 
-    // Combine internal and external loading states
     const loading = isSearching || externalLoading
     const [showDropdown, setShowDropdown] = useState(false)
     const dropdownRef = useRef(null)
     const searchTimeout = useRef(null)
 
-    // Helper to get selected item(s) regardless of input format
+    // Normalise selectedItems into an array
     const currentSelected = Array.isArray(selectedItems) ? selectedItems : (selectedItems ? [selectedItems] : [])
+
+    // Whether the rich custom panel is visible (single-select + renderSelected + item selected + no active query)
+    const showCustomPanel = !isMulti && currentSelected.length > 0 && !!renderSelected && query.length === 0
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -117,7 +134,9 @@ export default function SearchSelectCreate({
     return (
         <div className={cn('relative w-full', className)} ref={dropdownRef}>
             <div className="relative">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4 z-10 pointer-events-none" />
+
+                {/* Text input — hidden (but in DOM) when the custom panel is rendered */}
                 <Input
                     type="text"
                     value={query}
@@ -125,36 +144,64 @@ export default function SearchSelectCreate({
                     onFocus={() => handleSearch(query)}
                     placeholder={!isMulti && currentSelected.length > 0 ? (currentSelected[0][displayKey] || currentSelected[0]) : placeholder}
                     className={cn(
-                        "pl-10 pr-10 h-12 rounded-md border-gray-200 focus:ring-[#387cae]/20 transition-all",
-                        !isMulti && currentSelected.length > 0 && query.length === 0 && "placeholder:text-gray-900 placeholder:font-semibold"
+                        "pl-10 pr-10 rounded-md border-gray-200 focus:ring-[#387cae]/20 transition-all",
+                        sizeClass,
+                        !isMulti && currentSelected.length > 0 && query.length === 0 && "placeholder:text-gray-900 placeholder:font-semibold",
+                        // When custom panel visible: hide input but keep it in DOM (to receive focus on Click)
+                        showCustomPanel && 'opacity-0 absolute inset-0 pointer-events-none',
+                        inputClassName
                     )}
                 />
 
-                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                    {loading ? (
-                        <Loader2 className="h-4 w-4 animate-spin text-[#387cae]" />
-                    ) : !isMulti && currentSelected.length > 0 && query.length === 0 ? (
+                {/* ── Custom selected display (renderSelected mode) ── */}
+                {showCustomPanel && (
+                    <div
+                        className={cn(
+                            "flex items-center pl-10 pr-4 rounded-md border border-gray-200 bg-white cursor-pointer gap-2 overflow-hidden",
+                            sizeClass
+                        )}
+                        onClick={() => { setShowDropdown(true); handleSearch('') }}
+                    >
+                        <div className="flex-1 min-w-0">{renderSelected(currentSelected[0])}</div>
+                        {/* Single clear button — only one X exists here */}
                         <button
                             type="button"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onRemove(currentSelected[0]);
-                            }}
-                            className="text-gray-400 hover:text-red-500 transition-colors"
+                            onClick={(e) => { e.stopPropagation(); onRemove(currentSelected[0]) }}
+                            className="text-gray-400 hover:text-red-500 transition-colors shrink-0 p-1 rounded"
                         >
                             <X className="h-4 w-4" />
                         </button>
-                    ) : (
-                        <ChevronDown className={cn(
-                            "h-4 w-4 text-gray-400 transition-transform duration-200",
-                            showDropdown && "rotate-180"
-                        )} />
-                    )}
-                </div>
+                    </div>
+                )}
+
+                {/* ── Absolute controls (loader / X / chevron) — hidden when custom panel owns the X ── */}
+                {!showCustomPanel && (
+                    <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                        {loading ? (
+                            <Loader2 className="h-4 w-4 animate-spin text-[#387cae]" />
+                        ) : !isMulti && currentSelected.length > 0 && query.length === 0 ? (
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    onRemove(currentSelected[0])
+                                }}
+                                className="text-gray-400 hover:text-red-500 transition-colors"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        ) : (
+                            <ChevronDown className={cn(
+                                "h-4 w-4 text-gray-400 transition-transform duration-200",
+                                showDropdown && "rotate-180"
+                            )} />
+                        )}
+                    </div>
+                )}
             </div>
 
             {showDropdown && (
-                <div className="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
                     <div className="max-h-60 overflow-y-auto custom-scrollbar">
                         {results.length > 0 ? (
                             results.map((item, index) => {
@@ -168,10 +215,14 @@ export default function SearchSelectCreate({
                                             isSelected ? 'bg-gray-50 cursor-default opacity-60' : 'hover:bg-[#387cae]/5'
                                         )}
                                     >
-                                        <span className="text-sm font-medium text-gray-700">
-                                            {typeof item === 'object' ? (item[displayKey] || item.name || '') : item}
-                                        </span>
-                                        {isSelected && <Check className="h-4 w-4 text-[#387cae]" />}
+                                        {renderItem ? (
+                                            <div className="flex-1 min-w-0">{renderItem(item)}</div>
+                                        ) : (
+                                            <span className="text-sm font-medium text-gray-700">
+                                                {typeof item === 'object' ? (item[displayKey] || item.name || '') : item}
+                                            </span>
+                                        )}
+                                        {isSelected && <Check className="h-4 w-4 text-[#387cae] shrink-0 ml-2" />}
                                     </div>
                                 )
                             })
@@ -193,7 +244,7 @@ export default function SearchSelectCreate({
                                 <Button
                                     type="button"
                                     variant="ghost"
-                                    className="w-full justify-start gap-2 h-10 text-[#387cae] hover:text-[#387cae]/90 hover:bg-[#387cae]/5 rounded-lg text-xs font-bold"
+                                    className="w-full justify-start gap-2 h-10 text-[#387cae] hover:text-[#387cae]/90 hover:bg-[#387cae]/5 rounded-md text-xs font-bold"
                                 >
                                     <Plus className="h-4 w-4" />
                                     {createLabel} "{query}"
@@ -208,7 +259,7 @@ export default function SearchSelectCreate({
                     {currentSelected.map((item, index) => (
                         <div
                             key={item[valueKey] || index}
-                            className="bg-[#387cae]/10 text-[#387cae] px-3 py-1.5 rounded-lg text-xs font-bold border border-[#387cae]/20 flex items-center gap-2 group animate-in slide-in-from-left-2 duration-200"
+                            className="bg-[#387cae]/10 text-[#387cae] px-3 py-1.5 rounded-md text-xs font-bold border border-[#387cae]/20 flex items-center gap-2 group animate-in slide-in-from-left-2 duration-200"
                         >
                             {typeof item === 'object' ? (item[displayKey] || item.name || '') : item}
                             <button

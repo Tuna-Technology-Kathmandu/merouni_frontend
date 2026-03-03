@@ -112,12 +112,23 @@ const RelatedSchools = ({ college }) => {
                 className='flex-shrink-0'
               >
                 <div className='cursor-pointer p-2 sm:p-4 w-48 sm:w-56 md:w-64'>
-                  <div className='flex justify-center border-2 rounded-2xl sm:rounded-3xl items-center overflow-hidden mb-2 p-2 sm:p-4'>
-                    <img
-                      src={college.logo}
-                      alt={college.name}
-                      className='w-36 h-36 sm:w-40 sm:h-40 md:w-48 md:h-48 object-cover'
-                    />
+                  <div className='flex justify-center border-2 rounded-2xl sm:rounded-3xl items-center overflow-hidden mb-2 p-2 sm:p-4 bg-gray-50/50 aspect-square'>
+                    {college.logo ? (
+                      <img
+                        src={college.logo}
+                        alt={college.name}
+                        className='w-full h-full object-contain'
+                        onError={(e) => {
+                          e.target.style.display = 'none'
+                          e.target.nextSibling.style.display = 'flex'
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className={`${college.logo ? 'hidden' : 'flex'} w-full h-full items-center justify-center text-4xl sm:text-5xl font-bold bg-[#387cae]/10 text-[#387cae]`}
+                    >
+                      {college.name?.charAt(0) || '?'}
+                    </div>
                   </div>
                   <div className='px-2 sm:px-4 pb-2 sm:pb-4 flex flex-col'>
                     <h3 className='text-sm font-medium text-center line-clamp-2 text-gray-900'>

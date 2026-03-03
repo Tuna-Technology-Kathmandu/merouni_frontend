@@ -6,7 +6,7 @@ import Image from 'next/image'
 
 const SkillCourseCard = ({ course }) => {
     return (
-        <article className='bg-white rounded-xl border border-gray-100 overflow-hidden flex flex-col hover:border-gray-300 hover:shadow-lg transition-all duration-300 group h-full'>
+        <article className='bg-white rounded-md border border-gray-100 overflow-hidden flex flex-col hover:border-gray-300 hover:shadow-lg transition-all duration-300 group h-full'>
             <div className='relative h-48 w-full bg-gray-100 overflow-hidden'>
                 {course.thumbnail_image ? (
                     <Image
@@ -48,7 +48,7 @@ const SkillCourseCard = ({ course }) => {
                 <div className='mt-auto pt-4 border-t border-gray-100'>
                     <Link
                         href={`/skill-based-courses/${course.slug}`}
-                        className='block w-full py-2.5 rounded-lg text-center text-sm font-semibold text-white bg-[#387cae] hover:bg-[#2c6590] transition-colors shadow-sm hover:shadow active:scale-[0.98]'
+                        className='block w-full py-2.5 rounded-md text-center text-sm font-semibold text-white bg-[#387cae] hover:bg-[#2c6590] transition-colors shadow-sm hover:shadow active:scale-[0.98]'
                     >
                         View Details
                     </Link>

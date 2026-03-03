@@ -197,7 +197,7 @@ export default ImageSection
 //           </div>
 //         </div>
 
-//         <div className="space-y-4 text-[#b0b2c3] fixed left-8 top-[30%] md:-translate-y-1 bg-white p-2 rounded-xl flex items-center flex-col">
+//         <div className="space-y-4 text-[#b0b2c3] fixed left-8 top-[30%] md:-translate-y-1 bg-white p-2 rounded-md flex items-center flex-col">
 //           <div className="text-black font-bold text-sm">Share</div>
 //           <img src="/images/fb.png" alt="Facebook" className="w-6" />
 //           <img src="/images/insta.png" alt="Instagram" className="w-6" />

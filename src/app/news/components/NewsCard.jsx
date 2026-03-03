@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 const NewsCard = ({ image, title, description, date, slug }) => {
     return (
-        <div className='bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col group'>
+        <div className='bg-white rounded-md shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col group'>
             {/* Image */}
             <div className='relative h-48 w-full overflow-hidden'>
                 <Image

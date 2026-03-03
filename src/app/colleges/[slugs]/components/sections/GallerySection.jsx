@@ -40,7 +40,7 @@ const GallerySection = ({ college }) => {
   }
 
   return (
-    <div className='bg-white rounded-xl border p-6'>
+    <div className='bg-white rounded-md border p-6'>
       <h2 className='text-xl font-bold text-gray-900 mb-6'>Gallery</h2>
 
       {/* Images Grid */}
@@ -50,7 +50,7 @@ const GallerySection = ({ college }) => {
           <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
             {images.map((photo, index) => (
               <div
-                className='group relative aspect-square rounded-lg overflow-hidden cursor-pointer bg-gray-100'
+                className='group relative aspect-square rounded-md overflow-hidden cursor-pointer bg-gray-100'
                 onClick={() => setSelectedImage(photo.file_url)}
                 key={index}
               >
@@ -76,7 +76,7 @@ const GallerySection = ({ college }) => {
           <h3 className='text-sm font-medium text-gray-500 mb-4 uppercase tracking-wider'>Videos</h3>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
             {videos.map((item, index) => (
-              <div key={index} className='rounded-lg overflow-hidden bg-gray-100 border'>
+              <div key={index} className='rounded-md overflow-hidden bg-gray-100 border'>
                 <div className='relative w-full pt-[56.25%]'>
                   <iframe
                     src={item.file_url}

@@ -45,13 +45,13 @@ const MaterialItem = ({ material }) => {
         </h3>
 
         <div className='flex items-center gap-3 pt-4 border-t border-gray-50'>
-      
+
 
           {/* Download Button */}
           <button
             onClick={handleDownload}
             disabled={downloading}
-            className='flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0A70A7] text-white font-semibold text-sm hover:bg-[#085a85] active:scale-95 transition-all disabled:opacity-70 disabled:cursor-not-allowed'
+            className='flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-md bg-[#0A70A7] text-white font-semibold text-sm hover:bg-[#085a85] active:scale-95 transition-all disabled:opacity-70 disabled:cursor-not-allowed'
           >
             {downloading ? (
               <Loader2 size={14} className="animate-spin" />

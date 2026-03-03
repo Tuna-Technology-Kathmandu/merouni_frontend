@@ -23,7 +23,7 @@ const ImageGallery = ({ images, title = 'Campus Gallery', universityName }) => {
           {images.map((img, idx) => (
             <div
               key={idx}
-              className='group relative aspect-square rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500 border border-white hover:-translate-y-1'
+              className='group relative aspect-square rounded-md overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500 border border-white hover:-translate-y-1'
               onClick={() => setSelectedImage(img)}
             >
               <img

@@ -16,6 +16,7 @@ import CreateUpdateConsultancy from '@/ui/molecules/dialogs/CreateUpdateConsulta
 import ViewConsultancy from '@/ui/molecules/dialogs/ViewConsultancy'
 import CreateConsultencyUser from '@/ui/molecules/dialogs/CreateConsultencyUser'
 import EditConsultancyPage from './EditConsultancyPage'
+import ImageLightbox from '@/ui/molecules/image-lightbox'
 import { authFetch } from '@/app/utils/authFetch'
 import { deleteConsultancy } from './actions'
 import { formatDate } from '@/utils/date.util'
@@ -51,6 +52,21 @@ export default function ConsultancyManager() {
     totalPages: 1,
     totalCount: 0
   })
+
+  // Lightbox State
+  const [lightbox, setLightbox] = useState({
+    isOpen: false,
+    imageUrl: '',
+    altText: ''
+  })
+
+  const handleImageClick = (imageUrl, altText) => {
+    setLightbox({
+      isOpen: true,
+      imageUrl,
+      altText: altText || 'Consultancy Logo'
+    })
+  }
 
   useEffect(() => {
     setHeading('Consultancy Management')
@@ -140,14 +156,29 @@ export default function ConsultancyManager() {
       cell: ({ row }) => (
         <div className="flex items-center gap-3">
           {row.original.logo && (
-            <img src={row.original.logo} alt="" className="w-8 h-8 rounded-md object-contain border bg-gray-50" />
+            <img
+              src={row.original.logo}
+              alt=""
+              className="w-8 h-8 rounded-md object-contain border bg-gray-50 cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => handleImageClick(row.original.logo, row.original.title)}
+            />
           )}
           <span className="font-medium text-gray-900">{row.original.title}</span>
         </div>
       )
     },
     {
-      header: 'Locations',
+      header: 'Consultancy Location',
+      accessorKey: 'address',
+      cell: ({ row }) => {
+        const address = typeof row.original.address === 'string'
+          ? JSON.parse(row.original.address)
+          : row.original.address || {}
+        return <span className="text-gray-600 italic text-xs">{address.city || 'N/A'}</span>
+      }
+    },
+    {
+      header: "Student's Destination",
       accessorKey: 'destination',
       cell: ({ row }) => {
         let dests = row.original.destination
@@ -159,7 +190,7 @@ export default function ConsultancyManager() {
         return (
           <div className="flex flex-wrap gap-1">
             {dests.slice(0, 2).map((d, i) => (
-              <span key={i} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-bold uppercase tracking-tight">
+              <span key={i} className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-bold uppercase tracking-tight border border-blue-100">
                 {typeof d === 'string' ? d : d.country}
               </span>
             ))}
@@ -218,10 +249,10 @@ export default function ConsultancyManager() {
   ], [])
 
   return (
-    <div className='w-full space-y-4 p-4'>
+    <div className='w-full '>
       <ToastContainer />
 
-      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border'>
+      <div className='flex flex-col mb-3 sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
         <SearchInput
           value={searchQuery}
           onChange={(e) => handleSearchInput(e.target.value)}
@@ -234,7 +265,7 @@ export default function ConsultancyManager() {
         </Button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="bg-white rounded-md shadow-sm border overflow-hidden">
         <Table
           loading={tableLoading}
           data={consultancies}
@@ -274,6 +305,13 @@ export default function ConsultancyManager() {
         onConfirm={handleDeleteConfirm}
         title='Confirm Deletion'
         message='Are you sure you want to delete this consultancy? This action cannot be undone.'
+      />
+
+      <ImageLightbox
+        isOpen={lightbox.isOpen}
+        onClose={() => setLightbox({ ...lightbox, isOpen: false })}
+        imageUrl={lightbox.imageUrl}
+        altText={lightbox.altText}
       />
     </div>
   )

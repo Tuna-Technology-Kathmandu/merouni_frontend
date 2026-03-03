@@ -1,6 +1,5 @@
 import { authFetch } from '@/app/utils/authFetch'
-
-export async function createCollege(data) {
+export async function createOrUpdateCollege(data) {
   const response = await authFetch(
     `${process.env.baseUrl}/college`,
     {
@@ -12,14 +11,38 @@ export async function createCollege(data) {
     }
   )
 
+  const result = await response.json() // Always parse once
+
+  console.log("API response:", result)
+
+  if (!response.ok) {
+    console.error("API error:", result)
+    throw new Error(result.message || "Something went wrong")
+  }
+
+  return result
+}
+export async function saveDraft(data) {
+  const response = await authFetch(
+    `${process.env.baseUrl}/college/save-as-draft`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }
+  )
 
   if (!response.ok) {
     const error = await response.json()
-    throw new Error(error.message || 'Failed to create college')
+    throw new Error(error.message || 'Failed to save draft')
   }
 
   return response.json()
 }
+
+
 
 export const fetchUniversities = async (searchQuery = '') => {
   try {
@@ -85,6 +108,23 @@ export const fetchAllUniversity = async () => {
     throw error
   }
 }
+
+export const getProgramsByUniversity = async (universityIds) => {
+  try {
+    const response = await authFetch(
+      `${process.env.baseUrl}/program?universityIds=${universityIds.join(',')}`
+    )
+    if (!response.ok) {
+      throw new Error('Failed to fetch programs')
+    }
+    const data = await response.json()
+    return data.items
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
 
 export const getUniversityBySlug = async (slug) => {
   try {

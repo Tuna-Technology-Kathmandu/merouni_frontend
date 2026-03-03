@@ -98,7 +98,7 @@ const WishlistPage = () => {
 
   return (
     <div className='p-4'>
-      <div className='bg-white rounded-xl shadow p-4'>
+      <div className='bg-white rounded-md shadow p-4'>
         <h2 className='text-lg font-semibold mb-2'>Your Wishlist</h2>
         <p className='text-sm text-gray-600 mb-3'>
           Colleges you&apos;ve saved for later.
@@ -107,7 +107,7 @@ const WishlistPage = () => {
         {loading && (
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
             {[...Array(6)].map((_, i) => (
-              <div key={i} className='border rounded-lg p-4'>
+              <div key={i} className='border rounded-md p-4'>
                 <div className='flex items-center gap-4'>
                   <Skeleton className='w-16 h-16 rounded flex-shrink-0' />
                   <div className='flex-1 space-y-2'>
@@ -137,7 +137,7 @@ const WishlistPage = () => {
                     return (
                       <div
                         key={item.id}
-                        className='relative border rounded-lg hover:shadow-md transition-shadow hover:bg-gray-50 group'
+                        className='relative border rounded-md hover:shadow-md transition-shadow hover:bg-gray-50 group'
                       >
                         <Link
                           href={`/colleges/${item.college?.slugs || '#'}`}
@@ -198,7 +198,7 @@ const WishlistPage = () => {
                     return (
                       <div
                         key={item.id}
-                        className='relative border rounded-lg hover:shadow-md transition-shadow hover:bg-gray-50 group'
+                        className='relative border rounded-md hover:shadow-md transition-shadow hover:bg-gray-50 group'
                       >
                         <Link
                           href={`/consultancy/${item.consultancy?.slugs || '#'

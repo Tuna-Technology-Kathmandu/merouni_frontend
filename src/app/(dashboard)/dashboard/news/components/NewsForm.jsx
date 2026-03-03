@@ -6,7 +6,7 @@ import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
-import FileUpload from '../../addCollege/FileUpload'
+import FileUpload from '../../colleges/FileUpload'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 import { authFetch } from '@/app/utils/authFetch'
@@ -14,7 +14,7 @@ import { Image as ImageIcon, Info, Layers, Loader2, Settings } from 'lucide-reac
 
 const SectionHeader = ({ icon: Icon, title, subtitle }) => (
   <div className="flex items-center gap-3 mb-6">
-    <div className="w-10 h-10 rounded-xl bg-[#387cae]/10 flex items-center justify-center text-[#387cae] shadow-sm border border-[#387cae]/20">
+    <div className="w-10 h-10 rounded-md bg-[#387cae]/10 flex items-center justify-center text-[#387cae] shadow-sm border border-[#387cae]/20">
       <Icon size={20} />
     </div>
     <div>
@@ -163,9 +163,6 @@ export default function NewsForm({
     if (!data.category_id) {
       newErrors.category_id = 'Category is required'
     }
-    if (!uploadedFiles.featured_image) {
-      newErrors.featured_image = 'Featured image is required'
-    }
     const descriptionText = (data.description || '').replace(/<[^>]*>/g, '').trim()
     if (!descriptionText) {
       newErrors.description = 'Description is required'
@@ -259,7 +256,7 @@ export default function NewsForm({
 
                     <div className="pt-2">
                       <Label required>Description / Body</Label>
-                      <div className={formErrors.description ? 'ring-2 ring-red-400/40 rounded-xl mt-2' : 'mt-2'}>
+                      <div className={formErrors.description ? 'ring-2 ring-red-400/40 rounded-md mt-2' : 'mt-2'}>
                         <TipTapEditor
                           value={watch('description')}
                           onChange={(data) => {
@@ -282,8 +279,8 @@ export default function NewsForm({
               <div className="lg:col-span-4 space-y-8">
                 {/* Featured Image Section */}
                 <div className={`bg-white p-6 rounded-2xl shadow-sm border ${formErrors.featured_image ? 'border-red-300' : 'border-gray-100'}`}>
-                  <SectionHeader icon={ImageIcon} title="Featured Image" subtitle="Required — main image for the news" />
-                  <div className={`p-4 bg-gray-50 rounded-xl border border-dashed ${formErrors.featured_image ? 'border-red-300 bg-red-50/30' : 'border-gray-100'}`}>
+                  <SectionHeader icon={ImageIcon} title="Featured Image" subtitle="Optional — main image for the news" />
+                  <div className={`p-4 bg-gray-50 rounded-md border border-dashed ${formErrors.featured_image ? 'border-red-300 bg-red-50/30' : 'border-gray-100'}`}>
                     <FileUpload
                       label=''
                       onUploadComplete={(url) => {
@@ -315,7 +312,7 @@ export default function NewsForm({
                       </select>
                     </div>
 
-                   
+
                   </div>
                 </div>
               </div>

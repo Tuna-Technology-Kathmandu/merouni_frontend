@@ -24,7 +24,7 @@ export function UserTableClient({ users }) {
         </Button>
       </div>
 
-      <div className='bg-white rounded-lg shadow overflow-hidden'>
+      <div className='bg-white rounded-md shadow overflow-hidden'>
         <div className='overflow-x-auto'>
           <table className='min-w-full'>
             <thead>

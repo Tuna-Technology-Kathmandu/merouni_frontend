@@ -33,7 +33,7 @@ const AdLayout = ({ banners = [], size = '', number = 1, loading = false }) => {
         {displayBanners.map((banner, index) => (
           <div
             key={index}
-            className={`w-full sm:w-[350px] lg:w-[340px] xl:w-full rounded-lg overflow-hidden ${!banner ? 'bg-gray-100' : ''}`}
+            className={`w-full sm:w-[350px] lg:w-[340px] xl:w-full rounded-md overflow-hidden ${!banner ? 'bg-gray-100' : ''}`}
           >
             {banner ? (
               <a
@@ -54,7 +54,7 @@ const AdLayout = ({ banners = [], size = '', number = 1, loading = false }) => {
                 />
               </a>
             ) : (
-              <div className='group relative w-full h-[44px] md:h-[58px] lg:h-[70px] flex items-center justify-center text-gray-400 text-xs font-medium bg-gray-50 rounded-lg overflow-hidden cursor-pointer'>
+              <div className='group relative w-full h-[44px] md:h-[58px] lg:h-[70px] flex items-center justify-center text-gray-400 text-xs font-medium bg-gray-50 rounded-md overflow-hidden cursor-pointer'>
                 <span className='group-hover:opacity-0 transition-opacity duration-200'>Ads place available</span>
                 <Link
                   href='/contact'

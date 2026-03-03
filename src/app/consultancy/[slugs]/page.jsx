@@ -147,7 +147,7 @@ const ConsultancyDetailPage = ({ params }) => {
             <p className='text-gray-600 mb-6'>{error}</p>
             <button
               onClick={() => router.push('/consultancy')}
-              className='bg-[#0A6FA7] hover:bg-[#085e8a] text-white px-6 py-3 rounded-xl font-semibold transition-colors'
+              className='bg-[#0A6FA7] hover:bg-[#085e8a] text-white px-6 py-3 rounded-md font-semibold transition-colors'
             >
               Back to Consultancies
             </button>
@@ -174,7 +174,7 @@ const ConsultancyDetailPage = ({ params }) => {
             </p>
             <button
               onClick={() => router.push('/consultancy')}
-              className='bg-[#0A6FA7] hover:bg-[#085e8a] text-white px-6 py-3 rounded-xl font-semibold transition-colors'
+              className='bg-[#0A6FA7] hover:bg-[#085e8a] text-white px-6 py-3 rounded-md font-semibold transition-colors'
             >
               Back to Consultancies
             </button>

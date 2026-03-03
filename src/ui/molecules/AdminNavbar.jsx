@@ -190,7 +190,7 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
       <div className='flex items-center gap-3'>
         <button
           onClick={onMenuClick}
-          className='md:hidden p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors'
+          className='md:hidden p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors'
           aria-label="Open menu"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -223,7 +223,7 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
 
           {/* Suggestions Dropdown */}
           {searchQuery.trim() !== '' && (
-            <div className='absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200'>
+            <div className='absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2 duration-200'>
               <div className='max-h-[70vh] overflow-y-auto p-1.5 custom-scrollbar'>
                 {(() => {
                   let totalMatches = 0
@@ -264,7 +264,7 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
                                       setSearchQuery('')
                                       setInputValue('')
                                     }}
-                                    className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 rounded-lg transition-colors'
+                                    className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 rounded-md transition-colors'
                                     style={{ '--theme-blue': THEME_BLUE }}
                                     onMouseEnter={(e) => {
                                       e.currentTarget.style.backgroundColor = `${THEME_BLUE}10`;
@@ -301,7 +301,7 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
                                   setSearchQuery('')
                                   setInputValue('')
                                 }}
-                                className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 rounded-lg transition-colors'
+                                className='group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-700 rounded-md transition-colors'
                                 style={{ '--theme-blue': THEME_BLUE }}
                                 onMouseEnter={(e) => {
                                   e.currentTarget.style.backgroundColor = `${THEME_BLUE}10`;
@@ -360,7 +360,7 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
         <div className='relative' ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className='flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg p-1'
+            className='flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-md p-1'
             style={{ '--tw-ring-color': THEME_BLUE }}
           >
             <div
@@ -403,12 +403,12 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
 
           {/* Dropdown Menu */}
           {isDropdownOpen && (
-            <div className='absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-gray-200 py-1.5 z-50 ring-1 ring-black ring-opacity-5 animate-in fade-in zoom-in-95 duration-100'>
+            <div className='absolute right-0 mt-2 w-60 bg-white rounded-md shadow-xl border border-gray-200 py-1.5 z-50 ring-1 ring-black ring-opacity-5 animate-in fade-in zoom-in-95 duration-100'>
               <div className='px-1.5'>
                 <Link
                   href='/dashboard/profile'
                   onClick={() => setIsDropdownOpen(false)}
-                  className='group flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-all duration-200'
+                  className='group flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md transition-all duration-200'
                   style={{ '--theme-blue': THEME_BLUE }}
                 >
                   <FaUser
@@ -425,7 +425,7 @@ const AdminNavbar = ({ onMenuClick, searchQuery, setSearchQuery }) => {
 
                 <button
                   onClick={handleLogoutClick}
-                  className='w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-all duration-200 group'
+                  className='w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-md transition-all duration-200 group'
                 >
                   <FaSignOutAlt className='w-4 h-4 text-gray-500 group-hover:text-red-500 transition-colors' />
                   <span>Logout</span>

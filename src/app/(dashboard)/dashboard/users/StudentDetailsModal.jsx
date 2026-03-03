@@ -45,7 +45,7 @@ export default function StudentDetailsModal({ isOpen, onClose, student }) {
             </div>
           </div>
 
-          <div className='bg-gray-50 rounded-xl p-5 border border-gray-100 space-y-4'>
+          <div className='bg-gray-50 rounded-md p-5 border border-gray-100 space-y-4'>
             <div className='flex items-center gap-3 text-gray-600'>
               <Mail className='w-4 h-4 text-gray-400 shrink-0' />
               <span className='text-sm font-medium'>{student.email || 'N/A'}</span>
@@ -66,7 +66,7 @@ export default function StudentDetailsModal({ isOpen, onClose, student }) {
               Uploaded CV
             </h4>
             {student.cvUrl ? (
-              <div className='flex items-center justify-between p-3 bg-blue-50 border border-blue-100 rounded-lg'>
+              <div className='flex items-center justify-between p-3 bg-blue-50 border border-blue-100 rounded-md'>
                 <div className='flex items-center gap-3 overflow-hidden'>
                   <div className='p-2 bg-white rounded shadow-sm shrink-0'>
                     <FileText className='w-5 h-5 text-blue-600' />
@@ -76,7 +76,7 @@ export default function StudentDetailsModal({ isOpen, onClose, student }) {
                     <p className='text-xs text-blue-600'>Tap to view file</p>
                   </div>
                 </div>
-                <Button 
+                <Button
                   onClick={() => window.open(student.cvUrl, '_blank')}
                   className='bg-blue-600 hover:bg-blue-700 text-white shadow-sm shrink-0 ml-4'
                   size='sm'
@@ -85,7 +85,7 @@ export default function StudentDetailsModal({ isOpen, onClose, student }) {
                 </Button>
               </div>
             ) : (
-              <div className='p-4 bg-gray-50 border border-gray-200 border-dashed rounded-lg text-center flex flex-col items-center justify-center gap-2'>
+              <div className='p-4 bg-gray-50 border border-gray-200 border-dashed rounded-md text-center flex flex-col items-center justify-center gap-2'>
                 <div className='p-2 bg-white rounded-full shadow-sm'>
                   <FileText className='w-5 h-5 text-gray-400' />
                 </div>

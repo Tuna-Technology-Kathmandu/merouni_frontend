@@ -16,13 +16,13 @@ const UserCard = ({ type, value, loading }) => {
       case 'users':
         return '/dashboard/users'
       case 'college':
-        return '/dashboard/addCollege'
+        return '/dashboard/colleges'
       case 'university':
         return '/dashboard/university'
       case 'consultancy':
         return '/dashboard/consultancy'
       case 'agents':
-        return '/dashboard/agent'
+        return '/dashboard/users?role=agent'
       case 'events':
         return '/dashboard/events'
       case 'referrals':
@@ -148,7 +148,7 @@ const UserCard = ({ type, value, loading }) => {
             {displayValue}
           </h1>
         </div>
-        <div className={`flex items-center justify-center w-11 h-11 rounded-xl ${bgColor} ${iconColor} transition-transform duration-200 group-hover:scale-110`}>
+        <div className={`flex items-center justify-center w-11 h-11 rounded-md ${bgColor} ${iconColor} transition-transform duration-200 group-hover:scale-110`}>
           {icon}
         </div>
       </div>

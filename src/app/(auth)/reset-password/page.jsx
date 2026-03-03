@@ -116,7 +116,7 @@ const ResetPassword = () => {
               name='email'
               value={formData.email}
               readOnly
-              className='w-full px-4 py-3 border bg-gray-50 rounded-xl focus:outline-none cursor-not-allowed text-sm text-gray-500'
+              className='w-full px-4 py-3 border bg-gray-50 rounded-md focus:outline-none cursor-not-allowed text-sm text-gray-500'
             />
           </div>
 
@@ -130,7 +130,7 @@ const ResetPassword = () => {
               required
               maxLength={6}
               placeholder='XXXXXX'
-              className='w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm'
+              className='w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm'
             />
           </div>
 
@@ -143,7 +143,7 @@ const ResetPassword = () => {
                 placeholder='••••••••'
                 value={formData.newPassword}
                 onChange={handleChange}
-                className='w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm'
+                className='w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm'
               />
               <button
                 type='button'
@@ -164,7 +164,7 @@ const ResetPassword = () => {
                 placeholder='••••••••'
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm ${passwordError ? 'border-red-500 bg-red-50/20' : ''}`}
+                className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#0A6FA7] transition-all text-sm ${passwordError ? 'border-red-500 bg-red-50/20' : ''}`}
               />
               <button
                 type='button'
@@ -182,7 +182,7 @@ const ResetPassword = () => {
           <button
             type='submit'
             disabled={loading}
-            className='w-full py-3.5 px-6 bg-[#0A6FA7] text-white rounded-xl font-bold hover:bg-[#085a86] transition-all shadow-md active:scale-[0.98] disabled:opacity-50 mt-4 text-sm'
+            className='w-full py-3.5 px-6 bg-[#0A6FA7] text-white rounded-md font-bold hover:bg-[#085a86] transition-all shadow-md active:scale-[0.98] disabled:opacity-50 mt-4 text-sm'
           >
             {loading ? 'Resetting...' : 'Reset Password'}
           </button>

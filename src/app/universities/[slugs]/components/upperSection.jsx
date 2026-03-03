@@ -4,14 +4,14 @@ import { LiaUniversitySolid } from 'react-icons/lia'
 import { FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa'
 import { ImCross } from 'react-icons/im'
 import { IoMdMail } from 'react-icons/io'
+import Link from 'next/link'
+import { FaArrowLeft } from 'react-icons/fa'
 import he from 'he'
 import MemberSection from './MemberSection'
 import VideoSection from './VideoSection'
 import LevelSections from './LevelSections'
 import ImageGallery from './Gallery'
 import MapSection from './MapSection'
-import { formatDate } from '@/utils/date.util'
-
 const UpperSection = ({ university }) => {
 
   console.log(university, "universityuniversityuniversity")
@@ -19,7 +19,16 @@ const UpperSection = ({ university }) => {
     <div className='flex flex-col items-center'>
       {/* Top Section (Already Styled) */}
 
-      <div className='w-full'>
+      <div className='w-full relative'>
+        <div className='absolute top-6 left-6 md:left-24 z-10'>
+          <Link
+            href='/universities'
+            className='inline-flex items-center gap-2 px-4 py-2 bg-black/30 hover:bg-black/50 backdrop-blur-md text-white rounded-full text-sm font-medium transition-all shadow-lg border border-white/20'
+          >
+            <FaArrowLeft className='w-3 h-3' />
+            <span>Back to Universities</span>
+          </Link>
+        </div>
         <img
           src={
             university?.featured_image !== ''
@@ -60,7 +69,7 @@ const UpperSection = ({ university }) => {
               Established
             </p>
             <p className='text-sm text-gray-700'>
-              {formatDate(university?.date_of_establish) || 'N/A'}
+              {university?.date_of_establish ?? 'N/A'}
             </p>
           </div>
 
@@ -130,7 +139,7 @@ const UpperSection = ({ university }) => {
       </div>
 
       {/* About Section */}
-      <div className='rounded-xl p-8 w-full lg:w-[80%] mb-12 max-md:mb-7 px-[75px] max-md:px-[30px]'>
+      <div className='rounded-md p-8 w-full lg:w-[80%] mb-12 max-md:mb-7 px-[75px] max-md:px-[30px]'>
         <h2 className='font-bold text-xl md:text-2xl mb-4'>
           About {university?.fullname}
         </h2>
@@ -143,7 +152,7 @@ const UpperSection = ({ university }) => {
              [&>iframe]:max-w-[calc(100vw-40px)] 
              [&>iframe]:aspect-video 
              [&>iframe]:h-auto
-             [&>iframe]:rounded-lg 
+             [&>iframe]:rounded-md 
              [&>iframe]:mt-4
              [&>iframe]:mx-auto
              [&>iframe]:block
@@ -216,7 +225,7 @@ const UpperSection = ({ university }) => {
                 {university.programs.map((item, idx) => (
                   <li
                     key={item.id || idx}
-                    className="group flex items-center gap-3 rounded-xl bg-white px-5 py-4 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+                    className="group flex items-center gap-3 rounded-md bg-white px-5 py-4 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
                   >
                     <span className="h-2.5 w-2.5 rounded-full bg-[#30AD8F] group-hover:scale-125 transition-transform" />
 

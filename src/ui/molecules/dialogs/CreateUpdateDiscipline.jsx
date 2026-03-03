@@ -8,7 +8,7 @@ import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { Textarea } from '@/ui/shadcn/textarea'
-import FileUpload from '@/app/(dashboard)/dashboard/addCollege/FileUpload'
+import FileUpload from '@/app/(dashboard)/dashboard/colleges/FileUpload'
 import { authFetch } from '@/app/utils/authFetch'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 

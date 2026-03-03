@@ -25,6 +25,7 @@ import {
   MdQuiz,
   MdSchool
 } from 'react-icons/md'
+import { BookOpen } from 'lucide-react'
 import { VscReferences } from 'react-icons/vsc'
 
 export const menuItems = [
@@ -44,6 +45,24 @@ export const menuItems = [
         visible: ['admin', 'editor'],
         submenus: [
           {
+            icon: <HiOutlineUsers className='text-lg' />,
+            label: 'Users',
+            href: '/dashboard/users',
+            visible: ['admin']
+          },
+          {
+            icon: <FaHandshake className='text-lg' />,
+            label: 'Approve Agents',
+            href: '/dashboard/approve-agents',
+            visible: ['admin']
+          },
+          {
+            icon: <FaBuilding className='text-lg' />,
+            label: 'Banner',
+            href: '/dashboard/banner',
+            visible: ['admin', 'editor']
+          },
+          {
             icon: <MdPermContactCalendar className='text-lg' />,
             label: 'Messages',
             href: '/dashboard/contactus',
@@ -59,12 +78,6 @@ export const menuItems = [
             icon: <PlayCircle className='text-lg' />,
             label: 'Videos',
             href: '/dashboard/videos',
-            visible: ['admin', 'editor']
-          },
-          {
-            icon: <FaBuilding className='text-lg' />,
-            label: 'Banner',
-            href: '/dashboard/banner',
             visible: ['admin', 'editor']
           }
         ]
@@ -136,14 +149,14 @@ export const menuItems = [
 
       {
         icon: <IoSchoolSharp className='text-xl' />,
-        label: 'Colleges',
+        label: 'Colleges/Schools',
         href: null, // No direct href, has submenus
         visible: ['admin', 'editor'],
         submenus: [
           {
             icon: <IoSchoolSharp className='text-lg' />,
             label: 'Manage Colleges',
-            href: '/dashboard/addCollege',
+            href: '/dashboard/colleges',
             visible: ['admin', 'editor']
           },
           {
@@ -157,34 +170,41 @@ export const menuItems = [
             label: 'College Orderings',
             href: '/dashboard/college-orderings',
             visible: ['admin', 'editor']
+          },
+           {
+            icon: <SortAsc className='text-lg' />,
+            label: 'School Orderings',
+            href: '/dashboard/school-orderings',
+            visible: ['admin', 'editor']
           }
         ]
       },
       {
         icon: <FaUniversity className='text-xl' />,
         label: 'University',
+        href: '/dashboard/university',
+        visible: ['admin', 'editor']
+      },
+     
+      {
+        icon: <FaHandshake className='text-xl' />,
+        label: 'Consultancy',
         href: null,
         visible: ['admin', 'editor'],
         submenus: [
           {
-            icon: <FaUniversity className='text-lg' />,
-            label: 'Manage Universities',
-            href: '/dashboard/university',
+            icon: <FaHandshake className='text-lg' />,
+            label: 'Manage Consultancy',
+            href: '/dashboard/consultancy',
             visible: ['admin', 'editor']
           },
           {
             icon: <SortAsc className='text-lg' />,
-            label: 'University Orderings',
-            href: '/dashboard/university-orderings',
+            label: 'Consultancy Orderings',
+            href: '/dashboard/consultancy-orderings',
             visible: ['admin', 'editor']
           }
         ]
-      },
-      {
-        icon: <FaHandshake className='text-xl' />,
-        label: 'Consultancy',
-        href: '/dashboard/consultancy',
-        visible: ['admin', 'editor']
       },
       {
         icon: <BsCalendarEvent className='text-xl' />,
@@ -285,13 +305,6 @@ export const menuItems = [
       },
 
       {
-        icon: <HiOutlineUsers className='text-xl' />,
-        label: 'Users',
-        href: '/dashboard/users',
-        visible: ['admin']
-      },
-
-      {
         icon: <Lightbulb className='text-xl' />,
         label: 'Skill Based Courses',
         href: '/dashboard/skills-based-courses',
@@ -333,7 +346,7 @@ export const menuItems = [
         visible: ['admin', 'editor']
       },
       {
-        icon: <FaGraduationCap className='text-xl' />,
+        icon: <BookOpen className='text-xl' />,
         label: 'Program',
         href: '/dashboard/program',
         visible: ['admin', 'editor']
@@ -344,7 +357,7 @@ export const menuItems = [
         href: '/dashboard/degrees',
         visible: ['admin', 'editor']
       },
-      
+
       {
         icon: <HandCoins className='text-xl' />,
         label: 'Set Referral Point',

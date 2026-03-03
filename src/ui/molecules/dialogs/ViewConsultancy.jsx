@@ -62,7 +62,7 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                             {/* Header Section */}
                             <div className='flex flex-col md:flex-row gap-6 items-start'>
                                 {consultancy.logo && (
-                                    <div className='w-24 h-24 rounded-xl border bg-white p-2 flex items-center justify-center shrink-0'>
+                                    <div className='w-24 h-24 rounded-md border bg-white p-2 flex items-center justify-center shrink-0'>
                                         <img
                                             src={consultancy.logo}
                                             alt={consultancy.title}
@@ -110,9 +110,9 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                                     <div className='space-y-3'>
                                         <h4 className='text-xs font-bold uppercase tracking-widest flex items-center gap-2'>
                                             <MapPin className='w-3 h-3' />
-                                            Office Address
+                                            Consultancy's Location
                                         </h4>
-                                        <div className='p-4 bg-gray-50 rounded-xl border text-sm text-gray-700 leading-relaxed font-medium'>
+                                        <div className='p-4 bg-gray-50 rounded-md border text-sm text-gray-700 leading-relaxed font-medium'>
                                             {(() => {
                                                 const addr = typeof consultancy.address === 'string' ? JSON.parse(consultancy.address) : consultancy.address || {}
                                                 return (
@@ -130,7 +130,7 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                                             <Phone className='w-3 h-3' />
                                             Contact Information
                                         </h4>
-                                        <div className='p-4 bg-gray-50 rounded-xl border space-y-2'>
+                                        <div className='p-4 bg-gray-50 rounded-md border space-y-2'>
                                             {(() => {
                                                 const contacts = typeof consultancy.contact === 'string' ? JSON.parse(consultancy.contact) : consultancy.contact || []
                                                 return contacts.filter(Boolean).map((c, i) => (
@@ -149,13 +149,13 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                                     <div className='space-y-3'>
                                         <h4 className='text-xs font-bold uppercase tracking-widest flex items-center gap-2'>
                                             <Globe className='w-3 h-3' />
-                                            Target Countries
+                                            Student's Destination
                                         </h4>
                                         <div className='flex flex-wrap gap-2'>
                                             {(() => {
                                                 const dests = typeof consultancy.destination === 'string' ? JSON.parse(consultancy.destination) : consultancy.destination || []
                                                 return dests.map((d, i) => (
-                                                    <span key={i} className='px-3 py-1.5 bg-gray-100 border text-gray-700 rounded-lg text-xs font-bold uppercase'>
+                                                    <span key={i} className='px-3 py-1.5 bg-gray-100 border text-gray-700 rounded-md text-xs font-bold uppercase'>
                                                         {typeof d === 'string' ? d : d.country}
                                                     </span>
                                                 ))
@@ -170,7 +170,7 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                                         </h4>
                                         <div className='flex flex-wrap gap-2'>
                                             {consultancy.consultancyCourses?.map((course, i) => (
-                                                <span key={i} className='px-3 py-1.5 bg-blue-50/50 border border-blue-100 text-[#387cae] rounded-lg text-xs font-bold'>
+                                                <span key={i} className='px-3 py-1.5 bg-blue-50/50 border border-blue-100 text-[#387cae] rounded-md text-xs font-bold'>
                                                     {course.title}
                                                 </span>
                                             ))}
@@ -187,7 +187,7 @@ export default function ViewConsultancy({ isOpen, onClose, slug }) {
                                         <Info className='w-3 h-3' />
                                         About Consultancy
                                     </h4>
-                                    <div className='p-6 bg-white rounded-xl border shadow-sm prose prose-sm max-w-none text-gray-700 prose-headings:text-gray-900 prose-strong:text-gray-900'
+                                    <div className='p-6 bg-white rounded-md border shadow-sm prose prose-sm max-w-none text-gray-700 prose-headings:text-gray-900 prose-strong:text-gray-900'
                                         dangerouslySetInnerHTML={{ __html: consultancy.description || '<p class="italic">No description available.</p>' }}
                                     />
                                 </div>

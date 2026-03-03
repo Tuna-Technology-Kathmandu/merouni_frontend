@@ -11,46 +11,44 @@ const Description = ({ blog }) => {
   }
 
   return (
-    <>
-      <div className='w-full'>
-        <div
-          className='text-[13px] mt-4 leading-7 max-md:leading-5 md:text-sm lg:text-base text-justify'
-          dangerouslySetInnerHTML={{ __html: blog?.description }}
-        />
+    <div className='max-w-[1000px] mx-auto px-6'>
+      <div
+        className='text-[13px] mt-4 leading-7 max-md:leading-5 md:text-sm lg:text-base text-justify'
+        dangerouslySetInnerHTML={{ __html: blog?.description }}
+      />
 
-        <div
-          className='text-[13px] md:text-sm text-justify lg:text-base mt-4 !leading-7 
-          [&_ul]:list-disc 
-          [&_ol]:list-decimal 
-          [&_li]:ml-10 
-          [&_li]:mb-1 
-          [&_li]:mt-1 
-          !max-w-none 
-          text-black
-          
-          /* Table wrapper styles */
-          [&_.table-wrapper]:overflow-x-auto
-          [&_.table-wrapper]:my-4
-          [&_.table-wrapper]:w-full
-          [&_.table-wrapper]:[scrollbar-width:thin]
-          [&_.table-wrapper]:[scrollbar-color:gray-300_transparent]
-          
-          /* Table styles */
-          [&_table]:min-w-full
-          [&_table]:border-collapse
-          [&_th]:bg-gray-100
-          [&_th]:p-2
-          [&_th]:text-left
-          [&_th]:border
-          [&_th]:border-gray-300
-          [&_td]:p-2
-          [&_td]:border
-          [&_td]:border-gray-300
-          [&_tr:nth-child(even)]:bg-gray-50'
-          dangerouslySetInnerHTML={{ __html: processContent(blog?.content) }}
-        />
-      </div>
-    </>
+      <div
+        className='text-[13px] md:text-sm text-justify lg:text-base mt-4 !leading-7 
+        [&_ul]:list-disc 
+        [&_ol]:list-decimal 
+        [&_li]:ml-10 
+        [&_li]:mb-1 
+        [&_li]:mt-1 
+        !max-w-none 
+        text-black
+        
+        /* Table wrapper styles */
+        [&_.table-wrapper]:overflow-x-auto
+        [&_.table-wrapper]:my-4
+        [&_.table-wrapper]:w-full
+        [&_.table-wrapper]:[scrollbar-width:thin]
+        [&_.table-wrapper]:[scrollbar-color:gray-300_transparent]
+        
+        /* Table styles */
+        [&_table]:min-w-full
+        [&_table]:border-collapse
+        [&_th]:bg-gray-100
+        [&_th]:p-2
+        [&_th]:text-left
+        [&_th]:border
+        [&_th]:border-gray-300
+        [&_td]:p-2
+        [&_td]:border
+        [&_td]:border-gray-300
+        [&_tr:nth-child(even)]:bg-gray-50'
+        dangerouslySetInnerHTML={{ __html: processContent(blog?.content) }}
+      />
+    </div>
   )
 }
 

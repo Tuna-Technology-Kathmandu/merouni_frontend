@@ -46,7 +46,7 @@ const CustomTooltip = ({ active, payload }) => {
   const total = payload[0]?.payload?.total
   const pct = total ? ((item.value / total) * 100).toFixed(1) : '0'
   return (
-    <div className='bg-white/95 backdrop-blur rounded-xl shadow-lg border border-gray-100 px-4 py-3 min-w-[140px] z-[9999] relative'>
+    <div className='bg-white/95 backdrop-blur rounded-md shadow-lg border border-gray-100 px-4 py-3 min-w-[140px] z-[9999] relative'>
       <p className='font-semibold text-gray-900'>{item.name}</p>
       <p className='text-sm text-gray-600'>
         <span className='text-indigo-600 font-medium'>{item.value}</span>
