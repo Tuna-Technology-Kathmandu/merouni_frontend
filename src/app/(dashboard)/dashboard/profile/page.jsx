@@ -256,7 +256,7 @@ const ProfileUpdate = () => {
                 ? `${nameForm.firstName} ${nameForm.middleName || ''} ${nameForm.lastName}`.trim()
                 : 'User Profile'}
             </h1>
-            <p className='text-sm text-gray-600'>{roles}</p>
+            {!isStudent && <p className='text-sm text-gray-600'>{roles}</p>}
           </div>
         </div>
       </div>
@@ -294,22 +294,24 @@ const ProfileUpdate = () => {
               {nameForm?.phoneNo || 'Not provided'}
             </p>
           </div>
-          <div className='space-y-1.5'>
-            <Label className='text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1.5'>
-              <FaUserTag className='w-3 h-3' />
-              Role
-            </Label>
-            <div className='flex flex-wrap gap-1.5'>
-              {roles.split(', ').map((role, idx) => (
-                <span
-                  key={idx}
-                  className='inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200'
-                >
-                  {role}
-                </span>
-              ))}
+          {!isStudent && (
+            <div className='space-y-1.5'>
+              <Label className='text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1.5'>
+                <FaUserTag className='w-3 h-3' />
+                Role
+              </Label>
+              <div className='flex flex-wrap gap-1.5'>
+                {roles.split(', ').map((role, idx) => (
+                  <span
+                    key={idx}
+                    className='inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200'
+                  >
+                    {role}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
           {isStudent && (
             <div className='space-y-1.5'>
               <Label className='text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1.5'>
