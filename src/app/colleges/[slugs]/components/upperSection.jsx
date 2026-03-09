@@ -16,7 +16,13 @@ const ImageSection = ({ college }) => {
     college?.collegeContacts && college.collegeContacts.length > 0
   const hasWebsite = !!college?.website_url
   const hasUniversity = !!college?.university?.fullname
-  const instituteLevels = JSON.parse(college?.institute_level || '[]')
+  let instituteLevels = []
+  try {
+    instituteLevels = JSON.parse(college?.institute_level || '[]')
+    if (!Array.isArray(instituteLevels)) instituteLevels = []
+  } catch {
+    instituteLevels = []
+  }
   const hasInstituteLevel = instituteLevels.length > 0
 
 
