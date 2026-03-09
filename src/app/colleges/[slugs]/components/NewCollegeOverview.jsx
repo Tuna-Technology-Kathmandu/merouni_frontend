@@ -130,7 +130,7 @@ const CollegeOverview = ({ college }) => {
           </div>
 
           <ul className='flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-y-auto no-scrollbar pb-4 md:pb-0 border-b md:border-b-0 border-gray-100'>
-            {visibleSections.map((section, index) => (
+            {visibleSections?.map((section, index) => (
               <li
                 key={index}
                 onClick={() => handleScroll(index)}
@@ -155,7 +155,7 @@ const CollegeOverview = ({ college }) => {
 
       {/* Main Content */}
       <div className='flex-1 w-full space-y-16 md:space-y-24'>
-        {visibleSections.map((section, index) => (
+        {visibleSections?.map((section, index) => (
           <div key={index} className='scroll-mt-32' ref={section.ref}>
             {section.component}
           </div>
