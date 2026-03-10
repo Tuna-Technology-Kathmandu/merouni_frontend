@@ -7,11 +7,13 @@ import { cn } from '@/app/lib/utils'
 
 const FileUpload = ({
   onUploadComplete,
+  onFileSelect,
   label,
   required = false,
   defaultPreview = null,
   accept = 'image/*',
   extraData = {},
+  autoUpload = false,
   authorId = '1' // Added support for dynamic authorId
 }) => {
   const [isUploading, setIsUploading] = useState(false)
@@ -38,32 +40,39 @@ const FileUpload = ({
 
     setSelectedFile(file)
     setDescription('') // Reset description for new file
+    if (onFileSelect) onFileSelect(file)
 
     // Create preview for images
     if (file.type.startsWith('image/')) {
       setFileType('image')
       const reader = new FileReader()
-      reader.onloadend = () => setPreview(reader.result)
+      reader.onloadend = () => {
+        setPreview(reader.result)
+        if (autoUpload) {
+          // Trigger upload immediately after preview is ready
+          handleFileUploadWithFile(file)
+        }
+      }
       reader.readAsDataURL(file)
     } else if (file.type === 'application/pdf') {
       setFileType('pdf')
       setPreview(file.name)
+      if (autoUpload) handleFileUploadWithFile(file)
     }
   }
 
-  const handleFileUpload = async () => {
-    if (!selectedFile) return
-
+  // Accepts a file directly (for autoUpload mode)
+  const handleFileUploadWithFile = async (file) => {
+    if (!file) return
     setIsUploading(true)
 
     const formData = new FormData()
-    formData.append('title', selectedFile.name)
-    formData.append('altText', selectedFile.name)
-    formData.append('description', description)
-    formData.append('file', selectedFile)
+    formData.append('title', file.name)
+    formData.append('altText', file.name)
+    formData.append('description', '')
+    formData.append('file', file)
     formData.append('authorId', authorId)
 
-    // Append extra data (e.g., mediaType)
     Object.entries(extraData).forEach(([key, value]) => {
       formData.append(key, value)
     })
@@ -72,31 +81,20 @@ const FileUpload = ({
       const response = await axios.post(
         `${process.env.mediaUrl}${process.env.version}/media/upload`,
         formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       )
-
-      // Response success
       const data = response.data
-
       if (data.success === false) {
         toast.error(data.message || 'Upload failed.')
         return
       }
-
       toast.success('File uploaded successfully!')
       setSelectedFile(null)
       setDescription('')
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
+      if (fileInputRef.current) fileInputRef.current.value = ''
       onUploadComplete(data.media.url)
     } catch (error) {
       console.error('Upload failed:', error)
-
       if (error.response) {
         toast.error(error.response.data?.message || 'Upload failed.')
       } else if (error.request) {
@@ -107,6 +105,11 @@ const FileUpload = ({
     } finally {
       setIsUploading(false)
     }
+  }
+
+  const handleFileUpload = async () => {
+    if (!selectedFile) return
+    await handleFileUploadWithFile(selectedFile)
   }
 
   const handleRemove = (e) => {
@@ -208,7 +211,7 @@ const FileUpload = ({
                 </div>
               )}
 
-              {selectedFile && (
+              {selectedFile && !autoUpload && (
                 <div className='mt-4 space-y-3'>
                   <div className='space-y-1.5'>
                     <Label htmlFor="file-description" className="text-xs font-medium text-gray-500">Remarks / Description</Label>

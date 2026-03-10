@@ -1,14 +1,15 @@
 import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
-export default function FaqSection({ faqs }) {
+export default function FaqSection({ faqs: rawFaqs }) {
+    const faqs = Array.isArray(rawFaqs) ? rawFaqs : []
     const [openIndex, setOpenIndex] = useState(null)
 
     const toggleFaq = (index) => {
         setOpenIndex(openIndex === index ? null : index)
     }
 
-    if (!faqs || faqs.length === 0) {
+    if (faqs.length === 0) {
         return null
     }
 

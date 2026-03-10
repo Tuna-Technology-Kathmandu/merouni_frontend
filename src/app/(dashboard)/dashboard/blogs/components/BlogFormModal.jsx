@@ -42,6 +42,7 @@ const BlogFormModal = ({
     })
     const [selectedTags, setSelectedTags] = useState([])
     const [selectedCategory, setSelectedCategory] = useState(null)
+    const [featuredImageError, setFeaturedImageError] = useState('')
 
     const {
         register,
@@ -49,7 +50,7 @@ const BlogFormModal = ({
         reset,
         setValue,
         getValues,
-        formState: { errors }
+        formState: { errors, submitCount }
     } = useForm({
         defaultValues: {
             title: '',
@@ -65,6 +66,32 @@ const BlogFormModal = ({
         }
     })
 
+    // Refs for scroll-to-error
+    const titleRef = useRef(null)
+    const categoryRef = useRef(null)
+    const descriptionRef = useRef(null)
+    const contentRef = useRef(null)
+    const featuredImageRef = useRef(null)
+    const formScrollRef = useRef(null)
+
+    // Scroll to first error after submit attempt
+    useEffect(() => {
+        if (submitCount === 0) return
+        const fieldOrder = [
+            { key: 'title',       ref: titleRef },
+            { key: 'category',    ref: categoryRef },
+            { key: 'description', ref: descriptionRef },
+            { key: 'content',     ref: contentRef },
+        ]
+        for (const { key, ref } of fieldOrder) {
+            if (errors[key] && ref.current) {
+                ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                const input = ref.current.querySelector('input, textarea, [contenteditable]')
+                if (input) input.focus()
+                return
+            }
+        }
+    }, [submitCount, errors])
     useEffect(() => {
         if (isOpen) {
             if (isEditing && initialData) {
@@ -132,6 +159,7 @@ const BlogFormModal = ({
                 setSelectedTags([])
                 setSelectedCategory(null)
             }
+            setFeaturedImageError('')
         }
     }, [isOpen, isEditing, initialData, reset, setValue])
 
@@ -231,6 +259,13 @@ const BlogFormModal = ({
     }
 
     const onSubmitForm = (data) => {
+        if (!uploadedFiles.featured_image) {
+            setFeaturedImageError('Featured image is required')
+            if (featuredImageRef.current) {
+                featuredImageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            }
+            return
+        }
         const finalData = {
             ...data,
             tags: selectedTags,
@@ -261,7 +296,7 @@ const BlogFormModal = ({
                                 <div className='bg-white p-8 rounded-2xl shadow-sm border border-gray-100'>
                                     <SectionHeader icon={Info} title="Blog Content" subtitle="Detailed information about your post" />
                                     <div className='space-y-6'>
-                                        <div>
+                                        <div ref={titleRef}>
                                             <Label required={true} htmlFor='title'>Post Title</Label>
                                             <Input
                                                 id='title'
@@ -274,7 +309,7 @@ const BlogFormModal = ({
                                         </div>
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                            <div>
+                                            <div ref={categoryRef}>
                                                 <Label required={true} htmlFor='category'>Category</Label>
                                                 <SearchSelectCreate
                                                     onSearch={onSearchCategories}
@@ -311,7 +346,7 @@ const BlogFormModal = ({
                                             </div>
                                         </div>
 
-                                        <div>
+                                        <div ref={descriptionRef}>
                                             <Label required={true} htmlFor='description' className="text-gray-700 font-semibold mb-1.5 block text-sm">Short Description</Label>
                                             <Textarea
                                                 id='description'
@@ -324,7 +359,7 @@ const BlogFormModal = ({
                                             )}
                                         </div>
 
-                                        <div className="pt-2">
+                                        <div className="pt-2" ref={contentRef}>
                                             <Label required={true} className="text-gray-700 font-semibold mb-2.5 block text-sm">Main Content Body</Label>
                                             <TipTapEditor
                                                 onMediaUpload={onMediaUpload}
@@ -349,19 +384,20 @@ const BlogFormModal = ({
                                 <div className='bg-white p-6 rounded-2xl shadow-sm border border-gray-100'>
                                     <SectionHeader icon={ImageIcon} title="Featured Media" subtitle="Image & PDF Uploads" />
                                     <div className="space-y-6">
-                                        <div className="p-4 bg-gray-50 rounded-md border border-gray-100 border-dashed">
+                                        <div className="p-4 bg-gray-50 rounded-md border border-gray-100 border-dashed" ref={featuredImageRef}>
                                             <Label required={true} className="text-xs font-semibold tracking-wider mb-3 block">Featured Post Image</Label>
                                             <FileUpload
                                                 label=''
+                                                autoUpload={true}
+                                                onFileSelect={() => setFeaturedImageError('')}
                                                 onUploadComplete={(url) => {
                                                     setUploadedFiles(prev => ({ ...prev, featured_image: url }))
-                                                    setValue('featured_image', url, { shouldValidate: true })
+                                                    if (url) setFeaturedImageError('')
                                                 }}
                                                 defaultPreview={uploadedFiles.featured_image}
                                             />
-                                            <input type="hidden" {...register('featured_image', { required: 'Featured image is required' })} />
-                                            {errors.featured_image && (
-                                                <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.featured_image.message}</p>
+                                            {featuredImageError && (
+                                                <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{featuredImageError}</p>
                                             )}
                                         </div>
 
