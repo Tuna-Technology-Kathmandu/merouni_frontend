@@ -92,14 +92,24 @@ const ViewCollegeModal = ({
                                         </p>
                                     )}
                                     {viewCollegeData.google_map_url && (
-                                        <a
-                                            href={viewCollegeData.google_map_url}
-                                            target='_blank'
-                                            rel='noopener noreferrer'
-                                            className='text-blue-600 hover:underline inline-flex items-center gap-1 mt-2'
-                                        >
-                                            <MapPin className='w-4 h-4' /> View on Map
-                                        </a>
+                                        viewCollegeData.google_map_url.trim().startsWith('<iframe')
+                                            ? (
+                                                <div
+                                                    className='mt-3 w-full rounded-md overflow-hidden [&>iframe]:w-full [&>iframe]:border-0'
+                                                    style={{ height: '280px' }}
+                                                    dangerouslySetInnerHTML={{ __html: viewCollegeData.google_map_url }}
+                                                />
+                                            )
+                                            : (
+                                                <a
+                                                    href={viewCollegeData.google_map_url}
+                                                    target='_blank'
+                                                    rel='noopener noreferrer'
+                                                    className='text-blue-600 hover:underline inline-flex items-center gap-1 mt-2'
+                                                >
+                                                    <MapPin className='w-4 h-4' /> View on Map
+                                                </a>
+                                            )
                                     )}
                                 </div>
                             </div>

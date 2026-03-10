@@ -14,6 +14,7 @@ const CollegeOverview = ({ college }) => {
   const galleryRef = useRef(null)
   const facilityRef = useRef(null)
   const faqsRef = useRef(null)
+  const mapRef = useRef(null)
   const [activeSection, setActiveSection] = useState(0)
 
   const validMembers = (college.collegeMembers || []).filter(
@@ -71,6 +72,17 @@ const CollegeOverview = ({ college }) => {
       visible: college?.faqs?.length > 0,
       ref: faqsRef,
       component: <FaqSection faqs={college.faqs || []} />
+    },
+    {
+      name: 'Location',
+      visible: !!college?.google_map_url,
+      ref: mapRef,
+      component: (
+        <div className='bg-white rounded-md border p-6'>
+          <h2 className='text-xl font-bold text-gray-900 mb-4'>Location</h2>
+          <GoogleMap mapUrl={college.google_map_url} />
+        </div>
+      )
     }
   ]
   
