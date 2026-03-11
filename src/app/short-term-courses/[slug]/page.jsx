@@ -71,7 +71,7 @@ const SkillCourseDetailsPage = ({ params }) => {
                         }
                         action={{
                             label: 'Back to Courses',
-                            onClick: () => router.push('/skill-based-courses')
+                            onClick: () => router.push('/short-term-courses')
                         }}
                     />
                 </div>
@@ -89,7 +89,7 @@ const SkillCourseDetailsPage = ({ params }) => {
                 {/* Navigation */}
                 <div className='mb-8'>
                     <Link
-                        href='/skill-based-courses'
+                        href='/short-term-courses'
                         className='inline-flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-gray-900 transition-colors'
                     >
                         <FaArrowLeft className='w-3 h-3' />

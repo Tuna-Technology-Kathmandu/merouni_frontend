@@ -1,5 +1,6 @@
 'use client'
 
+import 'react-toastify/dist/ReactToastify.css'
 import { useState, useEffect, useMemo } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
@@ -8,7 +9,6 @@ import { fetchSkillsCourses } from './action'
 import Table from '@/ui/shadcn/DataTable'
 import { Edit2, Trash2, Eye, Plus } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
 import { useSelector } from 'react-redux'
 import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
@@ -43,7 +43,9 @@ export default function SkillsCoursesManager() {
             is_featured: false,
             author: author_id,
             institution_name: '',
-            content: ''
+            content: '',
+            location: '',
+            course_type: 'online'
         }
     })
 
@@ -71,7 +73,7 @@ export default function SkillsCoursesManager() {
     })
 
     useEffect(() => {
-        setHeading('Skills-Based Courses')
+        setHeading('Short Term Courses')
         loadCourses()
         return () => setHeading(null)
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -187,6 +189,8 @@ export default function SkillsCoursesManager() {
         setValue('is_featured', course.is_featured || false)
         setValue('institution_name', course.institution_name || '')
         setValue('content', course.content || '')
+        setValue('location', course.location || '')
+        setValue('course_type', course.course_type || 'online')
         setUploadedFiles({ thumbnail_image: course.thumbnail_image || '' })
     }
 
@@ -281,6 +285,20 @@ export default function SkillsCoursesManager() {
                 accessorKey: 'duration',
                 cell: ({ getValue }) => (
                     <span className="text-gray-600 text-sm">{getValue() || 'Flexible'}</span>
+                )
+            },
+            {
+                header: 'Location',
+                accessorKey: 'location',
+                cell: ({ getValue }) => (
+                    <span className="text-gray-600 text-sm">{getValue() || <span className="text-gray-400 italic">N/A</span>}</span>
+                )
+            },
+            {
+                header: 'Type',
+                accessorKey: 'course_type',
+                cell: ({ getValue }) => (
+                    <span className="capitalize text-gray-600 text-sm">{getValue() || 'Online'}</span>
                 )
             },
             {
@@ -470,6 +488,31 @@ export default function SkillsCoursesManager() {
                                             <option value="true">Yes</option>
                                         </select>
                                     </div>
+
+                                    {/* Location */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="location">Location</Label>
+                                        <Input
+                                            id="location"
+                                            placeholder='e.g. Kathmandu, Online'
+                                            {...register('location')}
+                                            className={errors.location ? 'border-destructive focus-visible:ring-destructive' : ''}
+                                        />
+                                    </div>
+
+                                    {/* Type */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="course_type">Course Mode</Label>
+                                        <select
+                                            id="course_type"
+                                            {...register('course_type')}
+                                            className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#387cae] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                                        >
+                                            <option value="online">Online</option>
+                                            <option value="offline">Offline</option>
+                                            <option value="both">Both</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </section>
 
@@ -651,6 +694,14 @@ export default function SkillsCoursesManager() {
                                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Created</p>
                                 <p className="text-gray-800 text-sm">{viewingCourse?.createdAt ? formatDate(viewingCourse.createdAt) : 'N/A'}</p>
                             </div>
+                            <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
+                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Location</p>
+                                <p className="text-gray-800 text-sm">{viewingCourse?.location || 'N/A'}</p>
+                            </div>
+                            <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
+                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Mode</p>
+                                <p className="text-gray-800 text-sm capitalize">{viewingCourse?.course_type || 'Online'}</p>
+                            </div>
                         </div>
 
                         {/* Description */}
@@ -695,6 +746,6 @@ export default function SkillsCoursesManager() {
                 confirmText='Delete'
                 cancelText='Cancel'
             />
-        </div>
+        </div >
     )
 }

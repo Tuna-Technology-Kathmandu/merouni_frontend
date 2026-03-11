@@ -3,12 +3,16 @@
 
 const API_URL = `${process.env.baseUrl}/skills-based-courses`
 
-export async function fetchPublicSkillCourses({ q = '', page = 1, limit = 20 } = {}) {
+export async function fetchPublicSkillCourses({ q = '', page = 1, limit = 20, price = '', duration = '', location = '', type = '' } = {}) {
     try {
         const queryParams = new URLSearchParams({
             page,
             limit,
-            ...(q && { q, search: q, title: q })
+            ...(q && { q, search: q, title: q }),
+            ...(price && { price }),
+            ...(duration && { duration }),
+            ...(location && { location }),
+            ...(type && { course_type: type })
         })
 
         const response = await fetch(`${API_URL}?${queryParams}`, {
