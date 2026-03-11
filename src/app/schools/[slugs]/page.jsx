@@ -110,7 +110,6 @@ const CollegeDetailPage = ({ params }) => {
   }, [])
 
   const fetchCollegeDetails = async (slugs) => {
-    // Only run on client side
     if (typeof window === 'undefined') return
 
     try {
@@ -135,6 +134,8 @@ const CollegeDetailPage = ({ params }) => {
       const data = await response.json()
       const collegeData = data.item
 
+      console.log(collegeData,"collegeDatacollegeDatacollegeDatacollegeData");
+      
       if (collegeData) {
         setCollege(collegeData)
       } else {

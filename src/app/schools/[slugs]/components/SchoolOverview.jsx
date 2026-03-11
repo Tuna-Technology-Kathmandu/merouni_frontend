@@ -5,6 +5,7 @@ import GallerySection from './sections/GallerySection'
 import MemberSection from './sections/MemberSection'
 import OverviewSection from './sections/OverviewSection'
 import ProgramSection from './sections/ProgramSection'
+import MapSection from './sections/MapSection'
 
 const SchoolOverview = ({ college }) => {
   const overviewRef = useRef(null)
@@ -13,6 +14,7 @@ const SchoolOverview = ({ college }) => {
   const galleryRef = useRef(null)
   const facilityRef = useRef(null)
   const faqsRef = useRef(null)
+  const mapRef = useRef(null)
   const [activeSection, setActiveSection] = useState(0)
 
   const validMembers = (college.collegeMembers || []).filter(
@@ -22,6 +24,7 @@ const SchoolOverview = ({ college }) => {
       member.contact_number?.trim() ||
       member.description?.trim()
   )
+
 
   const allSections = [
     {
@@ -59,9 +62,15 @@ const SchoolOverview = ({ college }) => {
       visible: college?.faqs?.length > 0,
       ref: faqsRef,
       component: <FaqSection faqs={college.faqs || []} />
+    },
+    {
+      name: 'Map',
+      visible: !!college?.google_map_url,
+      ref: mapRef,
+      component: <MapSection college={college} />
     }
   ]
-  
+
 
   const visibleSections = allSections.filter((section) => section.visible)
 
@@ -122,11 +131,10 @@ const SchoolOverview = ({ college }) => {
               <li
                 key={index}
                 onClick={() => handleScroll(index)}
-                className={`text-sm font-medium cursor-pointer whitespace-nowrap px-4 py-2 md:px-0 md:py-2.5 transition-all relative group ${
-                  activeSection === index
-                    ? 'text-[#0A6FA7]'
-                    : 'text-gray-500 hover:text-gray-800'
-                }`}
+                className={`text-sm font-medium cursor-pointer whitespace-nowrap px-4 py-2 md:px-0 md:py-2.5 transition-all relative group ${activeSection === index
+                  ? 'text-[#0A6FA7]'
+                  : 'text-gray-500 hover:text-gray-800'
+                  }`}
               >
                 {section.name}
                 {activeSection === index && (
@@ -151,7 +159,7 @@ const SchoolOverview = ({ college }) => {
       </div>
 
       {/* Now List the FAQS */}
-      
+
     </section>
   )
 }
