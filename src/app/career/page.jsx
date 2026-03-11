@@ -240,6 +240,13 @@ const CareerPage = () => {
                             >
                               Expired
                             </button>
+                          ) : career?.hasApplied ? (
+                            <button
+                              disabled
+                              className='px-5 py-1.5 bg-green-50 text-green-600 border border-green-200 rounded-full text-sm font-bold shadow-sm cursor-not-allowed z-10 relative'
+                            >
+                              Already Applied
+                            </button>
                           ) : user ? (
                             <button
                               onClick={(e) => {

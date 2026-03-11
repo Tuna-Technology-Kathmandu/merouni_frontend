@@ -3,7 +3,7 @@ import { THEME_BLUE } from '@/constants/constants'
 import ActionCard from '@/ui/molecules/ActionCard'
 import { Button } from '@/ui/shadcn/button'
 import { formatDate } from '@/utils/date.util'
-import { Briefcase, Calendar, CheckCircle2, ChevronLeft, MapPin } from 'lucide-react'
+import { Briefcase, Calendar, CheckCircle2, ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -124,12 +124,7 @@ const ShowCareer = ({ params }) => {
                       <Calendar className="w-4 h-4 text-gray-400" />
                       <span>Posted {formatDate(data?.createdAt)}</span>
                     </div>
-                    {data && (
-                      <div className="flex items-center gap-1.5">
-                        <MapPin className="w-4 h-4 text-gray-400" />
-                        <span>{data.name}</span>
-                      </div>
-                    )}
+                  
                   </div>
                 </div>
 
@@ -140,6 +135,13 @@ const ShowCareer = ({ params }) => {
                       className="px-6 py-2.5 bg-gray-200 text-gray-500 rounded-lg font-semibold text-sm cursor-not-allowed"
                     >
                       Expired
+                    </button>
+                  ) : data?.hasApplied ? (
+                    <button
+                      disabled
+                      className="px-6 py-2.5 bg-green-50 text-green-600 border border-green-200 rounded-lg font-semibold text-sm cursor-not-allowed"
+                    >
+                      Already Applied
                     </button>
                   ) : user && (
                     <button
@@ -215,6 +217,23 @@ const ShowCareer = ({ params }) => {
                       description={
                         <>
                           We are no longer accepting applications for{' '}
+                          <span className='font-semibold text-gray-900'>
+                            {data?.title || 'this role'}
+                          </span>
+                          .
+                        </>
+                      }
+                    />
+                  </div>
+                ) : data?.hasApplied ? (
+                  <div className="w-full max-w-2xl mx-auto py-4">
+                    <ActionCard
+                      variant='centered'
+                      icon={<CheckCircle2 className='w-full h-full text-green-500' />}
+                      title='Application Submitted'
+                      description={
+                        <>
+                          You have already submitted an application for{' '}
                           <span className='font-semibold text-gray-900'>
                             {data?.title || 'this role'}
                           </span>
