@@ -10,13 +10,6 @@ import { jwtDecode } from 'jwt-decode'
 import Link from 'next/link'
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogClose
-} from '@/ui/shadcn/dialog'
 
 const SignInPage = ({ defaultMode = 'login' }) => {
   const dispatch = useDispatch()
@@ -52,7 +45,6 @@ const SignInPage = ({ defaultMode = 'login' }) => {
   })
   const [errors, setErrors] = useState({})
   const [showPassword, setShowPassword] = useState(false)
-  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false)
 
   const togglePassword = () => setShowPassword((prev) => !prev)
 
@@ -75,13 +67,11 @@ const SignInPage = ({ defaultMode = 'login' }) => {
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Invalid email format'
     }
-
     if (!formData.password) {
       newErrors.password = 'Password is required'
     } else if (formData.password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters'
     }
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -140,7 +130,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
           toast.success('Login successful!')
           router.push('/dashboard')
         } catch (e) {
-          toast.error("Error signing in. Please try again.")
+          toast.error('Error signing in. Please try again.')
         }
       } else {
         toast.success(
@@ -306,13 +296,12 @@ const SignInPage = ({ defaultMode = 'login' }) => {
             <div className='flex justify-between items-center ml-1'>
               <label className='text-xs font-bold text-gray-700 uppercase tracking-widest'>Password</label>
               {isLogin && (
-                <button
-                  type="button"
-                  onClick={() => setIsForgotPasswordOpen(true)}
+                <Link
+                  href='/forgot-password'
                   className='text-xs font-bold text-[#0A6FA7] hover:underline'
                 >
                   Forgot?
-                </button>
+                </Link>
               )}
             </div>
             <div className='relative'>
@@ -346,7 +335,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
 
         <div className='mt-8 text-center text-sm font-medium'>
           <span className='text-gray-500'>
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
+            {isLogin ? "Don't have an account? " : 'Already have an account? '}
           </span>
           <button
             onClick={() => setIsLogin(!isLogin)}
@@ -356,35 +345,6 @@ const SignInPage = ({ defaultMode = 'login' }) => {
           </button>
         </div>
       </div>
-
-      <Dialog
-        isOpen={isForgotPasswordOpen}
-        onClose={() => setIsForgotPasswordOpen(false)}
-        className='max-w-md'
-      >
-        <DialogHeader>
-          <div className='flex items-center justify-between'>
-            <DialogTitle>Reset Password</DialogTitle>
-            <DialogClose onClick={() => setIsForgotPasswordOpen(false)} />
-          </div>
-        </DialogHeader>
-        <DialogContent>
-          <div className='p-6 text-center'>
-            <div className='mb-4 flex justify-center'>
-              <div className='w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center'>
-                <svg className='w-8 h-8 text-[#0A6FA7]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' />
-                </svg>
-              </div>
-            </div>
-            <h3 className='text-xl font-bold text-gray-900 mb-2'>Contact Administrator</h3>
-            <p className='text-gray-600 mb-6'>
-              Please contact the <strong>Mero Uni Admin</strong> to reset your password. Our team will verify your identity and assist you further.
-            </p>
-
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
