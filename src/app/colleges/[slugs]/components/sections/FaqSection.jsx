@@ -2,7 +2,20 @@ import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
 export default function FaqSection({ faqs: rawFaqs }) {
-    const faqs = Array.isArray(rawFaqs) ? rawFaqs : []
+    const getSafeFaqs = (data) => {
+        if (Array.isArray(data)) return data;
+        if (typeof data === 'string') {
+            try {
+                const parsed = JSON.parse(data);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch {
+                return [];
+            }
+        }
+        return [];
+    };
+
+    const faqs = getSafeFaqs(rawFaqs);
     const [openIndex, setOpenIndex] = useState(null)
 
     const toggleFaq = (index) => {

@@ -166,8 +166,7 @@ const CollegeDetailPage = ({ params }) => {
       <Header />
       <Navbar />
       <ImageSection college={college} />
-      <br />
-      <br />
+      <div className='h-4 md:h-6' />
       <SchoolOverview college={college} />
       <ApplyNow college={college} />
       <RelatedColleges college={college} />
