@@ -1,23 +1,27 @@
 'use client'
-import React, { useEffect, useState } from 'react'
-import { Search, Award, X, BookOpen, Newspaper } from 'lucide-react'
-import { IoSearch } from 'react-icons/io5'
-import EmptyState from '@/ui/shadcn/EmptyState'
-import { fetchPublicSkillCourses } from './actions'
-import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
-import Navbar from '@/components/Frontpage/Navbar'
 import Footer from '@/components/Frontpage/Footer'
 import Header from '@/components/Frontpage/Header'
+import Navbar from '@/components/Frontpage/Navbar'
+import { THEME_BLUE } from '@/constants/constants'
 import SkillCourseCard from '@/ui/molecules/cards/SkillCourseCard'
+import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
+import EmptyState from '@/ui/shadcn/EmptyState'
+import { BookOpen, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { IoSearch } from 'react-icons/io5'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { THEME_BLUE, THEME_GREEN } from '@/constants/constants'
+import { fetchPublicSkillCourses } from './actions'
 
 const SkillCoursesPage = () => {
     const [courses, setCourses] = useState([])
     const [loading, setLoading] = useState(false)
     const [debouncedSearch, setDebouncedSearch] = useState('')
     const [searchTerm, setSearchTerm] = useState('')
+    const [price, setPrice] = useState('')
+    const [duration, setDuration] = useState('')
+    const [location, setLocation] = useState('')
+    const [type, setType] = useState('')
 
     // Debounce search
     useEffect(() => {
@@ -35,6 +39,10 @@ const SkillCoursesPage = () => {
             try {
                 const response = await fetchPublicSkillCourses({
                     q: debouncedSearch,
+                    price,
+                    duration,
+                    location,
+                    type
                 })
                 setCourses(response.items || [])
             } catch (error) {
@@ -44,10 +52,14 @@ const SkillCoursesPage = () => {
             }
         }
         getCourses()
-    }, [debouncedSearch])
+    }, [debouncedSearch, price, duration, location, type])
 
     const clearFilters = () => {
         setSearchTerm('')
+        setPrice('')
+        setDuration('')
+        setLocation('')
+        setType('')
     }
 
     return (
@@ -64,7 +76,7 @@ const SkillCoursesPage = () => {
                             <h2 className='text-3xl font-extrabold text-gray-800'>
                                 Explore <span style={{ color: THEME_BLUE }}>Courses</span>
                             </h2>
-                            <div 
+                            <div
                                 className='absolute -bottom-2 left-0 w-12 h-1 rounded-full'
                                 style={{ backgroundColor: THEME_BLUE }}
                             ></div>
@@ -85,16 +97,53 @@ const SkillCoursesPage = () => {
                         </div>
                     </div>
 
-                    {/* Results Summary */}
-                    {!loading && (
-                        <div className='mb-8 px-2'>
+                    {/* Filters Row */}
+                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8'>
+                     
+
+                        <select
+                            value={duration}
+                            onChange={(e) => setDuration(e.target.value)}
+                            className='py-2.5 px-4 bg-white border border-gray-100 rounded-xl outline-none text-sm font-medium text-gray-700 shadow-sm focus:border-[#387cae] transition-all cursor-pointer'
+                        >
+                            <option value="">All Durations</option>
+                            <option value="Short">Short Term</option>
+                            <option value="Medium">Medium Term</option>
+                            <option value="Long">Long Term</option>
+                        </select>
+                     
+
+                        <select
+                            value={type}
+                            onChange={(e) => setType(e.target.value)}
+                            className='py-2.5 px-4 bg-white border border-gray-100 rounded-xl outline-none text-sm font-medium text-gray-700 shadow-sm focus:border-[#387cae] transition-all cursor-pointer'
+                        >
+                            <option value="">All Modes</option>
+                            <option value="online">Online</option>
+                            <option value="offline">Offline</option>
+                            <option value="both">Both</option>
+                        </select>
+                    </div>
+
+                    {/* Results Summary and Clear Filters */}
+                    <div className='flex justify-between items-center mb-8 px-2'>
+                        {!loading && (
                             <p className='text-sm text-gray-500 font-semibold'>
                                 Showing{' '}
                                 <span className='text-gray-900'>{courses.length}</span>{' '}
                                 results
                             </p>
-                        </div>
-                    )}
+                        )}
+                        {(searchTerm || price || duration || location || type) && (
+                            <button
+                                onClick={clearFilters}
+                                className='text-sm font-semibold text-[#387cae] hover:text-[#2c6590] flex items-center gap-1 transition-colors'
+                            >
+                                <X className='w-4 h-4' />
+                                Clear All Filters
+                            </button>
+                        )}
+                    </div>
 
                     {/* Courses Grid */}
                     {loading ? (

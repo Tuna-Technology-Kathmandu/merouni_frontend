@@ -7,6 +7,7 @@ import {
   DialogTitle
 } from '@/ui/shadcn/dialog'
 import { Input } from '@/ui/shadcn/input'
+import { Textarea } from '@/ui/shadcn/textarea'
 import { Label } from '@/ui/shadcn/label'
 import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
@@ -126,7 +127,8 @@ const CreateUpdateUniversityModal = ({
       ],
       map: '',
       gallery: [],
-      status: 'Published'
+      status: 'Published',
+      meta_description: ''
     }
   })
 
@@ -200,6 +202,7 @@ const CreateUpdateUniversityModal = ({
           setValue('map', uniData.map || '')
           setValue('description', uniData.description || '')
           setValue('status', uniData.status || 'Published')
+          setValue('meta_description', uniData.meta_description || '')
 
           if (uniData.contact) {
             setValue('contact.faxes', uniData.contact.faxes || '')
@@ -290,7 +293,8 @@ const CreateUpdateUniversityModal = ({
         members: [{ role: '', salutation: '', name: '', phone: '', email: '' }],
         map: '',
         gallery: [],
-        status: 'Published'
+        status: 'Published',
+        meta_description: ''
       })
       setUploadedFiles({
         logo: '',
@@ -426,8 +430,8 @@ const CreateUpdateUniversityModal = ({
     if (!allCourses) return []
     return query
       ? allCourses.filter((c) =>
-          c.title?.toLowerCase().includes(query.toLowerCase())
-        )
+        c.title?.toLowerCase().includes(query.toLowerCase())
+      )
       : allCourses
   }
 
@@ -460,8 +464,8 @@ const CreateUpdateUniversityModal = ({
     if (!allLevels) return []
     return query
       ? allLevels.filter((l) =>
-          l.title?.toLowerCase().includes(query.toLowerCase())
-        )
+        l.title?.toLowerCase().includes(query.toLowerCase())
+      )
       : allLevels
   }
 
@@ -641,6 +645,15 @@ const CreateUpdateUniversityModal = ({
                         {...register('levels', {
                           required: 'At least one level is required'
                         })}
+                      />
+                    </div>
+
+                    <div>
+                      <Label>Meta Description</Label>
+                      <Textarea
+                        {...register('meta_description')}
+                        placeholder='SEO Meta description...'
+                        className='min-h-[100px] rounded-md border-gray-200 focus:ring-[#387cae]/20'
                       />
                     </div>
                   </div>

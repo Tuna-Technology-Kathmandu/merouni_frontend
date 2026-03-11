@@ -5,6 +5,7 @@ import { Button } from '@/ui/shadcn/button'
 import { Checkbox } from '@/ui/shadcn/checkbox'
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from '@/ui/shadcn/dialog'
 import { Input } from '@/ui/shadcn/input'
+import { Textarea } from '@/ui/shadcn/textarea'
 import { Label } from '@/ui/shadcn/label'
 import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 import { Select } from '@/ui/shadcn/select'
@@ -50,7 +51,8 @@ export default function CreateUpdateConsultancy({
             logo: '',
             pinned: 0,
             courses: [],
-            map_type: ""
+            map_type: "",
+            meta_description: ""
         }
     })
 
@@ -129,7 +131,8 @@ export default function CreateUpdateConsultancy({
                 pinned: consultancy.pinned || 0,
                 featured_image: consultancy.featured_image || '',
                 logo: consultancy.logo || '',
-                courses: consultancy.consultancyCourses?.map(c => c.id) || []
+                courses: consultancy.consultancyCourses?.map(c => c.id) || [],
+                meta_description: consultancy.meta_description || ''
             })
         } else if (isOpen && !initialData) {
             reset({
@@ -138,7 +141,8 @@ export default function CreateUpdateConsultancy({
                 featured_image: '',
                 logo: '',
                 pinned: 0,
-                courses: []
+                courses: [],
+                meta_description: ''
             })
             setSelectedCourses([])
             setSelectedDestinations([])
@@ -206,6 +210,14 @@ export default function CreateUpdateConsultancy({
                                         value={watch('description')}
                                         onChange={(val) => setValue('description', val)}
                                         placeholder='Detailed description of services...'
+                                    />
+                                </div>
+                                <div className='space-y-2'>
+                                    <Label>Meta Description</Label>
+                                    <Textarea
+                                        {...register('meta_description')}
+                                        placeholder='SEO Meta description...'
+                                        className='min-h-[80px]'
                                     />
                                 </div>
                             </div>

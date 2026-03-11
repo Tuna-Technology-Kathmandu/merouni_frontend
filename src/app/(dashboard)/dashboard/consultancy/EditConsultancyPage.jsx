@@ -50,7 +50,8 @@ export default function EditConsultancyPage() {
       featured_image: '',
       logo: '',
       pinned: 0,
-      courses: []
+      courses: [],
+      meta_description: ''
     }
   })
 
@@ -157,6 +158,7 @@ export default function EditConsultancyPage() {
       })
       setValue('featured_image', consultancy.featured_image || '')
       setValue('logo', consultancy.logo || '')
+      setValue('meta_description', consultancy.meta_description || '')
       setValue('id', consultancy.id) // Store ID for update
 
     } catch (error) {
@@ -209,7 +211,8 @@ export default function EditConsultancyPage() {
           ? data.courses
           : data.courses
             ? [data.courses]
-            : []
+            : [],
+        meta_description: data.meta_description || null
       }
 
       // If we have an ID (edit mode), include it
@@ -303,6 +306,15 @@ export default function EditConsultancyPage() {
                 value={watch('description') || ''}
                 onChange={(data) => setValue('description', data)}
                 placeholder="Write about your consultancy..."
+              />
+            </div>
+            <div className='space-y-2'>
+              <Label htmlFor='meta_description'>Meta Description</Label>
+              <Textarea
+                id='meta_description'
+                {...register('meta_description')}
+                placeholder="SEO Meta description..."
+                className='min-h-[100px]'
               />
             </div>
           </div>

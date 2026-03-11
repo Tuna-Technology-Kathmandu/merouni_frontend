@@ -6,6 +6,7 @@ import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
+import { Textarea } from '@/ui/shadcn/textarea'
 import FileUpload from '../../colleges/FileUpload'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 import SearchSelectCreate from '@/ui/shadcn/search-select-create'
@@ -58,7 +59,8 @@ export default function NewsForm({
       status: 'draft',
       visibility: 'private',
       college_id: '',
-      category_id: ''
+      category_id: '',
+      meta_description: ''
     }
   })
 
@@ -118,7 +120,8 @@ export default function NewsForm({
         featured_image: '',
         status: 'draft',
         college_id: '',
-        category_id: ''
+        category_id: '',
+        meta_description: ''
       })
       setUploadedFiles({ featured_image: '' })
       setSelectedCollege(null)
@@ -136,7 +139,8 @@ export default function NewsForm({
         featured_image: initialData.featured_image || '',
         status: initialData.status || 'draft',
         college_id: initialData.college_id || initialData.newsCollege?.id || '',
-        category_id: initialData.category_id || initialData.newsCategory?.id || ''
+        category_id: initialData.category_id || initialData.newsCategory?.id || '',
+        meta_description: initialData.meta_description || ''
       })
       setUploadedFiles({
         featured_image: initialData.featured_image || ''
@@ -310,6 +314,16 @@ export default function NewsForm({
                         <option value='draft'>Draft</option>
                         <option value='published'>Published</option>
                       </select>
+                    </div>
+
+                    <div className='space-y-2'>
+                      <Label htmlFor='meta_description'>Meta Description</Label>
+                      <Textarea
+                        id='meta_description'
+                        {...register('meta_description')}
+                        placeholder='SEO Meta description...'
+                        className='min-h-[100px]'
+                      />
                     </div>
 
 

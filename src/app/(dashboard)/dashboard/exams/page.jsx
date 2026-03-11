@@ -81,7 +81,8 @@ export default function ExamManager() {
       exam_date: '',
       opening_date: '',
       closing_date: '',
-      category_id: ''
+      category_id: '',
+      meta_description: ''
     }
   })
   const [selectedLevel, setSelectedLevel] = useState(null)
@@ -176,7 +177,8 @@ export default function ExamManager() {
       exam_date: '',
       opening_date: '',
       closing_date: '',
-      category_id: ''
+      category_id: '',
+      meta_description: ''
     })
     setIsOpen(true)
   }
@@ -219,7 +221,8 @@ export default function ExamManager() {
       exam_date: formatInputDate(exam.exam_date),
       opening_date: formatInputDate(exam.opening_date),
       closing_date: formatInputDate(exam.closing_date),
-      category_id: exam.category_id || exam.category?.id || ''
+      category_id: exam.category_id || exam.category?.id || '',
+      meta_description: exam.meta_description || ''
     })
     setIsOpen(true)
   }
@@ -627,6 +630,14 @@ export default function ExamManager() {
                     <Input
                       {...register('pastQuestion')}
                       placeholder='Link to past questions'
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Meta Description</Label>
+                    <Textarea
+                      {...register('meta_description')}
+                      placeholder='SEO Meta description...'
+                      className="min-h-[80px]"
                     />
                   </div>
                 </div>

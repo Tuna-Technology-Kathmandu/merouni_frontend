@@ -3,6 +3,7 @@ import { getEvents } from '@/app/action'
 import { authFetch } from '@/app/utils/authFetch'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
+import { Textarea } from '@/ui/shadcn/textarea'
 import { Label } from '@/ui/shadcn/label'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
 import { Edit2, Eye, MapPin, Plus, Trash2 } from 'lucide-react'
@@ -52,7 +53,8 @@ export default function EventManager() {
         host: '',
         map_url: ''
       },
-      is_featured: false
+      is_featured: false,
+      meta_description: ''
     }
   })
 
@@ -214,6 +216,7 @@ export default function EventManager() {
     setSelectedCollege(null)
     setSelectedCategory(null)
     setFormErrors({})
+    setValue('meta_description', '')
   }
 
   const onSubmit = async (data) => {
@@ -320,6 +323,7 @@ export default function EventManager() {
       }
 
       setValue('is_featured', eventData.is_featured === 1)
+      setValue('meta_description', eventData.meta_description || '')
     } catch (error) {
       toast.error('Failed to fetch event data')
     } finally {
@@ -678,6 +682,15 @@ export default function EventManager() {
                   {formErrors.description && (
                     <p className='text-xs text-red-500 mt-1'>{formErrors.description}</p>
                   )}
+                </div>
+
+                <div className='space-y-2'>
+                  <Label>Meta Description</Label>
+                  <Textarea
+                    {...register('meta_description')}
+                    placeholder='SEO Meta description...'
+                    className='min-h-[80px]'
+                  />
                 </div>
 
                 <div className='space-y-2'>
