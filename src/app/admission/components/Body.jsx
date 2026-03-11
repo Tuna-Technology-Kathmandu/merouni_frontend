@@ -145,7 +145,7 @@ const AdmissionPage = () => {
             {/* Course Filter */}
             <div className='lg:col-span-3'>
               <label className='block text-[11px] font-bold mb-2'>
-                Course
+                Program
               </label>
               <SearchSelectCreate
                 onSearch={fetchCourses}

@@ -19,6 +19,7 @@ export async function getAdmission(search = '', page = 1, course = '') {
     }
 
     const data = await response.json()
+console.log(data,"datadatadata");
 
     return {
       items: data.items || data,
