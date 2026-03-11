@@ -1,0 +1,149 @@
+
+> my-app@0.1.0 build /Users/sdsys/Files/merouni.com/frontend
+> cross-env NEXT_LINT=false next build
+
+   ▲ Next.js 15.2.8
+   - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping linting
+   Checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/83) ...
+   Generating static pages (20/83) 
+   Generating static pages (41/83) 
+   Generating static pages (62/83) 
+Error fetching videos: Error: Dynamic server usage: Route /watch couldn't be rendered statically because it used revalidate: 0 fetch http://localhost:8000/api/v1/video?page=1&limit=100 /watch. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at g (.next/server/chunks/9245.js:17:13964)
+    at <unknown> (.next/server/chunks/9245.js:143:73414)
+    at <unknown> (.next/server/chunks/9245.js:5:33002)
+    at o.with (.next/server/chunks/9245.js:1:48892)
+    at l.with (.next/server/chunks/9245.js:1:43100)
+    at l.startActiveSpan (.next/server/chunks/9245.js:1:58144)
+    at o.startActiveSpan (.next/server/chunks/9245.js:1:58678)
+    at <unknown> (.next/server/chunks/9245.js:5:32510)
+    at o.with (.next/server/chunks/9245.js:1:48892)
+    at l.with (.next/server/chunks/9245.js:1:43100) {
+  description: "Route /watch couldn't be rendered statically because it used revalidate: 0 fetch http://localhost:8000/api/v1/video?page=1&limit=100 /watch. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+ ✓ Generating static pages (83/83)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /_not-found                            151 B         102 kB
+├ ƒ /[[...home]]                         12.8 kB         181 kB
+├ ○ /admission                           8.42 kB         199 kB
+├ ƒ /admission/[id]                      6.11 kB         156 kB
+├ ○ /blogs                               9.63 kB         209 kB
+├ ƒ /blogs/[slugs]                        2.7 kB         161 kB
+├ ○ /blogs/description                   3.41 kB         153 kB
+├ ○ /career                              3.94 kB         257 kB
+├ ƒ /career/[slugs]                      3.25 kB         219 kB
+├ ○ /colleges                            10.5 kB         216 kB
+├ ƒ /colleges/[slugs]                    10.9 kB         195 kB
+├ ƒ /colleges/apply/[slugs]/[[...rest]]   8.1 kB         169 kB
+├ ○ /consultancy                         7.88 kB         204 kB
+├ ƒ /consultancy/[slugs]                 9.86 kB         159 kB
+├ ƒ /consultancy/apply/[slugs]           7.66 kB         169 kB
+├ ○ /contact                                8 kB         204 kB
+├ ○ /course/slugs                         5.1 kB         156 kB
+├ ○ /courses                             6.61 kB         177 kB
+├ ƒ /courses/[slugs]                       151 B         102 kB
+├ ○ /dashboard                           9.66 kB         154 kB
+├ ○ /dashboard/academia                    188 B         110 kB
+├ ○ /dashboard/admin                       151 B         102 kB
+├ ○ /dashboard/admission                 11.2 kB         301 kB
+├ ○ /dashboard/agent                       151 B         102 kB
+├ ○ /dashboard/applications              5.86 kB         144 kB
+├ ○ /dashboard/applied-colleges          3.19 kB         108 kB
+├ ○ /dashboard/applied-consultancies     8.22 kB         177 kB
+├ ○ /dashboard/applied-scholarships      9.09 kB         183 kB
+├ ○ /dashboard/ApplyAgent                1.29 kB         103 kB
+├ ○ /dashboard/approve-agents            7.51 kB         143 kB
+├ ○ /dashboard/banner                    13.7 kB         179 kB
+├ ○ /dashboard/blogs                     7.34 kB         374 kB
+├ ○ /dashboard/career                    7.88 kB         320 kB
+├ ○ /dashboard/category                   9.4 kB         156 kB
+├ ○ /dashboard/college-orderings         2.87 kB         131 kB
+├ ○ /dashboard/college-rankings          9.01 kB         135 kB
+├ ○ /dashboard/college-referrals         3.76 kB         105 kB
+├ ○ /dashboard/colleges                  89.8 kB         452 kB
+├ ○ /dashboard/consultancy               21.4 kB         371 kB
+├ ○ /dashboard/consultancy-applications  8.54 kB         127 kB
+├ ○ /dashboard/consultancy-orderings     2.93 kB         131 kB
+├ ○ /dashboard/consultancy-referrals      3.8 kB         105 kB
+├ ○ /dashboard/contactus                 9.08 kB         145 kB
+├ ○ /dashboard/courses                   8.47 kB         157 kB
+├ ○ /dashboard/database-export           6.26 kB         142 kB
+├ ○ /dashboard/degree-orderings          2.85 kB         131 kB
+├ ○ /dashboard/degrees                   17.2 kB         326 kB
+├ ○ /dashboard/discipline                  15 kB         326 kB
+├ ○ /dashboard/edit-college              11.7 kB         165 kB
+├ ○ /dashboard/events                    14.6 kB         330 kB
+├ ○ /dashboard/exams                     13.2 kB         305 kB
+├ ○ /dashboard/faculty                   4.68 kB         142 kB
+├ ○ /dashboard/insights                   131 kB         239 kB
+├ ○ /dashboard/level                     4.62 kB         153 kB
+├ ○ /dashboard/material                  8.94 kB         178 kB
+├ ○ /dashboard/news                      6.12 kB         372 kB
+├ ○ /dashboard/profile                   11.1 kB         161 kB
+├ ○ /dashboard/program                     11 kB         302 kB
+├ ○ /dashboard/referConsultancy          7.19 kB         128 kB
+├ ○ /dashboard/referrals                 8.57 kB         146 kB
+├ ○ /dashboard/referStudent              7.38 kB         129 kB
+├ ○ /dashboard/scholarship               12.1 kB         303 kB
+├ ○ /dashboard/school-orderings          2.92 kB         131 kB
+├ ○ /dashboard/set-referral-point        3.54 kB         132 kB
+├ ○ /dashboard/short-term-courses        12.5 kB         333 kB
+├ ○ /dashboard/site-control              5.57 kB         295 kB
+├ ○ /dashboard/tag                       7.68 kB         138 kB
+├ ○ /dashboard/university                18.2 kB         376 kB
+├ ○ /dashboard/university-orderings      2.85 kB         131 kB
+├ ○ /dashboard/users                     13.2 kB         151 kB
+├ ○ /dashboard/vacancy                   7.79 kB         323 kB
+├ ○ /dashboard/videos                    11.5 kB         181 kB
+├ ○ /dashboard/wishlist                  3.31 kB         116 kB
+├ ○ /degree                              6.96 kB         197 kB
+├ ƒ /degree/[slugs]                      7.99 kB         254 kB
+├ ƒ /degree/single-subject/[slugs]       1.69 kB         186 kB
+├ ƒ /disciplines/[slug]                  4.15 kB         194 kB
+├ ○ /disclaimer                          3.76 kB         153 kB
+├ ○ /events                              6.79 kB         197 kB
+├ ƒ /events/[slugs]                      3.55 kB         162 kB
+├ ○ /exams                               12.4 kB         232 kB
+├ ○ /forgot-password                     5.16 kB         153 kB
+├ ○ /materials                           1.94 kB         156 kB
+├ ƒ /materials/category/[id]             1.64 kB         156 kB
+├ ○ /news                                10.2 kB         197 kB
+├ ○ /privacy-policy                      3.76 kB         153 kB
+├ ƒ /program/[slugs]                     6.31 kB         194 kB
+├ ○ /reset-password                      2.99 kB         127 kB
+├ ○ /scholarship                         7.04 kB         203 kB
+├ ƒ /scholarship/[slugs]                 11.8 kB         199 kB
+├ ƒ /scholarship/apply/[slugs]           7.73 kB         169 kB
+├ ○ /schools                             10.6 kB         213 kB
+├ ƒ /schools/[slugs]                     10.4 kB         194 kB
+├ ƒ /schools/apply/[slugs]               5.52 kB         167 kB
+├ ○ /short-term-courses                  6.42 kB         203 kB
+├ ƒ /short-term-courses/[slug]           5.42 kB         193 kB
+├ ○ /sign-in                             6.09 kB         164 kB
+├ ○ /universities                        8.63 kB         196 kB
+├ ƒ /universities/[slugs]                8.21 kB         254 kB
+├ ○ /vacancies                           7.71 kB         198 kB
+├ ƒ /vacancies/[slugs]                   2.63 kB         193 kB
+├ ƒ /vacancy/[slugs]                     4.38 kB         160 kB
+├ ƒ /watch                               7.79 kB         157 kB
+├ ƒ /watch/[slug]                          175 B         105 kB
+└ ○ /wishlist                            4.58 kB         163 kB
++ First Load JS shared by all             101 kB
+  ├ chunks/4041-d7801bf4c0a3d5ab.js      45.8 kB
+  ├ chunks/4597a8f9-77c7f0cbbaef0cf7.js  53.3 kB
+  └ other shared chunks (total)          2.26 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

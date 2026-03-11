@@ -1,0 +1,26 @@
+
+> my-app@0.1.0 build /Users/sdsys/Files/merouni.com/frontend
+> cross-env NEXT_LINT=false next build
+
+   ▲ Next.js 15.2.8
+   - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping linting
+   Checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/83) ...
+   Generating static pages (20/83) 
+   Generating static pages (41/83) 
+   Generating static pages (62/83) 
+ ✓ Generating static pages (83/83)
+   Finalizing page optimization ...
+   Collecting build traces ...
+[Error: ENOENT: no such file or directory, open '/Users/sdsys/Files/merouni.com/frontend/.next/server/app/favicon.ico/route.js.nft.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/sdsys/Files/merouni.com/frontend/.next/server/app/favicon.ico/route.js.nft.json'
+}
+ ELIFECYCLE  Command failed with exit code 1.
