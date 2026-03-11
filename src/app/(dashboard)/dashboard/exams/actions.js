@@ -75,3 +75,24 @@ export const fetchLevel = async (searchQuery = '') => {
     throw error
   }
 }
+
+//for category search
+export const fetchCategory = async (searchQuery = '') => {
+  try {
+    const params = new URLSearchParams()
+    params.append('type', 'EXAM')
+    if (searchQuery) params.append('q', searchQuery)
+
+    const response = await authFetch(
+      `${process.env.baseUrl}/category?${params.toString()}`
+    )
+    if (!response.ok) {
+      throw new Error('Failed to fetch category')
+    }
+    const data = await response.json()
+    return data.items
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}

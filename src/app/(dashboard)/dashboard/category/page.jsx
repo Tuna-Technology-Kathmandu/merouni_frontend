@@ -16,6 +16,7 @@ import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { Textarea } from '@/ui/shadcn/textarea'
 import SearchInput from '@/ui/molecules/SearchInput'
+import { formatDate } from '@/utils/date.util'
 
 export default function CategoryManager() {
   const { setHeading } = usePageHeading()
@@ -257,6 +258,8 @@ export default function CategoryManager() {
                   <option value='NEWS'>News</option>
                   <option value='MATERIAL'>Material</option>
                   <option value='SCHOLARSHIP'>Scholarship</option>
+                  <option value='EXAM'>Exam</option>
+
 
                 </select>
                 {errors.type && <p className='text-xs text-destructive mt-1'>{errors.type.message}</p>}
@@ -316,11 +319,11 @@ export default function CategoryManager() {
             <div className="grid grid-cols-2 gap-3">
               <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Created</p>
-                <p className="text-sm text-gray-600">{viewingCategory?.createdAt ? new Date(viewingCategory.createdAt).toLocaleDateString() : '—'}</p>
+                <p className="text-sm text-gray-600">{formatDate(viewingCategory?.createdAt)}</p>
               </div>
               <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Updated</p>
-                <p className="text-sm text-gray-600">{viewingCategory?.updatedAt ? new Date(viewingCategory.updatedAt).toLocaleDateString() : '—'}</p>
+                <p className="text-sm text-gray-600">{formatDate(viewingCategory?.updatedAt) }</p>
               </div>
             </div>
           </div>
