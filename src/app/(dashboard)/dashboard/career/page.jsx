@@ -326,7 +326,7 @@ export default function CareerForm() {
       header: 'Status',
       accessorKey: 'status',
       cell: ({ row }) => {
-        const status = row.original.status || 'active'
+        const status = row.original.status;
         return (
           <span
             className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${status === 'active'
@@ -676,14 +676,14 @@ export default function CareerForm() {
                   <div key={index} className='p-4 border rounded-md shadow-sm bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
                     <div className='space-y-1 text-sm'>
                       <h4 className='font-bold text-base text-[#387cae]'>
-                        {applicant.name || `${applicant.firstName || ''} ${applicant.lastName || ''}`.trim() || 'Unknown'}
+                        {applicant.name || `${applicant?.applicant?.firstName || ''} ${applicant?.applicant?.lastName || ''}`.trim() || 'Unknown'}
                       </h4>
                       <p className='text-gray-600 font-medium'>{applicant.email}</p>
                       {applicant.phone && <p className='text-gray-500'>{applicant.phone}</p>}
                     </div>
                     <div>
                       {(applicant.resume || applicant.resumeUrl || applicant.cv || applicant.cvUrl) ? (
-                        <a href={applicant.resume || applicant.resumeUrl || applicant.cv || applicant.cvUrl} target='_blank' rel='noopener noreferrer' className='text-sm font-semibold bg-[#387cae]/10 text-[#387cae] hover:bg-[#387cae] hover:text-white px-4 py-2 rounded-md transition-colors'>
+                        <a href={applicant.resume} target='_blank' rel='noopener noreferrer' className='text-sm font-semibold bg-[#387cae]/10 text-[#387cae] hover:bg-[#387cae] hover:text-white px-4 py-2 rounded-md transition-colors'>
                           View Resume
                         </a>
                       ) : (

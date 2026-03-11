@@ -12,6 +12,7 @@ import { Textarea } from '@/ui/shadcn/textarea'
 import { Button } from '@/ui/shadcn/button'
 import FileUpload from '@/app/(dashboard)/dashboard/colleges/FileUpload'
 import { useSelector } from 'react-redux'
+import { authFetch } from '@/app/utils/authFetch'
 
 const schema = yup.object({
     resume: yup.string().trim().required('Resume is required'),
@@ -19,7 +20,6 @@ const schema = yup.object({
 }).required()
 
 export default function ApplyCareerModal({ isOpen, onClose, careerId, careerTitle }) {
-    const user = useSelector((state) => state.user?.data)
     const [loading, setLoading] = useState(false)
 
 
@@ -46,7 +46,7 @@ export default function ApplyCareerModal({ isOpen, onClose, careerId, careerTitl
                 ...data
             }
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || process.env.baseUrl || ''}/career/apply/${careerId}`, {
+            const response = await authFetch(`${process.env.NEXT_PUBLIC_API_URL || process.env.baseUrl || ''}/career/apply/${careerId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

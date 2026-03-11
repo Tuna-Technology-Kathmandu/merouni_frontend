@@ -1,15 +1,14 @@
 'use client'
+import { THEME_BLUE } from '@/constants/constants'
+import ActionCard from '@/ui/molecules/ActionCard'
+import { Button } from '@/ui/shadcn/button'
 import { formatDate } from '@/utils/date.util'
-import { Briefcase, Calendar, ChevronLeft, MapPin } from 'lucide-react'
+import { Briefcase, Calendar, CheckCircle2, ChevronLeft, MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { toast, ToastContainer } from 'react-toastify'
-import ActionCard from '@/ui/molecules/ActionCard'
-import { Button } from '@/ui/shadcn/button'
-import { THEME_BLUE } from '@/constants/constants'
-import { CheckCircle2 } from 'lucide-react'
+import { ToastContainer } from 'react-toastify'
 import Footer from '../../../components/Frontpage/Footer'
 import Header from '../../../components/Frontpage/Header'
 import Navbar from '../../../components/Frontpage/Navbar'
@@ -135,7 +134,14 @@ const ShowCareer = ({ params }) => {
                 </div>
 
                 <div className="flex-shrink-0 mt-2 md:mt-0 flex flex-col md:flex-row gap-3 min-w-max">
-                  {user && (
+                  {data?.status === 'inactive' ? (
+                    <button
+                      disabled
+                      className="px-6 py-2.5 bg-gray-200 text-gray-500 rounded-lg font-semibold text-sm cursor-not-allowed"
+                    >
+                      Expired
+                    </button>
+                  ) : user && (
                     <button
                       onClick={() => setApplyModalOpen(true)}
                       className="px-6 py-2.5 bg-[#0A6FA7] text-white rounded-lg font-semibold text-sm hover:bg-[#0A6FA7]/90 hover:shadow shadow-sm transition-all"
@@ -200,7 +206,24 @@ const ShowCareer = ({ params }) => {
               />
 
               <div className="mt-12 pt-10 border-t border-gray-100 flex flex-col items-center text-center bg-gray-50/50 -mx-6 md:-mx-8 -mb-6 md:-mb-8 p-6 md:p-8 rounded-b-2xl">
-                {user ? (
+                {data?.status === 'inactive' ? (
+                  <div className="w-full max-w-2xl mx-auto py-4">
+                    <ActionCard
+                      variant='centered'
+                      icon={<CheckCircle2 className='w-full h-full text-gray-400' />}
+                      title='Position Closed'
+                      description={
+                        <>
+                          We are no longer accepting applications for{' '}
+                          <span className='font-semibold text-gray-900'>
+                            {data?.title || 'this role'}
+                          </span>
+                          .
+                        </>
+                      }
+                    />
+                  </div>
+                ) : user ? (
                   <>
                     <div className="w-12 h-12 bg-white border border-gray-100 shadow-sm rounded-full flex items-center justify-center mb-4">
                       <Briefcase className="w-6 h-6 text-[#0A6FA7]" />

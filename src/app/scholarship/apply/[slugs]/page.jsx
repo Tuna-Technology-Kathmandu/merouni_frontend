@@ -1,12 +1,12 @@
 'use client'
 
+import ActionCard from '@/ui/molecules/ActionCard'
 import { useRouter } from 'next/navigation'
 import { use, useEffect, useRef, useState } from 'react'
 import Header from '../../../../components/Frontpage/Header'
 import Navbar from '../../../../components/Frontpage/Navbar'
-import { getScholarshipBySlug, checkIfScholarshipApplied } from '../../actions'
+import { checkIfScholarshipApplied, getScholarshipBySlug } from '../../actions'
 import FormSection from './components/formSection'
-import ActionCard from '@/ui/molecules/ActionCard'
 
 import { THEME_BLUE } from '@/constants/constants'
 import { Button } from '@/ui/shadcn/button'

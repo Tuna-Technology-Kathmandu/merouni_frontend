@@ -33,7 +33,10 @@ const CareerPage = () => {
   const [applyModalOpen, setApplyModalOpen] = useState(false)
   const [selectedCareer, setSelectedCareer] = useState(null)
   const user = useSelector((state) => state.user?.data)
-  const router = useRouter()
+
+
+  console.log(selectedCareer, "Career selection");
+
 
   // Debounce search
   useEffect(() => {
@@ -230,7 +233,14 @@ const CareerPage = () => {
                           </span>
                         </div>
                         <div className='flex items-center gap-3'>
-                          {user ? (
+                          {career?.status === 'inactive' ? (
+                            <button
+                              disabled
+                              className='px-5 py-1.5 bg-gray-200 text-gray-500 rounded-full text-sm font-bold shadow-sm cursor-not-allowed z-10 relative'
+                            >
+                              Expired
+                            </button>
+                          ) : user ? (
                             <button
                               onClick={(e) => {
                                 e.preventDefault();
