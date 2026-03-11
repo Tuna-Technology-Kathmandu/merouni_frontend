@@ -16,7 +16,7 @@ const fetchUniversitiesFromAPI = async (page = 1, filters = {}, searchQuery = ''
   try {
     const queryParams = new URLSearchParams({
       page: page.toString(),
-      limit: '25'
+      limit: '24'
     })
 
     if (searchQuery) {

@@ -7,7 +7,7 @@ export const fetchDegrees = async (search = '', page = 1, disciplines = []) => {
       url.searchParams.append('discipline_id', disciplines.join(','))
     }
     url.searchParams.append('page', page)
-    url.searchParams.append('limit', 15)
+    url.searchParams.append('limit', 24)
 
     const response = await fetch(url.toString())
     const data = await response.json()

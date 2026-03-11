@@ -2,7 +2,7 @@ import { authFetch } from "../utils/authFetch"
 
 export async function getConsultancies(page = 1, searchQuery = '', courseId = '') {
   try {
-    let url = `${process.env.baseUrl}/consultancy?page=${page}&sort=desc&q=${searchQuery}&limit=15`
+    let url = `${process.env.baseUrl}/consultancy?page=${page}&sort=desc&q=${searchQuery}&limit=24`
     if (courseId) {
       url += `&courseId=${courseId}`
     }

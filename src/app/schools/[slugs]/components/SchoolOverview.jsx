@@ -5,7 +5,7 @@ import GallerySection from './sections/GallerySection'
 import MemberSection from './sections/MemberSection'
 import OverviewSection from './sections/OverviewSection'
 import ProgramSection from './sections/ProgramSection'
-import MapSection from './sections/MapSection'
+import GoogleMap from './GoogleMap'
 
 const SchoolOverview = ({ college }) => {
   const overviewRef = useRef(null)
@@ -24,7 +24,15 @@ const SchoolOverview = ({ college }) => {
       member.contact_number?.trim() ||
       member.description?.trim()
   )
-
+  const hasAddress = !!(
+    college?.collegeAddress?.country ||
+    college?.collegeAddress?.state ||
+    college?.collegeAddress?.city ||
+    college?.collegeAddress?.street ||
+    college?.collegeAddress?.postal_code
+  )
+  const address = college?.collegeAddress || {}
+  const hasMap = !!college?.google_map_url
 
   const allSections = [
     {
@@ -62,12 +70,6 @@ const SchoolOverview = ({ college }) => {
       visible: college?.faqs?.length > 0,
       ref: faqsRef,
       component: <FaqSection faqs={college.faqs || []} />
-    },
-    {
-      name: 'Map',
-      visible: !!college?.google_map_url,
-      ref: mapRef,
-      component: <MapSection college={college} />
     }
   ]
 
@@ -156,10 +158,99 @@ const SchoolOverview = ({ college }) => {
             {section.component}
           </div>
         ))}
+
+        {/* Location block - visible on mobile/tablet only (below main content) */}
+        {(hasMap || hasAddress) && (
+          <div className='xl:hidden w-full pt-4'>
+            <div className='bg-gray-50/30 rounded-3xl p-6 border border-gray-100/50'>
+              {hasMap && (
+                <div className='mb-6'>
+                  <p className='text-sm font-medium text-gray-900 mb-4 flex items-center gap-2'>
+                    <span className='w-1 h-4 bg-[#30AD8F] rounded-full' />
+                    Location Map
+                  </p>
+                  <div className='w-full h-44 rounded-2xl overflow-hidden border border-white bg-white'>
+                    <GoogleMap mapUrl={college.google_map_url} />
+                  </div>
+                </div>
+              )}
+              {hasAddress && (
+                <div>
+                  <p className='text-sm font-medium text-gray-900 mb-4 flex items-center gap-2'>
+                    <span className='w-1 h-4 bg-[#0A6FA7] rounded-full' />
+                    Office Address
+                  </p>
+                  <div className='space-y-3'>
+                    <div className='bg-white/80 p-4 rounded-2xl border border-gray-100'>
+                      <p className='text-xs text-gray-500 uppercase tracking-wider font-medium mb-1'>
+                        Street & City
+                      </p>
+                      <p className='text-sm text-gray-700 leading-snug'>
+                        {[address?.street, address?.city]
+                          .filter(Boolean)
+                          .join(', ') || '—'}
+                      </p>
+                      {(address?.state || address?.postal_code || address?.country) && (
+                        <p className='text-xs text-gray-500 mt-1'>
+                          {[address?.state, address?.postal_code, address?.country]
+                            .filter(Boolean)
+                            .join(', ')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Now List the FAQS */}
-
+      {/* Right sidebar - Map & Address (desktop xl only) */}
+      {(hasMap || hasAddress) && (
+        <aside className='w-full md:w-64 lg:w-72 md:sticky md:top-32 flex-shrink-0 hidden xl:block'>
+          <div className='bg-gray-50/30 rounded-3xl p-6 border border-gray-100/50'>
+            {hasMap && (
+              <div className='mb-8'>
+                <p className='text-sm font-medium text-gray-900 mb-4 flex items-center gap-2'>
+                  <span className='w-1 h-4 bg-[#30AD8F] rounded-full' />
+                  Location Map
+                </p>
+                <div className='w-full h-44 rounded-2xl overflow-hidden border border-white bg-white'>
+                  <GoogleMap mapUrl={college.google_map_url} />
+                </div>
+              </div>
+            )}
+            {hasAddress && (
+              <div>
+                <p className='text-sm font-medium text-gray-900 mb-4 flex items-center gap-2'>
+                  <span className='w-1 h-4 bg-[#0A6FA7] rounded-full' />
+                  Office Address
+                </p>
+                <div className='space-y-3'>
+                  <div className='bg-white/80 p-4 rounded-2xl border border-gray-100'>
+                    <p className='text-xs text-gray-500 uppercase tracking-wider font-medium mb-1'>
+                      Street & City
+                    </p>
+                    <p className='text-sm text-gray-700 leading-snug'>
+                      {[address?.street, address?.city]
+                        .filter(Boolean)
+                        .join(', ') || '—'}
+                    </p>
+                    {(address?.state || address?.postal_code || address?.country) && (
+                      <p className='text-xs text-gray-500 mt-1'>
+                        {[address?.state, address?.postal_code, address?.country]
+                          .filter(Boolean)
+                          .join(', ')}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </aside>
+      )}
     </section>
   )
 }
