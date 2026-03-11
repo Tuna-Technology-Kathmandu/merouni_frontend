@@ -300,7 +300,8 @@ export default function NewsManager() {
         visibility: data.visibility || 'private',
         author: author_id,
         college_id: data.college_id || null,
-        category_id: data.category_id || null
+        category_id: data.category_id || null,
+        meta_description: data.meta_description || null
       }
 
       if (editing && editingId) {
