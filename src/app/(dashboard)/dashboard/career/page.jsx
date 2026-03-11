@@ -20,7 +20,7 @@ import { Label } from '@/ui/shadcn/label'
 import { Select } from '@/ui/shadcn/select'
 import { Textarea } from '@/ui/shadcn/textarea'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
-import { Edit2, Eye, Trash2 } from 'lucide-react'
+import { Edit2, Eye, Trash2, Users } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
@@ -44,6 +44,10 @@ export default function CareerForm() {
   const [editId, setEditingId] = useState(null)
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [applicantsOpen, setApplicantsOpen] = useState(false)
+  const [applicantsData, setApplicantsData] = useState([])
+  const [loadingApplicants, setLoadingApplicants] = useState(false)
+  const [selectedCareer, setSelectedCareer] = useState(null)
   const [viewModalOpen, setViewModalOpen] = useState(false)
   const [viewCareerData, setViewCareerData] = useState(null)
   const [loadingView, setLoadingView] = useState(false)
@@ -244,6 +248,24 @@ export default function CareerForm() {
     setDeleteId(null)
   }
 
+  const handleViewApplicants = async (career) => {
+    setSelectedCareer(career)
+    setApplicantsOpen(true)
+    setLoadingApplicants(true)
+    try {
+      const response = await authFetch(
+        `${process.env.baseUrl}/career/applications?careerId=${career.id}`
+      )
+      const data = await response.json()
+      setApplicantsData(data?.items || data || [])
+    } catch (error) {
+      toast.error('Failed to fetch applicants')
+      setApplicantsData([])
+    } finally {
+      setLoadingApplicants(false)
+    }
+  }
+
   const handleView = async (slug) => {
     try {
       setLoadingView(true)
@@ -304,7 +326,7 @@ export default function CareerForm() {
       header: 'Status',
       accessorKey: 'status',
       cell: ({ row }) => {
-        const status = row.original.status || 'active'
+        const status = row.original.status;
         return (
           <span
             className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${status === 'active'
@@ -326,6 +348,13 @@ export default function CareerForm() {
       id: 'actions',
       cell: ({ row }) => (
         <div className='flex gap-2'>
+          <button
+            onClick={() => handleViewApplicants(row.original)}
+            className='p-1 text-green-600 hover:text-green-800'
+            title='View Applicants'
+          >
+            <Users className='w-4 h-4' />
+          </button>
           <button
             onClick={() => handleView(row.original.slugs)}
             className='p-1 text-purple-600 hover:text-purple-800'
@@ -392,8 +421,8 @@ export default function CareerForm() {
           }}
           className='max-w-5xl'
         >
-          <DialogContent className='max-w-5xl max-h-[90vh] flex flex-col p-0'>
-            <DialogHeader className='px-6 py-4 border-b'>
+          <DialogContent className='max-w-5xl max-h-[90vh] flex flex-col p-0 overflow-hidden'>
+            <DialogHeader className='px-6 py-4 border-b flex-shrink-0'>
               <DialogTitle>{editing ? 'Edit Career' : 'Add Career'}</DialogTitle>
               <DialogClose
                 onClick={() => {
@@ -405,131 +434,129 @@ export default function CareerForm() {
                 }}
               />
             </DialogHeader>
-            <div className='flex-1 overflow-y-auto p-6'>
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className='flex flex-col flex-1 overflow-hidden'
-              >
-                <div className='flex-1 overflow-y-auto space-y-6 pr-2'>
-                  {/* Basic Information */}
-                  <div className='bg-white p-6 rounded-md shadow-md'>
-                    <div className='grid grid-cols-1 gap-4'>
-                      <div>
-                        <Label
-                          required
-                        >
-                          Job Title
-                        </Label>
-                        <Input
-                          {...register('title', {
-                            required: 'Job title is required',
-                            minLength: {
-                              value: 3,
-                              message: 'Title must be at least 3 characters long'
-                            }
-                          })}
-                          className='w-full p-2 border rounded'
-                        />
-                        {errors.title && (
-                          <span className='text-red-500 text-sm mt-1'>
-                            {errors.title.message}
-                          </span>
-                        )}
-                      </div>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className='flex flex-col flex-1 overflow-hidden min-h-0'
+            >
+              <div className='flex-1 overflow-y-auto p-6 space-y-6'>
+                {/* Basic Information */}
+                <div className='bg-white p-6 rounded-md shadow-md'>
+                  <div className='grid grid-cols-1 gap-4'>
+                    <div>
+                      <Label
+                        required
+                      >
+                        Job Title
+                      </Label>
+                      <Input
+                        {...register('title', {
+                          required: 'Job title is required',
+                          minLength: {
+                            value: 3,
+                            message: 'Title must be at least 3 characters long'
+                          }
+                        })}
+                        className='w-full p-2 border rounded'
+                      />
+                      {errors.title && (
+                        <span className='text-red-500 text-sm mt-1'>
+                          {errors.title.message}
+                        </span>
+                      )}
+                    </div>
 
-                      <div>
-                        <Label required>Status</Label>
-                        <Select
-                          {...register('status', { required: 'Status is required' })}
-                          className='w-full p-2 border rounded bg-white'
-                        >
-                          <option value=''>Select Status</option>
-                          <option value='active'>Active</option>
-                          <option value='inactive'>Inactive</option>
-                        </Select>
-                        {errors.status && (
-                          <span className='text-red-500 text-sm mt-1'>
-                            {errors.status.message}
-                          </span>
-                        )}
-                      </div>
+                    <div>
+                      <Label required>Status</Label>
+                      <Select
+                        {...register('status', { required: 'Status is required' })}
+                        className='w-full p-2 border rounded bg-white'
+                      >
+                        <option value=''>Select Status</option>
+                        <option value='active'>Active</option>
+                        <option value='inactive'>Inactive</option>
+                      </Select>
+                      {errors.status && (
+                        <span className='text-red-500 text-sm mt-1'>
+                          {errors.status.message}
+                        </span>
+                      )}
+                    </div>
 
-                      <div>
-                        <Label required>Description</Label>
-                        <Textarea
-                          {...register('description', { required: 'Description is required' })}
-                          className='w-full p-2 border rounded'
-                          rows='3'
-                        />
-                        {errors.description && (
-                          <span className='text-red-500 text-sm mt-1'>
-                            {errors.description.message}
-                          </span>
-                        )}
-                      </div>
+                    <div>
+                      <Label required>Description</Label>
+                      <Textarea
+                        {...register('description', { required: 'Description is required' })}
+                        className='w-full p-2 border rounded'
+                        rows='3'
+                      />
+                      {errors.description && (
+                        <span className='text-red-500 text-sm mt-1'>
+                          {errors.description.message}
+                        </span>
+                      )}
+                    </div>
 
-                      <div>
-                        <Label required>Content</Label>
-                        <TipTapEditor
-                          value={watch('content')}
-                          onChange={(data) => {
-                            setValue('content', data, { shouldValidate: true })
-                          }}
-                        />
-                        <input
-                          type='hidden'
-                          {...register('content', {
-                            required: 'Content is required',
-                            validate: (value) =>
-                              (value && value !== '<p></p>' && value.trim() !== '') || 'Content is required'
-                          })}
-                        />
-                        {errors.content && (
-                          <span className='text-red-500 text-sm mt-1'>
-                            {errors.content.message}
-                          </span>
-                        )}
-                      </div>
+                    <div>
+                      <Label required>Content</Label>
+                      <TipTapEditor
+                        value={watch('content')}
+                        onChange={(data) => {
+                          setValue('content', data, { shouldValidate: true })
+                        }}
+                      />
+                      <input
+                        type='hidden'
+                        {...register('content', {
+                          required: 'Content is required',
+                          validate: (value) =>
+                            (value && value !== '<p></p>' && value.trim() !== '') || 'Content is required'
+                        })}
+                      />
+                      {errors.content && (
+                        <span className='text-red-500 text-sm mt-1'>
+                          {errors.content.message}
+                        </span>
+                      )}
+                    </div>
 
-                      <div>
-                        <FileUpload
-                          label='Featured Image'
-                          required={true}
-                          onUploadComplete={(url) => {
-                            setUploadedFiles((prev) => ({
-                              ...prev,
-                              featured: url
-                            }))
-                            setValue('featuredImage', url, { shouldValidate: true })
-                          }}
-                          defaultPreview={uploadedFiles.featured}
-                        />
-                        <input
-                          type='hidden'
-                          {...register('featuredImage', { required: 'Featured image is required' })}
-                        />
-                        {errors.featuredImage && (
-                          <span className='text-red-500 text-sm mt-1'>
-                            {errors.featuredImage.message}
-                          </span>
-                        )}
-                      </div>
+                    <div>
+                      <FileUpload
+                        label='Featured Image'
+                        required={true}
+                        onUploadComplete={(url) => {
+                          setUploadedFiles((prev) => ({
+                            ...prev,
+                            featured: url
+                          }))
+                          setValue('featuredImage', url, { shouldValidate: true })
+                        }}
+                        defaultPreview={uploadedFiles.featured}
+                      />
+                      <input
+                        type='hidden'
+                        {...register('featuredImage', { required: 'Featured image is required' })}
+                      />
+                      {errors.featuredImage && (
+                        <span className='text-red-500 text-sm mt-1'>
+                          {errors.featuredImage.message}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Submit Button - Sticky Footer */}
-                <div className='sticky bottom-0 bg-white border-t pt-4 pb-2 mt-4 flex justify-end'>
-                  <Button type='submit' disabled={loading}>
-                    {loading
-                      ? 'Processing...'
-                      : editing
-                        ? 'Update Career'
-                        : 'Create Career'}
-                  </Button>
-                </div>
-              </form>
-            </div>
+              {/* Submit Button - Static Footer */}
+              <div className='bg-white border-t px-6 py-4 flex justify-end flex-shrink-0'>
+                <Button type='submit' disabled={loading}>
+                  {loading
+                    ? 'Processing...'
+                    : editing
+                      ? 'Update Career'
+                      : 'Create Career'}
+                </Button>
+              </div>
+            </form>
           </DialogContent>
         </Dialog>
 
@@ -622,6 +649,56 @@ export default function CareerForm() {
           ) : (
             <p className='text-center text-gray-500'>No career data available.</p>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Applicants Modal */}
+      <Dialog
+        isOpen={applicantsOpen}
+        onClose={() => setApplicantsOpen(false)}
+        className='max-w-4xl'
+      >
+        <DialogContent className='max-w-4xl max-h-[80vh] flex flex-col p-0'>
+          <DialogHeader className='px-6 py-4 border-b'>
+            <DialogTitle>
+              Applicants for {selectedCareer?.title || 'Career'}
+            </DialogTitle>
+            <DialogClose onClick={() => setApplicantsOpen(false)} />
+          </DialogHeader>
+          <div className='flex-1 overflow-y-auto p-6'>
+            {loadingApplicants ? (
+              <div className='flex justify-center items-center h-48'>
+                Loading...
+              </div>
+            ) : applicantsData.length > 0 ? (
+              <div className='space-y-4'>
+                {applicantsData.map((applicant, index) => (
+                  <div key={index} className='p-4 border rounded-md shadow-sm bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
+                    <div className='space-y-1 text-sm'>
+                      <h4 className='font-bold text-base text-[#387cae]'>
+                        {applicant.name || `${applicant?.applicant?.firstName || ''} ${applicant?.applicant?.lastName || ''}`.trim() || 'Unknown'}
+                      </h4>
+                      <p className='text-gray-600 font-medium'>{applicant.email}</p>
+                      {applicant.phone && <p className='text-gray-500'>{applicant.phone}</p>}
+                    </div>
+                    <div>
+                      {(applicant.resume || applicant.resumeUrl || applicant.cv || applicant.cvUrl) ? (
+                        <a href={applicant.resume} target='_blank' rel='noopener noreferrer' className='text-sm font-semibold bg-[#387cae]/10 text-[#387cae] hover:bg-[#387cae] hover:text-white px-4 py-2 rounded-md transition-colors'>
+                          View Resume
+                        </a>
+                      ) : (
+                        <span className='text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full'>No Resume</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className='text-center text-gray-500 py-10 bg-gray-50 rounded-lg'>
+                No applicants found for this position.
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </>

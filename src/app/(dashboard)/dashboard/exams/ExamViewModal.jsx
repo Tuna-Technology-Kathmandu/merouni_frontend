@@ -34,6 +34,10 @@ const ExamViewModal = ({ isOpen, onClose, exam }) => {
                             <p className="text-base text-gray-900">{exam.university?.fullname || 'N/A'}</p>
                         </div>
                         <div>
+                            <h4 className="text-sm font-medium text-gray-500">Category</h4>
+                            <p className="text-base text-gray-900">{exam.category?.title || 'N/A'}</p>
+                        </div>
+                        <div>
                             <h4 className="text-sm font-medium text-gray-500">Created At</h4>
                             <p className="text-base text-gray-900">{exam.createdAt ? formatDate(exam.createdAt) : 'N/A'}</p>
                         </div>

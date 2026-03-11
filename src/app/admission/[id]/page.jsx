@@ -1,24 +1,18 @@
 'use client'
-import React, { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
 import {
-  GraduationCap,
-  MapPin,
-  BookOpen,
-  FileText,
-  Info,
   ArrowLeft,
-  Calendar,
-  Wallet,
   Building2,
-  ChevronRight
+  ChevronRight,
+  FileText,
+  GraduationCap
 } from 'lucide-react'
-import Navbar from '../../../components/Frontpage/Navbar'
+import Link from 'next/link'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import Footer from '../../../components/Frontpage/Footer'
 import Header from '../../../components/Frontpage/Header'
+import Navbar from '../../../components/Frontpage/Navbar'
 import { getAdmissionDetail } from '../actions'
-import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
-import Link from 'next/link'
 
 const AdmissionDetailPage = () => {
   const { id } = useParams()
@@ -88,6 +82,8 @@ const AdmissionDetailPage = () => {
     )
   }
 
+  console.log(admission,"admissionadmissionadmissionadmission");
+  
   return (
     <>
       <Header />
@@ -157,9 +153,9 @@ const AdmissionDetailPage = () => {
                       <GraduationCap size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Affiliation</p>
+                      <p className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Program</p>
                       <p className="text-base font-bold text-gray-700">
-                        {admission.collegeAdmissionCollege?.university?.fullname || 'Not Specified'}
+                        {admission.program?.title || 'Not Specified'}
                       </p>
                     </div>
                   </div>

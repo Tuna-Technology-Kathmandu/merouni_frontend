@@ -11,6 +11,7 @@ import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import CreateUpdateProgram from '@/ui/molecules/dialogs/CreateUpdateProgram'
 import ViewProgram from '@/ui/molecules/dialogs/ViewProgram'
 import SearchInput from '@/ui/molecules/SearchInput'
+import SearchSelectCreate from '@/ui/shadcn/search-select-create'
 
 export default function ProgramForm() {
   const { setHeading } = usePageHeading()
@@ -20,6 +21,9 @@ export default function ProgramForm() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
+
+  const [selectedUniversity, setSelectedUniversity] = useState(null)
+  const [selectedLevel, setSelectedLevel] = useState(null)
 
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showViewModal, setShowViewModal] = useState(false)
@@ -46,6 +50,10 @@ export default function ProgramForm() {
   }, [])
 
   useEffect(() => {
+    fetchPrograms()
+  }, [selectedUniversity, selectedLevel])
+
+  useEffect(() => {
     return () => {
       if (searchTimeout) {
         clearTimeout(searchTimeout)
@@ -61,6 +69,12 @@ export default function ProgramForm() {
       let url = `${process.env.baseUrl}/program?page=${page}`
       if (query) {
         url += `&q=${encodeURIComponent(query)}`
+      }
+      if (selectedUniversity) {
+        url += `&university_id=${selectedUniversity.id}`
+      }
+      if (selectedLevel) {
+        url += `&programlevel_id=${selectedLevel.id}`
       }
       const response = await authFetch(url)
       const data = await response.json()
@@ -146,6 +160,28 @@ export default function ProgramForm() {
     fetchPrograms(1, query)
   }
 
+  const handleUniversitySearch = async (query) => {
+    try {
+      const response = await authFetch(`${process.env.baseUrl}/university?q=${query}`)
+      const data = await response.json()
+      return data?.items || []
+    } catch (error) {
+      console.error('Failed to fetch universities', error)
+      return []
+    }
+  }
+
+  const handleLevelSearch = async (query) => {
+    try {
+      const response = await authFetch(`${process.env.baseUrl}/level?q=${query}`)
+      const data = await response.json()
+      return data?.items  || []
+    } catch (error) {
+      console.error('Failed to fetch levels', error)
+      return []
+    }
+  }
+
   const columns = [
     {
       header: 'Title',
@@ -217,15 +253,47 @@ export default function ProgramForm() {
       {/* Header Section */}
       <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
         <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
-          {/* Search Bar */}
-          <SearchInput
-            value={searchQuery}
-            onChange={(e) => handleSearchInput(e.target.value)}
-            placeholder='Search programs...'
-            className='max-w-md w-full'
-          />
+          <div className="flex flex-col sm:flex-row gap-3 w-full items-start sm:items-center">
+            {/* Search Bar */}
+            <div className="w-full sm:max-w-xs">
+              <SearchInput
+                value={searchQuery}
+                onChange={(e) => handleSearchInput(e.target.value)}
+                placeholder='Search programs...'
+                className='w-full'
+              />
+            </div>
 
-          <Button onClick={handleCreate} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
+            {/* University Filter */}
+            <div className="w-full sm:w-64">
+              <SearchSelectCreate
+                onSearch={handleUniversitySearch}
+                onSelect={setSelectedUniversity}
+                onRemove={() => setSelectedUniversity(null)}
+                selectedItems={selectedUniversity ? [selectedUniversity] : []}
+                placeholder="Filter by University"
+                displayKey="fullname"
+                valueKey="id"
+                isMulti={false}
+              />
+            </div>
+
+            {/* Level Filter */}
+            <div className="w-full sm:w-64">
+              <SearchSelectCreate
+                onSearch={handleLevelSearch}
+                onSelect={setSelectedLevel}
+                onRemove={() => setSelectedLevel(null)}
+                selectedItems={selectedLevel ? [selectedLevel] : []}
+                placeholder="Filter by Level"
+                displayKey="title"
+                valueKey="id"
+                isMulti={false}
+              />
+            </div>
+          </div>
+
+          <Button onClick={handleCreate} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2 shrink-0">
             <Plus className="w-4 h-4" />
             Add Program
           </Button>

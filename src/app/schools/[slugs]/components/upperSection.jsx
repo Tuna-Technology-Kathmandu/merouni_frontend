@@ -97,10 +97,10 @@ const ImageSection = ({ college }) => {
 
       {/* College details section */}
       <div className='px-4 sm:px-8 md:px-12 lg:px-24 w-full'>
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-5'>
+        <div className='flex flex-wrap justify-center gap-4 md:gap-5'>
           {/* University */}
           {hasUniversity && (
-            <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group'>
+            <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group w-full xs:w-[160px] sm:w-[200px] md:w-[220px]'>
               <div className='bg-blue-50 p-3 rounded-2xl mb-4 group-hover:bg-[#0A6FA7]/10 transition-colors duration-300'>
                 <FaUniversity className='w-6 h-6 text-[#0A6FA7]' />
               </div>
@@ -117,7 +117,7 @@ const ImageSection = ({ college }) => {
 
           {/* Institute Level */}
           {hasInstituteLevel && (
-            <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group'>
+            <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group w-full xs:w-[160px] sm:w-[200px] md:w-[220px]'>
               <div className='bg-indigo-50 p-3 rounded-2xl mb-4 group-hover:bg-indigo-100 transition-colors duration-300'>
                 <img
                   src='/images/level.png'
@@ -143,7 +143,7 @@ const ImageSection = ({ college }) => {
 
           {/* Contact */}
           {hasContacts && (
-            <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group'>
+            <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group w-full xs:w-[160px] sm:w-[200px] md:w-[220px]'>
               <div className='bg-orange-50 p-3 rounded-2xl mb-4 group-hover:bg-orange-100 transition-colors duration-300'>
                 <FaPhoneAlt className='w-5 h-5 text-orange-500' />
               </div>
@@ -166,7 +166,7 @@ const ImageSection = ({ college }) => {
 
           {/* Website */}
           {hasWebsite && (
-            <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group'>
+            <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group w-full xs:w-[160px] sm:w-[200px] md:w-[220px]'>
               <div className='bg-sky-50 p-3 rounded-2xl mb-4 group-hover:bg-sky-100 transition-colors duration-300'>
                 <BsGlobe2 className='w-5 h-5 text-sky-500' />
               </div>
@@ -186,7 +186,7 @@ const ImageSection = ({ college }) => {
 
           {/* New Address Card */}
           {hasAddress && (
-            <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group'>
+            <div className='bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30_rgba(0,0,0,0.06)] transition-all duration-300 p-5 flex flex-col items-center justify-center text-center border border-gray-100 hover:border-[#30AD8F]/20 group w-full xs:w-[160px] sm:w-[200px] md:w-[220px]'>
               <div className='bg-emerald-50 p-3 rounded-2xl mb-4 group-hover:bg-[#30AD8F]/10 transition-colors duration-300'>
                 <FaMapMarkerAlt className='w-5 h-5 text-[#30AD8F]' />
               </div>

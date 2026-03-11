@@ -10,15 +10,12 @@ import Footer from '../../components/Frontpage/Footer'
 import Header from '../../components/Frontpage/Header'
 import Pagination from '../blogs/components/Pagination'
 import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
+import ApplyCareerModal from './components/ApplyCareerModal'
+import { useSelector } from 'react-redux'
+import { useRouter } from 'next/navigation'
+import { formatDate } from '@/utils/date.util'
 
-function formatDate(dateString) {
-  if (!dateString) return ''
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
+
 
 const CareerPage = () => {
   const [careers, setCareers] = useState([])
@@ -33,6 +30,13 @@ const CareerPage = () => {
     totalCount: 0
   })
   const [isSearching, setIsSearching] = useState(false)
+  const [applyModalOpen, setApplyModalOpen] = useState(false)
+  const [selectedCareer, setSelectedCareer] = useState(null)
+  const user = useSelector((state) => state.user?.data)
+
+
+  console.log(selectedCareer, "Career selection");
+
 
   // Debounce search
   useEffect(() => {
@@ -228,8 +232,34 @@ const CareerPage = () => {
                             {formatDate(career.createdAt)}
                           </span>
                         </div>
-                        <div className='w-8 h-8 rounded-full bg-[#0A6FA7]/10 flex items-center justify-center group-hover:bg-[#0A6FA7] transition-colors duration-500'>
-                          <Briefcase className='w-4 h-4 text-[#0A6FA7] group-hover:text-white transition-colors duration-500' />
+                        <div className='flex items-center gap-3'>
+                          {career?.status === 'inactive' ? (
+                            <button
+                              disabled
+                              className='px-5 py-1.5 bg-gray-200 text-gray-500 rounded-full text-sm font-bold shadow-sm cursor-not-allowed z-10 relative'
+                            >
+                              Expired
+                            </button>
+                          ) : career?.hasApplied ? (
+                            <button
+                              disabled
+                              className='px-5 py-1.5 bg-green-50 text-green-600 border border-green-200 rounded-full text-sm font-bold shadow-sm cursor-not-allowed z-10 relative'
+                            >
+                              Already Applied
+                            </button>
+                          ) : user ? (
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setSelectedCareer(career);
+                                setApplyModalOpen(true);
+                              }}
+                              className='px-5 py-1.5 bg-[#0A6FA7] text-white rounded-full text-sm font-bold shadow hover:bg-[#0A6FA7]/90 transition-colors z-10 relative'
+                            >
+                              Apply Now
+                            </button>
+                          ) : (null)}
+
                         </div>
                       </div>
                     </div>
@@ -252,6 +282,19 @@ const CareerPage = () => {
           )}
         </div>
       </div>
+
+      {selectedCareer && (
+        <ApplyCareerModal
+          isOpen={applyModalOpen}
+          onClose={() => {
+            setApplyModalOpen(false)
+            setSelectedCareer(null)
+          }}
+          careerId={selectedCareer.id}
+          careerTitle={selectedCareer.title}
+        />
+      )}
+
       <Footer />
     </>
   )

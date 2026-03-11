@@ -7,7 +7,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
 import Link from '@tiptap/extension-link'
-import Image from '@tiptap/extension-image'
+import ImageResize from 'tiptap-extension-resize-image'
 import { Table } from '@tiptap/extension-table'
 import { TableRow } from '@tiptap/extension-table-row'
 import { TableCell } from '@tiptap/extension-table-cell'
@@ -422,7 +422,7 @@ export default function TipTapEditor({ value, onChange, onMediaUpload, placehold
           class: 'text-[#387cae] underline cursor-pointer',
         },
       }),
-      Image.configure({
+      ImageResize.configure({
         allowBase64: true,
       }),
       Table.configure({

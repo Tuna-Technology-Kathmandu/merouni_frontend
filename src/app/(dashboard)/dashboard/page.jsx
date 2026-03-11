@@ -579,6 +579,17 @@ export const AgentDashboard = () => {
   )
 }
 
+export const EditorDashboard = () => {
+  return (
+    <div className='p-4 flex flex-col gap-8'>
+      <div className='w-full flex flex-col gap-8'>
+        {/* QUICK ACTIONS */}
+        <QuickActions />
+
+      </div></div>
+  )
+}
+
 const DashboardPage = () => {
   const rawRole = useSelector((state) => state.user?.data?.role)
   const role =
@@ -608,6 +619,10 @@ const DashboardPage = () => {
 
   else if (role?.agent) {
     return <AgentDashboard />
+  }
+
+  else if (role?.editor) {
+    return <EditorDashboard />
   }
 
   return <>Loading...</>

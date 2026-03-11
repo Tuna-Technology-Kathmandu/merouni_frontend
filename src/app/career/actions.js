@@ -1,3 +1,4 @@
+import { authFetch } from "../utils/authFetch"
 
 export async function getCareers(page = 1, searchQuery = '', collegeId = '') {
   try {
@@ -11,7 +12,7 @@ export async function getCareers(page = 1, searchQuery = '', collegeId = '') {
       queryParams.append('college_id', collegeId)
     }
 
-    const response = await fetch(
+    const response = await authFetch(
       `${process.env.baseUrl}/career?${queryParams.toString()}`,
       {
         method: 'GET',
@@ -35,7 +36,7 @@ export async function getCareers(page = 1, searchQuery = '', collegeId = '') {
 
 export async function getCareer(slug) {
   try {
-    const response = await fetch(
+    const response = await authFetch(
       `${process.env.baseUrl}/career/${slug}`,
       {
         method: 'GET',
@@ -43,7 +44,7 @@ export async function getCareer(slug) {
           'Content-Type': 'application/json'
         },
         // Optional: Add cache configuration
-        cache: 'force-cache' // or 'no-store' for fresh data
+        cache: 'no-store' // or 'no-store' for fresh data
       }
     )
 

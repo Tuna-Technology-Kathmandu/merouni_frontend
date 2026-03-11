@@ -43,11 +43,23 @@ const SkillCourseCard = ({ course }) => {
                         <span className='text-gray-500'>Duration</span>
                         <span className='font-medium text-gray-700'>{course.duration || 'Flexible'}</span>
                     </div>
+                    {course.location && (
+                        <div className='flex items-center justify-between text-sm'>
+                            <span className='text-gray-500'>Location</span>
+                            <span className='font-medium text-gray-700 truncate ml-4'>{course.location}</span>
+                        </div>
+                    )}
+                    {course.course_type && (
+                        <div className='flex items-center justify-between text-sm'>
+                            <span className='text-gray-500'>Type</span>
+                            <span className='font-medium text-gray-700 capitalize'>{course.course_type}</span>
+                        </div>
+                    )}
                 </div>
 
                 <div className='mt-auto pt-4 border-t border-gray-100'>
                     <Link
-                        href={`/skill-based-courses/${course.slug}`}
+                        href={`/short-term-courses/${course.slug}`}
                         className='block w-full py-2.5 rounded-md text-center text-sm font-semibold text-white bg-[#387cae] hover:bg-[#2c6590] transition-colors shadow-sm hover:shadow active:scale-[0.98]'
                     >
                         View Details

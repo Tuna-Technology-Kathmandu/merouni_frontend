@@ -395,7 +395,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label>Duration <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
+                                        <Label>Duration</Label>
                                         <Input
                                             {...register('duration')}
                                             placeholder='e.g., 4 years'
@@ -407,7 +407,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label>Credits <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
+                                        <Label>Credits</Label>
                                         <Input
                                             type='number'
                                             step='0.1'
@@ -424,7 +424,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label>Level <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
+                                        <Label>Level</Label>
                                         <input type='hidden' {...register('level_id')} />
                                         <SearchSelectCreate
                                             onSearch={onSearchLevels}
@@ -441,7 +441,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label>Degree <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
+                                        <Label>Degree</Label>
                                         <SearchSelectCreate
                                             onSearch={onSearchDegrees}
                                             onSelect={(item) => { setSelectedDegree(item); setValue('degree_id', item.id) }}
@@ -457,7 +457,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label>Language of Instruction <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
+                                        <Label>Language of Instruction</Label>
                                         <Input
                                             {...register('language')}
                                             placeholder='e.g., English'
@@ -469,7 +469,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label>Fee Structure <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
+                                        <Label>Fee Structure</Label>
                                         <Input
                                             {...register('fee')}
                                             placeholder='e.g., 5,000 USD per year'
@@ -484,7 +484,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
 
                                 {/* Learning Outcomes – TipTap */}
                                 <div className="space-y-1.5">
-                                    <Label>Description / Learning Outcomes <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
+                                    <Label>Description / Learning Outcomes</Label>
                                     <div className={learningOutcomesError ? 'ring-2 ring-red-400 rounded-md' : ''}>
                                         <TipTapEditor
                                             value={learningOutcomes}
@@ -557,7 +557,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                 <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Scholarships & Exams</h3>
                                 <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
                                     <div className="space-y-1.5">
-                                        <Label>Scholarship <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
+                                        <Label>Scholarship</Label>
                                         <SearchSelectCreate
                                             onSearch={onSearchScholarships}
                                             onSelect={(item) => { setSelectedScholarship(item); setValue('scholarship_id', item.id) }}
@@ -573,7 +573,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                     </div>
 
                                     <div className="space-y-1.5">
-                                        <Label>Entrance Exam <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
+                                        <Label>Entrance Exam</Label>
                                         <SearchSelectCreate
                                             onSearch={onSearchExams}
                                             onSelect={(item) => { setSelectedExam(item); setValue('exam_id', item.id) }}
@@ -597,7 +597,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                         <Building2 size={13} className="text-violet-600" />
                                     </div>
                                     <h3 className="text-base font-semibold text-slate-800">Associated Universities</h3>
-                                    <span className="ml-auto text-xs text-gray-400 font-normal">(optional)</span>
+                                    
                                 </div>
                                 <p className="text-xs text-gray-400">Search and select the universities this program is affiliated with. You can select multiple.</p>
                                 <SearchSelectCreate
@@ -618,7 +618,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                             <section className="space-y-4">
                                 <h3 className="text-base font-semibold text-slate-800 border-b pb-2">Additional Information</h3>
                                 <div className="space-y-1.5">
-                                    <Label>Career Opportunities <span className='text-gray-400 text-xs font-normal'>(optional)</span></Label>
+                                    <Label>Career Opportunities</Label>
                                     <Textarea
                                         {...register('careers')}
                                         rows={3}

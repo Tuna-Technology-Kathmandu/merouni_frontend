@@ -28,7 +28,7 @@ import { Button } from '../../../../ui/shadcn/button'
 import { Input } from '../../../../ui/shadcn/input'
 import { Label } from '../../../../ui/shadcn/label'
 import { Select } from '../../../../ui/shadcn/select'
-import { createExam, deleteExam, fetchLevel, fetchUniversities, getAllExams } from './actions'
+import { createExam, deleteExam, fetchCategory, fetchLevel, fetchUniversities, getAllExams } from './actions'
 import ExamViewModal from './ExamViewModal'
 
 export default function ExamManager() {
@@ -69,6 +69,7 @@ export default function ExamManager() {
       affiliation: '',
       syllabus: '',
       pastQuestion: '',
+      pastQuestion: '',
       exam_type: 'Written',
       full_marks: '',
       pass_marks: '',
@@ -79,11 +80,14 @@ export default function ExamManager() {
       late_fee: '',
       exam_date: '',
       opening_date: '',
-      closing_date: ''
+      closing_date: '',
+      category_id: '',
+      meta_description: ''
     }
   })
   const [selectedLevel, setSelectedLevel] = useState(null)
   const [selectedUniversity, setSelectedUniversity] = useState(null)
+  const [selectedCategory, setSelectedCategory] = useState(null)
 
   useEffect(() => {
     setHeading('Exam Management')
@@ -172,7 +176,9 @@ export default function ExamManager() {
       late_fee: '',
       exam_date: '',
       opening_date: '',
-      closing_date: ''
+      closing_date: '',
+      category_id: '',
+      meta_description: ''
     })
     setIsOpen(true)
   }
@@ -183,6 +189,7 @@ export default function ExamManager() {
     // Set selected objects for SearchSelectCreate
     setSelectedLevel(exam.level || null)
     setSelectedUniversity(exam.university || null)
+    setSelectedCategory(exam.category || null)
 
     // Formatted dates for <input type="date" />
     const formatInputDate = (dateStr) => {
@@ -213,7 +220,9 @@ export default function ExamManager() {
       late_fee: exam.late_fee || '',
       exam_date: formatInputDate(exam.exam_date),
       opening_date: formatInputDate(exam.opening_date),
-      closing_date: formatInputDate(exam.closing_date)
+      closing_date: formatInputDate(exam.closing_date),
+      category_id: exam.category_id || exam.category?.id || '',
+      meta_description: exam.meta_description || ''
     })
     setIsOpen(true)
   }
@@ -223,6 +232,7 @@ export default function ExamManager() {
     setEditingId(null)
     setSelectedLevel(null)
     setSelectedUniversity(null)
+    setSelectedCategory(null)
   }
 
   const onSubmit = async (data) => {
@@ -241,11 +251,12 @@ export default function ExamManager() {
       const formattedData = {
         ...data,
         author: author_id,
-        full_marks: Number(data.full_marks || 0),
-        pass_marks: Number(data.pass_marks || 0),
-        questions_count: Number(data.questions_count || 0),
-        normal_fee: Number(data.normal_fee || 0),
-        late_fee: Number(data.late_fee || 0),
+        full_marks: data.full_marks ? Number(data.full_marks) : null,
+        pass_marks: data.pass_marks ? Number(data.pass_marks) : null,
+        questions_count: data.questions_count ? Number(data.questions_count) : null,
+        normal_fee: data.normal_fee ? Number(data.normal_fee) : null,
+        late_fee: data.late_fee ? Number(data.late_fee) : null,
+        category_id: data.category_id || null,
         ...(editingId && { id: editingId })
       }
 
@@ -296,6 +307,15 @@ export default function ExamManager() {
       accessorKey: 'title',
       cell: ({ row }) => (
         <div className="font-medium text-gray-900">{row.original.title}</div>
+      )
+    },
+    {
+      header: 'Category',
+      accessorKey: 'category.title',
+      cell: ({ row }) => (
+        <span className='px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium'>
+          {row.original.category?.title || 'N/A'}
+        </span>
       )
     },
     {
@@ -459,6 +479,25 @@ export default function ExamManager() {
                   </div>
 
                   <div className="space-y-2">
+                    <Label>Category</Label>
+                    <SearchSelectCreate
+                      onSearch={fetchCategory}
+                      onSelect={(item) => {
+                        setSelectedCategory(item)
+                        setValue('category_id', item.id)
+                      }}
+                      onRemove={() => {
+                        setSelectedCategory(null)
+                        setValue('category_id', '')
+                      }}
+                      selectedItems={selectedCategory}
+                      placeholder="Select category..."
+                      isMulti={false}
+                      displayKey="title"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
                     <Label>University/Affiliation</Label>
                     <SearchSelectCreate
                       onSearch={fetchUniversities}
@@ -485,57 +524,51 @@ export default function ExamManager() {
 
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
                   <div className="space-y-2">
-                    <Label required>Full Marks</Label>
+                    <Label>Full Marks</Label>
                     <Input
                       type='number'
-                      {...register('full_marks', { required: 'Full marks is required' })}
+                      {...register('full_marks')}
                       placeholder='e.g. 100'
                     />
-                    {errors.full_marks && <p className="text-xs text-red-500">{errors.full_marks.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label required>Pass Marks</Label>
+                    <Label>Pass Marks</Label>
                     <Input
                       type='number'
-                      {...register('pass_marks', { required: 'Pass marks is required' })}
+                      {...register('pass_marks')}
                       placeholder='e.g. 40'
                     />
-                    {errors.pass_marks && <p className="text-xs text-red-500">{errors.pass_marks.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label required>Duration</Label>
+                    <Label>Duration</Label>
                     <Input
-                      {...register('duration', { required: 'Duration is required' })}
+                      {...register('duration')}
                       placeholder='e.g. 2 Hours'
                     />
-                    {errors.duration && <p className="text-xs text-red-500">{errors.duration.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label required>Number of Questions</Label>
+                    <Label>Number of Questions</Label>
                     <Input
                       type='number'
-                      {...register('questions_count', { required: 'Number of questions is required' })}
+                      {...register('questions_count')}
                       placeholder='e.g. 100'
                     />
-                    {errors.questions_count && <p className="text-xs text-red-500">{errors.questions_count.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label required>Question Type</Label>
-                    <Select {...register('question_type', { required: 'Question type is required' })}>
+                    <Label>Question Type</Label>
+                    <Select {...register('question_type')}>
                       <option value="MCQ">MCQ</option>
                       <option value="Written">Written</option>
                       <option value="Practical">Practical</option>
                       <option value="Mixed">Mixed</option>
                     </Select>
-                    {errors.question_type && <p className="text-xs text-red-500">{errors.question_type.message}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label required>Exam Type</Label>
-                    <Select {...register('exam_type', { required: 'Exam type is required' })}>
+                    <Label>Exam Type</Label>
+                    <Select {...register('exam_type')}>
                       <option value="Written">Written</option>
                       <option value="Online">Online</option>
                     </Select>
-                    {errors.exam_type && <p className="text-xs text-red-500">{errors.exam_type.message}</p>}
                   </div>
                 </div>
               </section>
@@ -565,19 +598,16 @@ export default function ExamManager() {
 
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
                   <div className="space-y-2">
-                    <Label required>Opening Date</Label>
-                    <Input type='date' {...register('opening_date', { required: 'Opening date is required' })} />
-                    {errors.opening_date && <p className="text-xs text-red-500">{errors.opening_date.message}</p>}
+                    <Label>Opening Date</Label>
+                    <Input type='date' {...register('opening_date')} />
                   </div>
                   <div className="space-y-2">
-                    <Label required>Closing Date</Label>
-                    <Input type='date' {...register('closing_date', { required: 'Closing date is required' })} />
-                    {errors.closing_date && <p className="text-xs text-red-500">{errors.closing_date.message}</p>}
+                    <Label>Closing Date</Label>
+                    <Input type='date' {...register('closing_date')} />
                   </div>
                   <div className="space-y-2">
-                    <Label required>Exam Date</Label>
-                    <Input type='date' {...register('exam_date', { required: 'Exam date is required' })} />
-                    {errors.exam_date && <p className="text-xs text-red-500">{errors.exam_date.message}</p>}
+                    <Label>Exam Date</Label>
+                    <Input type='date' {...register('exam_date')} />
                   </div>
                 </div>
               </section>
@@ -600,6 +630,14 @@ export default function ExamManager() {
                     <Input
                       {...register('pastQuestion')}
                       placeholder='Link to past questions'
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Meta Description</Label>
+                    <Textarea
+                      {...register('meta_description')}
+                      placeholder='SEO Meta description...'
+                      className="min-h-[80px]"
                     />
                   </div>
                 </div>

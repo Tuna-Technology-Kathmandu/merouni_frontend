@@ -219,7 +219,7 @@ export default function SearchSelectCreate({
                                             <div className="flex-1 min-w-0">{renderItem(item)}</div>
                                         ) : (
                                             <span className="text-sm font-medium text-gray-700">
-                                                {typeof item === 'object' ? (item[displayKey] || item.name || '') : item}
+                                                {typeof item === 'object' ? (item[displayKey] || item.name || item.title) : item}
                                             </span>
                                         )}
                                         {isSelected && <Check className="h-4 w-4 text-[#387cae] shrink-0 ml-2" />}

@@ -47,7 +47,7 @@ const GallerySection = ({ college }) => {
       {images.length > 0 && (
         <div className='mb-8'>
           <h3 className='text-sm font-medium text-gray-500 mb-4 uppercase tracking-wider'>Photos</h3>
-          <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6'>
             {images.map((photo, index) => (
               <div
                 className='group relative aspect-square rounded-md overflow-hidden cursor-pointer bg-gray-100'

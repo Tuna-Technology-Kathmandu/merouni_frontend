@@ -306,8 +306,8 @@ export const menuItems = [
 
       {
         icon: <Lightbulb className='text-xl' />,
-        label: 'Skill Based Courses',
-        href: '/dashboard/skills-based-courses',
+        label: 'Short Term Courses',
+        href: '/dashboard/short-term-courses',
         visible: ['admin', 'editor']
       }
     ]
