@@ -28,7 +28,7 @@ const ImageSection = ({ college }) => {
 
 
   return (
-    <div className='flex flex-col items-center relative gap-8 md:gap-12 lg:gap-16'>
+    <div className='flex flex-col items-center relative gap-4 md:gap-6 lg:gap-8'>
       {/* College image, name and location */}
       <div className='w-full'>
         <div className='w-full relative'>

@@ -169,21 +169,30 @@ const CollegeCard = ({
         </div>
 
         <div className='absolute top-3 right-3 z-10'>
-          {user && (
-            <button
-              type='button'
-              onClick={handleWishlistToggle}
-              disabled={isLoading}
-              className='p-2 bg-white/80 hover:bg-white rounded-full transition-all shadow-sm'
-            >
-              <Heart
-                className={`w-4 h-4 transition-all ${isInWishlist
-                  ? 'fill-red-500 text-red-500'
-                  : 'text-gray-600'
-                  } ${isLoading ? 'opacity-50' : ''}`}
-              />
-            </button>
-          )}
+          {(() => {
+            if (!user) return null;
+            try {
+              const roles = typeof user.role === 'string' ? JSON.parse(user.role) : user.role;
+              if (roles?.admin || roles?.editor) return null;
+            } catch (err) {
+              console.error("Error parsing user roles:", err);
+            }
+            return (
+              <button
+                type='button'
+                onClick={handleWishlistToggle}
+                disabled={isLoading}
+                className='p-2 bg-white/80 hover:bg-white rounded-full transition-all shadow-sm'
+              >
+                <Heart
+                  className={`w-4 h-4 transition-all ${isInWishlist
+                    ? 'fill-red-500 text-red-500'
+                    : 'text-gray-600'
+                    } ${isLoading ? 'opacity-50' : ''}`}
+                />
+              </button>
+            );
+          })()}
         </div>
 
         {location && (
