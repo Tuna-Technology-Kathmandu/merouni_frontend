@@ -132,7 +132,9 @@ const services = {
   newsletter: new ApiService('newsletter'),
   college: new ApiService('college'),
   category: new ApiService('category'),
-  discipline: new ApiService('discipline')
+  discipline: new ApiService('discipline'),
+  school: new ApiService('school'),
+  consultancy: new ApiService('consultancy'),
 }
 
 export default services
