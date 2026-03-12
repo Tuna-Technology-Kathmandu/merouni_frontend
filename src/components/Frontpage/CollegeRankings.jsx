@@ -125,14 +125,14 @@ const CollegeRankings = () => {
             className='flex gap-4 md:gap-5 overflow-x-auto scroll-smooth pb-2 hide-scrollbar'
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {rankings.map((programGroup) => {
-              if (!programGroup?.program || !programGroup?.rankings?.length) {
+            {rankings.map((degreeGroup) => {
+              if (!degreeGroup?.degree || !degreeGroup?.rankings?.length) {
                 return null
               }
 
               return (
                 <div
-                  key={programGroup.program.id}
+                  key={degreeGroup.degree.id}
                   className='flex-shrink-0 w-[300px] sm:w-[320px] md:w-[360px] rounded-md border border-gray-200/80 bg-white overflow-hidden hover:border-gray-300 hover:shadow-md transition-all'
                 >
                   <div className='px-5 pt-5 pb-3'>
@@ -141,12 +141,12 @@ const CollegeRankings = () => {
                         <GraduationCap className='w-4 h-4 text-[#0A6FA7]' />
                       </div>
                       <h3 className='text-base font-semibold text-gray-900 line-clamp-2'>
-                        {programGroup.program.title || 'Program'}
+                        {degreeGroup.degree.title || 'Degree'}
                       </h3>
                     </div>
 
                     <ul className='space-y-1.5'>
-                      {programGroup.rankings.map((ranking) => {
+                      {degreeGroup.rankings.map((ranking) => {
                         const college = ranking.college
                         if (!college) return null
 
