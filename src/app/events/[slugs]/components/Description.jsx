@@ -58,34 +58,7 @@ const Description = ({ event }) => {
               />
             </section>
 
-            {event?.content && (
-              <section>
-                <div
-                  className='prose prose-lg prose-slate max-w-none 
-                  prose-headings:font-bold prose-headings:text-gray-900
-                  prose-p:text-gray-600 prose-p:leading-relaxed
-                  prose-a:text-[#0A6FA7] prose-a:no-underline hover:prose-a:underline
-                  prose-img:rounded-md
-                  [&_.table-wrapper]:overflow-x-auto
-                  [&_.table-wrapper]:my-8
-                  [&_.table-wrapper]:rounded-md
-                  [&_.table-wrapper]:border
-                  [&_.table-wrapper]:border-gray-100
-                  [&_table]:w-full
-                  [&_table]:border-collapse
-                  [&_th]:bg-gray-50
-                  [&_th]:text-left
-                  [&_th]:font-semibold
-                  [&_th]:p-4
-                  [&_th]:text-gray-900
-                  [&_td]:p-4
-                  [&_td]:border-t
-                  [&_td]:border-gray-50
-                  [&_td]:text-sm'
-                  dangerouslySetInnerHTML={{ __html: processContent(event?.content) }}
-                />
-              </section>
-            )}
+          
           </div>
         </div>
 

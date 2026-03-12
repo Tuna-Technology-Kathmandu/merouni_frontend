@@ -181,9 +181,7 @@ const ProgramDetailPage = ({ params }) => {
                   <Target className='w-5 h-5 text-[#0A6FA7]' />
                   Learning outcomes
                 </h2>
-                <div className='prose text-gray-700 whitespace-pre-wrap'>
-                  {program.learning_outcomes}
-                </div>
+                <div className='prose text-gray-700 whitespace-pre-wrap' dangerouslySetInnerHTML={{ __html: program?.learning_outcomes }} />
               </section>
             )}
 
