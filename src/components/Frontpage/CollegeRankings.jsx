@@ -182,6 +182,17 @@ const CollegeRankings = () => {
                         )
                       })}
                     </ul>
+
+                    {degreeGroup.rankings.length >= 3 && (
+                      <div className='mt-2.5 pt-2 flex items-center justify-end'>
+                        <Link
+                          href={`/college-rankings/${degreeGroup.degree.slug || ''}`}
+                          className='text-xs font-semibold text-[#0A6FA7] hover:text-[#064263] flex items-center transition-colors'
+                        >
+                          Explore All <ChevronRight className='w-3.5 h-3.5 ml-0.5' />
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 </div>
               )
