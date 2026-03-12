@@ -253,7 +253,6 @@ const SkillCourseDetailsPage = ({ params }) => {
                                 </div>
                             </div>
                         </div>
-
                     </aside>
                 </div>
             </main>

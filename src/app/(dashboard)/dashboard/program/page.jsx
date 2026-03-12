@@ -71,10 +71,10 @@ export default function ProgramForm() {
         url += `&q=${encodeURIComponent(query)}`
       }
       if (selectedUniversity) {
-        url += `&university_id=${selectedUniversity.id}`
+        url += `&universityIds=${selectedUniversity.id}`
       }
       if (selectedLevel) {
-        url += `&programlevel_id=${selectedLevel.id}`
+        url += `&levelId=${selectedLevel.id}`
       }
       const response = await authFetch(url)
       const data = await response.json()
