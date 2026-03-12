@@ -16,12 +16,12 @@ export async function fetchRankings() {
     }
 }
 
-export async function addRanking(degreeId, collegeId, description) {
+export async function addRanking(degreeId, collegeId) {
     try {
         const response = await authFetch(`${BASE_URL}/college-ranking`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ degree_id: degreeId, college_id: collegeId, description })
+            body: JSON.stringify({ degree_id: degreeId, college_id: collegeId })
         })
         if (!response.ok) {
             const errData = await response.json()
@@ -88,6 +88,21 @@ export async function updateDegreeOrder(degreeOrders) {
         return await response.json()
     } catch (error) {
         console.error('updateDegreeOrder error:', error)
+        throw error
+    }
+}
+
+export async function updateDegreeDescription(degreeId, description) {
+    try {
+        const response = await authFetch(`${BASE_URL}/college-ranking/degree-description`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ degree_id: degreeId, description })
+        })
+        if (!response.ok) throw new Error('Failed to update degree description')
+        return await response.json()
+    } catch (error) {
+        console.error('updateDegreeDescription error:', error)
         throw error
     }
 }

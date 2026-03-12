@@ -41,6 +41,7 @@ export default function CollegeRankingsPage() {
   const [deleteRankingId, setDeleteRankingId] = useState(null)
   const [isRemoveRankingDialogOpen, setIsRemoveRankingDialogOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isDescModalOpen, setIsDescModalOpen] = useState(false)
   const [draggedItem, setDraggedItem] = useState(null)
   const [draggedDegree, setDraggedDegree] = useState(null)
   const [selectedDegree, setSelectedDegree] = useState(null)
@@ -199,7 +200,7 @@ export default function CollegeRankingsPage() {
 
     try {
       setSubmitting(true)
-      await actions.addRanking(selectedDegree.id, selectedCollege.id, description)
+      await actions.addRanking(selectedDegree.id, selectedCollege.id)
       toast.success('College added to ranking')
       loadRankings()
 
@@ -207,9 +208,25 @@ export default function CollegeRankingsPage() {
       setIsEditModalOpen(false)
       setSelectedDegree(null)
       setSelectedCollege(null)
-      setDescription('')
     } catch (error) {
       toast.error(error.message || 'Failed to add ranking')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleUpdateDescription = async () => {
+    if (!selectedDegree) return
+    try {
+      setSubmitting(true)
+      await actions.updateDegreeDescription(selectedDegree.id, description)
+      toast.success('Description updated successfully')
+      loadRankings()
+      setIsDescModalOpen(false)
+      setSelectedDegree(null)
+      setDescription('')
+    } catch (error) {
+      toast.error(error.message || 'Failed to update description')
     } finally {
       setSubmitting(false)
     }
@@ -309,6 +326,17 @@ export default function CollegeRankingsPage() {
                 <button
                   onClick={() => {
                     setSelectedDegree(degreeGroup.degree)
+                    setDescription(degreeGroup.description || '')
+                    setIsDescModalOpen(true)
+                  }}
+                  className='p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-50 rounded-md transition-colors'
+                  title='Edit Description'
+                >
+                  <Edit2 size={18} />
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedDegree(degreeGroup.degree)
                     setSelectedCollege(null)
                     setDescription('')
                     setIsEditModalOpen(true)
@@ -333,6 +361,11 @@ export default function CollegeRankingsPage() {
 
             {/* Card Content - Ranking List */}
             <div className='p-4 space-y-3 flex-1 overflow-y-auto max-h-[400px] scrollbar-thin scrollbar-thumb-gray-100'>
+              {degreeGroup.description && (
+                <div className='text-xs text-slate-500 mb-3 ml-2 italic leading-relaxed'>
+                  "{degreeGroup.description}"
+                </div>
+              )}
               {degreeGroup.rankings?.length > 0 ? (
                 degreeGroup.rankings.map((ranking) => (
                   <div
@@ -433,7 +466,6 @@ export default function CollegeRankingsPage() {
           setIsEditModalOpen(false)
           setSelectedDegree(null)
           setSelectedCollege(null)
-          setDescription('')
         }}
         closeOnOutsideClick={false}
       >
@@ -500,23 +532,6 @@ export default function CollegeRankingsPage() {
                 allowCreate={false}
               />
             </div>
-
-            {/* Description */}
-            <div className={cn(
-              'space-y-3 transition-all duration-300',
-              !selectedDegree && 'opacity-30 pointer-events-none grayscale'
-            )}>
-              <Label className='text-[11px]'>
-                Description (Optional)
-              </Label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder='Add a description for this ranking...'
-                className='w-full min-h-[80px] px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#387cae]/20 focus:border-[#387cae] bg-gray-50/50 focus:bg-white transition-all resize-y'
-                rows={3}
-              />
-            </div>
           </div>
 
           <div className='p-6 bg-gray-50/50 border-t border-gray-100 flex justify-end gap-3'>
@@ -539,6 +554,69 @@ export default function CollegeRankingsPage() {
                 </>
               ) : (
                 'Add to Ranking'
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Description Edit Modal */}
+      <Dialog
+        isOpen={isDescModalOpen}
+        onClose={() => {
+          setIsDescModalOpen(false)
+          setSelectedDegree(null)
+          setDescription('')
+        }}
+        closeOnOutsideClick={false}
+      >
+        <DialogContent className='max-w-xl p-0 overflow-hidden bg-white'>
+          <DialogHeader className='p-6 border-b border-gray-100'>
+            <DialogTitle className='text-xl font-bold text-gray-900 flex items-center gap-2'>
+              <div className='w-10 h-10 rounded-md bg-[#387cae]/10 flex items-center justify-center text-[#387cae]'>
+                <Edit2 size={20} />
+              </div>
+              Edit Category Description
+            </DialogTitle>
+            <DialogDescription className='text-xs font-medium text-gray-500'>
+              Add or update the description for "{selectedDegree?.title}".
+            </DialogDescription>
+            <DialogClose onClick={() => setIsDescModalOpen(false)} />
+          </DialogHeader>
+
+          <div className='p-8 space-y-4'>
+            <Label className='text-[11px] font-bold uppercase tracking-wider text-slate-500'>
+              Description
+            </Label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder='Enter a description for this ranking category...'
+              className='w-full min-h-[120px] px-4 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#387cae]/20 focus:border-[#387cae] bg-gray-50/50 focus:bg-white transition-all resize-y shadow-inner'
+              rows={4}
+            />
+          </div>
+
+          <div className='p-6 bg-gray-50/50 border-t border-gray-100 flex justify-end gap-3'>
+            <Button
+              variant='outline'
+              onClick={() => setIsDescModalOpen(false)}
+              className='h-11 px-6 rounded-md border-gray-200 font-bold text-slate-600 hover:bg-slate-100'
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpdateDescription}
+              disabled={submitting}
+              className='h-11 px-8 rounded-md bg-[#387cae] hover:bg-[#387cae]/90 text-white font-bold shadow-lg shadow-[#387cae]/20 min-w-[140px]'
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                  Saving...
+                </>
+              ) : (
+                'Save Description'
               )}
             </Button>
           </div>
