@@ -37,14 +37,15 @@ export default function CollegeRankingsPage() {
   const [rankings, setRankings] = useState([])
   const [loading, setLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [deleteProgramId, setDeleteProgramId] = useState(null)
+  const [deleteDegreeId, setDeleteDegreeId] = useState(null)
   const [deleteRankingId, setDeleteRankingId] = useState(null)
   const [isRemoveRankingDialogOpen, setIsRemoveRankingDialogOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [draggedItem, setDraggedItem] = useState(null)
-  const [draggedProgram, setDraggedProgram] = useState(null)
-  const [selectedProgram, setSelectedProgram] = useState(null)
+  const [draggedDegree, setDraggedDegree] = useState(null)
+  const [selectedDegree, setSelectedDegree] = useState(null)
   const [selectedCollege, setSelectedCollege] = useState(null)
+  const [description, setDescription] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -66,17 +67,17 @@ export default function CollegeRankingsPage() {
     return () => setHeading(null)
   }, [setHeading, loadRankings])
 
-  const handleDeleteProgram = async () => {
-    if (!deleteProgramId) return
+  const handleDeleteDegree = async () => {
+    if (!deleteDegreeId) return
     try {
-      await actions.deleteProgramRankings(deleteProgramId)
+      await actions.deleteDegreeRankings(deleteDegreeId)
       toast.success('Rankings deleted successfully')
       loadRankings()
     } catch (error) {
       toast.error('Failed to delete rankings')
     } finally {
       setIsDialogOpen(false)
-      setDeleteProgramId(null)
+      setDeleteDegreeId(null)
     }
   }
 
@@ -99,10 +100,9 @@ export default function CollegeRankingsPage() {
     }
   }
 
-  const handleDragStart = (e, ranking, programId) => {
-    setDraggedItem({ ranking, programId })
+  const handleDragStart = (e, ranking, degreeId) => {
+    setDraggedItem({ ranking, degreeId })
     e.dataTransfer.effectAllowed = 'move'
-    // Create a ghost image or style
     e.target.style.opacity = '0.4'
   }
 
@@ -115,14 +115,14 @@ export default function CollegeRankingsPage() {
     e.dataTransfer.dropEffect = 'move'
   }
 
-  const handleDrop = async (e, targetRanking, programId) => {
+  const handleDrop = async (e, targetRanking, degreeId) => {
     e.preventDefault()
-    if (!draggedItem || draggedItem.programId !== programId) return
+    if (!draggedItem || draggedItem.degreeId !== degreeId) return
 
-    const programGroup = rankings.find((r) => r.program?.id === programId)
-    if (!programGroup) return
+    const degreeGroup = rankings.find((r) => r.degree?.id === degreeId)
+    if (!degreeGroup) return
 
-    const items = [...programGroup.rankings]
+    const items = [...degreeGroup.rankings]
     const draggedIndex = items.findIndex((r) => r.id === draggedItem.ranking.id)
     const targetIndex = items.findIndex((r) => r.id === targetRanking.id)
 
@@ -140,7 +140,7 @@ export default function CollegeRankingsPage() {
     }))
 
     try {
-      await actions.updateRankingOrder(programId, updatedRankings)
+      await actions.updateRankingOrder(degreeId, updatedRankings)
       toast.success('Ranking order updated')
       loadRankings()
     } catch (error) {
@@ -150,63 +150,64 @@ export default function CollegeRankingsPage() {
     }
   }
 
-  const handleProgramDragStart = (e, programGroup) => {
-    setDraggedProgram(programGroup)
+  const handleDegreeDragStart = (e, degreeGroup) => {
+    setDraggedDegree(degreeGroup)
     e.dataTransfer.effectAllowed = 'move'
     e.target.style.opacity = '0.4'
   }
 
-  const handleProgramDrop = async (e, targetProgramGroup) => {
+  const handleDegreeDrop = async (e, targetDegreeGroup) => {
     e.preventDefault()
-    if (!draggedProgram || draggedProgram.program?.id === targetProgramGroup.program?.id) {
-      setDraggedProgram(null)
+    if (!draggedDegree || draggedDegree.degree?.id === targetDegreeGroup.degree?.id) {
+      setDraggedDegree(null)
       return
     }
 
     const items = [...rankings]
-    const draggedIndex = items.findIndex((r) => r.program?.id === draggedProgram.program?.id)
-    const targetIndex = items.findIndex((r) => r.program?.id === targetProgramGroup.program?.id)
+    const draggedIndex = items.findIndex((r) => r.degree?.id === draggedDegree.degree?.id)
+    const targetIndex = items.findIndex((r) => r.degree?.id === targetDegreeGroup.degree?.id)
 
     if (draggedIndex === -1 || targetIndex === -1) {
-      setDraggedProgram(null)
+      setDraggedDegree(null)
       return
     }
 
     const [removed] = items.splice(draggedIndex, 1)
     items.splice(targetIndex, 0, removed)
 
-    const updatedProgramOrders = items.map((item, index) => ({
-      program_id: item.program?.id,
-      program_list_order: index + 1
+    const updatedDegreeOrders = items.map((item, index) => ({
+      degree_id: item.degree?.id,
+      degree_list_order: index + 1
     }))
 
     try {
-      await actions.updateProgramOrder(updatedProgramOrders)
-      toast.success('Program order updated')
+      await actions.updateDegreeOrder(updatedDegreeOrders)
+      toast.success('Degree order updated')
       loadRankings()
     } catch (error) {
-      toast.error('Failed to update program order')
+      toast.error('Failed to update degree order')
     } finally {
-      setDraggedProgram(null)
+      setDraggedDegree(null)
     }
   }
 
   const handleAddRanking = async () => {
-    if (!selectedProgram || !selectedCollege) {
-      toast.error('Please select both program and college')
+    if (!selectedDegree || !selectedCollege) {
+      toast.error('Please select both degree and college')
       return
     }
 
     try {
       setSubmitting(true)
-      await actions.addRanking(selectedProgram.id, selectedCollege.id)
+      await actions.addRanking(selectedDegree.id, selectedCollege.id, description)
       toast.success('College added to ranking')
       loadRankings()
 
       // Close modal and clear selection
       setIsEditModalOpen(false)
-      setSelectedProgram(null)
+      setSelectedDegree(null)
       setSelectedCollege(null)
+      setDescription('')
     } catch (error) {
       toast.error(error.message || 'Failed to add ranking')
     } finally {
@@ -215,24 +216,21 @@ export default function CollegeRankingsPage() {
   }
 
   const filteredRankings = rankings.filter(group =>
-    group.program?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    group.degree?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     group.rankings?.some(r => r.college?.name?.toLowerCase().includes(searchTerm.toLowerCase()))
   )
 
-  const onSearchPrograms = async (q) => {
-    const allRankedProgramIds = rankings.map(r => r.program?.id)
-    const programs = await actions.fetchPrograms(q)
-    // Filter out programs that are already ranked unless we are just adding more to them
-    // Actually, the current modal allows adding colleges to existing programs too.
-    return programs
+  const onSearchDegrees = async (q) => {
+    const degrees = await actions.fetchDegrees(q)
+    return degrees
   }
 
   const onSearchColleges = async (q) => {
-    if (!selectedProgram) return []
-    const colleges = await actions.fetchColleges(selectedProgram.id, q)
+    if (!selectedDegree) return []
+    const colleges = await actions.fetchColleges(selectedDegree.id, q)
 
-    // Filter out colleges already ranked for this program
-    const rankedCollegeIds = rankings.find(r => r.program?.id === selectedProgram.id)
+    // Filter out colleges already ranked for this degree
+    const rankedCollegeIds = rankings.find(r => r.degree?.id === selectedDegree.id)
       ?.rankings?.map(r => r.college?.id) || []
 
     return colleges.filter(c => !rankedCollegeIds.includes(c.id))
@@ -260,7 +258,7 @@ export default function CollegeRankingsPage() {
           <div className='relative w-full md:w-96 group'>
             <Search className='absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#387cae] transition-colors' size={18} />
             <Input
-              placeholder='Search programs or colleges...'
+              placeholder='Search degrees or colleges...'
               className='pl-11 h-11 rounded-md border-gray-200 bg-gray-50/50 focus:bg-white transition-all'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -268,8 +266,9 @@ export default function CollegeRankingsPage() {
           </div>
           <Button
             onClick={() => {
-              setSelectedProgram(null)
+              setSelectedDegree(null)
               setSelectedCollege(null)
+              setDescription('')
               setIsEditModalOpen(true)
             }}
           >
@@ -281,14 +280,14 @@ export default function CollegeRankingsPage() {
 
       {/* Rankings Grid */}
       <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6'>
-        {filteredRankings.map((programGroup) => (
+        {filteredRankings.map((degreeGroup) => (
           <div
-            key={programGroup.program?.id}
+            key={degreeGroup.degree?.id}
             draggable
-            onDragStart={(e) => handleProgramDragStart(e, programGroup)}
+            onDragStart={(e) => handleDegreeDragStart(e, degreeGroup)}
             onDragEnd={handleDragEnd}
             onDragOver={handleDragOver}
-            onDrop={(e) => handleProgramDrop(e, programGroup)}
+            onDrop={(e) => handleDegreeDrop(e, degreeGroup)}
             className='bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col group/card hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300'
           >
             {/* Card Header */}
@@ -298,19 +297,20 @@ export default function CollegeRankingsPage() {
                   <GripVertical size={20} />
                 </div>
                 <div className='flex flex-col overflow-hidden'>
-                  <h2 className='text-[15px] font-bold text-slate-900 truncate' title={programGroup.program?.title}>
-                    {programGroup.program?.title}
+                  <h2 className='text-[15px] font-bold text-slate-900 truncate' title={degreeGroup.degree?.title}>
+                    {degreeGroup.degree?.title}
                   </h2>
                   <span className='text-[11px] text-slate-500 font-semibold'>
-                    {programGroup.rankings?.length || 0} Colleges Ranked
+                    {degreeGroup.rankings?.length || 0} Colleges Ranked
                   </span>
                 </div>
               </div>
               <div className='flex gap-1'>
                 <button
                   onClick={() => {
-                    setSelectedProgram(programGroup.program)
+                    setSelectedDegree(degreeGroup.degree)
                     setSelectedCollege(null)
+                    setDescription('')
                     setIsEditModalOpen(true)
                   }}
                   className='p-2 text-[#387cae] hover:bg-[#387cae]/5 rounded-md transition-colors'
@@ -320,7 +320,7 @@ export default function CollegeRankingsPage() {
                 </button>
                 <button
                   onClick={() => {
-                    setDeleteProgramId(programGroup.program?.id)
+                    setDeleteDegreeId(degreeGroup.degree?.id)
                     setIsDialogOpen(true)
                   }}
                   className='p-2 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-md transition-colors'
@@ -333,15 +333,15 @@ export default function CollegeRankingsPage() {
 
             {/* Card Content - Ranking List */}
             <div className='p-4 space-y-3 flex-1 overflow-y-auto max-h-[400px] scrollbar-thin scrollbar-thumb-gray-100'>
-              {programGroup.rankings?.length > 0 ? (
-                programGroup.rankings.map((ranking) => (
+              {degreeGroup.rankings?.length > 0 ? (
+                degreeGroup.rankings.map((ranking) => (
                   <div
                     key={ranking.id}
                     draggable
-                    onDragStart={(e) => handleDragStart(e, ranking, programGroup.program?.id)}
+                    onDragStart={(e) => handleDragStart(e, ranking, degreeGroup.degree?.id)}
                     onDragEnd={handleDragEnd}
                     onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, ranking, programGroup.program?.id)}
+                    onDrop={(e) => handleDrop(e, ranking, degreeGroup.degree?.id)}
                     className='group/item flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-md hover:border-[#387cae]/30 hover:shadow-lg hover:shadow-[#387cae]/5 transition-all duration-200 cursor-grab active:cursor-grabbing'
                   >
                     <div className='text-gray-300 group-hover/item:text-[#387cae] transition-colors'>
@@ -431,8 +431,9 @@ export default function CollegeRankingsPage() {
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false)
-          setSelectedProgram(null)
+          setSelectedDegree(null)
           setSelectedCollege(null)
+          setDescription('')
         }}
         closeOnOutsideClick={false}
       >
@@ -442,29 +443,29 @@ export default function CollegeRankingsPage() {
               <div className='w-10 h-10 rounded-md bg-[#387cae]/10 flex items-center justify-center text-[#387cae]'>
                 <Plus size={20} />
               </div>
-              {selectedProgram ? 'Rank more Colleges' : 'Add New Ranking'}
+              {selectedDegree ? 'Rank more Colleges' : 'Add New Ranking'}
             </DialogTitle>
             <DialogDescription className='text-xs font-medium text-gray-500'>
-              Select a program and choose a college to add it to the rankings.
+              Select a degree and choose a college to add it to the rankings.
             </DialogDescription>
             <DialogClose onClick={() => setIsEditModalOpen(false)} />
           </DialogHeader>
 
           <div className='p-8 space-y-8'>
-            {/* Program Selection */}
+            {/* Degree Selection */}
             <div className='space-y-3'>
               <Label required className='text-[11px] '>
-                Search Program
+                Search Degree
               </Label>
               <SearchSelectCreate
-                onSearch={onSearchPrograms}
-                onSelect={setSelectedProgram}
+                onSearch={onSearchDegrees}
+                onSelect={setSelectedDegree}
                 onRemove={() => {
-                  setSelectedProgram(null)
+                  setSelectedDegree(null)
                   setSelectedCollege(null)
                 }}
-                selectedItems={selectedProgram}
-                placeholder='Search or select a program...'
+                selectedItems={selectedDegree}
+                placeholder='Search or select a degree...'
                 displayKey='title'
                 valueKey='id'
                 isMulti={false}
@@ -475,15 +476,15 @@ export default function CollegeRankingsPage() {
             {/* College Selection */}
             <div className={cn(
               'space-y-3 transition-all duration-300',
-              !selectedProgram && 'opacity-30 pointer-events-none grayscale'
+              !selectedDegree && 'opacity-30 pointer-events-none grayscale'
             )}>
               <div className='flex items-center justify-between'>
-                <Label required={!!selectedProgram} className='text-[11px] '>
+                <Label required={!!selectedDegree} className='text-[11px] '>
                   Select College
                 </Label>
-                {selectedProgram && (
+                {selectedDegree && (
                   <span className='text-[10px] text-[#387cae] bg-[#387cae]/5 px-2 py-0.5 rounded-full font-bold uppercase tracking-tight'>
-                    Offering {selectedProgram.title}
+                    For {selectedDegree.title}
                   </span>
                 )}
               </div>
@@ -492,7 +493,7 @@ export default function CollegeRankingsPage() {
                 onSelect={setSelectedCollege}
                 onRemove={() => setSelectedCollege(null)}
                 selectedItems={selectedCollege}
-                placeholder={selectedProgram ? 'Search colleges...' : 'Please select a program first'}
+                placeholder={selectedDegree ? 'Search colleges...' : 'Please select a degree first'}
                 displayKey='name'
                 valueKey='id'
                 isMulti={false}
@@ -500,15 +501,22 @@ export default function CollegeRankingsPage() {
               />
             </div>
 
-            {selectedProgram && !selectedCollege && (
-              <div className='p-4 rounded-2xl bg-blue-50/50 border border-blue-100 flex gap-3 animate-in fade-in slide-in-from-top-2 duration-300'>
-                <Trophy className='text-[#387cae] shrink-0' size={18} />
-                <p className='text-xs text-[#387cae] font-medium leading-relaxed'>
-                  Colleges ranked here are specific to the <b>{selectedProgram.title}</b> program.
-                  You can drag and drop them in the main view to adjust their rank.
-                </p>
-              </div>
-            )}
+            {/* Description */}
+            <div className={cn(
+              'space-y-3 transition-all duration-300',
+              !selectedDegree && 'opacity-30 pointer-events-none grayscale'
+            )}>
+              <Label className='text-[11px]'>
+                Description (Optional)
+              </Label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder='Add a description for this ranking...'
+                className='w-full min-h-[80px] px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#387cae]/20 focus:border-[#387cae] bg-gray-50/50 focus:bg-white transition-all resize-y'
+                rows={3}
+              />
+            </div>
           </div>
 
           <div className='p-6 bg-gray-50/50 border-t border-gray-100 flex justify-end gap-3'>
@@ -521,7 +529,7 @@ export default function CollegeRankingsPage() {
             </Button>
             <Button
               onClick={handleAddRanking}
-              disabled={!selectedProgram || !selectedCollege || submitting}
+              disabled={!selectedDegree || !selectedCollege || submitting}
               className='h-11 px-8 rounded-md bg-[#387cae] hover:bg-[#387cae]/90 text-white font-bold shadow-lg shadow-[#387cae]/20 min-w-[140px]'
             >
               {submitting ? (
@@ -537,16 +545,16 @@ export default function CollegeRankingsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation (Program Group) */}
+      {/* Delete Confirmation (Degree Group) */}
       <ConfirmationDialog
         open={isDialogOpen}
         onClose={() => {
           setIsDialogOpen(false)
-          setDeleteProgramId(null)
+          setDeleteDegreeId(null)
         }}
-        onConfirm={handleDeleteProgram}
-        title='Delete Program Rankings'
-        message='Are you sure you want to delete all rankings for this program? This action cannot be undone.'
+        onConfirm={handleDeleteDegree}
+        title='Delete Degree Rankings'
+        message='Are you sure you want to delete all rankings for this degree? This action cannot be undone.'
         confirmText='Delete'
         cancelText='Cancel'
       />
@@ -560,7 +568,7 @@ export default function CollegeRankingsPage() {
         }}
         onConfirm={handleDeleteRankingConfirm}
         title='Remove College'
-        message='Are you sure you want to remove this college from the rankings? This will only remove this college from this program list.'
+        message='Are you sure you want to remove this college from the rankings? This will only remove this college from this degree list.'
         confirmText='Remove'
         cancelText='Cancel'
       />

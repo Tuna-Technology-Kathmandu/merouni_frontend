@@ -163,7 +163,7 @@ export const menuItems = [
             icon: <MdEmojiEvents className='text-lg' />,
             label: 'College Rankings',
             href: '/dashboard/college-rankings',
-            visible: ['admin']
+            visible: ['admin','editor']
           },
           {
             icon: <SortAsc className='text-lg' />,
