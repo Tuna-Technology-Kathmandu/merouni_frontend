@@ -2,26 +2,23 @@
 import Footer from '@/components/Frontpage/Footer'
 import Header from '@/components/Frontpage/Header'
 import Navbar from '@/components/Frontpage/Navbar'
-import { THEME_BLUE } from '@/constants/constants'
 import SkillCourseCard from '@/ui/molecules/cards/SkillCourseCard'
 import { CardSkeleton } from '@/ui/shadcn/CardSkeleton'
 import EmptyState from '@/ui/shadcn/EmptyState'
-import { BookOpen, X } from 'lucide-react'
+import { Search, BookOpen, X, Filter, DollarSign, ChevronDown, Layers, CreditCard } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { IoSearch } from 'react-icons/io5'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { fetchPublicSkillCourses } from './actions'
+import { THEME_BLUE } from '@/constants/constants'
 
 const SkillCoursesPage = () => {
     const [courses, setCourses] = useState([])
     const [loading, setLoading] = useState(false)
     const [debouncedSearch, setDebouncedSearch] = useState('')
     const [searchTerm, setSearchTerm] = useState('')
-    const [price, setPrice] = useState('')
-    const [duration, setDuration] = useState('')
-    const [location, setLocation] = useState('')
     const [type, setType] = useState('')
+    const [price, setPrice] = useState('')
 
     // Debounce search
     useEffect(() => {
@@ -39,10 +36,8 @@ const SkillCoursesPage = () => {
             try {
                 const response = await fetchPublicSkillCourses({
                     q: debouncedSearch,
-                    price,
-                    duration,
-                    location,
-                    type
+                    type,
+                    price
                 })
                 setCourses(response.items || [])
             } catch (error) {
@@ -52,14 +47,12 @@ const SkillCoursesPage = () => {
             }
         }
         getCourses()
-    }, [debouncedSearch, price, duration, location, type])
+    }, [debouncedSearch, type, price])
 
     const clearFilters = () => {
         setSearchTerm('')
-        setPrice('')
-        setDuration('')
-        setLocation('')
         setType('')
+        setPrice('')
     }
 
     return (
@@ -69,75 +62,23 @@ const SkillCoursesPage = () => {
 
             <div className='min-h-screen bg-gray-50/50 py-12 px-6 font-sans'>
                 <div className='max-w-7xl mx-auto'>
-                    {/* Filters Bar - Aligned with blogs */}
-                    <div className='flex flex-col md:flex-row justify-between items-center gap-6 mb-12'>
-                        {/* Header Section Inline */}
-                        <div className='relative'>
-                            <h2 className='text-3xl font-extrabold text-gray-800'>
-                                Explore <span style={{ color: THEME_BLUE }}>Courses</span>
-                            </h2>
-                            <div
-                                className='absolute -bottom-2 left-0 w-12 h-1 rounded-full'
-                                style={{ backgroundColor: THEME_BLUE }}
-                            ></div>
-                        </div>
-
-                        {/* Search Input - Matched with blogs */}
-                        <div className='w-full md:w-[400px]'>
-                            <div className='relative group'>
-                                <IoSearch className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#387cae] transition-colors text-lg' />
-                                <input
-                                    type='text'
-                                    placeholder='Search courses...'
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className='w-full py-3.5 pl-12 pr-4 bg-white border border-gray-100 rounded-2xl outline-none text-sm font-semibold text-gray-900 shadow-[0_2px_15px_rgba(0,0,0,0.02)] focus:ring-2 focus:ring-[#387cae]/10 focus:border-[#387cae] transition-all placeholder-gray-400'
-                                />
+                    {/* Header Section */}
+                    <div className='flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12'>
+                        <div>
+                            <div className='relative inline-block mb-3'>
+                                <h1 className='text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight'>
+                                    Explore &nbsp;
+                                    <span style={{ color: THEME_BLUE }}>Short-Term Courses</span>
+                                </h1>
+                                <div className='absolute -bottom-2 left-0 w-16 h-1 rounded-full' style={{ backgroundColor: THEME_BLUE }}></div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Filters Row */}
-                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8'>
-                     
-
-                        <select
-                            value={duration}
-                            onChange={(e) => setDuration(e.target.value)}
-                            className='py-2.5 px-4 bg-white border border-gray-100 rounded-xl outline-none text-sm font-medium text-gray-700 shadow-sm focus:border-[#387cae] transition-all cursor-pointer'
-                        >
-                            <option value="">All Durations</option>
-                            <option value="Short">Short Term</option>
-                            <option value="Medium">Medium Term</option>
-                            <option value="Long">Long Term</option>
-                        </select>
-                     
-
-                        <select
-                            value={type}
-                            onChange={(e) => setType(e.target.value)}
-                            className='py-2.5 px-4 bg-white border border-gray-100 rounded-xl outline-none text-sm font-medium text-gray-700 shadow-sm focus:border-[#387cae] transition-all cursor-pointer'
-                        >
-                            <option value="">All Modes</option>
-                            <option value="online">Online</option>
-                            <option value="offline">Offline</option>
-                            <option value="both">Both</option>
-                        </select>
-                    </div>
-
-                    {/* Results Summary and Clear Filters */}
-                    <div className='flex justify-between items-center mb-8 px-2'>
-                        {!loading && (
-                            <p className='text-sm text-gray-500 font-semibold'>
-                                Showing{' '}
-                                <span className='text-gray-900'>{courses.length}</span>{' '}
-                                results
-                            </p>
-                        )}
-                        {(searchTerm || price || duration || location || type) && (
+                        {/* Clear All Button */}
+                        {(searchTerm || type || price) && (
                             <button
                                 onClick={clearFilters}
-                                className='text-sm font-semibold text-[#387cae] hover:text-[#2c6590] flex items-center gap-1 transition-colors'
+                                className='flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors'
                             >
                                 <X className='w-4 h-4' />
                                 Clear All Filters
@@ -145,72 +86,102 @@ const SkillCoursesPage = () => {
                         )}
                     </div>
 
-                    {/* Courses Grid */}
+                    {/* Filters Bar */}
+                    <div className='bg-white rounded-[32px] p-8 shadow-[0_2px_15px_rgba(0,0,0,0.02)] border border-gray-100 mb-12'>
+                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6'>
+                            {/* Search */}
+                            <div className='lg:col-span-6'>
+                                <label className='block text-[10px] font-black uppercase tracking-[0.2em] mb-3 text-gray-400 ml-1'>
+                                    Search Courses
+                                </label>
+                                <div className='relative group'>
+                                    <Search className='absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-300 group-focus-within:text-blue-500 transition-colors' />
+                                    <input
+                                        type='text'
+                                        placeholder='Search by skills, topics, or courses...'
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className='w-full px-5 py-4 pl-12 rounded-2xl border border-gray-100 bg-gray-50/30 outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all text-sm font-bold text-gray-900 placeholder-gray-300 shadow-sm'
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Mode Filter */}
+                            <div className='lg:col-span-3'>
+                                <label className='block text-[10px] font-black uppercase tracking-[0.2em] mb-3 text-gray-400 ml-1'>
+                                    Mode
+                                </label>
+                                <div className='relative group'>
+                                    <Layers className='absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300 group-focus-within:text-blue-500 transition-colors' />
+                                    <select
+                                        value={type}
+                                        onChange={(e) => setType(e.target.value)}
+                                        className='w-full px-5 py-4 pl-11 rounded-2xl border border-gray-100 bg-gray-50/30 outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all text-sm font-bold text-gray-900 appearance-none shadow-sm cursor-pointer'
+                                    >
+                                        <option value="">All Modes</option>
+                                        <option value="online">Online</option>
+                                        <option value="offline">Offline</option>
+                                        <option value="both">Both</option>
+                                    </select>
+                                    <ChevronDown className='absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300 pointer-events-none' />
+                                </div>
+                            </div>
+
+                            {/* Price Filter */}
+                            <div className='lg:col-span-3'>
+                                <label className='block text-[10px] font-black uppercase tracking-[0.2em] mb-3 text-gray-400 ml-1'>
+                                    Price
+                                </label>
+                                <div className='relative group'>
+                                    <CreditCard className='absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300 group-focus-within:text-blue-500 transition-colors' />
+                                    <select
+                                        value={price}
+                                        onChange={(e) => setPrice(e.target.value)}
+                                        className='w-full px-5 py-4 pl-11 rounded-2xl border border-gray-100 bg-gray-50/30 outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all text-sm font-bold text-gray-900 appearance-none shadow-sm cursor-pointer'
+                                    >
+                                        <option value="">Any Price</option>
+                                        <option value="free">Free Only</option>
+                                        <option value="paid">Paid Only</option>
+                                    </select>
+                                    <ChevronDown className='absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300 pointer-events-none' />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Results count */}
+                    {!loading && (
+                        <div className='mb-8 px-2'>
+                            <p className='text-sm text-gray-500 font-semibold'>
+                                Showing <span className='text-gray-900'>{courses.length}</span> programs
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Grid */}
                     {loading ? (
-                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-                            {Array(8)
-                                .fill('')
-                                .map((_, index) => (
-                                    <CardSkeleton key={index} />
-                                ))}
+                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+                            {Array(6).fill('').map((_, index) => (
+                                <CardSkeleton key={index} />
+                            ))}
                         </div>
                     ) : courses.length === 0 ? (
                         <div className='bg-white rounded-[32px] border border-gray-100 border-dashed py-20'>
                             <EmptyState
                                 icon={BookOpen}
                                 title='No Courses Found'
-                                description={
-                                    searchTerm
-                                        ? 'No courses match your search criteria'
-                                        : 'No courses are currently available'
-                                }
-                                action={
-                                    searchTerm
-                                        ? {
-                                            label: 'Clear Filters',
-                                            onClick: clearFilters
-                                        }
-                                        : null
-                                }
+                                description='Try adjusting your search or filters to find what you are looking for.'
+                                action={searchTerm || type || price ? { label: 'Clear All Filters', onClick: clearFilters } : null}
                             />
                         </div>
                     ) : (
-                        <div className='space-y-12'>
-                            {/* Featured Courses */}
-                            {courses.filter(c => c.is_featured).length > 0 && (
-                                <div>
-                                    <div className='flex items-center gap-2 mb-6 border-l-4 border-[#387cae] pl-4'>
-                                        <h2 className='text-2xl font-bold text-gray-800'>Featured Courses</h2>
-                                    </div>
-                                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-fr'>
-                                        {courses.filter(c => c.is_featured).map((course) => (
-                                            <SkillCourseCard
-                                                key={course.id}
-                                                course={course}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Remaining Courses */}
-                            {courses.filter(c => !c.is_featured).length > 0 && (
-                                <div>
-                                    <div className='flex items-center gap-2 mb-6 border-l-4 border-[#387cae] pl-4'>
-                                        <h2 className='text-2xl font-bold text-gray-800'>
-                                            {searchTerm ? "All Courses" : "Recent Courses"}
-                                        </h2>
-                                    </div>
-                                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-fr'>
-                                        {courses.filter(c => !c.is_featured).map((course) => (
-                                            <SkillCourseCard
-                                                key={course.id}
-                                                course={course}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+                            {courses.map((course) => (
+                                <SkillCourseCard
+                                    key={course.id}
+                                    course={course}
+                                />
+                            ))}
                         </div>
                     )}
                 </div>
