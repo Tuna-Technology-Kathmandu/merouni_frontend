@@ -7,7 +7,7 @@ const InfoSection = ({ college }) => {
   const contacts = college?.collegeContacts || []
   const hasAddress = !!(
     address.country ||
-    address.state ||
+    address.district ||
     address.city ||
     address.street ||
     address.postal_code
@@ -22,7 +22,7 @@ const InfoSection = ({ college }) => {
   const addressParts = [
     address.street,
     address.city,
-    address.state,
+    address.district,
     address.country,
     address.postal_code
   ].filter(Boolean)

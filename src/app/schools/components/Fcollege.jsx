@@ -17,7 +17,7 @@ const Fcollege = ({ name, description, image, slug }) => {
             {name}
           </div>
           <div className='text-black text-sm mb-4 line-clamp-3 w-3/4'>
-            {description.state}
+            {description.district}
           </div>
           <Link
             href={`/colleges/apply/${slug}`}

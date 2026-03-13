@@ -17,6 +17,7 @@ import {
 import { Upload } from 'lucide-react'
 import GallerySection from '@/ui/molecules/dialogs/college/components/GallerySection'
 import VideoSection from '@/ui/molecules/dialogs/college/components/VideoSection'
+import { DistrictLists } from '@/constants/district'
 
 
 
@@ -955,23 +956,39 @@ const EditCollegePage = () => {
           <div className='bg-white p-6 rounded-md shadow-md'>
             <h2 className='text-xl font-semibold mb-4'>Address</h2>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              {['country', 'state', 'city', 'street', 'postal_code'].map(
+              {['country', 'district', 'city', 'street', 'postal_code'].map(
                 (field) => (
                   <div key={field}>
                     <label className='block mb-2 capitalize'>
-                      {field !== 'state' ? (
+                      {field !== 'district' ? (
                         <>
                           {field.replace('_', ' ')}{' '}
                           <span className='text-red-500'>*</span>
                         </>
                       ) : (
-                        'District'
+                        <>
+                          District <span className='text-red-500'>*</span>
+                        </>
                       )}
                     </label>
-                    <input
-                      {...register(`address.${field}`)}
-                      className='w-full p-2 border rounded'
-                    />
+                    {field === 'district' ? (
+                      <select
+                        {...register(`address.${field}`, { required: true })}
+                        className='w-full p-2 border rounded bg-white'
+                      >
+                        <option value=''>Select District</option>
+                        {DistrictLists.map((district) => (
+                          <option key={district.name} value={district.name}>
+                            {district.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        {...register(`address.${field}`)}
+                        className='w-full p-2 border rounded'
+                      />
+                    )}
                   </div>
                 )
               )}
