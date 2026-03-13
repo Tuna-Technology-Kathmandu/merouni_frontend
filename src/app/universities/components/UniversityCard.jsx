@@ -13,13 +13,13 @@ const UniversityCard = ({ university }) => {
     city,
     state,
     slugs,
-    featured_img,
+    featured_image,
     logo,
     type_of_institute
   } = university
 
   const location = [city, state].filter(Boolean).join(', ')
-  const image = featured_img || logo || 'https://placehold.co/600x400?text=University'
+  const image = featured_image || logo || 'https://placehold.co/600x400?text=University'
 
   return (
     <motion.div
