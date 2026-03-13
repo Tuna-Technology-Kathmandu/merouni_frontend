@@ -210,6 +210,21 @@ export default function AdmissionManager() {
   const [editing, setEditing] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(false)
+  
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchTimeout, setSearchTimeout] = useState(null)
+  const [activeId, setActiveId] = useState(null)
+  
+  const [deleteId, setDeleteId] = useState(null)
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [editingId, setEditingId] = useState(null)
+  
+  const [viewModalOpen, setViewModalOpen] = useState(false)
+  const [viewData, setViewData] = useState(null)
+
+  const [selectedCollege, setSelectedCollege] = useState(null)
+  const [selectedProgram, setSelectedProgram] = useState(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
