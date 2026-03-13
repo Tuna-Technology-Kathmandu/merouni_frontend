@@ -19,19 +19,16 @@ import { DistrictLists } from '@/constants/district'
 // Client-side fetch functions
 const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
   try {
-    const queryParams = new URLSearchParams({
-      page: page.toString(),
-      limit: '24'
-    })
-
     const body = {
+      page,
+      limit: 24,
       degree_ids: filters.degree || [],
-      state: filters.state || [],
+      state: filters.district || [],
       university: filters.uni || [],
       type: filters.type || []
     }
 
-    const url = `${process.env.baseUrl}/college/filter?${queryParams.toString()}`
+    const url = `${process.env.baseUrl}/college/filter`
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -47,7 +44,7 @@ const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
       colleges:
         data.items?.map((college) => ({
           name: college.name,
-          location: `${college.address?.city || ''}, ${college.address?.state || ''}`,
+          location: `${college.address?.city || ''}, ${college.address?.district || ''}`,
           description: college.description,
           googleMapUrl: college.google_map_url,
           instituteType: college.institute_type,
@@ -97,7 +94,7 @@ const searchColleges = async (query) => {
       name: clz.name,
       slug: clz.slugs,
       collegeImage: clz.featured_img,
-      location: `${clz.address?.city || ''}, ${clz.address?.state || ''}`,
+      location: `${clz.address?.city || ''}, ${clz.address?.district || ''}`,
       description: clz.description || 'No description available.',
       logo: clz.college_logo || 'default_logo.png',
       instituteType: clz.institute_type || 'Unknown'
@@ -512,7 +509,7 @@ const CollegeFinder = () => {
             inputField='district'
             options={filteredDistricts}
             selectedValues={selectedFilters.state}
-            onCheckboxChange={(val) => handleFilterChange('state', val)}
+            onCheckboxChange={(val) => handleFilterChange('district', val)}
             defaultValue={filterInputs.district}
             onSearchChange={handleFilterSearchChange}
           />

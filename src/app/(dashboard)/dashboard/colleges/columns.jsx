@@ -83,7 +83,7 @@ export const createColumns = ({
       accessorKey: 'address',
       cell: ({ row }) => {
         const address = row.original.address || {}
-        const location = [address.city, address.state, address.country]
+        const location = [address.city, address.district, address.country]
           .filter(Boolean)
           .join(', ')
         const mapUrl = row.original.google_map_url

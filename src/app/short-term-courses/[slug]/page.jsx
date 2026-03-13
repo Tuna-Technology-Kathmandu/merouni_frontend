@@ -1,21 +1,32 @@
 'use client'
 
-import EmptyState from '@/ui/shadcn/EmptyState'
-import Image from 'next/image'
-import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
 import {
-    FaArrowLeft,
-    FaAward,
-    FaCheckCircle,
-    FaClock,
-    FaMoneyBillWave
-} from 'react-icons/fa'
-import Footer from '../../../components/Frontpage/Footer'
-import Header from '../../../components/Frontpage/Header'
-import Navbar from '../../../components/Frontpage/Navbar'
-import Loading from '../../../ui/molecules/Loading'
+    ArrowLeft,
+    Award,
+    Calendar,
+    Clock,
+    MapPin,
+    Users,
+    Bookmark,
+    ClipboardList,
+    DollarSign,
+    BadgeCheck,
+    Building2,
+    MessageSquare,
+    CheckCircle
+} from 'lucide-react'
+import Image from 'next/image'
+import Footer from '@/components/Frontpage/Footer'
+import Header from '@/components/Frontpage/Header'
+import Navbar from '@/components/Frontpage/Navbar'
+import Loading from '@/ui/molecules/Loading'
+import EmptyState from '@/ui/shadcn/EmptyState'
+
+import { formatDate } from '@/utils/date.util'
+import { Button } from '@/ui/shadcn/button'
+import { THEME_BLUE } from '@/constants/constants'
 import { fetchSkillCourseBySlug } from '../actions'
 
 const SkillCourseDetailsPage = ({ params }) => {
@@ -29,18 +40,15 @@ const SkillCourseDetailsPage = ({ params }) => {
             try {
                 const resolvedParams = await params
                 const slug = resolvedParams.slug
-
                 const data = await fetchSkillCourseBySlug(slug)
                 setCourse(data || null)
             } catch (err) {
-                console.error('Error fetching course details:', err)
+                console.error('Error:', err)
                 setError(err.message || 'Failed to load course details')
-                setCourse(null)
             } finally {
                 setLoading(false)
             }
         }
-
         fetchDetails()
     }, [params])
 
@@ -49,7 +57,7 @@ const SkillCourseDetailsPage = ({ params }) => {
             <div className='bg-white min-h-screen'>
                 <Header />
                 <Navbar />
-                <div className='min-h-[60vh] flex items-center justify-center'>
+                <div className='min-h-[60vh] flex items-center justify-center font-sans'>
                     <Loading />
                 </div>
                 <Footer />
@@ -62,13 +70,11 @@ const SkillCourseDetailsPage = ({ params }) => {
             <div className='bg-white min-h-screen'>
                 <Header />
                 <Navbar />
-                <div className='min-h-[60vh] flex items-center justify-center px-6'>
+                <div className='min-h-[60vh] flex items-center justify-center px-6 font-sans'>
                     <EmptyState
-                        icon={FaAward}
+                        icon={Award}
                         title='Course Not Found'
-                        description={
-                            error || 'The course you are looking for does not exist.'
-                        }
+                        description={error || 'The course you are looking for does not exist.'}
                         action={{
                             label: 'Back to Courses',
                             onClick: () => router.push('/short-term-courses')
@@ -80,110 +86,174 @@ const SkillCourseDetailsPage = ({ params }) => {
         )
     }
 
+    const DetailItem = ({ icon, label, value }) => (
+        <div className='flex items-center gap-4 py-4 border-b border-gray-100 last:border-0'>
+            <div className='w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0 shadow-sm border border-gray-50'>
+                {React.cloneElement(icon, { className: 'w-5 h-5', style: { color: THEME_BLUE } })}
+            </div>
+            <div className='flex flex-col'>
+                <span className='text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5'>{label}</span>
+                <span className='text-sm font-bold text-gray-800 tracking-tight'>{value}</span>
+            </div>
+        </div>
+    )
+
     return (
-        <div className='bg-white min-h-screen'>
+        <div className='bg-white min-h-screen font-sans'>
             <Header />
             <Navbar />
 
             <main className='max-w-7xl mx-auto px-6 py-12'>
                 {/* Navigation */}
                 <div className='mb-8'>
-                    <Link
-                        href='/short-term-courses'
+                    <button
+                        onClick={() => router.push('/short-term-courses')}
                         className='inline-flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-gray-900 transition-colors'
                     >
-                        <FaArrowLeft className='w-3 h-3' />
-                        <span>Back to Courses</span>
-                    </Link>
+                        <ArrowLeft className='w-4 h-4' />
+                        <span>Back to Skill Courses</span>
+                    </button>
                 </div>
 
                 <div className='flex flex-col lg:flex-row gap-12'>
                     {/* Main Content */}
                     <div className='flex-1'>
-                        {/* Header */}
+                        {/* Header Section */}
                         <div className='mb-8'>
                             <div className='flex items-start gap-4 mb-6'>
+                                <div className='p-4 rounded-2xl' style={{ backgroundColor: `${THEME_BLUE}15` }}>
+                                    <Award className='w-8 h-8' style={{ color: THEME_BLUE }} />
+                                </div>
                                 <div className='flex-1'>
-                                    <h1 className='text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight leading-tight'>
+                                    <h1 className='text-3xl md:text-5xl font-black text-gray-900 mb-3 tracking-tight'>
                                         {course.title}
                                     </h1>
-                                    <div className="flex flex-wrap gap-2 mb-4">
-                                        {course.status === 'active' && (
-                                            <span className='inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm font-semibold border border-green-100'>
-                                                <FaCheckCircle className="w-3 h-3" /> Active
-                                            </span>
+                                    <div className='flex flex-wrap items-center gap-4'>
+                                        {course.institution_name && (
+                                            <div className='flex items-center gap-1.5 font-bold text-gray-900 bg-gray-100 px-3 py-1.5 rounded-lg'>
+                                                <Building2 className='w-4 h-4' style={{ color: THEME_BLUE }} />
+                                                <span className='text-xs'>{course.institution_name}</span>
+                                                <CheckCircle className='w-3.5 h-3.5 text-blue-500 fill-blue-50' />
+                                            </div>
                                         )}
-                                        {course.is_featured && (
-                                            <span className='inline-flex items-center gap-1 px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-sm font-semibold border border-yellow-100'>
-                                                <FaAward className="w-3 h-3" /> Featured
+                                        <div className='flex gap-2'>
+                                            <span className='inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] font-black border border-blue-100 uppercase tracking-wider'>
+                                                {course.course_type || 'Skill Certification'}
                                             </span>
-                                        )}
+                                            {course.is_featured && (
+                                                <span className='inline-block px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-[10px] font-black border border-amber-100 uppercase tracking-wider'>
+                                                    Featured
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Thumbnail */}
-                            {course.thumbnail_image && (
-                                <div className="mb-8 rounded-2xl overflow-hidden border border-gray-100 shadow-sm relative h-[300px] md:h-[400px] w-full">
-                                    <Image
-                                        src={course.thumbnail_image}
-                                        alt={course.title}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                </div>
-                            )}
                         </div>
 
-                        {/* Description */}
-                        {course.description && (
-                            <div className='mb-12'>
-                                <h2 className='text-2xl font-bold text-gray-900 mb-6 border-b pb-2 border-gray-100'>
-                                    Course Overview
-                                </h2>
-                                <div
-                                    className='text-gray-600 leading-relaxed text-lg prose prose-gray max-w-none'
-                                    dangerouslySetInnerHTML={{ __html: course.description }}
+                        {/* Thumbnail Image */}
+                        {course.thumbnail_image && (
+                            <div className='mb-12 relative aspect-video rounded-[2rem] overflow-hidden border-8 border-gray-50 bg-gray-50 shadow-sm'>
+                                <Image
+                                    src={course.thumbnail_image}
+                                    alt={course.title}
+                                    fill
+                                    className='object-cover'
+                                    priority
                                 />
                             </div>
                         )}
 
-                        {/* Additional Metadata/Sections can be added here if the API provides more fields like curriculum, instructors etc */}
+                        {/* Description / Content */}
+                        <div className='space-y-12'>
+                            {course.description && (
+                                <div>
+                                    <h2 className='text-2xl font-bold text-gray-900 mb-6'>About This Course</h2>
+                                    <p className='text-gray-600 leading-relaxed text-lg whitespace-pre-line'>
+                                        {course.description}
+                                    </p>
+                                </div>
+                            )}
 
+                            {course.content && (
+                                <div>
+                                    <h2 className='text-2xl font-bold text-gray-900 mb-6'>Curriculum & Requirements</h2>
+                                    <div
+                                        className='prose prose-blue max-w-none text-gray-600 leading-relaxed text-lg'
+                                        dangerouslySetInnerHTML={{ __html: course.content }}
+                                    />
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Sidebar */}
-                    <div className='lg:w-80 space-y-6'>
-                        <div className='bg-gray-50 rounded-2xl p-8 sticky top-24 border border-gray-100 shadow-sm'>
+                    <aside className='lg:w-80 space-y-6'>
+                        <div className='bg-gray-50 rounded-2xl p-8 sticky top-24'>
                             <h3 className='text-sm font-bold text-gray-900 uppercase tracking-widest mb-6 border-b border-gray-200 pb-4'>
-                                Course Details
+                                Course Logistics
                             </h3>
-                            <div className='space-y-6'>
-                                <div className='flex flex-col border-b border-gray-100 pb-4 last:border-0 last:pb-0'>
+
+                            <div className='space-y-4'>
+                                <div className='flex flex-col border-b border-gray-100 pb-4'>
                                     <span className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-2'>
-                                        <FaMoneyBillWave className='w-3 h-3' />
-                                        Price
+                                        Investment
                                     </span>
-                                    <span className='text-2xl font-bold text-[#30ad8f]'>
+                                    <span className='text-2xl font-bold text-green-700'>
                                         {course.price ? `Rs. ${parseFloat(course.price).toLocaleString()}` : 'Free'}
                                     </span>
                                 </div>
 
-                                <div className='flex flex-col border-b border-gray-100 pb-4 last:border-0 last:pb-0'>
-                                    <span className='text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-2'>
-                                        <FaClock className='w-3 h-3' />
-                                        Duration
-                                    </span>
-                                    <span className='text-base font-medium text-gray-900'>
-                                        {course.duration || 'Flexible'}
-                                    </span>
+                                <DetailItem
+                                    icon={<Clock className='w-3 h-3' />}
+                                    label="Duration"
+                                    value={course.duration || 'Flexible'}
+                                />
+
+                                {course.class_time && (
+                                    <DetailItem
+                                        icon={<Clock className='w-3 h-3' />}
+                                        label="Time"
+                                        value={course.class_time}
+                                    />
+                                )}
+
+                                {course.start_date && (
+                                    <DetailItem
+                                        icon={<Calendar className='w-3 h-3' />}
+                                        label="Starts From"
+                                        value={formatDate(course.start_date)}
+                                    />
+                                )}
+
+                                {course.location && (
+                                    <DetailItem
+                                        icon={<MapPin className='w-3 h-3' />}
+                                        label="Location"
+                                        value={course.location}
+                                    />
+                                )}
+
+                                {course.seats_available && (
+                                    <DetailItem
+                                        icon={<Users className='w-3 h-3' />}
+                                        label="Availability"
+                                        value={`${course.seats_available} Seats Available`}
+                                    />
+                                )}
+
+                                <div className='pt-6 space-y-3'>
+                                    <Button
+                                        className='w-full py-6 text-lg font-bold text-white shadow-md transition-all hover:-translate-y-0.5'
+                                        style={{ backgroundColor: THEME_BLUE }}
+                                    >
+                                        Enroll Now
+                                    </Button>
+
                                 </div>
-                                {/* Author info could go here if available */}
                             </div>
-
-
                         </div>
-                    </div>
+                    </aside>
                 </div>
             </main>
 

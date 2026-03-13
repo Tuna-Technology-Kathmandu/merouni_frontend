@@ -24,7 +24,6 @@ class ApiService {
 
   async getAll(params = {}) {
     try {
-      // const url = queryParams ? `${this.baseUrl}?${queryParams}` : this.baseUrl;
       const url = this.buildUrl(this.baseUrl, params)
       const response = await fetch(url, {
         cache: 'no-store'
@@ -43,9 +42,6 @@ class ApiService {
 
   async getById(id, params = {}) {
     try {
-      // const url = `${this.baseUrl}/${id}${
-      //   queryParams ? `?${queryParams}` : ""
-      // }`;
       const url = this.buildUrl(`${this.baseUrl}/${id}`, params)
       const response = await fetch(url, {
         cache: 'no-store'
@@ -132,7 +128,9 @@ const services = {
   newsletter: new ApiService('newsletter'),
   college: new ApiService('college'),
   category: new ApiService('category'),
-  discipline: new ApiService('discipline')
+  discipline: new ApiService('discipline'),
+  school: new ApiService('school'),
+  consultancy: new ApiService('consultancy'),
 }
 
 export default services

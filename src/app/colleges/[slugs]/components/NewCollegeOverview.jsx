@@ -196,9 +196,9 @@ const CollegeOverview = ({ college }) => {
                           .filter(Boolean)
                           .join(', ') || '—'}
                       </p>
-                      {(address?.state || address?.postal_code || address?.country) && (
+                      {(address?.district || address?.postal_code || address?.country) && (
                         <p className='text-xs text-gray-500 mt-1'>
-                          {[address?.state, address?.postal_code, address?.country]
+                          {[address?.district, address?.postal_code, address?.country]
                             .filter(Boolean)
                             .join(', ')}
                         </p>
@@ -243,9 +243,9 @@ const CollegeOverview = ({ college }) => {
                         .filter(Boolean)
                         .join(', ') || '—'}
                     </p>
-                    {(address?.state || address?.postal_code || address?.country) && (
+                    {(address?.district || address?.postal_code || address?.country) && (
                       <p className='text-xs text-gray-500 mt-1'>
-                        {[address?.state, address?.postal_code, address?.country]
+                        {[address?.district, address?.postal_code, address?.country]
                           .filter(Boolean)
                           .join(', ')}
                       </p>

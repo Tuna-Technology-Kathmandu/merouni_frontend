@@ -45,6 +45,7 @@ import { cn } from '@/app/lib/utils'
 import { authFetch } from '@/app/utils/authFetch'
 import ConfirmationDialog from '@/ui/molecules/ConfirmationDialog'
 import GallerySection from './components/GallerySection'
+import { DistrictLists } from '@/constants/district'
 import FileUploadWithPreview from './components/MediaUploadWithBranding'
 import VideoSection from './components/VideoSection'
 
@@ -115,7 +116,7 @@ const CreateUpdateCollegeModal = ({
             facilities: [],
             address: {
                 country: '',
-                state: '',
+                district: '',
                 city: '',
                 street: '',
                 postal_code: ''
@@ -241,7 +242,7 @@ const CreateUpdateCollegeModal = ({
 
                     if (collegeData.collegeAddress) {
                         setValue('address.country', collegeData.collegeAddress.country)
-                        setValue('address.state', collegeData.collegeAddress.state)
+                        setValue('address.district', collegeData.collegeAddress.district)
                         setValue('address.city', collegeData.collegeAddress.city)
                         setValue('address.street', collegeData.collegeAddress.street)
                         setValue('address.postal_code', collegeData.collegeAddress.postal_code)
@@ -797,15 +798,21 @@ const CreateUpdateCollegeModal = ({
                                                 )}
                                             </div>
                                             <div>
-                                                <Label htmlFor='address.state' required={true}>State / Province</Label>
-                                                <Input
-                                                    id='address.state'
-                                                    {...register('address.state', { required: 'State is required' })}
-                                                    placeholder='e.g. Bagmati'
-                                                    className="h-11 rounded-md border-gray-200"
-                                                />
-                                                {errors.address?.state && (
-                                                    <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.address.state.message}</p>
+                                                <Label htmlFor='address.district' required={true}>District</Label>
+                                                <select
+                                                    id='address.district'
+                                                    {...register('address.district', { required: 'District is required' })}
+                                                    className="flex h-11 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-4 focus:ring-[#387cae]/5 focus:border-[#387cae] transition-all"
+                                                >
+                                                    <option value=''>Select District</option>
+                                                    {DistrictLists.map((district) => (
+                                                        <option key={district.name} value={district.name}>
+                                                            {district.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                {errors.address?.district && (
+                                                    <p className='text-xs font-semibold text-red-500 mt-2 ml-1'>{errors.address.district.message}</p>
                                                 )}
                                             </div>
                                         </div>

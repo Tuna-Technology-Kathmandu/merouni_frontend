@@ -10,7 +10,7 @@ const FeaturedDegree = () => {
     try {
       setLoading(true)
       const response = await fetch(
-        `${process.env.baseUrl}/degree?page=1&limit=6`
+        `${process.env.baseUrl}/degree?page=1&limit=7`
       )
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Failed to fetch degrees')
@@ -39,7 +39,7 @@ const FeaturedDegree = () => {
         </div>
         <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5'>
           {loading
-            ? Array.from({ length: 6 }).map((_, i) => (
+            ? Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className='flex flex-col gap-3'>
                 <div className='aspect-[16/10] rounded-md bg-gray-200 animate-pulse' />
                 <div className='h-6 w-3/4 bg-gray-200 rounded animate-pulse' />

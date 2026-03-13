@@ -1,20 +1,20 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
-import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose } from '@/ui/shadcn/dialog'
-import { Button } from '@/ui/shadcn/button'
 import { authFetch } from '@/app/utils/authFetch'
-import { toast } from 'react-toastify'
-import { useSelector } from 'react-redux'
-import { Trash2, X, Plus, Building2 } from 'lucide-react'
+import { Button } from '@/ui/shadcn/button'
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from '@/ui/shadcn/dialog'
 import SearchSelectCreate from '@/ui/shadcn/search-select-create'
+import { Building2, Plus, Trash2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import { useSelector } from 'react-redux'
+import { toast } from 'react-toastify'
 
 
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
-import { Textarea } from '@/ui/shadcn/textarea'
 import { Select } from '@/ui/shadcn/select'
+import { Textarea } from '@/ui/shadcn/textarea'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 
 const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
@@ -25,6 +25,9 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
     // Rich text field values (managed outside react-hook-form)
     const [learningOutcomes, setLearningOutcomes] = useState('')
     const [learningOutcomesError, setLearningOutcomesError] = useState(false)
+
+    const [eligibilityCriteria, setEligibilityCriteria] = useState('')
+    const [eligibilityCriteriaError, setEligibilityCriteriaError] = useState(false)
 
     // Local state for syllabus management UI
     const [currentYear, setCurrentYear] = useState(1)
@@ -99,6 +102,8 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
         })
         setLearningOutcomes('')
         setLearningOutcomesError(false)
+        setEligibilityCriteria('')
+        setEligibilityCriteriaError(false)
         setSelectedUniversities([])
         setSelectedLevel(null)
         setSelectedDegree(null)
@@ -142,6 +147,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
 
             // Set rich text
             setLearningOutcomes(program.learning_outcomes || '')
+            setEligibilityCriteria(program.eligibility_criteria || '')
 
             // Syllabus
             const enrichedSyllabus = (program.syllabus || []).map((item) => ({
@@ -307,6 +313,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
             const cleanedData = {
                 ...data,
                 learning_outcomes: learningOutcomes,
+                eligibility_criteria: eligibilityCriteria,
                 level_id: data.level_id ? Number(data.level_id) : undefined,
                 degree_id: data.degree_id ? Number(data.degree_id) : undefined,
                 credits: data.credits ? Number(data.credits) : undefined,
@@ -504,11 +511,18 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
 
                                 <div className="space-y-1.5">
                                     <Label>Eligibility Criteria</Label>
-                                    <Textarea
-                                        {...register('eligibility_criteria')}
-                                        rows={3}
-                                        placeholder='Describe admission requirements and prerequisites...'
-                                    />
+                                    <div className={eligibilityCriteriaError ? 'ring-2 ring-red-400 rounded-md' : ''}>
+                                        <TipTapEditor
+                                            value={eligibilityCriteria}
+                                            onChange={(html) => {
+                                                setEligibilityCriteria(html)
+                                                // const hasText = html && html.replace(/<[^>]*>/g, '').trim().length > 0
+                                                // if (hasText) setEligibilityCriteriaError(false)
+                                            }}
+                                            placeholder='Describe admission requirements and prerequisites...'
+                                            height='250px'
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="space-y-1.5">
@@ -597,7 +611,7 @@ const CreateUpdateProgram = ({ isOpen, onClose, slug, onSuccess }) => {
                                         <Building2 size={13} className="text-violet-600" />
                                     </div>
                                     <h3 className="text-base font-semibold text-slate-800">Associated Universities</h3>
-                                    
+
                                 </div>
                                 <p className="text-xs text-gray-400">Search and select the universities this program is affiliated with. You can select multiple.</p>
                                 <SearchSelectCreate

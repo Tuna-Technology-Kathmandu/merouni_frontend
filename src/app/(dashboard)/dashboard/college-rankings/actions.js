@@ -16,12 +16,12 @@ export async function fetchRankings() {
     }
 }
 
-export async function addRanking(programId, collegeId) {
+export async function addRanking(degreeId, collegeId) {
     try {
         const response = await authFetch(`${BASE_URL}/college-ranking`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ program_id: programId, college_id: collegeId })
+            body: JSON.stringify({ degree_id: degreeId, college_id: collegeId })
         })
         if (!response.ok) {
             const errData = await response.json()
@@ -34,16 +34,16 @@ export async function addRanking(programId, collegeId) {
     }
 }
 
-export async function deleteProgramRankings(programId) {
+export async function deleteDegreeRankings(degreeId) {
     try {
         const response = await authFetch(
-            `${BASE_URL}/college-ranking/program?program_id=${programId}`,
+            `${BASE_URL}/college-ranking/degree?degree_id=${degreeId}`,
             { method: 'DELETE' }
         )
         if (!response.ok) throw new Error('Failed to delete rankings')
         return await response.json()
     } catch (error) {
-        console.error('deleteProgramRankings error:', error)
+        console.error('deleteDegreeRankings error:', error)
         throw error
     }
 }
@@ -62,12 +62,12 @@ export async function deleteRanking(rankingId) {
     }
 }
 
-export async function updateRankingOrder(programId, rankings) {
+export async function updateRankingOrder(degreeId, rankings) {
     try {
         const response = await authFetch(`${BASE_URL}/college-ranking/order`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ program_id: programId, rankings })
+            body: JSON.stringify({ degree_id: degreeId, rankings })
         })
         if (!response.ok) throw new Error('Failed to update ranking order')
         return await response.json()
@@ -77,38 +77,52 @@ export async function updateRankingOrder(programId, rankings) {
     }
 }
 
-export async function updateProgramOrder(programOrders) {
+export async function updateDegreeOrder(degreeOrders) {
     try {
-        const response = await authFetch(`${BASE_URL}/college-ranking/program-order`, {
+        const response = await authFetch(`${BASE_URL}/college-ranking/degree-order`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ programOrders })
+            body: JSON.stringify({ degreeOrders })
         })
-        if (!response.ok) throw new Error('Failed to update program order')
+        if (!response.ok) throw new Error('Failed to update degree order')
         return await response.json()
     } catch (error) {
-        console.error('updateProgramOrder error:', error)
+        console.error('updateDegreeOrder error:', error)
         throw error
     }
 }
 
-export async function fetchPrograms(query = '') {
+export async function updateDegreeDescription(degreeId, description) {
     try {
-        const response = await authFetch(`${BASE_URL}/program?limit=1000${query ? `&q=${query}` : ''}`)
-        if (!response.ok) throw new Error('Failed to fetch programs')
+        const response = await authFetch(`${BASE_URL}/college-ranking/degree-description`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ degree_id: degreeId, description })
+        })
+        if (!response.ok) throw new Error('Failed to update degree description')
+        return await response.json()
+    } catch (error) {
+        console.error('updateDegreeDescription error:', error)
+        throw error
+    }
+}
+
+export async function fetchDegrees(query = '') {
+    try {
+        const response = await authFetch(`${BASE_URL}/degree?limit=1000${query ? `&q=${query}` : ''}`)
+        if (!response.ok) throw new Error('Failed to fetch degrees')
         const data = await response.json()
         return data.items || []
     } catch (error) {
-        console.error('fetchPrograms error:', error)
+        console.error('fetchDegrees error:', error)
         throw error
     }
 }
 
-export async function fetchColleges(programId, query = '') {
+export async function fetchColleges(degreeId, query = '') {
     try {
-        if (!programId) return []
+        if (!degreeId) return []
         const params = new URLSearchParams({
-            program_id: programId.toString(),
             limit: '100'
         })
         if (query) params.append('q', query)

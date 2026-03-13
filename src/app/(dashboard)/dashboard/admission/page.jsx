@@ -1,16 +1,14 @@
 'use client'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { Edit2, Eye, Trash2, Plus } from 'lucide-react'
+import { Edit2, Eye, Trash2, Plus, GripVertical, Building2, GraduationCap } from 'lucide-react'
 
 import { Button } from '@/ui/shadcn/button'
-import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
 import { usePageHeading } from '@/contexts/PageHeadingContext'
-import Table from '@/ui/shadcn/DataTable'
 import {
   Dialog,
   DialogHeader,
@@ -28,11 +26,162 @@ import {
   createOrUpdateAdmission,
   deleteAdmission,
   fetchColleges,
-  fetchPrograms
+  fetchPrograms,
+  updateAdmissionOrder
 } from './action'
 import AdmissionViewModal from './AdmissionViewModal'
 import TipTapEditor from '@/ui/shadcn/tiptap-editor'
 import SearchSelectCreate from '@/ui/shadcn/search-select-create'
+
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { cn } from '@/app/lib/utils'
+
+// ─── Sortable Admission Card ───────────────────────────────────────────────────
+const SortableCard = ({ admission, onView, onEdit, onDelete }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: admission.id })
+
+  const style = {
+    transform: transform ? CSS.Transform.toString(transform) : undefined,
+    transition,
+    opacity: isDragging ? 0.5 : 1
+  }
+
+  const collegeName = admission.collegeAdmissionCollege?.name || 'N/A'
+  const collegeLogo = admission.collegeAdmissionCollege?.college_logo || admission.collegeAdmissionCollege?.featured_img || null
+  const programTitle = admission.program?.title || 'N/A'
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'bg-white border rounded-xl transition-all duration-200 overflow-hidden',
+        isDragging
+          ? 'border-[#387cae]/40 shadow-xl ring-2 ring-[#387cae]/20'
+          : 'border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300'
+      )}
+    >
+      <div className='flex items-center gap-4 p-4'>
+        {/* Drag handle */}
+        <div
+          {...attributes}
+          {...listeners}
+          className='shrink-0 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing touch-none transition-colors'
+          title='Drag to reorder'
+        >
+          <GripVertical size={20} />
+        </div>
+
+        {/* Logo */}
+        <div className='w-16 h-16 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0 shadow-sm'>
+          {collegeLogo
+            ? <img src={collegeLogo} alt={collegeName} className='w-full h-full object-contain p-1.5' />
+            : <Building2 className='w-7 h-7 text-gray-300' />}
+        </div>
+
+        {/* Info */}
+        <div className='flex-1 min-w-0'>
+          <div className='flex items-center gap-2 flex-wrap mb-1'>
+            <h3 className='text-[16px] font-bold text-gray-900 truncate leading-tight'>
+              {collegeName}
+            </h3>
+          </div>
+          <div className='flex items-center gap-1.5 text-[13px] text-gray-500 mt-1'>
+            <GraduationCap className='w-4 h-4 shrink-0 text-gray-400' />
+            <span className='truncate'>{programTitle}</span>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className='flex items-center gap-1 pl-4 border-l border-gray-100'>
+          <button
+            onClick={() => onView(admission.id)}
+            title='View details'
+            className='w-9 h-9 flex items-center justify-center rounded-lg text-blue-500 hover:bg-blue-50 transition-all'
+          >
+            <Eye size={18} />
+          </button>
+          <button
+            onClick={() => onEdit(admission)}
+            title='Edit'
+            className='w-9 h-9 flex items-center justify-center rounded-lg text-amber-500 hover:bg-amber-50 transition-all'
+          >
+            <Edit2 size={18} />
+          </button>
+          <button
+            onClick={() => onDelete(admission.id)}
+            title='Delete'
+            className='w-9 h-9 flex items-center justify-center rounded-lg text-red-500 hover:bg-red-50 transition-all'
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Drag Overlay Ghost Card ──────────────────────────────────────────────────
+const OverlayCard = ({ admission }) => {
+  const collegeName = admission.collegeAdmissionCollege?.name || 'N/A'
+  const collegeLogo = admission.collegeAdmissionCollege?.college_logo || admission.collegeAdmissionCollege?.featured_img || null
+  const programTitle = admission.program?.title || 'N/A'
+
+  return (
+    <div className='bg-white border-2 border-[#387cae]/40 rounded-xl shadow-2xl rotate-[0.6deg] scale-[1.01]'>
+      <div className='flex items-center gap-4 p-4'>
+        <GripVertical size={20} className='text-[#387cae]/50 cursor-grabbing shrink-0' />
+        <div className='w-16 h-16 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0'>
+          {collegeLogo
+            ? <img src={collegeLogo} alt={collegeName} className='w-full h-full object-contain p-1.5' />
+            : <Building2 className='w-7 h-7 text-gray-300' />}
+        </div>
+        <div className='flex-1 min-w-0'>
+          <h3 className='text-[16px] font-bold text-gray-900 truncate mb-1'>{collegeName}</h3>
+          <div className='flex items-center gap-1.5 text-[13px] text-gray-500'>
+            <span className='truncate'>{programTitle}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Skeleton Card ────────────────────────────────────────────────────────────
+const CardSkeleton = ({ i = 0 }) => (
+  <div
+    className='bg-white border border-gray-200 rounded-xl overflow-hidden animate-pulse'
+    style={{ animationDelay: `${i * 60}ms` }}
+  >
+    <div className='flex items-center gap-4 p-4'>
+      <div className='w-5 h-5 bg-gray-200 rounded shrink-0' />
+      <div className='w-16 h-16 bg-gray-200 rounded-lg shrink-0' />
+      <div className='flex-1 space-y-2.5'>
+        <div className='h-5 bg-gray-200 rounded-md w-1/3' />
+        <div className='h-3 bg-gray-200 rounded w-1/4' />
+      </div>
+      <div className='flex gap-2 pl-4 border-l border-gray-100'>
+        {[0, 1, 2].map(j => <div key={j} className='w-9 h-9 bg-gray-200 rounded-lg' />)}
+      </div>
+    </div>
+  </div>
+)
 
 export default function AdmissionManager() {
   const { setHeading } = usePageHeading()
@@ -60,41 +209,62 @@ export default function AdmissionManager() {
   const [admissions, setAdmissions] = useState([])
   const [editing, setEditing] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    totalCount: 0
-  })
+  
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchTimeout, setSearchTimeout] = useState(null)
+  const [activeId, setActiveId] = useState(null)
+  
   const [deleteId, setDeleteId] = useState(null)
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [editingId, setEditingId] = useState(null)
-
-  const [searchQuery, setSearchQuery] = useState('')
-  const [searchTimeout, setSearchTimeout] = useState(null)
-
+  
   const [viewModalOpen, setViewModalOpen] = useState(false)
   const [viewData, setViewData] = useState(null)
 
   const [selectedCollege, setSelectedCollege] = useState(null)
   const [selectedProgram, setSelectedProgram] = useState(null)
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
+
   useEffect(() => {
     setHeading('Admission Management')
-    loadAdmissions()
+    loadAdmissions(searchQuery, false)
     return () => setHeading(null)
   }, [setHeading])
 
-  const loadAdmissions = async (page = 1, search = searchQuery) => {
-    setLoading(true)
+  const loadAdmissions = async (search = searchQuery, silent = true) => {
+    if (!silent) setLoading(true)
     try {
-      const data = await getAdmissions(page, search)
-      setAdmissions(data.items)
-      setPagination(data.pagination)
+      let all = []
+      let page = 1
+      let hasMore = true
+
+      while (hasMore) {
+        const data = await getAdmissions(page, search)
+        all = [...all, ...(data.items || [])]
+        hasMore = page < (data.pagination?.totalPages || 1)
+        page++
+      }
+
+      // Display all recursively fetched items for drag-and-drop
+      const uniqueItems = Array.from(new Map(all.map((a) => [a.id, a])).values())
+
+      uniqueItems.sort((a, b) => {
+        const oA = a.order_no ?? Infinity
+        const oB = b.order_no ?? Infinity
+        return oA !== oB ? oA - oB : b.id - a.id
+      })
+
+      setAdmissions(uniqueItems)
     } catch (err) {
       toast.error('Failed to load admissions')
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }
 
@@ -103,9 +273,45 @@ export default function AdmissionManager() {
     if (searchTimeout) clearTimeout(searchTimeout)
 
     const timeoutId = setTimeout(() => {
-      loadAdmissions(1, value)
-    }, 300)
+      loadAdmissions(value, false)
+    }, 350)
     setSearchTimeout(timeoutId)
+  }
+
+  const handleDragStart = (event) => setActiveId(event.active.id)
+  const handleDragCancel = () => setActiveId(null)
+
+  const handleDragEnd = async (event) => {
+    setActiveId(null)
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIdx = admissions.findIndex((a) => a.id === active.id)
+    const newIdx = admissions.findIndex((a) => a.id === over.id)
+    const reordered = arrayMove(admissions, oldIdx, newIdx)
+    setAdmissions(reordered)
+
+    const payload = reordered.map((a, i) => ({ id: a.id, order_no: i + 1 }))
+    await saveOrder(payload)
+  }
+
+  const saveOrder = async (payload) => {
+    try {
+      setSaving(true)
+      await updateAdmissionOrder(payload)
+      setAdmissions((prev) =>
+        prev.map((a) => {
+          const updated = payload.find((p) => p.id === a.id)
+          return updated ? { ...a, order_no: updated.order_no } : a
+        })
+      )
+      toast.success('Order saved', { autoClose: 1500 })
+    } catch (err) {
+      toast.error(err.message || 'Failed to save order')
+      loadAdmissions(searchQuery, true)
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleAdd = () => {
@@ -218,91 +424,81 @@ export default function AdmissionManager() {
     reset()
   }
 
-  const columns = useMemo(
-    () => [
-      {
-        header: 'College',
-        accessorKey: 'collegeAdmissionCollege.name',
-        cell: ({ row }) => (
-          <div className='font-medium text-gray-900'>
-            {row.original.collegeAdmissionCollege?.name || 'N/A'}
-          </div>
-        )
-      },
-      {
-        header: 'Program',
-        accessorKey: 'program.title',
-        cell: ({ row }) => (
-          <div className='text-gray-600'>
-            {row.original.program?.title || 'N/A'}
-          </div>
-        )
-      },
-      {
-        header: 'Actions',
-        id: 'actions',
-        cell: ({ row }) => (
-          <div className='flex gap-1'>
-            <Button
-              variant='ghost'
-              size='icon'
-              onClick={() => handleView(row.original.id)}
-              className='hover:bg-blue-50 text-blue-600'
-            >
-              <Eye className='w-4 h-4' />
-            </Button>
-            <Button
-              variant='ghost'
-              size='icon'
-              onClick={() => handleEdit(row.original)}
-              className='hover:bg-amber-50 text-amber-600'
-            >
-              <Edit2 className='w-4 h-4' />
-            </Button>
-            <Button
-              variant='ghost'
-              size='icon'
-              onClick={() => handleDeleteClick(row.original.id)}
-              className='hover:bg-red-50 text-red-600'
-            >
-              <Trash2 className='w-4 h-4' />
-            </Button>
-          </div>
-        )
-      }
-    ],
-    []
-  )
-
   return (
     <div className='w-full'>
       <ToastContainer />
 
-      <div className='flex flex-col mb-3 sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
-        <SearchInput
-          value={searchQuery}
-          onChange={(e) => handleSearchInput(e.target.value)}
-          placeholder='Search admissions by college or program...'
-          className='max-w-md w-full'
-        />
+      <div className='flex flex-col mb-3 sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-200'>
+        <div className='flex items-center gap-3 w-full sm:w-auto'>
+          <div className='relative w-full sm:w-64 shrink-0'>
+            <SearchInput
+              value={searchQuery}
+              onChange={(e) => handleSearchInput(e.target.value)}
+              placeholder='Search admissions...'
+              className='w-full'
+            />
+          </div>
+        </div>
+
         <Button
           onClick={handleAdd}
-          className='bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2'
+          className='bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2 w-full sm:w-auto rounded-md'
         >
           <Plus className='w-4 h-4' />
           Add Admission
         </Button>
       </div>
 
-      <div className='bg-white rounded-md shadow-sm border overflow-hidden'>
-        <Table
-          columns={columns}
-          data={admissions}
-          pagination={pagination}
-          onPageChange={(page) => loadAdmissions(page)}
-          loading={loading}
-          showSearch={false}
-        />
+      <div className='mt-2'>
+        {loading ? (
+          <div className='flex flex-col gap-3'>
+            {[...Array(6)].map((_, i) => <CardSkeleton key={i} i={i} />)}
+          </div>
+        ) : admissions.length === 0 ? (
+          <div className='bg-white border border-dashed border-gray-200 rounded-2xl py-20 text-center'>
+            <GraduationCap className='w-10 h-10 text-gray-200 mx-auto mb-3' />
+            <p className='text-gray-500 font-medium text-sm'>
+              {searchQuery ? 'No admissions match your search.' : 'No admissions found.'}
+            </p>
+          </div>
+        ) : (
+          <>
+            <p className='text-[11px] text-gray-400 px-1 mb-2 flex items-center gap-1.5'>
+              <GripVertical size={11} className='text-gray-300' />
+              Drag the grip handle to reorder · Changes save automatically
+              {saving && <span className='text-[#387cae] ml-2 animate-pulse'>Saving order...</span>}
+            </p>
+
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+              onDragCancel={handleDragCancel}
+            >
+              <SortableContext
+                items={admissions.map(a => a.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className='flex flex-col gap-3'>
+                  {admissions.map((admission) => (
+                    <SortableCard
+                      key={admission.id}
+                      admission={admission}
+                      onView={handleView}
+                      onEdit={handleEdit}
+                      onDelete={handleDeleteClick}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+
+              <DragOverlay dropAnimation={{ duration: 180, easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)' }}>
+                {activeId ? <OverlayCard admission={admissions.find(a => a.id === activeId)} /> : null}
+              </DragOverlay>
+            </DndContext>
+          </>
+        )}
       </div>
 
       <Dialog

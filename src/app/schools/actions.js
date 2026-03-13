@@ -70,7 +70,7 @@ export async function searchSchools(query, page = 1) {
       .filter((c) => c && c.fullname)
       .map((college) => ({
         name: college.fullname,
-        location: `${college.address?.city || ''}, ${college.address?.state || ''}`,
+        location: `${college.address?.city || ''}, ${college.address?.district || ''}`,
         description: college.description,
         logo: college.assets?.featuredImage,
         contactInfo: college.contactInfo,

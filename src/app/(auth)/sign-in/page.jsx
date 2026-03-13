@@ -266,7 +266,7 @@ const SignInPage = ({ defaultMode = 'login' }) => {
                     onChange={handleChange}
                     className='w-4 h-4 text-[#0A6FA7] border-gray-300 focus:ring-[#0A6FA7]'
                   />
-                  <span className='text-sm font-medium text-gray-700'>Agent</span>
+                  <span className='text-sm font-medium text-gray-700'>Partner</span>
                 </label>
               </div>
               <p className='text-[10px] text-gray-500 ml-1'>

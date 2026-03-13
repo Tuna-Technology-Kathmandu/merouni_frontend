@@ -16,8 +16,8 @@ export async function getColleges(page = 1, filters = {}) {
       queryParams.append('degree', filters.degree)
     }
 
-    if (filters.state) {
-      queryParams.append('state', filters.state)
+    if (filters.district) {
+      queryParams.append('district', filters.district)
     }
 
     if (filters.uni) {
@@ -43,7 +43,7 @@ export async function getColleges(page = 1, filters = {}) {
     return {
       colleges: data.items.map((college) => ({
         name: college.name,
-        location: `${college.address?.city || ''}, ${college.address?.state || ''}`,
+        location: `${college.address?.city || ''}, ${college.address?.district || ''}`,
         description: college.description,
         googleMapUrl: college.google_map_url,
         instituteType: college.institute_type,
@@ -100,7 +100,7 @@ export async function searchColleges(query) {
         name: clz.name,
         slug: clz.slugs,
         collegeImage: clz.featured_img,
-        location: `${clz.address.city}, ${clz.address.state}`,
+        location: `${clz.address.city}, ${clz.address.district}`,
         description: clz.description || 'No description available.',
         logo: clz.college_logo || 'default_logo.png', // Provide a fallback
         instituteType: clz.institute_type || 'Unknown',

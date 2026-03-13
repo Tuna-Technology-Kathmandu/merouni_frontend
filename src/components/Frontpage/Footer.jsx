@@ -6,80 +6,52 @@ import Link from 'next/link'
 import { FaFacebook, FaInstagram } from 'react-icons/fa6'
 import { TiSocialLinkedinCircular } from 'react-icons/ti'
 import { PiXLogoLight } from 'react-icons/pi'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, MapPin, Mail, Phone } from 'lucide-react'
 
-import { getExams, getColleges } from '@/app/action.js'
 import { getSiteConfig } from '@/app/actions/siteConfigActions'
 
 const Footer = () => {
   const [openSections, setOpenSections] = useState({})
   const [socialLinks, setSocialLinks] = useState({})
+  const [contactInfo, setContactInfo] = useState({
+    phone: '',
+    email: '',
+    address: ''
+  })
   const [sections, setSections] = useState({
-    Exams: { header: 'Top Exams', list: [] },
-    Colleges: { header: 'Colleges', list: [] },
-    Resources: { header: 'Materials', list: [] }
+    Info: {
+      header: 'Info',
+      list: [
+        { title: 'FAQs', href: '/faqs' },
+        { title: 'About Us', href: '/about-us' },
+        { title: 'Service Pricing', href: '/service-pricing' },
+        { title: 'Membership Pricing', href: '/membership-pricing' },
+        { title: 'Promote Your College and School', href: '/promote-college-school' },
+        { title: 'Advertising Policy', href: '/advertising-policy' }
+      ]
+    },
+    Materials: {
+      header: 'Materials',
+      list: [
+        { title: 'Class 11 Notes', href: '/materials?q=Class+11+Notes' },
+        { title: 'Class 12 Notes', href: '/materials?q=Class+12+Notes' },
+        { title: 'IOE Preparation', href: '/materials?q=IOE+Preparation' },
+        { title: 'CEE Preparation', href: '/materials?q=CEE+Preparation' }
+      ]
+    },
+    UsefulLinks: {
+      header: 'Useful Links',
+      list: [
+        { title: 'Short-Term Courses', href: '/short-term-courses' },
+        { title: 'Vacancies', href: '/vacancies' },
+        { title: 'Careers at MeroUni', href: '/career' }
+      ]
+    }
   })
 
   useEffect(() => {
     const fetchFooterData = async () => {
-      // 1. Fetch Exams
-      try {
-        const examsRes = await getExams(5, 1)
-        const items = examsRes?.items || examsRes || []
-        setSections(prev => ({
-          ...prev,
-          Exams: {
-            ...prev.Exams,
-            list: items.slice(0, 5).map(item => ({
-              title: item.title || item.name,
-              href: `/exam/${item.slugs || item.id}`
-            }))
-          }
-        }))
-      } catch (e) {
-        console.error('Footer: Error fetching exams:', e)
-      }
-
-      // 2. Fetch Colleges
-      try {
-        const collegesRes = await getColleges(null, null, 5, 1)
-        const items = collegesRes?.items || collegesRes || []
-        setSections(prev => ({
-          ...prev,
-          Colleges: {
-            ...prev.Colleges,
-            list: items.slice(0, 5).map(item => ({
-              title: item.name || item.title,
-              href: `/colleges/${item.slugs || item.id}`
-            }))
-          }
-        }))
-      } catch (e) {
-        console.error('Footer: Error fetching colleges:', e)
-      }
-
-      // 3. Fetch Resources (Materials)
-      try {
-        const res = await fetch(`${process.env.baseUrl}/material?page=1&limit=5`)
-        if (res.ok) {
-          const materialsRes = await res.json()
-          const items = materialsRes?.materials || materialsRes || []
-          setSections(prev => ({
-            ...prev,
-            Resources: {
-              ...prev.Resources,
-              list: items.slice(0, 5).map(item => ({
-                title: item.title || item.name,
-                href: `/materials/${item.id}`
-              }))
-            }
-          }))
-        }
-      } catch (e) {
-        console.error('Footer: Error fetching materials:', e)
-      }
-
-      // 4. Fetch Social Links
+      // 1. Fetch Social Links
       try {
         const socialRes = await getSiteConfig({ types: 'social_facebook,social_instagram,social_linkedin,social_twitter' })
         const socials = {}
@@ -91,6 +63,22 @@ const Footer = () => {
         }
       } catch (e) {
         console.error('Footer: Error fetching social links:', e)
+      }
+
+      // 2. Fetch Contact Info
+      try {
+        const contactRes = await getSiteConfig({ types: 'contact_phone,contact_email,contact_address' })
+        if (contactRes?.items) {
+          const info = {}
+          contactRes.items.forEach(item => {
+            if (item.type === 'contact_phone') info.phone = item.value
+            if (item.type === 'contact_email') info.email = item.value
+            if (item.type === 'contact_address') info.address = item.value
+          })
+          setContactInfo(prev => ({ ...prev, ...info }))
+        }
+      } catch (e) {
+        console.error('Footer: Error fetching contact info:', e)
       }
     }
     fetchFooterData()
@@ -109,7 +97,7 @@ const Footer = () => {
     <footer className='bg-gray-50 border-t border-gray-200/80'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-10 md:py-12'>
         {/* Links grid - desktop */}
-        <div className='hidden md:grid grid-cols-3 gap-8 lg:gap-12 pb-10 border-b border-gray-200/80'>
+        <div className='hidden md:grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 pb-10 border-b border-gray-200/80'>
           {Object.entries(sections).map(([key, section]) => (
             <div key={key}>
               <h3 className={headingClass}>{section.header}</h3>
@@ -124,6 +112,31 @@ const Footer = () => {
               </ul>
             </div>
           ))}
+
+          {/* Contact Us Column */}
+          <div>
+            <h3 className={headingClass}>Contact Us</h3>
+            <ul className='space-y-4'>
+              <li className='flex items-start gap-3'>
+                <MapPin className='w-5 h-5 text-[#387cae] shrink-0 mt-0.5' />
+                <span className='text-sm text-gray-600'>
+                  {contactInfo.address || 'Putalisadak, Kathmandu'}
+                </span>
+              </li>
+              <li className='flex items-center gap-3'>
+                <Phone className='w-5 h-5 text-[#387cae] shrink-0' />
+                <a href={`tel:${contactInfo.phone || '+9779840747576'}`} className={linkClass}>
+                  {contactInfo.phone || '+977 9840747576'}
+                </a>
+              </li>
+              <li className='flex items-center gap-3'>
+                <Mail className='w-5 h-5 text-[#387cae] shrink-0' />
+                <a href={`mailto:${contactInfo.email || 'info@merouni.com'}`} className={linkClass}>
+                  {contactInfo.email || 'info@merouni.com'}
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
         {/* Links accordion - mobile */}
@@ -145,7 +158,7 @@ const Footer = () => {
                 />
               </button>
               {openSections[index] && (
-                <ul className='space-y-2 pb-4'>
+                <ul className='space-y-3 pb-4'>
                   {section.list.map((item, i) => (
                     <li key={i}>
                       <Link
@@ -161,6 +174,43 @@ const Footer = () => {
               )}
             </div>
           ))}
+
+          {/* Contact Us Accordion */}
+          <div className='border-b border-gray-200/80 last:border-b-0'>
+            <button
+              type='button'
+              onClick={() => toggleSection('contact')}
+              className='w-full flex items-center justify-between py-4 text-left'
+              aria-expanded={openSections['contact']}
+            >
+              <span className={headingClass + ' mb-0'}>Contact Us</span>
+              <ChevronDown
+                className={`w-4 h-4 text-gray-500 transition-transform ${openSections['contact'] ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {openSections['contact'] && (
+              <ul className='space-y-4 pb-4'>
+                <li className='flex items-start gap-3'>
+                  <MapPin className='w-4 h-4 text-[#387cae] shrink-0 mt-0.5' />
+                  <span className='text-sm text-gray-600'>
+                    {contactInfo.address || 'Putalisadak, Kathmandu'}
+                  </span>
+                </li>
+                <li className='flex items-center gap-3'>
+                  <Phone className='w-4 h-4 text-[#387cae] shrink-0' />
+                  <a href={`tel:${contactInfo.phone || '+9779840747576'}`} className={linkClass}>
+                    {contactInfo.phone || '+977 9840747576'}
+                  </a>
+                </li>
+                <li className='flex items-center gap-3'>
+                  <Mail className='w-4 h-4 text-[#387cae] shrink-0' />
+                  <a href={`mailto:${contactInfo.email || 'info@merouni.com'}`} className={linkClass}>
+                    {contactInfo.email || 'info@merouni.com'}
+                  </a>
+                </li>
+              </ul>
+            )}
+          </div>
         </div>
 
         {/* Bottom: logo, socials, legal, copyright */}

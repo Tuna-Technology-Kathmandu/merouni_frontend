@@ -35,7 +35,7 @@ const RelatedColleges = ({ college }) => {
         const collegesData =
           data.items?.map((collegeItem) => ({
             name: collegeItem.name,
-            location: `${collegeItem.address?.city || ''}, ${collegeItem.address?.state || ''}`,
+            location: `${collegeItem.address?.city || ''}, ${collegeItem.address?.district || ''}`,
             description: collegeItem.description,
             googleMapUrl: collegeItem.google_map_url,
             instituteType: collegeItem.institute_type,

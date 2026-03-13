@@ -24,7 +24,7 @@ const Fcollege = ({ name, description, image, slug }) => {
         </div>
         <div className='absolute bottom-3 left-3 flex items-center gap-1.5 text-white text-xs font-medium bg-black/20 backdrop-blur-md px-2 py-1 rounded-md'>
           <MapPin className='w-3.5 h-3.5' />
-          <span>{description?.state || 'Nepal'}</span>
+          <span>{description?.district || 'Nepal'}</span>
         </div>
       </div>
 

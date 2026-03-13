@@ -97,6 +97,27 @@ export async function deleteAdmission(id) {
   }
 }
 
+export async function updateAdmissionOrder(data) {
+  try {
+    const response = await authFetch(`${process.env.baseUrl}/college/admission/update-order`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ admissions: data })
+    })
+
+    const responseData = await response.json()
+    if (!response.ok) {
+      throw new Error(responseData.error || 'Failed to update order')
+    }
+    return responseData
+  } catch (error) {
+    console.error('Error updating admission order:', error)
+    throw error
+  }
+}
+
 export async function fetchColleges(searchQuery = '') {
   try {
     const response = await authFetch(`${process.env.baseUrl}/college?limit=100&q=${encodeURIComponent(searchQuery)}`)

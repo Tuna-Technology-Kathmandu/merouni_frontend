@@ -42,6 +42,7 @@ export default function CategoryManager() {
   const [isViewOpen, setIsViewOpen] = useState(false)
   const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, total: 0 })
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedType, setSelectedType] = useState('')
   const [searchTimeout, setSearchTimeout] = useState(null)
 
   useEffect(() => {
@@ -51,13 +52,17 @@ export default function CategoryManager() {
   }, [setHeading])
 
   useEffect(() => {
+    loadCategories(1)
+  }, [selectedType])
+
+  useEffect(() => {
     return () => { if (searchTimeout) clearTimeout(searchTimeout) }
   }, [searchTimeout])
 
   const loadCategories = async (page = 1) => {
     try {
       setTableLoading(true)
-      const response = await fetchCategories(page)
+      const response = await fetchCategories(page, 10, selectedType)
       setCategories(response.items)
       console.log(response, "responseresponse")
       setPagination({
@@ -209,8 +214,31 @@ export default function CategoryManager() {
       {/* Header */}
       <div className='sticky top-0 z-30 bg-[#F7F8FA] py-4'>
         <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-md shadow-sm border'>
-          <SearchInput value={searchQuery} onChange={(e) => handleSearchInput(e.target.value)} placeholder='Search categories...' className='max-w-md w-full' />
-          <Button onClick={handleAddClick} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2">
+          <div className="flex flex-col sm:flex-row gap-3 w-full items-start sm:items-center">
+            <SearchInput value={searchQuery} onChange={(e) => handleSearchInput(e.target.value)} placeholder='Search categories...' className='max-w-md w-full' />
+
+            <select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+              className="h-10 px-3 pr-8 rounded-md border border-gray-200 bg-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#387cae]/20 transition-all appearance-none cursor-pointer"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 0.75rem center',
+                backgroundSize: '1rem'
+              }}
+            >
+              <option value="">All Types</option>
+              <option value="BLOG">Blog</option>
+              <option value="EVENT">Event</option>
+              <option value="NEWS">News</option>
+              <option value="MATERIAL">Material</option>
+              <option value="SCHOLARSHIP">Scholarship</option>
+              <option value="EXAM">Exam</option>
+            </select>
+          </div>
+
+          <Button onClick={handleAddClick} className="bg-[#387cae] hover:bg-[#387cae]/90 text-white gap-2 shrink-0">
             <Plus className="w-4 h-4" /> Add Category
           </Button>
         </div>
@@ -323,7 +351,7 @@ export default function CategoryManager() {
               </div>
               <div className="p-3 bg-gray-50 rounded-md border border-gray-100">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-0.5">Updated</p>
-                <p className="text-sm text-gray-600">{formatDate(viewingCategory?.updatedAt) }</p>
+                <p className="text-sm text-gray-600">{formatDate(viewingCategory?.updatedAt)}</p>
               </div>
             </div>
           </div>
