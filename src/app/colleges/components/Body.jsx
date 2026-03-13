@@ -19,19 +19,16 @@ import { DistrictLists } from '@/constants/district'
 // Client-side fetch functions
 const fetchCollegesFromAPI = async (page = 1, filters = {}) => {
   try {
-    const queryParams = new URLSearchParams({
-      page: page.toString(),
-      limit: '24'
-    })
-
     const body = {
+      page,
+      limit: 24,
       degree_ids: filters.degree || [],
       state: filters.state || [],
       university: filters.uni || [],
       type: filters.type || []
     }
 
-    const url = `${process.env.baseUrl}/college/filter?${queryParams.toString()}`
+    const url = `${process.env.baseUrl}/college/filter`
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
